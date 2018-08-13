@@ -16,6 +16,17 @@ class selection {
 
 private:
 
+/// ++++++++++++
+// Krishan
+/// ++++++++++++
+// Create a TTree to save some useful variables to. 
+TFile *hfile = new TFile("KrishTree.root","RECREATE");
+TTree *KrishTree = new TTree("KrishTree", "KrishTree");
+
+
+/// ++++++++++++
+/// ++++++++++++
+
 //newest values (July 2018):
 // Run1 On-Beam Data:
 // 3.22250e20 POT (tor101_wcut)
