@@ -1103,7 +1103,9 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 	
 	// Get the variation name by stripping the input file name -- HARDCODED
 	// Required format "files/filter_<NAME>.root"
-	dirname.erase(0,13); // - "files/filter_"
+	std::string file_path = "/uboone/data/users/kmistry/work/NueXSection_Outputs/detector_variations/";
+	int file_path_size = file_path.length();
+	dirname.erase(0,file_path_size); // - "files/filter_"
 	dirname.erase(dirname.end()-5, dirname.end()); // - ".root"
 
 	std::cout << "dirname:\t" << dirname << std::endl;

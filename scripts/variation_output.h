@@ -29,6 +29,7 @@
 #include "TPad.h"
 #include "TString.h"
 #include "TStyle.h"
+#include "TKey.h"
 
 // C++ includes
 #include <iostream>
