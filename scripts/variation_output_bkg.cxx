@@ -104,7 +104,6 @@ void variation_output_bkg::DrawTH1D(TH1D* h, double POT_Scaling){
 //***************************************************************************
 //***************************************************************************
 void variation_output_bkg::DrawTH1D_SAME(TH1D* hist, std::string variation, TLegend* legend, std::string histname){
-
 	
 	// ----------------------
 	//    Axis Specifiers
@@ -226,35 +225,35 @@ void variation_output_bkg::DrawTH1D_SAME(TH1D* hist, std::string variation, TLeg
 	// ----------------------
 	//    Draw Specifiers
 	// ----------------------
-	if (variation == "CV"){
+	if (variation == "BNBCV" || varition == "NuMICV"){
 	hist->SetLineColor(kBlack);
 	hist->SetLineWidth(2);
 	hist->SetLineStyle(1);
 	legend->AddEntry(hist, "CV", "l");
 	hist->Draw("hist,same");
 	} 
-	else if  (variation == "withDIC"){
+	else if  (variation == "BNBwithDIC" || varition == "NuMIwithDIC"){
 		hist->SetLineColor(kMagenta+2);
 		hist->SetLineWidth(2);
 		hist->SetLineStyle(1);
 		legend->AddEntry(hist, "DIC", "l");
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "EnhancedTPCVis" ){ 
+	else if  (variation == "BNBEnhancedTPCVis" || varition == "NuMIEnhancedTPCVis" ){ 
 		hist->SetLineColor(30);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "Enhanced TPC Vis.", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "altDeadChannels"){ 
+	else if  (variation == "BNBaltDeadChannels" || varition == "NuMIaltDeadChannels"){ 
 		hist->SetLineColor(38);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "Alt. Dead Chan.", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "deadSaturatedChannels"){
+	else if  (variation == "BNBdeadSaturatedChannels" || varition == "NuMIdeadSaturatedChannels"){
 		hist->SetLineColor(28);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "Dead Sat. Chan.", "l");
@@ -262,98 +261,101 @@ void variation_output_bkg::DrawTH1D_SAME(TH1D* hist, std::string variation, TLeg
 		hist->Draw("hist,same");
 		
 	}
-	else if  (variation == "stretchResp" ){
+	else if  (variation == "BNBstretchResp" || varition == "NuMIstretchResp" ){
 		hist->SetLineColor(36);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "Stretch Resp.", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "squeezeResp"){
+	else if  (variation == "BNBsqueezeResp" || varition == "NUMIsqueezeResp"){
 		hist->SetLineColor(1001);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "Squeeze Resp.", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "upPEnoise"){
+	else if  (variation == "BNBupPEnoise" || varition == "NuMIupPEnoise"){
 		hist->SetLineColor(kBlue+1);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "PE Noise Up", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "noiseAmpDown"){
+	else if  (variation == "BNBnoiseAmpDown" || varition == "NUMInoiseAmpDown"){
 		hist->SetLineColor(42);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "Noise Amp. Down", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "downPEnoise"){
+	else if  (variation == "BNBdownPEnoise" || varition == "NUMIdownPEnoise"){
 		hist->SetLineColor(50);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "PE Noise Down", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "noiseAmpUp"){
+	else if  (variation == "BNBnoiseAmpUp" || varition == "NUMInoiseAmpUp"){
 		hist->SetLineColor(kOrange+10);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "Noise Amp. Up", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "DTdown"){
+	else if  (variation == "BNBDTdown" || varition == "NUMIDTdown"){
 		hist->SetLineColor(kOrange+1);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "DT Down", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "DTup"){
+	else if  (variation == "BNBDTup" || varition == "NUMIDTup"){
 		hist->SetLineColor(kMagenta-10);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "DT Up", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "DLup"){
+	else if  (variation == "BNBDLup" || varition == "NUMIDLup"){
 		hist->SetLineColor(kMagenta);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "DL Up", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "DLdown"){
+	else if  (variation == "BNBDLdown" || varition == "NUMIDLdown"){
 		hist->SetLineColor(kTeal+6);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "DL Down", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "dataSCE"){
+	else if  (variation == "BNBdataSCE" || varition == "NUMIdataSCE"){
 		hist->SetLineColor(kYellow);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "SCE", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "LArG4BugFix"){
+	else if  (variation == "BNBLArG4BugFix" || varition == "NUMILArG4BugFix"){
 		hist->SetLineColor(kSpring-7);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "LArG4BugFix", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-    else if  (variation == "BirksRecomb"){
+    else if  (variation == "BNBBirksRecomb" || varition == "NUMIBirksRecomb"){
         hist->SetLineColor(kRed+1);
         hist->SetLineWidth(2);
         legend->AddEntry(hist, "Birks Recomb.","l");
         hist->SetLineStyle(1);
         hist->Draw("hist,same");
     }
-	else return;
+	else {
+		std::cout << "Error! Could not match varations:\t" << variation << std::endl;
+		return;
+	}
 }
 //***************************************************************************
 //***************************************************************************
@@ -917,7 +919,7 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 		if(mc_nu_id == 7) mc_nue_nc_counter_bar++;
 		
 		// Filter for truth Nues
-		if (mc_nu_id == 2 || mc_nu_id == 4 || mc_nu_id == 6 || mc_nu_id == 8) continue;
+		// if (mc_nu_id == 2 || mc_nu_id == 4 || mc_nu_id == 6 || mc_nu_id == 8) continue;
 
 		// --------------- Flash Information ---------------
 		std::vector<double> largest_flash_v 	= largest_flash_v_v.at(event); // Vec with the largest flash
@@ -997,64 +999,65 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 				const double pfp_Nu_vtx_Dist =  pfp_vtx_distance(tpc_obj_vtx_x, tpc_obj_vtx_y, tpc_obj_vtx_z, pfp_vtx_x, pfp_vtx_y, pfp_vtx_z);
 				
 				// CC && BeamNu 
-				if( pfp_obj.CCNC() == 0 && mc_origin == "kBeamNeutrino") {
+				// if( pfp_obj.CCNC() == 0 && mc_origin == "kBeamNeutrino") {
 					
 					// Electron (Shower like) && (Nue || Nuebar)
-					if ( pfp_pdg == 11 && (mc_parent_pdg == 12 || mc_parent_pdg == -12) ) {
+					// if ( pfp_pdg == 11 && (mc_parent_pdg == 12 || mc_parent_pdg == -12) ) {
+					if ( pfp_pdg == 11  ) {
 						nue_cc_counter++;
 
-						// Background event
+						// Background events
 						if (!bool_sig) {
+
+							// std::cout << tpc_classification.first << std::endl;
+
 							bkg_counter++;
+							h_total_hits->Fill(num_pfp_hits);
+
+							const double shower_phi = atan2(pfp_obj.pfpDirY(), pfp_obj.pfpDirX()) * 180 / 3.1415;
+							h_shower_phi->Fill(shower_phi);
+
+							h_shower_Nu_vtx_Dist->Fill(pfp_Nu_vtx_Dist);
+
+							//  ------------ Leading shower ------------
+							if (j == leading_shower_index){
+								const double leading_shower_phi 	= atan2(pfp_obj.pfpDirY(), pfp_obj.pfpDirX()) * 180 / 3.1415;
+								const double leading_shower_theta 	= acos(pfp_obj.pfpDirZ()) * 180 / 3.1415;
+								
+								const double leading_shower_length 	= pfp_obj.pfpLength();
+								const double lonest_track_length 	= GetLongestTrackLength(n_pfp, n_tpc_obj, tpc_obj);
+
+								h_ldg_shwr_hits			->Fill(num_pfp_hits);
+								h_ldg_shwr_hits_WPlane	->Fill(pfp_obj.NumPFPHitsW()); 		// W Plane
+								h_ldg_shwr_Open_Angle	->Fill(pfp_obj.pfpOpenAngle() * (180 / 3.1415) );
+								h_ldg_shwr_dEdx_WPlane	->Fill(pfp_obj.PfpdEdx().at(2) ); 	// W Plane
+								h_ldg_shwr_HitPerLen	->Fill(num_pfp_hits / pfp_obj.pfpLength() );
+								h_ldg_shwr_Phi			->Fill(leading_shower_phi);
+								h_ldg_shwr_Theta		->Fill(leading_shower_theta);
+								h_ldg_shwr_CTheta		->Fill(cos(leading_shower_theta * 3.1414 / 180.));
+								h_long_Track_ldg_shwr	->Fill(lonest_track_length / leading_shower_length);
+
+								// Vertex Information - require a shower so fill once  when leading shower
+								h_tpc_obj_vtx_x->Fill(tpc_obj_vtx_x);
+								h_tpc_obj_vtx_y->Fill(tpc_obj_vtx_y);
+								h_tpc_obj_vtx_z->Fill(tpc_obj_vtx_z);
+							}
+						
 						}
 						// Signal event
 						else sig_counter++;
-
-						h_total_hits->Fill(num_pfp_hits);
-
-						const double shower_phi = atan2(pfp_obj.pfpDirY(), pfp_obj.pfpDirX()) * 180 / 3.1415;
-						h_shower_phi->Fill(shower_phi);
-
-						h_shower_Nu_vtx_Dist->Fill(pfp_Nu_vtx_Dist);
-
-						//  ------------ Leading shower ------------
-						if (j == leading_shower_index){
-							const double leading_shower_phi 	= atan2(pfp_obj.pfpDirY(), pfp_obj.pfpDirX()) * 180 / 3.1415;
-							const double leading_shower_theta 	= acos(pfp_obj.pfpDirZ()) * 180 / 3.1415;
-							
-							const double leading_shower_length 	= pfp_obj.pfpLength();
-							const double lonest_track_length 	= GetLongestTrackLength(n_pfp, n_tpc_obj, tpc_obj);
-
-							h_ldg_shwr_hits			->Fill(num_pfp_hits);
-							h_ldg_shwr_hits_WPlane	->Fill(pfp_obj.NumPFPHitsW()); 		// W Plane
-							h_ldg_shwr_Open_Angle	->Fill(pfp_obj.pfpOpenAngle() * (180 / 3.1415) );
-							h_ldg_shwr_dEdx_WPlane	->Fill(pfp_obj.PfpdEdx().at(2) ); 	// W Plane
-							h_ldg_shwr_HitPerLen	->Fill(num_pfp_hits / pfp_obj.pfpLength() );
-							h_ldg_shwr_Phi			->Fill(leading_shower_phi);
-							h_ldg_shwr_Theta		->Fill(leading_shower_theta);
-							h_ldg_shwr_CTheta		->Fill(cos(leading_shower_theta * 3.1414 / 180.));
-							h_long_Track_ldg_shwr	->Fill(lonest_track_length / leading_shower_length);
-
-							// Vertex Information - require a shower so fill once  when leading shower
-							h_tpc_obj_vtx_x->Fill(tpc_obj_vtx_x);
-							h_tpc_obj_vtx_y->Fill(tpc_obj_vtx_y);
-							h_tpc_obj_vtx_z->Fill(tpc_obj_vtx_z);
-						}
-						
 					}
 					// Track like && (Nue || Nuebar)
 					if ( pfp_pdg == 13 && (mc_parent_pdg == 12 || mc_parent_pdg == -12) ) {
-						const double track_phi 	= atan2(pfp_obj.pfpDirY(), pfp_obj.pfpDirX()) * 180 / 3.1415;
-						h_track_phi->Fill(track_phi);
-						h_track_Nu_vtx_Dist->Fill(pfp_Nu_vtx_Dist);
+						// Background events
+						if (!bool_sig) {
+							const double track_phi 	= atan2(pfp_obj.pfpDirY(), pfp_obj.pfpDirX()) * 180 / 3.1415;
+							h_track_phi->Fill(track_phi);
+							h_track_Nu_vtx_Dist->Fill(pfp_Nu_vtx_Dist);
+						}
 					}
 					
-				}
-				// Anything not CC or beam origin
-				else {
-					other_counter++;
-				}
-				
+				// }
 
 			} // END LOOP PAR OBJ
 
@@ -1072,12 +1075,9 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 	std::cout << "---------------------------------------------------" << std::endl;
 	std::cout << "--------------- Reco COUNTERS ---------------------" << std::endl;
 	std::cout << "(Requiring shower like and (nue/nuebar or numu/numubar))" << std::endl;
-	std::cout << "RECO Nue CC Counter      --- " << nue_cc_counter << std::endl;
-	std::cout << "RECO Numu CC Counter     --- " << numu_cc_counter << std::endl;
-	std::cout << "RECO Other Counter       --- " << other_counter << std::endl;
-	std::cout << "---------------------------------------------------" << std::endl;
-	std::cout << "RECO Signal Counter      --- " << sig_counter << std::endl;
-	std::cout << "RECO Background Counter  --- " << bkg_counter << std::endl;
+	std::cout << "RECO Nue CC Counter (Tot) --- " << nue_cc_counter << std::endl;
+	std::cout << "RECO Signal Counter       --- " << sig_counter << std::endl;
+	std::cout << "RECO Background Counter   --- " << bkg_counter << std::endl;
 	std::cout << "---------------------------------------------------" << std::endl;
 	
 	// ----------------------
@@ -1093,7 +1093,7 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 	// Required format "files/filter_<NAME>.root"
 	std::string file_path = "/uboone/data/users/kmistry/work/NueXSection_Outputs/detector_variations/";
 	int file_path_size = file_path.length();
-	dirname.erase(0,file_path_size); // - "files/filter_"
+	dirname.erase(0,file_path_size+7); // - "files/filter_"
 	dirname.erase(dirname.end()-5, dirname.end()); // - ".root"
 
 	std::cout << "dirname:\t" << dirname << std::endl;
