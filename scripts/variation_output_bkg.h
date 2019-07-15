@@ -210,7 +210,7 @@ class variation_output_bkg {
 	// ----------------------
 	//      Other
 	// ----------------------
-	TFile * f_var_out = new TFile("plots/variation_out_bkg.root","UPDATE");
+	TFile * f_var_out;
 	bool PlotVar{false};
 
 	double largest_flash_y{0};

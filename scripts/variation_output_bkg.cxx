@@ -809,6 +809,13 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 
 	gStyle->SetOptStat(0); // say no to stats box
 
+	// Choose while file 
+	if (mode == "bnb")
+		f_var_out = new TFile("plots/variation_out_bnb_bkg.root","UPDATE");
+	else if (mode == "numi")
+		f_var_out = new TFile("plots/variation_out_numi_bkg.root","UPDATE");
+	else f_var_out = new TFile("plots/variation_out_bnb_bkg.root","UPDATE");
+
 	//*************************** Configure the cut parameters *************************************
 	std::cout << "\n --- Configuring Parameters --- \n" << std::endl;
 	_x1 = _config[0];
@@ -824,13 +831,16 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 		flash_time_start = 3.57; // Manually Override for BNB [us]
 		flash_time_end   = 5.25; // Manually Override for BNB [us]
 	}
-	else if (mode = "numi") {
+	else if (mode == "numi") {
 		std::cout << "Using NuMI Params" << std::endl;
 		flash_time_start = _config[7]; // Use default numi config
 		flash_time_end   = _config[8]; // Use default numi config
 	}
+	else if (mode == "same"){
+		std::cout << "Forget about the configs, we are going to make some plots!" << std::endl;
+	}
 	else {
-		std::cout << "Using default numi flash config, if using same option then this doesnt matter"<< std::endl;
+		std::cout << "Using default numi flash config since no match could be made"<< std::endl;
 		flash_time_start = _config[7]; // Use default numi config
 		flash_time_end   = _config[8]; // Use default numi config
 	}
