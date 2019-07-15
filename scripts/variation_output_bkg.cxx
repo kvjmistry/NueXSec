@@ -916,11 +916,8 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 		if(mc_nu_id == 5) mc_nue_cc_counter_bar++;
 		if(mc_nu_id == 7) mc_nue_nc_counter_bar++;
 		
-		if(mc_nu_id == 2) mc_numu_cc_counter++;
-		if(mc_nu_id == 4) mc_numu_nc_counter++;
-		if(mc_nu_id == 6) mc_numu_cc_counter_bar++;
-		if(mc_nu_id == 8) mc_numu_nc_counter_bar++;
-
+		// Filter for truth Nues
+		if (mc_nu_id == 2 || mc_nu_id == 4 || mc_nu_id == 6 || mc_nu_id == 8) continue;
 
 		// --------------- Flash Information ---------------
 		std::vector<double> largest_flash_v 	= largest_flash_v_v.at(event); // Vec with the largest flash
@@ -953,13 +950,8 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 			bool bool_sig{false}; 
 			for (unsigned int k=0; k < signal_modes.size(); k++){
 				if (signal_modes.at(k).find(tpc_classification.first) != std::string::npos) {
-					sig_counter++;
 					bool_sig = true;
 				}
-			}
-			// Background event
-			if (!bool_sig) {
-				bkg_counter++;
 			}
 
 			// TPC Obj vars
@@ -983,9 +975,6 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 
 			const double Flash_TPCObj_Dist = Flash_TPCObj_vtx_Dist(tpc_obj_vtx_y, tpc_obj_vtx_z, largest_flash_y, largest_flash_z);
 			h_Flash_TPCObj_Dist->Fill(Flash_TPCObj_Dist);
-
-
-
 
 			// Loop over the Par Objects
 			for (int j = 0; j < n_pfp ; j++){
@@ -1013,6 +1002,14 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 					// Electron (Shower like) && (Nue || Nuebar)
 					if ( pfp_pdg == 11 && (mc_parent_pdg == 12 || mc_parent_pdg == -12) ) {
 						nue_cc_counter++;
+
+						// Background event
+						if (!bool_sig) {
+							bkg_counter++;
+						}
+						// Signal event
+						else sig_counter++;
+
 						h_total_hits->Fill(num_pfp_hits);
 
 						const double shower_phi = atan2(pfp_obj.pfpDirY(), pfp_obj.pfpDirX()) * 180 / 3.1415;
@@ -1045,11 +1042,6 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 						}
 						
 					}
-					// Electron (Shower like) && (Numu || Numubar)
-					else if (pfp_pdg == 11 && (mc_parent_pdg == 14 || mc_parent_pdg == -14)){
-						numu_cc_counter++;
-					}
-
 					// Track like && (Nue || Nuebar)
 					if ( pfp_pdg == 13 && (mc_parent_pdg == 12 || mc_parent_pdg == -12) ) {
 						const double track_phi 	= atan2(pfp_obj.pfpDirY(), pfp_obj.pfpDirX()) * 180 / 3.1415;
@@ -1077,10 +1069,6 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 	std::cout << "MC Nue NC Counter      --- " << mc_nue_nc_counter << std::endl;
 	std::cout << "MC Nue CC Counter Bar  --- " << mc_nue_cc_counter_bar << std::endl;
 	std::cout << "MC Nue NC Counter Bar  --- " << mc_nue_nc_counter_bar << std::endl;
-	std::cout << "MC Numu CC Counter     --- " << mc_numu_cc_counter << std::endl;
-	std::cout << "MC Numu NC Counter     --- " << mc_numu_nc_counter << std::endl;
-	std::cout << "MC Numu CC Counter Bar --- " << mc_numu_cc_counter_bar << std::endl;
-	std::cout << "MC Numu NC Counter Bar --- " << mc_numu_nc_counter_bar << std::endl;
 	std::cout << "---------------------------------------------------" << std::endl;
 	std::cout << "--------------- Reco COUNTERS ---------------------" << std::endl;
 	std::cout << "(Requiring shower like and (nue/nuebar or numu/numubar))" << std::endl;

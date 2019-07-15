@@ -95,7 +95,6 @@ class variation_output_bkg {
 	int n_showers_50Hits{0};		// Number of showers in TPC Obj with > 50 Hits
 	double track_phi{0};			// Track Phi
 	int nue_cc_counter{0};			// Number of reco nue + nuebar
-	int numu_cc_counter{0};			// Number of reco numu + numubar
 	int other_counter{0};			// Counter for not numu/nue
 	int sig_counter{0};				// Number reco signal events
 	int bkg_counter{0};				// Number reco background events
@@ -136,12 +135,8 @@ class variation_output_bkg {
 	// ----------------------
 	int mc_nue_cc_counter = 0;
 	int mc_nue_nc_counter = 0;
-	int mc_numu_cc_counter = 0;
-	int mc_numu_nc_counter = 0;
 	int mc_nue_cc_counter_bar = 0;
-	int mc_numu_cc_counter_bar = 0;
 	int mc_nue_nc_counter_bar = 0;
-	int mc_numu_nc_counter_bar = 0;
 	
 	double mc_nu_energy = 0;
 	int mc_nu_id = -1;
