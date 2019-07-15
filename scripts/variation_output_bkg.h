@@ -69,7 +69,7 @@ class variation_output_bkg {
 	std::pair<std::string, int> TPCO_Classifier(xsecAna::TPCObjectContainer tpc_obj, bool true_in_tpc, bool has_pi0);
 
 	// Flash Functions
-	std::vector<std::vector<double>> GetLargestFlashVector(TFile* f); 				// Function to resize opical entries to same size of events and get largest flash vector
+	std::vector<std::vector<double>> GetLargestFlashVector(TFile* f, double flash_time_start, double flash_time_end); 				// Function to resize opical entries to same size of events and get largest flash vector
 	bool flash_in_time(double flash_time, double flash_start, double flash_end); 	// Decides whether flash is in time or not
 	bool flash_pe(int flash_pe, int flash_pe_threshold); 							// Decides whether flash has sufficient PE
 	double Flash_TPCObj_vtx_Dist(double tpc_vtx_y, double tpc_vtx_z, double flash_vtx_y, double flash_vtx_z); // Returns the 2D distance of the flash to TPC OBj Vertex

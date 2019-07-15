@@ -225,35 +225,35 @@ void variation_output_bkg::DrawTH1D_SAME(TH1D* hist, std::string variation, TLeg
 	// ----------------------
 	//    Draw Specifiers
 	// ----------------------
-	if (variation == "BNBCV" || varition == "NuMICV"){
-	hist->SetLineColor(kBlack);
-	hist->SetLineWidth(2);
-	hist->SetLineStyle(1);
-	legend->AddEntry(hist, "CV", "l");
-	hist->Draw("hist,same");
+	if (variation == "BNBCV" || variation == "NuMICV"){
+		hist->SetLineColor(kBlack);
+		hist->SetLineWidth(2);
+		hist->SetLineStyle(1);
+		legend->AddEntry(hist, "CV", "l");
+		hist->Draw("hist,same");
 	} 
-	else if  (variation == "BNBwithDIC" || varition == "NuMIwithDIC"){
+	else if  (variation == "BNBwithDIC"         || variation == "NuMIwithDIC"){
 		hist->SetLineColor(kMagenta+2);
 		hist->SetLineWidth(2);
 		hist->SetLineStyle(1);
 		legend->AddEntry(hist, "DIC", "l");
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "BNBEnhancedTPCVis" || varition == "NuMIEnhancedTPCVis" ){ 
+	else if  (variation == "BNBEnhancedTPCVis"  || variation == "NuMIEnhancedTPCVis" ){ 
 		hist->SetLineColor(30);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "Enhanced TPC Vis.", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "BNBaltDeadChannels" || varition == "NuMIaltDeadChannels"){ 
+	else if  (variation == "BNBaltDeadChannels" || variation == "NuMIaltDeadChannels"){ 
 		hist->SetLineColor(38);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "Alt. Dead Chan.", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "BNBdeadSaturatedChannels" || varition == "NuMIdeadSaturatedChannels"){
+	else if  (variation == "BNBdeadSaturatedChannels" || variation == "NuMIdeadSaturatedChannels"){
 		hist->SetLineColor(28);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "Dead Sat. Chan.", "l");
@@ -261,91 +261,91 @@ void variation_output_bkg::DrawTH1D_SAME(TH1D* hist, std::string variation, TLeg
 		hist->Draw("hist,same");
 		
 	}
-	else if  (variation == "BNBstretchResp" || varition == "NuMIstretchResp" ){
+	else if  (variation == "BNBstretchResp"  || variation == "NuMIstretchResp" ){
 		hist->SetLineColor(36);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "Stretch Resp.", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "BNBsqueezeResp" || varition == "NUMIsqueezeResp"){
+	else if  (variation == "BNBsqueezeResp"  || variation == "NUMIsqueezeResp"){
 		hist->SetLineColor(1001);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "Squeeze Resp.", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "BNBupPEnoise" || varition == "NuMIupPEnoise"){
+	else if  (variation == "BNBupPEnoise"    || variation == "NuMIupPEnoise"){
 		hist->SetLineColor(kBlue+1);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "PE Noise Up", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "BNBnoiseAmpDown" || varition == "NUMInoiseAmpDown"){
+	else if  (variation == "BNBnoiseAmpDown" || variation == "NUMInoiseAmpDown"){
 		hist->SetLineColor(42);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "Noise Amp. Down", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "BNBdownPEnoise" || varition == "NUMIdownPEnoise"){
+	else if  (variation == "BNBdownPEnoise"  || variation == "NUMIdownPEnoise"){
 		hist->SetLineColor(50);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "PE Noise Down", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "BNBnoiseAmpUp" || varition == "NUMInoiseAmpUp"){
+	else if  (variation == "BNBnoiseAmpUp"   || variation == "NUMInoiseAmpUp"){
 		hist->SetLineColor(kOrange+10);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "Noise Amp. Up", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "BNBDTdown" || varition == "NUMIDTdown"){
+	else if  (variation == "BNBDTdown"       || variation == "NUMIDTdown"){
 		hist->SetLineColor(kOrange+1);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "DT Down", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "BNBDTup" || varition == "NUMIDTup"){
+	else if  (variation == "BNBDTup"         || variation == "NUMIDTup"){
 		hist->SetLineColor(kMagenta-10);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "DT Up", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "BNBDLup" || varition == "NUMIDLup"){
+	else if  (variation == "BNBDLup"         || variation == "NUMIDLup"){
 		hist->SetLineColor(kMagenta);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "DL Up", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "BNBDLdown" || varition == "NUMIDLdown"){
+	else if  (variation == "BNBDLdown"       || variation == "NUMIDLdown"){
 		hist->SetLineColor(kTeal+6);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "DL Down", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "BNBdataSCE" || varition == "NUMIdataSCE"){
+	else if  (variation == "BNBdataSCE"      || variation == "NUMIdataSCE"){
 		hist->SetLineColor(kYellow);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "SCE", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-	else if  (variation == "BNBLArG4BugFix" || varition == "NUMILArG4BugFix"){
+	else if  (variation == "BNBLArG4BugFix"  || variation == "NUMILArG4BugFix"){
 		hist->SetLineColor(kSpring-7);
 		hist->SetLineWidth(2);
 		legend->AddEntry(hist, "LArG4BugFix", "l");
 		hist->SetLineStyle(1);
 		hist->Draw("hist,same");
 	}
-    else if  (variation == "BNBBirksRecomb" || varition == "NUMIBirksRecomb"){
+    else if  (variation == "BNBBirksRecomb"  || variation == "NUMIBirksRecomb"){
         hist->SetLineColor(kRed+1);
         hist->SetLineWidth(2);
         legend->AddEntry(hist, "Birks Recomb.","l");
@@ -498,7 +498,7 @@ void variation_output_bkg::PlotVariatons(TFile* f_var_out){
 }
 //***************************************************************************
 //************************** Flash Functions ********************************
-std::vector<std::vector<double>> variation_output_bkg::GetLargestFlashVector(TFile* f ){
+std::vector<std::vector<double>> variation_output_bkg::GetLargestFlashVector(TFile* f, double flash_start_time, double flash_end_time ){
 
 	// Get Optical Information from file
 	TTree* optical_tree = (TTree*)f->Get("AnalyzeTPCO/optical_tree");
@@ -621,8 +621,6 @@ std::vector<std::vector<double>> variation_output_bkg::GetLargestFlashVector(TFi
 		double largest_flash_time = 0;
 		
 		// Cut Variables defined in main.h
-		double flash_time_start = 3.57; // Manually Override for BNB [us]
-		double flash_time_end   = 5.25; // Manually Override for BNB [us]
 		int flash_pe_threshold = 50;
 
 		// Loop through all flashes in event and find largest
@@ -820,8 +818,23 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 	_z1 = _config[4];
 	_z2 = _config[5];
 	flash_pe_threshold = _config[6];
-	flash_time_start = 3.57; // Manually Override for BNB [us]
-	flash_time_end   = 5.25; // Manually Override for BNB [us]
+	
+	if (mode == "bnb"){
+		std::cout << "Using BNB Params" << std::endl;
+		flash_time_start = 3.57; // Manually Override for BNB [us]
+		flash_time_end   = 5.25; // Manually Override for BNB [us]
+	}
+	else if (mode = "numi") {
+		std::cout << "Using NuMI Params" << std::endl;
+		flash_time_start = _config[7]; // Use default numi config
+		flash_time_end   = _config[8]; // Use default numi config
+	}
+	else {
+		std::cout << "Using default numi flash config, if using same option then this doesnt matter"<< std::endl;
+		flash_time_start = _config[7]; // Use default numi config
+		flash_time_end   = _config[8]; // Use default numi config
+	}
+	
 	tolerance = _config[9];
 	shwr_nue_tolerance = _config[10];
 	trk_nue_tolerance = _config[11];
@@ -874,7 +887,7 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 	std::cout << "Total Events: " << tree_total_entries << std::endl;
 
 	// Get the largest Flash Vector of Vector	
-	std::vector<std::vector<double>> largest_flash_v_v = GetLargestFlashVector(inFile);
+	std::vector<std::vector<double>> largest_flash_v_v = GetLargestFlashVector(inFile, flash_time_start, flash_time_end);
 
 	// MCTruth Counting Tree
 	TTree * mctruth_counter_tree = (TTree*)inFile->Get("AnalyzeTPCO/mctruth_counter_tree"); 
