@@ -67,6 +67,7 @@ class variation_output_bkg {
 	
 	bool in_fv(double x, double y, double z, std::vector<double> fv_boundary_v);
 	std::pair<std::string, int> TPCO_Classifier(xsecAna::TPCObjectContainer tpc_obj, bool true_in_tpc, bool has_pi0);
+	int GetSecondaryShowerIndex(const int n_pfp, int n_tpc_obj, xsecAna::TPCObjectContainer tpc_obj);
 
 	// Flash Functions
 	std::vector<std::vector<double>> GetLargestFlashVector(TFile* f, double flash_time_start, double flash_time_end); 				// Function to resize opical entries to same size of events and get largest flash vector
@@ -74,6 +75,24 @@ class variation_output_bkg {
 	bool flash_pe(int flash_pe, int flash_pe_threshold); 							// Decides whether flash has sufficient PE
 	double Flash_TPCObj_vtx_Dist(double tpc_vtx_y, double tpc_vtx_z, double flash_vtx_y, double flash_vtx_z); // Returns the 2D distance of the flash to TPC OBj Vertex
 	
+
+	// ----------------------
+	//   Cut Functions
+	// ----------------------
+	void FlashinTime_FlashPE(TFile* f, double flash_start_time, double flash_end_time, std::vector<bool> &flash_cuts_pass_vec );
+	bool HasNue(const int pfp_pdg, const int pfp_hits );
+	bool opt_vtx_distance(double tpc_vtx_y, double tpc_vtx_z, double flash_vtx_y, double flash_vtx_z, double tolerance)
+	void flashRecoVtxDist(std::vector< double > largest_flash_v, double tolerance, const double tpc_vtx_x, const double tpc_vtx_y, const double tpc_vtx_z, std::vector<bool> &flash_cuts_pass_vec);
+	bool VtxNuDistance(double tpc_vtx_x, double tpc_vtx_y, double tpc_vtx_z, double pfp_vtx_x, double pfp_vtx_y, double pfp_vtx_z, double tolerance);
+	bool HitThreshold(const int n_pfp_hits, double threshold);
+	bool OpenAngleCut(const double leading_open_angle, const std::vector<double> tolerance_open_angle);
+	bool dEdxCut( const double leading_dedx, const double tolerance_dedx_min, const double tolerance_dedx_max);
+	bool HitLengthRatioCut(const double pfp_hits_length_tolerance, const double pfp_hits, const double pfp_length);
+	void LongestTrackLeadingShowerCut(const double ratio_tolerance, double longest_track_leading_shower_ratio);
+	bool IsContained(std::vector<double> track_start, std::vector<double> track_end, std::vector<double> fv_boundary_v);
+	bool ContainedTracksCut(std::vector<double> fv_boundary_v, std::vector<double> pfp_start_vtx, std::vector<double> pfp_end_vtx);
+
+
 	// ----------------------
 	//     Reco Variables
 	// ----------------------

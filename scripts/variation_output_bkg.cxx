@@ -24,6 +24,48 @@ int variation_output_bkg::GetLeadingShowerIndex(const int n_pfp, int n_tpc_obj, 
 
 	return leading_index;
 }
+// Get the secondary shower index, if no secondary shower exists, returns -999
+int variation_output_bkg::GetSecondaryShowerIndex(const int n_pfp, int n_tpc_obj, xsecAna::TPCObjectContainer tpc_obj){
+	int leading_index{0};
+	int most_hits{0};
+	int secondary_index{-999};
+	
+	// Loop over Particle Objects
+	for (int j = 0; j < n_pfp; j++) {
+		auto const pfp_obj = tpc_obj.GetParticle(j);
+		const int  pfp_pdg = pfp_obj.PFParticlePdgCode();
+		
+		if (pfp_pdg != 11) continue; // skip if not a shower
+
+		const int n_pfp_hits = pfp_obj.NumPFPHits();
+		
+		// Compare for most hits
+		if (n_pfp_hits > most_hits) {
+			leading_index = j; 
+			most_hits = n_pfp_hits; 
+		}
+	}
+	// Loop over Particle Objects but this time omit leading index
+	for (int j = 0; j < n_pfp; j++) {
+		
+		if(j == leading_index) continue;         //we assume leading shower == electron shower
+		
+		auto const pfp_obj = tpc_obj.GetParticle(j);
+		const int  pfp_pdg = pfp_obj.PFParticlePdgCode();
+		
+		if (pfp_pdg != 11) continue; // skip if not a shower if one doesnt exit returns -999
+
+		const int n_pfp_hits = pfp_obj.NumPFPHits();
+		
+		// Compare for most hits
+		if (n_pfp_hits > most_hits) {
+			secondary_index = j; 
+			most_hits = n_pfp_hits; 
+		}
+	}
+
+	return secondary_index;
+}
 //***************************************************************************
 //***************************************************************************
 double variation_output_bkg::GetLongestTrackLength(const int n_pfp, int n_tpc_obj, xsecAna::TPCObjectContainer tpc_obj){
@@ -110,15 +152,15 @@ void variation_output_bkg::DrawTH1D_SAME(TH1D* hist, std::string variation, TLeg
 	// ----------------------
 	if (histname == "h_total_hits"){
 		hist->SetTitle(";PFP Total Hits;Entries");
-		hist->GetYaxis()->SetRangeUser(0,4500);
+		// hist->GetYaxis()->SetRangeUser(0,4500);
 	}
 	else if (histname == "h_ldg_shwr_hits") {
 		hist->SetTitle("; Leading Shower Hits (All Planes);Entries");
-		hist->GetYaxis()->SetRangeUser(0,750);
+		// hist->GetYaxis()->SetRangeUser(0,750);
 	}
 	else if (histname == "h_ldg_shwr_hits_WPlane") {
 		hist->SetTitle(";Leading Shower Collection Plane Hits;Entries");
-		hist->GetYaxis()->SetRangeUser(0,5000);
+		// hist->GetYaxis()->SetRangeUser(0,5000);
 	}
 	else if (histname == "h_ldg_shwr_Open_Angle"){
 		hist->SetTitle(";Leading Shower Opening Angle [degrees];Entries");
@@ -126,11 +168,11 @@ void variation_output_bkg::DrawTH1D_SAME(TH1D* hist, std::string variation, TLeg
 	}
 	else if (histname == "h_ldg_shwr_dEdx_WPlane"){
 		hist->SetTitle(";Leading Shower dEdx Collection Plane [MeV/cm];Entries");
-		hist->GetYaxis()->SetRangeUser(0,7000);
+		// hist->GetYaxis()->SetRangeUser(0,7000);
 	}
 	else if (histname == "h_ldg_shwr_HitPerLen"){
 		hist->SetTitle(";Leading Shower Hits / Length [ cm^{-1} ];Entries");
-		hist->GetYaxis()->SetRangeUser(0,7000);
+		// hist->GetYaxis()->SetRangeUser(0,7000);
 	}
 	else if (histname == "h_ldg_shwr_Phi"){
 		hist->SetTitle(";Leading Shower #phi [degrees];Entries");
@@ -146,19 +188,19 @@ void variation_output_bkg::DrawTH1D_SAME(TH1D* hist, std::string variation, TLeg
 	}
 	else if (histname == "h_long_Track_ldg_shwr"){
 		hist->SetTitle(";Longest Track Length / Leading Shower Length;Entries");
-		hist->GetYaxis()->SetRangeUser(0,22000);
+		// hist->GetYaxis()->SetRangeUser(0,22000);
 	}
 	else if (histname == "h_tpc_obj_vtx_x"){
 		hist->SetTitle(";TPC Object Vertex X [cm];Entries");
-		hist->GetYaxis()->SetRangeUser(0,2500);
+		// hist->GetYaxis()->SetRangeUser(0,2500);
 	}
 	else if (histname == "h_tpc_obj_vtx_y"){
 		hist->SetTitle(";TPC Object Vertex Y [cm];Entries");
-		hist->GetYaxis()->SetRangeUser(0,2200);
+		// hist->GetYaxis()->SetRangeUser(0,2200);
 	}
 	else if (histname == "h_tpc_obj_vtx_z"){
 		hist->SetTitle(";TPC Object Vertex Z [cm];Entries");
-		hist->GetYaxis()->SetRangeUser(0,1200);
+		// hist->GetYaxis()->SetRangeUser(0,1200);
 	}
 	else if (histname == "h_n_pfp"){
 		hist->SetTitle(";Number of PFP;Entries");
@@ -186,7 +228,7 @@ void variation_output_bkg::DrawTH1D_SAME(TH1D* hist, std::string variation, TLeg
 	}
 	else if (histname == "h_track_phi"){
 		hist->SetTitle("; Track #phi [degrees];Entries");
-		hist->GetYaxis()->SetRangeUser(0,6000);
+		// hist->GetYaxis()->SetRangeUser(0,6000);
 	}
 	else if (histname == "h_shower_phi"){
 		hist->SetTitle("; Shower #phi [degrees];Entries");
@@ -198,7 +240,7 @@ void variation_output_bkg::DrawTH1D_SAME(TH1D* hist, std::string variation, TLeg
 	}
 	else if (histname == "h_largest_flash_z"){
 		hist->SetTitle("; Largest Flash Z [cm];Entries");
-		hist->GetYaxis()->SetRangeUser(0,1000);
+		// hist->GetYaxis()->SetRangeUser(0,1000);
 	}
 	else if (histname == "h_largest_flash_time"){
 		hist->SetTitle("; Largest Flash Time [#mus];Entries");
@@ -218,7 +260,7 @@ void variation_output_bkg::DrawTH1D_SAME(TH1D* hist, std::string variation, TLeg
 	}
 	else if (histname == "h_track_Nu_vtx_Dist"){
 		hist->SetTitle("; 3D Distance of Track to #nu Vertex [cm];Entries");
-		hist->GetYaxis()->SetRangeUser(0,18000);
+		// hist->GetYaxis()->SetRangeUser(0,18000);
 	}
 	else return;
 
@@ -427,18 +469,6 @@ std::vector<std::string> variation_output_bkg::GrabDirs(TFile* f_var_out) {
 }
 //***************************************************************************
 //***************************************************************************
-bool variation_output_bkg::flash_in_time(double flash_time, double flash_start, double flash_end) {
-	if(flash_time >= flash_start && flash_time <= flash_end) return true; // Pass in time
-	else return false; // Fail in time
-}
-//***************************************************************************
-//***************************************************************************
-bool variation_output_bkg::flash_pe(int flash_pe, int flash_pe_threshold) {
-	if (flash_pe >= flash_pe_threshold) return true; // Pass PE Thresh
-	else return false; // Fail PE Thresh
-}
-//***************************************************************************
-//***************************************************************************
 void variation_output_bkg::PlotVariatons(TFile* f_var_out){
 	f_var_out->cd();
 	
@@ -626,11 +656,11 @@ std::vector<std::vector<double>> variation_output_bkg::GetLargestFlashVector(TFi
 		// Loop through all flashes in event and find largest
 		for(int j = 0; j < optical_list_pe_v.at(i).size(); j++) {
 			
-			auto const opt_time         = optical_list_flash_time_v.at(i).at(j);
+			auto const opt_time         = optical_list_flash_time_v.at(i).at(j) + 0.94; // shift due to MC and offset
 			auto const opt_pe           = optical_list_pe_v.at(i).at(j);
 			const double opt_center_y   = optical_list_flash_center_y_v.at(i).at(j);
 			const double opt_center_z   = optical_list_flash_center_z_v.at(i).at(j);
-			const double opt_flash_time = optical_list_flash_time_v.at(i).at(j);
+			const double opt_flash_time = optical_list_flash_time_v.at(i).at(j) + 0.94; // shift due to MC and offset
 			
 			// See if flash was in time
 			in_time = flash_in_time(opt_time, flash_time_start, flash_time_end); 
@@ -666,38 +696,12 @@ std::vector<std::vector<double>> variation_output_bkg::GetLargestFlashVector(TFi
 }
 //***************************************************************************
 //***************************************************************************
-bool variation_output_bkg::in_fv(double x, double y, double z, std::vector<double> fv_boundary_v) {
-	const double det_x1 = 0;
-	const double det_x2 = 256.35;
-	const double det_y1 = -116.5;
-	const double det_y2 = 116.5;
-	const double det_z1 = 0;
-	const double det_z2 = 1036.8;
-
-	const double x1 = fv_boundary_v.at(0);
-	const double x2 = fv_boundary_v.at(1);
-	const double y1 = fv_boundary_v.at(2);
-	const double y2 = fv_boundary_v.at(3);
-	const double z1 = fv_boundary_v.at(4);
-	const double z2 = fv_boundary_v.at(5);
-
-	if(x <= det_x1 + x1 || x >= det_x2 - x2) {return false; }
-	if(y <= det_y1 + y1 || y >= det_y2 - y2) {return false; }
-	if(z <= det_z1 + z1 || z >= det_z2 - z2) {return false; }
-	return true;
-}
-//***************************************************************************
-//***************************************************************************
 double variation_output_bkg::Flash_TPCObj_vtx_Dist(double tpc_vtx_y, double tpc_vtx_z, double flash_vtx_y, double flash_vtx_z) {
 	const double distance = sqrt(pow((tpc_vtx_y - flash_vtx_y), 2) + pow((tpc_vtx_z - flash_vtx_z), 2) );
 	return distance;
 }
 //***************************************************************************
 //***************************************************************************
-//this function performs a classification on a tpc object basis,
-//by looping over each pfparticle contained
-//
-//extended functionality to help with detector variation cases
 std::pair<std::string, int> variation_output_bkg::TPCO_Classifier(xsecAna::TPCObjectContainer tpc_obj, bool true_in_tpc, bool has_pi0) {
 	int part_nue_cc     = 0;
 	int part_nue_bar_cc = 0;
@@ -793,6 +797,323 @@ std::pair<std::string, int> variation_output_bkg::TPCO_Classifier(xsecAna::TPCOb
 	//return the string for the tpco id
 	return std::make_pair("non_match", 0);
 }
+//*********************** Selection Cuts ************************************
+//***************************************************************************
+//IN FV
+bool variation_output_bkg::in_fv(double x, double y, double z, std::vector<double> fv_boundary_v) {
+	const double det_x1 = 0;
+	const double det_x2 = 256.35;
+	const double det_y1 = -116.5;
+	const double det_y2 = 116.5;
+	const double det_z1 = 0;
+	const double det_z2 = 1036.8;
+
+	const double x1 = fv_boundary_v.at(0);
+	const double x2 = fv_boundary_v.at(1);
+	const double y1 = fv_boundary_v.at(2);
+	const double y2 = fv_boundary_v.at(3);
+	const double z1 = fv_boundary_v.at(4);
+	const double z2 = fv_boundary_v.at(5);
+
+	if(x <= det_x1 + x1 || x >= det_x2 - x2) {return false; }
+	if(y <= det_y1 + y1 || y >= det_y2 - y2) {return false; }
+	if(z <= det_z1 + z1 || z >= det_z2 - z2) {return false; }
+	return true;
+}
+//***************************************************************************
+//***************************************************************************
+// Flash in time
+bool variation_output_bkg::flash_in_time(double flash_time, double flash_start, double flash_end) {
+	if(flash_time >= flash_start && flash_time <= flash_end) return true; // Pass in time
+	else return false; // Fail in time
+}
+//***************************************************************************
+//***************************************************************************
+// Flash PE
+bool variation_output_bkg::flash_pe(int flash_pe, int flash_pe_threshold) {
+	if (flash_pe >= flash_pe_threshold) return true; // Pass PE Thresh
+	else return false; // Fail PE Thresh
+}
+//***************************************************************************
+//***************************************************************************
+// Get the vector of flashes with true/false on whether it passed the selection or not
+void variation_output_bkg::FlashinTime_FlashPE(TFile* f, double flash_start_time, double flash_end_time, std::vector<bool> &flash_cuts_pass_vec ){
+	// Get Optical Information from file
+	TTree* optical_tree = (TTree*)f->Get("AnalyzeTPCO/optical_tree");
+
+	std::vector<std::vector<double>> largest_flash_v_v;
+
+	// ----------------------
+	//    Optical Info
+	// ----------------------
+	int fRun = 0;
+	int fEvent = 0;
+	int fOpFlashPE = 0;
+	double fOpFlashTime = 0;
+	double fOpFlashWidthY = 0;
+	double fOpFlashWidthZ = 0;
+	double fOpFlashCenterY = 0;
+	double fOpFlashCenterZ = 0;
+
+	optical_tree->SetBranchAddress("Run",              &fRun           ); // Run number of Flash
+	optical_tree->SetBranchAddress("Event",            &fEvent         ); // Event number of Flash
+	optical_tree->SetBranchAddress("OpFlashPE",        &fOpFlashPE     ); // PE of Flash
+	optical_tree->SetBranchAddress("OpFlashTime",      &fOpFlashTime   ); // Time of flash
+	optical_tree->SetBranchAddress("OpFlashWidhtY",    &fOpFlashWidthY );
+	optical_tree->SetBranchAddress("OpFlashWidthZ",    &fOpFlashWidthZ );
+	optical_tree->SetBranchAddress("OpFlashCenterY",   &fOpFlashCenterY); // Flash Y center
+	optical_tree->SetBranchAddress("OpFlashCenterZ",   &fOpFlashCenterZ); // Flash Z Center
+
+	// Num events in the optical tree
+	const int optical_entries = optical_tree->GetEntries();
+	std::cout << "Total Optical Entries: " << optical_entries << std::endl;
+
+	int current_event = 0;
+	int current_run = 0;
+	int last_event = 0;
+	int last_run = 0;
+
+	// Contains the entry number for a given OpFlash per event
+	std::vector<int>					optical_list_pe;
+	std::vector<std::vector<int> >		optical_list_pe_v;
+	
+	std::vector<double>					optical_list_flash_center_y; 
+	std::vector<std::vector<double> >	optical_list_flash_center_y_v;
+	
+	std::vector<double>					optical_list_flash_center_z; 
+	std::vector<std::vector<double> >	optical_list_flash_center_z_v;
+	
+	std::vector<double>					optical_list_flash_time;
+	std::vector<std::vector<double> >	optical_list_flash_time_v;
+	
+	// Loop over the optical entries to get the largest flash vector
+	
+	// ----------------------
+	// Resize the optical enties to be the same sizd as number of Events (TPC Obj)
+	// ----------------------
+	
+	for(int i = 0; i < optical_entries; i++) {
+		
+		// Get the Optical entry
+		optical_tree->GetEntry(i);
+
+		current_run		= fRun;
+		current_event 	= fEvent;
+
+		// New event
+		if(current_event != last_event) {
+			optical_list_pe.clear();
+			optical_list_flash_center_y.clear();
+			optical_list_flash_center_z.clear();
+			optical_list_flash_time.clear();
+
+			optical_list_pe.push_back(fOpFlashPE);
+			optical_list_flash_center_y.push_back(fOpFlashCenterY);
+			optical_list_flash_center_z.push_back(fOpFlashCenterZ);
+			optical_list_flash_time.push_back(fOpFlashTime);
+
+		}
+		// Same event
+		if(current_event == last_event && current_run == last_run) {
+			optical_list_pe_v.pop_back();
+			optical_list_flash_center_y_v.pop_back();
+			optical_list_flash_center_z_v.pop_back();
+			optical_list_flash_time_v.pop_back();
+
+			optical_list_pe.push_back(fOpFlashPE);
+			optical_list_flash_center_y.push_back(fOpFlashCenterY);
+			optical_list_flash_center_z.push_back(fOpFlashCenterZ);
+			optical_list_flash_time.push_back(fOpFlashTime);
+
+		}
+
+		last_event = current_event;
+		last_run   = current_run;
+
+		optical_list_pe_v.push_back(optical_list_pe);
+		optical_list_flash_center_y_v.push_back(optical_list_flash_center_y);
+		optical_list_flash_center_z_v.push_back(optical_list_flash_center_z);
+		optical_list_flash_time_v.push_back(optical_list_flash_time);
+
+	}
+	
+	std::cout << "Resized Optical List Size: " << optical_list_pe_v.size() << std::endl;
+	
+	flash_cuts_pass_vec.resize(optical_list_pe_v.size());
+
+	// Loop over the optical list
+	for(int i = 0; i < optical_list_pe_v.size(); i++) {
+		
+		bool in_time = false;
+		bool sufficient_flash = false;
+		
+		auto const opt_time_v = optical_list_flash_time_v.at(i);
+		auto const opt_pe_v   = optical_list_pe_v.at(i);
+		
+		for(int j = 0; j < optical_list_pe_v.at(i).size(); j++) {
+			
+			auto const opt_time = opt_time_v.at(j);
+			auto const opt_pe = opt_pe_v.at(j);
+			
+			in_time = flash_in_time(opt_time, flash_start_time, flash_end_time);
+			sufficient_flash = flash_pe(opt_pe, flash_pe_threshold);
+			
+			// Flash is both in time and over PE threshold
+			if(in_time == true && sufficient_flash == true) 
+				flash_cuts_pass_vec.at(i) = true;
+			else 
+				flash_cuts_pass_vec.at(i) = false;
+		}
+
+	}
+
+}
+//***************************************************************************
+//***************************************************************************
+// Check for valid reconstructed nue
+bool variation_output_bkg::HasNue(const int pfp_pdg, const int pfp_hits ) {
+
+	bool has_nue = false;
+	bool has_valid_shower = false;
+
+	if(pfp_pdg == 11 && pfp_hits > 0) { has_valid_shower = true; }
+	
+	if(pfp_pdg == 12) { has_nue = true; }
+	
+	if(has_nue == true && has_valid_shower == true) return true; 
+	else return false;
+	
+}
+//***************************************************************************
+//***************************************************************************
+// Flash reco Vertex Distance 
+bool variation_output_bkg::opt_vtx_distance(double tpc_vtx_y, double tpc_vtx_z, double flash_vtx_y, double flash_vtx_z, double tolerance) {
+	const double distance = sqrt(pow((tpc_vtx_y - flash_vtx_y), 2) + pow((tpc_vtx_z - flash_vtx_z), 2) );
+	
+	if(distance <= tolerance) return true;
+	return false;
+}
+void variation_output_bkg::flashRecoVtxDist(std::vector< double > largest_flash_v, double tolerance, const double tpc_vtx_x, const double tpc_vtx_y, const double tpc_vtx_z, std::vector<bool> &flash_cuts_pass_vec) {
+	
+	bool is_close;
+	for (unsigned int i=0; i < flash_cuts_pass_vec.size(); i++){
+		
+		//flash is upstream
+		if(tpc_vtx_z < largest_flash_v.at(1)) 
+			is_close = opt_vtx_distance(tpc_vtx_y, tpc_vtx_z, largest_flash_v.at(0), largest_flash_v.at(1), tolerance);
+		
+		//flash is downstream
+		if(tpc_vtx_z >= largest_flash_v.at(1)) 
+			is_close = opt_vtx_distance(tpc_vtx_y, tpc_vtx_z, largest_flash_v.at(0), largest_flash_v.at(1), (tolerance - 20));
+		
+		
+		if(is_close == true )
+			flash_cuts_pass_vec.at(i) = true;
+		
+		if(is_close == false) 
+			flash_cuts_pass_vec.at(i) = false;
+
+	}
+
+}
+//***************************************************************************
+//***************************************************************************
+// Vertex to shower distance
+bool variation_output_bkg::VtxNuDistance(double tpc_vtx_x, double tpc_vtx_y, double tpc_vtx_z, double pfp_vtx_x, double pfp_vtx_y, double pfp_vtx_z, double tolerance){
+	
+	const double distance = sqrt(pow((tpc_vtx_x - pfp_vtx_x), 2) + pow((tpc_vtx_y - pfp_vtx_y), 2) + pow((tpc_vtx_z - pfp_vtx_z), 2) );
+	
+	if(distance <= tolerance)
+		return true; 
+	else 
+		return false;
+
+}
+//***************************************************************************
+//***************************************************************************
+// Hit thresholds all planes
+bool variation_output_bkg::HitThreshold(const int n_pfp_hits, double threshold){
+
+	if(n_pfp_hits >= threshold)
+		return true;
+	else
+		return false; 
+
+}
+//***************************************************************************
+//***************************************************************************
+// Leading shower open angle
+bool variation_output_bkg::OpenAngleCut(const double leading_open_angle, const std::vector<double> tolerance_open_angle){
+
+	if(leading_open_angle <= tolerance_open_angle.at(1) && leading_open_angle >= tolerance_open_angle.at(0))
+		return true;
+	else 
+		return false;
+
+}
+//***************************************************************************
+//***************************************************************************
+// leading shower dEdx cut
+bool variation_output_bkg::dEdxCut( const double leading_dedx, const double tolerance_dedx_min, const double tolerance_dedx_max){
+
+	if(leading_dedx <= tolerance_dedx_max && leading_dedx >= tolerance_dedx_min)
+		return true;
+	else 
+		return false;
+
+}
+//***************************************************************************
+//***************************************************************************
+bool variation_output_bkg::HitLengthRatioCut(const double pfp_hits_length_tolerance, const double pfp_hits, const double pfp_length){
+	const double pfp_hits_length_ratio = (pfp_hits / pfp_length);
+
+	if (pfp_hits_length_ratio > pfp_hits_length_tolerance)
+		return true;
+	else
+		return false;
+	
+}
+//***************************************************************************
+//***************************************************************************
+void variation_output_bkg::LongestTrackLeadingShowerCut(const double ratio_tolerance, double longest_track_leading_shower_ratio){
+
+	if(longest_track_leading_shower_ratio < ratio_tolerance)
+		return true;
+	else
+		return false;
+
+}
+//***************************************************************************
+//***************************************************************************
+bool variation_output_bkg::IsContained(std::vector<double> track_start, std::vector<double> track_end, std::vector<double> fv_boundary_v) {
+	
+	if(in_fv(track_start.at(0), track_start.at(1), track_start.at(2), fv_boundary_v) == true
+	   && in_fv(track_end.at(0), track_end.at(1), track_end.at(2), fv_boundary_v) == true) {
+		return true;
+	}
+	else 
+		return false;
+}
+bool variation_output_bkg::ContainedTracksCut(std::vector<double> fv_boundary_v, std::vector<double> pfp_start_vtx, std::vector<double> pfp_end_vtx){
+
+	const bool is_contained = IsContained(pfp_start_vtx, pfp_end_vtx, fv_boundary_v);
+
+	//if not contained
+	if(is_contained == true) 
+		return true;
+	else
+		return false;
+	
+}
+//***************************************************************************
+//***************************************************************************
+
+//***************************************************************************
+//***************************************************************************
+
+//***************************************************************************
+//**************************************************************************
+
 //***************************************************************************
 //***************************************************************************
 // ----------------------
@@ -871,11 +1192,7 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 	//*************************** POT Scaling *************************************
 	std::cout << "=================================================\n" << std::endl;
 	
-	// For now the POT scaling is going to be 1 until figured out if we need a CV to 
-	// compare to...
-	// double CV_POT =  GetPOT("files/filter_CV.root");
-	double CV_POT = GetPOT(_file1);
-	
+	double CV_POT =  GetPOT("/uboone/data/users/kmistry/work/NueXSection_Outputs/detector_variations/filter_BNBCV.root");
 	double POT_Scaling =  CV_POT / GetPOT(_file1);
 	std::cout << "POT Scaling:\t" << POT_Scaling << std::endl;
 	std::cout << "=================================================\n" << std::endl;
@@ -987,6 +1304,9 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 			const int tpc_obj_mode = tpc_obj.Mode(); 
 			n_pfp = tpc_obj.NumPFParticles();
 			const int leading_shower_index = GetLeadingShowerIndex(n_pfp, n_tpc_obj, tpc_obj);
+			bool use_secondary_shower_cut{false};
+			const int secondary_shower_index = GetSecondaryShowerIndex(n_pfp, n_tpc_obj, tpc_obj);
+			if (secondary_shower_index != -999) use_secondary_shower_cut = true;
 
 			// Other histograms
 			n_tracks = 0; n_showers = 0; n_pfp_50Hits = 0; n_tracks_50Hits = 0; n_showers_50Hits = 0;
@@ -1011,13 +1331,26 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 				const int  pfp_pdg          = pfp_obj.PFParticlePdgCode();
 				const int  num_pfp_hits     = pfp_obj.NumPFPHits();
 				const int  mc_parent_pdg    = pfp_obj.MCParentPdg();
+				const int  n_pfp_hits_w     = pfp_obj.NumPFPHitsW(); // Collection plane hits
 				
-				const double pff_length     = pfp_obj.pfpLength();
+				const double pfp_length     = pfp_obj.pfpLength();
 				const double pfp_open_angle = pfp_obj.pfpOpenAngle();
+				const double leading_dedx   = pfp_obj.PfpdEdx().at(2);//just the collection plane!
 
 				const double pfp_vtx_x =  pfp_obj.pfpVtxX();
 				const double pfp_vtx_y =  pfp_obj.pfpVtxY();
 				const double pfp_vtx_z =  pfp_obj.pfpVtxZ();
+
+				const double pfp_dir_x = pfp_obj.pfpDirX();
+				const double pfp_dir_y = pfp_obj.pfpDirY();
+				const double pfp_dir_z = pfp_obj.pfpDirZ();
+
+				const double pfp_end_x = (pfp_obj.pfpVtxX() + (pfp_length * pfp_dir_x));
+				const double pfp_end_y = (pfp_obj.pfpVtxY() + (pfp_length * pfp_dir_y));
+				const double pfp_end_z = (pfp_obj.pfpVtxZ() + (pfp_length * pfp_dir_z));
+
+				std::vector<double> pfp_start_vtx {pfp_vtx_x, pfp_vtx_y, pfp_vtx_z};
+				std::vector<double> pfp_end_vtx {pfp_end_x, pfp_end_y, pfp_end_z};
 
 				const double pfp_Nu_vtx_Dist =  pfp_vtx_distance(tpc_obj_vtx_x, tpc_obj_vtx_y, tpc_obj_vtx_z, pfp_vtx_x, pfp_vtx_y, pfp_vtx_z);
 				
@@ -1048,7 +1381,7 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 								const double leading_shower_theta 	= acos(pfp_obj.pfpDirZ()) * 180 / 3.1415;
 								
 								const double leading_shower_length 	= pfp_obj.pfpLength();
-								const double lonest_track_length 	= GetLongestTrackLength(n_pfp, n_tpc_obj, tpc_obj);
+								const double longest_track_length 	= GetLongestTrackLength(n_pfp, n_tpc_obj, tpc_obj);
 
 								h_ldg_shwr_hits			->Fill(num_pfp_hits);
 								h_ldg_shwr_hits_WPlane	->Fill(pfp_obj.NumPFPHitsW()); 		// W Plane
@@ -1058,7 +1391,7 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 								h_ldg_shwr_Phi			->Fill(leading_shower_phi);
 								h_ldg_shwr_Theta		->Fill(leading_shower_theta);
 								h_ldg_shwr_CTheta		->Fill(cos(leading_shower_theta * 3.1414 / 180.));
-								h_long_Track_ldg_shwr	->Fill(lonest_track_length / leading_shower_length);
+								h_long_Track_ldg_shwr	->Fill(longest_track_length / leading_shower_length);
 
 								// Vertex Information - require a shower so fill once  when leading shower
 								h_tpc_obj_vtx_x->Fill(tpc_obj_vtx_x);

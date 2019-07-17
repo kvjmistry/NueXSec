@@ -58,3 +58,6 @@ Total POT (Method 2): 8.29012e+21
 File: /uboone/data/users/kmistry/work/NueXSection_Outputs/detector_variations/filter_BNBwithDIC.root
 Total POT (Method 1): 1.96741e+20
 Total POT (Method 2): 1.96741e+20
+File: /uboone/data/users/kmistry/work/NueXSection_Outputs/detector_variations/filter_BNBCV.root
+Total POT (Method 1): 1.93802e+20
+Total POT (Method 2): 1.93802e+20
