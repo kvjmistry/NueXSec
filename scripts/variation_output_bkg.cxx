@@ -1289,7 +1289,7 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 		// -------------------------------------------------
 
 		// Loop over TPCObj
-		for(int i = 0; i < n_tpc_obj; i++){
+		for (int i = 0; i < n_tpc_obj; i++){
 			auto const tpc_obj = tpc_object_container_v->at(i);
 
 			// Check to see in truth the vertex was inside the tpc FV
@@ -1334,6 +1334,11 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 			//****************************** Apply Pandora Reco Nue cut *****************************************
 			bool bool_HasNue = HasNue(tpc_obj, n_pfp );
 			if ( bool_HasNue == false ) continue;
+			//***************************************************************************************************
+
+			//****************************** Apply In FV cut ****************************************************
+			bool bool_inFV = in_fv(tpc_obj_vtx_x, tpc_obj_vtx_y, tpc_obj_vtx_z, fv_boundary_v);
+			if ( bool_inFV == false ) continue;
 			//***************************************************************************************************
 			
 
