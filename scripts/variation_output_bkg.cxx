@@ -950,19 +950,25 @@ void variation_output_bkg::FlashinTime_FlashPE(TFile* f, double flash_start_time
 		auto const opt_time_v = optical_list_flash_time_v.at(i);
 		auto const opt_pe_v   = optical_list_pe_v.at(i);
 		
-		for(int j = 0; j < optical_list_pe_v.at(i).size(); j++) {
+		// Loop over the optical list vec
+		for (int j = 0; j < optical_list_pe_v.at(i).size(); j++) {
 			
-			auto const opt_time = opt_time_v.at(j);
+			auto const opt_time = opt_time_v.at(j) +1.0;
 			auto const opt_pe = opt_pe_v.at(j);
 			
-			in_time = flash_in_time(opt_time, flash_start_time, flash_end_time);
+			in_time          = flash_in_time(opt_time, flash_start_time, flash_end_time);
 			sufficient_flash = flash_pe(opt_pe, flash_pe_threshold);
 			
 			// Flash is both in time and over PE threshold
-			if(in_time == true && sufficient_flash == true) 
+			if(in_time == true && sufficient_flash == true){
 				flash_cuts_pass_vec.at(i) = true;
-			else 
-				flash_cuts_pass_vec.at(i) = false;
+				break; // once pased we are done, so dont loop any more otherwise we may overwrite this
+
+			}
+		}
+
+		if (in_time == false && sufficient_flash == false) {
+			flash_cuts_pass_vec.at(i) = false;
 		}
 
 	}
@@ -1165,6 +1171,7 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 		flash_time_start = _config[7]; // Use default numi config
 		flash_time_end   = _config[8]; // Use default numi config
 	}
+	std::cout << "flash_time_start:\t" << flash_time_start << "   flash_time_end:\t" << flash_time_end << std::endl;
 	
 	tolerance = _config[9];
 	shwr_nue_tolerance = _config[10];
@@ -1256,6 +1263,7 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 		mctruth_counter_tree->GetEntry(event);
 
 		int n_tpc_obj = tpc_object_container_v->size();
+		if (event < 10) std::cout << "Total TPC Obj: " << n_tpc_obj << std::endl;
 
 		// --------------- MC Counters ---------------
 		if(mc_nu_id == 1) mc_nue_cc_counter++;
@@ -1282,10 +1290,10 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 		}
 
 		//************************ Apply Flash in time and Flash PE cut *************************************
-		if (!flash_cuts_pass_vec.at(event)) continue;
+		if (flash_cuts_pass_vec.at(event) == false) continue;
 		//***************************************************************************************************
 		
-		
+		// if (bool_sig) sig_counter++;
 		// -------------------------------------------------
 
 		// Loop over TPCObj
@@ -1305,6 +1313,8 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 					bool_sig = true;
 				}
 			}
+
+			// if (bool_sig) nue_cc_counter++;
 
 			// TPC Obj vars
 			tpc_obj_vtx_x = tpc_obj.pfpVtxX();
@@ -1331,16 +1341,20 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 			const double Flash_TPCObj_Dist = Flash_TPCObj_vtx_Dist(tpc_obj_vtx_y, tpc_obj_vtx_z, largest_flash_y, largest_flash_z);
 			h_Flash_TPCObj_Dist->Fill(Flash_TPCObj_Dist);
 
+
 			//****************************** Apply Pandora Reco Nue cut *****************************************
 			bool bool_HasNue = HasNue(tpc_obj, n_pfp );
 			if ( bool_HasNue == false ) continue;
 			//***************************************************************************************************
-
+			
 			//****************************** Apply In FV cut ****************************************************
 			bool bool_inFV = in_fv(tpc_obj_vtx_x, tpc_obj_vtx_y, tpc_obj_vtx_z, fv_boundary_v);
 			if ( bool_inFV == false ) continue;
 			//***************************************************************************************************
+			if (bool_sig) nue_cc_counter++;
 			
+
+			 
 
 			// Loop over the Par Objects
 			for (int j = 0; j < n_pfp ; j++){
@@ -1375,10 +1389,11 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 
 				const double pfp_Nu_vtx_Dist =  pfp_vtx_distance(tpc_obj_vtx_x, tpc_obj_vtx_y, tpc_obj_vtx_z, pfp_vtx_x, pfp_vtx_y, pfp_vtx_z);
 
+				
 
 				// Electron (Shower like)
 				if ( pfp_pdg == 11  ) {
-					nue_cc_counter++;
+					
 
 					// Background events
 					if (!bool_sig) {
@@ -1418,8 +1433,7 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 						}
 					
 					}
-					// Signal event
-					else sig_counter++;
+					
 				}
 				// Track like
 				if ( pfp_pdg == 13) {
