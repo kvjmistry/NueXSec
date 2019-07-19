@@ -82,11 +82,11 @@ class variation_output_bkg {
 	void FlashinTime_FlashPE(TFile* f, double flash_start_time, double flash_end_time, std::vector<bool> &flash_cuts_pass_vec );
 	bool HasNue(xsecAna::TPCObjectContainer tpc_obj, const int n_pfp );
 	bool opt_vtx_distance(double tpc_vtx_y, double tpc_vtx_z, double flash_vtx_y, double flash_vtx_z, double tolerance);
-	void flashRecoVtxDist(std::vector< double > largest_flash_v, double tolerance, const double tpc_vtx_x, const double tpc_vtx_y, const double tpc_vtx_z, std::vector<bool> &flash_cuts_pass_vec);
-	bool VtxNuDistance(double tpc_vtx_x, double tpc_vtx_y, double tpc_vtx_z, double pfp_vtx_x, double pfp_vtx_y, double pfp_vtx_z, double tolerance);
-	bool HitThreshold(const int n_pfp_hits, double threshold);
-	bool OpenAngleCut(const double leading_open_angle, const std::vector<double> tolerance_open_angle);
-	bool dEdxCut( const double leading_dedx, const double tolerance_dedx_min, const double tolerance_dedx_max);
+	bool flashRecoVtxDist(std::vector< double > largest_flash_v, double tolerance, const double tpc_vtx_x, const double tpc_vtx_y, const double tpc_vtx_z);
+	bool VtxNuDistance(xsecAna::TPCObjectContainer tpc_obj,int pfp_pdg_type , double tolerance);
+	bool HitThreshold(xsecAna::TPCObjectContainer tpc_obj, double threshold, bool useCollection);
+	bool OpenAngleCut(xsecAna::TPCObjectContainer tpc_obj, const std::vector<double> tolerance_open_angle);
+	bool dEdxCut( xsecAna::TPCObjectContainer tpc_obj, const double tolerance_dedx_min, const double tolerance_dedx_max);
 	bool HitLengthRatioCut(const double pfp_hits_length_tolerance, const double pfp_hits, const double pfp_length);
 	bool LongestTrackLeadingShowerCut(const double ratio_tolerance, double longest_track_leading_shower_ratio);
 	bool IsContained(std::vector<double> track_start, std::vector<double> track_end, std::vector<double> fv_boundary_v);

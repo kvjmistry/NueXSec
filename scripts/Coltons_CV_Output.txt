@@ -881,3 +881,5 @@ Print Name: ../scripts/plots/signal_selection_ele_energy_efficiency_rebin.pdf
 *** 	 Output File Opened 	 *** 
 *** 	 Output File Closed 	 *** 
 *** 	 Exiting C++ Code... 	 *** 
+(Default) Parameter Config from header
+File Path: /uboone/data/users/kmistry/work/NueXSection_Outputs/detector_variations/filter_numi_cosmic_v4.root

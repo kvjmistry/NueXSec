@@ -656,11 +656,11 @@ std::vector<std::vector<double>> variation_output_bkg::GetLargestFlashVector(TFi
 		// Loop through all flashes in event and find largest
 		for(int j = 0; j < optical_list_pe_v.at(i).size(); j++) {
 			
-			auto const opt_time         = optical_list_flash_time_v.at(i).at(j) + 0.94; // shift due to MC and offset
+			auto const opt_time         = optical_list_flash_time_v.at(i).at(j) ; // shift due to MC and offset
 			auto const opt_pe           = optical_list_pe_v.at(i).at(j);
 			const double opt_center_y   = optical_list_flash_center_y_v.at(i).at(j);
 			const double opt_center_z   = optical_list_flash_center_z_v.at(i).at(j);
-			const double opt_flash_time = optical_list_flash_time_v.at(i).at(j) + 0.94; // shift due to MC and offset
+			const double opt_flash_time = optical_list_flash_time_v.at(i).at(j); // shift due to MC and offset
 			
 			// See if flash was in time
 			in_time = flash_in_time(opt_time, flash_time_start, flash_time_end); 
@@ -1008,59 +1008,104 @@ bool variation_output_bkg::opt_vtx_distance(double tpc_vtx_y, double tpc_vtx_z, 
 	if(distance <= tolerance) return true;
 	return false;
 }
-void variation_output_bkg::flashRecoVtxDist(std::vector< double > largest_flash_v, double tolerance, const double tpc_vtx_x, const double tpc_vtx_y, const double tpc_vtx_z, std::vector<bool> &flash_cuts_pass_vec) {
+bool variation_output_bkg::flashRecoVtxDist(std::vector< double > largest_flash_v, double tolerance, const double tpc_vtx_x, const double tpc_vtx_y, const double tpc_vtx_z) {
 	
 	bool is_close;
-	for (unsigned int i=0; i < flash_cuts_pass_vec.size(); i++){
-		
-		//flash is upstream
-		if(tpc_vtx_z < largest_flash_v.at(1)) 
-			is_close = opt_vtx_distance(tpc_vtx_y, tpc_vtx_z, largest_flash_v.at(0), largest_flash_v.at(1), tolerance);
-		
-		//flash is downstream
-		if(tpc_vtx_z >= largest_flash_v.at(1)) 
-			is_close = opt_vtx_distance(tpc_vtx_y, tpc_vtx_z, largest_flash_v.at(0), largest_flash_v.at(1), (tolerance - 20));
-		
-		
-		if(is_close == true )
-			flash_cuts_pass_vec.at(i) = true;
-		
-		if(is_close == false) 
-			flash_cuts_pass_vec.at(i) = false;
-
-	}
-
+	
+	//flash is upstream
+	if(tpc_vtx_z < largest_flash_v.at(1)) 
+		is_close = opt_vtx_distance(tpc_vtx_y, tpc_vtx_z, largest_flash_v.at(0), largest_flash_v.at(1), tolerance);
+	
+	//flash is downstream
+	if(tpc_vtx_z >= largest_flash_v.at(1)) 
+		is_close = opt_vtx_distance(tpc_vtx_y, tpc_vtx_z, largest_flash_v.at(0), largest_flash_v.at(1), (tolerance - 20));
+	
+	if (is_close == true )
+		return true;
+	else
+		return false;
+	
 }
 //***************************************************************************
 //***************************************************************************
 // Vertex to shower distance
-bool variation_output_bkg::VtxNuDistance(double tpc_vtx_x, double tpc_vtx_y, double tpc_vtx_z, double pfp_vtx_x, double pfp_vtx_y, double pfp_vtx_z, double tolerance){
+bool variation_output_bkg::VtxNuDistance(xsecAna::TPCObjectContainer tpc_obj,int pfp_pdg_type , double tolerance){
 	
-	const double distance = sqrt(pow((tpc_vtx_x - pfp_vtx_x), 2) + pow((tpc_vtx_y - pfp_vtx_y), 2) + pow((tpc_vtx_z - pfp_vtx_z), 2) );
-	
-	if(distance <= tolerance)
-		return true; 
-	else 
-		return false;
+	const int n_pfp = tpc_obj.NumPFParticles();
+	const double tpc_vtx_x = tpc_obj.pfpVtxX();
+	const double tpc_vtx_y = tpc_obj.pfpVtxY();
+	const double tpc_vtx_z = tpc_obj.pfpVtxZ();
+
+	const int n_tracks = tpc_obj.NPfpTracks();
+	if (n_tracks == 0 && pfp_pdg_type == 13 ) return true; 
+
+	for (int j = 0; j < n_pfp; j++) {
+
+		auto const part   = tpc_obj.GetParticle(j);
+		const int pfp_pdg = part.PFParticlePdgCode();
+
+		if (pfp_pdg == pfp_pdg_type) {
+
+			const double pfp_vtx_x = part.pfpVtxX();
+			const double pfp_vtx_y = part.pfpVtxY();
+			const double pfp_vtx_z = part.pfpVtxZ();
+
+			const double distance = sqrt(pow((tpc_vtx_x - pfp_vtx_x), 2) + pow((tpc_vtx_y - pfp_vtx_y), 2) + pow((tpc_vtx_z - pfp_vtx_z), 2) );
+
+			if (distance <= tolerance) return true; 
+		}
+
+	}
+	return false;
 
 }
 //***************************************************************************
 //***************************************************************************
 // Hit thresholds all planes
-bool variation_output_bkg::HitThreshold(const int n_pfp_hits, double threshold){
+bool variation_output_bkg::HitThreshold(xsecAna::TPCObjectContainer tpc_obj, double threshold, bool useCollection){
 
-	if(n_pfp_hits >= threshold)
-		return true;
-	else
-		return false; 
+	const int n_pfp = tpc_obj.NumPFParticles();
+
+	for (int j = 0; j < n_pfp; j++) {
+
+		auto const pfp_obj = tpc_obj.GetParticle(j);
+		int  num_pfp_hits  = pfp_obj.NumPFPHits();
+		const int  pfp_pdg = pfp_obj.PFParticlePdgCode();
+
+		if (useCollection) num_pfp_hits = pfp_obj.NumPFPHitsW(); // Collection plane hits
+
+		if (pfp_pdg == 11 && num_pfp_hits >= threshold) return true;
+	}
+	
+	return false;
+	
 
 }
 //***************************************************************************
 //***************************************************************************
 // Leading shower open angle
-bool variation_output_bkg::OpenAngleCut(const double leading_open_angle, const std::vector<double> tolerance_open_angle){
+bool variation_output_bkg::OpenAngleCut(xsecAna::TPCObjectContainer tpc_obj, const std::vector<double> tolerance_open_angle){
 
-	if(leading_open_angle <= tolerance_open_angle.at(1) && leading_open_angle >= tolerance_open_angle.at(0))
+	const int n_pfp = tpc_obj.NumPFParticles();
+
+	int leading_index = 0;
+	int leading_hits  = 0;
+	
+	for (int j = 0; j < n_pfp; j++) {
+		auto const part = tpc_obj.GetParticle(j);
+		const int pfp_pdg = part.PFParticlePdgCode();
+		const int n_pfp_hits = part.NumPFPHits();
+		
+		if (pfp_pdg == 11 && n_pfp_hits > leading_hits) {
+			leading_hits = n_pfp_hits;
+			leading_index = j;
+		}
+	}
+	
+	auto const leading_shower       = tpc_obj.GetParticle(leading_index);
+	const double leading_open_angle = leading_shower.pfpOpenAngle() * (180 / 3.1415);
+
+	if (leading_open_angle <= tolerance_open_angle.at(1) && leading_open_angle >= tolerance_open_angle.at(0))
 		return true;
 	else 
 		return false;
@@ -1069,9 +1114,28 @@ bool variation_output_bkg::OpenAngleCut(const double leading_open_angle, const s
 //***************************************************************************
 //***************************************************************************
 // leading shower dEdx cut
-bool variation_output_bkg::dEdxCut( const double leading_dedx, const double tolerance_dedx_min, const double tolerance_dedx_max){
+bool variation_output_bkg::dEdxCut( xsecAna::TPCObjectContainer tpc_obj, const double tolerance_dedx_min, const double tolerance_dedx_max){
 
-	if(leading_dedx <= tolerance_dedx_max && leading_dedx >= tolerance_dedx_min)
+	const int n_pfp = tpc_obj.NumPFParticles();
+	int leading_index = 0;
+	int leading_hits  = 0;
+
+	for (int j = 0; j < n_pfp; j++) {
+		
+		auto const part = tpc_obj.GetParticle(j);
+		const int pfp_pdg = part.PFParticlePdgCode();
+		const int n_pfp_hits = part.NumPFPHits();
+		
+		if (pfp_pdg == 11 && n_pfp_hits > leading_hits) {
+			leading_hits = n_pfp_hits;
+			leading_index = j;
+		}
+	} 
+	
+	auto const leading_shower = tpc_obj.GetParticle(leading_index);
+	double leading_dedx = leading_shower.PfpdEdx().at(2);//just the collection plane!
+
+	if (leading_dedx <= tolerance_dedx_max && leading_dedx >= tolerance_dedx_min)
 		return true;
 	else 
 		return false;
@@ -1173,19 +1237,20 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 	}
 	std::cout << "flash_time_start:\t" << flash_time_start << "   flash_time_end:\t" << flash_time_end << std::endl;
 	
-	tolerance = _config[9];
-	shwr_nue_tolerance = _config[10];
-	trk_nue_tolerance = _config[11];
-	shwr_hit_threshold = _config[12];
+	tolerance                     = _config[9];
+	shwr_nue_tolerance            = _config[10];
+	trk_nue_tolerance             = _config[11];
+	shwr_hit_threshold            = _config[12];
 	shwr_hit_threshold_collection = _config[13];
-	tolerance_open_angle_min = _config[14];
-	tolerance_open_angle_max = _config[15];
-	tolerance_dedx_min = _config[16];
-	tolerance_dedx_max = _config[17];
-	dist_tolerance = _config[18];
-	pfp_hits_length_tolerance = _config[19];
-	ratio_tolerance = _config[20];
-	detector_variations = _config[21];
+	tolerance_open_angle_min      = _config[14];
+	tolerance_open_angle_max      = _config[15];
+	tolerance_dedx_min            = _config[16];
+	tolerance_dedx_max            = _config[17];
+	dist_tolerance                = _config[18];
+	pfp_hits_length_tolerance     = _config[19];
+	ratio_tolerance               = _config[20];
+	detector_variations           = _config[21];
+	const std::vector<double> tolerance_open_angle {tolerance_open_angle_min, tolerance_open_angle_max};
 
 	//*************************** SAME PLOT *************************************
 	// if bool true just run this function
@@ -1258,12 +1323,13 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 	// ----------------------
 	std::cout << "Starting Eventloop..." << std::endl;
 	for(int event = 0; event < tree_total_entries; event++){
+
+		if (event % 100000 == 0) std::cout << "On entry " << event/100000.0 <<"00k" << std::endl;
 		
 		TPCObjTree->GetEntry(event);
 		mctruth_counter_tree->GetEntry(event);
 
 		int n_tpc_obj = tpc_object_container_v->size();
-		if (event < 10) std::cout << "Total TPC Obj: " << n_tpc_obj << std::endl;
 
 		// --------------- MC Counters ---------------
 		if(mc_nu_id == 1) mc_nue_cc_counter++;
@@ -1351,10 +1417,43 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 			bool bool_inFV = in_fv(tpc_obj_vtx_x, tpc_obj_vtx_y, tpc_obj_vtx_z, fv_boundary_v);
 			if ( bool_inFV == false ) continue;
 			//***************************************************************************************************
-			if (bool_sig) nue_cc_counter++;
 			
+			//****************************** Apply flash vtx cut ************************************************
+			bool bool_flashvtx = flashRecoVtxDist(largest_flash_v, tolerance, tpc_obj_vtx_x, tpc_obj_vtx_y,  tpc_obj_vtx_z);
+			if ( bool_flashvtx == false ) continue;
+			//***************************************************************************************************	 
 
-			 
+			//****************************** Apply vtx nu distance cut ******************************************
+			bool bool_vtxnudist = VtxNuDistance( tpc_obj, 11, shwr_nue_tolerance);
+			if ( bool_vtxnudist == false ) continue;
+			//***************************************************************************************************
+		
+			//****************************** Apply track vtx nu distance cut ************************************
+			bool bool_trackvtxnudist = VtxNuDistance( tpc_obj, 13, trk_nue_tolerance);
+			if ( bool_trackvtxnudist == false ) continue;
+			//***************************************************************************************************
+
+			//****************************** Apply Hit threshold cut**** cut ************************************
+			bool bool_hitTh = HitThreshold(tpc_obj, shwr_hit_threshold, false);
+			if ( bool_hitTh == false ) continue;
+			//***************************************************************************************************
+
+			//****************************** Apply Hit threshold collection cut *********************************
+			bool bool_hitThW = HitThreshold(tpc_obj, shwr_hit_threshold_collection, true);
+			if ( bool_hitThW == false ) continue;
+			//***************************************************************************************************
+
+			//****************************** Apply Open Angle cut ***********************************************
+			bool bool_OpenAngle = OpenAngleCut(tpc_obj, tolerance_open_angle);
+			if ( bool_OpenAngle == false ) continue;
+			//***************************************************************************************************
+
+			//****************************** Apply dEdx cut *****************************************************
+			bool bool_dEdx = dEdxCut(tpc_obj, tolerance_dedx_min, tolerance_dedx_max);
+			if ( bool_dEdx == false ) continue;
+			//***************************************************************************************************
+
+			if (bool_sig ) nue_cc_counter++;
 
 			// Loop over the Par Objects
 			for (int j = 0; j < n_pfp ; j++){
@@ -1388,9 +1487,7 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 				std::vector<double> pfp_end_vtx {pfp_end_x, pfp_end_y, pfp_end_z};
 
 				const double pfp_Nu_vtx_Dist =  pfp_vtx_distance(tpc_obj_vtx_x, tpc_obj_vtx_y, tpc_obj_vtx_z, pfp_vtx_x, pfp_vtx_y, pfp_vtx_z);
-
 				
-
 				// Electron (Shower like)
 				if ( pfp_pdg == 11  ) {
 					
