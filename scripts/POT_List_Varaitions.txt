@@ -61,3 +61,9 @@ Total POT (Method 2): 1.96741e+20
 File: /uboone/data/users/kmistry/work/NueXSection_Outputs/detector_variations/filter_BNBCV.root
 Total POT (Method 1): 1.93802e+20
 Total POT (Method 2): 1.93802e+20
+File: /uboone/data/users/kmistry/work/NueXSection_Outputs/detector_variations/filter_BNBdeadSaturatedChannels.root
+Total POT (Method 1): 1.94234e+20
+Total POT (Method 2): 1.94234e+20
+File: /uboone/data/users/kmistry/work/NueXSection_Outputs/detector_variations/filter_BNBdataSCE.root
+Total POT (Method 1): 1.96761e+20
+Total POT (Method 2): 1.96761e+20

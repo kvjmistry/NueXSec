@@ -67,7 +67,6 @@ class variation_output_bkg {
 	
 	bool in_fv(double x, double y, double z, std::vector<double> fv_boundary_v);
 	std::pair<std::string, int> TPCO_Classifier(xsecAna::TPCObjectContainer tpc_obj, bool true_in_tpc, bool has_pi0);
-	int GetSecondaryShowerIndex(const int n_pfp, int n_tpc_obj, xsecAna::TPCObjectContainer tpc_obj);
 
 	// Flash Functions
 	std::vector<std::vector<double>> GetLargestFlashVector(TFile* f, double flash_time_start, double flash_time_end); 				// Function to resize opical entries to same size of events and get largest flash vector
@@ -79,7 +78,7 @@ class variation_output_bkg {
 	// ----------------------
 	//   Cut Functions
 	// ----------------------
-	void FlashinTime_FlashPE(TFile* f, double flash_start_time, double flash_end_time, std::vector<bool> &flash_cuts_pass_vec );
+	void FlashinTime_FlashPE(TFile* f, double flash_start_time, double flash_end_time, std::vector<bool> &flash_cuts_pass_vec, TString mode );
 	bool HasNue(xsecAna::TPCObjectContainer tpc_obj, const int n_pfp );
 	bool opt_vtx_distance(double tpc_vtx_y, double tpc_vtx_z, double flash_vtx_y, double flash_vtx_z, double tolerance);
 	bool flashRecoVtxDist(std::vector< double > largest_flash_v, double tolerance, const double tpc_vtx_x, const double tpc_vtx_y, const double tpc_vtx_z);
@@ -87,10 +86,11 @@ class variation_output_bkg {
 	bool HitThreshold(xsecAna::TPCObjectContainer tpc_obj, double threshold, bool useCollection);
 	bool OpenAngleCut(xsecAna::TPCObjectContainer tpc_obj, const std::vector<double> tolerance_open_angle);
 	bool dEdxCut( xsecAna::TPCObjectContainer tpc_obj, const double tolerance_dedx_min, const double tolerance_dedx_max);
-	bool HitLengthRatioCut(const double pfp_hits_length_tolerance, const double pfp_hits, const double pfp_length);
-	bool LongestTrackLeadingShowerCut(const double ratio_tolerance, double longest_track_leading_shower_ratio);
+	bool SecondaryShowersDistCut(xsecAna::TPCObjectContainer tpc_obj, const double dist_tolerance);
+	bool HitLengthRatioCut(const double pfp_hits_length_tolerance, xsecAna::TPCObjectContainer tpc_obj);
+	bool LongestTrackLeadingShowerCut(const double ratio_tolerance, xsecAna::TPCObjectContainer tpc_obj);
 	bool IsContained(std::vector<double> track_start, std::vector<double> track_end, std::vector<double> fv_boundary_v);
-	bool ContainedTracksCut(std::vector<double> fv_boundary_v, std::vector<double> pfp_start_vtx, std::vector<double> pfp_end_vtx);
+	bool ContainedTracksCut(std::vector<double> fv_boundary_v, xsecAna::TPCObjectContainer tpc_obj);
 
 
 	// ----------------------
@@ -146,6 +146,25 @@ class variation_output_bkg {
 	double pfp_hits_length_tolerance;
 	double ratio_tolerance;
 	bool detector_variations;
+
+	// ----------------------
+	//    Cut Counters
+	// ----------------------
+	int counter_FlashinTime_FlashPE{0};
+	int counter_HasNue{0};
+	int counter_inFV{0};
+	int counter_FlashRecoVtxDist{0};
+	int counter_VtxNuDist{0};
+	int counter_VtxTrackNuDist{0};
+	int counter_HitThresh{0};
+	int counter_HitThreshW{0};
+	int counter_OpenAngle{0};
+	int counter_dEdx{0};
+	int counter_SecondaryShowers{0};
+	int counter_HitLenghtRatio{0};
+	int counter_LongestTrackLeadingShower{0};
+	int counter_ContainedTrack{0};
+
 
 	// ----------------------
 	//  MC Tree Variables

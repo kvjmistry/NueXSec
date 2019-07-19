@@ -24,48 +24,6 @@ int variation_output_bkg::GetLeadingShowerIndex(const int n_pfp, int n_tpc_obj, 
 
 	return leading_index;
 }
-// Get the secondary shower index, if no secondary shower exists, returns -999
-int variation_output_bkg::GetSecondaryShowerIndex(const int n_pfp, int n_tpc_obj, xsecAna::TPCObjectContainer tpc_obj){
-	int leading_index{0};
-	int most_hits{0};
-	int secondary_index{-999};
-	
-	// Loop over Particle Objects
-	for (int j = 0; j < n_pfp; j++) {
-		auto const pfp_obj = tpc_obj.GetParticle(j);
-		const int  pfp_pdg = pfp_obj.PFParticlePdgCode();
-		
-		if (pfp_pdg != 11) continue; // skip if not a shower
-
-		const int n_pfp_hits = pfp_obj.NumPFPHits();
-		
-		// Compare for most hits
-		if (n_pfp_hits > most_hits) {
-			leading_index = j; 
-			most_hits = n_pfp_hits; 
-		}
-	}
-	// Loop over Particle Objects but this time omit leading index
-	for (int j = 0; j < n_pfp; j++) {
-		
-		if(j == leading_index) continue;         //we assume leading shower == electron shower
-		
-		auto const pfp_obj = tpc_obj.GetParticle(j);
-		const int  pfp_pdg = pfp_obj.PFParticlePdgCode();
-		
-		if (pfp_pdg != 11) continue; // skip if not a shower if one doesnt exit returns -999
-
-		const int n_pfp_hits = pfp_obj.NumPFPHits();
-		
-		// Compare for most hits
-		if (n_pfp_hits > most_hits) {
-			secondary_index = j; 
-			most_hits = n_pfp_hits; 
-		}
-	}
-
-	return secondary_index;
-}
 //***************************************************************************
 //***************************************************************************
 double variation_output_bkg::GetLongestTrackLength(const int n_pfp, int n_tpc_obj, xsecAna::TPCObjectContainer tpc_obj){
@@ -837,7 +795,7 @@ bool variation_output_bkg::flash_pe(int flash_pe, int flash_pe_threshold) {
 //***************************************************************************
 //***************************************************************************
 // Get the vector of flashes with true/false on whether it passed the selection or not
-void variation_output_bkg::FlashinTime_FlashPE(TFile* f, double flash_start_time, double flash_end_time, std::vector<bool> &flash_cuts_pass_vec ){
+void variation_output_bkg::FlashinTime_FlashPE(TFile* f, double flash_start_time, double flash_end_time, std::vector<bool> &flash_cuts_pass_vec, TString mode ){
 	// Get Optical Information from file
 	TTree* optical_tree = (TTree*)f->Get("AnalyzeTPCO/optical_tree");
 
@@ -953,7 +911,10 @@ void variation_output_bkg::FlashinTime_FlashPE(TFile* f, double flash_start_time
 		// Loop over the optical list vec
 		for (int j = 0; j < optical_list_pe_v.at(i).size(); j++) {
 			
-			auto const opt_time = opt_time_v.at(j) +1.0;
+			auto opt_time =  opt_time_v.at(j);
+			if (mode == "numi") opt_time = opt_time_v.at(j) + 1.0;
+			else opt_time = opt_time_v.at(j);
+			
 			auto const opt_pe = opt_pe_v.at(j);
 			
 			in_time          = flash_in_time(opt_time, flash_start_time, flash_end_time);
@@ -1134,32 +1095,138 @@ bool variation_output_bkg::dEdxCut( xsecAna::TPCObjectContainer tpc_obj, const d
 	
 	auto const leading_shower = tpc_obj.GetParticle(leading_index);
 	double leading_dedx = leading_shower.PfpdEdx().at(2);//just the collection plane!
+	leading_dedx = leading_dedx * (196.979 /242.72);
 
-	if (leading_dedx <= tolerance_dedx_max && leading_dedx >= tolerance_dedx_min)
-		return true;
-	else 
-		return false;
+	if (leading_dedx <= tolerance_dedx_max && leading_dedx >= tolerance_dedx_min) return true;
+	 
+	return false;
 
 }
 //***************************************************************************
 //***************************************************************************
-bool variation_output_bkg::HitLengthRatioCut(const double pfp_hits_length_tolerance, const double pfp_hits, const double pfp_length){
-	const double pfp_hits_length_ratio = (pfp_hits / pfp_length);
+// Secondar Showers Cut
+bool variation_output_bkg::SecondaryShowersDistCut(xsecAna::TPCObjectContainer tpc_obj, const double dist_tolerance){
 
-	if (pfp_hits_length_ratio > pfp_hits_length_tolerance)
-		return true;
-	else
-		return false;
+	const int n_pfp = tpc_obj.NumPFParticles();
+	const int n_pfp_showers = tpc_obj.NPfpShowers();
+	
+	// This cut does not target events with fewer than 2 showers
+	if (n_pfp_showers <= 1) return true; 
+	
+	const double tpco_vtx_x = tpc_obj.pfpVtxX();
+	const double tpco_vtx_y = tpc_obj.pfpVtxY();
+	const double tpco_vtx_z = tpc_obj.pfpVtxZ();
+	int leading_index = 0;
+	int leading_hits  = 0;
+	
+	for (int j = 0; j < n_pfp; j++) {
+		
+		auto const part = tpc_obj.GetParticle(j);
+		const int pfp_pdg = part.PFParticlePdgCode();
+		const int n_pfp_hits = part.NumPFPHits();
+		
+		if (pfp_pdg == 11 && n_pfp_hits > leading_hits) {
+			leading_hits = n_pfp_hits;
+			leading_index = j;
+		}
+	}
+	
+	for (int j = 0; j < n_pfp; j++) {
+		
+		if (j == leading_index) continue; // We assume leading shower == electron shower
+		
+		auto const part = tpc_obj.GetParticle(j);
+		const int pfp_pdg = part.PFParticlePdgCode();
+		const double pfp_vtx_x = part.pfpVtxX();
+		const double pfp_vtx_y = part.pfpVtxY();
+		const double pfp_vtx_z = part.pfpVtxZ();
+		
+		const double distance = sqrt(pow((pfp_vtx_x - tpco_vtx_x),2) + pow((pfp_vtx_y - tpco_vtx_y),2) + pow((pfp_vtx_z - tpco_vtx_z),2));
+		
+		if (pfp_pdg == 11) {
+			if (distance > dist_tolerance) return false;
+			// if (distance <= dist_tolerance) return true;
+				
+		}
+	}
+	
+	return true;
 	
 }
 //***************************************************************************
 //***************************************************************************
-bool variation_output_bkg::LongestTrackLeadingShowerCut(const double ratio_tolerance, double longest_track_leading_shower_ratio){
+bool variation_output_bkg::HitLengthRatioCut(const double pfp_hits_length_tolerance, xsecAna::TPCObjectContainer tpc_obj){
+	
+	const int n_pfp = tpc_obj.NumPFParticles();
+	const int n_pfp_showers = tpc_obj.NPfpShowers();
+	int leading_index = 0;
+	int leading_hits  = 0;
+	
+	for (int j = 0; j < n_pfp; j++) {
+		
+		auto const part = tpc_obj.GetParticle(j);
+		const int pfp_pdg = part.PFParticlePdgCode();
+		const int n_pfp_hits = part.NumPFPHits();
+		
+		if (pfp_pdg == 11 && n_pfp_hits > leading_hits) {
+			leading_hits = n_pfp_hits;
+			leading_index = j;
+		}
+	}
+	
+	auto const leading_shower = tpc_obj.GetParticle(leading_index);
+	const int pfp_pdg = leading_shower.PFParticlePdgCode();
+	const double pfp_hits = leading_shower.NumPFPHits();
+	const double pfp_length = leading_shower.pfpLength();
+	const double pfp_hits_length_ratio = (pfp_hits / pfp_length);
 
-	if(longest_track_leading_shower_ratio < ratio_tolerance)
-		return true;
-	else
-		return false;
+	if (pfp_pdg == 11 && pfp_hits_length_ratio > pfp_hits_length_tolerance ) return true;
+
+	return false;
+	
+}
+//***************************************************************************
+//***************************************************************************
+bool variation_output_bkg::LongestTrackLeadingShowerCut(const double ratio_tolerance, xsecAna::TPCObjectContainer tpc_obj){
+
+	const int n_pfp = tpc_obj.NumPFParticles();
+	const int n_pfp_tracks = tpc_obj.NPfpTracks();
+	
+	if (n_pfp_tracks == 0) return true;
+	
+	int leading_index = 0;
+	int leading_hits  = 0;
+	double longest_track = 0;
+	
+	for (int j = 0; j < n_pfp; j++) {
+		
+		auto const pfp = tpc_obj.GetParticle(j);
+		const int pfp_pdg = pfp.PFParticlePdgCode();
+		const int n_pfp_hits = pfp.NumPFPHits();
+		
+		if (pfp_pdg == 11 && n_pfp_hits > leading_hits) {
+			leading_hits = n_pfp_hits;
+			leading_index = j;
+		}
+		
+		if(pfp_pdg == 13) {
+			
+			const double trk_length = pfp.pfpLength();
+			
+			if (trk_length > longest_track) longest_track = trk_length;
+			
+		}
+	
+	} //end loop pfparticles
+	
+	auto const leading_shower = tpc_obj.GetParticle(leading_index);
+	const double leading_shower_length = leading_shower.pfpLength();
+	const double longest_track_leading_shower_ratio = longest_track / leading_shower_length;
+
+	//if the ratio is too large:
+	if (longest_track_leading_shower_ratio > ratio_tolerance) return false;
+
+	return true;
 
 }
 //***************************************************************************
@@ -1173,16 +1240,44 @@ bool variation_output_bkg::IsContained(std::vector<double> track_start, std::vec
 	else 
 		return false;
 }
-bool variation_output_bkg::ContainedTracksCut(std::vector<double> fv_boundary_v, std::vector<double> pfp_start_vtx, std::vector<double> pfp_end_vtx){
+bool variation_output_bkg::ContainedTracksCut(std::vector<double> fv_boundary_v, xsecAna::TPCObjectContainer tpc_obj){
 
-	const bool is_contained = IsContained(pfp_start_vtx, pfp_end_vtx, fv_boundary_v);
-
-	//if not contained
-	if(is_contained == true) 
-		return true;
-	else
-		return false;
+	const int n_pfp = tpc_obj.NumPFParticles();
+	const int n_pfp_tracks = tpc_obj.NPfpTracks();
 	
+	// This is normally enabled, but due to test cut below it is off
+	if (n_pfp_tracks == 0) return true;
+
+	for (int j = 0; j < n_pfp; j++) {
+		
+		auto const pfp = tpc_obj.GetParticle(j);
+		const int pfp_pdg = pfp.PFParticlePdgCode();
+		
+		if (pfp_pdg == 13) {
+			
+			const double pfp_vtx_x = pfp.pfpVtxX();
+			const double pfp_vtx_y = pfp.pfpVtxY();
+			const double pfp_vtx_z = pfp.pfpVtxZ();
+			const double pfp_dir_x = pfp.pfpDirX();
+			const double pfp_dir_y = pfp.pfpDirY();
+			const double pfp_dir_z = pfp.pfpDirZ();
+			const double trk_length = pfp.pfpLength();
+			const double pfp_end_x = (pfp.pfpVtxX() + (trk_length * pfp_dir_x));
+			const double pfp_end_y = (pfp.pfpVtxY() + (trk_length * pfp_dir_y));
+			const double pfp_end_z = (pfp.pfpVtxZ() + (trk_length * pfp_dir_z));
+
+			std::vector<double> pfp_start_vtx {pfp_vtx_x, pfp_vtx_y, pfp_vtx_z};
+			std::vector<double> pfp_end_vtx {pfp_end_x, pfp_end_y, pfp_end_z};
+
+			const bool is_contained = IsContained(pfp_start_vtx, pfp_end_vtx, fv_boundary_v);
+
+			//if not contained
+			if(is_contained == false) return false;
+		
+		} // end is track
+	
+	} // end loop pfprticles
+	return true;	
 }
 //***************************************************************************
 //***************************************************************************
@@ -1290,7 +1385,7 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 
 	//************* Get list of flashes that pass flash in time and flash pe cut ************************
 	std::vector<bool> flash_cuts_pass_vec;
-	FlashinTime_FlashPE(inFile, flash_time_start, flash_time_end, flash_cuts_pass_vec );
+	FlashinTime_FlashPE(inFile, flash_time_start, flash_time_end, flash_cuts_pass_vec, mode );
 	//***************************************************************************************************
 
 	// MCTruth Counting Tree
@@ -1355,11 +1450,8 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 			h_largest_flash_pe	->Fill(largest_flash_pe);
 		}
 
-		//************************ Apply Flash in time and Flash PE cut *************************************
-		if (flash_cuts_pass_vec.at(event) == false) continue;
-		//***************************************************************************************************
 		
-		// if (bool_sig) sig_counter++;
+		
 		// -------------------------------------------------
 
 		// Loop over TPCObj
@@ -1380,8 +1472,6 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 				}
 			}
 
-			// if (bool_sig) nue_cc_counter++;
-
 			// TPC Obj vars
 			tpc_obj_vtx_x = tpc_obj.pfpVtxX();
 			tpc_obj_vtx_y = tpc_obj.pfpVtxY();
@@ -1390,9 +1480,6 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 			const int tpc_obj_mode = tpc_obj.Mode(); 
 			n_pfp = tpc_obj.NumPFParticles();
 			const int leading_shower_index = GetLeadingShowerIndex(n_pfp, n_tpc_obj, tpc_obj);
-			bool use_secondary_shower_cut{false};
-			const int secondary_shower_index = GetSecondaryShowerIndex(n_pfp, n_tpc_obj, tpc_obj);
-			if (secondary_shower_index != -999) use_secondary_shower_cut = true;
 
 			// Other histograms
 			n_tracks = 0; n_showers = 0; n_pfp_50Hits = 0; n_tracks_50Hits = 0; n_showers_50Hits = 0;
@@ -1407,53 +1494,100 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 			const double Flash_TPCObj_Dist = Flash_TPCObj_vtx_Dist(tpc_obj_vtx_y, tpc_obj_vtx_z, largest_flash_y, largest_flash_z);
 			h_Flash_TPCObj_Dist->Fill(Flash_TPCObj_Dist);
 
+			if (bool_sig) nue_cc_counter++;
 
+			//************************ Apply Flash in time and Flash PE cut *************************************
+			if (flash_cuts_pass_vec.at(event) == false) continue;
+			if (bool_sig) counter_FlashinTime_FlashPE++;
+			//***************************************************************************************************
+			
 			//****************************** Apply Pandora Reco Nue cut *****************************************
 			bool bool_HasNue = HasNue(tpc_obj, n_pfp );
 			if ( bool_HasNue == false ) continue;
+			if (bool_sig) counter_HasNue++;
 			//***************************************************************************************************
 			
 			//****************************** Apply In FV cut ****************************************************
 			bool bool_inFV = in_fv(tpc_obj_vtx_x, tpc_obj_vtx_y, tpc_obj_vtx_z, fv_boundary_v);
 			if ( bool_inFV == false ) continue;
+			if (bool_sig) counter_inFV++;
 			//***************************************************************************************************
 			
 			//****************************** Apply flash vtx cut ************************************************
 			bool bool_flashvtx = flashRecoVtxDist(largest_flash_v, tolerance, tpc_obj_vtx_x, tpc_obj_vtx_y,  tpc_obj_vtx_z);
 			if ( bool_flashvtx == false ) continue;
+			if (bool_sig) counter_FlashRecoVtxDist++;
 			//***************************************************************************************************	 
 
 			//****************************** Apply vtx nu distance cut ******************************************
 			bool bool_vtxnudist = VtxNuDistance( tpc_obj, 11, shwr_nue_tolerance);
 			if ( bool_vtxnudist == false ) continue;
+			if (bool_sig) counter_VtxNuDist++;
 			//***************************************************************************************************
 		
 			//****************************** Apply track vtx nu distance cut ************************************
 			bool bool_trackvtxnudist = VtxNuDistance( tpc_obj, 13, trk_nue_tolerance);
 			if ( bool_trackvtxnudist == false ) continue;
+			if (bool_sig) counter_VtxTrackNuDist++;
 			//***************************************************************************************************
 
 			//****************************** Apply Hit threshold cut**** cut ************************************
 			bool bool_hitTh = HitThreshold(tpc_obj, shwr_hit_threshold, false);
 			if ( bool_hitTh == false ) continue;
+			if (bool_sig) counter_HitThresh++;
 			//***************************************************************************************************
 
 			//****************************** Apply Hit threshold collection cut *********************************
 			bool bool_hitThW = HitThreshold(tpc_obj, shwr_hit_threshold_collection, true);
 			if ( bool_hitThW == false ) continue;
+			if (bool_sig) counter_HitThreshW++;
 			//***************************************************************************************************
 
 			//****************************** Apply Open Angle cut ***********************************************
 			bool bool_OpenAngle = OpenAngleCut(tpc_obj, tolerance_open_angle);
 			if ( bool_OpenAngle == false ) continue;
+			if (bool_sig) counter_OpenAngle++;
 			//***************************************************************************************************
 
 			//****************************** Apply dEdx cut *****************************************************
 			bool bool_dEdx = dEdxCut(tpc_obj, tolerance_dedx_min, tolerance_dedx_max);
 			if ( bool_dEdx == false ) continue;
+			if (bool_sig) counter_dEdx++;
 			//***************************************************************************************************
 
-			if (bool_sig ) nue_cc_counter++;
+			//************************* Apply Secondary shower dist cut *****************************************
+			bool bool_sshwrcut = SecondaryShowersDistCut(tpc_obj, dist_tolerance);
+			if ( bool_sshwrcut == false ) continue;
+			if (bool_sig) counter_SecondaryShowers++;
+			//***************************************************************************************************
+
+			//************************* Apply hit per lengh ratio cut *******************************************
+			bool bool_hitlengthratio = HitLengthRatioCut( pfp_hits_length_tolerance, tpc_obj);
+			if ( bool_hitlengthratio == false ) continue;
+			if (bool_sig) counter_HitLenghtRatio++;
+			//***************************************************************************************************
+
+			//************************* Apply Longest Track Leading Shower cut **********************************
+			bool bool_longtrackleadingshwr = LongestTrackLeadingShowerCut(ratio_tolerance, tpc_obj);
+			if ( bool_longtrackleadingshwr == false ) continue;
+			if (bool_sig) counter_LongestTrackLeadingShower++;
+			//***************************************************************************************************
+			
+			//************************* Apply Contained Track Cut ***********************************************
+			bool bool_contTrack = ContainedTracksCut(fv_boundary_v, tpc_obj);
+			if ( bool_contTrack  == false ) continue;
+			if (bool_sig) counter_ContainedTrack++;
+			//***************************************************************************************************
+			
+			//************************* Skip unmatched and other mixed events ***********************************
+			if (tpc_classification.first == "unmatched" || tpc_classification.first == "other_mixed") continue;
+			//***************************************************************************************************
+
+			if (bool_sig ) sig_counter++;
+			if (!bool_sig ) bkg_counter++;
+
+
+			// if (!bool_sig ) std::cout << tpc_classification.first << std::endl;
 
 			// Loop over the Par Objects
 			for (int j = 0; j < n_pfp ; j++){
@@ -1488,50 +1622,46 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 
 				const double pfp_Nu_vtx_Dist =  pfp_vtx_distance(tpc_obj_vtx_x, tpc_obj_vtx_y, tpc_obj_vtx_z, pfp_vtx_x, pfp_vtx_y, pfp_vtx_z);
 				
-				// Electron (Shower like)
-				if ( pfp_pdg == 11  ) {
+				// Background events
+				if (!bool_sig) {
+
+					// std::cout << tpc_classification.first << std::endl;
+
 					
+					h_total_hits->Fill(num_pfp_hits);
 
-					// Background events
-					if (!bool_sig) {
+					const double shower_phi = atan2(pfp_obj.pfpDirY(), pfp_obj.pfpDirX()) * 180 / 3.1415;
+					h_shower_phi->Fill(shower_phi);
 
-						// std::cout << tpc_classification.first << std::endl;
+					h_shower_Nu_vtx_Dist->Fill(pfp_Nu_vtx_Dist);
 
-						bkg_counter++;
-						h_total_hits->Fill(num_pfp_hits);
+					//  ------------ Leading shower ------------
+					if (j == leading_shower_index){
+						const double leading_shower_phi 	= atan2(pfp_obj.pfpDirY(), pfp_obj.pfpDirX()) * 180 / 3.1415;
+						const double leading_shower_theta 	= acos(pfp_obj.pfpDirZ()) * 180 / 3.1415;
+						
+						const double leading_shower_length 	= pfp_obj.pfpLength();
+						const double longest_track_length 	= GetLongestTrackLength(n_pfp, n_tpc_obj, tpc_obj);
 
-						const double shower_phi = atan2(pfp_obj.pfpDirY(), pfp_obj.pfpDirX()) * 180 / 3.1415;
-						h_shower_phi->Fill(shower_phi);
+						h_ldg_shwr_hits			->Fill(num_pfp_hits);
+						h_ldg_shwr_hits_WPlane	->Fill(pfp_obj.NumPFPHitsW()); 		// W Plane
+						h_ldg_shwr_Open_Angle	->Fill(pfp_obj.pfpOpenAngle() * (180 / 3.1415) );
+						h_ldg_shwr_dEdx_WPlane	->Fill(pfp_obj.PfpdEdx().at(2) ); 	// W Plane
+						h_ldg_shwr_HitPerLen	->Fill(num_pfp_hits / pfp_obj.pfpLength() );
+						h_ldg_shwr_Phi			->Fill(leading_shower_phi);
+						h_ldg_shwr_Theta		->Fill(leading_shower_theta);
+						h_ldg_shwr_CTheta		->Fill(cos(leading_shower_theta * 3.1414 / 180.));
+						h_long_Track_ldg_shwr	->Fill(longest_track_length / leading_shower_length);
 
-						h_shower_Nu_vtx_Dist->Fill(pfp_Nu_vtx_Dist);
-
-						//  ------------ Leading shower ------------
-						if (j == leading_shower_index){
-							const double leading_shower_phi 	= atan2(pfp_obj.pfpDirY(), pfp_obj.pfpDirX()) * 180 / 3.1415;
-							const double leading_shower_theta 	= acos(pfp_obj.pfpDirZ()) * 180 / 3.1415;
-							
-							const double leading_shower_length 	= pfp_obj.pfpLength();
-							const double longest_track_length 	= GetLongestTrackLength(n_pfp, n_tpc_obj, tpc_obj);
-
-							h_ldg_shwr_hits			->Fill(num_pfp_hits);
-							h_ldg_shwr_hits_WPlane	->Fill(pfp_obj.NumPFPHitsW()); 		// W Plane
-							h_ldg_shwr_Open_Angle	->Fill(pfp_obj.pfpOpenAngle() * (180 / 3.1415) );
-							h_ldg_shwr_dEdx_WPlane	->Fill(pfp_obj.PfpdEdx().at(2) ); 	// W Plane
-							h_ldg_shwr_HitPerLen	->Fill(num_pfp_hits / pfp_obj.pfpLength() );
-							h_ldg_shwr_Phi			->Fill(leading_shower_phi);
-							h_ldg_shwr_Theta		->Fill(leading_shower_theta);
-							h_ldg_shwr_CTheta		->Fill(cos(leading_shower_theta * 3.1414 / 180.));
-							h_long_Track_ldg_shwr	->Fill(longest_track_length / leading_shower_length);
-
-							// Vertex Information - require a shower so fill once  when leading shower
-							h_tpc_obj_vtx_x->Fill(tpc_obj_vtx_x);
-							h_tpc_obj_vtx_y->Fill(tpc_obj_vtx_y);
-							h_tpc_obj_vtx_z->Fill(tpc_obj_vtx_z);
-						}
-					
+						// Vertex Information - require a shower so fill once  when leading shower
+						h_tpc_obj_vtx_x->Fill(tpc_obj_vtx_x);
+						h_tpc_obj_vtx_y->Fill(tpc_obj_vtx_y);
+						h_tpc_obj_vtx_z->Fill(tpc_obj_vtx_z);
 					}
-					
+				
 				}
+					
+				
 				// Track like
 				if ( pfp_pdg == 13) {
 					// Background events
@@ -1548,19 +1678,33 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 
 	} // END EVENT LOOP
 	std::cout << "Finished Eventloop..." << std::endl;
-
-	
+		
 	std::cout << "--------------- MC Truth COUNTERS -----------------" << std::endl;
 	std::cout << "MC Nue CC Counter      --- " << mc_nue_cc_counter << std::endl;
 	std::cout << "MC Nue NC Counter      --- " << mc_nue_nc_counter << std::endl;
 	std::cout << "MC Nue CC Counter Bar  --- " << mc_nue_cc_counter_bar << std::endl;
 	std::cout << "MC Nue NC Counter Bar  --- " << mc_nue_nc_counter_bar << std::endl;
 	std::cout << "---------------------------------------------------" << std::endl;
+	std::cout << "--------------- Cut COUNTERS ---------------------" << std::endl;
+	std::cout << "Flash in Time, Flash PE      --- " << counter_FlashinTime_FlashPE << std::endl;
+	std::cout << "Reco Nue                     --- " << counter_HasNue << std::endl;
+	std::cout << "In FV                        --- " << counter_inFV << std::endl;
+	std::cout << "Flash Reco Vtx Dist          --- " << counter_FlashRecoVtxDist << std::endl;
+	std::cout << "Vtx Nu Dist                  --- " << counter_VtxNuDist << std::endl;
+	std::cout << "Vtx Track Nu Dist            --- " << counter_VtxTrackNuDist << std::endl;
+	std::cout << "Hit Threshold                --- " << counter_HitThresh << std::endl;
+	std::cout << "Hit Threshold Collection     --- " << counter_HitThreshW << std::endl;
+	std::cout << "Open Angle                   --- " << counter_OpenAngle << std::endl;
+	std::cout << "dEdx                         --- " << counter_dEdx << std::endl;
+	std::cout << "Secondary Showers            --- " << counter_SecondaryShowers << std::endl;
+	std::cout << "Hit Length Ratio             --- " << counter_HitLenghtRatio << std::endl;
+	std::cout << "Longest Track Leading Shower --- " << counter_LongestTrackLeadingShower << std::endl;
+	std::cout << "Contained Tracks             --- " << counter_ContainedTrack << std::endl;
+	std::cout << "---------------------------------------------------" << std::endl;
 	std::cout << "--------------- Reco COUNTERS ---------------------" << std::endl;
-	std::cout << "(Requiring shower like and (nue/nuebar or numu/numubar))" << std::endl;
-	std::cout << "RECO Nue CC Counter (Tot) --- " << nue_cc_counter << std::endl;
-	std::cout << "RECO Signal Counter       --- " << sig_counter << std::endl;
-	std::cout << "RECO Background Counter   --- " << bkg_counter << std::endl;
+	std::cout << "True Nue CC in FV --- " << nue_cc_counter << std::endl;
+	std::cout << "RECO Signal       --- " << sig_counter << std::endl;
+	std::cout << "RECO Background   --- " << bkg_counter << std::endl;
 	std::cout << "---------------------------------------------------" << std::endl;
 	
 	// ----------------------
