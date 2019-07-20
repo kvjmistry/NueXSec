@@ -25,6 +25,8 @@ bool flash_in_time(double flash_time, double flash_start, double flash_end);
 //***************************************************************************
 bool flash_pe(int flash_pe, int flash_pe_threshold);
 //***************************************************************************
+static bool sortbysec(const std::tuple<int,int,int> &a, const std::tuple<int,int,int> &b);
+//***************************************************************************
 void loop_flashes(TFile * f, TTree * optical_tree, int flash_pe_threshold, double flash_time_start,
                   double flash_time_end, std::vector<int> * _passed_runs, std::vector<std::pair<double, int> > * flash_time, const int stream);
 //***************************************************************************
@@ -65,7 +67,7 @@ void OpenAngleCut(std::vector<xsecAna::TPCObjectContainer> * tpc_object_containe
                   const std::vector<double> tolerance_open_angle, const bool _verbose);
 //***************************************************************************
 void dEdxCut(std::vector<xsecAna::TPCObjectContainer> * tpc_object_container_v, std::vector<std::pair<int, std::string> > * passed_tpco,
-             const double tolerance_dedx_min, const double tolerance_dedx_max, const bool _verbose);
+             const double tolerance_dedx_min, const double tolerance_dedx_max, const bool _verbose, const bool is_ext);
 //***************************************************************************
 void SecondaryShowersDistCut(std::vector<xsecAna::TPCObjectContainer> * tpc_object_container_v,
                              std::vector<std::pair<int, std::string> > * passed_tpco, bool _verbose, const double dist_tolerance);

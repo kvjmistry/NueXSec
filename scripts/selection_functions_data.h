@@ -51,6 +51,9 @@ std::pair<std::string, int> TPCO_Classifier_Data(xsecAna::TPCObjectContainer tpc
 void PostCutsdEdxData(std::vector<xsecAna::TPCObjectContainer> * tpc_object_container_v,
                       std::vector<std::pair<int, std::string> > * passed_tpco, bool _verbose,
                       TH1D * h_dedx_cuts_data);
+void PostCutsdEdxAltScaleData(std::vector<xsecAna::TPCObjectContainer> * tpc_object_container_v,
+                              std::vector<std::pair<int, std::string> > * passed_tpco, bool _verbose, const double alt_scale,
+                              TH1D * h_dedx_cuts_data);
 //***************************************************************************
 //***************************************************************************
 void PostCutOpenAngleData(std::vector<xsecAna::TPCObjectContainer> * tpc_object_container_v,
@@ -199,8 +202,21 @@ void LeadingMomentumTrackTopologyData(std::vector<xsecAna::TPCObjectContainer> *
                                       TH1D * h_ele_pfp_momentum_has_track_data);
 //***************************************************************************
 //***************************************************************************
+void LeadingPhiTrackTopologyData(std::vector<xsecAna::TPCObjectContainer> * tpc_object_container_v,
+                                 std::vector<std::pair<int, std::string> > * passed_tpco, bool _verbose,
+                                 TH1D * h_ele_pfp_phi_no_track_data,
+                                 TH1D * h_ele_pfp_phi_has_track_data);
+//***************************************************************************
+//***************************************************************************
+void LeadingThetaTrackTopologyData(std::vector<xsecAna::TPCObjectContainer> * tpc_object_container_v,
+                                   std::vector<std::pair<int, std::string> > * passed_tpco, bool _verbose,
+                                   TH1D * h_ele_pfp_theta_no_track_data,
+                                   TH1D * h_ele_pfp_theta_has_track_data);
+//***************************************************************************
+//***************************************************************************
 void XYZPositionData(std::vector<xsecAna::TPCObjectContainer> * tpc_object_container_v,
-                     std::vector<std::pair<int, std::string> > * passed_tpco, bool _verbose, std::vector<TH1 * > * h_ele_pfp_xyz_data, TH2 * h_pfp_zy_vtx_data);
+                     std::vector<std::pair<int, std::string> > * passed_tpco, bool _verbose, std::vector<TH1 * > * h_ele_pfp_xyz_data,
+                     TH2 * h_pfp_zy_vtx_data, double & xyz_near, double & xyz_far);
 void XYZPositionData(std::vector<xsecAna::TPCObjectContainer> * tpc_object_container_v,
                      std::vector<std::pair<int, std::string> > * passed_tpco, bool _verbose, std::vector<TH1 * > * h_ele_pfp_xyz_data);
 //***************************************************************************
@@ -244,6 +260,39 @@ void PostCutsLeadingMomentumData(std::vector<xsecAna::TPCObjectContainer> * tpc_
 void dEdxThetaData(std::vector<xsecAna::TPCObjectContainer> * tpc_object_container_v,
                    std::vector<std::pair<int, std::string> > * passed_tpco, bool _verbose,
                    TH2D * h_dedx_theta_data);
+//***************************************************************************
+//***************************************************************************
+void EventMultiplicityData(std::vector<xsecAna::TPCObjectContainer> * tpc_object_container_v,
+                           std::vector<std::pair<int, std::string> > * passed_tpco, bool _verbose,
+                           TH1D * h_multiplicity_shower_data, TH1D * h_multiplicity_track_data);
+//***************************************************************************
+//***************************************************************************
+void LeadingKinematicsShowerTopologyData(std::vector<xsecAna::TPCObjectContainer> * tpc_object_container_v,
+                                         std::vector<std::pair<int, std::string> > * passed_tpco, bool _verbose,
+                                         TH1D * h_ele_pfp_momentum_1shwr_data,
+                                         TH1D * h_ele_pfp_momentum_2shwr_data,
+                                         TH1D * h_ele_pfp_theta_1shwr_data,
+                                         TH1D * h_ele_pfp_theta_2shwr_data,
+                                         TH1D * h_ele_pfp_phi_1shwr_data,
+                                         TH1D * h_ele_pfp_phi_2shwr_data);
+//***************************************************************************
+//***************************************************************************
+void IsContainedPlotData(std::vector<xsecAna::TPCObjectContainer> * tpc_object_container_v,
+                         std::vector<std::pair<int, std::string> > * passed_tpco, bool _verbose,
+                         std::vector<double> fv_boundary_v, TH1 * h_track_containment_data);
+//***************************************************************************
+//***************************************************************************
+void EvaluatedEdxMethodData(
+        std::vector<xsecAna::TPCObjectContainer> * tpc_object_container_v,
+        std::vector<std::pair<int, std::string> > * passed_tpco,
+        TH1D * dedx,
+        TH1D * dedx_cali,
+        TH1D * dedx_omit,
+        TH1D * dedx_omit_cali,
+        TH2D * dedx_yz_ratio_cali,
+        TH2D * dedx_yz_ratio_omit,
+        TH2D * dedx_yz_ratio_omit_cali
+        );
 //***************************************************************************
 //***************************************************************************
 };

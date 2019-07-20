@@ -1,0 +1,69 @@
+File: filter_withDIC.root
+Total POT (Method 1): 8.3951e+21
+Total POT (Method 2): 8.3951e+21
+File: filter_EnhancedTPCVis.root
+Total POT (Method 1): 6.10999e+21
+Total POT (Method 2): 6.10999e+21
+File: filter_deadSaturatedChannels.root
+Total POT (Method 1): 6.7252e+21
+Total POT (Method 2): 6.7252e+21
+File: filter_numi_cosmic_v4.root
+Total POT (Method 1): 1.82027e+21
+Total POT (Method 2): 1.82027e+21
+File: filter_stretchResp.root
+Total POT (Method 1): 7.14407e+21
+Total POT (Method 2): 7.14407e+21
+File: filter_altDeadChannels.root
+Total POT (Method 1): 8.10415e+21
+Total POT (Method 2): 8.10415e+21
+File: filter_CV.root
+Total POT (Method 1): 8.26505e+21
+Total POT (Method 2): 8.26505e+21
+File: filter_squeezeResp.root
+Total POT (Method 1): 8.14288e+21
+Total POT (Method 2): 8.14288e+21
+File: filter_upPEnoise.root
+Total POT (Method 1): 7.82788e+21
+Total POT (Method 2): 7.82788e+21
+File: filter_noiseAmpDown.root
+Total POT (Method 1): 8.32739e+21
+Total POT (Method 2): 8.32739e+21
+File: filter_downPEnoise.root
+Total POT (Method 1): 8.2784e+21
+Total POT (Method 2): 8.2784e+21
+File: filter_noiseAmpUp.root
+Total POT (Method 1): 8.35778e+21
+Total POT (Method 2): 8.35778e+21
+File: filter_DTdown.root
+Total POT (Method 1): 7.85459e+21
+Total POT (Method 2): 7.85459e+21
+File: filter_DTup.root
+Total POT (Method 1): 7.78057e+21
+Total POT (Method 2): 7.78057e+21
+File: filter_DLup.root
+Total POT (Method 1): 7.56441e+21
+Total POT (Method 2): 7.56441e+21
+File: filter_DLdown.root
+Total POT (Method 1): 7.56908e+21
+Total POT (Method 2): 7.56908e+21
+File: filter_dataSCE.root
+Total POT (Method 1): 8.27396e+21
+Total POT (Method 2): 8.27396e+21
+File: filter_LArG4BugFix.root
+Total POT (Method 1): 8.19563e+21
+Total POT (Method 2): 8.19563e+21
+File: filter_BirksRecomb.root
+Total POT (Method 1): 8.29012e+21
+Total POT (Method 2): 8.29012e+21
+File: /uboone/data/users/kmistry/work/NueXSection_Outputs/detector_variations/filter_BNBwithDIC.root
+Total POT (Method 1): 1.96741e+20
+Total POT (Method 2): 1.96741e+20
+File: /uboone/data/users/kmistry/work/NueXSection_Outputs/detector_variations/filter_BNBCV.root
+Total POT (Method 1): 1.93802e+20
+Total POT (Method 2): 1.93802e+20
+File: /uboone/data/users/kmistry/work/NueXSection_Outputs/detector_variations/filter_BNBdeadSaturatedChannels.root
+Total POT (Method 1): 1.94234e+20
+Total POT (Method 2): 1.94234e+20
+File: /uboone/data/users/kmistry/work/NueXSection_Outputs/detector_variations/filter_BNBdataSCE.root
+Total POT (Method 1): 1.96761e+20
+Total POT (Method 2): 1.96761e+20

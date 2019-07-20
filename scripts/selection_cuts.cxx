@@ -18,6 +18,12 @@ bool selection_cuts::flash_pe(int flash_pe, int flash_pe_threshold)
 	}
 	return false;//false
 }
+// Driver function to sort the vector elements
+// by second element of pairs
+bool selection_cuts::sortbysec(const std::tuple<int,int,int> &a, const std::tuple<int,int,int> &b)
+{
+	return (std::get<0>(a) < std::get<0>(b));
+}
 //***************************************************************************
 void selection_cuts::loop_flashes(TFile * f, TTree * optical_tree, int flash_pe_threshold, double flash_time_start,
                                   double flash_time_end, std::vector<int> * _passed_runs, std::vector<std::pair<double, int> > * flash_time, const int stream)
@@ -25,11 +31,13 @@ void selection_cuts::loop_flashes(TFile * f, TTree * optical_tree, int flash_pe_
 	optical_tree = (TTree*)f->Get("AnalyzeTPCO/optical_tree");
 
 	int fRun = 0;
+	int fSubrun = 0;
 	int fEvent = 0;
 	int fOpFlashPE = 0;
 	double fOpFlashTime = 0;
 
 	optical_tree->SetBranchAddress("Run",              &fRun);
+	optical_tree->SetBranchAddress("SubRun",           &fSubrun);
 	optical_tree->SetBranchAddress("Event",            &fEvent);
 	optical_tree->SetBranchAddress("OpFlashPE",        &fOpFlashPE);
 	optical_tree->SetBranchAddress("OpFlashTime",      &fOpFlashTime);
@@ -41,8 +49,10 @@ void selection_cuts::loop_flashes(TFile * f, TTree * optical_tree, int flash_pe_
 
 	int current_event = 0;
 	int current_run = 0;
+	int current_subrun = 0;
 	int last_event = 0;
 	int last_run = 0;
+	int last_subrun = 0;
 
 	//contains the entry number for a given OpFlash per event
 	std::vector<int> optical_list_pe;
@@ -52,6 +62,8 @@ void selection_cuts::loop_flashes(TFile * f, TTree * optical_tree, int flash_pe_
 
 	std::cout << "Optical Entries: " << optical_entries << std::endl;
 
+	//std::vector<std::tuple<int, int, int> > temp_v;
+
 	for(int i = 0; i < optical_entries; i++)
 	{
 		optical_tree->GetEntry(i);
@@ -59,6 +71,7 @@ void selection_cuts::loop_flashes(TFile * f, TTree * optical_tree, int flash_pe_
 		//this function here is meant to construct a vector mapping to which
 		//events successfully pass this cut
 		current_run = fRun;
+		current_subrun = fSubrun;
 		current_event = fEvent;
 		double op_flash_time = fOpFlashTime;
 
@@ -78,8 +91,15 @@ void selection_cuts::loop_flashes(TFile * f, TTree * optical_tree, int flash_pe_
 		//based on comparisons, shift is ~1 us
 		if(stream == 2) {op_flash_time = op_flash_time + 1.0; }
 
-		auto const pair = std::make_pair(op_flash_time, current_run);
-		flash_time->push_back(pair);
+		auto const my_pair = std::make_pair(op_flash_time, current_run);
+		flash_time->push_back(my_pair);
+		// auto const tuple = std::make_tuple(current_run, current_subrun, current_event);
+		// temp_v.push_back(tuple);
+
+		///////////////////
+		// Using sort() function to sort by 2nd element
+		// of pair
+		//std::sort(flash_time->begin(), flash_time->end(), sortbysec);
 
 		//new event
 		if(current_event != last_event)
@@ -99,10 +119,23 @@ void selection_cuts::loop_flashes(TFile * f, TTree * optical_tree, int flash_pe_
 		}
 		last_event = current_event;
 		last_run = current_run;
+		last_subrun = current_subrun;
+
 		optical_list_pe_v.push_back(optical_list_pe);
 		optical_list_time_v.push_back(optical_list_time);
 	}
 	std::cout << "Optical List Vector Size: " << optical_list_pe_v.size() << std::endl;
+	//
+	// std::sort(temp_v.begin(), temp_v.end(), sortbysec);
+	// const int last_run = 0;
+	//
+	// for(auto const tuple : temp_v)
+	// {
+	//      const int run = std::get<0>(tuple);
+	//      const int subrun = std::get<1>(tuple);
+	//      const int event = std::get<2>(tuple);
+	//      //std::cout << "Run: " << run << " Subrun: " << subrun << " Event: " << event << std::endl;
+	// }
 
 	std::vector<int> optical_pass_list_v;
 	int opt_list_counter = 0;
@@ -360,7 +393,7 @@ void selection_cuts::SetXYflashVector(TFile * f, TTree * optical_tree, std::vect
 		// largest_flash_v.at(2) = current_event;
 		// largest_flash_v.at(3) = fOpFlashWidthZ;
 		largest_flash_v.at(4) = largest_flash_time;
-		largest_flash_v.at(5) = largest_flash;
+		largest_flash_v.at(5) = largest_flash; //PE
 		largest_flash_v_v->push_back(largest_flash_v);
 	}
 
@@ -644,6 +677,10 @@ void selection_cuts::HitThresholdCollection(std::vector<xsecAna::TPCObjectContai
 			passed_tpco->at(i).first = 0;
 			passed_tpco->at(i).second = "HitThresholdW";
 		}
+		if(n_pfp_hits_w >= threshold)
+		{
+			if(_verbose) {std::cout << "[Collection Hit Threshold]" << '\t' << "Passed" << std::endl; }
+		}
 	}
 
 	//      bool over_threshold = false;
@@ -688,6 +725,10 @@ void selection_cuts::HasNue(std::vector<xsecAna::TPCObjectContainer> * tpc_objec
 
 		bool has_nue = false;
 		bool has_valid_shower = false;
+
+		//test case -- difference is very small following all selection cuts
+		//if(tpc_obj.NPfpShowers() != 0) {has_nue = true; has_valid_shower = true; }
+
 		for(int j = 0; j <n_pfp; j++)
 		{
 			auto const part = tpc_obj.GetParticle(j);
@@ -735,11 +776,15 @@ void selection_cuts::OpenAngleCut(std::vector<xsecAna::TPCObjectContainer> * tpc
 			passed_tpco->at(i).first = 0;
 			passed_tpco->at(i).second = "OpenAngle";
 		}
+		if(leading_open_angle <= tolerance_open_angle.at(1) && leading_open_angle >= tolerance_open_angle.at(0))
+		{
+			if(_verbose) {std::cout << "[Open Angle]" << '\t' << "Passed" << std::endl; }
+		}
 	}//end loop tpc objects
 }//end open angle cut
 //***************************************************************************
 void selection_cuts::dEdxCut(std::vector<xsecAna::TPCObjectContainer> * tpc_object_container_v, std::vector<std::pair<int, std::string> > * passed_tpco,
-                             const double tolerance_dedx_min, const double tolerance_dedx_max, const bool _verbose)
+                             const double tolerance_dedx_min, const double tolerance_dedx_max, const bool _verbose, const bool use_calibration)
 {
 	int n_tpc_obj = tpc_object_container_v->size();
 	for(int i = 0; i < n_tpc_obj; i++)
@@ -764,11 +809,15 @@ void selection_cuts::dEdxCut(std::vector<xsecAna::TPCObjectContainer> * tpc_obje
 		}//end loop pfparticles
 		auto const leading_shower = tpc_obj.GetParticle(leading_index);
 		double leading_dedx = leading_shower.PfpdEdx().at(2);//just the collection plane!
-		if(is_data) {leading_dedx = leading_dedx * (242.72 / 196.979); }
+		if(use_calibration == true) {leading_dedx = leading_dedx * (196.979 /242.72); }
 		if(leading_dedx > tolerance_dedx_max || leading_dedx < tolerance_dedx_min)
 		{
 			passed_tpco->at(i).first = 0;
 			passed_tpco->at(i).second = "dEdX";
+		}
+		if(leading_dedx <= tolerance_dedx_max && leading_dedx >= tolerance_dedx_min)
+		{
+			if(_verbose) {std::cout << "[dE/dx]" << '\t' << "Passed" << std::endl; }
 		}
 	}//end loop tpc objects
 }//end dedx cut
@@ -820,6 +869,10 @@ void selection_cuts::SecondaryShowersDistCut(std::vector<xsecAna::TPCObjectConta
 					passed_tpco->at(i).second = "SecondaryDist";
 					if(_verbose) {std::cout << "[SecondaryDist] TPC Object Failed!" << std::endl; }
 					break;
+				}
+				if(distance <= dist_tolerance)
+				{
+					if(_verbose) {std::cout << "[2nd Shower]" << '\t' << "Passed" << std::endl; }
 				}
 			}
 		}        //end loop pfp
@@ -939,9 +992,8 @@ void selection_cuts::ContainedTracksCut(std::vector<xsecAna::TPCObjectContainer>
 		auto const tpc_obj = tpc_object_container_v->at(i);
 		const int n_pfp = tpc_obj.NumPFParticles();
 		const int n_pfp_tracks = tpc_obj.NPfpTracks();
+		//this is normally enabled, but due to test cut below it is off
 		if(n_pfp_tracks == 0) {continue; }
-		int leading_index = 0;
-		int leading_hits  = 0;
 
 		for(int j = 0; j < n_pfp; j++)
 		{
@@ -975,6 +1027,29 @@ void selection_cuts::ContainedTracksCut(std::vector<xsecAna::TPCObjectContainer>
 				}
 			}//end is track
 		}//end loop pfparticles
+		 //adding temporary cut on the shower direction here
+		 // const int n_pfp_showers = tpc_obj.NPfpShowers();
+		 // int leading_index = 0;
+		 // int leading_hits  = 0;
+		 // for(int j = 0; j < n_pfp; j++)
+		 // {
+		 //     auto const part = tpc_obj.GetParticle(j);
+		 //     const int pfp_pdg = part.PFParticlePdgCode();
+		 //     const int n_pfp_hits = part.NumPFPHits();
+		 //     if(pfp_pdg == 11 && n_pfp_hits > leading_hits)
+		 //     {
+		 //             leading_hits = n_pfp_hits;
+		 //             leading_index = j;
+		 //     }
+		 // }//end loop pfparticles
+		 // auto const leading_shower = tpc_obj.GetParticle(leading_index);
+		 // const double leading_theta = acos(leading_shower.pfpDirZ()) * 180 / 3.1415;
+		 //
+		 // if(leading_theta > 60)
+		 // {
+		 //     passed_tpco->at(i).first = 0;
+		 //     passed_tpco->at(i).second = "Contained";
+		 // }
 	}//end loop tpc objects
 }
 //***************************************************************************

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 //Root Includes
 #include "TFile.h"
@@ -13,11 +14,11 @@ int main(int argc, char * argv[])
 	TFile * f = new TFile(_file1);
 	if(!f->IsOpen()) {std::cout << "Could not open file!" << std::endl; return 1; }
 	TTree * mytree = (TTree*)f->Get("AnalyzeTPCO/pot_tree");
+        TTree * pot_tree2 = (TTree*)f->Get("AnalyzeTPCO/pottree");
 
 	double pot_sum = 0;
 	double pot;
 	mytree->SetBranchAddress("pot", &pot);
-
 
 	for(int i = 0; i < mytree->GetEntries(); i++)
 	{
@@ -26,19 +27,27 @@ int main(int argc, char * argv[])
 		pot_sum = pot_sum + pot;
 	}
 
-	double pot_sum_2 = 0;
-	/*
-	TTree * mytree_2 = (TTree*)f->Get("AnalyzeTPCO/pottree");
-	double pot_2;
-	mytree_2->SetBranchAddress("pot", &pot_2);
-	for(int i = 0; i < mytree_2->GetEntries(); i++)
-	{
-		mytree_2->GetEntry(i);
-		pot_sum_2 = pot_sum_2 + pot_2;
-	}
-	*/
+	double pot_sum2 = 0;
+	double pot2;
+	int run;
+	int subrun;
+	pot_tree2->SetBranchAddress("pot", &pot2);
+	pot_tree2->SetBranchAddress("run", &run);
+	pot_tree2->SetBranchAddress("subrun", &subrun);
 
-	std::cout << "Total POT:     " << pot_sum << std::endl;
-	std::cout << "Alt Total POT: " << pot_sum_2 << std::endl;
+	std::ofstream run_subrun_file;
+	run_subrun_file.open("custom_run_subrun_list_data.txt");
+
+
+	for(int i = 0; i < pot_tree2->GetEntries(); i++)
+	{
+		pot_tree2->GetEntry(i);
+		pot_sum2 += pot2;
+		run_subrun_file << run << " " << subrun << '\n';
+	}
+	run_subrun_file.close();
+
+	std::cout << "Total POT (Method 1): " << pot_sum  << std::endl;
+	std::cout << "Total POT (Method 2): " << pot_sum2 << std::endl;
 	return 0;
 }

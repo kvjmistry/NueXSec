@@ -251,8 +251,10 @@ void utility::ConstructShowerdQdX(xsecAna::GeometryHelper geoHelper, bool is_dat
                                   std::vector<art::Ptr<recob::Cluster> > clusters, double _dQdxRectangleLength, double _dQdxRectangleWidth,
                                   const art::Ptr<recob::Shower> shower, std::vector< std::vector < double > > & shower_cluster_dqdx,
                                   std::vector< std::vector < double > > & shower_cluster_dq, std::vector< std::vector < double > > & shower_cluster_dx,
-                                  bool _verbose)
+                                  bool _verbose, bool use_xyz_calibration, bool omit_first_point)
 {
+	std::cout << "[Analyze] [Utility] [dQdx] Start - XYZ Calibration - " << use_xyz_calibration << " - Omit First Point - " << omit_first_point << std::endl;
+
 	double _gain = 0;
 	const double _data_gain = 240;
 	const double _mc_gain = 200;
@@ -263,7 +265,7 @@ void utility::ConstructShowerdQdX(xsecAna::GeometryHelper geoHelper, bool is_dat
 	detinfo::DetectorProperties const * detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
 	const double drift = detprop->DriftVelocity() * 1e-3;
 
-
+	TVector3 shower_vtx(shower->ShowerStart().X(), shower->ShowerStart().Y(), shower->ShowerStart().Z());
 	TVector3 shower_dir(shower->Direction().X(), shower->Direction().Y(),
 	                    shower->Direction().Z());
 
@@ -281,6 +283,11 @@ void utility::ConstructShowerdQdX(xsecAna::GeometryHelper geoHelper, bool is_dat
 	if(_verbose) {std::cout << "[Analyze] [Utility] [dQdx] Clusters size: " << n_clusters << std::endl; }
 	int cluster_num = 0;
 	//these are the clusters associated with a given shower
+	//
+	//std::vector<recob::Hit> Plane0Hits;
+	//std::vector<recob::Hit> Plane1Hits;
+	//std::vector<recob::Hit> Plane2Hits;
+
 	for(auto const cluster : clusters)
 	{
 		std::cout << "[Analyze] [Utility] [dQdx] Cluster Num: " << cluster_num << std::endl;
@@ -293,6 +300,9 @@ void utility::ConstructShowerdQdX(xsecAna::GeometryHelper geoHelper, bool is_dat
 		const double cluster_start_position = cluster_start_wire * wire_spacing;
 		const double cluster_start_ns = drift * cluster->StartTick() * fromTickToNs;
 		std::vector< double > cluster_start = {cluster_start_position, cluster_start_ns};
+
+		//for using xyzt calibration map need to export T0 to next function
+		//T0.at(cluster->Plane().Plane) = cluster_start_ns;
 
 		const double cluster_end_position = cluster_end_wire * wire_spacing;
 		const double cluster_end_ns = drift * cluster->EndTick() * fromTickToNs;
@@ -307,7 +317,9 @@ void utility::ConstructShowerdQdX(xsecAna::GeometryHelper geoHelper, bool is_dat
 		geoHelper.buildRectangle(_dQdxRectangleLength, _dQdxRectangleWidth,
 		                         cluster_start, cluster_axis, rectangle_points);
 
-		bool first_point = true;
+		bool first_point;
+		if(omit_first_point) {first_point = false; }
+		if(!omit_first_point) {first_point = true; }
 		shower_cluster_dqdx.at(cluster_num).resize(3);//the number of planes
 		std::vector<double> dqdx_plane0;
 		std::vector<double> dqdx_plane1;
@@ -321,23 +333,53 @@ void utility::ConstructShowerdQdX(xsecAna::GeometryHelper geoHelper, bool is_dat
 		std::vector<double> dx_plane1;
 		std::vector<double> dx_plane2;
 
+		double wire_pitch = geoHelper.getPitch(shower_dir, cluster->Plane().Plane);
+
+		//ShowerPitch.at(cluster->Plane().Plane) = wire_pitch;
+
 		for(auto const hit : hits_v)
 		{
 			const double hit_position = hit->WireID().Wire * wire_spacing;
 			const double hit_ns       = hit->PeakTime() * drift * fromTickToNs;
 			std::vector < double >  hit_pos = {hit_position, hit_ns};
-			double wire_pitch = geoHelper.getPitch(shower_dir, cluster->Plane().Plane);
 			//check if the hits associated with the cluster are inside the box we define - standard is 4 x 1 cm
 			bool is_inside = geoHelper.isInside(hit_pos, rectangle_points);
 
-			// The function considers points on the border outside, manually add the first point
+			// The function considers points on the border outside, manually add the first point if set to be valid
 			if(first_point || is_inside)
 			{
 				const double charge = hit->Integral() * _gain;
-				if(cluster->Plane().Plane == 0) {dqdx_plane0.push_back(charge / wire_pitch); }
-				if(cluster->Plane().Plane == 1) {dqdx_plane1.push_back(charge / wire_pitch); }
-				if(cluster->Plane().Plane == 2) {dqdx_plane2.push_back(charge / wire_pitch); }
+				double yzcorrection = 1;
+				double xcorrection  = 1;
+				//do xyz correction
+				if(use_xyz_calibration)
+				{
+					// get 2D distance of hit to vtx
+					const double r2D = sqrt( ( (hit_position - shower_vtx.Z()) * (hit_position - shower_vtx.Z()) ) +
+					                         ( (hit_ns - shower_vtx.X()) * (hit_ns - shower_vtx.X()) ) );
+					const double r3D = r2D/shower_dir[1];
+					auto xyz = shower_vtx + shower_dir * r3D;
 
+					const lariov::TPCEnergyCalibProvider& energyCalibProvider = art::ServiceHandle<lariov::TPCEnergyCalibService>()->GetProvider();;
+					yzcorrection = energyCalibProvider.YZdqdxCorrection(cluster->Plane().Plane, xyz.Y(), xyz.Z());
+					xcorrection  = energyCalibProvider.XdqdxCorrection(cluster->Plane().Plane,  xyz.X());
+				}
+				if(cluster->Plane().Plane == 0)
+				{
+					dqdx_plane0.push_back(charge / wire_pitch * (yzcorrection * xcorrection));
+					//Plane0Hits.push_back(hit);
+				}
+				if(cluster->Plane().Plane == 1)
+				{
+					dqdx_plane1.push_back(charge / wire_pitch * (yzcorrection * xcorrection));
+					//Plane1Hits.push_back(hit);
+				}
+				if(cluster->Plane().Plane == 2)
+				{
+					dqdx_plane2.push_back(charge / wire_pitch * (yzcorrection * xcorrection));
+					//Plane2Hits.push_back(hit);
+					std::cout << "[Analyze] [Utility] [dQdx] Collection dQ/dx: " << charge / wire_pitch * (yzcorrection * xcorrection) << std::endl;
+				}
 				if(cluster->Plane().Plane == 0) {dq_plane0.push_back(charge); }
 				if(cluster->Plane().Plane == 1) {dq_plane1.push_back(charge); }
 				if(cluster->Plane().Plane == 2) {dq_plane2.push_back(charge); }
@@ -345,18 +387,9 @@ void utility::ConstructShowerdQdX(xsecAna::GeometryHelper geoHelper, bool is_dat
 				if(cluster->Plane().Plane == 0) {dx_plane0.push_back(wire_pitch); }
 				if(cluster->Plane().Plane == 1) {dx_plane1.push_back(wire_pitch); }
 				if(cluster->Plane().Plane == 2) {dx_plane2.push_back(wire_pitch); }
-			}
+			}//end if hit is in box
 			if(first_point == true) {first_point = false; }
 		}//end looping hits
-
-		//Now I want to see the total integrated charge for this plane
-		// const double total_dqdx_plane0 = std::accumulate(dqdx_plane0.begin(), dqdx_plane0.end(), 0.0) / _dQdxRectangleLength;
-		// const double total_dqdx_plane1 = std::accumulate(dqdx_plane1.begin(), dqdx_plane1.end(), 0.0) / _dQdxRectangleLength;
-		// const double total_dqdx_plane2 = std::accumulate(dqdx_plane2.begin(), dqdx_plane2.end(), 0.0) / _dQdxRectangleLength;
-		//
-		// shower_cluster_dqdx.at(cluster_num).at(0) = total_dqdx_plane0;
-		// shower_cluster_dqdx.at(cluster_num).at(1) = total_dqdx_plane1;
-		// shower_cluster_dqdx.at(cluster_num).at(2) = total_dqdx_plane2;
 
 		// Get the median
 		size_t n_0 = dqdx_plane0.size() / 2;
@@ -387,6 +420,18 @@ void utility::ConstructShowerdQdX(xsecAna::GeometryHelper geoHelper, bool is_dat
 		cluster_num++;
 	}//end looping clusters
 	std::cout << "[Analyze] [Utility] [dQdx] Finished Calculating dQdx" << std::endl;
+
+	//if no hits on a wire plane - leaves vector empty
+	//to keep planes ordered correctly, fill with a dummy value
+	//if(Plane0Hits.size() == 0){Plane0Hits.push_back(0);}
+	//if(Plane1Hits.size() == 0){Plane1Hits.push_back(0);}
+	//if(Plane2Hits.size() == 0){Plane2Hits.push_back(0);}
+
+	//push back list of hits for each cluster in 1 x 4 cm box
+	//PlaneHitsInBox.push_back(Plane0Hits);
+	//PlaneHitsInBox.push_back(Plane1Hits);
+	//PlaneHitsInBox.push_back(Plane2Hits);
+
 }//end function dqdx
 
 void utility::ConvertdEdX(std::vector< std::vector < double > > & shower_cluster_dqdx, std::vector<double> & shower_dEdx)
@@ -604,5 +649,36 @@ void utility::ConstructShowerdQdXAlternative(xsecAna::GeometryHelper geoHelper, 
 	}//end looping clusters
 	std::cout << "[Analyze] [Utility] [dQdx] Finished Calculating dQdx" << std::endl;
 }//end function dqdx
+
+double utility::CorrectedPositionWeight(TH2D * EnergyAngleWeightMap, const double true_nu_energy,
+                                        const double true_nu_px, const double true_nu_py, const double true_nu_pz)
+{
+	//momentum vector in the uB coordinates
+	const double ub_nu_p_mag = sqrt((true_nu_px * true_nu_px) +
+	                                (true_nu_py * true_nu_py) +
+	                                (true_nu_pz * true_nu_pz));
+	TVector3 ub_nu_p (true_nu_px / ub_nu_p_mag, true_nu_py / ub_nu_p_mag, true_nu_pz / ub_nu_p_mag);
+	//Reweighting map expects angles in terms of orthogonal plane between uB, target, and dump
+	//need to rotate numi_nu_p into new coordinates
+
+	//unit vector of new direction
+	//with the corrected location + matrix
+	//this is found using the NuMIFlux.cc code, used to produce gSimple files
+	const TVector3 ub_plane_orth (0.720298, -0.602981, -0.342905);
+
+	ub_nu_p.RotateUz(ub_plane_orth);
+	//this redefines the TVector3
+	//for clarity define new TVector3
+	const TVector3 orth_nu_p = ub_nu_p;
+
+	//larsoft complains about unused variables - so comment out for now
+	//const double orth_nu_theta = acos(orth_nu_p.Z()) * (180.0 / 3.1415);
+	const double orth_nu_phi   = atan2(orth_nu_p.Y(), orth_nu_p.X()) * (180.0 / 3.1415);
+
+	//reweight map is built for the angle in the plane --> phi
+	const double weight = EnergyAngleWeightMap->GetBinContent(true_nu_energy, orth_nu_phi);
+
+	return weight;
+}
 
 }//end namespace

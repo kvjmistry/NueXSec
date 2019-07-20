@@ -94,6 +94,9 @@ bool _save_truth_info;
 bool _is_mc;
 bool _is_data;
 
+bool reweigh_position;
+std::string _map_path;
+
 TTree * myTree;
 std::vector<xsecAna::TPCObjectContainer> tpc_object_container_v;
 
@@ -160,6 +163,21 @@ int fMCNumChargedParticles = 0;
 bool has_pi0 = false;
 double fMCNuTime = -1;
 
+std::vector<double> fEventWeight_v;
+std::vector<int>    fMCNuPdg_v;
+std::vector<double> fMCNuVtxX_v;
+std::vector<double> fMCNuVtxY_v;
+std::vector<double> fMCNuVtxZ_v;
+std::vector<double> fMCNuEnergy_v;
+std::vector<double> fMCNuMomentum_v;
+std::vector<double> fMCNuDirX_v;
+std::vector<double> fMCNuDirY_v;
+std::vector<double> fMCNuDirZ_v;
+
+TH2D * EnergyAngleWeightMap_nue;
+TH2D * EnergyAngleWeightMap_anue;
+TH2D * EnergyAngleWeightMap_numu;
+TH2D * EnergyAngleWeightMap_anumu;
 
 TTree* _sr_tree;
 int _sr_run, _sr_subrun;
@@ -245,6 +263,17 @@ xsecAna::TpcObjectAnalysis::TpcObjectAnalysis(fhicl::ParameterSet const & p)
 	mctruth_counter_tree->Branch("has_pi0", &has_pi0, "has_pi0/O");
 	mctruth_counter_tree->Branch("fMCNuTime", &fMCNuTime, "fMCNuTime/D");
 	mctruth_counter_tree->Branch("fMCOrigin", &fMCOrigin, "fMCOrigin/I");
+	//these are not limited to 1 neutrino per event
+	mctruth_counter_tree->Branch("fMCNuPdg_v", &fMCNuPdg_v); 
+	mctruth_counter_tree->Branch("fEventWeight_v", &fEventWeight_v);
+        mctruth_counter_tree->Branch("fMCNuVtxX_v", &fMCNuVtxX_v);
+        mctruth_counter_tree->Branch("fMCNuVtxY_v", &fMCNuVtxY_v);
+        mctruth_counter_tree->Branch("fMCNuVtxZ_v", &fMCNuVtxZ_v);
+        mctruth_counter_tree->Branch("fMCNuEnergy_v", &fMCNuEnergy_v);
+        mctruth_counter_tree->Branch("fMCNuMomentum_v", &fMCNuMomentum_v);
+        mctruth_counter_tree->Branch("fMCNuDirX_v", &fMCNuDirX_v);
+        mctruth_counter_tree->Branch("fMCNuDirY_v", &fMCNuDirY_v);
+        mctruth_counter_tree->Branch("fMCNuDirZ_v", &fMCNuDirZ_v);
 
 	_sr_tree = fs->make<TTree>("pottree","");
 	_sr_tree->Branch("run",                &_sr_run,                "run/I");
@@ -277,6 +306,9 @@ xsecAna::TpcObjectAnalysis::TpcObjectAnalysis(fhicl::ParameterSet const & p)
 	//Instead we just count the most important truth events.
 	_save_truth_info                = p.get<bool>("SaveTruthInfo", false);
 
+	reweigh_position                = p.get<bool>("ReweighMapBool", true);
+	_map_path			= p.get<std::string>("ReweighMapPath", "../arXiv/NuMIFlux_reweight_map.root");
+
 	std::cout << "[Analyze] End Setting fcl Parameters " << std::endl;
 
 }
@@ -295,6 +327,28 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e)
 	if(_is_data == true)     {run_pot_counting = false; std::cout << "[Analyze] Do Not Count MC POT" << std::endl; }
 	if(_is_mc == true)       {run_pot_counting = true;  std::cout << "[Analyze] Count MC POT" << std::endl; }
 
+	if(reweigh_position)
+	{
+		try
+		{
+		  TFile * map_file = new TFile(_map_path.c_str());
+		  TH2D * _EnergyAngleWeightMap_nue   = (TH2D*)map_file->Get("nueFluxHistoEngPhi");
+		  TH2D * _EnergyAngleWeightMap_anue  = (TH2D*)map_file->Get("anueFluxHistoEngPhi");
+		  TH2D * _EnergyAngleWeightMap_numu  = (TH2D*)map_file->Get("numuFluxHistoEngPhi");
+		  TH2D * _EnergyAngleWeightMap_anumu = (TH2D*)map_file->Get("anumuFluxHistoEngPhi");
+
+		  EnergyAngleWeightMap_nue   = _EnergyAngleWeightMap_nue;
+		  EnergyAngleWeightMap_anue  = _EnergyAngleWeightMap_anue;
+		  EnergyAngleWeightMap_numu  = _EnergyAngleWeightMap_numu;
+		  EnergyAngleWeightMap_anumu = _EnergyAngleWeightMap_anumu;
+		}
+		catch(...)
+		{
+		  std::cout << "!! Unable to Open Instance of Reweighing Map !!" << std::endl;
+		  reweigh_position = false;
+		}
+	}
+
 	//there are so may mc particles -- why?
 	//these are not all final state particles we see
 	//MC Particle Information
@@ -304,6 +358,12 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e)
 	{
 		e.getByLabel("largeant", MCParticleHandle);
 		if(!MCParticleHandle.isValid() && _cosmic_only == false) {std::cout << "[Analyze] MCParticleHandle is not valid" << std::endl; exit(1); }
+	}
+	art::Handle < std::vector < simb::MCTruth > > MCTruthHandle;
+	if(_is_mc == true)
+	{
+		e.getByLabel("generator", MCTruthHandle);
+		if(!MCTruthHandle.isValid() && _cosmic_only == false) {std::cout << "[Analyze] MCTruthHandle is not valid" << std::endl; exit(1); }
 	}
 
 	//maybe make them filled at the same place as the other - so it's a per event
@@ -406,6 +466,8 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e)
 				fMCPy = mcparticle.Py();
 				fMCPz = mcparticle.Pz();
 				mctruth = nue_xsec::recotruehelper::TrackIDToMCTruth(e, "largeant", mcparticle.TrackId());
+				simb::MCNeutrino mc_nu = mctruth->GetNeutrino();
+				const int fMCNuPdg = mc_nu.Nu().PdgCode();
 				if(mctruth->Origin() == simb::kBeamNeutrino && event_neutrino == false)
 				{
 					//mctruth = nue_xsec::recotruehelper::TrackIDToMCTruth(e, "largeant", mcparticle.TrackId());
@@ -413,9 +475,7 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e)
 					if(mctruth->Origin() == simb::kBeamNeutrino) {fMCOrigin = 0; }
 					if(mctruth->Origin() == simb::kCosmicRay)    {fMCOrigin = 1; }
 					if(mctruth->Origin() == simb::kUnknown)      {fMCOrigin = 2; }
-					simb::MCNeutrino mc_nu = mctruth->GetNeutrino();
 					bool fCCNC = mc_nu.CCNC(); //0 is CC, 1 is NC
-					int fMCNuPdg = mc_nu.Nu().PdgCode();
 					if(fMCNuPdg == 12  && fCCNC == 0) {mc_nue_cc_counter++;      fMCNuID = 1; }
 					if(fMCNuPdg == 14  && fCCNC == 0) {mc_numu_cc_counter++;     fMCNuID = 2; }
 					if(fMCNuPdg == 12  && fCCNC == 1) {mc_nue_nc_counter++;      fMCNuID = 3; }
@@ -443,7 +503,6 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e)
 					fMCNuTime      = mc_nu.Nu().Trajectory().T(0);
 					event_neutrino = true;
 				}
-
 				//this should only give the stable final state particles
 				if(mctruth->Origin() == simb::kBeamNeutrino && mcparticle.StatusCode() == 1)
 				{
@@ -465,7 +524,65 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e)
 		fMCNumParticles = mc_num_particles;
 		fMCNumChargedParticles = mc_num_charged_particles;
 		std::cout << "[Analyze] MC Num Particles: " << mc_num_particles << std::endl;
+		//mctruth object loop
+		for(auto const & mctruth : (*MCTruthHandle) )
+		{
+		//sometimes we have more than 1 neutrino in an event
+		//this is particularly important for data
+		//try and save vectors of the variables
+		  //const int mctruth_pdgcode = mctruth.GetParticle().PdgCode();
+		  const int mctruth_pdgcode = mctruth.GetNeutrino().Nu().PdgCode();
+		  bool is_mctruth_neutrino = false;
+		  if(mctruth_pdgcode == 12 || mctruth_pdgcode == -12 || mctruth_pdgcode == 14 || mctruth_pdgcode == -14){is_mctruth_neutrino = true;}
+		  if(mctruth.Origin() == simb::kBeamNeutrino && is_mctruth_neutrino == true)
+		  {
+		    fMCNuPdg_v      .push_back( mctruth_pdgcode);
+                    fMCNuVtxX_v     .push_back( mctruth.GetNeutrino().Nu().Vx());
+                    fMCNuVtxY_v     .push_back( mctruth.GetNeutrino().Nu().Vy());
+                    fMCNuVtxZ_v     .push_back( mctruth.GetNeutrino().Nu().Vz());
+                    fMCNuEnergy_v   .push_back( mctruth.GetNeutrino().Nu().E());
+                    fMCNuMomentum_v .push_back( mctruth.GetNeutrino().Nu().P());
+                    fMCNuDirX_v     .push_back( (mctruth.GetNeutrino().Nu().Px() / mctruth.GetNeutrino().Nu().P()));
+                    fMCNuDirY_v     .push_back( (mctruth.GetNeutrino().Nu().Py() / mctruth.GetNeutrino().Nu().P()));
+                    fMCNuDirZ_v     .push_back( (mctruth.GetNeutrino().Nu().Pz() / mctruth.GetNeutrino().Nu().P()));
+		    //weight to correct for uB position
+		    if(reweigh_position == true)
+		    {
+                      if(mctruth_pdgcode == 12)
+		      {
+			fEventWeight_v.push_back(utility::CorrectedPositionWeight(EnergyAngleWeightMap_nue, 
+						 fMCNuEnergy, fMCNuDirX, fMCNuDirY, fMCNuDirZ));
+		      }
+                      if(mctruth_pdgcode == -12)
+                      {
+                        fEventWeight_v.push_back(utility::CorrectedPositionWeight(EnergyAngleWeightMap_anue,
+                                                 fMCNuEnergy, fMCNuDirX, fMCNuDirY, fMCNuDirZ));
+                      }
+                      if(mctruth_pdgcode == 14)
+                      {
+                        fEventWeight_v.push_back(utility::CorrectedPositionWeight(EnergyAngleWeightMap_numu,
+                                                 fMCNuEnergy, fMCNuDirX, fMCNuDirY, fMCNuDirZ));
+                      }
+                      if(mctruth_pdgcode == -14)
+                      {
+                        fEventWeight_v.push_back(utility::CorrectedPositionWeight(EnergyAngleWeightMap_anumu,
+                                                 fMCNuEnergy, fMCNuDirX, fMCNuDirY, fMCNuDirZ));
+                      }
+		    }//end if reweigh == true
+		    if(reweigh_position == false){fEventWeight_v.push_back(1.0);}
+		  }//end if mctruth->origin == kBeamNeutrino
+		}//end loop mctruth
 		mctruth_counter_tree->Fill();
+	        fMCNuPdg_v.clear();
+                fMCNuVtxX_v.clear();
+                fMCNuVtxY_v.clear();
+                fMCNuVtxZ_v.clear();
+                fMCNuEnergy_v.clear();
+                fMCNuMomentum_v.clear();
+                fMCNuDirX_v.clear();
+                fMCNuDirY_v.clear();
+                fMCNuDirZ_v.clear();
+		fEventWeight_v.clear();
 	}
 
 	// Implementation of required member function here.
@@ -681,8 +798,15 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e)
 			std::vector < std::vector< double > > shower_cluster_dq_alt;
 			std::vector < std::vector< double > > shower_cluster_dx_alt;
 
+			std::vector < std::vector< double > > shower_cluster_dqdx_cali;
+			std::vector < std::vector< double > > shower_cluster_dqdx_omit;
+			std::vector < std::vector< double > > shower_cluster_dqdx_omit_cali;
+
 			std::vector<double> shower_dEdx;
 			std::vector<double> shower_dEdx_alt;
+			std::vector<double> shower_dEdx_cali;
+			std::vector<double> shower_dEdx_omit;
+			std::vector<double> shower_dEdx_omit_cali;
 
 			shower_cluster_dqdx.resize(num_clusters);
 			shower_cluster_dq.resize(num_clusters);
@@ -692,8 +816,15 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e)
 			shower_cluster_dq_alt.resize(num_clusters);
 			shower_cluster_dx_alt.resize(num_clusters);
 
+			shower_cluster_dqdx_cali.resize(num_clusters);
+			shower_cluster_dqdx_omit.resize(num_clusters);
+			shower_cluster_dqdx_omit_cali.resize(num_clusters);
+
 			shower_dEdx.resize(3, 0);
 			shower_dEdx_alt.resize(3, 0);
+			shower_dEdx_cali.resize(3,0);
+			shower_dEdx_omit.resize(3, 0);
+			shower_dEdx_omit_cali.resize(3, 0);
 
 			for(int clust = 0; clust < num_clusters; clust++)
 			{
@@ -704,6 +835,10 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e)
 				shower_cluster_dqdx_alt.at(clust).resize(3, 0);
 				shower_cluster_dq_alt.at(clust).resize(3, 0);
 				shower_cluster_dx_alt.at(clust).resize(3, 0);
+
+				shower_cluster_dqdx_cali.at(clust).resize(3, 0);
+				shower_cluster_dqdx_omit.at(clust).resize(3, 0);
+				shower_cluster_dqdx_omit_cali.at(clust).resize(3, 0);
 			}
 
 			std::vector<double> dqdx_cali;
@@ -910,14 +1045,42 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e)
 					xsecAna::utility::GetNumberOfHitsPerPlane(e, _pfp_producer, this_shower, pfp_hits_u, pfp_hits_v, pfp_hits_w);
 					pfp_hits = (pfp_hits_u + pfp_hits_v + pfp_hits_w);
 
-					//trying to do dqdx!
-					xsecAna::utility::ConstructShowerdQdX(geoHelper, _is_data, ClusterToHitsMap, clusters, _dQdxRectangleLength,_dQdxRectangleWidth,
-					                                      this_shower, shower_cluster_dqdx, shower_cluster_dq, shower_cluster_dx, _verbose);
-					xsecAna::utility::ConstructShowerdQdXAlternative(geoHelper, _is_data, ClusterToHitsMap, clusters, _dQdxRectangleLength,_dQdxRectangleWidth,
-					                                                 this_shower, shower_cluster_dqdx_alt, shower_cluster_dq_alt, shower_cluster_dx_alt, dqdx_cali, _verbose);
+					//trying to do dqdx
+					//1st bool argument - use xyz calibration
+					//2nd bool argument - omit first point in box
+					//this is the default method
+					xsecAna::utility::ConstructShowerdQdX(geoHelper, _is_data, ClusterToHitsMap, clusters, 
+									      _dQdxRectangleLength,_dQdxRectangleWidth,
+					                                      this_shower, shower_cluster_dqdx, shower_cluster_dq, shower_cluster_dx, _verbose,
+									      false, false);
+					//this method uses the xyz calibration map
+                                        xsecAna::utility::ConstructShowerdQdX(geoHelper, _is_data, ClusterToHitsMap, clusters,
+                                                                              _dQdxRectangleLength,_dQdxRectangleWidth,
+                                                                              this_shower, shower_cluster_dqdx_cali, shower_cluster_dq, shower_cluster_dx, _verbose,
+                                                                              true, false);
+					//this is the default method - but omitting first point of box
+					xsecAna::utility::ConstructShowerdQdX(geoHelper, _is_data, ClusterToHitsMap, clusters, 
+									      _dQdxRectangleLength,_dQdxRectangleWidth,
+					                                      this_shower, shower_cluster_dqdx_omit, shower_cluster_dq, shower_cluster_dx, _verbose,
+									      false, true);
+					//this method uses the xyz calibration map - omitting first point of box
+                                        xsecAna::utility::ConstructShowerdQdX(geoHelper, _is_data, ClusterToHitsMap, clusters,
+                                                                              _dQdxRectangleLength,_dQdxRectangleWidth,
+                                                                              this_shower, shower_cluster_dqdx_omit_cali, 
+									      shower_cluster_dq, shower_cluster_dx, _verbose,
+                                                                              true, true);
+
+					//this is a test method used by pandora lee group
+					xsecAna::utility::ConstructShowerdQdXAlternative(geoHelper, _is_data, ClusterToHitsMap, clusters, 
+											 _dQdxRectangleLength,_dQdxRectangleWidth,
+					                                                 this_shower, shower_cluster_dqdx_alt, 
+											 shower_cluster_dq_alt, shower_cluster_dx_alt, dqdx_cali, _verbose);
 					//then dEdx!
-					xsecAna::utility::ConvertdEdX(shower_cluster_dqdx, shower_dEdx);
-					xsecAna::utility::ConvertdEdX(shower_cluster_dqdx_alt, shower_dEdx_alt);
+					xsecAna::utility::ConvertdEdX(shower_cluster_dqdx,           shower_dEdx);
+					xsecAna::utility::ConvertdEdX(shower_cluster_dqdx_alt,       shower_dEdx_alt);
+					xsecAna::utility::ConvertdEdX(shower_cluster_dqdx_cali,      shower_dEdx_cali);
+					xsecAna::utility::ConvertdEdX(shower_cluster_dqdx_omit,      shower_dEdx_omit);
+					xsecAna::utility::ConvertdEdX(shower_cluster_dqdx_omit_cali, shower_dEdx_omit_cali);
 					// for(auto const cluster_dqdx : shower_cluster_dqdx)
 					// {
 					//      //cluster dqdx is size 3 - one for each plane
@@ -929,11 +1092,13 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e)
 					// if(_verbose) {std::cout << "[Analyze] [dEdx] Plane 1: " << shower_dEdx.at(1) << std::endl; }
 					// if(_verbose) {std::cout << "[Analyze] [dEdx] Plane 2: " << shower_dEdx.at(2) << std::endl; }
 
-					if(!_is_data){xsecAna::utility::GetEnergyPerPlane(e, _pfp_producer, this_shower, calibration_u, calibration_v, calibration_w,
-					                                    pfp_energy_u, pfp_energy_v, pfp_energy_w);}
+					if(!_is_data){xsecAna::utility::GetEnergyPerPlane(e, _pfp_producer, this_shower, 
+									calibration_u, calibration_v, calibration_w,
+					                                pfp_energy_u, pfp_energy_v, pfp_energy_w);}
 
 
-					if(_is_data){xsecAna::utility::GetEnergyPerPlane(e, _pfp_producer, this_shower, calibration_u_data, calibration_v_data, calibration_w_data,
+					if(_is_data){xsecAna::utility::GetEnergyPerPlane(e, _pfp_producer, this_shower, 
+								      	    calibration_u_data, calibration_v_data, calibration_w_data,
 					                                    pfp_energy_u, pfp_energy_v, pfp_energy_w);}
 
 					n_pfp_showers++;
@@ -966,6 +1131,13 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e)
 			particle_container.SetPfpClusterdQ_alt(shower_cluster_dq_alt);
 			particle_container.SetPfpClusterdX_alt(shower_cluster_dx_alt);
 			particle_container.SetPfpdEdx_alt(shower_dEdx_alt);
+
+			particle_container.SetPfpClusterdQdxCali(shower_cluster_dqdx_cali);
+			particle_container.SetPfpdEdxCali(shower_dEdx_cali);
+			particle_container.SetPfpClusterdQdxOmitFirst(shower_cluster_dqdx_omit);
+			particle_container.SetPfpdEdxOmitFirst(shower_dEdx_omit);
+			particle_container.SetPfpClusterdQdxOmitFirst_cali(shower_cluster_dqdx_omit_cali);
+			particle_container.SetPfpdEdxOmitFirst_cali(shower_dEdx_omit_cali);
 
 			tpc_object_container.AddParticle(particle_container);
 
