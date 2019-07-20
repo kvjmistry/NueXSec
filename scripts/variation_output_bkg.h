@@ -9,14 +9,15 @@
 // the effect of the various detector systematics.
 
 // USAGE
-// mode = "same" || ""
-// ./main.exe --var_mode_bkg <MC_Var_File> <mode> 
+// mode = "bnb" || "numi"
+// plot_confg = "same" || ""
+
+// ./main.exe --var_mode_bkg <MC_Var_File> <mode> <plot_config>
 // ------------------------------------------------
 
 // Library and Other Includes
 #include "../xsecAna/TpcObjectContainer.h"
 #include "../xsecAna/ParticleContainer.h"
-// #include "histogram_functions.h"
 
 // ROOT includes
 #include "TFile.h"
@@ -47,7 +48,7 @@ class variation_output_bkg {
 	// ----------------------
 	//   Main Function
 	// ----------------------
-	void run_var(const char * file1, TString mode, const std::vector<double> _config);
+	void run_var(const char * file1, TString mode, const std::vector<double> _config, TString plot_config);
 
 	// ----------------------
 	//   Other Functions

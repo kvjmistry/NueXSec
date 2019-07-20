@@ -175,7 +175,7 @@ int main(int argc, char *argv[]){
 	{
 		variation_output_bkg _var_mode_instance_bkg;
 		// ./main.exe --var_mode_bkg file_name <"same">/""
-		_var_mode_instance_bkg.run_var(argv[2], argv[3], config);
+		_var_mode_instance_bkg.run_var(argv[2], argv[3], config, argv[4]);
 		return 0;
 	}
 

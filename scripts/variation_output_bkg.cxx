@@ -134,7 +134,7 @@ void variation_output_bkg::DrawTH1D_SAME(TH1D* hist, std::string variation, TLeg
 	}
 	else if (histname == "h_ldg_shwr_Phi"){
 		hist->SetTitle(";Leading Shower #phi [degrees];Entries");
-		// hist->GetYaxis()->SetRangeUser(0,7000);
+		hist->GetYaxis()->SetRangeUser(0,25);
 	}
 	else if (histname == "h_ldg_shwr_Theta"){
 		hist->SetTitle(";Leading Shower #theta [degrees];Entries");
@@ -1155,6 +1155,7 @@ bool variation_output_bkg::SecondaryShowersDistCut(xsecAna::TPCObjectContainer t
 }
 //***************************************************************************
 //***************************************************************************
+// Hits per length cut
 bool variation_output_bkg::HitLengthRatioCut(const double pfp_hits_length_tolerance, xsecAna::TPCObjectContainer tpc_obj){
 	
 	const int n_pfp = tpc_obj.NumPFParticles();
@@ -1187,6 +1188,7 @@ bool variation_output_bkg::HitLengthRatioCut(const double pfp_hits_length_tolera
 }
 //***************************************************************************
 //***************************************************************************
+// Longest Track Leading Shower Cut
 bool variation_output_bkg::LongestTrackLeadingShowerCut(const double ratio_tolerance, xsecAna::TPCObjectContainer tpc_obj){
 
 	const int n_pfp = tpc_obj.NumPFParticles();
@@ -1231,6 +1233,7 @@ bool variation_output_bkg::LongestTrackLeadingShowerCut(const double ratio_toler
 }
 //***************************************************************************
 //***************************************************************************
+// Contained Tracks Cut
 bool variation_output_bkg::IsContained(std::vector<double> track_start, std::vector<double> track_end, std::vector<double> fv_boundary_v) {
 	
 	if(in_fv(track_start.at(0), track_start.at(1), track_start.at(2), fv_boundary_v) == true
@@ -1284,7 +1287,7 @@ bool variation_output_bkg::ContainedTracksCut(std::vector<double> fv_boundary_v,
 // ----------------------
 //         Main
 // ----------------------
-void variation_output_bkg::run_var(const char * _file1, TString mode, const std::vector<double> _config) {
+void variation_output_bkg::run_var(const char * _file1, TString mode, const std::vector<double> _config, TString plot_config) {
 	// std::cout << "=================================================\n" << std::endl;
 	// std::cout << "Warning, there are hardcoded values" << 
 	// 	"in this script, grep for  \"HARDCODED\" for places\n" << std::endl;
@@ -1295,12 +1298,12 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 
 	gStyle->SetOptStat(0); // say no to stats box
 
-	// Choose while file 
+	// Choose which file 
 	if (mode == "bnb")
 		f_var_out = new TFile("plots/variation_out_bnb_bkg.root","UPDATE");
 	else if (mode == "numi")
 		f_var_out = new TFile("plots/variation_out_numi_bkg.root","UPDATE");
-	else f_var_out = new TFile("plots/variation_out_bnb_bkg.root","UPDATE");
+	else return;
 
 	//*************************** Configure the cut parameters *************************************
 	std::cout << "\n --- Configuring Parameters --- \n" << std::endl;
@@ -1322,14 +1325,7 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 		flash_time_start = _config[7]; // Use default numi config
 		flash_time_end   = _config[8]; // Use default numi config
 	}
-	else if (mode == "same"){
-		std::cout << "Forget about the configs, we are going to make some plots!" << std::endl;
-	}
-	else {
-		std::cout << "Using default numi flash config since no match could be made"<< std::endl;
-		flash_time_start = _config[7]; // Use default numi config
-		flash_time_end   = _config[8]; // Use default numi config
-	}
+	else return;
 	std::cout << "flash_time_start:\t" << flash_time_start << "   flash_time_end:\t" << flash_time_end << std::endl;
 	
 	tolerance                     = _config[9];
@@ -1347,9 +1343,9 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 	detector_variations           = _config[21];
 	const std::vector<double> tolerance_open_angle {tolerance_open_angle_min, tolerance_open_angle_max};
 
-	//*************************** SAME PLOT *************************************
+	//*************************** RUN PLOTTING FUNCTION PLOT***********************
 	// if bool true just run this function
-	if (mode == "same") PlotVar = true; 
+	if (plot_config == "same") PlotVar = true; 
 	else PlotVar = false; 
 
 	if (PlotVar) {
@@ -1586,8 +1582,7 @@ void variation_output_bkg::run_var(const char * _file1, TString mode, const std:
 			if (bool_sig ) sig_counter++;
 			if (!bool_sig ) bkg_counter++;
 
-
-			// if (!bool_sig ) std::cout << tpc_classification.first << std::endl;
+			//if (!bool_sig ) std::cout << tpc_classification.first << std::endl;
 
 			// Loop over the Par Objects
 			for (int j = 0; j < n_pfp ; j++){
