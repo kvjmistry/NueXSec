@@ -11,13 +11,9 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 MRBSOURCE=$MRB_SOURCE
-MODULETOP=${MRBSOURCE}/uboonecode/uboone/NueXSecModules
+MODULETOP=${MRBSOURCE}/ubana/ubana/NueXSec
 MODULEANA=${MODULETOP}/xsecAna/
 MODULESCRIPT=${MODULETOP}/scripts/
-MODULEPYTHON=${MODULETOP}/python/
-
-#LIBRARYNAME1=libxsecAna.so 
-#LIBRARYNAME2=libxsecAna_dict.so 
 
 cd ${MODULETOP}
 
@@ -29,26 +25,9 @@ export LD_LIBRARY_PATH
 cd ${MODULEANA}
 make clean
 make
-#cp ${LIBRARYNAME1} ${MODULESCRIPT}
-#cp ${LIBRARYNAME2} ${MODULESCRIPT}
 
 #Now we can build the scripts as we have the newest version of the libraries
-#First check that the libraries exist
 cd ${MODULESCRIPT}
-#if [ -e ${LIBRARYNAME1} ]
-#then
-#    echo -e "${BLUE}Library: " ${LIBRARYNAME1} " ${BLUE}found! ${NC} "
-#else
-#    echo -e "${RED}Library Not Found!: " ${LIBRARYNAME1} " ${NC} "
-#fi
-
-#if [ -e ${LIBRARYNAME2} ]
-#then
-#    echo -e "${BLUE}Library: " ${LIBRARYNAME2} " ${BLUE}found! ${NC} "
-#else
-#    echo -e "${RED}Library Not Found!: " ${LIBRARYNAME2} " ${NC} "
-#fi
-
 make clean
 make
 

@@ -1,6 +1,1 @@
-add_subdirectory(potFinder)
-add_subdirectory(xsecAna)
-add_subdirectory(flashSaver)
-add_subdirectory(job)
-add_subdirectory(fluxAna)
-add_subdirectory(fluxUncertainyCheck)
+add_subdirectory(EventRates)
