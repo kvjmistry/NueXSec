@@ -89,9 +89,9 @@ physics:
 
       # SoftwareTriggerAlgo:               "NUMI_FEMBeamTriggerAlgo"
 
-      # POTSummaryProducerMC: "generator"
+      POTSummaryProducerMC: "generator"
       # POTSummaryProducerData: "beamdata"
-      # POTSummaryInstance: ""
+      POTSummaryInstance: ""
     }
   }
   analysis: [NuMIEventRates]

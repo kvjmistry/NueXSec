@@ -112,6 +112,7 @@ public:
 
     // Selected optional functions.
     void beginJob() override;
+    void endSubRun(art::SubRun const &sr) override;
     void endJob() override;
     
     double Calc_Theta(double Pz, double P);
@@ -130,9 +131,9 @@ private:
     std::string fSoftware_Trigger_Module_Label;
 
     // POT product labels
-    // std::string fPOT_Summary_Overlay_Label;
-    // std::string fPOT_Summary_Data_Label;
-    // std::string fPOT_Summary_Data_Instance_Name_Label;
+    std::string _potsum_producer_mc;
+    std::string _potsum_producer_data;
+    std::string _potsum_instance;
     
     // Histograms
     // Nue all
@@ -180,6 +181,15 @@ private:
     double NuMuEnergy, NuMuTheta, NuMuPhi;
     int PDG;
 
+    TTree * pot_tree;
+    double pot = 0.0;
+
+    TTree* _sr_tree;
+    int _sr_run, _sr_subrun;
+    double _sr_begintime, _sr_endtime;
+    double _sr_pot;
+    std::ofstream _run_subrun_list_file;
+
 };
 //______________________________________________________________________________
 NuMIEventRates::NuMIEventRates(fhicl::ParameterSet const& p) : EDAnalyzer{p} {
@@ -193,9 +203,9 @@ NuMIEventRates::NuMIEventRates(fhicl::ParameterSet const& p) : EDAnalyzer{p} {
     // fSoftware_Trigger_Module_Label = p.get<std::string>("SoftwareTriggerModuleLabel");
 
     // POT product labels
-    // fPOTSummary_Overlay_Label = p.get< std::string >("POTSummaryOverlayLabel");
-    // fPOTSummary_Data_Label    = p.get< std::string >("POTSummaryDataLabel");
-    // fPOTSummary_Data_Instance_Name_Label = p.get< std::string >("POTSummaryDataInstanceNameLabel");
+    _potsum_producer_mc             = p.get<std::string>("POTSummaryProducerMC");
+	_potsum_instance                = p.get<std::string>("POTSummaryInstance");
+
 }
 //______________________________________________________________________________
 double NuMIEventRates::Calc_Theta(double Pz, double P){
@@ -221,8 +231,17 @@ void NuMIEventRates::beginJob() {
     // Art TFile Service
     art::ServiceHandle<art::TFileService> tfs;
 
-    // Create the TTree and add relavent branches
-    MCTree = tfs->make<TTree>("MCTree","MCTree");
+    // POT Trees
+     pot_tree = tfs->make<TTree>("pot_tree", "pot_per_subrun");
+    _sr_tree = tfs->make<TTree>("pottree","");
+    pot_tree->Branch("pot", &pot, "pot/D");
+
+	_sr_tree->Branch("run",                &_sr_run,                "run/I");
+	_sr_tree->Branch("subrun",             &_sr_subrun,             "subrun/I");
+	_sr_tree->Branch("begintime",          &_sr_begintime,          "begintime/D");
+	_sr_tree->Branch("endtime",            &_sr_endtime,            "endtime/D");
+	_sr_tree->Branch("pot",                &_sr_pot,                "pot/D");
+    _run_subrun_list_file.open ("run_subrun_list.txt", std::ofstream::out | std::ofstream::trunc);
 
     // Create the TTree and add relavent branches
     MCTree = tfs->make<TTree>("EventTree","EventTree");
@@ -244,15 +263,15 @@ void NuMIEventRates::beginJob() {
     hNue_E_vs_Theta_All ->SetOption("COLZ,TEXT");
     hNue_E_vs_Phi_All   ->SetOption("COLZ,TEXT");
     
-    hNue_Energy_All = Nue_All_dir.make<TH1D>("Nue_Energy_All","Nue_Energy_All; E [GeV]; Events",100., 0., 5);
+    hNue_Energy_All = Nue_All_dir.make<TH1D>("Nue_Energy_All","Nue_Energy_All; E [GeV]; Events",400., 0., 20.);
     hNue_Theta_All  = Nue_All_dir.make<TH1D>("Nue_Theta_All","Nue_Theta_All; Theta [Degrees]; Events", 100., 0., 180);
     hNue_Phi_All    = Nue_All_dir.make<TH1D>("Nue_Phi_All","Nue_Phi_All; Phi [Degrees]; Events", 10., -180., 180);
-    hNue_Energy_All ->SetOption("HIST,TEXT00");
+    hNue_Energy_All ->SetOption("HIS");
     hNue_Theta_All  ->SetOption("HIST,TEXT00");
     hNue_Phi_All    ->SetOption("HIST,TEXT00");
 
     // Nue
-    hNue_Energy = Nue_dir.make<TH1D>("Nue_Energy","Nue_Energy; E [GeV]; Events",100., 0., 5.);
+    hNue_Energy = Nue_dir.make<TH1D>("Nue_Energy","Nue_Energy; E [GeV]; Events",400., 0., 20.);
     hNue_Theta  = Nue_dir.make<TH1D>("Nue_Theta","Nue_Theta; Theta [Degrees]; Events", 200., 0., 180);
     hNue_Phi    = Nue_dir.make<TH1D>("Nue_Phi","Nue_Phi; Phi [Degrees]; Events", 10., -180., 180);
     hNue_Energy ->SetOption("HIST,TEXT00");
@@ -260,10 +279,10 @@ void NuMIEventRates::beginJob() {
     hNue_Phi    ->SetOption("HIST,TEXT00");
 
     // Nue bar
-    hNue_bar_Energy = Nue_bar_dir.make<TH1D>("Nue_bar_Energy","Nue_bar_Energy; E [GeV]; Events",50., 0., 5.);
+    hNue_bar_Energy = Nue_bar_dir.make<TH1D>("Nue_bar_Energy","Nue_bar_Energy; E [GeV]; Events",400., 0., 20.);
     hNue_bar_Theta  = Nue_bar_dir.make<TH1D>("Nue_bar_Theta","Nue_bar_Theta; Theta [Degrees]; Events", 10., 0., 180);
     hNue_bar_Phi    = Nue_bar_dir.make<TH1D>("Nue_bar_Phi","Nue_bar_Phi; Phi [Degrees]; Events", 10., -180., 180);
-    hNue_bar_Energy ->SetOption("HIST,TEXT00");
+    hNue_bar_Energy ->SetOption("HIS");
     hNue_bar_Theta  ->SetOption("HIST,TEXT00");
     hNue_bar_Phi    ->SetOption("HIST,TEXT00");  
 
@@ -273,26 +292,26 @@ void NuMIEventRates::beginJob() {
     hNuMu_E_vs_Theta_All->SetOption("COLZ,TEXT");
     hNuMu_E_vs_Phi_All->SetOption("COLZ,TEXT");
     
-    hNuMu_Energy_All = NuMu_All_dir.make<TH1D>("NuMu_Energy_All","NuMu_Energy_All; E [GeV]; Events",100., 0., 5.);
+    hNuMu_Energy_All = NuMu_All_dir.make<TH1D>("NuMu_Energy_All","NuMu_Energy_All; E [GeV]; Events",400., 0., 20.);
     hNuMu_Theta_All  = NuMu_All_dir.make<TH1D>("NuMu_Theta_All","NuMu_Theta_All; Theta [Degrees]; Events", 10., 0., 180);
     hNuMu_Phi_All    = NuMu_All_dir.make<TH1D>("NuMu_Phi_All","NuMu_Phi_All; Phi [Degrees]; Events", 10., -180., 180);
-    hNuMu_Energy_All  ->SetOption("HIST,TEXT00");
+    hNuMu_Energy_All  ->SetOption("HIS");
     hNuMu_Theta_All   ->SetOption("HIST,TEXT00");
     hNuMu_Phi_All     ->SetOption("HIST,TEXT00");
 
     // NuMu
-    hNuMu_Energy = NuMu_dir.make<TH1D>("NuMu_Energy","NuMu_Energy; E [GeV]; Events",100., 0., 5.);
+    hNuMu_Energy = NuMu_dir.make<TH1D>("NuMu_Energy","NuMu_Energy; E [GeV]; Events",400., 0., 20.);
     hNuMu_Theta  = NuMu_dir.make<TH1D>("NuMu_Theta","NuMu_Theta; Theta [Degrees]; Events", 10., 0., 180);
     hNuMu_Phi    = NuMu_dir.make<TH1D>("NuMu_Phi","NuMu_Phi; Phi [Degrees]; Events", 10., -180., 180);
-    hNuMu_Energy ->SetOption("HIST,TEXT00");
+    hNuMu_Energy ->SetOption("HIS");
     hNuMu_Theta ->SetOption("HIST,TEXT00");
     hNuMu_Phi   ->SetOption("HIST,TEXT00");
 
     // NuMu_bar
-    hNuMu_bar_Energy = NuMu_bar_dir.make<TH1D>("NuMu_bar_Energy","NuMu_bar_Energy; E [GeV]; Events",100., 0., 5.);
+    hNuMu_bar_Energy = NuMu_bar_dir.make<TH1D>("NuMu_bar_Energy","NuMu_bar_Energy; E [GeV]; Events",400., 0., 20.);
     hNuMu_bar_Theta  = NuMu_bar_dir.make<TH1D>("NuMu_bar_Theta","NuMu_bar_Theta; Theta [Degrees]; Events", 10., 0., 180);
     hNuMu_bar_Phi    = NuMu_bar_dir.make<TH1D>("NuMu_bar_Phi","NuMu_bar_Phi; Phi [Degrees]; Events", 10., -180., 180);
-    hNuMu_bar_Energy->SetOption("HIST,TEXT00");
+    hNuMu_bar_Energy->SetOption("HIS");
     hNuMu_bar_Theta->SetOption("HIST,TEXT00");
     hNuMu_bar_Phi->SetOption("HIST,TEXT00");
 
@@ -337,8 +356,8 @@ void NuMIEventRates::analyze(art::Event const& e) {
 
     for (int p = 0; p < mclist[iList]->NParticles(); p++) { // Loop over MCTruth Particles
 
-        if (mclist[iList]->GetNeutrino().CCNC() == 1) NC_event ++; // The event was NC and we dont want to include the additional scattered neutrino
-        //if (mclist[iList]->GetNeutrino().CCNC() == 1) continue; // The event was NC then skip the event
+        //if (mclist[iList]->GetNeutrino().CCNC() == 1) NC_event ++; // The event was NC and we dont want to include the additional scattered neutrino
+        if (mclist[iList]->GetNeutrino().CCNC() == 1) continue; // The event was NC then skip the event
 
         simb::MCParticle particle{mclist[iList]->GetParticle(p)}; // Get a MC Particle
 
@@ -440,6 +459,41 @@ void NuMIEventRates::analyze(art::Event const& e) {
     MCTree->Fill();
 
 }
+
+void NuMIEventRates::endSubRun(art::SubRun const & sr) {
+
+    
+    auto const & POTSummaryHandle = sr.getValidHandle < sumdata::POTSummary >("generator");
+    auto const & POTSummary(*POTSummaryHandle);
+    const double total_pot = POTSummary.totpot;
+    std::cout << "----------------------------" << std::endl;
+    std::cout << "Total POT / subRun: " << total_pot << std::endl;
+    std::cout << "----------------------------" << std::endl;
+
+    pot = total_pot;
+    pot_tree->Fill();
+
+    // Saving run and subrun number on file so that we can run Zarko's script easily
+	_run_subrun_list_file << sr.run() << " " << sr.subRun() << std::endl;
+	
+    _sr_run       = sr.run();
+    _sr_subrun    = sr.subRun();
+    _sr_begintime = sr.beginTime().value();
+    _sr_endtime   = sr.endTime().value();
+
+    art::Handle<sumdata::POTSummary> potsum_h;
+
+    // MC
+    if(sr.getByLabel(_potsum_producer_mc, potsum_h)) {
+        _sr_pot = potsum_h->totpot;
+    }
+    else
+        _sr_pot = 0.;
+
+    _sr_tree->Fill();
+
+}
+
 //______________________________________________________________________________
 void NuMIEventRates::endJob() {
 
