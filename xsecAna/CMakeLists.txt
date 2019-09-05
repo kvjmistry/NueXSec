@@ -1,6 +1,7 @@
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 include_directories( $ENV{PANDORA_INC} )
 include_directories( $ENV{LARPANDORACONTENT_INC} )
+include_directories( ../lib/ )
 
 # define ROOTLIB
 set( ROOTLIB -L$ENV{ROOTSYS}/lib -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl)
@@ -8,25 +9,13 @@ set( ROOTLIB -L$ENV{ROOTSYS}/lib -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpa
 link_libraries( ${LIB_NAME} -L$ENV{BOOST_LIB} -lboost_system ${ROOTLIB} )
 
 art_make( BASENAME_ONLY
-          LIBRARY_NAME     uboonecode_uboone_NueXSecModules
+          LIBRARY_NAME     NueXSec
           LIB_LIBRARIES
-                   #uboonecode_uboone_NueXSecModules_Algorithms
-                   #uboonecode_uboone_NueXSecModules_DataTypes
-                   uboonecode_uboone_BasicTool_GeoAlgo
-                   #uboone_UBFlashFinder
-		   uboonecode_uboone_SelectionTool_OpT0FinderBase
-		   uboonecode_uboone_SelectionTool_OpT0FinderAlgorithms
-	  	   larcore_Geometry
 		   larcore_Geometry_Geometry_service
-                   uboone_RawData
+		   larcorealg_Geometry
                    SignalShapingServiceMicroBooNE_service
                    larevt_CalibrationDBI_IOVData
                    larevt_CalibrationDBI_Providers
-                   larsim_MCCheater_BackTracker_service
-                   #Simulation
-		   #Utilities
-		   #TimeService_service
-		   #MCBase
                    lardataobj_RawData
 		   lardataobj_RecoBase
                    lardataobj_AnalysisBase
@@ -35,7 +24,6 @@ art_make( BASENAME_ONLY
                    nusimdata_SimulationBase
                    ${PANDORASDK}
                    ${PANDORAMONITORING}
-                   #larpandora_LArPandoraContent
                    ${UBOONECODE_LIB}
 		   ${LARDATA_LIB}
 		   ${ART_FRAMEWORK_CORE}
@@ -44,9 +32,11 @@ art_make( BASENAME_ONLY
 		   ${ART_FRAMEWORK_SERVICES_REGISTRY}
 		   ${ART_FRAMEWORK_SERVICES_OPTIONAL}
 		   ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-                   art_Persistency_Common canvas_Persistency_Common
-                   art_Persistency_Provenance canvas_Persistency_Provenance
-                   art_Utilities canvas_Utilities
+                   art_Persistency_Common 
+                   art_Persistency_Provenance 
+                   art_Utilities 
+		   cetlib_except
+		   canvas
                    ${ART_PERSISTENCY_COMMON}
 		   ${ART_PERSISTENCY_PROVENANCE}
 		   ${ART_UTILITIES}
@@ -60,23 +50,13 @@ art_make( BASENAME_ONLY
 		   ${ROOT_BASIC_LIB_LIST}
 
           MODULE_LIBRARIES
-                   #uboonecode_uboone_UBXSec_Algorithms 
-                   #uboonecode_uboone_UBXSec_DataTypes
-                   uboonecode_uboone_NueXSecModules
-                   larsim_MCCheater_BackTracker_service
+                   NueXSec
+		   #NueXSec_dict
 		   larpandora_LArPandoraInterface
-                   #                   larpandora_LArPandoraContent
-		   uboone_NueXSecModules_xsecAna_dict 
-		   uboonecode_uboone_BasicTool_GeoAlgo
-		   uboonecode_uboone_SelectionTool_OpT0FinderBase
-		   uboonecode_uboone_SelectionTool_OpT0FinderAlgorithms
                    uboone_UBFlashFinder
-
-                   uboone_RawData
                    SignalShapingServiceMicroBooNE_service
                    larevt_CalibrationDBI_IOVData
                    larevt_CalibrationDBI_Providers
-	  	   larcore_Geometry
 		   larcore_Geometry_Geometry_service
 		   lardataobj_RecoBase
                    lardataobj_AnalysisBase

@@ -4,8 +4,8 @@
 //_________________________________________________________________________________
 double PostMCCorrecitons::GetCorrectedPhi(recob::Track t, recob::Vertex tpcobj_nu_vtx) {
 
-	TVector3 pt1 = t.Vertex();
-	TVector3 pt2 = t.End();
+	TVector3 pt1 = t.Vertex<TVector3>();
+	TVector3 pt2 = t.End<TVector3>();
 
 	double nu_vtx[3];
 	tpcobj_nu_vtx.XYZ(nu_vtx);
@@ -45,8 +45,8 @@ double PostMCCorrecitons::GetCorrectedPhi(recob::Track t, recob::Vertex tpcobj_n
 //_________________________________________________________________________________
 double PostMCCorrecitons::GetCorrectedCosTheta(recob::Track t, recob::Vertex tpcobj_nu_vtx) {
 
-	TVector3 pt1 = t.Vertex();
-	TVector3 pt2 = t.End();
+	TVector3 pt1 = t.Vertex<TVector3>();
+	TVector3 pt2 = t.End<TVector3>();
 
 	double nu_vtx[3];
 	tpcobj_nu_vtx.XYZ(nu_vtx);

@@ -6,8 +6,8 @@
 #include "GeometryHelper.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
-#include "uboone/Database/TPCEnergyCalib/TPCEnergyCalibProvider.h"
-#include "uboone/Database/TPCEnergyCalib/TPCEnergyCalibService.h"
+#include "ubevt/Database/TPCEnergyCalib/TPCEnergyCalibProvider.h"
+#include "ubevt/Database/TPCEnergyCalib/TPCEnergyCalibService.h"
 
 #include "lardataobj/AnalysisBase/Calorimetry.h"
 

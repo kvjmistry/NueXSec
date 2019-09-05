@@ -3,6 +3,8 @@
 #include <iostream>
 #include <stdexcept>
 
+using Point_t = ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>>;
+
 namespace xsecAna {
 
 TPCObject::TPCObject() {
@@ -96,12 +98,12 @@ const int TPCObject::GetNTracksCloseToVertex(double tolerance) const {
 	// Loop over tracks and calulate multiplicity
 	for (auto t : this->fTracks) {
 
-		TVector3 start = t->Vertex();
-		TVector3 end = t->End();
+		TVector3 start = t->Vertex<TVector3>();
+		TVector3 end = t->End<TVector3>();
 
-		if ( (vtx-start).Mag() < tolerance   ||   (vtx-end).Mag() < tolerance ) {
-			multiplicity++;
-		}
+		// if ( (vtx-start).Mag() < tolerance   ||   (vtx-end).Mag() < tolerance ) {
+		// 	multiplicity++;
+		// }
 	}
 
 	return multiplicity;

@@ -202,46 +202,46 @@ void utility::GetEnergyPerPlane(art::Event const & e,
 //___________________________________________________________________________________________________
 void utility::GetTrackPurityAndEfficiency( lar_pandora::HitVector recoHits, double & trackPurity, double & trackEfficiency ) {
 
-	art::ServiceHandle<cheat::BackTracker> bt;
+	// art::ServiceHandle<cheat::BackTracker> bt;
 
-	// map from geant track id to true track deposited energy
-	std::map<int,double> trkidToIDE;
+	// // map from geant track id to true track deposited energy
+	// std::map<int,double> trkidToIDE;
 
-	for(size_t h = 0; h < recoHits.size(); h++) {
+	// for(size_t h = 0; h < recoHits.size(); h++) {
 
-		art::Ptr<recob::Hit> recoHit = recoHits[h];
-		std::vector<sim::TrackIDE> eveIDs = bt->HitToEveID(recoHit);
+	// 	art::Ptr<recob::Hit> recoHit = recoHits[h];
+	// 	std::vector<sim::TrackIDE> eveIDs = bt->HitToEveID(recoHit);
 
-		for(size_t e = 0; e < eveIDs.size(); ++e) {
-			//std::cout<<"[Hit "<< h<<"] hit plane: "<<recoHit->View()<<" "<<e<<" "<<eveIDs[e].trackID<<" "<<eveIDs[e].energy<<" "
-			//<<eveIDs[e].energyFrac<<"   pdg "<< (bt->TrackIDToParticle(eveIDs[e].trackID))->PdgCode()<<"   process "
-			//<<(bt->TrackIDToParticle(eveIDs[e].trackID))->Process()<<std::endl;
-			trkidToIDE[eveIDs[e].trackID] += eveIDs[e].energy;
-		}
-	}
+	// 	for(size_t e = 0; e < eveIDs.size(); ++e) {
+	// 		//std::cout<<"[Hit "<< h<<"] hit plane: "<<recoHit->View()<<" "<<e<<" "<<eveIDs[e].trackID<<" "<<eveIDs[e].energy<<" "
+	// 		//<<eveIDs[e].energyFrac<<"   pdg "<< (bt->TrackIDToParticle(eveIDs[e].trackID))->PdgCode()<<"   process "
+	// 		//<<(bt->TrackIDToParticle(eveIDs[e].trackID))->Process()<<std::endl;
+	// 		trkidToIDE[eveIDs[e].trackID] += eveIDs[e].energy;
+	// 	}
+	// }
 
-	double maxe = -1;
-	double tote = 0;
-	int trackid;
-	for(auto const& ii : trkidToIDE) {
-		tote += ii.second;
-		if ((ii.second)>maxe) {
-			maxe = ii.second;
-			trackid = ii.first;
-		}
-	}
+	// double maxe = -1;
+	// double tote = 0;
+	// int trackid;
+	// for(auto const& ii : trkidToIDE) {
+	// 	tote += ii.second;
+	// 	if ((ii.second)>maxe) {
+	// 		maxe = ii.second;
+	// 		trackid = ii.first;
+	// 	}
+	// }
 
-	if (tote>0) {
-		trackPurity = maxe/tote;
-	}
+	// if (tote>0) {
+	// 	trackPurity = maxe/tote;
+	// }
 
-	std::vector<sim::IDE> vide(bt->TrackIDToSimIDE(trackid));
-	double totalEnergyFromMainTrack = 0;
-	for (const sim::IDE& ide: vide) {
-		totalEnergyFromMainTrack += ide.energy;
-	}
+	// std::vector<sim::IDE> vide(bt->TrackIDToSimIDE(trackid));
+	// double totalEnergyFromMainTrack = 0;
+	// for (const sim::IDE& ide: vide) {
+	// 	totalEnergyFromMainTrack += ide.energy;
+	// }
 
-	trackEfficiency = maxe/(totalEnergyFromMainTrack); //totalEnergyFromMainTrack includes both inductions and collection energies
+	// trackEfficiency = maxe/(totalEnergyFromMainTrack); //totalEnergyFromMainTrack includes both inductions and collection energies
 
 	return;
 }
