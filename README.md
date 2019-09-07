@@ -5,18 +5,12 @@ Larsoft modules for use in the Nue Cross Section Analysis
 
 The module is a simple method to create a structured data products in an intiutive manner and links important information like the reconstructed and true quantities, such that the end user does not need to run any reco-true matching code prior to analysis.
 
-Be sure that you add NueXSecModules to your CMakeLists.txt before building with larsoft and then build with `mrb i`.
+Be sure that you add NueXSec to your CMakeLists.txt before building with larsoft and then build with `mrb i`.
 
-*For First Time Use assuming  MRB is available*
+## Larsoft Modules
+To compile:  
+The TPCObject libraries are located in the xsecAna directory. You can compile these libraries by doing: `source compile_xsecAna.sh`. This cleans and builds both the larsoft repository (where the libraries live). This **does not** build your release of larsoft! - You will still have to do an `mrb i` or `make install` as normal in your larsoft build dir if you want to work with any larsoft products/modules.
 
-You can simply do: `source ana_setup_script.sh`. This cleans and builds both the larsoft repository (where the libraries live) and the analysis scripts. This **does not** build your release of larsoft! - You will still have to do an `mrb i` or `make install` as normal in your larsoft build dir if you want to work with any larsoft products/modules.
-
-If you plan to do development of the analysis scripts (stand-alone C++ code), then simply build either of the `xsecAna` and `scripts` repositories by hand or run `source update_libraries.sh`. This ensures that the libraries are up-to-date, copied to all analysis directories, and all the c++ code is freshly built.
-
-If you ever change any of the classes in `/xsecAna/` be sure to `source update_libraries.sh` again to build and update the libraries in `/scripts` and `/python`.
-With the last update to my Makefile, if you are on the GPVM or on a device with SIP (system integrity protection) disabled, then ROOT should be able to find the libraries located in `xsecAna`. If this is not the case for you, simply copy the relevant libraries and ROOTMAP to the `scripts` repository. You'll need to do this any time you make a change to the library files.
-
-##Larsoft Moduels
 The total package is currently composed of three modules:
 
 1. Reco-true matching module - this module constructed the "MC Ghosts".
@@ -31,7 +25,7 @@ The `xsecAna` directory contains the modules which are used in LArsoft. In this 
 
 If anyone intends to apply these two container classes outside of my module's framework, then simply be aware of the following: as I have constructed two custom data products, we need to make sure that the proper library information is generated. This means looking at the Linkdef.h, classes_def.h, and classes.h files.
 
-##Analysis and Test Scripts
+## Analysis and Test Scripts
 
 Be sure to read the comments in the relevant files you're using!
 
@@ -48,18 +42,6 @@ The selection is able to run without any of the listed files, however will *not*
 Additional functionality includes providing the path to a custom configuration text file using `-c config.txt` (see utility.h for the formatting of the `configure` function used to set the cut values). If this is not set, the code will use a set of default parameters in `main.h`.
 Also, the default running condition is to use the full selection and produce many many plots - use `--slim` to run more quickly and simply see the cut's performances.
 
-##Python
-
-The python directory is a new addition. These scripts can be used to more easily interface with the c++ code, and avoiding needing to recompile when changing cut values.
-Look into the code to see which versions are being run (i.e. slim or not), but by default the `run_selection.py` acts as the simplest way of running the selection code. It creates a formatted config file based on the parameters in the python code and the only required inputs are as you would run the selection from the `.exe` but without worrying about the options.
-
-```python
-python run_selection.py mc_file ext_file data_file
-```
-
-Notice how the path of the `config.txt` is not included here - the script handles this for you.
-
-If you're looking to vary cut parameters quickly, `iterate_cuts.py` is a skeleton (though working) version of various scripts which simply run a for loop over the c++ selection code. This can be somewhat time-consuming, so beware. But it also contains some of the matplotlib functionality for making efficiency and purity plots following the results of the selection code. (slim mode is default here to increase speed).
 
 ##Further Notes
 
