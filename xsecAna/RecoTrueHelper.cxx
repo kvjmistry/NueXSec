@@ -92,6 +92,7 @@ void recotruehelper::Configure(art::Event const & e,
 		throw std::exception();
 	}
 	art::fill_ptr_vector(hitVector, hit_h);
+
 	art::FindManyP<simb::MCParticle,anab::BackTrackerHitMatchingData> mcps_from_hit(hit_h, e, _hit_mcp_producer);
 
 	// Collect PFParticles and match Reco Particles to Hits

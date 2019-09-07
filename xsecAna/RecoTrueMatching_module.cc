@@ -88,7 +88,7 @@ xsecAna::RecoTrueMatching::RecoTrueMatching(fhicl::ParameterSet const & p) {
 	_debug                          = p.get<bool>("Debug", true);
 	_cosmic_only                    = p.get<bool>("CosmicOnly", false);
 	_use_premade_ass                = p.get<bool>("UsePremadeAssociation", true);
-	_mcpHitAssLabel                 = p.get<std::string>("MCPHitAssProducer", "pandoraCosmicHitRemoval");
+	_mcpHitAssLabel                 = p.get<std::string>("MCPHitAssProducer");
 
 	produces< std::vector<xsecAna::MCGhost> >();
 	produces< art::Assns<simb::MCParticle, xsecAna::MCGhost> >();
@@ -112,6 +112,7 @@ void xsecAna::RecoTrueMatching::produce(art::Event & e)
 	std::unique_ptr< art::Assns<recob::PFParticle, xsecAna::MCGhost> > assnOutGhostPFP (new art::Assns<recob::PFParticle, xsecAna::MCGhost>);
 
 
+	// ------- EXT -------
 	if(_cosmic_only)
 	{
 		std::cout << "[RecoTrueMatching] Cosmic Only Configuration! - End Module" << std::endl;
@@ -121,8 +122,8 @@ void xsecAna::RecoTrueMatching::produce(art::Event & e)
 		return;
 	}
 
+	// ------- DATA -------
 	_is_data = e.isRealData();
-
 	if (_is_data) {
 		std::cout << "[RecoTrueMatching] Running on a real data file. No MC-PFP matching will be attempted." << std::endl;
 		e.put(std::move(mcGhostVector));
@@ -131,6 +132,7 @@ void xsecAna::RecoTrueMatching::produce(art::Event & e)
 		return;
 	}
 
+	// ----- MC ----------
 	if(!_use_premade_ass) 
 	{	
 		std::cout << "[RecoTrueMatching] Constructing Associations w/ SimChannels for MCParticle<-->Hits " << std::endl;

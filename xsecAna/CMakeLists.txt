@@ -51,7 +51,6 @@ art_make( BASENAME_ONLY
 
           MODULE_LIBRARIES
                    NueXSec
-		   #NueXSec_dict
 		   larpandora_LArPandoraInterface
                    uboone_UBFlashFinder
                    SignalShapingServiceMicroBooNE_service

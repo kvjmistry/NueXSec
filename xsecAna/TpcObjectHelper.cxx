@@ -51,18 +51,22 @@ void tpcobjecthelper::GetTPCObjects(lar_pandora::PFParticleVector pfParticleList
 			lar_pandora::PFParticleVector pfp_v;
 			int p, t, s;
 
-
+			std::cout << "here1" << std::endl;
 			// Collect PFPs for this TPC object
 			CollectPFP(pfParticleList, particle, pfp_v);
+
+			std::cout << "here2" << std::endl;
 
 			// Collect Tracks and Showers for this TPC object
 			CollectTracksAndShowers(pfParticleToTrackMap, pfParticleToShowerMap, pfp_v, // input
 			                        track_v, shower_v);                     // output
 
+			std::cout << "here3" << std::endl;
+
 			// Calculate multiplicity for this TPC object
 			this->GetMultiplicity(pfParticleList, pfp_v, particle, p, t, s);
 
-
+			
 
 			if (_debug) std::cout << "[TPCObjectHelper] [GetTPCObjects] \t Number of pfp for this TPC object: "    << pfp_v.size()   << std::endl;
 			for (auto pfp : pfp_v) {
@@ -104,9 +108,13 @@ void tpcobjecthelper::CollectPFP(lar_pandora::PFParticleVector pfParticleList,
 	pfp_v.emplace_back(particle);
 
 	// And their daughters
+	std::cout << particle->Self() << std::endl;
 	const std::vector<size_t> &daughterIDs = particle->Daughters();
-	if(daughterIDs.size() == 0) return;
+
+	std::cout << daughterIDs.size() << std::endl;
+	if(daughterIDs.size() == 0) return; // The problem comes from the return;
 	else {
+
 		for (unsigned int m = 0; m < daughterIDs.size(); ++m) {
 			const art::Ptr<recob::PFParticle> daughter = pfParticleList.at(daughterIDs.at(m));
 			// Recursive call

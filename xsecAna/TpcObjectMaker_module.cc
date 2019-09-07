@@ -58,12 +58,9 @@ std::string _pfp_producer;
 std::string _hitfinderLabel;
 std::string _geantModuleLabel;
 std::string _spacepointLabel;
-std::string _neutrino_flash_match_producer;
-std::string _cosmic_flash_match_producer;
 std::string _opflash_producer_beam;
 std::string _potsum_producer;
 std::string _potsum_instance;
-std::string _particle_id_producer;
 
 std::string _vertexLabel;
 std::string _trackLabel;
@@ -101,12 +98,9 @@ xsecAna::TpcObjectMaker::TpcObjectMaker(fhicl::ParameterSet const & p)
 	_hitfinderLabel                 = p.get<std::string>("HitProducer");
 	_geantModuleLabel               = p.get<std::string>("GeantModule");
 	_spacepointLabel                = p.get<std::string>("SpacePointProducer");
-	_neutrino_flash_match_producer  = p.get<std::string>("NeutrinoFlashMatchProducer");
-	_cosmic_flash_match_producer    = p.get<std::string>("CosmicFlashMatchProducer");
 	_opflash_producer_beam          = p.get<std::string>("OpFlashBeamProducer");
 	_potsum_producer                = p.get<std::string>("POTSummaryProducer");
 	_potsum_instance                = p.get<std::string>("POTSummaryInstance");
-	_particle_id_producer           = p.get<std::string>("ParticleIDProducer");
 
 	_vertexLabel                    =p.get<std::string>("VertexProducer");
 	_trackLabel                     =p.get<std::string>("TrackProducer");
@@ -123,7 +117,7 @@ xsecAna::TpcObjectMaker::TpcObjectMaker(fhicl::ParameterSet const & p)
 
 	_cosmic_only                    = p.get<bool>("CosmicOnly", false);
 	_use_premade_ass                = p.get<bool>("UsePremadeAssociation", true);
-	_mcpHitAssLabel                 = p.get<std::string>("MCPHitAssProducer", "pandoraCosmicHitRemoval");
+	_mcpHitAssLabel                 = p.get<std::string>("MCPHitAssProducer");
 
 
 	if(_verbose) {std::cout << "[TpcObjectMaker] End setting fcl parameters " << std::endl; }

@@ -41,3 +41,4 @@ clean:
 
 copy:
 	mv *NueXSec* ../lib/
+	mv *.o ../lib
