@@ -100,6 +100,9 @@ xsecAna::RecoTrueMatching::RecoTrueMatching(fhicl::ParameterSet const & p) {
 
 void xsecAna::RecoTrueMatching::produce(art::Event & e)
 {
+
+	std::cout << "[RecoTrueMatching] ------------------------------------ [RecoTrueMatching]" << std::endl;
+
 	nue_xsec::recotruehelper _recotruehelper_instance;
 
 	if(_debug) std::cout << "[RecoTrueMatching] Starts" << std::endl;
@@ -148,7 +151,7 @@ void xsecAna::RecoTrueMatching::produce(art::Event & e)
 	}
 
 	lar_pandora::MCParticlesToPFParticles matchedMCToPFParticles; // This is a map: MCParticle to matched PFParticle
-	lar_pandora::MCParticlesToHits matchedParticleHits;
+	lar_pandora::MCParticlesToHits        matchedParticleHits;
 
 	_recotruehelper_instance.GetRecoToTrueMatches(matchedMCToPFParticles, matchedParticleHits);
 
@@ -156,7 +159,7 @@ void xsecAna::RecoTrueMatching::produce(art::Event & e)
 
 	for (auto const& iter : matchedMCToPFParticles) {
 
-		art::Ptr<simb::MCParticle>  mc_par = iter.first;// The MCParticle
+		art::Ptr<simb::MCParticle>  mc_par = iter.first;  // The MCParticle
 		art::Ptr<recob::PFParticle> pf_par = iter.second; // The matched PFParticle
 
 		xsecAna::MCGhost mcGhost;

@@ -59,6 +59,8 @@ void endSubRun(art::SubRun const &sr) override;
 private:
 
 // Declare member data here.
+int iteration{0}; // index to count number of entries run over
+
 TTree * pot_tree;
 double pot = 0.0;
 
@@ -94,8 +96,6 @@ bool _save_truth_info;
 bool _is_mc;
 bool _is_data;
 
-bool reweigh_position;
-std::string _map_path;
 
 TTree * myTree;
 std::vector<xsecAna::TPCObjectContainer> tpc_object_container_v;
@@ -187,1033 +187,1036 @@ std::ofstream _run_subrun_list_file;
 
 };
 
+// INITALISE
+xsecAna::TpcObjectAnalysis::TpcObjectAnalysis(fhicl::ParameterSet const & p) :
+    EDAnalyzer(p),
+    _pfp_producer      (p.get<std::string>("PFParticleProducer")),
+    _mc_ghost_producer (p.get<std::string>("MCGhostProducer"   )),
+    _tpcobject_producer(p.get<std::string>("TPCObjectProducer" )){
+    
+    art::ServiceHandle<art::TFileService> fs;
 
-xsecAna::TpcObjectAnalysis::TpcObjectAnalysis(fhicl::ParameterSet const & p)
-	:
-	EDAnalyzer(p),
-	_pfp_producer(p.get<std::string>("PFParticleProducer")),
-	_mc_ghost_producer(p.get<std::string>("MCGhostProducer")),
-	_tpcobject_producer(p.get<std::string>("TPCObjectProducer"))
-// More initializers here.
-{
-	art::ServiceHandle<art::TFileService> fs;
+    // ----------------------- TPC OBJ TREE ------------------------------------
+    myTree = fs->make<TTree>("tree","");
+    myTree->Branch("TpcObjectContainerV", &tpc_object_container_v);
+    
+    // ----------------------- Another POT TREE --------------------------------
+    pot_tree = fs->make<TTree>("pot_tree", "pot_per_subrun");
+    pot_tree->Branch("pot", &pot, "pot/D");
 
-	myTree = fs->make<TTree>("tree","");
-	myTree->Branch("TpcObjectContainerV", &tpc_object_container_v);
-	pot_tree = fs->make<TTree>("pot_tree", "pot_per_subrun");
+    // ----------------------- OPTICAL TREE ------------------------------------
+    optical_tree = fs->make<TTree>("optical_tree", "optical_objects");
+    optical_tree->Branch("Event",            &fEvent,               "fEvent/I"         );
+    optical_tree->Branch("Run",              &fRun,                 "fRun/I"           );
+    optical_tree->Branch("SubRun",           &fSubRun,              "fSubRun/I"        );
+    optical_tree->Branch("OpFlashPE",        &fOpFlashPE,           "fOpFlashPE/I"     );
+    optical_tree->Branch("OpFlashTime",      &fOpFlashTime,         "fOpFlashTime/D"   );
+    optical_tree->Branch("OpFlashWidhtY",    &fOpFlashWidthY,       "fOpFlashWidthY/D" );
+    optical_tree->Branch("OpFlashWidthZ",    &fOpFlashWidthZ,       "fOpFlashWidthZ/D" );
+    optical_tree->Branch("OpFlashCenterY",   &fOpFlashCenterY,      "fOpFlashCenterY/D");
+    optical_tree->Branch("OpFlashCenterZ",   &fOpFlashCenterZ,      "fOpFlashCenterZ/D");
+    optical_tree->Branch("HasRecoFlash",     &fHasRecoFlash,        "fHasRecoFlash/I"  );
 
-	pot_tree->Branch("pot", &pot, "pot/D");
+    // ---------------------_-- MC PAR TREE ------------------------------------
+    mcparticle_tree = fs->make<TTree>("mcparticle_tree",    "mcparticle_objects");
+   
+    mcparticle_tree->Branch("event",      &event,           "event/I"           );
+    mcparticle_tree->Branch("run",        &run,             "run/I"             );
+    mcparticle_tree->Branch("subrun",     &subrun,          "subrun/I"          );
+    mcparticle_tree->Branch("MC_ID",      &fMCParticleID,   "fMCParticleID/I"   );
+    mcparticle_tree->Branch("MC_Mother",  &fMCMother,       "fMCMother/I"       );
+    mcparticle_tree->Branch("MC_Origin",  &fMCOrigin,       "fMCOrigin/I"       );
+    mcparticle_tree->Branch("StatusCode", &fStatusCode,     "fStatusCode/I"     );
+    mcparticle_tree->Branch("MC_PDG",     &fMcparticle_pdg, "fMcparticle_pdg/I" );
+    mcparticle_tree->Branch("MCVtxX",     &fMCVtxX,         "fMCVtxX/D"         );
+    mcparticle_tree->Branch("MCVtxY",     &fMCVtxY,         "fMCVtxY/D"         );
+    mcparticle_tree->Branch("MCVtxZ",     &fMCVtxZ,         "fMCVtxZ/D"         );
+    mcparticle_tree->Branch("MCEnergy",   &fMCEnergy,       "fMCEnergy/D"       );
+    mcparticle_tree->Branch("MCMass",     &fMCMass,         "MCMass/D"          );
+    mcparticle_tree->Branch("MCPx",       &fMCPx,           "MCPx/D"            );
+    mcparticle_tree->Branch("MCPy",       &fMCPy,           "MCPy/D"            );
+    mcparticle_tree->Branch("MCPz",       &fMCPz,           "MCPz/D"            );
 
-	optical_tree = fs->make<TTree>("optical_tree", "optical_objects");
-	optical_tree->Branch("Event",            &fEvent,               "fEvent/I"         );
-	optical_tree->Branch("Run",              &fRun,                 "fRun/I"           );
-	optical_tree->Branch("SubRun",           &fSubRun,              "fSubRun/I"        );
-	optical_tree->Branch("OpFlashPE",        &fOpFlashPE,           "fOpFlashPE/I"     );
-	optical_tree->Branch("OpFlashTime",      &fOpFlashTime,         "fOpFlashTime/D"   );
-	optical_tree->Branch("OpFlashWidhtY",    &fOpFlashWidthY,       "fOpFlashWidthY/D" );
-	optical_tree->Branch("OpFlashWidthZ",    &fOpFlashWidthZ,       "fOpFlashWidthZ/D" );
-	optical_tree->Branch("OpFlashCenterY",   &fOpFlashCenterY,      "fOpFlashCenterY/D");
-	optical_tree->Branch("OpFlashCenterZ",   &fOpFlashCenterZ,      "fOpFlashCenterZ/D");
-	optical_tree->Branch("HasRecoFlash",     &fHasRecoFlash,        "fHasRecoFlash/I"  );
+    // ----------------------- MC TRUTH TREE -----------------------------------
+    mctruth_counter_tree = fs->make<TTree>("mctruth_counter_tree", "mctruth_counter");
+   
+    mctruth_counter_tree->Branch("event",                  &event,                  "event/I"                 );
+    mctruth_counter_tree->Branch("run",                    &run,                    "run/I"                   );
+    mctruth_counter_tree->Branch("subrun",                 &subrun,                 "subrun/I"                );
+    
+    mctruth_counter_tree->Branch("mc_nue_cc_counter",      &mc_nue_cc_counter,      "mc_nue_cc_counter/I"     );
+    mctruth_counter_tree->Branch("mc_numu_cc_counter",     &mc_numu_cc_counter,     "mc_numu_cc_counter/I"    );
+    mctruth_counter_tree->Branch("mc_nue_nc_counter",      &mc_nue_nc_counter,      "mc_nue_nc_counter/I"     );
+    mctruth_counter_tree->Branch("mc_numu_nc_counter",     &mc_numu_nc_counter,     "mc_numu_nc_counter/I"    );
+    mctruth_counter_tree->Branch("mc_nue_cc_counter_bar",  &mc_nue_cc_counter_bar,  "mc_nue_cc_counter/I"     );
+    mctruth_counter_tree->Branch("mc_numu_cc_counter_bar", &mc_numu_cc_counter_bar, "mc_numu_cc_counter/I"    );
+    mctruth_counter_tree->Branch("mc_nue_nc_counter_bar",  &mc_nue_nc_counter_bar,  "mc_nue_nc_counter_bar/I" );
+    mctruth_counter_tree->Branch("mc_numu_nc_counter_bar", &mc_numu_nc_counter_bar, "mc_numu_cc_counter/I"    );
+    
+    mctruth_counter_tree->Branch("fMCNuVtxX",              &fMCNuVtxX,              "fMCNuVtxX/D"             );
+    mctruth_counter_tree->Branch("fMCNuVtxY",              &fMCNuVtxY,              "fMCNuVtxY/D"             );
+    mctruth_counter_tree->Branch("fMCNuVtxZ",              &fMCNuVtxZ,              "fMCNuVtxZ/D"             );
+    mctruth_counter_tree->Branch("fMCNuEnergy",            &fMCNuEnergy,            "fMCNuEnergy/D"           );
+    mctruth_counter_tree->Branch("fMCNuMomentum",          &fMCNuMomentum,          "fMCNuMomentum/D"         );
+    mctruth_counter_tree->Branch("fMCNuID",                &fMCNuID,                "fMCNuID/I"               );
+    mctruth_counter_tree->Branch("fMCNuDirX",              &fMCNuDirX,              "fMCNuDirX/D"             );
+    mctruth_counter_tree->Branch("fMCNuDirY",              &fMCNuDirY,              "fMCNuDirY/D"             );
+    mctruth_counter_tree->Branch("fMCNuDirZ",              &fMCNuDirZ,              "fMCNuDirZ/D"             );
+    mctruth_counter_tree->Branch("fMCEleDirX",             &fMCEleDirX,             "fMCEleDirX/D"            );
+    mctruth_counter_tree->Branch("fMCEleDirY",             &fMCEleDirY,             "fMCEleDirY/D"            );
+    mctruth_counter_tree->Branch("fMCEleDirZ",             &fMCEleDirZ,             "fMCEleDirZ/D"            );
+    mctruth_counter_tree->Branch("fMCEleEnergy",           &fMCEleEnergy,           "fMCEleEnergy/D"          );
+    mctruth_counter_tree->Branch("fMCEleMomentum",         &fMCEleMomentum,         "fMCEleMomentum/D"        );
+    mctruth_counter_tree->Branch("fMCNumParticles",        &fMCNumParticles,        "fMCNumParticles/I"       );
+    mctruth_counter_tree->Branch("fMCNumChargedParticles", &fMCNumChargedParticles, "fMCNumChargedParticles/I");
+    mctruth_counter_tree->Branch("has_pi0",                &has_pi0,                "has_pi0/O"               );
+    mctruth_counter_tree->Branch("fMCNuTime",              &fMCNuTime,              "fMCNuTime/D"             );
+    mctruth_counter_tree->Branch("fMCOrigin",              &fMCOrigin,              "fMCOrigin/I"             );
+    
+    //these are not limited to 1 neutrino per event
+    mctruth_counter_tree->Branch("fMCNuPdg_v",      &fMCNuPdg_v     ); 
+    mctruth_counter_tree->Branch("fEventWeight_v",  &fEventWeight_v );
+    mctruth_counter_tree->Branch("fMCNuVtxX_v",     &fMCNuVtxX_v    );
+    mctruth_counter_tree->Branch("fMCNuVtxY_v",     &fMCNuVtxY_v    );
+    mctruth_counter_tree->Branch("fMCNuVtxZ_v",     &fMCNuVtxZ_v    );
+    mctruth_counter_tree->Branch("fMCNuEnergy_v",   &fMCNuEnergy_v  );
+    mctruth_counter_tree->Branch("fMCNuMomentum_v", &fMCNuMomentum_v);
+    mctruth_counter_tree->Branch("fMCNuDirX_v",     &fMCNuDirX_v    );
+    mctruth_counter_tree->Branch("fMCNuDirY_v",     &fMCNuDirY_v    );
+    mctruth_counter_tree->Branch("fMCNuDirZ_v",     &fMCNuDirZ_v    );
 
-	mcparticle_tree = fs->make<TTree>("mcparticle_tree", "mcparticle_objects");
-	mcparticle_tree->Branch("event",      &event, "event/I");
-	mcparticle_tree->Branch("run",        &run, "run/I");
-	mcparticle_tree->Branch("MC_ID",      &fMCParticleID, "fMCParticleID/I");
-	mcparticle_tree->Branch("MC_Mother",  &fMCMother, "fMCMother/I");
-	mcparticle_tree->Branch("MC_Origin",  &fMCOrigin, "fMCOrigin/I");
-	mcparticle_tree->Branch("StatusCode", &fStatusCode, "fStatusCode/I");
-	mcparticle_tree->Branch("MC_PDG",     &fMcparticle_pdg, "fMcparticle_pdg/I");
-	mcparticle_tree->Branch("MCVtxX",     &fMCVtxX, "fMCVtxX/D");
-	mcparticle_tree->Branch("MCVtxY",     &fMCVtxY, "fMCVtxY/D");
-	mcparticle_tree->Branch("MCVtxZ",     &fMCVtxZ, "fMCVtxZ/D");
-	mcparticle_tree->Branch("MCEnergy",   &fMCEnergy, "fMCEnergy/D");
-	mcparticle_tree->Branch("MCMass",     &fMCMass, "MCMass/D");
-	mcparticle_tree->Branch("MCPx",       &fMCPx, "MCPx/D");
-	mcparticle_tree->Branch("MCPy",       &fMCPy, "MCPy/D");
-	mcparticle_tree->Branch("MCPz",       &fMCPz, "MCPz/D");
-
-	mctruth_counter_tree = fs->make<TTree>("mctruth_counter_tree", "mctruth_counter");
-	mctruth_counter_tree->Branch("mc_nue_cc_counter",  &mc_nue_cc_counter,  "mc_nue_cc_counter/I");
-	mctruth_counter_tree->Branch("mc_numu_cc_counter", &mc_numu_cc_counter, "mc_numu_cc_counter/I");
-	mctruth_counter_tree->Branch("mc_nue_nc_counter",  &mc_nue_nc_counter,  "mc_nue_nc_counter/I");
-	mctruth_counter_tree->Branch("mc_numu_nc_counter", &mc_numu_nc_counter, "mc_numu_nc_counter/I");
-
-	mctruth_counter_tree->Branch("mc_nue_cc_counter_bar",  &mc_nue_cc_counter_bar,  "mc_nue_cc_counter/I");
-	mctruth_counter_tree->Branch("mc_numu_cc_counter_bar", &mc_numu_cc_counter_bar, "mc_numu_cc_counter/I");
-	mctruth_counter_tree->Branch("mc_nue_nc_counter_bar",  &mc_nue_nc_counter_bar,  "mc_nue_nc_counter_bar/I");
-	mctruth_counter_tree->Branch("mc_numu_nc_counter_bar", &mc_numu_nc_counter_bar, "mc_numu_cc_counter/I");
-
-	mctruth_counter_tree->Branch("fMCNuVtxX", &fMCNuVtxX, "fMCNuVtxX/D");
-	mctruth_counter_tree->Branch("fMCNuVtxY", &fMCNuVtxY, "fMCNuVtxY/D");
-	mctruth_counter_tree->Branch("fMCNuVtxZ", &fMCNuVtxZ, "fMCNuVtxZ/D");
-	mctruth_counter_tree->Branch("fMCNuEnergy", &fMCNuEnergy, "fMCNuEnergy/D");
-	mctruth_counter_tree->Branch("fMCNuMomentum", &fMCNuMomentum, "fMCNuMomentum/D");
-	mctruth_counter_tree->Branch("fMCNuID", &fMCNuID, "fMCNuID/I");
-	mctruth_counter_tree->Branch("fMCNuDirX", &fMCNuDirX, "fMCNuDirX/D");
-	mctruth_counter_tree->Branch("fMCNuDirY", &fMCNuDirY, "fMCNuDirY/D");
-	mctruth_counter_tree->Branch("fMCNuDirZ", &fMCNuDirZ, "fMCNuDirZ/D");
-	mctruth_counter_tree->Branch("fMCEleDirX", &fMCEleDirX, "fMCEleDirX/D");
-	mctruth_counter_tree->Branch("fMCEleDirY", &fMCEleDirY, "fMCEleDirY/D");
-	mctruth_counter_tree->Branch("fMCEleDirZ", &fMCEleDirZ, "fMCEleDirZ/D");
-	mctruth_counter_tree->Branch("fMCEleEnergy", &fMCEleEnergy, "fMCEleEnergy/D");
-	mctruth_counter_tree->Branch("fMCEleMomentum", &fMCEleMomentum, "fMCEleMomentum/D");
-	mctruth_counter_tree->Branch("fMCNumParticles", &fMCNumParticles, "fMCNumParticles/I");
-	mctruth_counter_tree->Branch("fMCNumChargedParticles", &fMCNumChargedParticles, "fMCNumChargedParticles/I");
-	mctruth_counter_tree->Branch("has_pi0", &has_pi0, "has_pi0/O");
-	mctruth_counter_tree->Branch("fMCNuTime", &fMCNuTime, "fMCNuTime/D");
-	mctruth_counter_tree->Branch("fMCOrigin", &fMCOrigin, "fMCOrigin/I");
-	//these are not limited to 1 neutrino per event
-	mctruth_counter_tree->Branch("fMCNuPdg_v", &fMCNuPdg_v); 
-	mctruth_counter_tree->Branch("fEventWeight_v", &fEventWeight_v);
-        mctruth_counter_tree->Branch("fMCNuVtxX_v", &fMCNuVtxX_v);
-        mctruth_counter_tree->Branch("fMCNuVtxY_v", &fMCNuVtxY_v);
-        mctruth_counter_tree->Branch("fMCNuVtxZ_v", &fMCNuVtxZ_v);
-        mctruth_counter_tree->Branch("fMCNuEnergy_v", &fMCNuEnergy_v);
-        mctruth_counter_tree->Branch("fMCNuMomentum_v", &fMCNuMomentum_v);
-        mctruth_counter_tree->Branch("fMCNuDirX_v", &fMCNuDirX_v);
-        mctruth_counter_tree->Branch("fMCNuDirY_v", &fMCNuDirY_v);
-        mctruth_counter_tree->Branch("fMCNuDirZ_v", &fMCNuDirZ_v);
-
-	_sr_tree = fs->make<TTree>("pottree","");
-	_sr_tree->Branch("run",                &_sr_run,                "run/I");
-	_sr_tree->Branch("subrun",             &_sr_subrun,             "subrun/I");
-	_sr_tree->Branch("begintime",          &_sr_begintime,          "begintime/D");
-	_sr_tree->Branch("endtime",            &_sr_endtime,            "endtime/D");
-	_sr_tree->Branch("pot",                &_sr_pot,                "pot/D");
-	_run_subrun_list_file.open ("run_subrun_list.txt", std::ofstream::out | std::ofstream::trunc);
-
-	_potsum_producer_mc             = p.get<std::string>("POTSummaryProducerMC");
-	_potsum_producer_data           = p.get<std::string>("POTSummaryProducerData");
-	_potsum_instance                = p.get<std::string>("POTSummaryInstance");
+    // --------------------------- POT TREE ------------------------------------
+    _sr_tree = fs->make<TTree>("pottree","");
+    _sr_tree->Branch("run",       &_sr_run,       "run/I"      );
+    _sr_tree->Branch("subrun",    &_sr_subrun,    "subrun/I"   );
+    _sr_tree->Branch("begintime", &_sr_begintime, "begintime/D");
+    _sr_tree->Branch("endtime",   &_sr_endtime,   "endtime/D"  );
+    _sr_tree->Branch("pot",       &_sr_pot,       "pot/D"      );
+    _run_subrun_list_file.open ("run_subrun_list.txt", std::ofstream::out | std::ofstream::trunc);
 
 
-	std::cout << "[Analyze] Setting fcl Parameters " << std::endl;
+    // --------------------------- FCL PARAMS ----------------------------------
+    std::cout << "[Analyze] Setting fcl Parameters " << std::endl;
+    _potsum_producer_mc    = p.get<std::string>("POTSummaryProducerMC");
+    _potsum_producer_data  = p.get<std::string>("POTSummaryProducerData");
+    _potsum_instance       = p.get<std::string>("POTSummaryInstance");
 
-	calibration_u                   = p.get<double>("CalibrationU");
-	calibration_v                   = p.get<double>("CalibrationV");
-	calibration_w                   = p.get<double>("CalibrationW");
+    calibration_u          = p.get<double>("CalibrationU");
+    calibration_v          = p.get<double>("CalibrationV");
+    calibration_w          = p.get<double>("CalibrationW");
 
-	calibration_u_data		= p.get<double>("CalibrationDataU");
-	calibration_v_data		= p.get<double>("CalibrationDataV");
-	calibration_w_data		= p.get<double>("CalibrationDataW");
+    calibration_u_data     = p.get<double>("CalibrationDataU");
+    calibration_v_data     = p.get<double>("CalibrationDataV");
+    calibration_w_data     = p.get<double>("CalibrationDataW");
 
-	_debug                          = p.get<bool>("Debug", false);
-	_verbose                        = p.get<bool>("Verbose", false);
-	_cosmic_only                    = p.get<bool>("CosmicOnly", false);
-	//we set this to be false by default, as it severely inflates the size of
-	//of the output file.
-	//Instead we just count the most important truth events.
-	_save_truth_info                = p.get<bool>("SaveTruthInfo", false);
+    _debug                 = p.get<bool>("Debug", false);
+    _verbose               = p.get<bool>("Verbose", false);
+    _cosmic_only           = p.get<bool>("CosmicOnly", false);
+    
+    // We set this to be false by default, as it severely inflates the size of the output file.
+    // Instead we just count the most important truth events.
+    _save_truth_info                = p.get<bool>("SaveTruthInfo", false);
 
-	reweigh_position                = p.get<bool>("ReweighMapBool", true);
-	_map_path			= p.get<std::string>("ReweighMapPath", "../arXiv/NuMIFlux_reweight_map.root");
-
-	std::cout << "[Analyze] End Setting fcl Parameters " << std::endl;
+    std::cout << "[Analyze] End Setting fcl Parameters " << std::endl;
 
 }
 
 void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e)
 {
 
-	run = e.id().run();
-	event = e.id().event();
-	subrun = e.id().subRun();
-	_is_data = e.isRealData();
-	_is_mc = !_is_data;
-	if(_cosmic_only == true) {std::cout << "[Analyze] Running in Cosmic Only Configuration! " << std::endl; }
-	if(_is_mc == true)       {std::cout << "[Analyze] Running with Monte Carlo " << std::endl; }
-	if(_is_data == true)     {std::cout << "[Analyze] Running with Data " << std::endl; }
-	if(_is_data == true)     {run_pot_counting = false; std::cout << "[Analyze] Do Not Count MC POT" << std::endl; }
-	if(_is_mc == true)       {run_pot_counting = true;  std::cout << "[Analyze] Count MC POT" << std::endl; }
-
-	if(reweigh_position)
-	{
-		try
-		{
-		  TFile * map_file = new TFile(_map_path.c_str());
-		  TH2D * _EnergyAngleWeightMap_nue   = (TH2D*)map_file->Get("nueFluxHistoEngPhi");
-		  TH2D * _EnergyAngleWeightMap_anue  = (TH2D*)map_file->Get("anueFluxHistoEngPhi");
-		  TH2D * _EnergyAngleWeightMap_numu  = (TH2D*)map_file->Get("numuFluxHistoEngPhi");
-		  TH2D * _EnergyAngleWeightMap_anumu = (TH2D*)map_file->Get("anumuFluxHistoEngPhi");
-
-		  EnergyAngleWeightMap_nue   = _EnergyAngleWeightMap_nue;
-		  EnergyAngleWeightMap_anue  = _EnergyAngleWeightMap_anue;
-		  EnergyAngleWeightMap_numu  = _EnergyAngleWeightMap_numu;
-		  EnergyAngleWeightMap_anumu = _EnergyAngleWeightMap_anumu;
-		}
-		catch(...)
-		{
-		  std::cout << "!! Unable to Open Instance of Reweighing Map !!" << std::endl;
-		  reweigh_position = false;
-		}
-	}
-
-	//there are so may mc particles -- why?
-	//these are not all final state particles we see
-	//MC Particle Information
-	//art::ServiceHandle<cheat::BackTracker> bt;
-	art::Handle < std::vector < simb::MCParticle > > MCParticleHandle;
-	if(_is_mc == true)
-	{
-		e.getByLabel("largeant", MCParticleHandle);
-		if(!MCParticleHandle.isValid() && _cosmic_only == false) {std::cout << "[Analyze] MCParticleHandle is not valid" << std::endl; exit(1); }
-	}
-	art::Handle < std::vector < simb::MCTruth > > MCTruthHandle;
-	if(_is_mc == true)
-	{
-		e.getByLabel("generator", MCTruthHandle);
-		if(!MCTruthHandle.isValid() && _cosmic_only == false) {std::cout << "[Analyze] MCTruthHandle is not valid" << std::endl; exit(1); }
-	}
-
-	//maybe make them filled at the same place as the other - so it's a per event
-	//this is getting the optical information
-	std::string beam_flash_tag = "simpleFlashBeam";
-	auto const & beam_opf = e.getValidHandle<std::vector < recob::OpFlash> >(beam_flash_tag);
-	auto const & beam_opflashes(*beam_opf);
-	std::cout << "[Analyze] [OPTICAL] " << beam_flash_tag << " in this event: " << beam_opflashes.size() << std::endl;
-
-	//if there is no optical activity in this event then I have to check where the true nu vtx is
-	//if it's a true nue without reco optical event, but interacts in the FV then this is
-	//a loss in efficiency!
-	if(beam_opflashes.size() == 0)
-	{
-		std::cout << "[Analyze] [Optical] No Optical Activity in this Event!" << std::endl;
-		fHasRecoFlash   = 0;
-		fEvent          = event;
-		fRun            = run;
-		fSubRun         = subrun;
-		fOpFlashPE      = -999;
-		fOpFlashTime    = -999;
-		fOpFlashWidthY  = -999;
-		fOpFlashWidthZ  = -999;
-		fOpFlashCenterY = -999;
-		fOpFlashCenterZ = -999;
-		optical_tree->Fill();
-	}
-
-	for(auto const & opflsh : beam_opflashes)
-	{
-		fHasRecoFlash   = 1;
-		fEvent          = event;
-		fRun            = run;
-		fSubRun         = subrun;
-		fOpFlashPE      = opflsh.TotalPE();
-		fOpFlashTime    = opflsh.Time();
-		fOpFlashWidthY  = opflsh.YWidth();
-		fOpFlashWidthZ  = opflsh.ZWidth();
-		fOpFlashCenterY = opflsh.YCenter();
-		fOpFlashCenterZ = opflsh.ZCenter();
-		optical_tree->Fill();
-	}
-
-
-	//I need the MC Track for later - getting cosmic info from MCParticle->MCTrack
-	//std::string mc_track_tag = "mcreco";
-	//art::FindManyP<sim::MCTrack> mctracks_from_mcparticle(MCParticleHandle, e, mc_track_tag);
-	//MCTrack association not there!
-
-	if(_cosmic_only == false && _is_mc == true)
-	{
-		std::cout << "[Analyze] [MCPARTICLE] largeant in this event: " << MCParticleHandle->size() << std::endl;
-		if(_save_truth_info == true)
-		{
-			std::cout << "[Analyze] [MCPARTICLE] Saving MC Truth Tree Configuration" << std::endl;
-			std::cout << "[Analyze] [MCPARTICLE] This inflates the output file size!" << std::endl;
-		}
-
-		bool event_neutrino = false;
-		int mc_num_particles = 0;
-		int mc_num_charged_particles = 0;
-		has_pi0 = false;
-
-		for(auto const & mcparticle : (*MCParticleHandle) )
-		{
-			fMCMother = mcparticle.Mother();
-			fMCParticleID = mcparticle.TrackId();
-			art::Ptr<simb::MCTruth> mctruth;
-			//we only care about every MC Particle if we're saving all truth info
-			if(_save_truth_info == true)
-			{
-				fMcparticle_pdg = mcparticle.PdgCode();
-				fStatusCode = mcparticle.StatusCode();
-				fMCVtxX = mcparticle.Vx();
-				fMCVtxY = mcparticle.Vy();
-				fMCVtxZ = mcparticle.Vz();
-				fMCEnergy = mcparticle.E();
-				fMCMass = mcparticle.Mass();
-				fMCPx = mcparticle.Px();
-				fMCPy = mcparticle.Py();
-				fMCPz = mcparticle.Pz();
-				mctruth = nue_xsec::recotruehelper::TrackIDToMCTruth(e, "largeant", mcparticle.TrackId());
-				//bt->TrackIDToMCTruth(mcparticle.TrackId());
-				if(mctruth->Origin() == simb::kBeamNeutrino) {fMCOrigin = 0; }
-				if(mctruth->Origin() == simb::kCosmicRay) {fMCOrigin = 1; }
-				if(mctruth->Origin() == simb::kUnknown) {fMCOrigin = 2; }
-				simb::MCNeutrino mc_nu = mctruth->GetNeutrino();
-				mcparticle_tree->Fill();
-			}
-			if(fMCMother == 0)
-			{
-				fMcparticle_pdg = mcparticle.PdgCode();
-				fStatusCode = mcparticle.StatusCode();
-				fMCVtxX = mcparticle.Vx();
-				fMCVtxY = mcparticle.Vy();
-				fMCVtxZ = mcparticle.Vz();
-				fMCEnergy = mcparticle.E();
-				fMCMass = mcparticle.Mass();
-				fMCPx = mcparticle.Px();
-				fMCPy = mcparticle.Py();
-				fMCPz = mcparticle.Pz();
-				mctruth = nue_xsec::recotruehelper::TrackIDToMCTruth(e, "largeant", mcparticle.TrackId());
-				simb::MCNeutrino mc_nu = mctruth->GetNeutrino();
-				const int fMCNuPdg = mc_nu.Nu().PdgCode();
-				if(mctruth->Origin() == simb::kBeamNeutrino && event_neutrino == false)
-				{
-					//mctruth = nue_xsec::recotruehelper::TrackIDToMCTruth(e, "largeant", mcparticle.TrackId());
-					//bt->TrackIDToMCTruth(mcparticle.TrackId());
-					if(mctruth->Origin() == simb::kBeamNeutrino) {fMCOrigin = 0; }
-					if(mctruth->Origin() == simb::kCosmicRay)    {fMCOrigin = 1; }
-					if(mctruth->Origin() == simb::kUnknown)      {fMCOrigin = 2; }
-					bool fCCNC = mc_nu.CCNC(); //0 is CC, 1 is NC
-					if(fMCNuPdg == 12  && fCCNC == 0) {mc_nue_cc_counter++;      fMCNuID = 1; }
-					if(fMCNuPdg == 14  && fCCNC == 0) {mc_numu_cc_counter++;     fMCNuID = 2; }
-					if(fMCNuPdg == 12  && fCCNC == 1) {mc_nue_nc_counter++;      fMCNuID = 3; }
-					if(fMCNuPdg == 14  && fCCNC == 1) {mc_numu_nc_counter++;     fMCNuID = 4; }
-					if(fMCNuPdg == -12 && fCCNC == 0) {mc_nue_cc_counter_bar++;  fMCNuID = 5; }
-					if(fMCNuPdg == -14 && fCCNC == 0) {mc_numu_cc_counter_bar++; fMCNuID = 6; }
-					if(fMCNuPdg == -12 && fCCNC == 1) {mc_nue_nc_counter_bar++;  fMCNuID = 7; }
-					if(fMCNuPdg == -14 && fCCNC == 1) {mc_numu_nc_counter_bar++; fMCNuID = 8; }
-					//this loop is only enerted once per event, assuming 1 nu event per event.
-					//this way we get the neutrino vertex and energy per event and can use this
-					//to calculate if it's in the FV in the future, during the selection.
-					fMCNuVtxX     = mc_nu.Nu().Vx();
-					fMCNuVtxY     = mc_nu.Nu().Vy();
-					fMCNuVtxZ     = mc_nu.Nu().Vz();
-					fMCNuEnergy   = mc_nu.Nu().E();
-					fMCNuMomentum = mc_nu.Nu().P();
-					fMCNuDirX     = (mc_nu.Nu().Px() / mc_nu.Nu().P());
-					fMCNuDirY     = (mc_nu.Nu().Py() / mc_nu.Nu().P());
-					fMCNuDirZ     = (mc_nu.Nu().Pz() / mc_nu.Nu().P());
-					fMCEleDirX     = (mc_nu.Lepton().Px() / mc_nu.Lepton().P());
-					fMCEleDirY     = (mc_nu.Lepton().Py() / mc_nu.Lepton().P());
-					fMCEleDirZ     = (mc_nu.Lepton().Pz() / mc_nu.Lepton().P());
-					fMCEleEnergy   = mc_nu.Lepton().E();
-					fMCEleMomentum = mc_nu.Lepton().P();
-					fMCNuTime      = mc_nu.Nu().Trajectory().T(0);
-					event_neutrino = true;
-				}
-				//this should only give the stable final state particles
-				if(mctruth->Origin() == simb::kBeamNeutrino && mcparticle.StatusCode() == 1)
-				{
-					mc_num_particles++;
-					if(_verbose) {std::cout << " [Analyze] [MCTruth] Stable Final State Particles " << fMcparticle_pdg << std::endl; }
-					if(fMcparticle_pdg == 111)
-					{
-						has_pi0 = true;
-						if(_verbose) {std::cout << " [Analyze] [MCTruth] Event has Neutrino Induced Pi0" << std::endl; }
-					}
-					if(fMcparticle_pdg == 11  || fMcparticle_pdg == 13   || fMcparticle_pdg == -11  || fMcparticle_pdg == -13 ||
-					   fMcparticle_pdg == 211 || fMcparticle_pdg == -211 || fMcparticle_pdg == 2212 || fMcparticle_pdg == 321 || fMcparticle_pdg == -321)
-					{
-						mc_num_charged_particles++;
-					}
-				}
-			}//end if fMCMother == 0
-		}//end loop mc particles
-		fMCNumParticles = mc_num_particles;
-		fMCNumChargedParticles = mc_num_charged_particles;
-		std::cout << "[Analyze] MC Num Particles: " << mc_num_particles << std::endl;
-		//mctruth object loop
-		for(auto const & mctruth : (*MCTruthHandle) )
-		{
-		//sometimes we have more than 1 neutrino in an event
-		//this is particularly important for data
-		//try and save vectors of the variables
-		  //const int mctruth_pdgcode = mctruth.GetParticle().PdgCode();
-		  const int mctruth_pdgcode = mctruth.GetNeutrino().Nu().PdgCode();
-		  bool is_mctruth_neutrino = false;
-		  if(mctruth_pdgcode == 12 || mctruth_pdgcode == -12 || mctruth_pdgcode == 14 || mctruth_pdgcode == -14){is_mctruth_neutrino = true;}
-		  if(mctruth.Origin() == simb::kBeamNeutrino && is_mctruth_neutrino == true)
-		  {
-		    fMCNuPdg_v      .push_back( mctruth_pdgcode);
-                    fMCNuVtxX_v     .push_back( mctruth.GetNeutrino().Nu().Vx());
-                    fMCNuVtxY_v     .push_back( mctruth.GetNeutrino().Nu().Vy());
-                    fMCNuVtxZ_v     .push_back( mctruth.GetNeutrino().Nu().Vz());
-                    fMCNuEnergy_v   .push_back( mctruth.GetNeutrino().Nu().E());
-                    fMCNuMomentum_v .push_back( mctruth.GetNeutrino().Nu().P());
-                    fMCNuDirX_v     .push_back( (mctruth.GetNeutrino().Nu().Px() / mctruth.GetNeutrino().Nu().P()));
-                    fMCNuDirY_v     .push_back( (mctruth.GetNeutrino().Nu().Py() / mctruth.GetNeutrino().Nu().P()));
-                    fMCNuDirZ_v     .push_back( (mctruth.GetNeutrino().Nu().Pz() / mctruth.GetNeutrino().Nu().P()));
-		    //weight to correct for uB position
-		    if(reweigh_position == true)
-		    {
-                      if(mctruth_pdgcode == 12)
-		      {
-			fEventWeight_v.push_back(utility::CorrectedPositionWeight(EnergyAngleWeightMap_nue, 
-						 fMCNuEnergy, fMCNuDirX, fMCNuDirY, fMCNuDirZ));
-		      }
-                      if(mctruth_pdgcode == -12)
-                      {
-                        fEventWeight_v.push_back(utility::CorrectedPositionWeight(EnergyAngleWeightMap_anue,
-                                                 fMCNuEnergy, fMCNuDirX, fMCNuDirY, fMCNuDirZ));
-                      }
-                      if(mctruth_pdgcode == 14)
-                      {
-                        fEventWeight_v.push_back(utility::CorrectedPositionWeight(EnergyAngleWeightMap_numu,
-                                                 fMCNuEnergy, fMCNuDirX, fMCNuDirY, fMCNuDirZ));
-                      }
-                      if(mctruth_pdgcode == -14)
-                      {
-                        fEventWeight_v.push_back(utility::CorrectedPositionWeight(EnergyAngleWeightMap_anumu,
-                                                 fMCNuEnergy, fMCNuDirX, fMCNuDirY, fMCNuDirZ));
-                      }
-		    }//end if reweigh == true
-		    if(reweigh_position == false){fEventWeight_v.push_back(1.0);}
-		  }//end if mctruth->origin == kBeamNeutrino
-		}//end loop mctruth
-		mctruth_counter_tree->Fill();
-	        fMCNuPdg_v.clear();
-                fMCNuVtxX_v.clear();
-                fMCNuVtxY_v.clear();
-                fMCNuVtxZ_v.clear();
-                fMCNuEnergy_v.clear();
-                fMCNuMomentum_v.clear();
-                fMCNuDirX_v.clear();
-                fMCNuDirY_v.clear();
-                fMCNuDirZ_v.clear();
-		fEventWeight_v.clear();
-	}
-
-	// Implementation of required member function here.
-
-	if(!tpc_object_container_v.empty()) {tpc_object_container_v.clear(); }
-
-	// Get PFP
-	art::Handle<std::vector<recob::PFParticle> > pfp_h;
-	e.getByLabel(_pfp_producer,pfp_h);
-	if(!pfp_h.isValid())
-	{
-		std::cout << "[Analyze] PFP product " << _pfp_producer << " not found..." << std::endl;
-		//throw std::exception();
-	}
-	if(pfp_h->empty())
-	{
-		std::cout << "[Analyze] PFP " << _pfp_producer << " is empty." << std::endl;
-	}
-	art::FindManyP<recob::Track> tracks_from_pfp(pfp_h, e, _pfp_producer);
-	art::FindManyP<recob::Shower> showers_from_pfp(pfp_h, e, _pfp_producer);
-
-	//Need to get clusters for dQ/dX
-	art::Handle<std::vector<recob::Cluster > > cluster_h;
-	e.getByLabel(_pfp_producer, cluster_h);
-	if(!cluster_h.isValid()) {std::cout << "[Analyze] Cannot locate recob::Cluster. " << std::endl; }
-
-	art::FindManyP<recob::Cluster> clusters_from_pfpart(pfp_h, e, _pfp_producer);
-	art::FindManyP<recob::Hit> hits_from_clusters(cluster_h, e, _pfp_producer);
-	//making a map of clusters to hit vectors
-	std::map < art::Ptr< recob::Cluster>, std::vector<art::Ptr < recob::Hit> > > ClusterToHitsMap;
-	std::vector<art::Ptr<recob::Cluster> > cluster_v;
-	art::fill_ptr_vector(cluster_v, cluster_h);
-	for(auto const cluster : cluster_v )
-	{
-		std::vector<art::Ptr<recob::Hit> > hits_v = hits_from_clusters.at(cluster.key());
-		ClusterToHitsMap.insert(std::make_pair(cluster, hits_v));
-	}
-
-	// Get TPCObjects from the Event
-	art::Handle<std::vector<xsecAna::TPCObject> > tpcobj_h;
-	e.getByLabel(_tpcobject_producer, tpcobj_h);
-	if (!tpcobj_h.isValid()) {std::cout << "[Analyze] Cannote locate xsecAna::TPCObject." << std::endl; }
-
-	// Get Ghosts
-	art::Handle<std::vector<xsecAna::MCGhost> > ghost_h;
-	e.getByLabel(_mc_ghost_producer,ghost_h);
-	if(!ghost_h.isValid()) {
-		std::cout << "[Analyze] MCGhost product " << _mc_ghost_producer << " not found..." << std::endl;
-		//throw std::exception();
-	}
-	art::FindManyP<xsecAna::MCGhost>   mcghost_from_pfp   (pfp_h,   e, _mc_ghost_producer);
-	art::FindManyP<simb::MCParticle> mcpar_from_mcghost (ghost_h, e, _mc_ghost_producer);
-
-	//art::FindManyP<xsecAna::FlashMatch> tpcobjToFlashMatchAssns(tpcobj_h, e, _neutrino_flash_match_producer);
-	art::FindManyP<recob::Track>      tpcobjToTrackAssns(tpcobj_h, e, _tpcobject_producer);
-	art::FindManyP<recob::Shower>     tpcobjToShowerAssns(tpcobj_h, e, _tpcobject_producer);
-	art::FindManyP<recob::PFParticle> tpcobjToPFPAssns(tpcobj_h, e, _tpcobject_producer);
-
-	if(_verbose) {std::cout << "[Analyze] TPC Objects in this Event: " << tpcobj_h->size() << std::endl; }
-	//loop over all of the tpc objects!
-
-	int tpc_object_counter = 0;
-	for(size_t tpc_counter = 0; tpc_counter < tpcobj_h->size(); tpc_counter++)
-	{
-		if(_verbose) {std::cout << "[Analyze] TPC Object Number: " << tpc_counter << std::endl; }
-		const xsecAna::TPCObject tpcobj = (*tpcobj_h)[tpc_counter];
-		const int ntracks                   = tpcobj.GetNTracks();
-		const int nshowers                  = tpcobj.GetNShowers();
-		const int npfparticles              = tpcobj.GetNPFP();
-		const simb::Origin_t tpcobj_origin  = tpcobj.GetOrigin();
-		const std::vector<recob::PFParticle> pfp_v = tpcobj.GetPFPs();
-		const std::vector<art::Ptr<recob::Track>  >  track_v  = tpcobj.GetTracks();
-		const std::vector<art::Ptr<recob::Shower> > shower_v  = tpcobj.GetShowers();
-
-		if(_verbose)
-		{
-			std::cout << "[Analyze] N PFPs   : " << npfparticles << std::endl;
-			std::cout << "[Analyze] N Tracks : " << ntracks << std::endl;
-			std::cout << "[Analyze] N Showers: " << nshowers << std::endl;
-		}
-
-		// Reco vertex
-		double reco_nu_vtx[3];
-		//set to default values
-		reco_nu_vtx[0] = -999;
-		reco_nu_vtx[1] = -999;
-		reco_nu_vtx[2] = -999;
-		recob::Vertex tpcobj_nu_vtx = tpcobj.GetVertex();
-		tpcobj_nu_vtx.XYZ(reco_nu_vtx);
-		const double pfp_nu_vtx_x = reco_nu_vtx[0];
-		const double pfp_nu_vtx_y = reco_nu_vtx[1];
-		const double pfp_nu_vtx_z = reco_nu_vtx[2];
-		//_slc_nuvtx_fv[slice] = (UBXSecHelper::InFV(reco_nu_vtx) ? 1 : 0);
-
-		int n_pfp_tracks = 0;
-		int n_pfp_showers = 0;
-
-		xsecAna::TPCObjectContainer tpc_object_container;
-		tpc_object_container.SetpfpVtxX(pfp_nu_vtx_x);
-		tpc_object_container.SetpfpVtxY(pfp_nu_vtx_y);
-		tpc_object_container.SetpfpVtxZ(pfp_nu_vtx_z);
-		tpc_object_container.SetRunNumber(run);
-		tpc_object_container.SetIsData(_is_data);
-		tpc_object_container.SetSubRunNumber(subrun);
-		tpc_object_container.SetEventNumber(event);
-		tpc_object_container.SetHasMCPi0(has_pi0);
-		tpc_object_container.SetIndex(tpc_object_counter);
-		//convert simb::Origin_t object to std::string
-		std::string str_origin = "kUnset";
-		if(tpcobj_origin == simb::kUnknown)      {str_origin = "kUnknown"; }
-		if(tpcobj_origin == simb::kBeamNeutrino) {str_origin = "kBeamNeutrino"; }
-		if(tpcobj_origin == simb::kCosmicRay)    {str_origin = "kCosmicRay"; }
-		tpc_object_container.SetOrigin(str_origin);
-
-		if(_verbose) {std::cout << "[Analyze] Number of PFP in this TPC Object: " << npfparticles << std::endl; }
-		tpc_object_container.SetNumPFParticles(npfparticles);
-
-		// Hits - we want the hits from both tracks and showers
-		int nhits_u = 0;
-		int nhits_v = 0;
-		int nhits_w = 0;
-		int total_nhits_u = 0;
-		int total_nhits_v = 0;
-		int total_nhits_w = 0;
-		int total_nhits = 0;
-		//need to sum all hits from both tracks and showers
-		for(auto const track : track_v)
-		{
-			//art::Ptr<recob::Track> & _track = track;
-			xsecAna::utility::GetNumberOfHitsPerPlane(e, _pfp_producer, track, nhits_u, nhits_v, nhits_w);
-			total_nhits_u += nhits_u;
-			total_nhits_v += nhits_v;
-			total_nhits_w += nhits_w;
-		}
-		for(auto const shower : shower_v)
-		{
-			//art::Ptr<recob::Shower> & _shower = shower;
-			xsecAna::utility::GetNumberOfHitsPerPlane(e, _pfp_producer, shower, nhits_u, nhits_v, nhits_w);
-			total_nhits_u += nhits_u;
-			total_nhits_v += nhits_v;
-			total_nhits_w += nhits_w;
-		}
-		total_nhits = (total_nhits_u + total_nhits_v + total_nhits_w);
-
-		tpc_object_container.SetNumPFPHits   (total_nhits);
-		tpc_object_container.SetNumPFPHitsU  (total_nhits_u);
-		tpc_object_container.SetNumPFPHitsV  (total_nhits_v);
-		tpc_object_container.SetNumPFPHitsW  (total_nhits_w);
-
-		int pfp_nu_counter = 0;
-		//int pfpNuPdg = 0;//not set
-		int pfpParentPdg = 0;
-		int mode = -1;
-		int ccnc = -1;
-		int tpco_mc_pdg  = -1;
-		int tpco_pfp_pdg = -1;
-		bool is_neutrino = false;
-		double mc_nu_vtx_x = -999;
-		double mc_nu_vtx_y = -999;
-		double mc_nu_vtx_z = -999;
-		//bool is_primary = false; // not set
-
-		//****************************************
-		//loop over pfparticles in the tpc object
-		//****************************************
-		std::cout << "[Analyze] PFParticle Loop: " << std::endl;
-		auto pfps_from_tpcobj = tpcobjToPFPAssns.at(tpc_object_counter);
-		for(auto const pfp : pfps_from_tpcobj)
-		{
-			xsecAna::ParticleContainer particle_container;
-
-			int mcPdg = 0;
-			//int mcNuPdg = 0; // not set
-			int mcParentPdg = 0;
-			double pfp_dir_x = -999;
-			double pfp_dir_y = -999;
-			double pfp_dir_z = -999;
-			double pfp_theta = -999;
-			double pfp_phi = -999;
-			double pfp_length = -999;
-			double pfp_momentum = -999;
-			int pfp_hits = 0;
-			int pfp_hits_u = 0;
-			int pfp_hits_v = 0;
-			int pfp_hits_w = 0;
-			double pfp_open_angle = -999;
-			double pfp_energy_u = -999;
-			double pfp_energy_v = -999;
-			double pfp_energy_w = -999;
-
-			double mc_vtx_x = -999;
-			double mc_vtx_y = -999;
-			double mc_vtx_z = -999;
-			double mc_dir_x = -999;
-			double mc_dir_y = -999;
-			double mc_dir_z = -999;
-			double mc_theta = -999;
-			double mc_phi = -999;
-			double mcLength = -999;
-			double mcEnergy = -999;
-			double mcMomentum = -999;
-			double mcNeutrinoEnergy = -999;
-			int particle_mode = -1;
-			int particle_is_cc = -1;
-			//double mc_open_angle = 0; //unset
-			std::vector<art::Ptr<recob::Cluster> > clusters = clusters_from_pfpart.at(pfp.key());
-			const int num_clusters = clusters.size();
-			std::vector < std::vector< double > > shower_cluster_dqdx;
-			std::vector < std::vector< double > > shower_cluster_dq;
-			std::vector < std::vector< double > > shower_cluster_dx;
-
-			std::vector < std::vector< double > > shower_cluster_dqdx_alt;
-			std::vector < std::vector< double > > shower_cluster_dq_alt;
-			std::vector < std::vector< double > > shower_cluster_dx_alt;
-
-			std::vector < std::vector< double > > shower_cluster_dqdx_cali;
-			std::vector < std::vector< double > > shower_cluster_dqdx_omit;
-			std::vector < std::vector< double > > shower_cluster_dqdx_omit_cali;
-
-			std::vector<double> shower_dEdx;
-			std::vector<double> shower_dEdx_alt;
-			std::vector<double> shower_dEdx_cali;
-			std::vector<double> shower_dEdx_omit;
-			std::vector<double> shower_dEdx_omit_cali;
-
-			shower_cluster_dqdx.resize(num_clusters);
-			shower_cluster_dq.resize(num_clusters);
-			shower_cluster_dx.resize(num_clusters);
-
-			shower_cluster_dqdx_alt.resize(num_clusters);
-			shower_cluster_dq_alt.resize(num_clusters);
-			shower_cluster_dx_alt.resize(num_clusters);
-
-			shower_cluster_dqdx_cali.resize(num_clusters);
-			shower_cluster_dqdx_omit.resize(num_clusters);
-			shower_cluster_dqdx_omit_cali.resize(num_clusters);
-
-			shower_dEdx.resize(3, 0);
-			shower_dEdx_alt.resize(3, 0);
-			shower_dEdx_cali.resize(3,0);
-			shower_dEdx_omit.resize(3, 0);
-			shower_dEdx_omit_cali.resize(3, 0);
-
-			for(int clust = 0; clust < num_clusters; clust++)
-			{
-				shower_cluster_dqdx.at(clust).resize(3, 0);
-				shower_cluster_dq.at(clust).resize(3, 0);
-				shower_cluster_dx.at(clust).resize(3, 0);
-
-				shower_cluster_dqdx_alt.at(clust).resize(3, 0);
-				shower_cluster_dq_alt.at(clust).resize(3, 0);
-				shower_cluster_dx_alt.at(clust).resize(3, 0);
-
-				shower_cluster_dqdx_cali.at(clust).resize(3, 0);
-				shower_cluster_dqdx_omit.at(clust).resize(3, 0);
-				shower_cluster_dqdx_omit_cali.at(clust).resize(3, 0);
-			}
-
-			std::vector<double> dqdx_cali;
-			dqdx_cali.resize(3, 0);
-
-
-			const int pfpPdg = pfp->PdgCode();
-			//if(_verbose) {std::cout << "[Analyze] PFP PDG Code " << pfpPdg << std::endl; }
-			const unsigned int pfpParent_id = pfp->Parent();
-			int position = 0;
-			int parent_position = -1;
-			for(auto const parent_search : pfps_from_tpcobj)
-			{
-				if(parent_search->Self() == pfpParent_id ) {parent_position = position; }
-				position++;
-			}
-			if(parent_position != -1)
-			{
-				try
-				{
-					auto const pfpParent_obj = pfps_from_tpcobj.at(parent_position);
-					pfpParentPdg = pfpParent_obj->PdgCode();
-				}
-				catch(...) {std::cout << "[Analyze] [EXCEPTION] No Parent Found!" << std::endl; }
-			}
-			//if(_verbose) {std::cout << "[Analyze] PFP Parent PDG Code " << pfpParentPdg << std::endl; }
-			particle_container.SetpfpPdgCode(pfpPdg);
-			//particle_container.SetpfpNuPdgCode(pfpParentPdg); //this will sometimes be a neutrino and sometimes not!
-			particle_container.SetpfpParentPdgCode(pfpParentPdg);
-			const int index = pfp->Self();
-			particle_container.SetIndex(index);
-			simb::Origin_t mcOrigin = simb::kUnknown;
-
-			if(pfpPdg == 12 || pfpPdg == 14) {
-				if(_verbose) {std::cout << "[Analyze] PFP Neutrino with PDG Code: " << pfpPdg << std::endl; }
-				is_neutrino = true;
-				tpco_pfp_pdg = pfpPdg;
-				pfp_nu_counter++;
-			}
-			particle_container.SetIsNeutrino(is_neutrino);
-
-			// Reco vertex
-			lar_pandora::VertexVector vertexVector;
-			lar_pandora::PFParticlesToVertices particlesToVertices;
-			lar_pandora::LArPandoraHelper::CollectVertices(e, _pfp_producer, vertexVector, particlesToVertices);
-
-			auto iter = particlesToVertices.find(pfp);
-			//auto iter = pfParticleToVertexMap.find(pfp);
-			double pfp_vtx_x = -999;
-			double pfp_vtx_y = -999;
-			double pfp_vtx_z = -999;
-			if (iter != particlesToVertices.end())
-			{
-				lar_pandora::VertexVector vertex_v = particlesToVertices.find(pfp)->second;
-				double reco_vtx[3];
-				vertex_v[0]->XYZ(reco_vtx);
-				pfp_vtx_x = reco_vtx[0];
-				pfp_vtx_y = reco_vtx[1];
-				pfp_vtx_z = reco_vtx[2];
-			}
-			particle_container.SetpfpVtxX(pfp_vtx_x);
-			particle_container.SetpfpVtxY(pfp_vtx_y);
-			particle_container.SetpfpVtxZ(pfp_vtx_z);
-
-			//mcghosts do accounting for pfp to mcghost to mc particle
-			const std::vector<art::Ptr<MCGhost> > mcghost = mcghost_from_pfp.at(pfp.key());
-			std::vector<art::Ptr<simb::MCParticle> > mcpart;
-			if(mcghost.size() == 0) {std::cout << "[Analyze] No matched MC Ghost to PFP!" << std::endl; }
-			//we don't want to just throw these events out!
-			if(mcghost.size() > 1)
-			{
-				if(_verbose) {std::cout << "[Analyze] Too many matched MC Ghost to PFP!" << std::endl; }
-			}//end if 2+ MC Ghost
-			if(mcghost.size() >= 1)
-			{
-				if(_verbose) {std::cout << "[Analyze] One MC Ghost Found!" << std::endl; }
-				mcpart = mcpar_from_mcghost.at(mcghost[0].key());
-				const art::Ptr<simb::MCParticle> the_mcpart = mcpart.at(0);
-				const art::Ptr<simb::MCTruth> mctruth = nue_xsec::recotruehelper::TrackIDToMCTruth(e, "largeant", the_mcpart->TrackId());
-				//bt->TrackIDToMCTruth(the_mcpart->TrackId());
-				simb::MCNeutrino mc_nu;
-				if(!mctruth) {std::cout << "[Analyze] MCTruth Pointer Not Valid!" << std::endl; }
-				else
-				{
-					mc_nu = mctruth->GetNeutrino();
-					mcOrigin = mctruth->Origin();
-				}
-				if(mcOrigin != simb::kCosmicRay)
-				{
-					mode = mc_nu.Mode();
-					ccnc = mc_nu.CCNC();
-					mcParentPdg = mc_nu.Nu().PdgCode();
-					mcNeutrinoEnergy = mc_nu.Nu().E();
-					mc_nu_vtx_x = mc_nu.Nu().Position().X();
-					mc_nu_vtx_y = mc_nu.Nu().Position().Y();
-					mc_nu_vtx_z = mc_nu.Nu().Position().Z();
-					//test cout
-					std::cout << mc_nu_vtx_x << ", " << mc_nu_vtx_y << ", " << mc_nu_vtx_z << std::endl;
-					mc_vtx_x = the_mcpart->Vx();
-					mc_vtx_y = the_mcpart->Vy();
-					mc_vtx_z = the_mcpart->Vz();
-				}
-				//if(mcOrigin == simb::kCosmicRay)
-				//{
-				//std::vector<art::Ptr<sim::MCTrack> > mc_tracks = mctracks_from_mcparticle.at(the_mcpart.key());
-				//if(mc_tracks.size() == 1)
-				//{
-				//	mc_vtx_x = mc_tracks.at(0)->Start().X();
-				//	mc_vtx_y = mc_tracks.at(0)->Start().Y();
-				//	mc_vtx_z = mc_tracks.at(0)->Start().Z();
-				//	//I can include the length and directions here!
-				//}
-				//}
-				particle_mode = mode;
-				particle_is_cc = ccnc;
-				mcPdg = the_mcpart->PdgCode();
-				if(is_neutrino == true) {tpco_mc_pdg = mcPdg; }
-				mcMomentum = the_mcpart->P();
-				mc_dir_x = the_mcpart->Px() / mcMomentum;
-				mc_dir_y = the_mcpart->Py() / mcMomentum;
-				mc_dir_z = the_mcpart->Pz() / mcMomentum;
-				mc_theta = acos(mc_dir_z) * (180 / 3.1415);
-				mc_phi = atan2(mc_dir_y, mc_dir_x) * (180 / 3.1415);
-				const double mc_length_x = the_mcpart->Position().X() - the_mcpart->EndPosition().X();
-				const double mc_length_y = the_mcpart->Position().Y() - the_mcpart->EndPosition().Y();
-				const double mc_length_z = the_mcpart->Position().Z() - the_mcpart->EndPosition().Z();
-				mcLength = sqrt((mc_length_x * mc_length_x) + (mc_length_y * mc_length_y) + (mc_length_z * mc_length_z));
-				mcEnergy = the_mcpart->E();
-
-
-			} //end mcghost == 1
-			particle_container.SetmcPdgCode(mcPdg);
-			//convert simb::Origin_t to std::string
-			std::string str_mcorigin;
-			if(mcOrigin == simb::kUnknown) {str_mcorigin = "kUnknown"; }
-			if(mcOrigin == simb::kBeamNeutrino) {str_mcorigin = "kBeamNeutrino"; }
-			if(mcOrigin == simb::kCosmicRay) {str_mcorigin = "kCosmicRay"; }
-			particle_container.SetOrigin(str_mcorigin);
-			particle_container.SetmcPdgCode(mcPdg);
-			particle_container.SetmcParentPdgCode(mcParentPdg);
-			particle_container.SetmcNeutrinoEnergy(mcNeutrinoEnergy);
-			particle_container.SetmcVtxX(mc_vtx_x);
-			particle_container.SetmcVtxY(mc_vtx_y);
-			particle_container.SetmcVtxZ(mc_vtx_z);
-			particle_container.SetmcDirX(mc_dir_x);
-			particle_container.SetmcDirY(mc_dir_y);
-			particle_container.SetmcDirZ(mc_dir_z);
-			particle_container.SetmcTheta(mc_theta);
-			particle_container.SetmcPhi(mc_phi);
-			particle_container.SetmcLength(mcLength);
-			particle_container.SetmcEnergy(mcEnergy);
-			particle_container.SetmcMomentum(mcMomentum);
-			particle_container.SetMode(particle_mode);
-			particle_container.SetCCNC(particle_is_cc);
-
-			//pfp tracks
-			if(pfpPdg == 13)
-			{
-				std::vector<art::Ptr<recob::Track> > tracks = tracks_from_pfp.at(pfp.key());
-				if(_verbose) {std::cout << "[Analyze] \t\t n tracks ass to this pfp: " << tracks.size() << std::endl; }
-				//we want to take the first association, right?
-				if(tracks.size() != 0)
-				{
-					const art::Ptr<recob::Track> this_track = tracks.at(0);
-					pfp_dir_x = this_track->VertexDirection().X();
-					pfp_dir_y = this_track->VertexDirection().Y();
-					pfp_dir_z = this_track->VertexDirection().Z();
-					pfp_theta = acos(pfp_dir_z) * (180 / 3.1415);
-					pfp_phi = atan2(pfp_dir_y, pfp_dir_x) * (180 / 3.1415);
-					pfp_length = this_track->Length();
-					pfp_momentum = this_track->StartMomentum();
-
-					xsecAna::utility::GetNumberOfHitsPerPlane(e, _pfp_producer, this_track, pfp_hits_u, pfp_hits_v, pfp_hits_w);
-					pfp_hits = (pfp_hits_u + pfp_hits_v + pfp_hits_w);
-
-					if(!_is_data){xsecAna::utility::GetEnergyPerPlane(e, _pfp_producer, this_track, calibration_u, calibration_v, calibration_w,
-					                                    pfp_energy_u, pfp_energy_v, pfp_energy_w);}
-
-                                        if(_is_data){xsecAna::utility::GetEnergyPerPlane(e, _pfp_producer, this_track, calibration_u_data, calibration_v_data, calibration_w_data,
-                                                                            pfp_energy_u, pfp_energy_v, pfp_energy_w);}
-
-					n_pfp_tracks++;
-				}
-			}//end pfp tracks
-
-			//pfp showers
-			if(pfpPdg == 11)
-			{
-				std::vector<art::Ptr<recob::Shower> > showers = showers_from_pfp.at(pfp.key());
-				if(_verbose) {std::cout << "[Analyze] \t\t n showers ass to this pfp: " << showers.size() << std::endl; }
-				//we want to take the first association, right?
-				if(showers.size() != 0)
-				{
-					const art::Ptr<recob::Shower> this_shower = showers.at(0);
-					pfp_dir_x = this_shower->Direction().X();
-					pfp_dir_y = this_shower->Direction().Y();
-					pfp_dir_z = this_shower->Direction().Z();
-					pfp_theta = acos(pfp_dir_z) * (180 / 3.1415);
-					pfp_phi = atan2(pfp_dir_y, pfp_dir_x) * (180 / 3.1415);
-					pfp_length = this_shower->Length();
-					pfp_momentum = this_shower->Energy().at(this_shower->best_plane());
-					pfp_open_angle = this_shower->OpenAngle();
-
-					xsecAna::utility::GetNumberOfHitsPerPlane(e, _pfp_producer, this_shower, pfp_hits_u, pfp_hits_v, pfp_hits_w);
-					pfp_hits = (pfp_hits_u + pfp_hits_v + pfp_hits_w);
-
-					//trying to do dqdx
-					//1st bool argument - use xyz calibration
-					//2nd bool argument - omit first point in box
-					//this is the default method
-					xsecAna::utility::ConstructShowerdQdX(geoHelper, _is_data, ClusterToHitsMap, clusters, 
-									      _dQdxRectangleLength,_dQdxRectangleWidth,
-					                                      this_shower, shower_cluster_dqdx, shower_cluster_dq, shower_cluster_dx, _verbose,
-									      false, false);
-					//this method uses the xyz calibration map
-                                        xsecAna::utility::ConstructShowerdQdX(geoHelper, _is_data, ClusterToHitsMap, clusters,
-                                                                              _dQdxRectangleLength,_dQdxRectangleWidth,
-                                                                              this_shower, shower_cluster_dqdx_cali, shower_cluster_dq, shower_cluster_dx, _verbose,
-                                                                              true, false);
-					//this is the default method - but omitting first point of box
-					xsecAna::utility::ConstructShowerdQdX(geoHelper, _is_data, ClusterToHitsMap, clusters, 
-									      _dQdxRectangleLength,_dQdxRectangleWidth,
-					                                      this_shower, shower_cluster_dqdx_omit, shower_cluster_dq, shower_cluster_dx, _verbose,
-									      false, true);
-					//this method uses the xyz calibration map - omitting first point of box
-                                        xsecAna::utility::ConstructShowerdQdX(geoHelper, _is_data, ClusterToHitsMap, clusters,
-                                                                              _dQdxRectangleLength,_dQdxRectangleWidth,
-                                                                              this_shower, shower_cluster_dqdx_omit_cali, 
-									      shower_cluster_dq, shower_cluster_dx, _verbose,
-                                                                              true, true);
-
-					//this is a test method used by pandora lee group
-					xsecAna::utility::ConstructShowerdQdXAlternative(geoHelper, _is_data, ClusterToHitsMap, clusters, 
-											 _dQdxRectangleLength,_dQdxRectangleWidth,
-					                                                 this_shower, shower_cluster_dqdx_alt, 
-											 shower_cluster_dq_alt, shower_cluster_dx_alt, dqdx_cali, _verbose);
-					//then dEdx!
-					xsecAna::utility::ConvertdEdX(shower_cluster_dqdx,           shower_dEdx);
-					xsecAna::utility::ConvertdEdX(shower_cluster_dqdx_alt,       shower_dEdx_alt);
-					xsecAna::utility::ConvertdEdX(shower_cluster_dqdx_cali,      shower_dEdx_cali);
-					xsecAna::utility::ConvertdEdX(shower_cluster_dqdx_omit,      shower_dEdx_omit);
-					xsecAna::utility::ConvertdEdX(shower_cluster_dqdx_omit_cali, shower_dEdx_omit_cali);
-					// for(auto const cluster_dqdx : shower_cluster_dqdx)
-					// {
-					//      //cluster dqdx is size 3 - one for each plane
-					//      if(_verbose) {std::cout << "[Analyze] [dQdx] Plane 0: " << cluster_dqdx.at(0) << std::endl; }
-					//      if(_verbose) {std::cout << "[Analyze] [dQdx] Plane 1: " << cluster_dqdx.at(1) << std::endl; }
-					//      if(_verbose) {std::cout << "[Analyze] [dQdx] Collection Plane: " << cluster_dqdx.at(2) << std::endl; }
-					// }
-					// if(_verbose) {std::cout << "[Analyze] [dEdx] Plane 0: " << shower_dEdx.at(0) << std::endl; }
-					// if(_verbose) {std::cout << "[Analyze] [dEdx] Plane 1: " << shower_dEdx.at(1) << std::endl; }
-					// if(_verbose) {std::cout << "[Analyze] [dEdx] Plane 2: " << shower_dEdx.at(2) << std::endl; }
-
-					if(!_is_data){xsecAna::utility::GetEnergyPerPlane(e, _pfp_producer, this_shower, 
-									calibration_u, calibration_v, calibration_w,
-					                                pfp_energy_u, pfp_energy_v, pfp_energy_w);}
-
-
-					if(_is_data){xsecAna::utility::GetEnergyPerPlane(e, _pfp_producer, this_shower, 
-								      	    calibration_u_data, calibration_v_data, calibration_w_data,
-					                                    pfp_energy_u, pfp_energy_v, pfp_energy_w);}
-
-					n_pfp_showers++;
-				}
-			}//end pfp showers
-
-			if(_verbose) {std::cout << "[Analyze] Filling Particle Container Objects" << std::endl; }
-
-			particle_container.SetpfpDirX(pfp_dir_x);
-			particle_container.SetpfpDirY(pfp_dir_y);
-			particle_container.SetpfpDirZ(pfp_dir_z);
-			particle_container.SetpfpTheta(pfp_theta);
-			particle_container.SetpfpPhi(pfp_phi);
-			particle_container.SetpfpLength(pfp_length);
-			particle_container.SetpfpMomentum(pfp_momentum);
-			particle_container.SetpfpOpenAngle(pfp_open_angle);
-			particle_container.SetNumPFPHits(pfp_hits);
-			particle_container.SetNumPFPHitsU(pfp_hits_u);
-			particle_container.SetNumPFPHitsV(pfp_hits_v);
-			particle_container.SetNumPFPHitsW(pfp_hits_w);
-			particle_container.SetpfpEnergyU(pfp_energy_u);
-			particle_container.SetpfpEnergyV(pfp_energy_v);
-			particle_container.SetpfpEnergyW(pfp_energy_w);
-			particle_container.SetPfpClusterdQdx(shower_cluster_dqdx);
-			particle_container.SetPfpClusterdQ(shower_cluster_dq);
-			particle_container.SetPfpClusterdX(shower_cluster_dx);
-			particle_container.SetPfpdEdx(shower_dEdx);
-
-			particle_container.SetPfpClusterdQdx_alt(shower_cluster_dqdx_alt);
-			particle_container.SetPfpClusterdQ_alt(shower_cluster_dq_alt);
-			particle_container.SetPfpClusterdX_alt(shower_cluster_dx_alt);
-			particle_container.SetPfpdEdx_alt(shower_dEdx_alt);
-
-			particle_container.SetPfpClusterdQdxCali(shower_cluster_dqdx_cali);
-			particle_container.SetPfpdEdxCali(shower_dEdx_cali);
-			particle_container.SetPfpClusterdQdxOmitFirst(shower_cluster_dqdx_omit);
-			particle_container.SetPfpdEdxOmitFirst(shower_dEdx_omit);
-			particle_container.SetPfpClusterdQdxOmitFirst_cali(shower_cluster_dqdx_omit_cali);
-			particle_container.SetPfpdEdxOmitFirst_cali(shower_dEdx_omit_cali);
-
-			tpc_object_container.AddParticle(particle_container);
-
-		}//end loop over pfp in tpcobject
-		tpc_object_container.SetNumPFPNeutrinos(pfp_nu_counter);
-		tpc_object_container.SetMode(mode);
-		tpc_object_container.SetCCNC(ccnc);
-		tpc_object_container.SetmcPdgCode(tpco_mc_pdg);
-		tpc_object_container.SetpfpPdgCode(tpco_pfp_pdg);
-		tpc_object_container.SetNPfpTracks(n_pfp_tracks);
-		tpc_object_container.SetNPfpShowers(n_pfp_showers);
-		tpc_object_container.SetmcVtxX(mc_nu_vtx_x);
-		tpc_object_container.SetmcVtxY(mc_nu_vtx_y);
-		tpc_object_container.SetmcVtxZ(mc_nu_vtx_z);
-		//tpc_object_container.SetmcPdgCode();
-
-		tpc_object_container_v.push_back(tpc_object_container);
-		tpc_object_counter++;
-	}//end loop tpc objects
-
-	//fill root tree per event
-	std::cout << "[Analyze] Fill Root Tree - End Event" << std::endl;
-	myTree->Fill();
+    run = e.id().run();
+    event = e.id().event();
+    subrun = e.id().subRun();
+    _is_data = e.isRealData();
+    _is_mc = !_is_data;
+
+    std::cout << "[Analyze] ------------------------------------------- [Analyze]" << std::endl;
+    std::cout << "[Analyze] Runing over entry: " << iteration << std::endl;
+    iteration++;
+
+    if(_cosmic_only == true) {std::cout << "[Analyze] Running in Cosmic Only Configuration! " << std::endl; }
+    if(_is_mc == true)       {std::cout << "[Analyze] Running with Monte Carlo " << std::endl; }
+    if(_is_data == true)     {std::cout << "[Analyze] Running with Data " << std::endl; }
+    if(_is_data == true)     {run_pot_counting = false; std::cout << "[Analyze] Do Not Count MC POT" << std::endl; }
+    if(_is_mc == true)       {run_pot_counting = true;  std::cout << "[Analyze] Count MC POT" << std::endl; }
+
+    
+    //there are so may mc particles -- why?
+    //these are not all final state particles we see
+    //MC Particle Information
+    art::Handle < std::vector < simb::MCParticle > > MCParticleHandle;
+    if (_is_mc == true) {
+        e.getByLabel("largeant", MCParticleHandle);
+        if (!MCParticleHandle.isValid() && _cosmic_only == false) std::cout << "[Analyze] MCParticleHandle is not valid" << std::endl; exit(1); 
+    }
+    
+    // MC Truth Handle
+    art::Handle < std::vector < simb::MCTruth > > MCTruthHandle;
+    if (_is_mc == true) {
+        e.getByLabel("generator", MCTruthHandle);
+        if (!MCTruthHandle.isValid() && _cosmic_only == false) std::cout << "[Analyze] MCTruthHandle is not valid" << std::endl; exit(1);
+    }
+
+    // Get the optical information --  Maybe make them filled at the same place as the other - so it's a per event
+    std::string beam_flash_tag = "simpleFlashBeam";
+    auto const & beam_opf = e.getValidHandle<std::vector < recob::OpFlash> >(beam_flash_tag);
+    auto const & beam_opflashes(*beam_opf);
+    std::cout << "[Analyze] [OPTICAL] " << beam_flash_tag << " in this event: " << beam_opflashes.size() << std::endl;
+
+    // If there is no optical activity in this event then I have to check where the true nu vtx is
+    // If it's a true nue without reco optical event, but interacts in the FV then this is a loss in efficiency!
+    if(beam_opflashes.size() == 0) {
+        std::cout << "[Analyze] [Optical] No Optical Activity in this Event!" << std::endl;
+        fHasRecoFlash   = 0;
+        fEvent          = event;
+        fRun            = run;
+        fSubRun         = subrun;
+        fOpFlashPE      = -999;
+        fOpFlashTime    = -999;
+        fOpFlashWidthY  = -999;
+        fOpFlashWidthZ  = -999;
+        fOpFlashCenterY = -999;
+        fOpFlashCenterZ = -999;
+        optical_tree->Fill();
+    }
+
+    for(auto const & opflsh : beam_opflashes) {
+        fHasRecoFlash   = 1;
+        fEvent          = event;
+        fRun            = run;
+        fSubRun         = subrun;
+        fOpFlashPE      = opflsh.TotalPE();
+        fOpFlashTime    = opflsh.Time();
+        fOpFlashWidthY  = opflsh.YWidth();
+        fOpFlashWidthZ  = opflsh.ZWidth();
+        fOpFlashCenterY = opflsh.YCenter();
+        fOpFlashCenterZ = opflsh.ZCenter();
+        optical_tree->Fill();
+    }
+
+
+    //I need the MC Track for later - getting cosmic info from MCParticle->MCTrack
+    //std::string mc_track_tag = "mcreco";
+    //art::FindManyP<sim::MCTrack> mctracks_from_mcparticle(MCParticleHandle, e, mc_track_tag);
+    //MCTrack association not there!
+    if (_cosmic_only == false && _is_mc == true) {
+        std::cout << "[Analyze] [MCPARTICLE] largeant in this event: " << MCParticleHandle->size() << std::endl;
+        
+        if (_save_truth_info == true) {
+            std::cout << "[Analyze] [MCPARTICLE] Saving MC Truth Tree Configuration" << std::endl;
+            std::cout << "[Analyze] [MCPARTICLE] This inflates the output file size!" << std::endl;
+        }
+
+        bool event_neutrino = false;
+        int  mc_num_particles = 0;
+        int  mc_num_charged_particles = 0;
+        has_pi0 = false;
+
+        // Loop over the MC Particles
+        for (auto const & mcparticle : (*MCParticleHandle) ) {
+            
+            fMCMother     = mcparticle.Mother();
+            fMCParticleID = mcparticle.TrackId();
+            art::Ptr<simb::MCTruth> mctruth;
+            
+            // We only care about every MC Particle if we're saving all truth info
+            if(_save_truth_info == true){
+                fMcparticle_pdg = mcparticle.PdgCode();
+                fStatusCode     = mcparticle.StatusCode();
+                fMCVtxX         = mcparticle.Vx();
+                fMCVtxY         = mcparticle.Vy();
+                fMCVtxZ         = mcparticle.Vz();
+                fMCEnergy       = mcparticle.E();
+                fMCMass         = mcparticle.Mass();
+                fMCPx           = mcparticle.Px();
+                fMCPy           = mcparticle.Py();
+                fMCPz           = mcparticle.Pz();
+                mctruth         = nue_xsec::recotruehelper::TrackIDToMCTruth(e, "largeant", mcparticle.TrackId());
+
+                if(mctruth->Origin() == simb::kBeamNeutrino) fMCOrigin = 0; 
+                if(mctruth->Origin() == simb::kCosmicRay)    fMCOrigin = 1;
+                if(mctruth->Origin() == simb::kUnknown)      fMCOrigin = 2;
+                simb::MCNeutrino mc_nu = mctruth->GetNeutrino();
+                mcparticle_tree->Fill();
+            }
+            
+            if (fMCMother == 0) {
+                fMcparticle_pdg = mcparticle.PdgCode();
+                fStatusCode = mcparticle.StatusCode();
+                fMCVtxX     = mcparticle.Vx();
+                fMCVtxY     = mcparticle.Vy();
+                fMCVtxZ     = mcparticle.Vz();
+                fMCEnergy   = mcparticle.E();
+                fMCMass     = mcparticle.Mass();
+                fMCPx       = mcparticle.Px();
+                fMCPy       = mcparticle.Py();
+                fMCPz       = mcparticle.Pz();
+                
+                mctruth     = nue_xsec::recotruehelper::TrackIDToMCTruth(e, "largeant", mcparticle.TrackId());
+                simb::MCNeutrino mc_nu = mctruth->GetNeutrino();
+                const int fMCNuPdg     = mc_nu.Nu().PdgCode();
+                
+                if (mctruth->Origin() == simb::kBeamNeutrino && event_neutrino == false) {
+                    //mctruth = nue_xsec::recotruehelper::TrackIDToMCTruth(e, "largeant", mcparticle.TrackId());
+                    //bt->TrackIDToMCTruth(mcparticle.TrackId());
+                    
+                    if(mctruth->Origin() == simb::kBeamNeutrino) fMCOrigin = 0;
+                    if(mctruth->Origin() == simb::kCosmicRay)    fMCOrigin = 1;
+                    if(mctruth->Origin() == simb::kUnknown)      fMCOrigin = 2;
+                    
+                    bool fCCNC  = mc_nu.CCNC(); //0 is CC, 1 is NC
+                    if(fMCNuPdg == 12  && fCCNC == 0) {mc_nue_cc_counter++;      fMCNuID = 1; }
+                    if(fMCNuPdg == 14  && fCCNC == 0) {mc_numu_cc_counter++;     fMCNuID = 2; }
+                    if(fMCNuPdg == 12  && fCCNC == 1) {mc_nue_nc_counter++;      fMCNuID = 3; }
+                    if(fMCNuPdg == 14  && fCCNC == 1) {mc_numu_nc_counter++;     fMCNuID = 4; }
+                    if(fMCNuPdg == -12 && fCCNC == 0) {mc_nue_cc_counter_bar++;  fMCNuID = 5; }
+                    if(fMCNuPdg == -14 && fCCNC == 0) {mc_numu_cc_counter_bar++; fMCNuID = 6; }
+                    if(fMCNuPdg == -12 && fCCNC == 1) {mc_nue_nc_counter_bar++;  fMCNuID = 7; }
+                    if(fMCNuPdg == -14 && fCCNC == 1) {mc_numu_nc_counter_bar++; fMCNuID = 8; }
+                    
+                    // This loop is only enerted once per event, assuming 1 nu event per event.
+                    // This way we get the neutrino vertex and energy per event and can use this
+                    // to calculate if it's in the FV in the future, during the selection.
+                    fMCNuVtxX      = mc_nu.Nu().Vx();
+                    fMCNuVtxY      = mc_nu.Nu().Vy();
+                    fMCNuVtxZ      = mc_nu.Nu().Vz();
+                    fMCNuEnergy    = mc_nu.Nu().E();
+                    fMCNuMomentum  = mc_nu.Nu().P();
+                    fMCNuDirX      = (mc_nu.Nu().Px() / mc_nu.Nu().P());
+                    fMCNuDirY      = (mc_nu.Nu().Py() / mc_nu.Nu().P());
+                    fMCNuDirZ      = (mc_nu.Nu().Pz() / mc_nu.Nu().P());
+                    fMCEleDirX     = (mc_nu.Lepton().Px() / mc_nu.Lepton().P());
+                    fMCEleDirY     = (mc_nu.Lepton().Py() / mc_nu.Lepton().P());
+                    fMCEleDirZ     = (mc_nu.Lepton().Pz() / mc_nu.Lepton().P());
+                    fMCEleEnergy   = mc_nu.Lepton().E();
+                    fMCEleMomentum = mc_nu.Lepton().P();
+                    fMCNuTime      = mc_nu.Nu().Trajectory().T(0);
+                    event_neutrino = true;
+                }
+                
+                // This should only give the stable final state particles
+                if (mctruth->Origin() == simb::kBeamNeutrino && mcparticle.StatusCode() == 1) {
+                    mc_num_particles++;
+                    
+                    if(_verbose) {std::cout << "[Analyze] [MCTruth] Stable Final State Particles " << fMcparticle_pdg << std::endl; }
+                    
+                    if(fMcparticle_pdg == 111) {
+                        has_pi0 = true;
+                        if(_verbose) {std::cout << "[Analyze] [MCTruth] Event has Neutrino Induced Pi0" << std::endl; }
+                    }
+                    
+                    if(fMcparticle_pdg == 11  || fMcparticle_pdg == 13   || fMcparticle_pdg == -11  || fMcparticle_pdg == -13 ||
+                       fMcparticle_pdg == 211 || fMcparticle_pdg == -211 || fMcparticle_pdg == 2212 || fMcparticle_pdg == 321 || fMcparticle_pdg == -321){
+                        mc_num_charged_particles++;
+                    }
+                }
+            
+            } // End if fMCMother == 0
+        
+        } // End loop over MC particles
+        
+        fMCNumParticles        = mc_num_particles;
+        fMCNumChargedParticles = mc_num_charged_particles;
+        std::cout << "[Analyze] MC Num Particles: " << mc_num_particles << std::endl;
+       
+        // Mctruth object loop
+        for (auto const & mctruth : (*MCTruthHandle) ){
+            
+            // Sometimes we have more than 1 neutrino in an event
+            // this is particularly important for data try and save vectors of the variables
+            
+            // const int mctruth_pdgcode = mctruth.GetParticle().PdgCode();
+            const int mctruth_pdgcode = mctruth.GetNeutrino().Nu().PdgCode();
+            bool is_mctruth_neutrino  = false;
+            
+            if (mctruth_pdgcode == 12 || mctruth_pdgcode == -12 || mctruth_pdgcode == 14 || mctruth_pdgcode == -14) is_mctruth_neutrino = true;
+            
+            if (mctruth.Origin() == simb::kBeamNeutrino && is_mctruth_neutrino == true) {
+                fMCNuPdg_v      .push_back( mctruth_pdgcode);
+                fMCNuVtxX_v     .push_back( mctruth.GetNeutrino().Nu().Vx());
+                fMCNuVtxY_v     .push_back( mctruth.GetNeutrino().Nu().Vy());
+                fMCNuVtxZ_v     .push_back( mctruth.GetNeutrino().Nu().Vz());
+                fMCNuEnergy_v   .push_back( mctruth.GetNeutrino().Nu().E());
+                fMCNuMomentum_v .push_back( mctruth.GetNeutrino().Nu().P());
+                fMCNuDirX_v     .push_back( (mctruth.GetNeutrino().Nu().Px() / mctruth.GetNeutrino().Nu().P()));
+                fMCNuDirY_v     .push_back( (mctruth.GetNeutrino().Nu().Py() / mctruth.GetNeutrino().Nu().P()));
+                fMCNuDirZ_v     .push_back( (mctruth.GetNeutrino().Nu().Pz() / mctruth.GetNeutrino().Nu().P()));
+                fEventWeight_v.push_back(1.0);
+            
+            } // End if mctruth->origin == kBeamNeutrino
+       
+        } // End loop mctruth
+        
+        mctruth_counter_tree->Fill();
+        fMCNuPdg_v     .clear();
+        fMCNuVtxX_v    .clear();
+        fMCNuVtxY_v    .clear();
+        fMCNuVtxZ_v    .clear();
+        fMCNuEnergy_v  .clear();
+        fMCNuMomentum_v.clear();
+        fMCNuDirX_v    .clear();
+        fMCNuDirY_v    .clear();
+        fMCNuDirZ_v    .clear();
+        fEventWeight_v .clear();
+    }
+
+    // Clear the TPC Obj vector
+    if (!tpc_object_container_v.empty()) tpc_object_container_v.clear();
+
+    // Get PFP
+    art::Handle<std::vector<recob::PFParticle> > pfp_h;
+    e.getByLabel(_pfp_producer,pfp_h);
+    if (!pfp_h.isValid()) {
+        std::cout << "[Analyze] PFP product " << _pfp_producer << " not found..." << std::endl;
+    }
+
+    if(pfp_h->empty()) {
+        std::cout << "[Analyze] PFP " << _pfp_producer << " is empty." << std::endl;
+    }
+
+    art::FindManyP<recob::Track>  tracks_from_pfp (pfp_h, e, _pfp_producer);
+    art::FindManyP<recob::Shower> showers_from_pfp(pfp_h, e, _pfp_producer);
+
+    // Need to get clusters for dQ/dX
+    art::Handle<std::vector<recob::Cluster > > cluster_h;
+    e.getByLabel(_pfp_producer, cluster_h);
+    if (!cluster_h.isValid()) {std::cout << "[Analyze] Cannot locate recob::Cluster. " << std::endl; }
+
+    art::FindManyP<recob::Cluster> clusters_from_pfpart(pfp_h,     e, _pfp_producer);
+    art::FindManyP<recob::Hit>     hits_from_clusters  (cluster_h, e, _pfp_producer);
+    
+    // Making a map of clusters to hit vectors
+    std::map < art::Ptr< recob::Cluster>, std::vector<art::Ptr < recob::Hit> > > ClusterToHitsMap;
+    std::vector<art::Ptr<recob::Cluster> > cluster_v;
+    art::fill_ptr_vector(cluster_v, cluster_h);
+    for (auto const cluster : cluster_v ) {
+        std::vector<art::Ptr<recob::Hit> > hits_v = hits_from_clusters.at(cluster.key());
+        ClusterToHitsMap.insert(std::make_pair(cluster, hits_v));
+    }
+
+    // Get TPCObjects from the Event
+    art::Handle<std::vector<xsecAna::TPCObject> > tpcobj_h;
+    e.getByLabel(_tpcobject_producer, tpcobj_h);
+    if (!tpcobj_h.isValid()) {std::cout << "[Analyze] Cannote locate xsecAna::TPCObject." << std::endl; }
+
+    // Get the MC Ghosts
+    art::Handle<std::vector<xsecAna::MCGhost> > ghost_h;
+    e.getByLabel(_mc_ghost_producer,ghost_h);
+    if (!ghost_h.isValid()) {
+        std::cout << "[Analyze] MCGhost product " << _mc_ghost_producer << " not found..." << std::endl;
+    }
+    
+    art::FindManyP<xsecAna::MCGhost>   mcghost_from_pfp   (pfp_h,   e, _mc_ghost_producer);
+    art::FindManyP<simb::MCParticle>   mcpar_from_mcghost (ghost_h, e, _mc_ghost_producer);
+
+    //art::FindManyP<xsecAna::FlashMatch> tpcobjToFlashMatchAssns(tpcobj_h, e, _neutrino_flash_match_producer);
+    art::FindManyP<recob::Track>      tpcobjToTrackAssns  (tpcobj_h, e, _tpcobject_producer);
+    art::FindManyP<recob::Shower>     tpcobjToShowerAssns (tpcobj_h, e, _tpcobject_producer);
+    art::FindManyP<recob::PFParticle> tpcobjToPFPAssns    (tpcobj_h, e, _tpcobject_producer);
+
+    if(_verbose) {std::cout << "[Analyze] TPC Objects in this Event: " << tpcobj_h->size() << std::endl; }
+   
+    // Loop over all of the tpc objects!
+    int tpc_object_counter = 0;
+    for (size_t tpc_counter = 0; tpc_counter < tpcobj_h->size(); tpc_counter++) {
+        
+        if(_verbose) {std::cout << "[Analyze] TPC Object Number: " << tpc_counter << std::endl; }
+        
+        const xsecAna::TPCObject tpcobj                       = (*tpcobj_h)[tpc_counter];
+        const int ntracks                                     = tpcobj.GetNTracks();
+        const int nshowers                                    = tpcobj.GetNShowers();
+        const int npfparticles                                = tpcobj.GetNPFP();
+        const simb::Origin_t tpcobj_origin                    = tpcobj.GetOrigin();
+        const std::vector<recob::PFParticle> pfp_v            = tpcobj.GetPFPs();
+        const std::vector<art::Ptr<recob::Track>  >  track_v  = tpcobj.GetTracks();
+        const std::vector<art::Ptr<recob::Shower> > shower_v  = tpcobj.GetShowers();
+
+        if(_verbose) {
+            std::cout << "[Analyze] N PFPs   : " << npfparticles << std::endl;
+            std::cout << "[Analyze] N Tracks : " << ntracks << std::endl;
+            std::cout << "[Analyze] N Showers: " << nshowers << std::endl;
+        }
+
+        // Reco vertex
+        double reco_nu_vtx[3];
+        
+        // Set to default values
+        reco_nu_vtx[0] = -999;
+        reco_nu_vtx[1] = -999;
+        reco_nu_vtx[2] = -999;
+        recob::Vertex tpcobj_nu_vtx = tpcobj.GetVertex();
+        tpcobj_nu_vtx.XYZ(reco_nu_vtx);
+        const double pfp_nu_vtx_x = reco_nu_vtx[0];
+        const double pfp_nu_vtx_y = reco_nu_vtx[1];
+        const double pfp_nu_vtx_z = reco_nu_vtx[2];
+
+        int n_pfp_tracks = 0;
+        int n_pfp_showers = 0;
+
+        xsecAna::TPCObjectContainer tpc_object_container;
+        tpc_object_container.SetpfpVtxX(pfp_nu_vtx_x);
+        tpc_object_container.SetpfpVtxY(pfp_nu_vtx_y);
+        tpc_object_container.SetpfpVtxZ(pfp_nu_vtx_z);
+        tpc_object_container.SetRunNumber(run);
+        tpc_object_container.SetIsData(_is_data);
+        tpc_object_container.SetSubRunNumber(subrun);
+        tpc_object_container.SetEventNumber(event);
+        tpc_object_container.SetHasMCPi0(has_pi0);
+        tpc_object_container.SetIndex(tpc_object_counter);
+        //convert simb::Origin_t object to std::string
+        std::string str_origin = "kUnset";
+        
+        if(tpcobj_origin == simb::kUnknown)      str_origin = "kUnknown";
+        if(tpcobj_origin == simb::kBeamNeutrino) str_origin = "kBeamNeutrino";
+        if(tpcobj_origin == simb::kCosmicRay)    str_origin = "kCosmicRay";
+        tpc_object_container.SetOrigin(str_origin);
+
+        if(_verbose) {std::cout << "[Analyze] Number of PFP in this TPC Object: " << npfparticles << std::endl; }
+        tpc_object_container.SetNumPFParticles(npfparticles);
+
+        // Hits - we want the hits from both tracks and showers
+        int nhits_u = 0;
+        int nhits_v = 0;
+        int nhits_w = 0;
+        int total_nhits_u = 0;
+        int total_nhits_v = 0;
+        int total_nhits_w = 0;
+        int total_nhits = 0;
+        
+        // Need to sum all hits from both tracks and showers
+        for (auto const track : track_v) {
+            //art::Ptr<recob::Track> & _track = track;
+            xsecAna::utility::GetNumberOfHitsPerPlane(e, _pfp_producer, track, nhits_u, nhits_v, nhits_w);
+            total_nhits_u += nhits_u;
+            total_nhits_v += nhits_v;
+            total_nhits_w += nhits_w;
+        }
+        
+        for (auto const shower : shower_v) {
+            //art::Ptr<recob::Shower> & _shower = shower;
+            xsecAna::utility::GetNumberOfHitsPerPlane(e, _pfp_producer, shower, nhits_u, nhits_v, nhits_w);
+            total_nhits_u += nhits_u;
+            total_nhits_v += nhits_v;
+            total_nhits_w += nhits_w;
+        }
+        
+        total_nhits = (total_nhits_u + total_nhits_v + total_nhits_w);
+
+        tpc_object_container.SetNumPFPHits   (total_nhits);
+        tpc_object_container.SetNumPFPHitsU  (total_nhits_u);
+        tpc_object_container.SetNumPFPHitsV  (total_nhits_v);
+        tpc_object_container.SetNumPFPHitsW  (total_nhits_w);
+
+        int pfp_nu_counter = 0;
+        //int pfpNuPdg = 0;//not set
+        int pfpParentPdg = 0;
+        int mode = -1;
+        int ccnc = -1;
+        int tpco_mc_pdg  = -1;
+        int tpco_pfp_pdg = -1;
+        bool is_neutrino = false;
+        double mc_nu_vtx_x = -999;
+        double mc_nu_vtx_y = -999;
+        double mc_nu_vtx_z = -999;
+        //bool is_primary = false; // not set
+
+        //****************************************
+        //loop over pfparticles in the tpc object
+        //****************************************
+        std::cout << "[Analyze] PFParticle Loop: " << std::endl;
+        auto pfps_from_tpcobj = tpcobjToPFPAssns.at(tpc_object_counter);
+        for (auto const pfp : pfps_from_tpcobj) {
+            xsecAna::ParticleContainer particle_container;
+
+            int mcPdg = 0;
+            //int mcNuPdg = 0; // not set
+            int    mcParentPdg    = 0;
+            double pfp_dir_x      = -999;
+            double pfp_dir_y      = -999;
+            double pfp_dir_z      = -999;
+            double pfp_theta      = -999;
+            double pfp_phi        = -999;
+            double pfp_length     = -999;
+            double pfp_momentum   = -999;
+            int    pfp_hits       = 0;
+            int    pfp_hits_u     = 0;
+            int    pfp_hits_v     = 0;
+            int    pfp_hits_w     = 0;
+            double pfp_open_angle = -999;
+            double pfp_energy_u   = -999;
+            double pfp_energy_v   = -999;
+            double pfp_energy_w   = -999;
+
+            double mc_vtx_x         = -999;
+            double mc_vtx_y         = -999;
+            double mc_vtx_z         = -999;
+            double mc_dir_x         = -999;
+            double mc_dir_y         = -999;
+            double mc_dir_z         = -999;
+            double mc_theta         = -999;
+            double mc_phi           = -999;
+            double mcLength         = -999;
+            double mcEnergy         = -999;
+            double mcMomentum       = -999;
+            double mcNeutrinoEnergy = -999;
+            
+            int particle_mode       = -1;
+            int particle_is_cc      = -1;
+            //double mc_open_angle = 0; //unset
+            
+            std::vector<art::Ptr<recob::Cluster> > clusters = clusters_from_pfpart.at(pfp.key());
+            const int num_clusters = clusters.size();
+            std::vector < std::vector< double > > shower_cluster_dqdx;
+            std::vector < std::vector< double > > shower_cluster_dq;
+            std::vector < std::vector< double > > shower_cluster_dx;
+
+            std::vector < std::vector< double > > shower_cluster_dqdx_alt;
+            std::vector < std::vector< double > > shower_cluster_dq_alt;
+            std::vector < std::vector< double > > shower_cluster_dx_alt;
+
+            std::vector < std::vector< double > > shower_cluster_dqdx_cali;
+            std::vector < std::vector< double > > shower_cluster_dqdx_omit;
+            std::vector < std::vector< double > > shower_cluster_dqdx_omit_cali;
+
+            std::vector<double> shower_dEdx;
+            std::vector<double> shower_dEdx_alt;
+            std::vector<double> shower_dEdx_cali;
+            std::vector<double> shower_dEdx_omit;
+            std::vector<double> shower_dEdx_omit_cali;
+
+            shower_cluster_dqdx.resize(num_clusters);
+            shower_cluster_dq  .resize(num_clusters);
+            shower_cluster_dx  .resize(num_clusters);
+
+            shower_cluster_dqdx_alt.resize(num_clusters);
+            shower_cluster_dq_alt  .resize(num_clusters);
+            shower_cluster_dx_alt  .resize(num_clusters);
+
+            shower_cluster_dqdx_cali     .resize(num_clusters);
+            shower_cluster_dqdx_omit     .resize(num_clusters);
+            shower_cluster_dqdx_omit_cali.resize(num_clusters);
+
+            shower_dEdx          .resize(3, 0);
+            shower_dEdx_alt      .resize(3, 0);
+            shower_dEdx_cali     .resize(3,0);
+            shower_dEdx_omit     .resize(3, 0);
+            shower_dEdx_omit_cali.resize(3, 0);
+
+            for (int clust = 0; clust < num_clusters; clust++) {
+                shower_cluster_dqdx.at(clust).resize(3, 0);
+                shower_cluster_dq  .at(clust).resize(3, 0);
+                shower_cluster_dx  .at(clust).resize(3, 0);
+
+                shower_cluster_dqdx_alt.at(clust).resize(3, 0);
+                shower_cluster_dq_alt  .at(clust).resize(3, 0);
+                shower_cluster_dx_alt  .at(clust).resize(3, 0);
+
+                shower_cluster_dqdx_cali     .at(clust).resize(3, 0);
+                shower_cluster_dqdx_omit     .at(clust).resize(3, 0);
+                shower_cluster_dqdx_omit_cali.at(clust).resize(3, 0);
+            }
+
+            std::vector<double> dqdx_cali;
+            dqdx_cali.resize(3, 0);
+
+            const int pfpPdg = pfp->PdgCode();
+            // if(_verbose) {std::cout << "[Analyze] PFP PDG Code " << pfpPdg << std::endl; }
+            
+            const unsigned int pfpParent_id = pfp->Parent();
+            int position        = 0;
+            int parent_position = -1;
+            
+            for (auto const parent_search : pfps_from_tpcobj) {
+                if(parent_search->Self() == pfpParent_id ) {parent_position = position; }
+                position++;
+            }
+            
+            if(parent_position != -1) {
+                
+                try {
+                    auto const pfpParent_obj = pfps_from_tpcobj.at(parent_position);
+                    pfpParentPdg             = pfpParent_obj->PdgCode();
+                }
+                
+                catch(...) {std::cout << "[Analyze] [EXCEPTION] No Parent Found!" << std::endl; }
+            }
+            
+            // if(_verbose) {std::cout << "[Analyze] PFP Parent PDG Code " << pfpParentPdg << std::endl; }
+            
+            particle_container.SetpfpPdgCode(pfpPdg);
+            // particle_container.SetpfpNuPdgCode(pfpParentPdg); //this will sometimes be a neutrino and sometimes not!
+            particle_container.SetpfpParentPdgCode(pfpParentPdg);
+            const int index = pfp->Self();
+            particle_container.SetIndex(index);
+            simb::Origin_t mcOrigin = simb::kUnknown;
+
+            if (pfpPdg == 12 || pfpPdg == 14) { // Check: do we need the -12 and -14 pdg codes here??
+                if(_verbose) {std::cout << "[Analyze] PFP Neutrino with PDG Code: " << pfpPdg << std::endl; }
+                is_neutrino = true;
+                tpco_pfp_pdg = pfpPdg;
+                pfp_nu_counter++;
+            }
+            particle_container.SetIsNeutrino(is_neutrino);
+
+            // Reco vertex
+            lar_pandora::VertexVector vertexVector;
+            lar_pandora::PFParticlesToVertices particlesToVertices;
+            lar_pandora::LArPandoraHelper::CollectVertices(e, _pfp_producer, vertexVector, particlesToVertices);
+
+            auto iter = particlesToVertices.find(pfp);
+            //auto iter = pfParticleToVertexMap.find(pfp);
+            double pfp_vtx_x = -999;
+            double pfp_vtx_y = -999;
+            double pfp_vtx_z = -999;
+            
+            if (iter != particlesToVertices.end()) {
+                lar_pandora::VertexVector vertex_v = particlesToVertices.find(pfp)->second;
+                double reco_vtx[3];
+                vertex_v[0]->XYZ(reco_vtx);
+                pfp_vtx_x = reco_vtx[0];
+                pfp_vtx_y = reco_vtx[1];
+                pfp_vtx_z = reco_vtx[2];
+            }
+            
+            particle_container.SetpfpVtxX(pfp_vtx_x);
+            particle_container.SetpfpVtxY(pfp_vtx_y);
+            particle_container.SetpfpVtxZ(pfp_vtx_z);
+
+            // MC Ghosts do accounting for pfp to mcghost to mc particle
+            const std::vector<art::Ptr<MCGhost> > mcghost = mcghost_from_pfp.at(pfp.key());
+            std::vector<art::Ptr<simb::MCParticle> > mcpart;
+            if(mcghost.size() == 0) {std::cout << "[Analyze] No matched MC Ghost to PFP!" << std::endl; }
+            
+            // We don't want to just throw these events out!
+            if(mcghost.size() > 1) {
+                if(_verbose) {std::cout << "[Analyze] Too many matched MC Ghost to PFP!" << std::endl; }
+            } // End if 2+ MC Ghost
+            
+            if (mcghost.size() >= 1) {
+                if(_verbose) {std::cout << "[Analyze] One MC Ghost Found!" << std::endl; }
+                mcpart = mcpar_from_mcghost.at(mcghost[0].key());
+                const art::Ptr<simb::MCParticle> the_mcpart = mcpart.at(0);
+                const art::Ptr<simb::MCTruth> mctruth = nue_xsec::recotruehelper::TrackIDToMCTruth(e, "largeant", the_mcpart->TrackId());
+                //bt->TrackIDToMCTruth(the_mcpart->TrackId());
+                simb::MCNeutrino mc_nu;
+                
+                if(!mctruth) {std::cout << "[Analyze] MCTruth Pointer Not Valid!" << std::endl; }
+                else {
+                    mc_nu    = mctruth->GetNeutrino();
+                    mcOrigin = mctruth->Origin();
+                }
+                
+                if(mcOrigin != simb::kCosmicRay) {
+                    mode             = mc_nu.Mode();
+                    ccnc             = mc_nu.CCNC();
+                    mcParentPdg      = mc_nu.Nu().PdgCode();
+                    mcNeutrinoEnergy = mc_nu.Nu().E();
+                    mc_nu_vtx_x      = mc_nu.Nu().Position().X();
+                    mc_nu_vtx_y      = mc_nu.Nu().Position().Y();
+                    mc_nu_vtx_z      = mc_nu.Nu().Position().Z();
+                    
+                    std::cout << mc_nu_vtx_x << ", " << mc_nu_vtx_y << ", " << mc_nu_vtx_z << std::endl;
+                    mc_vtx_x = the_mcpart->Vx();
+                    mc_vtx_y = the_mcpart->Vy();
+                    mc_vtx_z = the_mcpart->Vz();
+                }
+                //if(mcOrigin == simb::kCosmicRay)
+                //{
+                //std::vector<art::Ptr<sim::MCTrack> > mc_tracks = mctracks_from_mcparticle.at(the_mcpart.key());
+                //if(mc_tracks.size() == 1)
+                //{
+                //	mc_vtx_x = mc_tracks.at(0)->Start().X();
+                //	mc_vtx_y = mc_tracks.at(0)->Start().Y();
+                //	mc_vtx_z = mc_tracks.at(0)->Start().Z();
+                //	//I can include the length and directions here!
+                //}
+                //}
+                particle_mode  = mode;
+                particle_is_cc = ccnc;
+                mcPdg          = the_mcpart->PdgCode();
+                if (is_neutrino == true) tpco_mc_pdg = mcPdg;
+                mcMomentum = the_mcpart->P();
+                mc_dir_x   = the_mcpart->Px() / mcMomentum;
+                mc_dir_y   = the_mcpart->Py() / mcMomentum;
+                mc_dir_z   = the_mcpart->Pz() / mcMomentum;
+                mc_theta   = acos(mc_dir_z) * (180 / 3.1415);
+                mc_phi     = atan2(mc_dir_y, mc_dir_x) * (180 / 3.1415);
+                
+                const double mc_length_x = the_mcpart->Position().X() - the_mcpart->EndPosition().X();
+                const double mc_length_y = the_mcpart->Position().Y() - the_mcpart->EndPosition().Y();
+                const double mc_length_z = the_mcpart->Position().Z() - the_mcpart->EndPosition().Z();
+                
+                mcLength = sqrt((mc_length_x * mc_length_x) + (mc_length_y * mc_length_y) + (mc_length_z * mc_length_z));
+                mcEnergy = the_mcpart->E();
+
+            } // End mcghost == 1
+           
+            particle_container.SetmcPdgCode(mcPdg);
+            //convert simb::Origin_t to std::string
+            std::string str_mcorigin;
+            
+            if(mcOrigin == simb::kUnknown) {str_mcorigin = "kUnknown"; }
+            if(mcOrigin == simb::kBeamNeutrino) {str_mcorigin = "kBeamNeutrino"; }
+            if(mcOrigin == simb::kCosmicRay) {str_mcorigin = "kCosmicRay"; }
+            
+            particle_container.SetOrigin(str_mcorigin);
+            particle_container.SetmcPdgCode(mcPdg);
+            particle_container.SetmcParentPdgCode(mcParentPdg);
+            particle_container.SetmcNeutrinoEnergy(mcNeutrinoEnergy);
+            particle_container.SetmcVtxX(mc_vtx_x);
+            particle_container.SetmcVtxY(mc_vtx_y);
+            particle_container.SetmcVtxZ(mc_vtx_z);
+            particle_container.SetmcDirX(mc_dir_x);
+            particle_container.SetmcDirY(mc_dir_y);
+            particle_container.SetmcDirZ(mc_dir_z);
+            particle_container.SetmcTheta(mc_theta);
+            particle_container.SetmcPhi(mc_phi);
+            particle_container.SetmcLength(mcLength);
+            particle_container.SetmcEnergy(mcEnergy);
+            particle_container.SetmcMomentum(mcMomentum);
+            particle_container.SetMode(particle_mode);
+            particle_container.SetCCNC(particle_is_cc);
+
+            // ------------------------- PFP tracks ----------------------------
+            if(pfpPdg == 13) {
+                
+                std::vector<art::Ptr<recob::Track> > tracks = tracks_from_pfp.at(pfp.key());
+                if(_verbose) {std::cout << "[Analyze] n tracks ass to this pfp: " << tracks.size() << std::endl; }
+                
+                // We want to take the first association, right?
+                if(tracks.size() != 0) {
+                    const art::Ptr<recob::Track> this_track = tracks.at(0);
+                    pfp_dir_x    = this_track->VertexDirection().X();
+                    pfp_dir_y    = this_track->VertexDirection().Y();
+                    pfp_dir_z    = this_track->VertexDirection().Z();
+                    pfp_theta    = acos(pfp_dir_z) * (180 / 3.1415);
+                    pfp_phi      = atan2(pfp_dir_y, pfp_dir_x) * (180 / 3.1415);
+                    pfp_length   = this_track->Length();
+                    pfp_momentum = this_track->StartMomentum();
+
+                    xsecAna::utility::GetNumberOfHitsPerPlane(e, _pfp_producer, this_track, pfp_hits_u, pfp_hits_v, pfp_hits_w);
+                    pfp_hits = (pfp_hits_u + pfp_hits_v + pfp_hits_w);
+
+                    if(!_is_data){xsecAna::utility::GetEnergyPerPlane(e, _pfp_producer, this_track, calibration_u,
+                                                                      calibration_v, calibration_w, pfp_energy_u, pfp_energy_v, pfp_energy_w);}
+
+                    if(_is_data){xsecAna::utility::GetEnergyPerPlane(e, _pfp_producer, this_track, calibration_u_data,
+                                                                     calibration_v_data, calibration_w_data, pfp_energy_u, pfp_energy_v, pfp_energy_w);}
+
+                    n_pfp_tracks++;
+                }
+            
+            } // End pfp tracks
+
+            // ------------------------- PFP showers ---------------------------
+            if(pfpPdg == 11) {
+                
+                std::vector<art::Ptr<recob::Shower> > showers = showers_from_pfp.at(pfp.key());
+                
+                if(_verbose) {std::cout << "[Analyze] n showers ass to this pfp: " << showers.size() << std::endl; }
+                
+                //we want to take the first association, right?
+                if(showers.size() != 0){
+                    const art::Ptr<recob::Shower> this_shower = showers.at(0);
+                    pfp_dir_x = this_shower->Direction().X();
+                    pfp_dir_y = this_shower->Direction().Y();
+                    pfp_dir_z = this_shower->Direction().Z();
+                    pfp_theta = acos(pfp_dir_z) * (180 / 3.1415);
+                    pfp_phi = atan2(pfp_dir_y, pfp_dir_x) * (180 / 3.1415);
+                    pfp_length = this_shower->Length();
+                    
+                    std::cout << "best plane: " << this_shower->best_plane() << std::endl;
+                    std::cout << "shower energy vec size: " << this_shower->Energy().size() << std::endl; // THIS IS ZERO?? NEEDS DEBUGGING
+
+                    // pfp_momentum = this_shower->Energy().at(this_shower->best_plane());
+                    
+                    pfp_open_angle = this_shower->OpenAngle();
+
+                    xsecAna::utility::GetNumberOfHitsPerPlane(e, _pfp_producer, this_shower, pfp_hits_u, pfp_hits_v, pfp_hits_w);
+                    pfp_hits = (pfp_hits_u + pfp_hits_v + pfp_hits_w);
+
+                    //trying to do dqdx
+                    //1st bool argument - use xyz calibration
+                    //2nd bool argument - omit first point in box
+                    //this is the default method
+                    xsecAna::utility::ConstructShowerdQdX(geoHelper, _is_data, ClusterToHitsMap, clusters, 
+                                          _dQdxRectangleLength,_dQdxRectangleWidth,
+                                                          this_shower, shower_cluster_dqdx, shower_cluster_dq, shower_cluster_dx, _verbose,
+                                          false, false);
+                    
+                    //this method uses the xyz calibration map
+                    xsecAna::utility::ConstructShowerdQdX(geoHelper, _is_data, ClusterToHitsMap, clusters,
+                                                          _dQdxRectangleLength,_dQdxRectangleWidth,
+                                                          this_shower, shower_cluster_dqdx_cali, shower_cluster_dq, shower_cluster_dx, _verbose,
+                                                          true, false);
+                    
+                    //this is the default method - but omitting first point of box
+                    xsecAna::utility::ConstructShowerdQdX(geoHelper, _is_data, ClusterToHitsMap, clusters, 
+                                                          _dQdxRectangleLength,_dQdxRectangleWidth,
+                                                          this_shower, shower_cluster_dqdx_omit, shower_cluster_dq, shower_cluster_dx, _verbose,
+                                                          false, true);
+                    
+                    //this method uses the xyz calibration map - omitting first point of box
+                    xsecAna::utility::ConstructShowerdQdX(geoHelper, _is_data, ClusterToHitsMap, clusters,
+                                                          _dQdxRectangleLength,_dQdxRectangleWidth,
+                                                          this_shower, shower_cluster_dqdx_omit_cali, 
+                                                          shower_cluster_dq, shower_cluster_dx, _verbose,
+                                                          true, true);
+
+                    //this is a test method used by pandora lee group
+                    xsecAna::utility::ConstructShowerdQdXAlternative(geoHelper, _is_data, ClusterToHitsMap, clusters, 
+                                                                     _dQdxRectangleLength,_dQdxRectangleWidth,
+                                                                     this_shower, shower_cluster_dqdx_alt, 
+                                                                     shower_cluster_dq_alt, shower_cluster_dx_alt, dqdx_cali, _verbose);
+                    
+                    //then dEdx!
+                    xsecAna::utility::ConvertdEdX(shower_cluster_dqdx,           shower_dEdx);
+                    xsecAna::utility::ConvertdEdX(shower_cluster_dqdx_alt,       shower_dEdx_alt);
+                    xsecAna::utility::ConvertdEdX(shower_cluster_dqdx_cali,      shower_dEdx_cali);
+                    xsecAna::utility::ConvertdEdX(shower_cluster_dqdx_omit,      shower_dEdx_omit);
+                    xsecAna::utility::ConvertdEdX(shower_cluster_dqdx_omit_cali, shower_dEdx_omit_cali);
+                    
+                    // for(auto const cluster_dqdx : shower_cluster_dqdx)
+                    // {
+                    //      //cluster dqdx is size 3 - one for each plane
+                    //      if(_verbose) {std::cout << "[Analyze] [dQdx] Plane 0: " << cluster_dqdx.at(0) << std::endl; }
+                    //      if(_verbose) {std::cout << "[Analyze] [dQdx] Plane 1: " << cluster_dqdx.at(1) << std::endl; }
+                    //      if(_verbose) {std::cout << "[Analyze] [dQdx] Collection Plane: " << cluster_dqdx.at(2) << std::endl; }
+                    // }
+                    // if(_verbose) {std::cout << "[Analyze] [dEdx] Plane 0: " << shower_dEdx.at(0) << std::endl; }
+                    // if(_verbose) {std::cout << "[Analyze] [dEdx] Plane 1: " << shower_dEdx.at(1) << std::endl; }
+                    // if(_verbose) {std::cout << "[Analyze] [dEdx] Plane 2: " << shower_dEdx.at(2) << std::endl; }
+
+                    if(!_is_data){xsecAna::utility::GetEnergyPerPlane(e, _pfp_producer, this_shower, 
+                                    calibration_u, calibration_v, calibration_w,
+                                                    pfp_energy_u, pfp_energy_v, pfp_energy_w);}
+
+                    if(_is_data){xsecAna::utility::GetEnergyPerPlane(e, _pfp_producer, this_shower, 
+                                              calibration_u_data, calibration_v_data, calibration_w_data,
+                                                        pfp_energy_u, pfp_energy_v, pfp_energy_w);}
+
+                    n_pfp_showers++;
+                
+                }
+            
+            } // End pfp showers
+
+            if(_verbose) {std::cout << "[Analyze] Filling Particle Container Objects" << std::endl; }
+
+            particle_container.SetpfpDirX(pfp_dir_x);
+            particle_container.SetpfpDirY(pfp_dir_y);
+            particle_container.SetpfpDirZ(pfp_dir_z);
+            particle_container.SetpfpTheta(pfp_theta);
+            particle_container.SetpfpPhi(pfp_phi);
+            particle_container.SetpfpLength(pfp_length);
+            particle_container.SetpfpMomentum(pfp_momentum);
+            particle_container.SetpfpOpenAngle(pfp_open_angle);
+            particle_container.SetNumPFPHits(pfp_hits);
+            particle_container.SetNumPFPHitsU(pfp_hits_u);
+            particle_container.SetNumPFPHitsV(pfp_hits_v);
+            particle_container.SetNumPFPHitsW(pfp_hits_w);
+            particle_container.SetpfpEnergyU(pfp_energy_u);
+            particle_container.SetpfpEnergyV(pfp_energy_v);
+            particle_container.SetpfpEnergyW(pfp_energy_w);
+            particle_container.SetPfpClusterdQdx(shower_cluster_dqdx);
+            particle_container.SetPfpClusterdQ(shower_cluster_dq);
+            particle_container.SetPfpClusterdX(shower_cluster_dx);
+            particle_container.SetPfpdEdx(shower_dEdx);
+
+            particle_container.SetPfpClusterdQdx_alt(shower_cluster_dqdx_alt);
+            particle_container.SetPfpClusterdQ_alt(shower_cluster_dq_alt);
+            particle_container.SetPfpClusterdX_alt(shower_cluster_dx_alt);
+            particle_container.SetPfpdEdx_alt(shower_dEdx_alt);
+
+            particle_container.SetPfpClusterdQdxCali(shower_cluster_dqdx_cali);
+            particle_container.SetPfpdEdxCali(shower_dEdx_cali);
+            particle_container.SetPfpClusterdQdxOmitFirst(shower_cluster_dqdx_omit);
+            particle_container.SetPfpdEdxOmitFirst(shower_dEdx_omit);
+            particle_container.SetPfpClusterdQdxOmitFirst_cali(shower_cluster_dqdx_omit_cali);
+            particle_container.SetPfpdEdxOmitFirst_cali(shower_dEdx_omit_cali);
+
+            tpc_object_container.AddParticle(particle_container);
+
+        } // End loop over pfp in tpcobject
+        
+        tpc_object_container.SetNumPFPNeutrinos(pfp_nu_counter);
+        tpc_object_container.SetMode(mode);
+        tpc_object_container.SetCCNC(ccnc);
+        tpc_object_container.SetmcPdgCode(tpco_mc_pdg);
+        tpc_object_container.SetpfpPdgCode(tpco_pfp_pdg);
+        tpc_object_container.SetNPfpTracks(n_pfp_tracks);
+        tpc_object_container.SetNPfpShowers(n_pfp_showers);
+        tpc_object_container.SetmcVtxX(mc_nu_vtx_x);
+        tpc_object_container.SetmcVtxY(mc_nu_vtx_y);
+        tpc_object_container.SetmcVtxZ(mc_nu_vtx_z);
+        //tpc_object_container.SetmcPdgCode();
+
+        tpc_object_container_v.push_back(tpc_object_container);
+        tpc_object_counter++;
+   
+    } // End loop tpc objects
+
+    // Fill root tree per event
+    std::cout << "[Analyze] Fill Root Tree - End Event" << std::endl;
+    myTree->Fill();
 }
 
 void xsecAna::TpcObjectAnalysis::endSubRun(art::SubRun const & sr) {
 
-	if(run_pot_counting == true)
-	{
-		auto const & POTSummaryHandle = sr.getValidHandle < sumdata::POTSummary >("generator");
-		auto const & POTSummary(*POTSummaryHandle);
-		const double total_pot = POTSummary.totpot;
-		std::cout << "----------------------------" << std::endl;
-		std::cout << "Total POT / subRun: " << total_pot << std::endl;
-		std::cout << "----------------------------" << std::endl;
+    if(run_pot_counting == true) {
+        auto const & POTSummaryHandle = sr.getValidHandle < sumdata::POTSummary >("generator");
+        auto const & POTSummary(*POTSummaryHandle);
+        const double total_pot = POTSummary.totpot;
+        std::cout << "----------------------------" << std::endl;
+        std::cout << "Total POT / subRun: " << total_pot << std::endl;
+        std::cout << "----------------------------" << std::endl;
 
-		pot = total_pot;
-		pot_tree->Fill();
-	}
-	if (_debug) std::cout << "[Analysis::endSubRun] Starts" << std::endl;
+        pot = total_pot;
+        pot_tree->Fill();
+    }
+    
+    if (_debug) std::cout << "[Analysis::endSubRun] Starts" << std::endl;
 
-	// Saving run and subrun number on file so that we can run Zarko's script easily
-	_run_subrun_list_file << sr.run() << " " << sr.subRun() << std::endl;
+    // Saving run and subrun number on file so that we can run Zarko's script easily
+    _run_subrun_list_file << sr.run() << " " << sr.subRun() << std::endl;
 
-	_sr_run       = sr.run();
-	_sr_subrun    = sr.subRun();
-	_sr_begintime = sr.beginTime().value();
-	_sr_endtime   = sr.endTime().value();
+    _sr_run       = sr.run();
+    _sr_subrun    = sr.subRun();
+    _sr_begintime = sr.beginTime().value();
+    _sr_endtime   = sr.endTime().value();
 
-	art::Handle<sumdata::POTSummary> potsum_h;
+    art::Handle<sumdata::POTSummary> potsum_h;
 
-	// MC
-	if (_is_mc) {
-		if (_debug) std::cout << "[UBXSec::endSubRun] Getting POT for MC" << std::endl;
-		if(sr.getByLabel(_potsum_producer_mc, potsum_h)) {
-			if (_debug) std::cout << "[UBXSec::endSubRun] POT are valid" << std::endl;
-			_sr_pot = potsum_h->totpot;
-		}
-		else
-			_sr_pot = 0.;
-	}
+    // MC
+    if (_is_mc) {
+        
+        if (_debug) std::cout << "[Analysis::endSubRun] Getting POT for MC" << std::endl;
+        
+        if(sr.getByLabel(_potsum_producer_mc, potsum_h)) {
+            if (_debug) std::cout << "[Analysis::endSubRun] POT are valid" << std::endl;
+            _sr_pot = potsum_h->totpot;
+        }
+        else
+            _sr_pot = 0.;
+    }
 
-	// Data
-	if (_is_data) {
-		if (_debug) std::cout << "[UBXSec::endSubRun] Getting POT for DATA, producer " << _potsum_producer_data << ", instance " << _potsum_instance << std::endl;
-		if (sr.getByLabel(_potsum_producer_data, _potsum_instance, potsum_h)) {
-			if (_debug) std::cout << "[UBXSec::endSubRun] POT are valid" << std::endl;
-			_sr_pot = potsum_h->totpot;
-		}
-		else
-			_sr_pot = 0;
-	}
+    // Data
+    if (_is_data) {
+        
+        if (_debug) std::cout << "[Analysis::endSubRun] Getting POT for DATA, producer " << _potsum_producer_data << ", instance " << _potsum_instance << std::endl;
+        
+        if (sr.getByLabel(_potsum_producer_data, _potsum_instance, potsum_h)) {
+            if (_debug) std::cout << "[Analysis::endSubRun] POT are valid" << std::endl;
+            _sr_pot = potsum_h->totpot;
+        }
+        else
+            _sr_pot = 0;
+    
+    }
 
-	_sr_tree->Fill();
+    _sr_tree->Fill();
 
-	if (_debug) std::cout << "[UBXSec::endSubRun] Ends" << std::endl;
+    if (_debug) std::cout << "[Analysis::endSubRun] Ends" << std::endl;
 }
 
 DEFINE_ART_MODULE(xsecAna::TpcObjectAnalysis)

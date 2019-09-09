@@ -51,7 +51,6 @@ physics:
       VertexProducer:             "pandora"
       TrackProducer:              "pandora"
       ShowerProducer:             "pandora"
-      UseGENIEInfo:               "true"
       MinimumHitRequirement:      "3"
       
       BeamSpillStart:             "5"
@@ -94,9 +93,6 @@ physics:
 
       Debug:   "true"
       Verbose: "true"
-
-      ReweighMapBool: "true"
-      ReweighMapPath: '../arXiv/NuMIFlux_reweight_map.root'
 
     }
   }

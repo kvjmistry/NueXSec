@@ -66,7 +66,6 @@ std::string _vertexLabel;
 std::string _trackLabel;
 std::string _showerLabel;
 
-bool _use_genie_info;
 int _minimumHitRequirement;
 
 double _beam_spill_start;
@@ -106,7 +105,6 @@ xsecAna::TpcObjectMaker::TpcObjectMaker(fhicl::ParameterSet const & p)
 	_trackLabel                     =p.get<std::string>("TrackProducer");
 	_showerLabel                    =p.get<std::string>("ShowerProducer");
 
-	_use_genie_info                 = p.get<bool>("UseGENIEInfo", "false");
 	_minimumHitRequirement          = p.get<int>("MinimumHitRequirement", 3);
 
 	_beam_spill_start               = p.get<double>("BeamSpillStart", 3.2);
@@ -132,6 +130,8 @@ xsecAna::TpcObjectMaker::TpcObjectMaker(fhicl::ParameterSet const & p)
 
 void xsecAna::TpcObjectMaker::produce(art::Event & e)
 {
+
+	std::cout << "[TpcObjectMaker] ---------------------------------------- [TpcObjectMaker]" << std::endl;
 	// Implementation of required member function here.
 	//art::ServiceHandle<cheat::BackTracker> bt;
 	nue_xsec::recotruehelper _recotruehelper_instance;
@@ -157,18 +157,18 @@ void xsecAna::TpcObjectMaker::produce(art::Event & e)
 	if(_verbose && _is_mc)  {std::cout << "[TpcObjectMaker] --- Running with MC --- " << std::endl; }
 	if(_verbose && _is_data) {std::cout << "[TpcObjectMaker] --- Running with Data --- "<< std::endl; }
 
-// Instantiate the output
+    // Instantiate the output
 	std::unique_ptr< std::vector< xsecAna::TPCObject > >                 tpcObjectVector        (new std::vector<xsecAna::TPCObject>);
 	std::unique_ptr< art::Assns<xsecAna::TPCObject, recob::Track> >      assnOutTPCObjectTrack  (new art::Assns<xsecAna::TPCObject, recob::Track>      );
 	std::unique_ptr< art::Assns<xsecAna::TPCObject, recob::Shower> >     assnOutTPCObjectShower (new art::Assns<xsecAna::TPCObject, recob::Shower>     );
 	std::unique_ptr< art::Assns<xsecAna::TPCObject, recob::PFParticle> > assnOutTPCObjectPFP    (new art::Assns<xsecAna::TPCObject, recob::PFParticle> );
 
 
-// Use LArPandoraHelper functions to collect Pandora information
+    // Use LArPandoraHelper functions to collect Pandora information
 	lar_pandora::PFParticleVector pfParticleList;        //vector of PFParticles
 	lar_pandora::LArPandoraHelper::CollectPFParticles(e, _pfp_producer, pfParticleList);
 
-// Collect vertices, tracks and shower
+    // Collect vertices, tracks and shower
 	lar_pandora::VertexVector allPfParticleVertices;
 	lar_pandora::PFParticlesToVertices pfParticleToVertexMap;
 	lar_pandora::LArPandoraHelper::CollectVertices(e, _vertexLabel, allPfParticleVertices, pfParticleToVertexMap);
@@ -189,13 +189,13 @@ void xsecAna::TpcObjectMaker::produce(art::Event & e)
 	                                                         pfParticleToVertexMap, pfp_v_v, track_v_v, shower_v_v, p_v, t_v, s_v);
 
 	lar_pandora::MCParticlesToPFParticles matchedParticles;    // This is a map: MCParticle to matched PFParticle
-	lar_pandora::MCParticlesToHits matchedParticleHits;
+	lar_pandora::MCParticlesToHits        matchedParticleHits;
 	if (_is_mc)
 	{
 		_recotruehelper_instance.GetRecoToTrueMatches(matchedParticles, matchedParticleHits);
 	}
 
-//reco true matching is performed here!
+    //reco true matching is performed here!
 	std::vector<art::Ptr<recob::PFParticle> > neutrinoOriginPFP;
 	std::vector<art::Ptr<recob::PFParticle> > cosmicOriginPFP;
 
@@ -295,7 +295,7 @@ void xsecAna::TpcObjectMaker::produce(art::Event & e)
 	e.put(std::move(assnOutTPCObjectShower));
 	e.put(std::move(assnOutTPCObjectPFP));
 
-	if (_debug) std::cout << "[TPCObjectMaker] Ends" << std::endl;
+	if (_debug) std::cout << "[TPCObjectMaker] Ends\n" << std::endl;
 }
 
 DEFINE_ART_MODULE(xsecAna::TpcObjectMaker)

@@ -96,8 +96,8 @@ void recotruehelper::Configure(art::Event const & e,
 	art::FindManyP<simb::MCParticle,anab::BackTrackerHitMatchingData> mcps_from_hit(hit_h, e, _hit_mcp_producer);
 
 	// Collect PFParticles and match Reco Particles to Hits
-	lar_pandora::PFParticleVector recoParticleVector;
-	lar_pandora::PFParticleVector recoNeutrinoVector;
+	lar_pandora::PFParticleVector  recoParticleVector;
+	lar_pandora::PFParticleVector  recoNeutrinoVector;
 	lar_pandora::PFParticlesToHits recoParticlesToHits;
 	lar_pandora::HitsToPFParticles recoHitsToParticles;
 
@@ -117,11 +117,11 @@ void recotruehelper::Configure(art::Event const & e,
 	}
 
 	// Collect MCParticles and match True Particles to Hits
-	lar_pandora::MCParticleVector trueParticleVector;
+	lar_pandora::MCParticleVector     trueParticleVector;
 	lar_pandora::MCTruthToMCParticles truthToParticles;
 	lar_pandora::MCParticlesToMCTruth particlesToTruth;
-	lar_pandora::MCParticlesToHits trueParticlesToHits;
-	lar_pandora::HitsToMCParticles trueHitsToParticles;
+	lar_pandora::MCParticlesToHits    trueParticlesToHits;
+	lar_pandora::HitsToMCParticles    trueHitsToParticles;
 
 	if (!e.isRealData()) {
 		lar_pandora::LArPandoraHelper::CollectMCParticles(e, _geantModuleLabel, trueParticleVector);

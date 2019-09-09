@@ -43,31 +43,43 @@ void tpcobjecthelper::GetTPCObjects(lar_pandora::PFParticleVector pfParticleList
 	for (unsigned int n = 0; n < pfParticleList.size(); ++n) {
 		const art::Ptr<recob::PFParticle> particle = pfParticleList.at(n);
 
-		if(lar_pandora::LArPandoraHelper::IsNeutrino(particle)) {
-			if (_debug) std::cout << "[TPCObjectHelper] [GetTPCObjects] \t Creating TPC Object " << track_v_v.size() << std::endl;
+			// std::cout << 
+			// "PDG: "          <<pfParticleList.at(n) ->PdgCode()      << "\t" <<
+			// "Num Daughters: "<<pfParticleList.at(n) ->NumDaughters() << "\t" <<
+			// "ID: "           <<pfParticleList.at(n) ->Self()         << "\t" <<
+			// "Parent: "       <<pfParticleList.at(n) ->Parent()       << "\t" <<
+			// "Primary?: "     <<pfParticleList.at(n) ->IsPrimary()    << "\t"
+			// << std::endl;
 
-			lar_pandora::TrackVector track_v;
-			lar_pandora::ShowerVector shower_v;
+		if(lar_pandora::LArPandoraHelper::IsNeutrino(particle)) {
+			if (_debug) std::cout << "\n[TPCObjectHelper] [GetTPCObjects] \t Creating TPC Object " << track_v_v.size() << std::endl;
+
+			lar_pandora::TrackVector      track_v;
+			lar_pandora::ShowerVector     shower_v;
 			lar_pandora::PFParticleVector pfp_v;
 			int p, t, s;
 
-			std::cout << "here1" << std::endl;
+			std::cout << "Listing the pfps in the vector if neutrino:  "<< std::endl;
+
+			std::cout << 
+			"PDG: "          <<pfParticleList.at(n) ->PdgCode()      << "\t" <<
+			"Num Daughters: "<<pfParticleList.at(n) ->NumDaughters() << "\t" <<
+			"ID: "           <<pfParticleList.at(n) ->Self()         << "\t" <<
+			"Parent: "       <<pfParticleList.at(n) ->Parent()       << "\t" <<
+			"Primary?: "     <<pfParticleList.at(n) ->IsPrimary()    << "\t"
+			<< std::endl;
+
 			// Collect PFPs for this TPC object
 			CollectPFP(pfParticleList, particle, pfp_v);
-
-			std::cout << "here2" << std::endl;
 
 			// Collect Tracks and Showers for this TPC object
 			CollectTracksAndShowers(pfParticleToTrackMap, pfParticleToShowerMap, pfp_v, // input
 			                        track_v, shower_v);                     // output
 
-			std::cout << "here3" << std::endl;
-
 			// Calculate multiplicity for this TPC object
 			this->GetMultiplicity(pfParticleList, pfp_v, particle, p, t, s);
 
 			
-
 			if (_debug) std::cout << "[TPCObjectHelper] [GetTPCObjects] \t Number of pfp for this TPC object: "    << pfp_v.size()   << std::endl;
 			for (auto pfp : pfp_v) {
 				if (_debug) std::cout << "[TPCObjectHelper] [GetTPCObjects] \t \t PFP " << pfp->Self() << " with pdg " << pfp->PdgCode();
@@ -105,25 +117,30 @@ void tpcobjecthelper::CollectPFP(lar_pandora::PFParticleVector pfParticleList,
                                  art::Ptr<recob::PFParticle> particle,
                                  lar_pandora::PFParticleVector &pfp_v) {
 
-	pfp_v.emplace_back(particle);
-
+	pfp_v.push_back(particle);
+	
 	// And their daughters
-	std::cout << particle->Self() << std::endl;
 	const std::vector<size_t> &daughterIDs = particle->Daughters();
 
-	std::cout << daughterIDs.size() << std::endl;
-	if(daughterIDs.size() == 0) return; // The problem comes from the return;
+	// std::cout <<particle->Self() << "  " << daughterIDs.size() << std::endl;
+	if(daughterIDs.size() == 0) std::cout << " " << std::endl; // The problem comes from the return;
 	else {
 
-		for (unsigned int m = 0; m < daughterIDs.size(); ++m) {
-			const art::Ptr<recob::PFParticle> daughter = pfParticleList.at(daughterIDs.at(m));
+		for (size_t m = 0; m < daughterIDs.size(); ++m) {
+			std::cout << "daughter IDs: " << daughterIDs.at(m) << std::endl;
+			const art::Ptr<recob::PFParticle> daughter{pfParticleList.at(daughterIDs.at(m))};
+			
+			
+			const std::vector<size_t> &daughterIDs2 = daughter->Daughters();
+			std::cout <<"d: " << daughter->Self() << "  " << daughterIDs2.size() << std::endl;
+			
 			// Recursive call
-			CollectPFP(pfParticleList, daughter, pfp_v);
+			// CollectPFP(pfParticleList, daughter, pfp_v );
+			pfp_v.push_back(daughter);
 		}
 	}
 
 }
-
 //______________________________________________________________________________________________________________________________________
 void tpcobjecthelper::CollectTracksAndShowers(lar_pandora::PFParticlesToTracks pfParticleToTrackMap,
                                               lar_pandora::PFParticlesToShowers pfParticleToShowerMap,
