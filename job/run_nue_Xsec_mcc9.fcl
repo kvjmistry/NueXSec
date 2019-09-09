@@ -45,16 +45,9 @@ physics:
       HitProducer:                "gaushit"
       GeantModule:                "largeant"
       SpacePointProducer:         "pandora"
-      OpFlashBeamProducer:        "simpleFlashBeam"
-      POTSummaryInstance:         ""
-      POTSummaryProducer:         "generator"
       VertexProducer:             "pandora"
       TrackProducer:              "pandora"
       ShowerProducer:             "pandora"
-      MinimumHitRequirement:      "3"
-      
-      BeamSpillStart:             "5"
-      BeamSpillEnd:               "16"
       
       UsePremadeAssociation:      "true"
       MCPHitAssProducer:          "gaushitTruthMatch"
