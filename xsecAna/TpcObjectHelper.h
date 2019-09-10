@@ -28,7 +28,7 @@ public:
  *  @param pfParticleList the list of PFP
  *  @param particle the neutrino PFP, input
  *  @param pfp_v output, a vector of PFP (the TPC object) */
-void CollectPFP(lar_pandora::PFParticleVector pfParticleList, art::Ptr<recob::PFParticle> particle, lar_pandora::PFParticleVector &pfp_v);
+void CollectPFP(lar_pandora::PFParticleMap pfParticleMap, art::Ptr<recob::PFParticle> particle, lar_pandora::PFParticleVector &pfp_v);
 
 /**
  *  @brief Gets all the tracks and PFP for a single Pandora slice
@@ -65,7 +65,7 @@ void GetMultiplicity(lar_pandora::PFParticleVector pfParticleList, lar_pandora::
  *  @param p_v output, multiplicity in number of PFPs
  *  @param t_v output, multiplicity in number of tracks
  *  @param s_v output, multiplicity in number of showers */
-void GetTPCObjects(lar_pandora::PFParticleVector pfParticleList, lar_pandora::PFParticlesToTracks pfParticleToTrackMap, lar_pandora::PFParticlesToShowers pfParticleToShowerMap, lar_pandora::PFParticlesToVertices pfParticleToVertexMap, std::vector<lar_pandora::PFParticleVector> & pfp_v_v, std::vector<lar_pandora::TrackVector> & track_v_v, std::vector<lar_pandora::ShowerVector> & shower_v_v, std::vector<int> & p_v, std::vector<int> & t_v, std::vector<int> & s_v);
+void GetTPCObjects(lar_pandora::PFParticleVector pfParticleList, lar_pandora::PFParticleMap pfParticleMap, lar_pandora::PFParticlesToTracks pfParticleToTrackMap, lar_pandora::PFParticlesToShowers pfParticleToShowerMap, lar_pandora::PFParticlesToVertices pfParticleToVertexMap, std::vector<lar_pandora::PFParticleVector> & pfp_v_v, std::vector<lar_pandora::TrackVector> & track_v_v, std::vector<lar_pandora::ShowerVector> & shower_v_v, std::vector<int> & p_v, std::vector<int> & t_v, std::vector<int> & s_v);
 
 
 /**

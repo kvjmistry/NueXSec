@@ -89,9 +89,9 @@ xsecAna::TpcObjectMaker::TpcObjectMaker(fhicl::ParameterSet const & p) {
     _geantModuleLabel               = p.get<std::string>("GeantModule");
     _spacepointLabel                = p.get<std::string>("SpacePointProducer");
 
-    _vertexLabel                    =p.get<std::string>("VertexProducer");
-    _trackLabel                     =p.get<std::string>("TrackProducer");
-    _showerLabel                    =p.get<std::string>("ShowerProducer");
+    _vertexLabel                    = p.get<std::string>("VertexProducer");
+    _trackLabel                     = p.get<std::string>("TrackProducer");
+    _showerLabel                    = p.get<std::string>("ShowerProducer");
 
     _debug                          = p.get<bool>("Debug", false);
     _verbose                        = p.get<bool>("Verbose", false);
@@ -161,17 +161,24 @@ void xsecAna::TpcObjectMaker::produce(art::Event & e) {
     lar_pandora::PFParticleVector pfParticleList;        //vector of PFParticles
     lar_pandora::LArPandoraHelper::CollectPFParticles(e, _pfp_producer, pfParticleList);
 
-    // -------------------------------------------------------------------------
-    // Collect vertices, tracks and shower
+    // Collect vertices
     lar_pandora::VertexVector allPfParticleVertices;
     lar_pandora::PFParticlesToVertices pfParticleToVertexMap;
     lar_pandora::LArPandoraHelper::CollectVertices(e, _vertexLabel, allPfParticleVertices, pfParticleToVertexMap);
+   
+    // Collect Tracks
     lar_pandora::TrackVector allPfParticleTracks;
     lar_pandora::PFParticlesToTracks pfParticleToTrackMap;
     lar_pandora::LArPandoraHelper::CollectTracks(e, _trackLabel, allPfParticleTracks, pfParticleToTrackMap);
+   
+    // Collect Showers
     lar_pandora::ShowerVector allPfParticleShowers;
     lar_pandora::PFParticlesToShowers pfParticleToShowerMap;
     lar_pandora::LArPandoraHelper::CollectShowers(e, _showerLabel, allPfParticleShowers, pfParticleToShowerMap);
+
+    // Build Map going from PFP to Particle ID
+    lar_pandora::PFParticleMap pfParticleMap; // PFP Map of PFP to Particle ID
+    lar_pandora::LArPandoraHelper::BuildPFParticleMap(pfParticleList, pfParticleMap);
 
     std::vector<lar_pandora::TrackVector     > track_v_v;
     std::vector<lar_pandora::ShowerVector    > shower_v_v;
@@ -180,13 +187,14 @@ void xsecAna::TpcObjectMaker::produce(art::Event & e) {
 
     // -------------------------------------------------------------------------
     // Get the TPC Objects
-    _tpcobjecthelper_instance.tpcobjecthelper::GetTPCObjects(pfParticleList, pfParticleToTrackMap, pfParticleToShowerMap,
+    _tpcobjecthelper_instance.tpcobjecthelper::GetTPCObjects(pfParticleList, pfParticleMap, pfParticleToTrackMap, pfParticleToShowerMap,
                                                              pfParticleToVertexMap, pfp_v_v, track_v_v, shower_v_v, p_v, t_v, s_v);
 
+    // -------------------------------------------------------------------------
+    // Get the reco to true matches
     lar_pandora::MCParticlesToPFParticles matchedParticles;    // This is a map: MCParticle to matched PFParticle
     lar_pandora::MCParticlesToHits        matchedParticleHits;
     
-    // -------------------------------------------------------------------------
     // If MC, get the reco true matches
     if (_is_mc) {
         _recotruehelper_instance.GetRecoToTrueMatches(matchedParticles, matchedParticleHits);
@@ -198,12 +206,11 @@ void xsecAna::TpcObjectMaker::produce(art::Event & e) {
     std::vector<art::Ptr<recob::PFParticle> > cosmicOriginPFP;
 
     if(!neutrinoOriginPFP.empty()) {neutrinoOriginPFP.clear(); }
-    if(!cosmicOriginPFP.empty()) {cosmicOriginPFP.clear(); }
+    if(!cosmicOriginPFP.empty())   {cosmicOriginPFP.clear(); }
 
     std::vector< std::pair< int, simb::Origin_t > > pfp_origin_v;
     if(!pfp_origin_v.empty()) {pfp_origin_v.clear(); }
 
-    // -------------------------------------------------------------------------
     // Only perform matching if we have beam and is mc
     if(_cosmic_only == false && _is_mc == true) {
         
@@ -213,7 +220,6 @@ void xsecAna::TpcObjectMaker::produce(art::Event & e) {
             art::Ptr<recob::PFParticle> pf_par = iter1->second; // The matched PFParticle
 
             const art::Ptr<simb::MCTruth> mc_truth = nue_xsec::recotruehelper::TrackIDToMCTruth(e, _geantModuleLabel, mc_par->TrackId());
-            //bt->TrackIDToMCTruth(mc_par->TrackId());
 
             if (!mc_truth) {
                 std::cerr << "[TPCObjectMaker] Problem with MCTruth pointer." << std::endl;

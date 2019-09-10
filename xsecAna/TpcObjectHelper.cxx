@@ -22,6 +22,7 @@ art::Ptr<recob::PFParticle> tpcobjecthelper::GetNuPFP(lar_pandora::PFParticleVec
 
 //___________________________________________________________________________________________________
 void tpcobjecthelper::GetTPCObjects(lar_pandora::PFParticleVector pfParticleList,
+									lar_pandora::PFParticleMap pfParticleMap,
                                     lar_pandora::PFParticlesToTracks pfParticleToTrackMap,
                                     lar_pandora::PFParticlesToShowers pfParticleToShowerMap,
                                     lar_pandora::PFParticlesToVertices pfParticleToVertexMap,
@@ -43,14 +44,6 @@ void tpcobjecthelper::GetTPCObjects(lar_pandora::PFParticleVector pfParticleList
 	for (unsigned int n = 0; n < pfParticleList.size(); ++n) {
 		const art::Ptr<recob::PFParticle> particle = pfParticleList.at(n);
 
-			// std::cout << 
-			// "PDG: "          <<pfParticleList.at(n) ->PdgCode()      << "\t" <<
-			// "Num Daughters: "<<pfParticleList.at(n) ->NumDaughters() << "\t" <<
-			// "ID: "           <<pfParticleList.at(n) ->Self()         << "\t" <<
-			// "Parent: "       <<pfParticleList.at(n) ->Parent()       << "\t" <<
-			// "Primary?: "     <<pfParticleList.at(n) ->IsPrimary()    << "\t"
-			// << std::endl;
-
 		if(lar_pandora::LArPandoraHelper::IsNeutrino(particle)) {
 			if (_debug) std::cout << "\n[TPCObjectHelper] [GetTPCObjects] \t Creating TPC Object " << track_v_v.size() << std::endl;
 
@@ -59,18 +52,8 @@ void tpcobjecthelper::GetTPCObjects(lar_pandora::PFParticleVector pfParticleList
 			lar_pandora::PFParticleVector pfp_v;
 			int p, t, s;
 
-			std::cout << "Listing the pfps in the vector if neutrino:  "<< std::endl;
-
-			std::cout << 
-			"PDG: "          <<pfParticleList.at(n) ->PdgCode()      << "\t" <<
-			"Num Daughters: "<<pfParticleList.at(n) ->NumDaughters() << "\t" <<
-			"ID: "           <<pfParticleList.at(n) ->Self()         << "\t" <<
-			"Parent: "       <<pfParticleList.at(n) ->Parent()       << "\t" <<
-			"Primary?: "     <<pfParticleList.at(n) ->IsPrimary()    << "\t"
-			<< std::endl;
-
 			// Collect PFPs for this TPC object
-			CollectPFP(pfParticleList, particle, pfp_v);
+			CollectPFP(pfParticleMap, particle, pfp_v);
 
 			// Collect Tracks and Showers for this TPC object
 			CollectTracksAndShowers(pfParticleToTrackMap, pfParticleToShowerMap, pfp_v, // input
@@ -113,7 +96,7 @@ void tpcobjecthelper::GetTPCObjects(lar_pandora::PFParticleVector pfParticleList
 }
 
 //______________________________________________________________________________________________________________________________________
-void tpcobjecthelper::CollectPFP(lar_pandora::PFParticleVector pfParticleList,
+void tpcobjecthelper::CollectPFP(lar_pandora::PFParticleMap pfParticleMap,
                                  art::Ptr<recob::PFParticle> particle,
                                  lar_pandora::PFParticleVector &pfp_v) {
 
@@ -122,21 +105,14 @@ void tpcobjecthelper::CollectPFP(lar_pandora::PFParticleVector pfParticleList,
 	// And their daughters
 	const std::vector<size_t> &daughterIDs = particle->Daughters();
 
-	// std::cout <<particle->Self() << "  " << daughterIDs.size() << std::endl;
-	if(daughterIDs.size() == 0) std::cout << " " << std::endl; // The problem comes from the return;
+	if(daughterIDs.size() == 0) return; 
 	else {
 
 		for (size_t m = 0; m < daughterIDs.size(); ++m) {
-			std::cout << "daughter IDs: " << daughterIDs.at(m) << std::endl;
-			const art::Ptr<recob::PFParticle> daughter{pfParticleList.at(daughterIDs.at(m))};
-			
-			
-			const std::vector<size_t> &daughterIDs2 = daughter->Daughters();
-			std::cout <<"d: " << daughter->Self() << "  " << daughterIDs2.size() << std::endl;
+			const art::Ptr<recob::PFParticle> daughter{pfParticleMap.at(daughterIDs.at(m))};
 			
 			// Recursive call
-			// CollectPFP(pfParticleList, daughter, pfp_v );
-			pfp_v.push_back(daughter);
+			CollectPFP(pfParticleMap, daughter, pfp_v );
 		}
 	}
 
