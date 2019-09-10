@@ -322,7 +322,7 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e) {
     _is_mc   = !_is_data;
 
     std::cout << "[Analyze] ------------------------------------------- [Analyze]" << std::endl;
-    std::cout << "[Analyze] Runing over entry: " << iteration << std::endl;
+    std::cout << "[Analyze] Running over entry: " << iteration << std::endl;
     iteration++;
 
     if(_cosmic_only == true) {std::cout << "[Analyze] Running in Cosmic Only Configuration! " << std::endl;}
@@ -538,7 +538,7 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e) {
                 fMCNuDirX_v     .push_back( (mctruth.GetNeutrino().Nu().Px() / mctruth.GetNeutrino().Nu().P()));
                 fMCNuDirY_v     .push_back( (mctruth.GetNeutrino().Nu().Py() / mctruth.GetNeutrino().Nu().P()));
                 fMCNuDirZ_v     .push_back( (mctruth.GetNeutrino().Nu().Pz() / mctruth.GetNeutrino().Nu().P()));
-                fEventWeight_v.push_back(1.0);
+                fEventWeight_v  .push_back(1.0);
             
             } // End if mctruth->origin == kBeamNeutrino
        
@@ -1030,19 +1030,26 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e) {
                 
                 if(_verbose) {std::cout << "[Analyze] n showers ass to this pfp: " << showers.size() << std::endl; }
                 
-                //we want to take the first association, right?
+               
                 if(showers.size() != 0){
-                    const art::Ptr<recob::Shower> this_shower = showers.at(0);
-                    pfp_dir_x = this_shower->Direction().X();
-                    pfp_dir_y = this_shower->Direction().Y();
-                    pfp_dir_z = this_shower->Direction().Z();
-                    pfp_theta = acos(pfp_dir_z) * (180 / 3.1415);
-                    pfp_phi = atan2(pfp_dir_y, pfp_dir_x) * (180 / 3.1415);
+                    const art::Ptr<recob::Shower> this_shower = showers.at(0);  // We want to take the first association, right?
+                    pfp_dir_x  = this_shower->Direction().X();
+                    pfp_dir_y  = this_shower->Direction().Y();
+                    pfp_dir_z  = this_shower->Direction().Z();
+                    pfp_theta  = acos(pfp_dir_z) * (180 / 3.1415);
+                    pfp_phi    = atan2(pfp_dir_y, pfp_dir_x) * (180 / 3.1415);
                     pfp_length = this_shower->Length();
                     
                     std::cout << "best plane: " << this_shower->best_plane() << std::endl;
                     std::cout << "shower energy vec size: " << this_shower->Energy().size() << std::endl; // THIS IS ZERO?? NEEDS DEBUGGING
 
+                    std::cout <<
+                    "pfp_dir_x: "  << this_shower->Direction().X() << "\t" << 
+                    "pfp_dir_y: "  << this_shower->Direction().Y() << "\t" << 
+                    "pfp_dir_z: "  << this_shower->Direction().Z() << "\t" << 
+                    "pfp_theta: "  << acos(pfp_dir_z) * (180 / 3.1415) << "\t" << 
+                    "pfp_phi  : "  << atan2(pfp_dir_y, pfp_dir_x) * (180 / 3.1415) << "\t" << 
+                    std::endl;
                     // pfp_momentum = this_shower->Energy().at(this_shower->best_plane());
                     
                     pfp_open_angle = this_shower->OpenAngle();
@@ -1055,9 +1062,9 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e) {
                     //2nd bool argument - omit first point in box
                     //this is the default method
                     xsecAna::utility::ConstructShowerdQdX(geoHelper, _is_data, ClusterToHitsMap, clusters, 
-                                          _dQdxRectangleLength,_dQdxRectangleWidth,
+                                                          _dQdxRectangleLength,_dQdxRectangleWidth,
                                                           this_shower, shower_cluster_dqdx, shower_cluster_dq, shower_cluster_dx, _verbose,
-                                          false, false);
+                                                          false, false);
                     
                     //this method uses the xyz calibration map
                     xsecAna::utility::ConstructShowerdQdX(geoHelper, _is_data, ClusterToHitsMap, clusters,

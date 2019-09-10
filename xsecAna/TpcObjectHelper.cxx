@@ -60,7 +60,7 @@ void tpcobjecthelper::GetTPCObjects(lar_pandora::PFParticleVector pfParticleList
 			                        track_v, shower_v);                     // output
 
 			// Calculate multiplicity for this TPC object
-			this->GetMultiplicity(pfParticleList, pfp_v, particle, p, t, s);
+			GetMultiplicity(pfParticleMap, pfp_v, particle, p, t, s);
 
 			
 			if (_debug) std::cout << "[TPCObjectHelper] [GetTPCObjects] \t Number of pfp for this TPC object: "    << pfp_v.size()   << std::endl;
@@ -100,7 +100,7 @@ void tpcobjecthelper::CollectPFP(lar_pandora::PFParticleMap pfParticleMap,
                                  art::Ptr<recob::PFParticle> particle,
                                  lar_pandora::PFParticleVector &pfp_v) {
 
-	pfp_v.push_back(particle);
+	pfp_v.emplace_back(particle);
 	
 	// And their daughters
 	const std::vector<size_t> &daughterIDs = particle->Daughters();
@@ -154,7 +154,7 @@ void tpcobjecthelper::CollectTracksAndShowers(lar_pandora::PFParticlesToTracks p
 
 
 //______________________________________________________________________________________________________________________________________
-void tpcobjecthelper::GetMultiplicity(lar_pandora::PFParticleVector pfParticleList,
+void tpcobjecthelper::GetMultiplicity(lar_pandora::PFParticleMap pfParticleMap,
                                       lar_pandora::PFParticleVector pfp_v,
                                       art::Ptr<recob::PFParticle> particle,
                                       int & p,
@@ -180,7 +180,7 @@ void tpcobjecthelper::GetMultiplicity(lar_pandora::PFParticleVector pfParticleLi
 	else {
 		for (unsigned int m = 0; m < daughterIDs.size(); ++m) {
 
-			const art::Ptr<recob::PFParticle> daughter = pfParticleList.at(daughterIDs.at(m));
+			const art::Ptr<recob::PFParticle> daughter{pfParticleMap.at(daughterIDs.at(m))};
 
 			bool found_in_tpcobj = false;
 			for (auto pfp : pfp_v) {

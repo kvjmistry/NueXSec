@@ -49,7 +49,7 @@ void CollectTracksAndShowers(lar_pandora::PFParticlesToTracks pfParticleToTrackM
  *  @param p output, multiplicity in number of PFPs
  *  @param t output, multiplicity in number of tracks
  *  @param s output, multiplicity in number of showers */
-void GetMultiplicity(lar_pandora::PFParticleVector pfParticleList, lar_pandora::PFParticleVector pfp_v, art::Ptr<recob::PFParticle> particle, int & p, int & t, int & s);
+void GetMultiplicity(lar_pandora::PFParticleMap pfParticleMap, lar_pandora::PFParticleVector pfp_v, art::Ptr<recob::PFParticle> particle, int & p, int & t, int & s);
 
 /**
  *  @brief Constructs TPC objects using Pandora PFP slices

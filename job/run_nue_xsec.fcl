@@ -7,7 +7,7 @@ process_name : NueXsecExtractorProcess
 
 services:
 {
-  TFileService: {fileName: "nue_xsec_treemaker.root"}
+  TFileService: {fileName: "nue_xsec_tree.root"}
   @table::microboone_services_reco
   @table::microboone_full_services
   message:       @local::microboone_message_services_prod_debug
@@ -57,7 +57,6 @@ physics:
     }
   }
   production: [ProduceMCGhost,ProduceTPCO]
-  # production: [ProduceMCGhost]
   analyzers:
   {
     AnalyzeTPCO:
