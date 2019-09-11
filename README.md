@@ -9,23 +9,24 @@ Be sure that you add NueXSec to your CMakeLists.txt before building with larsoft
 
 ## Larsoft Modules
 To compile:  
-The TPCObject libraries are located in the xsecAna directory. You can compile these libraries by doing: `source compile_xsecAna.sh`. This cleans and builds both the larsoft repository (where the libraries live). This **does not** build your release of larsoft! - You will still have to do an `mrb i` or `make install` as normal in your larsoft build dir if you want to work with any larsoft products/modules.
+The TPCObject libraries are located in the Modules directory. You can compile these libraries by doing: `source compile_xsecAna.sh`. This builds and copies the TPC Object libraries to the lib directory. This **does not** build your release of larsoft! - You will still have to do an `mrb i` or `make install` as normal in your larsoft build dir if you want to work with any larsoft products/modules.
 
 The total package is currently composed of three modules:
 
-1. Reco-true matching module - this module constructed the "MC Ghosts".
-2. Orders the recob::Track/Shower objects into TPC Objects and creates associations.
-3. Analysis module to save TPC Objects and recob::Particles into an output ROOT file.
+1. RecoTrueMatching:- this module constructs the "MC Ghosts" which are a tool used for mapping Truth to Reco info.
+2. TpcObjectMaker: Orders the recob::Track/Shower objects into TPC Objects and creates associations.
+3. TpcObjectAnalysis: Saves TPC Objects and other relavent information into an output ROOT file.
 
-The initial idea for this is based on Marco's code, which constructs similar TPC Objects, which contain primarily associations to recob::Tracks/Showers. My module expands to save the dataproducts of the recob::Tracks/Showers as well as their associated MC Truth variables.
+The initial idea for this is based on Marco's code, which constructs similar TPC Objects, which contain primarily associations to recob::Tracks/Showers. This module expands to save the dataproducts of the recob::Tracks/Showers as well as their associated MC Truth variables.
 
 The output root file is composed of `std::vector<xsecAna::ParticleContainer>` which compose a `xsecAna::TPCObjectContainer` object. Based on the Pandora particle hierarchy, the event will have any number of `xsecAna::TPCObjectContainer`, which are saved in an `std::vector<xsecAna::TPCObjectContainer>`.
 
-The `xsecAna` directory contains the modules which are used in LArsoft. In this directory you can find the fcl file among the class definitions. You can run the module just like any other larsoft module: `lar -c run_Xsec.fcl -s source_file_path`.
+The `Modules` directory contains the modules which are used in LArsoft. In this directory you can find the fcl file among the class definitions. You can run the module just like any other larsoft module: `lar -c run_nue_xsec.fcl -s source_file_path`. This will soon be changed so there is an individual fcl file for cosmic, overlay, data, EXT etc.
 
-If anyone intends to apply these two container classes outside of my module's framework, then simply be aware of the following: as I have constructed two custom data products, we need to make sure that the proper library information is generated. This means looking at the Linkdef.h, classes_def.h, and classes.h files.
+If anyone intends to apply these two container classes outside of this module's framework, then simply be aware of the following: as there have been two custom data products that have been made and we need to make sure that the proper library information is generated. This means looking at the Linkdef.h, classes_def.h, and classes.h files.
 
 ## Analysis and Test Scripts
+Currently works for MCC8 era, this will be updated in the future for MCC9!
 
 Be sure to read the comments in the relevant files you're using!
 
@@ -68,7 +69,7 @@ I also have a custom_potSum.cxx which is an interation of finding the POT of MC 
 Lastly, we need to consulte GENIE and the NuMI flux histograms to find the proper scaling value. This particular scaling factor will change based on your desired signal and beam. If you'd like to use it, I'll be happy to provide you with the scaling factor I use or the module and source files. Those on the gpvms can access `/uboone/app/users/chill2/flux_scripts`. The script is simple enough so I simply execute using root: `root -l flux_calc.cxx+`.
 
 
-## Open Tickets
+## Current Issue Tracking
 
 This is a place where I will be tracking some issues:
 
