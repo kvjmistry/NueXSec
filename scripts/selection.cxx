@@ -40,6 +40,7 @@ void selection::make_selection( const char * _file1,
 	const double flux_nue_bar = POT * scaling_nue_bar;
 	const double flux = flux_nue + flux_nue_bar;
 
+
 	std::vector<double> selected_energy_vector;
 
 	mctruth_counter_tree->SetBranchAddress("mc_nue_cc_counter",      &mc_nue_cc_counter);
@@ -69,20 +70,8 @@ void selection::make_selection( const char * _file1,
 	mctruth_counter_tree->SetBranchAddress("has_pi0", &has_pi0);
 	mctruth_counter_tree->SetBranchAddress("fMCNuTime", &mc_nu_time);
 
-<<<<<<< HEAD
-
-
-
-
-
-
-
-
-
-=======
 	std::ofstream neutrino_in_tpc_list;
 	neutrino_in_tpc_list.open("neutrino_in_tpc_list.txt");
->>>>>>> kmistry
 
 	//configure the externally configurable cut parameters
 	std::cout << "\n --- Configuring Parameters --- \n" << std::endl;
@@ -2280,40 +2269,12 @@ void selection::make_selection( const char * _file1,
 	//**********************************
 	//now let's do the cuts
 	//*********************************
-<<<<<<< HEAD
-
-
-
-	/// ++++++++++++
-	// Krishan
-	/// ++++++++++++
-	// Create a TTree to save some useful variables to.
-
-	double mc_cos_theta;
-	double mc_phi;
-	double mc_ele_cos_theta;
-	double mc_ele_theta;
-	double mc_ele_phi;
-
-	TBranch *bmc_nu_energy = KrishTree->Branch("mc_nu_energy",   &mc_nu_energy, "mc_nu_energy/D");
-	TBranch *bmc_cos_theta =KrishTree->Branch("mc_cos_theta",   &mc_cos_theta, "mc_cos_theta/D");
-	TBranch *bmc_phi =  KrishTree->Branch("mc_phi", &mc_phi, "mc_phi/D");
-
-	TBranch *bmc_ele_energy = KrishTree->Branch("mc_ele_energy", &mc_ele_energy, "mc_ele_energy/D");
-	TBranch *bmc_ele_theta = KrishTree->Branch("mc_ele_theta",  &mc_ele_theta, "mc_ele_theta/D");
-	TBranch *bmc_ele_phi = KrishTree->Branch("mc_ele_phi",    &mc_ele_phi, "mc_ele_phi/D");
-
-	/// ++++++++++++
-	/// ++++++++++++
-
-=======
 	// Create an outfile with the event num, run and subrun for GenEvents in TPC
 	std::ofstream Gen_events_in_TPC_list;
 	Gen_events_in_TPC_list.open("Gen_events_in_TPC_list.txt");
 	int Gen_evt{0}, Gen_run{0}, Gen_subrun{0};
 
 
->>>>>>> kmistry
 	for(int event = 0; event < total_entries; event++)
 	{
 		if(_verbose)
@@ -2388,12 +2349,6 @@ void selection::make_selection( const char * _file1,
 		std::vector<std::pair<int, std::string> > * dummy_passed_tpco = new std::vector<std::pair<int, std::string> >;
 		passed_tpco->resize(tpc_object_container_v->size());
 		dummy_passed_tpco->resize(tpc_object_container_v->size());
-
-			
-			
-		
-
-
 		for(int i = 0; i < passed_tpco->size(); i++)
 		{
 			passed_tpco->at(i).first = 1;
@@ -2402,47 +2357,27 @@ void selection::make_selection( const char * _file1,
 			dummy_passed_tpco->at(i).second = "Passed";
 		}
 
-		mc_cos_theta = -999;
+		double mc_cos_theta = -999;
 		if(mc_nu_momentum != 0) {mc_cos_theta = mc_nu_dir_z; }
-		mc_phi       = atan2(mc_nu_dir_y, mc_nu_dir_x);
-		mc_ele_cos_theta = -999;
-		mc_ele_theta = -999;
+		const double mc_phi       = atan2(mc_nu_dir_y, mc_nu_dir_x);
+		double mc_ele_cos_theta = -999;
+		double mc_ele_theta = -999;
 		if(mc_ele_momentum != 0)
 		{
 			mc_ele_cos_theta = mc_ele_dir_z;
 			mc_ele_theta = acos(mc_ele_dir_z) * (180/3.1415);
 		}
-<<<<<<< HEAD
-		mc_ele_phi       = atan2(mc_ele_dir_y, mc_ele_dir_x);
-		if(true_in_tpc == true)
-		{
-			h_all_true_energy_theta->Fill(mc_nu_energy, acos(mc_cos_theta) * (180 / 3.1415));
-
-
-			if(mc_nu_id == 1 || mc_nu_id == 5)
-=======
 		const double mc_ele_phi = atan2(mc_ele_dir_y, mc_ele_dir_x);
 		if(true_in_tpc == true)
 		{
 			h_all_true_energy_theta->Fill(mc_nu_energy, acos(mc_cos_theta) * (180 / 3.1415));
 			if((mc_nu_id == 1 || mc_nu_id == 5) && detector_variations == false)
->>>>>>> kmistry
 			{
 				h_nue_true_energy_theta->Fill(mc_nu_energy, acos(mc_cos_theta) * (180 / 3.1415));
 				h_nue_true_energy_phi->Fill(mc_nu_energy, mc_phi * (180 / 3.1415));
 				h_ele_true_energy_theta->Fill(mc_ele_energy, acos(mc_ele_cos_theta) * (180 / 3.1415));
 				h_ele_true_energy_phi->Fill(mc_ele_energy, mc_ele_phi * (180 / 3.1415));
 
-<<<<<<< HEAD
-
-				KrishTree->Fill();
-				std::cout << "Filling TTree!" << std::endl;
-
-				// std::cout << "mc_ele_phi:\t" << mc_ele_phi <<  "\tmc_ele_theta:\t" << mc_ele_theta << "\tmc_ele_energy:\t" << mc_ele_energy 
-				// 		  << "\tmc_nu_energy:\t" << mc_nu_energy <<  "\tmc_cos_theta:\t" << mc_cos_theta << "\tmc_phi:\t" << mc_phi
-				// << std::endl;
-
-=======
 				if (tpc_object_container_v->size() != 0 ){
 					auto const tpc_object_container = tpc_object_container_v->at(0);
 					Gen_evt     = tpc_object_container.EventNumber();
@@ -2453,7 +2388,6 @@ void selection::make_selection( const char * _file1,
 				else std::cout << "Got a TPCObj of size zero!" << std::endl;
 
 				
->>>>>>> kmistry
 
 			}
 		}
@@ -4706,16 +4640,7 @@ void selection::make_selection( const char * _file1,
 		_functions_instance.selection_functions::DifferentialEnergySlices(tpc_object_container_v, passed_tpco, _verbose, tpco_classifier_v,
 		                                                                  h_low_true_momentum, h_med_true_momentum, h_high_true_momentum);
 
-
-		
-			
 	}//end event loop
-<<<<<<< HEAD
-	hfile->cd();
-	if (hfile->IsOpen()) std::cout << "File is still open\n" << std::endl;
-	KrishTree->Write();
-	
-=======
 	std::cout << "Debugging Events: " << num_debug_events << std::endl;
 
 	//***************************
@@ -7181,7 +7106,6 @@ void selection::make_selection( const char * _file1,
 			}//end event loop for variation events
 		}
 	}//end detector variations
->>>>>>> kmistry
 
 	std::cout << "------------------ " << std::endl;
 	std::cout << " MC Nue          : " << total_mc_entries_inFV_nue << std::endl;
@@ -11495,8 +11419,6 @@ void selection::make_selection( const char * _file1,
 	leg_stack_failure_reason->AddEntry(h_failure_reason_unmatched,       "Unmatched", "f");
 	leg_stack_failure_reason->Draw();
 	failure_reason_stack_c1->Print(Form("%s%s", file_locate_prefix, "failure_reason_stack.pdf"));
-
-
 
 
 	std::cout << " --- End Cross Section Calculation --- " << std::endl;
