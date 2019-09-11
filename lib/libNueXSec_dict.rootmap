@@ -8,5 +8,5 @@ class vector<xsecAna::ParticleContainer>
 class vector<xsecAna::TPCObjectContainer>
 class xsecAna::ParticleContainer
 class xsecAna::TPCObjectContainer
-header ubana/NueXSec/xsecAna/ParticleContainer.h
-header ubana/NueXSec/xsecAna/TpcObjectContainer.h
+header ParticleContainer.h
+header TpcObjectContainer.h

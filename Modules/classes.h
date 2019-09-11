@@ -8,9 +8,9 @@
 #include "lardataobj/AnalysisBase/FlashMatch.h"
 
 //#include "uboone/NueXSecModules/xsecAna/"
-#include "ubana/NueXSec/xsecAna/TPCObject.h"
-#include "ubana/NueXSec/xsecAna/MCGhost.h"
-#include "ubana/NueXSec/xsecAna/TpcObjectContainer.h"
+#include "ubana/NueXSec/Modules/TPCObject.h"
+#include "ubana/NueXSec/Modules/MCGhost.h"
+#include "ubana/NueXSec/Modules/TpcObjectContainer.h"
 
 #include "nusimdata/SimulationBase/MCParticle.h"
 
