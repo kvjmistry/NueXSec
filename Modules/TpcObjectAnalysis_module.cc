@@ -1039,18 +1039,7 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e) {
                     pfp_theta  = acos(pfp_dir_z) * (180 / 3.1415);
                     pfp_phi    = atan2(pfp_dir_y, pfp_dir_x) * (180 / 3.1415);
                     pfp_length = this_shower->Length();
-                    
-                    std::cout << "best plane: " << this_shower->best_plane() << std::endl;
-                    std::cout << "shower energy vec size: " << this_shower->Energy().size() << std::endl; // THIS IS ZERO?? NEEDS DEBUGGING
-
-                    std::cout <<
-                    "pfp_dir_x: "  << this_shower->Direction().X() << "\t" << 
-                    "pfp_dir_y: "  << this_shower->Direction().Y() << "\t" << 
-                    "pfp_dir_z: "  << this_shower->Direction().Z() << "\t" << 
-                    "pfp_theta: "  << acos(pfp_dir_z) * (180 / 3.1415) << "\t" << 
-                    "pfp_phi  : "  << atan2(pfp_dir_y, pfp_dir_x) * (180 / 3.1415) << "\t" << 
-                    std::endl;
-                    // pfp_momentum = this_shower->Energy().at(this_shower->best_plane());
+                    // pfp_momentum = this_shower->Energy().at(this_shower->best_plane()); // This is not filled by Pandora at the moment
                     
                     pfp_open_angle = this_shower->OpenAngle();
 
