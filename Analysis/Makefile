@@ -22,15 +22,20 @@ OBJ_FILES = bin/main.o bin/utility.o bin/selection.o
 all: $(MAIN)
 
 $(MAIN): $(OBJ_FILES)
-	echo Building $(MAIN)
+	@echo
+	@echo -e  "\033[0;32mBuilding $(MAIN)\033[0;36m"
 	$(CXX) $(LIBS) -o $@ $^
+	@echo -e "\033[0;31mDone!"
+	@echo
 
 # Build the Object files
 bin/%.o: src/%.cxx include/%.h
-	mkdir -p bin
+	@mkdir -p bin
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) -c $^
-	mv *.o bin
+	@mv *.o bin
 
 # Clean compilation
 clean:
+	@echo -e "\033[0;31m"
 	rm nuexsec bin/*
+	@echo

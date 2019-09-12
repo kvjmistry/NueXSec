@@ -2,6 +2,7 @@
 #define SELECTION_h
 
 #include "main.h"
+#include "TFile.h"
 
 namespace xsecSelection {
 
@@ -10,11 +11,11 @@ namespace xsecSelection {
         private:
 
         // TFiles
-        // TFile * f_mc;        // The MC file
-        // TFile * f_data;      // The data file
-        // TFile * f_ext;       // The ext file
-        // TFile * f_dirt;      // The dirt file
-        // TFile * f_variation; // The variation file
+        TFile * f_mc;        // The MC file
+        TFile * f_data;      // The data file
+        TFile * f_ext;       // The ext file
+        TFile * f_dirt;      // The dirt file
+        TFile * f_variation; // The variation file
 
 
         public:
