@@ -4,18 +4,13 @@ int main(int argc, char *argv[]){
 
     const char * input_config_file_name;
     bool using_default_config      = true;
-    bool using_slim_version        = false;
-    bool monte_carlo_file          = false;
-    bool ext_file                  = false;
-    bool data_file                 = false;
-    bool dirt_file                 = false;
-    bool variation_file            = false;
+    // bool using_slim_version        = false;
 
-    char * monte_carlo_file_path = (char *)"empty";
-    char * ext_file_path         = (char *)"empty";
-    char * data_file_path        = (char *)"empty";
-    char * dirt_file_path        = (char *)"empty";
-    char * variation_file_path   = (char *)"empty";
+    char * mc_file_name          = (char *)"empty";
+    char * ext_file_name         = (char *)"empty";
+    char * data_file_name        = (char *)"empty";
+    char * dirt_file_name        = (char *)"empty";
+    char * variation_file_name   = (char *)"empty";
 
     // -------------------------------------------------------------------------
     // Loop over input arguments
@@ -26,7 +21,7 @@ int main(int argc, char *argv[]){
         // Slim input
         if(strcmp(arg, "--slim") == 0) {
             std::cout << "Running with slim mode"<< std::endl;
-            using_slim_version = true;
+            // using_slim_version = true;
             std::cout << " *** \t Running with Slimmed Selection (no histograms will be made)\t *** " << std::endl;
         }
         
@@ -40,37 +35,32 @@ int main(int argc, char *argv[]){
         // MC file
         if(strcmp(arg, "--mc") == 0) {
             std::cout << "Running with MC file: " << argv[i+1]<< std::endl;
-            monte_carlo_file = true;
-            monte_carlo_file_path = argv[i+1];
+            mc_file_name = argv[i+1];
         }
 
         // EXT file
         if(strcmp(arg, "--ext") == 0){
             std::cout << "Running with EXT file: " << argv[i+1]<< std::endl;
-            ext_file = true;
-            ext_file_path = argv[i+1];
+            ext_file_name = argv[i+1];
         }
 
         // Data file
         if(strcmp(arg, "--data") == 0){
             std::cout << "Running with Data file: " << argv[i+1]<< std::endl;
-            data_file = true;
-            data_file_path = argv[i+1];
+            data_file_name = argv[i+1];
         }
 
         // Dirt file overlay or not?
         if(strcmp(arg, "--dirt") == 0){
             std::cout << "Running with Dirt file: " << argv[i+1]<< std::endl;
-            dirt_file = true;
-            dirt_file_path = argv[i+1];
+            dirt_file_name = argv[i+1];
         }
 
         // Variation file
         if(strcmp(arg, "--var") == 0){
             std::cout << "Running with Systematic Variation file: " << argv[i+1]<< std::endl;
-            variation_file = true;
-            variation_file_path = argv[i+1];
-            std::string variation_type = variation_file_path;
+            variation_file_name = argv[i+1];
+            std::string variation_type = variation_file_name;
         }
         if (strcmp(arg, "--h") == 0 || strcmp(arg, "-h") == 0|| strcmp(arg, "--help") == 0 || strcmp(arg, "--usage") == 0){
             std::cout << " \n ./nuexsec --mc <mc file> [--data <data file>] [--ext <ext file>] [--dirt <dirt file>] [--var <variation file>] [-c <input config file>][--slim] \n " << std::endl; 
@@ -83,7 +73,7 @@ int main(int argc, char *argv[]){
     // -------------------------------------------------------------------------
     std::vector<double> config;
     std::vector<double> input_config;
-    // xsecSelection::selection  _selection_instance;
+    xsecSelection::selection  _selection_instance;
 
     // Configure the cut values
     std::vector<double> default_config = utility::configure_cuts(
@@ -147,8 +137,8 @@ int main(int argc, char *argv[]){
     }
     // -------------------------------------------------------------------------
 
-    // Call the selection
-    //_selection_instance.xsecSelection::selection::make_selection(monte_carlo_file_path, ext_file_path, data_file_path, dirt_file_path, variation_file_path, config);
+    // Initialise the selction script
+    _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config);
     
     // -------------------------------------------------------------------------
     // Finished!

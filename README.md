@@ -9,7 +9,7 @@ Be sure that you add NueXSec to your CMakeLists.txt before building with larsoft
 
 ## Larsoft Modules
 To compile:  
-The TPCObject libraries are located in the Modules directory. You can compile these libraries by doing: `source compile_xsecAna.sh`. This builds and copies the TPC Object libraries to the lib directory. This **does not** build your release of larsoft! - You will still have to do an `mrb i` or `make install` as normal in your larsoft build dir if you want to work with any larsoft products/modules.
+The TPCObject libraries are located in the Modules directory. You can compile these libraries by doing: `source compile_tpcobj_lib.sh`. This builds and copies the TPC Object libraries to the lib directory. This **does not** build your release of larsoft! - You will still have to do an `mrb i` or `make install` as normal in your larsoft build dir if you want to work with any larsoft products/modules.
 
 The total package is currently composed of three modules:
 

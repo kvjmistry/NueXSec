@@ -1,13 +1,27 @@
 #ifndef MAIN_h
 #define MAIN_h
 
-// #include "selection.h"
 #include "utility.h"
+#include "selection.h"
+#include "../../Modules/LinkDef.h"
 
+// STD includes
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 #include <cstring>
+
+// ROOT includes
+#include "TDirectory.h"
+#include "TROOT.h"
+#include "TH1F.h"
+#include "TH1D.h"
+#include "TGraph.h"
+#include "TH2D.h"
+#include "TFile.h"
+#include "TVector3.h"
+#include "TRotation.h"
 
 /*
 
