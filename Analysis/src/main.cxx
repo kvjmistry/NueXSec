@@ -76,7 +76,8 @@ int main(int argc, char *argv[]){
     xsecSelection::selection  _selection_instance;
 
     // Configure the cut values
-    std::vector<double> default_config = utility::configure_cuts(
+    utilityNS::utility _utility;
+    std::vector<double> default_config = _utility.configure_cuts(
             _x1, _x2, _y1, _y2, _z1, _z2,
             flash_pe_threshold,
             flash_time_start,

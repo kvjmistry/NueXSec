@@ -1,8 +1,8 @@
 #ifndef MAIN_h
 #define MAIN_h
 
-#include "utility.h"
 #include "selection.h"
+#include "utility.h"
 #include "../../Modules/LinkDef.h"
 
 // STD includes
