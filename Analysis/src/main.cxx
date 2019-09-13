@@ -4,7 +4,7 @@ int main(int argc, char *argv[]){
 
     const char * input_config_file_name;
     bool using_default_config      = true;
-    // bool using_slim_version        = false;
+    bool using_slim_version        = false;
 
     char * mc_file_name          = (char *)"empty";
     char * ext_file_name         = (char *)"empty";
@@ -21,7 +21,7 @@ int main(int argc, char *argv[]){
         // Slim input
         if(strcmp(arg, "--slim") == 0) {
             std::cout << "Running with slim mode"<< std::endl;
-            // using_slim_version = true;
+            using_slim_version = true;
             std::cout << " *** \t Running with Slimmed Selection (no histograms will be made)\t *** " << std::endl;
         }
         
@@ -139,10 +139,10 @@ int main(int argc, char *argv[]){
     // -------------------------------------------------------------------------
 
     // Initialise the selction script
-    _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config);
+    _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config, using_slim_version );
     
     // -------------------------------------------------------------------------
     // Finished!
-    std::cout << "*** \t Exiting C++ Code... \t *** " << std::endl;
+    std::cout << "\033[0;32m*** \t Exiting C++ Code... \t *** \033[0m" << std::endl;
     return 0;
 }

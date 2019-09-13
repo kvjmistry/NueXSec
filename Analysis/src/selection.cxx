@@ -2,16 +2,22 @@
 
 namespace xsecSelection {
 
-// Main function for selection
 void selection::Initialise( const char * mc_file,
                             const char * ext_file,
                             const char * data_file,
                             const char * dirt_file,
                             const char * variation_file,
-                            const std::vector<double> _config
-                            ){
+                            const std::vector<double> _config,
+                            bool _slim){
     
     std::cout << "\nInitialising..." << std::endl;
+    if (_slim){
+        std::cout << "\033[0;32m-------------------------------" << std::endl;
+        std::cout << "     Running in Slim Mode!" << std::endl;
+        std::cout << "-------------------------------\033[0m" << std::endl;
+        slim = _slim;
+    } 
+
     // Print the input files
     std::cout <<
     "MC   File Path:      " << mc_file        <<"\n" <<
@@ -250,7 +256,82 @@ void selection::Initialise( const char * mc_file,
 
     } // End intialisation of dirt variables
     
+    // Invoke main selection function
+    make_selection();
 
 } // END Initialise function
+
+// Main function for selection
+void selection::make_selection(){
+    std::cout << "Now Running the selection!"<< std::endl;
+    
+    // *************************************************************************
+    //  ----- Loop over the TPC Objects and Apply the selection cuts -----------
+    // *************************************************************************
+    
+    // MC ----------------------------------------------------------------------
+    if (bool_use_mc){
+        
+        // Loop over the Events
+        for (int event = 0; event < tree_total_entries; event++){
+        
+            // Get the entry in the tree
+            mytree->GetEntry(event);               // TPC Objects
+            mctruth_counter_tree->GetEntry(event); // MC Tree
+            
+            // The total number of TPC Objects
+            int n_tpc_obj = tpc_object_container_v->size();
+
+            // Create a vector of Passed Containers
+            std::vector<Passed_Container> passed_v(tree_total_entries);
+
+            // Largest flash information
+            std::vector<double> largest_flash_v = mc_largest_flash_v_v.at(event); // Vec with the largest flash
+
+            // Create an instance of the selection cut (also initialises flash info)
+            selection_cuts selection_cuts_instance;
+            selection_cuts_instance.SetFlashVariables(largest_flash_v);
+            
+            // Loop over the TPC Objects ---------------------------------------
+            // (In Pandora Consolidated, there should be 1 TPC Object per event)
+            for (int i = 0; i < n_tpc_obj; i++){
+                const xsecAna::TPCObjectContainer tpc_obj = tpc_object_container_v->at(i); // Get the TPC Obj
+
+                // Initalise cut instance with tpc object specifics such as num pfp
+
+                // Here we apply the selection cuts
+            
+            } // End loop over the TPC Objects
+        
+        } // End loop over the Events
+    }
+    // Data --------------------------------------------------------------------
+    if (bool_use_data){
+
+    }
+    // EXT ---------------------------------------------------------------------
+    if (bool_use_ext){
+
+    }
+    // Dirt --------------------------------------------------------------------
+    if (bool_use_dirt){
+
+    }
+    // -------------------------------------------------------------------------
+
+
+    // Now fill hisograms and write to a file
+    
+
+    // Plots the histograms and write to a file
+    
+    
+    
+    std::cout << "Finished running the selection!"<< std::endl;
+    return;
+}
+
+
+
 } // END NAMESPACE xsecSelection
 

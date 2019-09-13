@@ -6,13 +6,27 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <cstring>
 
 // Root Includes
+#include "TDirectory.h"
+#include "TROOT.h"
+#include "TH1F.h"
+#include "TH1D.h"
+#include "TGraph.h"
+#include "TH2D.h"
 #include "TFile.h"
+#include "TVector3.h"
+#include "TRotation.h"
 #include "TTree.h"
-#include "TString.h"
 
+// Analysis Includes
+#include "Passed_Container.h"
+#include "selection_cuts.h"
 #include "../Modules/LinkDef.h"
+#include "../../Modules/TpcObjectContainer.h"
+#include "../../Modules/ParticleContainer.h"
+
 
 namespace utilityNS {
 

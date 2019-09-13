@@ -1,21 +1,14 @@
 #ifndef SELECTION_h
 #define SELECTION_h
 
-// STD includes
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <cstring>
-
-
 #include "utility.h"
-#include "TFile.h"
-#include "TTree.h"
-#include "TString.h"
-#include "../../Modules/LinkDef.h"
-#include "../../Modules/TpcObjectContainer.h"
-#include "../../Modules/ParticleContainer.h"
+
+/* 
+Class is the main controller of the selection. Main.cxx will invoke the intilalisation
+of this class. After the initialisation, the make_selection() function will be
+run.
+
+*/
 
 namespace xsecSelection {
 
@@ -29,6 +22,7 @@ namespace xsecSelection {
             bool bool_use_data{false};
             bool bool_use_dirt{false};
             bool bool_use_variation{false};
+            bool slim{false};               // Flag to decide whether to make, fill and plot histograms
 
             // TFiles
             TFile * f_mc;        // The MC file
@@ -161,25 +155,23 @@ namespace xsecSelection {
 
         public:
             selection() = default;
-
+            // -----------------------------------------------------------------
+            // Allow the utility class to modify the private member data of this class
             friend class utilityNS::utility;
-           
-            // Function to Initialise the selection class
+            // -----------------------------------------------------------------
+            // Function to Initialise the selection class ----------------------
             void Initialise( const char * mc_file,
                              const char * ext_file,
                              const char * data_file,
                              const char * dirt_file,
                              const char * variation_file,
-                             const std::vector<double> _config
-                             );
-            
+                             const std::vector<double> _config,
+                             bool _slim);
+            // -----------------------------------------------------------------
            
-            // Main function for selection
+            // Main function for selection -------------------------------------
             void make_selection();
-
-            
-
-
+            // -----------------------------------------------------------------
 
     }; // END Class
 
