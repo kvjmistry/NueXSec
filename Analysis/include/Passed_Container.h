@@ -20,9 +20,9 @@ class Passed_Container {
         };
         
         enum cuts{
+            k_flash_pe_intime,                 // Flash PE and In time flash
+            k_has_nue,                         // Pandora Nue 
             k_in_fv,                           // Fiducial volume
-            k_flash_pe,                        // Flash PE
-            k_flash_intime,                    // In time flash
             k_vtx_to_flash,                    // Vertex to flash
             k_shwr_nue_dist,                   // Distance between pfp shower and nue object
             k_trk_nue_dist,                    // Distance between pfp track and nue object

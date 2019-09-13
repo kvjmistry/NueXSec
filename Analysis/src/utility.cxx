@@ -106,9 +106,8 @@ namespace utilityNS {
         return true;
     }
     // -------------------------------------------------------------------------
-    std::vector<std::vector<double>> utility::GetLargestFlashVector(TTree* optical_tree, double flash_time_start, double flash_time_end, int flash_pe_threshold){
-
-    std::vector<std::vector<double>> largest_flash_v_v;
+    void utility::GetLargestFlashVector(TTree* optical_tree, double flash_time_start, double flash_time_end, int flash_pe_threshold, 
+        std::vector<std::vector<double>> &largest_flash_v_v, std::vector<std::vector<int>> &optical_list_pe_v, std::vector<std::vector<double>> &optical_list_flash_time_v){
 
     // ----------------------
     //    Optical Info
@@ -142,7 +141,6 @@ namespace utilityNS {
 
     // Contains the entry number for a given OpFlash per event
     std::vector<int>					optical_list_pe;
-    std::vector<std::vector<int> >		optical_list_pe_v;
     
     std::vector<double>					optical_list_flash_center_y; 
     std::vector<std::vector<double> >	optical_list_flash_center_y_v;
@@ -151,7 +149,6 @@ namespace utilityNS {
     std::vector<std::vector<double> >	optical_list_flash_center_z_v;
     
     std::vector<double>					optical_list_flash_time;
-    std::vector<std::vector<double> >	optical_list_flash_time_v;
     
     // Loop over the optical entries to get the largest flash vector
     
@@ -241,7 +238,7 @@ namespace utilityNS {
             // See if flash meets the threshold requirements
             sufficient_flash = (opt_pe >= flash_pe_threshold) ? true : false;
             
-            //Flash is both in time and over PE threshold
+            // Flash is both in time and over PE threshold
             if(in_time == true && sufficient_flash == true) {
                 
                 // Find the largest flash in this event
@@ -263,7 +260,7 @@ namespace utilityNS {
         
     }
 
-    return largest_flash_v_v;
+    return;
     }
     // -------------------------------------------------------------------------
 } // End namespace utlity

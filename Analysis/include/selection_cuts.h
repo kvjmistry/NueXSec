@@ -50,15 +50,16 @@ class selection_cuts{
     // ------------------- Selection Cuts Functions ----------------------------
     // *************************************************************************
     // Flash is in time and flash PE 
-    void FlashinTime_FlashPE(TFile* f, double flash_start_time, double flash_end_time, std::vector<bool> &flash_cuts_pass_vec, TString mode );
+    bool FlashinTime_FlashPE(double flash_time_start, double flash_time_end, double flash_pe_threshold, std::vector<double> opt_time_v, std::vector<int> opt_pe_v);
     // -------------------------------------------------------------------------
     // Pandora Reco Nue
-    bool HasNue(xsecAna::TPCObjectContainer tpc_obj, const int n_pfp );
+    bool HasNue(xsecAna::TPCObjectContainer tpc_obj);
     // -------------------------------------------------------------------------
     // In FV
     bool in_fv(double x, double y, double z, std::vector<double> fv_boundary_v);
     // -------------------------------------------------------------------------
     // Flash to vtx distance
+    bool opt_vtx_distance(double tpc_vtx_y, double tpc_vtx_z, double flash_vtx_y, double flash_vtx_z, double tolerance);
     bool flashRecoVtxDist(std::vector< double > largest_flash_v, double tolerance, const double tpc_vtx_x, const double tpc_vtx_y, const double tpc_vtx_z);
     // -------------------------------------------------------------------------
     // Vertex to nu distance cut

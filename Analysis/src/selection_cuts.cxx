@@ -121,6 +121,60 @@ std::pair<std::string, int> selection_cuts::TPCO_Classifier(xsecAna::TPCObjectCo
 // *****************************************************************************
 // ----------------------- Selection Cuts Functions ----------------------------
 // *****************************************************************************
+
+// -----------------------------------------------------------------------------
+bool selection_cuts::FlashinTime_FlashPE(double flash_time_start, double flash_time_end, double flash_pe_threshold, std::vector<double> opt_time_v, std::vector<int> opt_pe_v){
+
+    bool in_time          = false;
+    bool sufficient_flash = false;
+    
+    // Loop over the optical list vec
+    for (unsigned int j = 0; j < opt_pe_v.size(); j++) {
+        
+        auto opt_time = opt_time_v.at(j) + 1.0;
+        auto opt_pe   = opt_pe_v.at(j);
+        
+        // See if flash was in time
+        in_time = (opt_time >= flash_time_start && opt_time <= flash_time_end) ? true : false;
+        
+        // See if flash meets the threshold requirements
+        sufficient_flash = (opt_pe >= flash_pe_threshold) ? true : false;
+        
+        // Flash is both in time and over PE threshold
+        if(in_time == true && sufficient_flash == true){
+            return true;
+            break; // once pased we are done, so dont loop any more otherwise we may overwrite this
+
+        }
+    }
+
+    return false;
+    
+}
+// -----------------------------------------------------------------------------
+bool selection_cuts::HasNue(xsecAna::TPCObjectContainer tpc_obj) {
+
+    bool has_nue = false;
+    bool has_valid_shower = false;
+
+    // Loop over the PFP
+    for (int j = 0; j < n_pfp; j++) {
+        auto const part     = tpc_obj.GetParticle(j);
+        const int  pfp_pdg  = part.PFParticlePdgCode();
+        const int  pfp_hits = part.NumPFPHits();
+        
+        if(pfp_pdg == 11 && pfp_hits > 0) has_valid_shower = true; 
+        
+        if(pfp_pdg == 12) has_nue = true; 
+    }
+
+    if(has_nue == true && has_valid_shower == true)
+        return true; 
+    else 
+        return false;
+    
+}
+// -----------------------------------------------------------------------------
 bool selection_cuts::in_fv(double x, double y, double z, std::vector<double> fv_boundary_v){
 
     const double det_x1 = 0;
@@ -143,10 +197,61 @@ bool selection_cuts::in_fv(double x, double y, double z, std::vector<double> fv_
     return true;
 }
 // -----------------------------------------------------------------------------
+// Flash reco Vertex Distance 
+bool selection_cuts::opt_vtx_distance(double tpc_vtx_y, double tpc_vtx_z, double flash_vtx_y, double flash_vtx_z, double tolerance) {
+    const double distance = sqrt(pow((tpc_vtx_y - flash_vtx_y), 2) + pow((tpc_vtx_z - flash_vtx_z), 2) );
+    
+    if(distance <= tolerance) return true;
+    return false;
+}
 // -----------------------------------------------------------------------------
+bool selection_cuts::flashRecoVtxDist(std::vector< double > largest_flash_v, double tolerance, const double tpc_vtx_x, const double tpc_vtx_y, const double tpc_vtx_z){
+    bool is_close;
+    
+    // Flash is upstream
+    if(tpc_vtx_z < largest_flash_v.at(1)) 
+        is_close = opt_vtx_distance(tpc_vtx_y, tpc_vtx_z, largest_flash_v.at(0), largest_flash_v.at(1), tolerance);
+    
+    // Flash is downstream
+    if(tpc_vtx_z >= largest_flash_v.at(1)) 
+        is_close = opt_vtx_distance(tpc_vtx_y, tpc_vtx_z, largest_flash_v.at(0), largest_flash_v.at(1), (tolerance - 20));
+    
+    if (is_close == true )
+        return true;
+    else
+        return false;
+}
 // -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
+bool selection_cuts::VtxNuDistance(xsecAna::TPCObjectContainer tpc_obj,int pfp_pdg_type , double tolerance){
+    
+    const int n_pfp = tpc_obj.NumPFParticles();
+    const double tpc_vtx_x = tpc_obj.pfpVtxX();
+    const double tpc_vtx_y = tpc_obj.pfpVtxY();
+    const double tpc_vtx_z = tpc_obj.pfpVtxZ();
+
+    const int n_tracks = tpc_obj.NPfpTracks();
+    if (n_tracks == 0 && pfp_pdg_type == 13 ) return true; 
+
+    for (int j = 0; j < n_pfp; j++) {
+
+        auto const part   = tpc_obj.GetParticle(j);
+        const int pfp_pdg = part.PFParticlePdgCode();
+
+        if (pfp_pdg == pfp_pdg_type) {
+
+            const double pfp_vtx_x = part.pfpVtxX();
+            const double pfp_vtx_y = part.pfpVtxY();
+            const double pfp_vtx_z = part.pfpVtxZ();
+
+            const double distance = sqrt(pow((tpc_vtx_x - pfp_vtx_x), 2) + pow((tpc_vtx_y - pfp_vtx_y), 2) + pow((tpc_vtx_z - pfp_vtx_z), 2) );
+
+            if (distance <= tolerance) return true; 
+        }
+
+    }
+    return false;
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

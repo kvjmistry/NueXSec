@@ -69,7 +69,8 @@ namespace utilityNS {
         bool in_fv(double x, double y, double z, std::vector<double> fv_boundary_v);
         // ---------------------------------------------------------------------
         // Get the largest flash vector from the optical tree
-        std::vector<std::vector<double>> GetLargestFlashVector(TTree* optical_tree, double flash_time_start, double flash_time_end, int flash_pe_threshold);
+        void GetLargestFlashVector(TTree* optical_tree, double flash_time_start, double flash_time_end, int flash_pe_threshold, 
+                                   std::vector<std::vector<double>> &largest_flash_v_v, std::vector<std::vector<int>> &optical_list_pe_v, std::vector<std::vector<double>> &optical_list_flash_time_v);
         // ---------------------------------------------------------------------
 
 

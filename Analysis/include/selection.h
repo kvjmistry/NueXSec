@@ -79,6 +79,24 @@ namespace xsecSelection {
             bool   detector_variations;
             std::vector<double> fv_boundary_v;
 
+            // Enumeration of cut variables
+            enum cuts{
+            k_flash_pe_intime,                 // Flash PE and In time flash
+            k_has_nue,                         // Pandora Nue 
+            k_in_fv,                           // Fiducial volume
+            k_vtx_to_flash,                    // Vertex to flash
+            k_shwr_nue_dist,                   // Distance between pfp shower and nue object
+            k_trk_nue_dist,                    // Distance between pfp track and nue object
+            k_shwr_hit_threshold,              // Hit threshold for at least one shower
+            k_shwr_hit_threshold_collection,   // Hit threshold for at least one shower on collection plane
+            k_shwr_open_angle,                 // Tolerance for leading shower open angle
+            k_shwr_dedx,                       // Tolerance for dedx of leading shower
+            k_dist_nue_vtx,                    // Tolerance for distance from the reco nue vtx for TPCO w/ >3 showers
+            k_pfp_hits_length,                 // Tolerance for hits/length
+            k_longest_trk_leading_shwr_length, // Tolerance for longest track length / leading shower length
+            k_cuts_MAX
+            };
+
             // TPC Object Containers
             std::vector<xsecAna::TPCObjectContainer> * tpc_object_container_v       = nullptr;  // MC
             std::vector<xsecAna::TPCObjectContainer> * data_tpc_object_container_v  = nullptr;  // Data
@@ -90,6 +108,16 @@ namespace xsecSelection {
             std::vector<std::vector<double>> data_largest_flash_v_v;  // Data container for largest flashes
             std::vector<std::vector<double>> ext_largest_flash_v_v;   // EXT container for largest flashes
             std::vector<std::vector<double>> dirt_largest_flash_v_v;  // Dirt container for largest flashes
+
+            std::vector<std::vector<int>> mc_optical_list_pe_v;       // MC container for optical flash PE
+            std::vector<std::vector<int>> data_optical_list_pe_v;     // Data container for optical flash PE
+            std::vector<std::vector<int>> ext_optical_list_pe_v;      // EXT container for optical flash PE
+            std::vector<std::vector<int>> dirt_optical_list_pe_v;     // Dirt container for optical flash PE
+
+            std::vector<std::vector<double>> mc_optical_list_flash_time_v;   // MC container for optical flash time
+            std::vector<std::vector<double>> data_optical_list_flash_time_v; // Data container for optical flash time
+            std::vector<std::vector<double>> ext_optical_list_flash_time_v;  // EXT container for optical flash time
+            std::vector<std::vector<double>> dirt_optical_list_flash_time_v; // Dirt container for optical flash time
 
             // Counter variables
            int tree_total_entries;      // MC

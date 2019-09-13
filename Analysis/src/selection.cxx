@@ -137,7 +137,7 @@ void selection::Initialise( const char * mc_file,
         for (int i = 0; i < total_mc_entries; i++) {
             mctruth_counter_tree->GetEntry(i);
             
-            const bool true_in_tpc = _utility_instance.in_fv(mc_nu_vtx_x, mc_nu_vtx_y, mc_nu_vtx_z, fv_boundary_v);
+            bool true_in_tpc = _utility_instance.in_fv(mc_nu_vtx_x, mc_nu_vtx_y, mc_nu_vtx_z, fv_boundary_v);
             true_in_tpc_v.at(i) = true_in_tpc;
             
             // Total Nue in Cryostat
@@ -178,8 +178,8 @@ void selection::Initialise( const char * mc_file,
         std::cout << "MC Numu NC Counter Bar --- " << _mc_numu_nc_counter_bar << std::endl;
         std::cout << "-------------------------------" << std::endl;
     
-        // Get the largest flash vector
-        mc_largest_flash_v_v =  _utility_instance.GetLargestFlashVector(optree, flash_time_start, flash_time_end,flash_pe_threshold);
+        // Get the largest flash vector and optical lists for PE and flash time
+        _utility_instance.GetLargestFlashVector(optree, flash_time_start, flash_time_end, flash_pe_threshold, mc_largest_flash_v_v, mc_optical_list_pe_v, mc_optical_list_flash_time_v);
         
         // Get the total number of events in TPC Obj Tree
         tree_total_entries = mytree->GetEntries();
@@ -199,8 +199,8 @@ void selection::Initialise( const char * mc_file,
         // Data TPC Object Container
         data_tree->SetBranchAddress("TpcObjectContainerV", &data_tpc_object_container_v);
  
-        // Get the largest flash vector
-        data_largest_flash_v_v =  _utility_instance.GetLargestFlashVector(data_optree, flash_time_start, flash_time_end,flash_pe_threshold);
+        // Get the largest flash vector and optical lists for PE and flash time
+         _utility_instance.GetLargestFlashVector(data_optree, flash_time_start, flash_time_end,flash_pe_threshold, data_largest_flash_v_v, data_optical_list_pe_v, data_optical_list_flash_time_v);
 
         // Get the total number of events in TPC Obj Tree
         data_tree_total_entries = data_tree->GetEntries();
@@ -221,8 +221,8 @@ void selection::Initialise( const char * mc_file,
         // EXT TPC Object Container
         ext_tree->SetBranchAddress("TpcObjectContainerV", &ext_tpc_object_container_v);
  
-        // Get the largest flash vector
-        ext_largest_flash_v_v =  _utility_instance.GetLargestFlashVector(ext_optree, flash_time_start, flash_time_end,flash_pe_threshold);
+        // Get the largest flash vector and optical lists for PE and flash time
+        _utility_instance.GetLargestFlashVector(ext_optree, flash_time_start, flash_time_end, flash_pe_threshold, ext_largest_flash_v_v, ext_optical_list_pe_v, ext_optical_list_flash_time_v);
 
         // Get the total number of events in TPC Obj Tree
         ext_tree_total_entries = ext_tree->GetEntries();
@@ -243,8 +243,8 @@ void selection::Initialise( const char * mc_file,
         // Dirt TPC Object Container
         dirt_tree->SetBranchAddress("TpcObjectContainerV", &dirt_tpc_object_container_v);
  
-        // Get the largest flash vector
-        dirt_largest_flash_v_v =  _utility_instance.GetLargestFlashVector(dirt_optree, flash_time_start, flash_time_end,flash_pe_threshold);
+        // Get the largest flash vector and optical lists for PE and flash time
+        _utility_instance.GetLargestFlashVector(dirt_optree, flash_time_start, flash_time_end, flash_pe_threshold, dirt_largest_flash_v_v, dirt_optical_list_pe_v, dirt_optical_list_flash_time_v);
 
         // Get the total number of events in TPC Obj Tree
         dirt_tree_total_entries = dirt_tree->GetEntries();
@@ -300,7 +300,28 @@ void selection::make_selection(){
                 // Initalise cut instance with tpc object specifics such as num pfp
                 selection_cuts_instance.SetTPCObjVariables(tpc_obj, mc_nu_vtx_x, mc_nu_vtx_y, mc_nu_vtx_z, fv_boundary_v, has_pi0);
 
-                // Here we apply the selection cuts
+                // Here we apply the selection cuts ----------------------------
+                
+                // Flash is in time and has more than the required PE ----------
+                passed_v.at(event).cut_v.at(k_flash_pe_intime) = selection_cuts_instance.FlashinTime_FlashPE(flash_time_start, flash_time_end, flash_pe_threshold, mc_optical_list_flash_time_v.at(event), mc_optical_list_pe_v.at(event));
+                
+                // Has a valid Nue ---------------------------------------------
+                passed_v.at(event).cut_v.at(k_has_nue) = selection_cuts_instance.HasNue(tpc_obj);
+
+                // Is in the FV ------------------------------------------------
+                passed_v.at(event).cut_v.at(k_in_fv) = selection_cuts_instance.in_fv(tpc_obj.pfpVtxX(), tpc_obj.pfpVtxY(), tpc_obj.pfpVtxZ(), fv_boundary_v);
+
+                // Apply flash vtx cut -----------------------------------------
+                passed_v.at(event).cut_v.at(k_vtx_to_flash) = selection_cuts_instance.flashRecoVtxDist(mc_largest_flash_v_v.at(event), tolerance, tpc_obj.pfpVtxX(), tpc_obj.pfpVtxY(), tpc_obj.pfpVtxZ());
+
+                // Apply vtx nu distance cut -----------------------------------
+                passed_v.at(event).cut_v.at(k_shwr_nue_dist) = selection_cuts_instance.VtxNuDistance( tpc_obj, 11, shwr_nue_tolerance);
+
+                // Apply track vtx nu distance cut -----------------------------
+                passed_v.at(event).cut_v.at(k_trk_nue_dist) = selection_cuts_instance.VtxNuDistance( tpc_obj, 13, trk_nue_tolerance);
+
+                // Apply Hit threshold cut -------------------------------------
+
             
             } // End loop over the TPC Objects
         

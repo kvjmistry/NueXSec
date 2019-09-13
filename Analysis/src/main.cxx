@@ -144,5 +144,6 @@ int main(int argc, char *argv[]){
     // -------------------------------------------------------------------------
     // Finished!
     std::cout << "\033[0;32m*** \t Exiting C++ Code... \t *** \033[0m" << std::endl;
+    std::cout << "\033[0;31m*** \t Warning shift of 1us is still set in flash times \t *** \033[0m" << std::endl;
     return 0;
 }
