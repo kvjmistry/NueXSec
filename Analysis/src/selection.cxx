@@ -298,6 +298,7 @@ void selection::make_selection(){
                 const xsecAna::TPCObjectContainer tpc_obj = tpc_object_container_v->at(i); // Get the TPC Obj
 
                 // Initalise cut instance with tpc object specifics such as num pfp
+                selection_cuts_instance.SetTPCObjVariables(tpc_obj, mc_nu_vtx_x, mc_nu_vtx_y, mc_nu_vtx_z, fv_boundary_v, has_pi0);
 
                 // Here we apply the selection cuts
             

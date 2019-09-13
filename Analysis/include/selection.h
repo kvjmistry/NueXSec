@@ -2,6 +2,8 @@
 #define SELECTION_h
 
 #include "utility.h"
+#include "selection_cuts.h"
+
 
 /* 
 Class is the main controller of the selection. Main.cxx will invoke the intilalisation
@@ -9,6 +11,7 @@ of this class. After the initialisation, the make_selection() function will be
 run.
 
 */
+
 
 namespace xsecSelection {
 
@@ -46,7 +49,7 @@ namespace xsecSelection {
             TTree * dirt_tree;   // Dirt TPC Object Tree
             TTree * dirt_optree; // Dirt Optical Tree
 
-            // Class Instances
+            // // Class Instances
             utilityNS::utility _utility_instance;
 
             // Variables -------------------------------------------------------

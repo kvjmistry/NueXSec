@@ -1,10 +1,7 @@
 #ifndef SELECTION_CUTS_h
 #define SELECTION_CUTS_h
 
-#include "selection.h"
-
-#include "../../Modules/TpcObjectContainer.h"
-#include "../../Modules/ParticleContainer.h"
+#include "utility.h"
 
 // Class for applying the selection cuts. Cut classes will inherit
 // from this one and override function
@@ -26,13 +23,27 @@ class selection_cuts{
 
     // TPC Object Variables
     bool true_in_tpc; // MC Truth -- see if vtx is in tpc
+    std::pair<std::string, int> tpc_classification;  // Classification (classification, leading index)
+
+    double tpc_obj_vtx_x = -999.; // TPC Object Vtx X,Y,Z
+    double tpc_obj_vtx_y = -999.;
+    double tpc_obj_vtx_z = -999.;
+    
+    double n_pfp;                // The number of PFP
+    int    tpc_obj_mode;         // Mode of interaction e.g nue_cc_qe
+    int    leading_shower_index; // Index of the leading shower
 
     // -------------------------------------------------------------------------
     // Initialise the flash variables for this event 
     void SetFlashVariables(std::vector<double> largest_flash_v);
     // -------------------------------------------------------------------------
     // Initialise the TPC object variabeles
-    void SetTPCObjVariables(xsecAna::TPCObjectContainer tpc_obj);
+    void SetTPCObjVariables(xsecAna::TPCObjectContainer tpc_obj, 
+                            double mc_nu_vtx_x, double mc_nu_vtx_y, double mc_nu_vtx_z,
+                            std::vector<double> fv_boundary_v, bool has_pi0);
+    // -------------------------------------------------------------------------
+    // Helper function to classify the event category
+    std::pair<std::string, int> TPCO_Classifier(xsecAna::TPCObjectContainer tpc_obj, bool true_in_tpc, bool has_pi0);
     // -------------------------------------------------------------------------
 
     // *************************************************************************
