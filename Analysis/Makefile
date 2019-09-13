@@ -1,5 +1,6 @@
 # Directory for TPC Object Libraries
 LIBDIR = ../lib
+MODULESDIR = ../Modules
 
 # Compilation Flags
 CXX = g++
@@ -10,7 +11,7 @@ CXXFLAGS=$(shell root-config --cflags)
 LIBS=$(shell root-config --libs) -L$(LIBDIR) -lNueXSec
 
 # Debug Flags
-DEBUGFLAGS= -O0 -g -D _DEBUG 
+DEBUGFLAGS= -O0 -g -D _DEBUG
 
 # Output name of the executable
 MAIN = nuexsec
@@ -29,7 +30,7 @@ $(MAIN): $(OBJ_FILES)
 	@echo
 
 # Build the Object files
-bin/%.o: src/%.cxx include/%.h
+bin/%.o: src/%.cxx
 	@mkdir -p bin
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) -c $^
 	@mv *.o bin

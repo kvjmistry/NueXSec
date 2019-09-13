@@ -3,7 +3,6 @@
 
 #include "selection.h"
 #include "utility.h"
-#include "../../Modules/LinkDef.h"
 
 // STD includes
 #include <iostream>

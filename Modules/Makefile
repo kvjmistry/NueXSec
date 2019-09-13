@@ -16,10 +16,13 @@ TARGETNAME=NueXSec
 
 DICTNAME=$(TARGETNAME)_dict
 DICTOBJECTS=$(DICTNAME).o $(DICTNAME).cxx $(DICTNAME)_rdict.pcm
-TARGETS=lib$(TARGETNAME).so
+TARGETS=lib$(TARGETNAME).so lib$(TARGETNAME)_dict.so
 
 
 all: $(TARGETS)
+
+lib$(TARGETNAME)_dict.so: lib$(TARGETNAME).so
+	$(LD) $(LDFLAGS) $(LIBS) -o $@ $^
 
 lib$(TARGETNAME).so: $(DICTNAME).cxx $(SOURCES) 
 	$(LD) $(LDFLAGS) $(COMPILE_FLAGS) $(LIBS) $(CXXFLAGS) -o $@ $^
@@ -36,4 +39,3 @@ clean:
 
 copy:
 	mv *NueXSec* ../lib/
-	mv *.o ../lib

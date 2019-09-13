@@ -12,12 +12,14 @@
 #include "TTree.h"
 #include "TString.h"
 
+#include "../Modules/LinkDef.h"
+
 namespace utilityNS {
 
     class utility{
 
         public:
-        // -----------------------------------------------------------------------------
+        // ---------------------------------------------------------------------
         // Function to configure the cut values from main.h
         std::vector<double> configure_cuts( double _x1,
                                             double _x2,
@@ -43,13 +45,21 @@ namespace utilityNS {
                                             bool do_variations
                                             );
 
-        // -----------------------------------------------------------------------------
+        // ---------------------------------------------------------------------
         // Get a TFile from a file
         bool GetFile(TFile* &f, TString string);
-        // -----------------------------------------------------------------------------
+        // ---------------------------------------------------------------------
         // Get a TTrees from a file
         void GetTree(TFile* f, TTree* &T, TString string);
-        // -----------------------------------------------------------------------------
+        // ---------------------------------------------------------------------
+        // Checks in FV, makes no cut, but returns a bool
+        bool in_fv(double x, double y, double z, std::vector<double> fv_boundary_v);
+        // ---------------------------------------------------------------------
+        // Get the largest flash vector from the optical tree
+        std::vector<std::vector<double>> GetLargestFlashVector(TTree* optical_tree, double flash_time_start, double flash_time_end, int flash_pe_threshold);
+        // ---------------------------------------------------------------------
+
+
     }; // End Class Utility
 } // End namespace
 
