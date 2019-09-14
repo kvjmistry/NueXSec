@@ -8,6 +8,8 @@
 Class to hold information to whether a specific cut has passed the selection
 Main purpose is to be a container.
 
+Will also hold counters
+
 Default is to set true and change to false when cut fails
 
 */
@@ -16,7 +18,8 @@ Default is to set true and change to false when cut fails
 class Passed_Container {
     public:
         Passed_Container(){
-            cut_v.resize(k_cuts_MAX, true);
+            cut_v.resize(k_cuts_MAX, false);
+            
         };
         
         enum cuts{
@@ -38,7 +41,7 @@ class Passed_Container {
         };
 
         std::vector<bool> cut_v;
-
+        
 };
 
 #endif

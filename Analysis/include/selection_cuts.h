@@ -45,6 +45,9 @@ class selection_cuts{
     // Helper function to classify the event category
     std::pair<std::string, int> TPCO_Classifier(xsecAna::TPCObjectContainer tpc_obj, bool true_in_tpc, bool has_pi0);
     // -------------------------------------------------------------------------
+    // Helper function to total up the passed neutrinos and their classifcations
+    void TabulateOrigins(std::vector<double> &tabulated_origins);
+    // -------------------------------------------------------------------------
 
     // *************************************************************************
     // ------------------- Selection Cuts Functions ----------------------------

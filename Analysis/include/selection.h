@@ -120,6 +120,12 @@ namespace xsecSelection {
             std::vector<std::vector<double>> ext_optical_list_flash_time_v;  // EXT container for optical flash time
             std::vector<std::vector<double>> dirt_optical_list_flash_time_v; // Dirt container for optical flash time
 
+            // Passed Containers
+            std::vector<Passed_Container> mc_passed_v; // MC Passed Container
+            
+            // Counter Containers
+            std::vector<std::vector<double>> mc_counter_v;
+
             // Counter variables
            int tree_total_entries;      // MC
            int data_tree_total_entries; // Data

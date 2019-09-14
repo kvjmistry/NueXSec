@@ -15,7 +15,7 @@ void selection_cuts::SetTPCObjVariables(xsecAna::TPCObjectContainer tpc_obj,
     true_in_tpc = in_fv(mc_nu_vtx_x, mc_nu_vtx_y, mc_nu_vtx_z, fv_boundary_v);
 
     // Classify the event  
-    std::pair<std::string, int> tpc_classification = TPCO_Classifier(tpc_obj, true_in_tpc, has_pi0);
+    tpc_classification = TPCO_Classifier(tpc_obj, true_in_tpc, has_pi0);
 
     // TPC Obj vars
     tpc_obj_vtx_x        = tpc_obj.pfpVtxX();
@@ -498,4 +498,112 @@ bool selection_cuts::ContainedTracksCut(std::vector<double> fv_boundary_v, xsecA
     return true;	
 }
 // -----------------------------------------------------------------------------
+void selection_cuts::TabulateOrigins(std::vector<double> &tabulated_origins) {
+    
+    int nue_cc        = 0;
+    int nue_cc_qe     = 0;
+    int nue_cc_res    = 0;
+    int nue_cc_dis    = 0;
+    int nue_cc_coh    = 0;
+    int nue_cc_mec    = 0;
+
+    int nue_bar_cc_qe     = 0;
+    int nue_bar_cc_res    = 0;
+    int nue_bar_cc_dis    = 0;
+    int nue_bar_cc_coh    = 0;
+    int nue_bar_cc_mec    = 0;
+
+    int total_nue_cc_qe     = 0;
+    int total_nue_cc_res    = 0;
+    int total_nue_cc_dis    = 0;
+    int total_nue_cc_coh    = 0;
+    int total_nue_cc_mec    = 0;
+
+    int nue_cc_mixed  = 0;
+    int nue_cc_out_fv = 0;
+    int cosmic        = 0;
+    int nc            = 0;
+    int numu_cc       = 0;
+    int numu_cc_qe    = 0;
+    int numu_cc_res   = 0;
+    int numu_cc_dis   = 0;
+    int numu_cc_coh   = 0;
+    int numu_cc_mec   = 0;
+    int numu_cc_mixed = 0;
+    int nc_pi0        = 0;
+    int unmatched     = 0;
+    int other_mixed   = 0;
+    int total         = 0;
+    int signal_tpco_num = -1;
+    int only_nue_cc = 0;
+    int only_nue_bar_cc = 0;
+
+
+    std::string tpco_id = tpc_classification.first;
+
+    if(tpco_id == "nue_cc_qe")       {nue_cc_qe++;  }
+    if(tpco_id == "nue_cc_res")      {nue_cc_res++; }
+    if(tpco_id == "nue_cc_coh")      {nue_cc_coh++; }
+    if(tpco_id == "nue_cc_dis")      {nue_cc_dis++; }
+    if(tpco_id == "nue_cc_mec")      {nue_cc_mec++; }
+
+    if(tpco_id == "nue_bar_cc_qe")   {nue_bar_cc_qe++;  }
+    if(tpco_id == "nue_bar_cc_res")  {nue_bar_cc_res++; }
+    if(tpco_id == "nue_bar_cc_coh")  {nue_bar_cc_coh++; }
+    if(tpco_id == "nue_bar_cc_dis")  {nue_bar_cc_dis++; }
+    if(tpco_id == "nue_bar_cc_mec")  {nue_bar_cc_mec++; }
+
+    if(tpco_id == "nue_cc_out_fv")   {nue_cc_out_fv++; }
+    if(tpco_id == "nue_cc_mixed")    {nue_cc_mixed++; }
+    if(tpco_id == "nc")              {nc++; }
+    if(tpco_id == "numu_cc_qe")      {numu_cc_qe++; }
+    if(tpco_id == "numu_cc_res")     {numu_cc_res++; }
+    if(tpco_id == "numu_cc_coh")     {numu_cc_coh++; }
+    if(tpco_id == "numu_cc_dis")     {numu_cc_dis++; }
+    if(tpco_id == "numu_cc_mec")     {numu_cc_mec++; }
+    if(tpco_id == "numu_cc_mixed")   {numu_cc_mixed++; }
+    if(tpco_id == "nc_pi0")          {nc_pi0++; }
+    if(tpco_id == "cosmic")          {cosmic++; }
+    if(tpco_id == "other_mixed")     {other_mixed++; }
+    if(tpco_id == "unmatched")       {unmatched++; }
+
+    only_nue_cc = nue_cc_qe + nue_cc_res + nue_cc_dis + nue_cc_coh + nue_cc_mec;
+    only_nue_bar_cc = nue_bar_cc_qe + nue_bar_cc_res + nue_bar_cc_dis + nue_bar_cc_coh + nue_bar_cc_mec;
+
+    total_nue_cc_qe  = nue_cc_qe  + nue_bar_cc_qe;
+    total_nue_cc_res = nue_cc_res + nue_bar_cc_res;
+    total_nue_cc_dis = nue_cc_dis + nue_bar_cc_dis;
+    total_nue_cc_coh = nue_cc_coh + nue_bar_cc_coh;
+    total_nue_cc_mec = nue_cc_mec + nue_bar_cc_mec;
+
+
+    nue_cc = only_nue_cc + only_nue_bar_cc;
+    numu_cc = numu_cc_qe + numu_cc_res + numu_cc_dis + numu_cc_coh + numu_cc_mec;
+    total = nue_cc + nue_cc_mixed + nue_cc_out_fv + cosmic + nc + numu_cc + numu_cc_mixed + nc_pi0 + unmatched + other_mixed;
+
+    tabulated_origins.at(0)  += nue_cc;//this is nue_cc + nue_bar_cc
+    tabulated_origins.at(1)  += nue_cc_mixed;
+    tabulated_origins.at(2)  += cosmic;
+    tabulated_origins.at(3)  += nc;
+    tabulated_origins.at(4)  += numu_cc;
+    tabulated_origins.at(5)  += unmatched;
+    tabulated_origins.at(6)  += other_mixed;
+    tabulated_origins.at(7)  += total;
+    tabulated_origins.at(8)  += signal_tpco_num;
+    tabulated_origins.at(9)  += nue_cc_out_fv;
+    tabulated_origins.at(10) += nc_pi0;
+    tabulated_origins.at(11) += numu_cc_mixed;
+    tabulated_origins.at(12) += total_nue_cc_qe;
+    tabulated_origins.at(13) += total_nue_cc_res;
+    tabulated_origins.at(14) += total_nue_cc_dis;
+    tabulated_origins.at(15) += total_nue_cc_coh;
+    tabulated_origins.at(16) += total_nue_cc_mec;
+    tabulated_origins.at(17) += numu_cc_qe;
+    tabulated_origins.at(18) += numu_cc_res;
+    tabulated_origins.at(19) += numu_cc_dis;
+    tabulated_origins.at(20) += numu_cc_coh;
+    tabulated_origins.at(21) += numu_cc_mec;
+    tabulated_origins.at(22) += only_nue_cc;
+    tabulated_origins.at(23) += only_nue_bar_cc;
+}
 // -----------------------------------------------------------------------------
