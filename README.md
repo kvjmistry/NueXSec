@@ -37,29 +37,22 @@ While I've tried to control for input handling `main.exe` expects any of the dat
 The selection is able to run without any of the listed files, however will *not* work as intended with (for example) only EXT and Data or MC and Data. But MC and EXT only works as intended.
 
 ```
-./main.exe path_to_mc_file path_to_ext_file path_to_on_beam_data_file
+./nuexsec --mc path_to_mc_file --ext path_to_ext_file -- data path_to_on_beam_data_file
 ```
 
+Full options are available by doing `./nuexsec --h`
+
 Additional functionality includes providing the path to a custom configuration text file using `-c config.txt` (see utility.h for the formatting of the `configure` function used to set the cut values). If this is not set, the code will use a set of default parameters in `main.h`.
+
 Also, the default running condition is to use the full selection and produce many many plots - use `--slim` to run more quickly and simply see the cut's performances.
 
 
-##Further Notes
+## Further Notes
 
 If you find that you'd like to include all of the MC Truth information, then be sure to set the fcl parameter. There are a very large number of MCParticles and this inflates the size of the output file, as such they're only saved when requested. This should keep the size of the output file more managable and improve speed of the analysis scritps.
 
-**Important**: If your analysis scripts are unable to find the library files read on: as we are using a set of custom data products in the ROOT output file, we need to tell ROOT how to read these. If you try to run the scripts before doing this step, you will likely be told to generate a dictionary file or two. To avoid this problem first you'll want to make sure you `make clean` and then `make` in the `xsecAna` directory. This make file will compile the `TPCObjectContainer` and `ParticleContainer` classes and construct a number of libraries. Simply make sure these are copied over to the `scripts` directory if you are unable to direct ROOT to the `xsecAna` directory (due to SIP for example).
 
-Setting your $LD_LIBRARY_PATH may also solve this problem.
-```bash
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/library/
-export LD_LIBRARY_PATH
-```
-
-This means, however, whenever you change the `TPCObjectContainer` or `ParticleContainer` classes you need to make sure you recompile and ensure the new libraries are visible to your script.
-This includes the python scripts, as they directly call the c++ modules.
-
-###Calculating the Cross Section
+## Calculating the Cross Section
 
 The cross section is calculated at the end of the scripts/selection.cxx code. Using whatever the final results of the selection are, the values are plugged into the standard formula to caculate the cross section. This is mostly striaght-forward, however calculating the flux can be tricky.
 
