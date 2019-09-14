@@ -25,17 +25,26 @@ The `Modules` directory contains the modules which are used in LArsoft. In this 
 
 If anyone intends to apply these two container classes outside of this module's framework, then simply be aware of the following: as there have been two custom data products that have been made and we need to make sure that the proper library information is generated. This means looking at the Linkdef.h, classes_def.h, and classes.h files.
 
-## Analysis and Test Scripts
-Currently works for MCC8 era, this will be updated in the future for MCC9!
+If you find that you'd like to include all of the MC Truth information, then be sure to set the `SaveTruthInfo` fcl parameter to `true`. There are a very large number of MCParticles and this inflates the size of the output file, as such they're only saved when requested. This should keep the size of the output file more managable and improve speed of the analysis scritps.
 
-Be sure to read the comments in the relevant files you're using!
+## Analysis and Test Scripts
+There are two directories for the Analysis part of the selection, `scripts` and `Analysis`. The `scripts` directory contains the old MCC8 selection code. The Analysis area is a place where I am updating/developing the selection.
+
+Be sure to read the comments in the relevant files you're using, the header files contain information what each class and function is doing!
+
+
+MCC8 (this will soon be depriciated):  
 
 The scripts directory is where I have some test and analysis scripts. `out_inspect.cxx` is a simple ROOT script, which will print out the information contained in your generated file. Here you can check to make sure the modules are doing what you wish.
+
 As for performing the $\nu_{e}$ selection, you can run one of the `selection` scripts. The `selection_slim` script is simplest and a good place to understand the individual cuts implemented. Other versions of the `selection` scripts involve a good deal of plotting code. If you want to create ROOT plots based on the cut variables you should run one of these.
 There are more details included in `main.h` which handles all of the various classes.
 While I've tried to control for input handling `main.exe` expects any of the data/mc files to be listed in a particular order: MC, EXT, Data.
+
 The selection is able to run without any of the listed files, however will *not* work as intended with (for example) only EXT and Data or MC and Data. But MC and EXT only works as intended.
 
+
+MCC9:  
 ```
 ./nuexsec --mc path_to_mc_file --ext path_to_ext_file -- data path_to_on_beam_data_file
 ```
@@ -45,11 +54,6 @@ Full options are available by doing `./nuexsec --h`
 Additional functionality includes providing the path to a custom configuration text file using `-c config.txt` (see utility.h for the formatting of the `configure` function used to set the cut values). If this is not set, the code will use a set of default parameters in `main.h`.
 
 Also, the default running condition is to use the full selection and produce many many plots - use `--slim` to run more quickly and simply see the cut's performances.
-
-
-## Further Notes
-
-If you find that you'd like to include all of the MC Truth information, then be sure to set the fcl parameter. There are a very large number of MCParticles and this inflates the size of the output file, as such they're only saved when requested. This should keep the size of the output file more managable and improve speed of the analysis scritps.
 
 
 ## Calculating the Cross Section
