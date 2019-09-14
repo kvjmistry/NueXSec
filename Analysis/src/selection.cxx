@@ -283,7 +283,7 @@ void selection::make_selection(){
         // Loop over the Events
         for (int event = 0; event < tree_total_entries; event++){
             // Alert the user
-    	    if (event % 100000 == 0) std::cout << "On entry " << event/100000.0 <<"00k" << std::endl;
+    	    if (event % 100000 == 0) std::cout << "On entry " << event/100000.0 <<"00k " << std::flush;
         
             // Get the entry in the tree
             mytree->GetEntry(event);               // TPC Objects
@@ -308,109 +308,126 @@ void selection::make_selection(){
                 selection_cuts_instance.SetTPCObjVariables(tpc_obj, mc_nu_vtx_x, mc_nu_vtx_y, mc_nu_vtx_z, fv_boundary_v, has_pi0);
 
                 // Here we apply the selection cuts ----------------------------
-                bool pass;
+                bool pass; // A flag to see if an event passes an event
 
                 // Flash is in time and has more than the required PE ----------
                 pass = selection_cuts_instance.FlashinTime_FlashPE(flash_time_start, flash_time_end, flash_pe_threshold, mc_optical_list_flash_time_v.at(event), mc_optical_list_pe_v.at(event));
                 mc_passed_v.at(event).cut_v.at(k_flash_pe_intime) = pass;
-                selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_flash_pe_intime));
                 if(!pass) continue; // Failed the cut!
+
+                // Set counters for how many passed the cut
+                selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_flash_pe_intime));
                 
                 // Has a valid Nue ---------------------------------------------
                 pass = selection_cuts_instance.HasNue(tpc_obj);
                 mc_passed_v.at(event).cut_v.at(k_has_nue) = pass;
                 if(!pass) continue; // Failed the cut!
 
+                // Set counters for how many passed the cut
+                selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_has_nue));
+
                 // Is in the FV ------------------------------------------------
                 pass = selection_cuts_instance.in_fv(tpc_obj.pfpVtxX(), tpc_obj.pfpVtxY(), tpc_obj.pfpVtxZ(), fv_boundary_v);
                 mc_passed_v.at(event).cut_v.at(k_in_fv) = pass;
                 if(!pass) continue; // Failed the cut!
+
+                // Set counters for how many passed the cut
+                selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_in_fv));
 
                 // Apply flash vtx cut -----------------------------------------
                 pass = selection_cuts_instance.flashRecoVtxDist(mc_largest_flash_v_v.at(event), tolerance, tpc_obj.pfpVtxX(), tpc_obj.pfpVtxY(), tpc_obj.pfpVtxZ());
                 mc_passed_v.at(event).cut_v.at(k_vtx_to_flash) = pass;
                 if(!pass) continue; // Failed the cut!
 
+                // Set counters for how many passed the cut
+                selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_vtx_to_flash));
+
                 // Apply vtx nu distance cut -----------------------------------
                 pass = selection_cuts_instance.VtxNuDistance( tpc_obj, 11, shwr_nue_tolerance);
                 mc_passed_v.at(event).cut_v.at(k_shwr_nue_dist) = pass;
                 if(!pass) continue; // Failed the cut!
+
+                // Set counters for how many passed the cut
+                selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_shwr_nue_dist));
 
                 // Apply track vtx nu distance cut -----------------------------
                 pass = selection_cuts_instance.VtxNuDistance( tpc_obj, 13, trk_nue_tolerance);
                 mc_passed_v.at(event).cut_v.at(k_trk_nue_dist) = pass;
                 if(!pass) continue; // Failed the cut!
 
+                // Set counters for how many passed the cut
+                selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_trk_nue_dist));
+
                 // Apply Hit threshold cut -------------------------------------
                 pass = selection_cuts_instance.HitThreshold(tpc_obj, shwr_hit_threshold, false);
                 mc_passed_v.at(event).cut_v.at(k_shwr_hit_threshold) = pass;
                 if(!pass) continue; // Failed the cut!
 
+                // Set counters for how many passed the cut
+                selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_shwr_hit_threshold));
+
                 // Apply Hit threshold collection cut --------------------------
                 pass = selection_cuts_instance.HitThreshold(tpc_obj, shwr_hit_threshold_collection, true);
                 mc_passed_v.at(event).cut_v.at(k_shwr_hit_threshold_collection) = pass;
                 if(!pass) continue; // Failed the cut!
+
+                // Set counters for how many passed the cut
+                selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_shwr_hit_threshold_collection));
             
                 // Apply Open Angle cut ----------------------------------------
                 pass = selection_cuts_instance.OpenAngleCut(tpc_obj, tolerance_open_angle_min, tolerance_open_angle_max);
                 mc_passed_v.at(event).cut_v.at(k_shwr_open_angle) = pass;
                 if(!pass) continue; // Failed the cut!
 
+                // Set counters for how many passed the cut
+                selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_shwr_open_angle));
+
                 // Apply dEdx cut ----------------------------------------------
                 pass = selection_cuts_instance.dEdxCut(tpc_obj, tolerance_dedx_min, tolerance_dedx_max);
                 mc_passed_v.at(event).cut_v.at(k_shwr_dedx) = pass;
                 if(!pass) continue; // Failed the cut!
 
+                // Set counters for how many passed the cut
+                selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_shwr_dedx));
+
                 // Apply Secondary shower dist cut -----------------------------
                 pass = selection_cuts_instance.SecondaryShowersDistCut(tpc_obj, dist_tolerance);
                 mc_passed_v.at(event).cut_v.at(k_dist_nue_vtx) = pass;
-                if(!pass) continue; // Failed the cut! 
+                if(!pass) continue; // Failed the cut!
+
+                // Set counters for how many passed the cut
+                selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_dist_nue_vtx)); 
 
                 // Apply hit per lengh ratio cut -------------------------------
                 pass = selection_cuts_instance.HitLengthRatioCut( pfp_hits_length_tolerance, tpc_obj);
                 mc_passed_v.at(event).cut_v.at(k_pfp_hits_length) = pass;
                 if(!pass) continue; // Failed the cut!
 
+                // Set counters for how many passed the cut
+                selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_pfp_hits_length));
+
                 // Apply Longest Track Leading Shower cut ----------------------
                 pass = selection_cuts_instance.LongestTrackLeadingShowerCut(ratio_tolerance, tpc_obj);
                 mc_passed_v.at(event).cut_v.at(k_longest_trk_leading_shwr_length) = pass;
                 if(!pass) continue; // Failed the cut!
+
+                // Set counters for how many passed the cut
+                selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_longest_trk_leading_shwr_length));
 
                 // Apply Contained Track Cut -----------------------------------
                 pass = selection_cuts_instance.ContainedTracksCut(fv_boundary_v, tpc_obj);
                 mc_passed_v.at(event).cut_v.at(k_trk_contained) = pass;
                 if(!pass) continue; // Failed the cut!
 
+                // Set counters for how many passed the cut
+                selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_trk_contained));
+
             } // End loop over the TPC Objects
 
             
         
         } // End loop over the Events
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(0)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(1)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(2)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(3)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(4)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(5)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(6)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(7)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(8)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(9)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(10)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(11)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(12)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(13)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(14)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(15)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(16)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(17)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(18)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(19)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(20)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(21)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(22)  << std::endl;
-        std::cout << mc_counter_v.at(k_flash_pe_intime).at(23)  << std::endl;
-
+        std::cout << std::endl;
         std::cout << "Ending Selection over MC" << std::endl;
     }
     // Data --------------------------------------------------------------------
