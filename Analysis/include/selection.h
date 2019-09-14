@@ -51,6 +51,7 @@ namespace xsecSelection {
 
             // // Class Instances
             utilityNS::utility _utility_instance;
+            selection_cuts mc_selection_cuts_instance;
 
             // Variables -------------------------------------------------------
 
@@ -96,6 +97,24 @@ namespace xsecSelection {
             k_longest_trk_leading_shwr_length, // Tolerance for longest track length / leading shower length
             k_trk_contained,                   // Contained Tracks
             k_cuts_MAX
+            };
+
+            // Vector containing the cut names
+            std::vector<std::string> cut_names = {
+                "Flash PE and In Time",                     // Flash PE and In time flash
+                "Has Pandora Nue",                          // Pandora Nue 
+                "In FV",                                    // Fiducial volume
+                "Vertex to Flash",                          // Vertex to flash
+                "Shower to Nue Dist",                       // Distance between pfp shower and nue object
+                "Trak to Nue Dist",                         // Distance between pfp track and nue object
+                "Shower Hit_Threshold",                     // Hit threshold for at least one shower
+                "Shower Hit Threshold Collection Plane",    // Hit threshold for at least one shower on collection plane
+                "Shower Open Angle",                        // Tolerance for leading shower open angle
+                "Shower dEdx",                              // Tolerance for dedx of leading shower
+                "Dist Nue Vtx Secondary Showers",           // Tolerance for distance from the reco nue vtx for TPCO w/ >3 showers
+                "Hits per Length",                          // Tolerance for hits/length
+                "Longest Track over Leading Shower Length", // Tolerance for longest track length / leading shower length
+                "Track Is Contained"                        // Contained Tracks
             };
 
             // TPC Object Containers

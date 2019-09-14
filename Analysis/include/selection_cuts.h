@@ -48,7 +48,10 @@ class selection_cuts{
     // Helper function to total up the passed neutrinos and their classifcations
     void TabulateOrigins(std::vector<double> &tabulated_origins);
     // -------------------------------------------------------------------------
-
+    // Prints the results of the cuts
+    void PrintInfo(int mc_nue_cc_counter, std::vector<double> counter_v, int counter_intime_cosmics,
+                              double intime_scale_factor, double data_scale_factor,
+                              int counter_dirt, double dirt_scale_factor, std::string cut_name);
     // *************************************************************************
     // ------------------- Selection Cuts Functions ----------------------------
     // *************************************************************************
