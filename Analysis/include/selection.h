@@ -94,6 +94,7 @@ namespace xsecSelection {
             k_dist_nue_vtx,                    // Tolerance for distance from the reco nue vtx for TPCO w/ >3 showers
             k_pfp_hits_length,                 // Tolerance for hits/length
             k_longest_trk_leading_shwr_length, // Tolerance for longest track length / leading shower length
+            k_trk_contained,                   // Contained Tracks
             k_cuts_MAX
             };
 

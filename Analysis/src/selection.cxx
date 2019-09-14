@@ -271,6 +271,7 @@ void selection::make_selection(){
     
     // MC ----------------------------------------------------------------------
     if (bool_use_mc){
+        std::cout << "Starting Selection over MC" << std::endl;
         
         // Loop over the Events
         for (int event = 0; event < tree_total_entries; event++){
@@ -321,11 +322,34 @@ void selection::make_selection(){
                 passed_v.at(event).cut_v.at(k_trk_nue_dist) = selection_cuts_instance.VtxNuDistance( tpc_obj, 13, trk_nue_tolerance);
 
                 // Apply Hit threshold cut -------------------------------------
+                passed_v.at(event).cut_v.at(k_shwr_hit_threshold) = selection_cuts_instance.HitThreshold(tpc_obj, shwr_hit_threshold, false);
 
+                // Apply Hit threshold collection cut --------------------------
+                passed_v.at(event).cut_v.at(k_shwr_hit_threshold_collection) = selection_cuts_instance.HitThreshold(tpc_obj, shwr_hit_threshold_collection, true);
             
+                // Apply Open Angle cut ----------------------------------------
+                passed_v.at(event).cut_v.at(k_shwr_open_angle) = selection_cuts_instance.OpenAngleCut(tpc_obj, tolerance_open_angle_min, tolerance_open_angle_max);
+
+                // Apply dEdx cut ----------------------------------------------
+                passed_v.at(event).cut_v.at(k_shwr_dedx) = selection_cuts_instance.dEdxCut(tpc_obj, tolerance_dedx_min, tolerance_dedx_max);
+
+                // Apply Secondary shower dist cut -----------------------------
+                passed_v.at(event).cut_v.at(k_dist_nue_vtx) = selection_cuts_instance.SecondaryShowersDistCut(tpc_obj, dist_tolerance);
+
+                // Apply hit per lengh ratio cut -------------------------------
+                passed_v.at(event).cut_v.at(k_pfp_hits_length) = selection_cuts_instance.HitLengthRatioCut( pfp_hits_length_tolerance, tpc_obj);
+
+                // Apply Longest Track Leading Shower cut ----------------------
+                passed_v.at(event).cut_v.at(k_longest_trk_leading_shwr_length) = selection_cuts_instance.LongestTrackLeadingShowerCut(ratio_tolerance, tpc_obj);
+
+                // Apply Contained Track Cut -----------------------------------
+                passed_v.at(event).cut_v.at(k_trk_contained) = selection_cuts_instance.ContainedTracksCut(fv_boundary_v, tpc_obj);
+
             } // End loop over the TPC Objects
         
         } // End loop over the Events
+        
+        std::cout << "Ending Selection over MC" << std::endl;
     }
     // Data --------------------------------------------------------------------
     if (bool_use_data){

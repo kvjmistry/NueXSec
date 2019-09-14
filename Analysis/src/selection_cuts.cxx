@@ -253,8 +253,249 @@ bool selection_cuts::VtxNuDistance(xsecAna::TPCObjectContainer tpc_obj,int pfp_p
 
 }
 // -----------------------------------------------------------------------------
+bool selection_cuts::HitThreshold(xsecAna::TPCObjectContainer tpc_obj, double threshold, bool useCollection){
+
+    const int n_pfp = tpc_obj.NumPFParticles();
+
+    for (int j = 0; j < n_pfp; j++) {
+
+        auto const pfp_obj = tpc_obj.GetParticle(j);
+        int  num_pfp_hits  = pfp_obj.NumPFPHits();
+        const int  pfp_pdg = pfp_obj.PFParticlePdgCode();
+
+        if (useCollection) num_pfp_hits = pfp_obj.NumPFPHitsW(); // Collection plane hits
+
+        if (pfp_pdg == 11 && num_pfp_hits >= threshold) return true;
+    }
+    
+    return false;
+    
+}
 // -----------------------------------------------------------------------------
+bool selection_cuts::OpenAngleCut(xsecAna::TPCObjectContainer tpc_obj, double tolerance_open_angle_min, double tolerance_open_angle_max){
+
+    const int n_pfp = tpc_obj.NumPFParticles();
+
+    int leading_index = 0;
+    int leading_hits  = 0;
+    
+    for (int j = 0; j < n_pfp; j++) {
+        auto const part = tpc_obj.GetParticle(j);
+        const int pfp_pdg = part.PFParticlePdgCode();
+        const int n_pfp_hits = part.NumPFPHits();
+        
+        if (pfp_pdg == 11 && n_pfp_hits > leading_hits) {
+            leading_hits = n_pfp_hits;
+            leading_index = j;
+        }
+    }
+    
+    auto const leading_shower       = tpc_obj.GetParticle(leading_index);
+    const double leading_open_angle = leading_shower.pfpOpenAngle() * (180 / 3.1415);
+
+    if (leading_open_angle <= tolerance_open_angle_max && leading_open_angle >= tolerance_open_angle_min)
+        return true;
+    else 
+        return false;
+}
 // -----------------------------------------------------------------------------
+bool selection_cuts::dEdxCut( xsecAna::TPCObjectContainer tpc_obj, const double tolerance_dedx_min, const double tolerance_dedx_max){
+
+    const int n_pfp = tpc_obj.NumPFParticles();
+    int leading_index = 0;
+    int leading_hits  = 0;
+
+    for (int j = 0; j < n_pfp; j++) {
+        
+        auto const part = tpc_obj.GetParticle(j);
+        const int pfp_pdg = part.PFParticlePdgCode();
+        const int n_pfp_hits = part.NumPFPHits();
+        
+        if (pfp_pdg == 11 && n_pfp_hits > leading_hits) {
+            leading_hits = n_pfp_hits;
+            leading_index = j;
+        }
+    } 
+    
+    auto const leading_shower = tpc_obj.GetParticle(leading_index);
+    double leading_dedx = leading_shower.PfpdEdx().at(2);//just the collection plane!
+    leading_dedx = leading_dedx * (196.979 /242.72);
+
+    if (leading_dedx <= tolerance_dedx_max && leading_dedx >= tolerance_dedx_min) return true;
+     
+    return false;
+
+}
 // -----------------------------------------------------------------------------
+bool selection_cuts::SecondaryShowersDistCut(xsecAna::TPCObjectContainer tpc_obj, const double dist_tolerance){
+
+    const int n_pfp = tpc_obj.NumPFParticles();
+    const int n_pfp_showers = tpc_obj.NPfpShowers();
+    
+    // This cut does not target events with fewer than 2 showers
+    if (n_pfp_showers <= 1) return true; 
+    
+    const double tpco_vtx_x = tpc_obj.pfpVtxX();
+    const double tpco_vtx_y = tpc_obj.pfpVtxY();
+    const double tpco_vtx_z = tpc_obj.pfpVtxZ();
+    int leading_index = 0;
+    int leading_hits  = 0;
+    
+    for (int j = 0; j < n_pfp; j++) {
+        
+        auto const part = tpc_obj.GetParticle(j);
+        const int pfp_pdg = part.PFParticlePdgCode();
+        const int n_pfp_hits = part.NumPFPHits();
+        
+        if (pfp_pdg == 11 && n_pfp_hits > leading_hits) {
+            leading_hits = n_pfp_hits;
+            leading_index = j;
+        }
+    }
+    
+    for (int j = 0; j < n_pfp; j++) {
+        
+        if (j == leading_index) continue; // We assume leading shower == electron shower
+        
+        auto const part = tpc_obj.GetParticle(j);
+        const int pfp_pdg = part.PFParticlePdgCode();
+        const double pfp_vtx_x = part.pfpVtxX();
+        const double pfp_vtx_y = part.pfpVtxY();
+        const double pfp_vtx_z = part.pfpVtxZ();
+        
+        const double distance = sqrt(pow((pfp_vtx_x - tpco_vtx_x),2) + pow((pfp_vtx_y - tpco_vtx_y),2) + pow((pfp_vtx_z - tpco_vtx_z),2));
+        
+        if (pfp_pdg == 11) {
+            if (distance > dist_tolerance) return false;
+            // if (distance <= dist_tolerance) return true;
+                
+        }
+    }
+    
+    return true;
+    
+}
+// -----------------------------------------------------------------------------
+bool selection_cuts::HitLengthRatioCut(const double pfp_hits_length_tolerance, xsecAna::TPCObjectContainer tpc_obj){
+    
+    const int n_pfp = tpc_obj.NumPFParticles();
+    int leading_index = 0;
+    int leading_hits  = 0;
+    
+    for (int j = 0; j < n_pfp; j++) {
+        
+        auto const part = tpc_obj.GetParticle(j);
+        const int pfp_pdg = part.PFParticlePdgCode();
+        const int n_pfp_hits = part.NumPFPHits();
+        
+        if (pfp_pdg == 11 && n_pfp_hits > leading_hits) {
+            leading_hits = n_pfp_hits;
+            leading_index = j;
+        }
+    }
+    
+    auto const leading_shower = tpc_obj.GetParticle(leading_index);
+    const int pfp_pdg = leading_shower.PFParticlePdgCode();
+    const double pfp_hits = leading_shower.NumPFPHits();
+    const double pfp_length = leading_shower.pfpLength();
+    const double pfp_hits_length_ratio = (pfp_hits / pfp_length);
+
+    if (pfp_pdg == 11 && pfp_hits_length_ratio > pfp_hits_length_tolerance ) return true;
+
+    return false;
+    
+}
+// -----------------------------------------------------------------------------
+bool selection_cuts::LongestTrackLeadingShowerCut(const double ratio_tolerance, xsecAna::TPCObjectContainer tpc_obj){
+
+    const int n_pfp = tpc_obj.NumPFParticles();
+    const int n_pfp_tracks = tpc_obj.NPfpTracks();
+    
+    if (n_pfp_tracks == 0) return true;
+    
+    int leading_index = 0;
+    int leading_hits  = 0;
+    double longest_track = 0;
+    
+    for (int j = 0; j < n_pfp; j++) {
+        
+        auto const pfp = tpc_obj.GetParticle(j);
+        const int pfp_pdg = pfp.PFParticlePdgCode();
+        const int n_pfp_hits = pfp.NumPFPHits();
+        
+        if (pfp_pdg == 11 && n_pfp_hits > leading_hits) {
+            leading_hits = n_pfp_hits;
+            leading_index = j;
+        }
+        
+        if(pfp_pdg == 13) {
+            
+            const double trk_length = pfp.pfpLength();
+            
+            if (trk_length > longest_track) longest_track = trk_length;
+            
+        }
+    
+    } //end loop pfparticles
+    
+    auto const leading_shower = tpc_obj.GetParticle(leading_index);
+    const double leading_shower_length = leading_shower.pfpLength();
+    const double longest_track_leading_shower_ratio = longest_track / leading_shower_length;
+
+    //if the ratio is too large:
+    if (longest_track_leading_shower_ratio > ratio_tolerance) return false;
+
+    return true;
+
+}
+// -----------------------------------------------------------------------------
+bool selection_cuts::IsContained(std::vector<double> track_start, std::vector<double> track_end, std::vector<double> fv_boundary_v) {
+    
+    if(in_fv(track_start.at(0), track_start.at(1), track_start.at(2), fv_boundary_v) == true
+       && in_fv(track_end.at(0), track_end.at(1), track_end.at(2), fv_boundary_v) == true) {
+        return true;
+    }
+    else 
+        return false;
+}
+bool selection_cuts::ContainedTracksCut(std::vector<double> fv_boundary_v, xsecAna::TPCObjectContainer tpc_obj){
+
+    const int n_pfp = tpc_obj.NumPFParticles();
+    const int n_pfp_tracks = tpc_obj.NPfpTracks();
+    
+    // This is normally enabled, but due to test cut below it is off
+    if (n_pfp_tracks == 0) return true;
+
+    for (int j = 0; j < n_pfp; j++) {
+        
+        auto const pfp = tpc_obj.GetParticle(j);
+        const int pfp_pdg = pfp.PFParticlePdgCode();
+        
+        if (pfp_pdg == 13) {
+            
+            const double pfp_vtx_x = pfp.pfpVtxX();
+            const double pfp_vtx_y = pfp.pfpVtxY();
+            const double pfp_vtx_z = pfp.pfpVtxZ();
+            const double pfp_dir_x = pfp.pfpDirX();
+            const double pfp_dir_y = pfp.pfpDirY();
+            const double pfp_dir_z = pfp.pfpDirZ();
+            const double trk_length = pfp.pfpLength();
+            const double pfp_end_x = (pfp.pfpVtxX() + (trk_length * pfp_dir_x));
+            const double pfp_end_y = (pfp.pfpVtxY() + (trk_length * pfp_dir_y));
+            const double pfp_end_z = (pfp.pfpVtxZ() + (trk_length * pfp_dir_z));
+
+            std::vector<double> pfp_start_vtx {pfp_vtx_x, pfp_vtx_y, pfp_vtx_z};
+            std::vector<double> pfp_end_vtx {pfp_end_x, pfp_end_y, pfp_end_z};
+
+            const bool is_contained = IsContained(pfp_start_vtx, pfp_end_vtx, fv_boundary_v);
+
+            //if not contained
+            if(is_contained == false) return false;
+        
+        } // end is track
+    
+    } // end loop pfprticles
+    return true;	
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

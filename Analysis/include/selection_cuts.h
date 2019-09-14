@@ -69,7 +69,7 @@ class selection_cuts{
     bool HitThreshold(xsecAna::TPCObjectContainer tpc_obj, double threshold, bool useCollection);
     // -------------------------------------------------------------------------
     // Open Angle
-    bool OpenAngleCut(xsecAna::TPCObjectContainer tpc_obj, const std::vector<double> tolerance_open_angle);
+    bool OpenAngleCut(xsecAna::TPCObjectContainer tpc_obj, double tolerance_open_angle_min, double tolerance_open_angle_max);
     // -------------------------------------------------------------------------
     // dEdx
     bool dEdxCut( xsecAna::TPCObjectContainer tpc_obj, const double tolerance_dedx_min, const double tolerance_dedx_max);
@@ -84,6 +84,7 @@ class selection_cuts{
     bool LongestTrackLeadingShowerCut(const double ratio_tolerance, xsecAna::TPCObjectContainer tpc_obj);
     // -------------------------------------------------------------------------
     // Contained Tracks Cut
+    bool IsContained(std::vector<double> track_start, std::vector<double> track_end, std::vector<double> fv_boundary_v);
     bool ContainedTracksCut(std::vector<double> fv_boundary_v, xsecAna::TPCObjectContainer tpc_obj);
     // -------------------------------------------------------------------------
 
