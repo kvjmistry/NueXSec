@@ -89,7 +89,7 @@ namespace xsecSelection {
                 "In FV",                                    // Fiducial volume
                 "Vertex to Flash",                          // Vertex to flash
                 "Shower to Nue Dist",                       // Distance between pfp shower and nue object
-                "Track to Nue Dist",                         // Distance between pfp track and nue object
+                "Track to Nue Dist",                        // Distance between pfp track and nue object
                 "Shower Hit_Threshold",                     // Hit threshold for at least one shower
                 "Shower Hit Threshold Collection Plane",    // Hit threshold for at least one shower on collection plane
                 "Shower Open Angle",                        // Tolerance for leading shower open angle
@@ -129,10 +129,10 @@ namespace xsecSelection {
             std::vector<std::vector<double>> mc_counter_v;
 
             // Counter variables
-           int tree_total_entries;      // MC
-           int data_tree_total_entries; // Data
-           int ext_tree_total_entries;  // EXT
-           int dirt_tree_total_entries;  // Dirt
+            int tree_total_entries;       // MC
+            int data_tree_total_entries;  // Data
+            int ext_tree_total_entries;   // EXT
+            int dirt_tree_total_entries;  // Dirt
 
             // MC Truth Counter Tree Variables
             int mc_nue_cc_counter      = 0;

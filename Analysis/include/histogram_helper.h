@@ -21,7 +21,7 @@ class histogram_helper{
                 "In_FV",                                    // Fiducial volume
                 "Vertex_to_Flash",                          // Vertex to flash
                 "Shower_to_Nue_Dist",                       // Distance between pfp shower and nue object
-                "Track_to_Nue_Dist",                         // Distance between pfp track and nue object
+                "Track_to_Nue_Dist",                        // Distance between pfp track and nue object
                 "Shower_Hit_Threshold",                     // Hit threshold for at least one shower
                 "Shower_Hit_Threshold_Collection_Plane",    // Hit threshold for at least one shower on collection plane
                 "Shower_Open_Angle",                        // Tolerance for leading shower open angle
