@@ -65,6 +65,9 @@ namespace utilityNS {
         // Get a TTrees from a file
         void GetTree(TFile* f, TTree* &T, TString string);
         // ---------------------------------------------------------------------
+        // Get a TDirectory from a file
+        bool GetDirectory(TFile* f, TDirectory* &d, TString string);
+        // ---------------------------------------------------------------------
         // Checks in FV, makes no cut, but returns a bool
         bool in_fv(double x, double y, double z, std::vector<double> fv_boundary_v);
         // ---------------------------------------------------------------------

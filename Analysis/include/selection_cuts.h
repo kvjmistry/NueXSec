@@ -9,9 +9,6 @@ class selection_cuts{
 
     private:
 
-    // Bools to switch file type 
-    bool mc, data, ext, dirt, variation; 
-
     public:
     selection_cuts(){};                 // Default constructor
 

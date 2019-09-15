@@ -16,7 +16,10 @@ void selection::Initialise( const char * mc_file,
         std::cout << "     Running in Slim Mode!" << std::endl;
         std::cout << "-------------------------------\033[0m" << std::endl;
         slim = _slim;
-    } 
+    }
+
+    // Initialise the histogram helper
+    if (!_slim) histogram_helper_instance.Initialise();
 
     // Print the input files
     std::cout <<
@@ -277,7 +280,7 @@ void selection::make_selection(){
         mc_passed_v.resize(tree_total_entries);
         
         // Resize the Counter Vector
-        mc_counter_v.resize(k_cuts_MAX);
+        mc_counter_v.resize(Passed_Container::k_cuts_MAX);
         for (unsigned int i = 0; i < mc_counter_v.size(); i++) mc_counter_v.at(i).resize(24, 0.0 );
         
         // Loop over the Events
@@ -311,115 +314,115 @@ void selection::make_selection(){
 
                 // Flash is in time and has more than the required PE ----------
                 pass = mc_selection_cuts_instance.FlashinTime_FlashPE(flash_time_start, flash_time_end, flash_pe_threshold, mc_optical_list_flash_time_v.at(event), mc_optical_list_pe_v.at(event));
-                mc_passed_v.at(event).cut_v.at(k_flash_pe_intime) = pass;
+                mc_passed_v.at(event).cut_v.at(Passed_Container::k_flash_pe_intime) = pass;
                 if(!pass) continue; // Failed the cut!
 
                 // Set counters for how many passed the cut
-                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_flash_pe_intime));
+                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(Passed_Container::k_flash_pe_intime));
                 
                 // Has a valid Nue ---------------------------------------------
                 pass = mc_selection_cuts_instance.HasNue(tpc_obj);
-                mc_passed_v.at(event).cut_v.at(k_has_nue) = pass;
+                mc_passed_v.at(event).cut_v.at(Passed_Container::k_has_nue) = pass;
                 if(!pass) continue; // Failed the cut!
 
                 // Set counters for how many passed the cut
-                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_has_nue));
+                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(Passed_Container::k_has_nue));
 
                 // Is in the FV ------------------------------------------------
                 pass = mc_selection_cuts_instance.in_fv(tpc_obj.pfpVtxX(), tpc_obj.pfpVtxY(), tpc_obj.pfpVtxZ(), fv_boundary_v);
-                mc_passed_v.at(event).cut_v.at(k_in_fv) = pass;
+                mc_passed_v.at(event).cut_v.at(Passed_Container::k_in_fv) = pass;
                 if(!pass) continue; // Failed the cut!
 
                 // Set counters for how many passed the cut
-                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_in_fv));
+                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(Passed_Container::k_in_fv));
 
                 // Apply flash vtx cut -----------------------------------------
                 pass = mc_selection_cuts_instance.flashRecoVtxDist(mc_largest_flash_v_v.at(event), tolerance, tpc_obj.pfpVtxX(), tpc_obj.pfpVtxY(), tpc_obj.pfpVtxZ());
-                mc_passed_v.at(event).cut_v.at(k_vtx_to_flash) = pass;
+                mc_passed_v.at(event).cut_v.at(Passed_Container::k_vtx_to_flash) = pass;
                 if(!pass) continue; // Failed the cut!
 
                 // Set counters for how many passed the cut
-                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_vtx_to_flash));
+                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(Passed_Container::k_vtx_to_flash));
 
                 // Apply vtx nu distance cut -----------------------------------
                 pass = mc_selection_cuts_instance.VtxNuDistance( tpc_obj, 11, shwr_nue_tolerance);
-                mc_passed_v.at(event).cut_v.at(k_shwr_nue_dist) = pass;
+                mc_passed_v.at(event).cut_v.at(Passed_Container::k_shwr_nue_dist) = pass;
                 if(!pass) continue; // Failed the cut!
 
                 // Set counters for how many passed the cut
-                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_shwr_nue_dist));
+                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(Passed_Container::k_shwr_nue_dist));
 
                 // Apply track vtx nu distance cut -----------------------------
                 pass = mc_selection_cuts_instance.VtxNuDistance( tpc_obj, 13, trk_nue_tolerance);
-                mc_passed_v.at(event).cut_v.at(k_trk_nue_dist) = pass;
+                mc_passed_v.at(event).cut_v.at(Passed_Container::k_trk_nue_dist) = pass;
                 if(!pass) continue; // Failed the cut!
 
                 // Set counters for how many passed the cut
-                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_trk_nue_dist));
+                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(Passed_Container::k_trk_nue_dist));
 
                 // Apply Hit threshold cut -------------------------------------
                 pass = mc_selection_cuts_instance.HitThreshold(tpc_obj, shwr_hit_threshold, false);
-                mc_passed_v.at(event).cut_v.at(k_shwr_hit_threshold) = pass;
+                mc_passed_v.at(event).cut_v.at(Passed_Container::k_shwr_hit_threshold) = pass;
                 if(!pass) continue; // Failed the cut!
 
                 // Set counters for how many passed the cut
-                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_shwr_hit_threshold));
+                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(Passed_Container::k_shwr_hit_threshold));
 
                 // Apply Hit threshold collection cut --------------------------
                 pass = mc_selection_cuts_instance.HitThreshold(tpc_obj, shwr_hit_threshold_collection, true);
-                mc_passed_v.at(event).cut_v.at(k_shwr_hit_threshold_collection) = pass;
+                mc_passed_v.at(event).cut_v.at(Passed_Container::k_shwr_hit_threshold_collection) = pass;
                 if(!pass) continue; // Failed the cut!
 
                 // Set counters for how many passed the cut
-                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_shwr_hit_threshold_collection));
+                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(Passed_Container::k_shwr_hit_threshold_collection));
             
                 // Apply Open Angle cut ----------------------------------------
                 pass = mc_selection_cuts_instance.OpenAngleCut(tpc_obj, tolerance_open_angle_min, tolerance_open_angle_max);
-                mc_passed_v.at(event).cut_v.at(k_shwr_open_angle) = pass;
+                mc_passed_v.at(event).cut_v.at(Passed_Container::k_shwr_open_angle) = pass;
                 if(!pass) continue; // Failed the cut!
 
                 // Set counters for how many passed the cut
-                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_shwr_open_angle));
+                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(Passed_Container::k_shwr_open_angle));
 
                 // Apply dEdx cut ----------------------------------------------
                 pass = mc_selection_cuts_instance.dEdxCut(tpc_obj, tolerance_dedx_min, tolerance_dedx_max);
-                mc_passed_v.at(event).cut_v.at(k_shwr_dedx) = pass;
+                mc_passed_v.at(event).cut_v.at(Passed_Container::k_shwr_dedx) = pass;
                 if(!pass) continue; // Failed the cut!
 
                 // Set counters for how many passed the cut
-                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_shwr_dedx));
+                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(Passed_Container::k_shwr_dedx));
 
                 // Apply Secondary shower dist cut -----------------------------
                 pass = mc_selection_cuts_instance.SecondaryShowersDistCut(tpc_obj, dist_tolerance);
-                mc_passed_v.at(event).cut_v.at(k_dist_nue_vtx) = pass;
+                mc_passed_v.at(event).cut_v.at(Passed_Container::k_dist_nue_vtx) = pass;
                 if(!pass) continue; // Failed the cut!
 
                 // Set counters for how many passed the cut
-                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_dist_nue_vtx)); 
+                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(Passed_Container::k_dist_nue_vtx)); 
 
                 // Apply hit per lengh ratio cut -------------------------------
                 pass = mc_selection_cuts_instance.HitLengthRatioCut( pfp_hits_length_tolerance, tpc_obj);
-                mc_passed_v.at(event).cut_v.at(k_pfp_hits_length) = pass;
+                mc_passed_v.at(event).cut_v.at(Passed_Container::k_pfp_hits_length) = pass;
                 if(!pass) continue; // Failed the cut!
 
                 // Set counters for how many passed the cut
-                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_pfp_hits_length));
+                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(Passed_Container::k_pfp_hits_length));
 
                 // Apply Longest Track Leading Shower cut ----------------------
                 pass = mc_selection_cuts_instance.LongestTrackLeadingShowerCut(ratio_tolerance, tpc_obj);
-                mc_passed_v.at(event).cut_v.at(k_longest_trk_leading_shwr_length) = pass;
+                mc_passed_v.at(event).cut_v.at(Passed_Container::k_longest_trk_leading_shwr_length) = pass;
                 if(!pass) continue; // Failed the cut!
 
                 // Set counters for how many passed the cut
-                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_longest_trk_leading_shwr_length));
+                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(Passed_Container::k_longest_trk_leading_shwr_length));
 
                 // Apply Contained Track Cut -----------------------------------
                 pass = mc_selection_cuts_instance.ContainedTracksCut(fv_boundary_v, tpc_obj);
-                mc_passed_v.at(event).cut_v.at(k_trk_contained) = pass;
+                mc_passed_v.at(event).cut_v.at(Passed_Container::k_trk_contained) = pass;
                 if(!pass) continue; // Failed the cut!
 
                 // Set counters for how many passed the cut
-                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(k_trk_contained));
+                mc_selection_cuts_instance.TabulateOrigins(mc_counter_v.at(Passed_Container::k_trk_contained));
 
             } // End loop over the TPC Objects
 

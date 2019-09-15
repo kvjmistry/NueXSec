@@ -80,6 +80,17 @@ namespace utilityNS {
         }
     }
     // -------------------------------------------------------------------------
+    bool utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
+        d = (TDirectory*)f->Get(string);
+        if (d == NULL) {
+            // std::cout << "\nfailed to get:\t" << string << "\tThis directory might not exist in the file\n" << std::endl;
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    // -------------------------------------------------------------------------
     bool utility::in_fv(double x, double y, double z, std::vector<double> fv_boundary_v) {
     
         // The MicroBooNE Active Volume
