@@ -98,3 +98,120 @@ void histogram_helper::Initialise(){
     MakeDirectory("Dirt");
 }
 // -----------------------------------------------------------------------------
+void histogram_helper::InitHistograms(){
+    
+    // Flash Histograms
+    h_flash_time_v.resize(k_flash_MAX);
+    for (unsigned int i=0; i < h_flash_time_v.size();i++){
+        h_flash_time_v.at(i) = new TH1D ( Form("h_flash_time_%s", type_prefix.at(i).c_str()) ,"", 80, 0, 20);
+    }
+
+}
+// -----------------------------------------------------------------------------
+void histogram_helper::FillMCTruth( double mc_nu_energy,  double mc_nu_momentum,  int mc_nu_id, bool in_tpc,
+                                    double mc_nu_vtx_x,   double mc_nu_vtx_y,  double mc_nu_vtx_z,
+                                    double mc_nu_dir_x,   double mc_nu_dir_y,  double mc_nu_dir_z,
+                                    double mc_ele_dir_x,  double mc_ele_dir_y, double mc_ele_dir_z,
+                                    double mc_ele_energy, double mc_ele_momentum ) {
+    
+    double mc_cos_theta     = -999;
+    double theta            = -999;
+    double mc_ele_cos_theta = -999;
+    double mc_ele_theta     = -999;
+
+    // Caclulate theta and cos(theta)
+    if (mc_nu_momentum != 0) {
+        mc_cos_theta = mc_nu_dir_z;
+        theta        = acos(mc_cos_theta) * (180 / 3.1415);
+    }
+    
+    // Caclulate theta and cos(theta) for the electron
+    if (mc_ele_momentum != 0) {
+        mc_ele_cos_theta = mc_ele_dir_z;
+        mc_ele_theta     = acos(mc_ele_cos_theta) * (180/3.1415);
+    }
+    
+    // Calculate Phi
+    double phi        = atan2(mc_nu_dir_y, mc_nu_dir_x) * (180/3.1415);
+    double mc_ele_phi = atan2(mc_ele_dir_y, mc_ele_dir_x) * (180/3.1415);
+   
+    if ((mc_nu_id == 1 || mc_nu_id == 5) && in_tpc == true){
+        
+        // 1D Hists
+        h_nue_true_theta->Fill(theta);
+        h_nue_true_phi  ->Fill(phi);
+        
+        // 2D Hists
+        h_nue_true_theta_phi   ->Fill(phi, theta );
+        h_nue_true_energy_theta->Fill(mc_nu_momentum, theta);
+        h_nue_true_energy_phi  ->Fill(mc_nu_momentum, phi);
+        
+        h_ele_true_energy_theta->Fill(mc_ele_energy, mc_ele_theta);
+        h_ele_true_energy_phi  ->Fill(mc_ele_energy, mc_ele_phi);
+    }
+    
+
+}
+// -----------------------------------------------------------------------------
+void histogram_helper::WriteMCTruth(std::string type){
+
+    f_nuexsec->cd();
+
+    bool bool_dir;
+    TDirectory *truth_dir; // e.g MC/Truth, Data/Truth, EXT/Truth
+
+    // Get the truth directory and cd
+    bool_dir = _utility_instance.GetDirectory(f_nuexsec, truth_dir ,Form("%s/%s", type.c_str(), "Truth") );
+    if (bool_dir) truth_dir->cd();
+
+    // Now write the histograms
+    h_nue_true_theta->Write("",TObject::kOverwrite);
+    h_nue_true_phi  ->Write("",TObject::kOverwrite);
+    
+    // 2D Hists
+    h_nue_true_theta_phi   ->Write("",TObject::kOverwrite);
+    h_nue_true_energy_theta->Write("",TObject::kOverwrite);
+    h_nue_true_energy_phi  ->Write("",TObject::kOverwrite);
+    
+    h_ele_true_energy_theta->Write("",TObject::kOverwrite);
+    h_ele_true_energy_phi  ->Write("",TObject::kOverwrite);
+
+
+}
+// -----------------------------------------------------------------------------
+void histogram_helper::FillOptical(std::vector<std::vector<double>> optical_list_flash_time_v, int type){
+
+    // Loop over the optical list events
+    for (unsigned int i = 0; i < optical_list_flash_time_v.size();i++){
+
+        // Loop over the flashes in each event
+        for (unsigned int j = 0; j < optical_list_flash_time_v.at(i).size();j++){
+            h_flash_time_v.at(type)->Fill(optical_list_flash_time_v.at(i).at(j));
+        }
+    }
+
+}
+// -----------------------------------------------------------------------------
+void histogram_helper::WriteOptical(int type){
+
+    f_nuexsec->cd();
+
+    bool bool_dir;
+    TDirectory *truth_dir; // e.g MC/Truth, Data/Truth, EXT/Truth
+
+    // Get the Optical directory and cd
+    bool_dir = _utility_instance.GetDirectory(f_nuexsec, truth_dir ,Form("%s/%s", type_prefix.at(type).c_str(), "Optical") );
+    if (bool_dir) truth_dir->cd();
+
+    // Now write the histograms
+    h_flash_time_v.at(type)->Write("",TObject::kOverwrite);
+    
+   
+}
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

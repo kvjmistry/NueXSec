@@ -52,7 +52,7 @@ namespace xsecSelection {
 
             // Class Instances
             utilityNS::utility _utility_instance;
-            selection_cuts mc_selection_cuts_instance;
+            std::vector<selection_cuts> selection_cuts_instance;
             histogram_helper histogram_helper_instance;
 
             // Variables -------------------------------------------------------
@@ -122,6 +122,7 @@ namespace xsecSelection {
             std::vector<std::vector<double>> ext_optical_list_flash_time_v;  // EXT container for optical flash time
             std::vector<std::vector<double>> dirt_optical_list_flash_time_v; // Dirt container for optical flash time
 
+
             // Passed Containers
             std::vector<Passed_Container> mc_passed_v; // MC Passed Container
             
@@ -135,35 +136,30 @@ namespace xsecSelection {
             int dirt_tree_total_entries;  // Dirt
 
             // MC Truth Counter Tree Variables
-            int mc_nue_cc_counter      = 0;
-            int mc_nue_nc_counter      = 0;
-            int mc_numu_cc_counter     = 0;
-            int mc_numu_nc_counter     = 0;
-            int mc_nue_cc_counter_bar  = 0;
-            int mc_numu_cc_counter_bar = 0;
-            int mc_nue_nc_counter_bar  = 0;
-            int mc_numu_nc_counter_bar = 0;
-            double mc_nu_energy        = 0;
-            double mc_nu_momentum      = 0;
-            int mc_nu_id               = -1;
-            int mc_nu_id_var           = -1;
-            double mc_nu_vtx_x         = -999;
-            double mc_nu_vtx_y         = -999;
-            double mc_nu_vtx_z         = -999;
-            double mc_nu_vtx_x_var     = -999;
-            double mc_nu_vtx_y_var     = -999;
-            double mc_nu_vtx_z_var     = -999;
-
-            double mc_nu_dir_x         = -999;
-            double mc_nu_dir_y         = -999;
-            double mc_nu_dir_z         = -999;
-            double mc_ele_dir_x        = -999;
-            double mc_ele_dir_y        = -999;
-            double mc_ele_dir_z        = -999;
-            double mc_ele_energy       = 0;
-            double mc_ele_momentum     = 0;
-            bool has_pi0               = false;
-            double mc_nu_time          = -1;
+            int    mc_nue_cc_counter      = 0;
+            int    mc_nue_nc_counter      = 0;
+            int    mc_numu_cc_counter     = 0;
+            int    mc_numu_nc_counter     = 0;
+            int    mc_nue_cc_counter_bar  = 0;
+            int    mc_numu_cc_counter_bar = 0;
+            int    mc_nue_nc_counter_bar  = 0;
+            int    mc_numu_nc_counter_bar = 0;
+            double mc_nu_energy           = 0;
+            double mc_nu_momentum         = 0;
+            int    mc_nu_id               = -1;
+            double mc_nu_vtx_x            = -999;
+            double mc_nu_vtx_y            = -999;
+            double mc_nu_vtx_z            = -999;
+            double mc_nu_dir_x            = -999;
+            double mc_nu_dir_y            = -999;
+            double mc_nu_dir_z            = -999;
+            double mc_ele_dir_x           = -999;
+            double mc_ele_dir_y           = -999;
+            double mc_ele_dir_z           = -999;
+            double mc_ele_energy          = 0;
+            double mc_ele_momentum        = 0;
+            bool   has_pi0                = false;
+            double mc_nu_time             = -1;
 
             int mc_nu_num_particles         = 0;
             int mc_nu_num_charged_particles = 0;
@@ -207,9 +203,15 @@ namespace xsecSelection {
                              const std::vector<double> _config,
                              bool _slim);
             // -----------------------------------------------------------------
-           
-            // Main function for selection -------------------------------------
+            // Main function for selection
             void make_selection();
+            // -----------------------------------------------------------------
+            // Template code to apply selection cuts
+            void ApplyCuts();
+            // -----------------------------------------------------------------
+
+            // Function to save all written histograms to file
+            void SavetoFile();
             // -----------------------------------------------------------------
 
     }; // END Class
