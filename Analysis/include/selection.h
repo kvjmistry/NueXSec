@@ -52,7 +52,7 @@ namespace xsecSelection {
 
             // Class Instances
             utilityNS::utility _utility_instance;
-            std::vector<selection_cuts> selection_cuts_instance;
+            std::vector<selection_cuts> selection_cuts_instance; // One for each type e.g MC, Data, EXT..
             histogram_helper histogram_helper_instance;
 
             // Variables -------------------------------------------------------
@@ -124,10 +124,16 @@ namespace xsecSelection {
 
 
             // Passed Containers
-            std::vector<Passed_Container> mc_passed_v; // MC Passed Container
+            std::vector<Passed_Container> mc_passed_v;   // MC Passed Container
+            std::vector<Passed_Container> data_passed_v; // Data Passed Container
+            std::vector<Passed_Container> ext_passed_v;  // EXT Passed Container
+            std::vector<Passed_Container> dirt_passed_v; // Dirt Passed Container
             
             // Counter Containers
             std::vector<std::vector<double>> mc_counter_v;
+            std::vector<std::vector<double>> data_counter_v;
+            std::vector<std::vector<double>> ext_counter_v;
+            std::vector<std::vector<double>> dirt_counter_v;
 
             // Counter variables
             int tree_total_entries;       // MC
@@ -207,7 +213,12 @@ namespace xsecSelection {
             void make_selection();
             // -----------------------------------------------------------------
             // Template code to apply selection cuts
-            void ApplyCuts();
+            bool ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer &tpc_obj,
+                           std::vector<std::vector<double>> &largest_flash_v_v,
+                           std::vector<std::vector<int>>    &optical_list_pe_v,
+                           std::vector<std::vector<double>> &optical_list_flash_time_v,
+                           std::vector<std::vector<double>> &counter_v,
+                           std::vector<Passed_Container>    &passed_v);
             // -----------------------------------------------------------------
 
             // Function to save all written histograms to file

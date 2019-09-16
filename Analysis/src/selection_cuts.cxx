@@ -26,6 +26,40 @@ void selection_cuts::SetTPCObjVariables(xsecAna::TPCObjectContainer tpc_obj,
     leading_shower_index = tpc_classification.second;
 
 }
+void selection_cuts::SetTPCObjVariables(xsecAna::TPCObjectContainer tpc_obj, std::string type){
+    
+    // We have to do some work to get the leading index
+    int n_pfp = tpc_obj.NumPFParticles();
+    int leading_index;
+    int most_hits = 0;
+
+    // Loop over the PFP
+    for (int j = 0; j < n_pfp; j++) {
+        auto const part         = tpc_obj.GetParticle(j);
+        const int n_pfp_hits    = part.NumPFPHits();
+        const int pfp_pdg       = part.PFParticlePdgCode();
+        
+        if (pfp_pdg == 11) {
+            
+            if (n_pfp_hits > most_hits) {
+                leading_index = j;
+                most_hits = n_pfp_hits;
+            }
+        }
+        
+    } // End loop over the pfp
+
+    tpc_classification = std::make_pair(type, leading_index);
+
+    // TPC Obj vars
+    tpc_obj_vtx_x        = tpc_obj.pfpVtxX();
+    tpc_obj_vtx_y        = tpc_obj.pfpVtxY();
+    tpc_obj_vtx_z        = tpc_obj.pfpVtxZ();
+    tpc_obj_mode         = tpc_obj.Mode(); 
+    n_pfp                = tpc_obj.NumPFParticles();
+    leading_shower_index = leading_index;
+
+}
 // -----------------------------------------------------------------------------
 std::pair<std::string, int> selection_cuts::TPCO_Classifier(xsecAna::TPCObjectContainer tpc_obj, bool true_in_tpc, bool has_pi0) {
     int part_nue_cc     = 0;

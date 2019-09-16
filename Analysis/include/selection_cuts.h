@@ -39,6 +39,9 @@ class selection_cuts{
                             double mc_nu_vtx_x, double mc_nu_vtx_y, double mc_nu_vtx_z,
                             std::vector<double> fv_boundary_v, bool has_pi0);
     // -------------------------------------------------------------------------
+    // As above but for DATA 
+    void SetTPCObjVariables(xsecAna::TPCObjectContainer tpc_obj, std::string type); 
+    // -------------------------------------------------------------------------
     // Helper function to classify the event category
     std::pair<std::string, int> TPCO_Classifier(xsecAna::TPCObjectContainer tpc_obj, bool true_in_tpc, bool has_pi0);
     // -------------------------------------------------------------------------
