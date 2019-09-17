@@ -26,9 +26,9 @@ class selection_cuts{
     double tpc_obj_vtx_y = -999.;
     double tpc_obj_vtx_z = -999.;
     
-    double n_pfp;                // The number of PFP
-    int    tpc_obj_mode;         // Mode of interaction e.g nue_cc_qe
-    int    leading_shower_index; // Index of the leading shower
+    double n_pfp{0.0};                // The number of PFP
+    int    tpc_obj_mode{0};           // Mode of interaction e.g nue_cc_qe
+    int    leading_shower_index{0};   // Index of the leading shower
 
     // -------------------------------------------------------------------------
     // Initialise the flash variables for this event 
@@ -46,17 +46,20 @@ class selection_cuts{
     std::pair<std::string, int> TPCO_Classifier(xsecAna::TPCObjectContainer tpc_obj, bool true_in_tpc, bool has_pi0);
     // -------------------------------------------------------------------------
     // Helper function to total up the passed neutrinos and their classifcations
-    void TabulateOrigins(std::vector<double> &tabulated_origins);
+    void TabulateOrigins(std::vector<double> &tabulated_origins, std::string type);
     // -------------------------------------------------------------------------
     // Prints the results of the cuts
     void PrintInfo(int mc_nue_cc_counter, std::vector<double> counter_v, int counter_intime_cosmics,
                               double intime_scale_factor, double data_scale_factor,
                               int counter_dirt, double dirt_scale_factor, std::string cut_name);
+    // -------------------------------------------------------------------------
+    // Prints total selected in data
+    void PrintInfoData(int counter, std::string cut_name);
     // *************************************************************************
     // ------------------- Selection Cuts Functions ----------------------------
     // *************************************************************************
     // Flash is in time and flash PE 
-    bool FlashinTime_FlashPE(double flash_time_start, double flash_time_end, double flash_pe_threshold, std::vector<double> opt_time_v, std::vector<int> opt_pe_v);
+    bool FlashinTime_FlashPE(double flash_time_start, double flash_time_end, double flash_pe_threshold, std::vector<double> &opt_time_v, std::vector<int> &opt_pe_v, std::string type);
     // -------------------------------------------------------------------------
     // Pandora Reco Nue
     bool HasNue(xsecAna::TPCObjectContainer tpc_obj);
@@ -74,11 +77,14 @@ class selection_cuts{
     // Hit Thresholds
     bool HitThreshold(xsecAna::TPCObjectContainer tpc_obj, double threshold, bool useCollection);
     // -------------------------------------------------------------------------
+    // Leading Shower Collection Plane Hit Threshold
+    bool LeadingHitThreshold(xsecAna::TPCObjectContainer tpc_obj, double threshold);
+    // -------------------------------------------------------------------------
     // Open Angle
     bool OpenAngleCut(xsecAna::TPCObjectContainer tpc_obj, double tolerance_open_angle_min, double tolerance_open_angle_max);
     // -------------------------------------------------------------------------
     // dEdx
-    bool dEdxCut( xsecAna::TPCObjectContainer tpc_obj, const double tolerance_dedx_min, const double tolerance_dedx_max);
+    bool dEdxCut( xsecAna::TPCObjectContainer tpc_obj, const double tolerance_dedx_min, const double tolerance_dedx_max, std::string type);
     // -------------------------------------------------------------------------
     // Secondary Shower Distance
     bool SecondaryShowersDistCut(xsecAna::TPCObjectContainer tpc_obj, const double dist_tolerance);

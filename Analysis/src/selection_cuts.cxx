@@ -28,9 +28,10 @@ void selection_cuts::SetTPCObjVariables(xsecAna::TPCObjectContainer tpc_obj,
 }
 void selection_cuts::SetTPCObjVariables(xsecAna::TPCObjectContainer tpc_obj, std::string type){
     
+    n_pfp = tpc_obj.NumPFParticles();
+
     // We have to do some work to get the leading index
-    int n_pfp = tpc_obj.NumPFParticles();
-    int leading_index;
+    int leading_index = -1;
     int most_hits = 0;
 
     // Loop over the PFP
@@ -56,7 +57,6 @@ void selection_cuts::SetTPCObjVariables(xsecAna::TPCObjectContainer tpc_obj, std
     tpc_obj_vtx_y        = tpc_obj.pfpVtxY();
     tpc_obj_vtx_z        = tpc_obj.pfpVtxZ();
     tpc_obj_mode         = tpc_obj.Mode(); 
-    n_pfp                = tpc_obj.NumPFParticles();
     leading_shower_index = leading_index;
 
 }
@@ -157,7 +157,7 @@ std::pair<std::string, int> selection_cuts::TPCO_Classifier(xsecAna::TPCObjectCo
 // *****************************************************************************
 
 // -----------------------------------------------------------------------------
-bool selection_cuts::FlashinTime_FlashPE(double flash_time_start, double flash_time_end, double flash_pe_threshold, std::vector<double> opt_time_v, std::vector<int> opt_pe_v){
+bool selection_cuts::FlashinTime_FlashPE(double flash_time_start, double flash_time_end, double flash_pe_threshold, std::vector<double> &opt_time_v, std::vector<int> &opt_pe_v, std::string type){
 
     bool in_time          = false;
     bool sufficient_flash = false;
@@ -165,7 +165,13 @@ bool selection_cuts::FlashinTime_FlashPE(double flash_time_start, double flash_t
     // Loop over the optical list vec
     for (unsigned int j = 0; j < opt_pe_v.size(); j++) {
         
-        auto opt_time = opt_time_v.at(j) + 1.0;
+        double opt_time;
+        
+        if      (type == "MC")  opt_time = opt_time_v.at(j) + 1.0;
+        else if (type == "EXT") opt_time = opt_time_v.at(j) - 0.343;
+        else                    opt_time = opt_time_v.at(j);
+        
+        
         auto opt_pe   = opt_pe_v.at(j);
         
         // See if flash was in time
@@ -306,6 +312,23 @@ bool selection_cuts::HitThreshold(xsecAna::TPCObjectContainer tpc_obj, double th
     
 }
 // -----------------------------------------------------------------------------
+bool selection_cuts::LeadingHitThreshold(xsecAna::TPCObjectContainer tpc_obj, double threshold){
+
+    const int n_pfp = tpc_obj.NumPFParticles();
+    int num_pfp_hits;
+
+    for (int j = 0; j < n_pfp; j++) {
+
+        auto const pfp_obj = tpc_obj.GetParticle(j);
+        if (j == leading_shower_index) num_pfp_hits = pfp_obj.NumPFPHitsW(); // Collection plane hits
+
+    }
+
+    if (num_pfp_hits >= threshold) return true;
+    else return false;
+    
+}
+// -----------------------------------------------------------------------------
 bool selection_cuts::OpenAngleCut(xsecAna::TPCObjectContainer tpc_obj, double tolerance_open_angle_min, double tolerance_open_angle_max){
 
     const int n_pfp = tpc_obj.NumPFParticles();
@@ -333,27 +356,12 @@ bool selection_cuts::OpenAngleCut(xsecAna::TPCObjectContainer tpc_obj, double to
         return false;
 }
 // -----------------------------------------------------------------------------
-bool selection_cuts::dEdxCut( xsecAna::TPCObjectContainer tpc_obj, const double tolerance_dedx_min, const double tolerance_dedx_max){
-
-    const int n_pfp = tpc_obj.NumPFParticles();
-    int leading_index = 0;
-    int leading_hits  = 0;
-
-    for (int j = 0; j < n_pfp; j++) {
-        
-        auto const part = tpc_obj.GetParticle(j);
-        const int pfp_pdg = part.PFParticlePdgCode();
-        const int n_pfp_hits = part.NumPFPHits();
-        
-        if (pfp_pdg == 11 && n_pfp_hits > leading_hits) {
-            leading_hits = n_pfp_hits;
-            leading_index = j;
-        }
-    } 
+bool selection_cuts::dEdxCut( xsecAna::TPCObjectContainer tpc_obj, const double tolerance_dedx_min, const double tolerance_dedx_max, std::string type){
     
-    auto const leading_shower = tpc_obj.GetParticle(leading_index);
+    auto const leading_shower = tpc_obj.GetParticle(leading_shower_index);
     double leading_dedx = leading_shower.PfpdEdx().at(2);//just the collection plane!
-    leading_dedx = leading_dedx * (196.979 /242.72);
+    
+    if (type == "MC" || type == "Dirt") leading_dedx = leading_dedx * (196.979 /242.72); // Only calibrate the MC
 
     if (leading_dedx <= tolerance_dedx_max && leading_dedx >= tolerance_dedx_min) return true;
      
@@ -532,113 +540,120 @@ bool selection_cuts::ContainedTracksCut(std::vector<double> fv_boundary_v, xsecA
     return true;	
 }
 // -----------------------------------------------------------------------------
-void selection_cuts::TabulateOrigins(std::vector<double> &tabulated_origins) {
+void selection_cuts::TabulateOrigins(std::vector<double> &tabulated_origins, std::string type ) {
     
-    int nue_cc        = 0;
-    int nue_cc_qe     = 0;
-    int nue_cc_res    = 0;
-    int nue_cc_dis    = 0;
-    int nue_cc_coh    = 0;
-    int nue_cc_mec    = 0;
+    if (type == "MC"){
+        int nue_cc        = 0;
+        int nue_cc_qe     = 0;
+        int nue_cc_res    = 0;
+        int nue_cc_dis    = 0;
+        int nue_cc_coh    = 0;
+        int nue_cc_mec    = 0;
 
-    int nue_bar_cc_qe     = 0;
-    int nue_bar_cc_res    = 0;
-    int nue_bar_cc_dis    = 0;
-    int nue_bar_cc_coh    = 0;
-    int nue_bar_cc_mec    = 0;
+        int nue_bar_cc_qe     = 0;
+        int nue_bar_cc_res    = 0;
+        int nue_bar_cc_dis    = 0;
+        int nue_bar_cc_coh    = 0;
+        int nue_bar_cc_mec    = 0;
 
-    int total_nue_cc_qe     = 0;
-    int total_nue_cc_res    = 0;
-    int total_nue_cc_dis    = 0;
-    int total_nue_cc_coh    = 0;
-    int total_nue_cc_mec    = 0;
+        int total_nue_cc_qe     = 0;
+        int total_nue_cc_res    = 0;
+        int total_nue_cc_dis    = 0;
+        int total_nue_cc_coh    = 0;
+        int total_nue_cc_mec    = 0;
 
-    int nue_cc_mixed  = 0;
-    int nue_cc_out_fv = 0;
-    int cosmic        = 0;
-    int nc            = 0;
-    int numu_cc       = 0;
-    int numu_cc_qe    = 0;
-    int numu_cc_res   = 0;
-    int numu_cc_dis   = 0;
-    int numu_cc_coh   = 0;
-    int numu_cc_mec   = 0;
-    int numu_cc_mixed = 0;
-    int nc_pi0        = 0;
-    int unmatched     = 0;
-    int other_mixed   = 0;
-    int total         = 0;
-    int signal_tpco_num = -1;
-    int only_nue_cc = 0;
-    int only_nue_bar_cc = 0;
-
-
-    std::string tpco_id = tpc_classification.first;
-
-    if(tpco_id == "nue_cc_qe")       {nue_cc_qe++;  }
-    if(tpco_id == "nue_cc_res")      {nue_cc_res++; }
-    if(tpco_id == "nue_cc_coh")      {nue_cc_coh++; }
-    if(tpco_id == "nue_cc_dis")      {nue_cc_dis++; }
-    if(tpco_id == "nue_cc_mec")      {nue_cc_mec++; }
-
-    if(tpco_id == "nue_bar_cc_qe")   {nue_bar_cc_qe++;  }
-    if(tpco_id == "nue_bar_cc_res")  {nue_bar_cc_res++; }
-    if(tpco_id == "nue_bar_cc_coh")  {nue_bar_cc_coh++; }
-    if(tpco_id == "nue_bar_cc_dis")  {nue_bar_cc_dis++; }
-    if(tpco_id == "nue_bar_cc_mec")  {nue_bar_cc_mec++; }
-
-    if(tpco_id == "nue_cc_out_fv")   {nue_cc_out_fv++; }
-    if(tpco_id == "nue_cc_mixed")    {nue_cc_mixed++; }
-    if(tpco_id == "nc")              {nc++; }
-    if(tpco_id == "numu_cc_qe")      {numu_cc_qe++; }
-    if(tpco_id == "numu_cc_res")     {numu_cc_res++; }
-    if(tpco_id == "numu_cc_coh")     {numu_cc_coh++; }
-    if(tpco_id == "numu_cc_dis")     {numu_cc_dis++; }
-    if(tpco_id == "numu_cc_mec")     {numu_cc_mec++; }
-    if(tpco_id == "numu_cc_mixed")   {numu_cc_mixed++; }
-    if(tpco_id == "nc_pi0")          {nc_pi0++; }
-    if(tpco_id == "cosmic")          {cosmic++; }
-    if(tpco_id == "other_mixed")     {other_mixed++; }
-    if(tpco_id == "unmatched")       {unmatched++; }
-
-    only_nue_cc = nue_cc_qe + nue_cc_res + nue_cc_dis + nue_cc_coh + nue_cc_mec;
-    only_nue_bar_cc = nue_bar_cc_qe + nue_bar_cc_res + nue_bar_cc_dis + nue_bar_cc_coh + nue_bar_cc_mec;
-
-    total_nue_cc_qe  = nue_cc_qe  + nue_bar_cc_qe;
-    total_nue_cc_res = nue_cc_res + nue_bar_cc_res;
-    total_nue_cc_dis = nue_cc_dis + nue_bar_cc_dis;
-    total_nue_cc_coh = nue_cc_coh + nue_bar_cc_coh;
-    total_nue_cc_mec = nue_cc_mec + nue_bar_cc_mec;
+        int nue_cc_mixed  = 0;
+        int nue_cc_out_fv = 0;
+        int cosmic        = 0;
+        int nc            = 0;
+        int numu_cc       = 0;
+        int numu_cc_qe    = 0;
+        int numu_cc_res   = 0;
+        int numu_cc_dis   = 0;
+        int numu_cc_coh   = 0;
+        int numu_cc_mec   = 0;
+        int numu_cc_mixed = 0;
+        int nc_pi0        = 0;
+        int unmatched     = 0;
+        int other_mixed   = 0;
+        int total         = 0;
+        int signal_tpco_num = -1;
+        int only_nue_cc = 0;
+        int only_nue_bar_cc = 0;
 
 
-    nue_cc = only_nue_cc + only_nue_bar_cc;
-    numu_cc = numu_cc_qe + numu_cc_res + numu_cc_dis + numu_cc_coh + numu_cc_mec;
-    total = nue_cc + nue_cc_mixed + nue_cc_out_fv + cosmic + nc + numu_cc + numu_cc_mixed + nc_pi0 + unmatched + other_mixed;
+        std::string tpco_id = tpc_classification.first;
 
-    tabulated_origins.at(0)  += nue_cc;//this is nue_cc + nue_bar_cc
-    tabulated_origins.at(1)  += nue_cc_mixed;
-    tabulated_origins.at(2)  += cosmic;
-    tabulated_origins.at(3)  += nc;
-    tabulated_origins.at(4)  += numu_cc;
-    tabulated_origins.at(5)  += unmatched;
-    tabulated_origins.at(6)  += other_mixed;
-    tabulated_origins.at(7)  += total;
-    tabulated_origins.at(8)  += signal_tpco_num;
-    tabulated_origins.at(9)  += nue_cc_out_fv;
-    tabulated_origins.at(10) += nc_pi0;
-    tabulated_origins.at(11) += numu_cc_mixed;
-    tabulated_origins.at(12) += total_nue_cc_qe;
-    tabulated_origins.at(13) += total_nue_cc_res;
-    tabulated_origins.at(14) += total_nue_cc_dis;
-    tabulated_origins.at(15) += total_nue_cc_coh;
-    tabulated_origins.at(16) += total_nue_cc_mec;
-    tabulated_origins.at(17) += numu_cc_qe;
-    tabulated_origins.at(18) += numu_cc_res;
-    tabulated_origins.at(19) += numu_cc_dis;
-    tabulated_origins.at(20) += numu_cc_coh;
-    tabulated_origins.at(21) += numu_cc_mec;
-    tabulated_origins.at(22) += only_nue_cc;
-    tabulated_origins.at(23) += only_nue_bar_cc;
+        if(tpco_id == "nue_cc_qe")       {nue_cc_qe++;  }
+        if(tpco_id == "nue_cc_res")      {nue_cc_res++; }
+        if(tpco_id == "nue_cc_coh")      {nue_cc_coh++; }
+        if(tpco_id == "nue_cc_dis")      {nue_cc_dis++; }
+        if(tpco_id == "nue_cc_mec")      {nue_cc_mec++; }
+
+        if(tpco_id == "nue_bar_cc_qe")   {nue_bar_cc_qe++;  }
+        if(tpco_id == "nue_bar_cc_res")  {nue_bar_cc_res++; }
+        if(tpco_id == "nue_bar_cc_coh")  {nue_bar_cc_coh++; }
+        if(tpco_id == "nue_bar_cc_dis")  {nue_bar_cc_dis++; }
+        if(tpco_id == "nue_bar_cc_mec")  {nue_bar_cc_mec++; }
+
+        if(tpco_id == "nue_cc_out_fv")   {nue_cc_out_fv++; }
+        if(tpco_id == "nue_cc_mixed")    {nue_cc_mixed++; }
+        if(tpco_id == "nc")              {nc++; }
+        if(tpco_id == "numu_cc_qe")      {numu_cc_qe++; }
+        if(tpco_id == "numu_cc_res")     {numu_cc_res++; }
+        if(tpco_id == "numu_cc_coh")     {numu_cc_coh++; }
+        if(tpco_id == "numu_cc_dis")     {numu_cc_dis++; }
+        if(tpco_id == "numu_cc_mec")     {numu_cc_mec++; }
+        if(tpco_id == "numu_cc_mixed")   {numu_cc_mixed++; }
+        if(tpco_id == "nc_pi0")          {nc_pi0++; }
+        if(tpco_id == "cosmic")          {cosmic++; }
+        if(tpco_id == "other_mixed")     {other_mixed++; }
+        if(tpco_id == "unmatched")       {unmatched++; }
+
+        only_nue_cc = nue_cc_qe + nue_cc_res + nue_cc_dis + nue_cc_coh + nue_cc_mec;
+        only_nue_bar_cc = nue_bar_cc_qe + nue_bar_cc_res + nue_bar_cc_dis + nue_bar_cc_coh + nue_bar_cc_mec;
+
+        total_nue_cc_qe  = nue_cc_qe  + nue_bar_cc_qe;
+        total_nue_cc_res = nue_cc_res + nue_bar_cc_res;
+        total_nue_cc_dis = nue_cc_dis + nue_bar_cc_dis;
+        total_nue_cc_coh = nue_cc_coh + nue_bar_cc_coh;
+        total_nue_cc_mec = nue_cc_mec + nue_bar_cc_mec;
+
+
+        nue_cc = only_nue_cc + only_nue_bar_cc;
+        numu_cc = numu_cc_qe + numu_cc_res + numu_cc_dis + numu_cc_coh + numu_cc_mec;
+        total = nue_cc + nue_cc_mixed + nue_cc_out_fv + cosmic + nc + numu_cc + numu_cc_mixed + nc_pi0 + unmatched + other_mixed;
+
+        tabulated_origins.at(0)  += nue_cc;//this is nue_cc + nue_bar_cc
+        tabulated_origins.at(1)  += nue_cc_mixed;
+        tabulated_origins.at(2)  += cosmic;
+        tabulated_origins.at(3)  += nc;
+        tabulated_origins.at(4)  += numu_cc;
+        tabulated_origins.at(5)  += unmatched;
+        tabulated_origins.at(6)  += other_mixed;
+        tabulated_origins.at(7)  += total;
+        tabulated_origins.at(8)  += signal_tpco_num;
+        tabulated_origins.at(9)  += nue_cc_out_fv;
+        tabulated_origins.at(10) += nc_pi0;
+        tabulated_origins.at(11) += numu_cc_mixed;
+        tabulated_origins.at(12) += total_nue_cc_qe;
+        tabulated_origins.at(13) += total_nue_cc_res;
+        tabulated_origins.at(14) += total_nue_cc_dis;
+        tabulated_origins.at(15) += total_nue_cc_coh;
+        tabulated_origins.at(16) += total_nue_cc_mec;
+        tabulated_origins.at(17) += numu_cc_qe;
+        tabulated_origins.at(18) += numu_cc_res;
+        tabulated_origins.at(19) += numu_cc_dis;
+        tabulated_origins.at(20) += numu_cc_coh;
+        tabulated_origins.at(21) += numu_cc_mec;
+        tabulated_origins.at(22) += only_nue_cc;
+        tabulated_origins.at(23) += only_nue_bar_cc;
+    }
+    else {
+        // Only need to count total selected for other categories
+        tabulated_origins.at(0) += 1;
+    }
+    
 }
 // -----------------------------------------------------------------------------
 void selection_cuts::PrintInfo(int mc_nue_cc_counter, std::vector<double> counter_v, int counter_intime_cosmics,
@@ -668,6 +683,8 @@ void selection_cuts::PrintInfo(int mc_nue_cc_counter, std::vector<double> counte
 
     counter = counter + (counter_intime_cosmics * (intime_scale_factor / data_scale_factor)) + (counter_dirt * (dirt_scale_factor / data_scale_factor));
 
+    std::cout << "\n------------------------" << std::endl;
+    std::cout << "------------------------" << std::endl;
     std::cout << "\n\033[0;33m <" << cut_name << "> \033[0m" << std::endl;
     std::cout << " Total Candidate Nue     : " << counter                << "\t \t " << double(counter                * data_scale_factor  ) << std::endl;
     std::cout << " Number of Nue CC        : " << counter_nue_cc         << "\t \t " << double(counter_nue_cc         * data_scale_factor  ) << std::endl;
@@ -699,10 +716,11 @@ void selection_cuts::PrintInfo(int mc_nue_cc_counter, std::vector<double> counte
     const double efficiency = double(counter_nue_cc) / double(mc_nue_cc_counter);
     const double purity = double(counter_nue_cc) / double(counter);
     std::cout << " Efficiency       : " << "( " << counter_nue_cc << " / " << mc_nue_cc_counter << " ) = " << efficiency << std::endl;
-    std::cout << " Purity           : " << purity << std::endl;
-    std::cout << "------------------------" << std::endl;
-    std::cout << "------------------------\n" << std::endl;
+    std::cout << " Purity           : " << "( " << counter_nue_cc << " / " << counter           << " ) = " << purity << std::endl;
 }
 // -----------------------------------------------------------------------------
+void selection_cuts::PrintInfoData(int counter, std::string cut_name) {
+    std::cout << " [Data] Total Candidate Nue     : " << counter << std::endl;
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
