@@ -339,7 +339,7 @@ void selection::make_selection(){
     }
     // Data --------------------------------------------------------------------
     if (bool_use_data){
-    std::cout << "Starting Selection over Data" << std::endl;
+        std::cout << "Starting Selection over Data" << std::endl;
 
         // resize the Passed vector
         data_passed_v.resize(data_tree_total_entries);
@@ -354,7 +354,7 @@ void selection::make_selection(){
             if (event % 100000 == 0) std::cout << "On entry " << event/100000.0 <<"00k " << std::flush;
         
             // Get the entry in the tree
-            data_tree->GetEntry(event);               // TPC Objects
+            data_tree->GetEntry(event); // TPC Objects
 
             // The total number of TPC Objects
             int n_tpc_obj = data_tpc_object_container_v->size();
@@ -383,33 +383,115 @@ void selection::make_selection(){
     }
     // EXT ---------------------------------------------------------------------
     if (bool_use_ext){
+        std::cout << "Starting Selection over EXT" << std::endl;
+         
+        // resize the Passed vector
+        ext_passed_v.resize(ext_tree_total_entries);
+        
+        // Resize the Counter Vector
+        ext_counter_v.resize(Passed_Container::k_cuts_MAX);
+        for (unsigned int i = 0; i < ext_counter_v.size(); i++) ext_counter_v.at(i).resize(1, 0 ); 
+        
+        // Loop over the Events
+        for (int event = 0; event < ext_tree_total_entries; event++){
+            // Alert the user
+            if (event % 100000 == 0) std::cout << "On entry " << event/100000.0 <<"00k " << std::flush;
+        
+            // Get the entry in the tree
+            ext_tree->GetEntry(event);  // TPC Objects
+
+            // The total number of TPC Objects
+            int n_tpc_obj = ext_tpc_object_container_v->size();
+
+            // Largest flash information
+            std::vector<double> largest_flash_v = ext_largest_flash_v_v.at(event); // Vec with the largest flash
+
+            // Create an instance of the selection cut (also initialises flash info)
+            selection_cuts_instance.at(histogram_helper::k_ext).SetFlashVariables(largest_flash_v);
+             
+            // Loop over the TPC Objects ---------------------------------------
+            // (In Pandora Consolidated, there should be 1 TPC Object per event)
+            for (int i = 0; i < n_tpc_obj; i++){
+                const xsecAna::TPCObjectContainer tpc_obj = ext_tpc_object_container_v->at(i); // Get the TPC Obj
+
+                // Apply the selection cuts 
+                bool pass = ApplyCuts(histogram_helper::k_ext, event, tpc_obj, ext_largest_flash_v_v, ext_optical_list_pe_v, ext_optical_list_flash_time_v, ext_counter_v, ext_passed_v);
+                if (!pass) continue;
+
+            } // End loop over the TPC Objects
+
+        
+        } // End loop over the Events
+        std::cout << std::endl;
+        std::cout << "Ending Selection over EXT" << std::endl;
 
     }
     // Dirt --------------------------------------------------------------------
     if (bool_use_dirt){
+        std::cout << "Starting Selection over Dirt" << std::endl;
+         
+        // resize the Passed vector
+        dirt_passed_v.resize(dirt_tree_total_entries);
+        
+        // Resize the Counter Vector
+        dirt_counter_v.resize(Passed_Container::k_cuts_MAX);
+        for (unsigned int i = 0; i < dirt_counter_v.size(); i++) dirt_counter_v.at(i).resize(1, 0 ); 
+        
+        // Loop over the Events
+        for (int event = 0; event < dirt_tree_total_entries; event++){
+            // Alert the user
+            if (event % 100000 == 0) std::cout << "On entry " << event/100000.0 <<"00k " << std::flush;
+        
+            // Get the entry in the tree
+            dirt_tree->GetEntry(event); // TPC Objects
+
+            // The total number of TPC Objects
+            int n_tpc_obj = dirt_tpc_object_container_v->size();
+
+            // Largest flash information
+            std::vector<double> largest_flash_v = dirt_largest_flash_v_v.at(event); // Vec with the largest flash
+
+            // Create an instance of the selection cut (also initialises flash info)
+            selection_cuts_instance.at(histogram_helper::k_dirt).SetFlashVariables(largest_flash_v);
+             
+            // Loop over the TPC Objects ---------------------------------------
+            // (In Pandora Consolidated, there should be 1 TPC Object per event)
+            for (int i = 0; i < n_tpc_obj; i++){
+                const xsecAna::TPCObjectContainer tpc_obj = dirt_tpc_object_container_v->at(i); // Get the TPC Obj
+
+                // Apply the selection cuts 
+                bool pass = ApplyCuts(histogram_helper::k_dirt, event, tpc_obj, dirt_largest_flash_v_v, dirt_optical_list_pe_v, dirt_optical_list_flash_time_v, dirt_counter_v, dirt_passed_v);
+                if (!pass) continue;
+
+            } // End loop over the TPC Objects
+
+        
+        } // End loop over the Events
+        std::cout << std::endl;
+        std::cout << "Ending Selection over Dirt" << std::endl;
 
     }
     // -------------------------------------------------------------------------
+    int num_ext{0}, num_dirt{0};
 
-
-    // Now fill hisograms and write to a file
-    
-
-    // Plots the histograms and write to a file
-    
     // Print the results of the selection -- needs configuring for all the correct 
     // scale factors. For now they are all set to 1.
-    for (unsigned int k = 0; k < mc_counter_v.size(); k++) {
-        if (bool_use_mc)   selection_cuts_instance.at(histogram_helper::k_mc)  .PrintInfo(total_mc_entries_inFV, mc_counter_v.at(k), 0, 1, 1, 0, 1, cut_names.at(k));
-        if (bool_use_data) selection_cuts_instance.at(histogram_helper::k_data).PrintInfoData(data_counter_v.at(k).at(0), cut_names.at(k));
+    if (bool_use_mc) { 
+        for (unsigned int k = 0; k < mc_counter_v.size(); k++) {
+            if (bool_use_ext)  num_ext  = ext_counter_v .at(k).at(0);
+            if (bool_use_dirt) num_dirt = dirt_counter_v.at(k).at(0);
+            if (bool_use_mc)   selection_cuts_instance.at(histogram_helper::k_mc)  .PrintInfo(total_mc_entries_inFV, mc_counter_v.at(k), num_ext, 1, 1, num_dirt, 1, cut_names.at(k));
+            if (bool_use_data) selection_cuts_instance.at(histogram_helper::k_data).PrintInfoData(data_counter_v.at(k).at(0), cut_names.at(k));
+        }
     }
 
-    // for (unsigned int k = 0; k < data_counter_v.size(); k++) {
-    //     if (bool_use_data) selection_cuts_instance.at(histogram_helper::k_data).PrintInfoData(data_counter_v.at(k).at(0), cut_names.at(k));
-    // }
-    
-    
-    
+    // If no MC file specified then just print the data
+    if (bool_use_data && !bool_use_mc) {
+        for (unsigned int k = 0; k < data_counter_v.size(); k++) {
+            if (bool_use_data) selection_cuts_instance.at(histogram_helper::k_data).PrintInfoData(data_counter_v.at(k).at(0), cut_names.at(k));
+        }
+    }
+
     std::cout << "Finished running the selection!"<< std::endl;
     return;
 } // End Selection
