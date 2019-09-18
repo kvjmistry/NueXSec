@@ -15,6 +15,25 @@ class histogram_helper{
 
     // enum to switch file type 
     enum type {k_mc, k_data, k_ext, k_dirt, k_variation, k_type_MAX}; 
+    
+    // enums for cut dirs
+    enum enum_cut_dirs {
+                k_Flash_PE_and_In_Time,                     // Flash PE and In time flash
+                k_Has_Pandora_Nue,                          // Pandora Nue 
+                k_In_FV,                                    // Fiducial volume
+                k_Vertex_to_Flash,                          // Vertex to flash
+                k_Shower_to_Nue_Dist,                       // Distance between pfp shower and nue object
+                k_Track_to_Nue_Dist,                        // Distance between pfp track and nue object
+                k_Shower_Hit_Threshold,                     // Hit threshold for at least one shower
+                k_Shower_Hit_Threshold_Collection_Plane,    // Hit threshold for at least one shower on collection plane
+                k_Shower_Open_Angle,                        // Tolerance for leading shower open angle
+                k_Shower_dEdx,                              // Tolerance for dedx of leading shower
+                k_Dist_Nue_Vtx_Secondary_Showers,           // Tolerance for distance from the reco nue vtx for TPCO w/ >3 showers
+                k_Hits_per_Length,                          // Tolerance for hits/length
+                k_Longest_Track_over_Leading_Shower_Length, // Tolerance for longest track length / leading shower length
+                k_Track_Is_Contained,                       // Contained Tracks
+                k_cut_dirs_MAX
+                };
 
     // -------------------------------------------------------------------------
     // Initialiser function
@@ -41,6 +60,23 @@ class histogram_helper{
     // -------------------------------------------------------------------------
     // Write Optical information to file
     void WriteOptical(int type);
+    // -------------------------------------------------------------------------
+    // Function to return the enum index of the classification type. This will be used
+    // to fill the appropriate histogram
+    int IndexOfClassification(std::string tpco_id);
+    // -------------------------------------------------------------------------
+    // Fill the Reco Vertex histograms
+    void FillRecoVtx(int classification_index, int cut_index, const xsecAna::TPCObjectContainer &tpc_obj);
+    // -------------------------------------------------------------------------
+    void WriteRecoVtx(int type);
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
@@ -77,30 +113,32 @@ class histogram_helper{
 
     // Names of the classifications
     std::vector<std::string> classification_dirs = {
+                "nue_cc",
                 "nue_cc_mixed",
-                "numu_cc_mixed",
-                "other_mixed",
+                "nue_cc_out_fv",
                 "cosmic",
-                "nue_cc_out_fv",
-                "nue_cc_out_fv",
-                "nue_cc_qe",
-                "nue_cc_res",
-                "nue_cc_dis",
-                "nue_cc_coh",
-                "nue_cc_mec",
-                "nue_bar_cc_qe",
-                "nue_bar_cc_res",
-                "nue_bar_cc_dis",
-                "nue_bar_cc_coh",
-                "nue_bar_cc_mec",
-                "numu_cc_qe",
-                "numu_cc_res",
-                "numu_cc_dis",
-                "numu_cc_coh",
-                "numu_cc_mec",
+                "numu_cc",
                 "nc",
                 "nc_pi0",
-                "unmatched"
+                "nc_mixed",
+                "unmatched",
+                "ext",
+                "data"
+                };
+
+    enum legend {
+                k_nue_cc,
+                k_nue_cc_mixed,
+                k_nue_cc_out_fv,
+                k_cosmic,
+                k_numu_cc,
+                k_nc,
+                k_nc_pi0,
+                k_nc_mixed,
+                k_unmatched,
+                k_leg_ext,
+                k_leg_data,
+                k_classifications_MAX
                 };
 
     // Class instances
@@ -125,6 +163,11 @@ class histogram_helper{
     // Optical Plots
     std::vector<TH1D*> h_flash_time_v;
     enum flash_time{ k_flash_mc, k_flash_data, k_flash_ext, k_flash_dirt, k_flash_MAX };
+
+    // Reco Plots
+    std::vector<std::vector<TH1D*>> h_reco_vtx_x;
+    std::vector<std::vector<TH1D*>> h_reco_vtx_y;
+    std::vector<std::vector<TH1D*>> h_reco_vtx_z;
 
 }; // End Class Histogram Helper
 

@@ -522,6 +522,11 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
         selection_cuts_instance.at(type).SetTPCObjVariables(tpc_obj, mc_nu_vtx_x, mc_nu_vtx_y, mc_nu_vtx_z, fv_boundary_v, has_pi0);
     }
 
+    // Get the classification index for filling stacked histograms
+    int classification_index;
+    if (!slim) classification_index = histogram_helper_instance.IndexOfClassification(selection_cuts_instance.at(type).tpc_classification.first);
+    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_Flash_PE_and_In_Time, tpc_obj);
+
     // Here we apply the selection cuts ----------------------------------------
     bool pass; // A flag to see if an event passes an event
 
@@ -648,16 +653,20 @@ void selection::SavetoFile(){
     if (bool_use_mc) {
         histogram_helper_instance.WriteMCTruth("MC");
         histogram_helper_instance.WriteOptical(histogram_helper::k_mc);
+        histogram_helper_instance.WriteRecoVtx(histogram_helper::k_mc);
     }
     if (bool_use_data) {
         histogram_helper_instance.WriteOptical(histogram_helper::k_data);
+        histogram_helper_instance.WriteRecoVtx(histogram_helper::k_data);
     }
     if (bool_use_ext) {
         histogram_helper_instance.WriteOptical(histogram_helper::k_ext);
+        histogram_helper_instance.WriteRecoVtx(histogram_helper::k_ext);
     }
     if (bool_use_dirt) {
         histogram_helper_instance.WriteMCTruth("Dirt");
         histogram_helper_instance.WriteOptical(histogram_helper::k_dirt);
+        histogram_helper_instance.WriteRecoVtx(histogram_helper::k_dirt);
     }
 
    

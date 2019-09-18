@@ -106,6 +106,24 @@ void histogram_helper::InitHistograms(){
         h_flash_time_v.at(i) = new TH1D ( Form("h_flash_time_%s", type_prefix.at(i).c_str()) ,"", 80, 0, 20);
     }
 
+    // Reco Vtx X
+    h_reco_vtx_x.resize(k_cut_dirs_MAX);
+    h_reco_vtx_y.resize(k_cut_dirs_MAX);
+    h_reco_vtx_z.resize(k_cut_dirs_MAX);
+    
+    for (unsigned int i=0; i < cut_dirs.size();i++){
+
+        h_reco_vtx_x.at(i).resize(k_classifications_MAX);
+        h_reco_vtx_y.at(i).resize(k_classifications_MAX);
+        h_reco_vtx_z.at(i).resize(k_classifications_MAX);
+
+        for (unsigned int j=0; j < classification_dirs.size();j++){
+            h_reco_vtx_x.at(i).at(j) = new TH1D ( Form("h_reco_vtx_x_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 20, -10, 270);
+            h_reco_vtx_y.at(i).at(j) = new TH1D ( Form("h_reco_vtx_y_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 20, -10, 120);
+            h_reco_vtx_z.at(i).at(j) = new TH1D ( Form("h_reco_vtx_z_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 20, -10, 1050);
+        }
+    }
+
 }
 // -----------------------------------------------------------------------------
 void histogram_helper::FillMCTruth( double mc_nu_energy,  double mc_nu_momentum,  int mc_nu_id, bool in_tpc,
@@ -209,8 +227,107 @@ void histogram_helper::WriteOptical(int type){
    
 }
 // -----------------------------------------------------------------------------
+int histogram_helper::IndexOfClassification(std::string tpco_id){
+
+    // Nue CC
+    if (tpco_id == "nue_cc_qe"  || tpco_id == "nue_bar_cc_qe"  ||
+        tpco_id == "nue_cc_res" || tpco_id == "nue_bar_cc_res" ||
+        tpco_id == "nue_cc_dis" || tpco_id == "nue_bar_cc_dis" || 
+        tpco_id == "nue_cc_coh" || tpco_id == "nue_bar_cc_coh" || 
+        tpco_id == "nue_cc_mec" || tpco_id == "nue_bar_cc_mec") {
+        return k_nue_cc;
+    }
+
+    // Nue CC OOFV
+    if (tpco_id == "nue_cc_out_fv"){
+        return k_nue_cc_out_fv;
+    }
+
+    // NuMu CC
+    if (tpco_id == "numu_cc_qe" || tpco_id == "numu_cc_res" ||
+       tpco_id == "numu_cc_dis" || tpco_id == "numu_cc_coh" || 
+       tpco_id == "numu_cc_mec" || tpco_id == "numu_cc_mixed"){
+        return k_numu_cc;
+    }
+
+    // NC
+    if (tpco_id == "nc"){
+        return k_nc;
+    }
+    
+    // NC pi0
+    if (tpco_id == "nc_pi0"){
+        return k_nc_pi0;
+    }
+
+    // Nue CC Mixed
+    if (tpco_id == "nue_cc_mixed"){
+        return k_nue_cc_mixed;
+    }
+
+    // Cosmic
+    if (tpco_id == "cosmic"){
+        return k_cosmic;
+    }
+
+    // Other Mixed
+    if (tpco_id == "other_mixed"){
+        return k_nc_mixed;
+    }
+
+    // Unmatched
+    if (tpco_id == "unmatched" || tpco_id == "bad_reco"){
+        return k_unmatched;
+    }
+
+    // Data
+    if (tpco_id == "Data"){
+        return  k_leg_data;
+    }
+
+    // EXT/ In time cosmics
+    if (tpco_id == "EXT"){
+        return  k_leg_ext;
+    }
+
+    std::cout << "Reached end of index of classifcation, this is BAD!!!! " << tpco_id << std::endl;
+    return k_classifications_MAX;
+}
 // -----------------------------------------------------------------------------
+void histogram_helper::FillRecoVtx(int classification_index, int cut_index, const xsecAna::TPCObjectContainer &tpc_obj){
+
+    h_reco_vtx_x.at(cut_index).at(classification_index)->Fill(tpc_obj.pfpVtxX());
+    h_reco_vtx_y.at(cut_index).at(classification_index)->Fill(tpc_obj.pfpVtxY());
+    h_reco_vtx_z.at(cut_index).at(classification_index)->Fill(tpc_obj.pfpVtxZ());
+
+}
 // -----------------------------------------------------------------------------
+void histogram_helper::WriteRecoVtx(int type){
+
+    f_nuexsec->cd();
+
+    bool bool_dir;
+    TDirectory *truth_dir; // e.g MC/Truth, Data/Truth, EXT/Truth
+
+    // loop over the cut directories
+    for (unsigned int i = 0; i < cut_dirs.size(); i++){
+        
+        // loop over the classification directories
+        for (unsigned int j = 0; j < classification_dirs.size(); j++){
+
+            // Get the classification directory and cd
+            bool_dir = _utility_instance.GetDirectory(f_nuexsec, truth_dir ,Form("%s/%s/%s/%s", type_prefix.at(type).c_str(), "Stack", cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str() ) );
+            if (bool_dir) truth_dir->cd();
+
+            // Now write the histogram
+            h_reco_vtx_x.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_vtx_y.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_vtx_z.at(i).at(j)->Write("",TObject::kOverwrite);
+        }
+
+    }
+    
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
