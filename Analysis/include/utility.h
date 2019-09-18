@@ -19,6 +19,12 @@
 #include "TVector3.h"
 #include "TRotation.h"
 #include "TTree.h"
+#include "THStack.h"
+#include "TLegend.h"
+#include "TCanvas.h"
+#include "TPad.h"
+#include "TPaveText.h"
+#include "TSystem.h"
 
 // Analysis Includes
 #include "Passed_Container.h"
@@ -67,6 +73,9 @@ namespace utilityNS {
         // ---------------------------------------------------------------------
         // Get a TDirectory from a file
         bool GetDirectory(TFile* f, TDirectory* &d, TString string);
+        // ---------------------------------------------------------------------
+        // Get a histogram from a file
+        bool GetHist(TFile* f, TH1D* &h, TString string);
         // ---------------------------------------------------------------------
         // Checks in FV, makes no cut, but returns a bool
         bool in_fv(double x, double y, double z, std::vector<double> fv_boundary_v);

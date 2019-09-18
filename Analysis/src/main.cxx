@@ -7,6 +7,7 @@ int main(int argc, char *argv[]){
     const char * input_config_file_name;
     bool using_default_config      = true;
     bool using_slim_version        = false;
+    bool make_histos               = false;
 
     char * mc_file_name          = (char *)"empty";
     char * ext_file_name         = (char *)"empty";
@@ -25,6 +26,11 @@ int main(int argc, char *argv[]){
             std::cout << "Running with slim mode"<< std::endl;
             using_slim_version = true;
             std::cout << " *** \t Running with Slimmed Selection (no histograms will be made)\t *** " << std::endl;
+        }
+
+        if(strcmp(arg, "--hist") == 0) {
+            std::cout << "Making Histograms"<< std::endl;
+            make_histos = true;
         }
         
         // Configuration file
@@ -65,12 +71,12 @@ int main(int argc, char *argv[]){
             std::string variation_type = variation_file_name;
         }
         if (strcmp(arg, "--h") == 0 || strcmp(arg, "-h") == 0|| strcmp(arg, "--help") == 0 || strcmp(arg, "--usage") == 0){
-            std::cout << " \n ./nuexsec --mc <mc file> [--data <data file>] [--ext <ext file>] [--dirt <dirt file>] [--var <variation file>] [-c <input config file>][--slim] \n " << std::endl; 
+            std::cout << " \n ./nuexsec --mc <mc file> [--data <data file>] [--ext <ext file>] [--dirt <dirt file>] [--var <variation file>] [-c <input config file>] [--slim] [--hist] \n " << std::endl; 
             exit(1);
         }
         
     }
-    if(argc < 2 )  { std::cout << " \n Please include the input file path \n " << std::endl; exit(1); }
+    // if(argc < 2 )  { std::cout << " \n Please include the input file path \n " << std::endl; exit(1); }
 
     // -------------------------------------------------------------------------
     std::vector<double> config;
@@ -146,6 +152,8 @@ int main(int argc, char *argv[]){
     // now save all the outputs to file
     if (!using_slim_version) _selection_instance.xsecSelection::selection::SavetoFile();
     
+    if (make_histos) _selection_instance.xsecSelection::selection::MakeHistograms();
+
     // -------------------------------------------------------------------------
     // Finished!
     std::cout << "\033[0;32m*** \t Exiting C++ Code... \t *** \033[0m" << std::endl;

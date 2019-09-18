@@ -9,13 +9,13 @@ void selection_cuts::SetFlashVariables(std::vector<double> largest_flash_v){
 // -----------------------------------------------------------------------------
 void selection_cuts::SetTPCObjVariables(xsecAna::TPCObjectContainer tpc_obj, 
                                         double mc_nu_vtx_x, double mc_nu_vtx_y, double mc_nu_vtx_z,
-                                        std::vector<double> fv_boundary_v, bool has_pi0){
+                                        std::vector<double> fv_boundary_v, bool has_pi0, std::string type){
     
     // Check if the true vtx is in the FV
     true_in_tpc = in_fv(mc_nu_vtx_x, mc_nu_vtx_y, mc_nu_vtx_z, fv_boundary_v);
 
     // Classify the event  
-    tpc_classification = TPCO_Classifier(tpc_obj, true_in_tpc, has_pi0);
+    tpc_classification = TPCO_Classifier(tpc_obj, true_in_tpc, has_pi0, type);
 
     // TPC Obj vars
     tpc_obj_vtx_x        = tpc_obj.pfpVtxX();
@@ -61,7 +61,7 @@ void selection_cuts::SetTPCObjVariables(xsecAna::TPCObjectContainer tpc_obj, std
 
 }
 // -----------------------------------------------------------------------------
-std::pair<std::string, int> selection_cuts::TPCO_Classifier(xsecAna::TPCObjectContainer tpc_obj, bool true_in_tpc, bool has_pi0) {
+std::pair<std::string, int> selection_cuts::TPCO_Classifier(xsecAna::TPCObjectContainer tpc_obj, bool true_in_tpc, bool has_pi0, std::string type) {
     int part_nue_cc     = 0;
     int part_nue_bar_cc = 0;
     int part_cosmic     = 0;
@@ -69,6 +69,8 @@ std::pair<std::string, int> selection_cuts::TPCO_Classifier(xsecAna::TPCObjectCo
     int part_nc_pi0     = 0;
     int part_numu_cc    = 0;
     int part_unmatched  = 0;
+
+    
 
     const int tpc_obj_mode = tpc_obj.Mode();
     const int n_pfp = tpc_obj.NumPFParticles();
@@ -101,7 +103,11 @@ std::pair<std::string, int> selection_cuts::TPCO_Classifier(xsecAna::TPCObjectCo
         if(part.Origin() == "kCosmicRay") { part_cosmic++;    }
         if(part.Origin() == "kUnknown"  ) { part_unmatched++; }
     }
-    //some tpc objects actually have 0 hits - crazy!
+
+    // Classify all dirt as One category for now
+    if (type == "Dirt") return std::make_pair("Dirt", leading_index);
+    
+    // Some tpc objects actually have 0 hits - crazy!
     if(tpc_obj.NumPFPHits() == 0) {return std::make_pair("bad_reco", 0); }
 
     //currently, any tpc objects which only have a track end up with a leading_index of -1

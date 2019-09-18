@@ -23,6 +23,7 @@ class Passed_Container {
         };
         
         enum cuts{
+            k_pandora_output,                  // The output TPC Objects from Pandora
             k_flash_pe_intime,                 // Flash PE and In time flash
             k_has_nue,                         // Pandora Nue 
             k_in_fv,                           // Fiducial volume

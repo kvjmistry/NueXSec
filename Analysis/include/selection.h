@@ -4,6 +4,7 @@
 #include "utility.h"
 #include "selection_cuts.h"
 #include "histogram_helper.h"
+#include "histogram_plotter.h"
 
 
 /* 
@@ -19,6 +20,11 @@ namespace xsecSelection {
     class selection {
 
         private:
+    
+            // Scale factors
+            const double data_scale_factor   = 0.1301; // v6 value - 0.12758;
+            const double intime_scale_factor = 1.0154;
+            const double dirt_scale_factor   = 0.16411;
 
             // Bools
             bool bool_use_mc{false};
@@ -53,7 +59,8 @@ namespace xsecSelection {
             // Class Instances
             utilityNS::utility _utility_instance;
             std::vector<selection_cuts> selection_cuts_instance; // One for each type e.g MC, Data, EXT..
-            histogram_helper histogram_helper_instance;
+            histogram_helper  histogram_helper_instance;
+            // histogram_plotter histogram_plotter_instance;
 
             // Variables -------------------------------------------------------
 
@@ -84,6 +91,7 @@ namespace xsecSelection {
 
             // Vector containing the cut names
             std::vector<std::string> cut_names = {
+                "Pandora Output",                           // The output TPC Objects from Pandora
                 "Flash PE and In Time",                     // Flash PE and In time flash
                 "Has Pandora Nue",                          // Pandora Nue 
                 "In FV",                                    // Fiducial volume
@@ -220,9 +228,11 @@ namespace xsecSelection {
                            std::vector<std::vector<double>> &counter_v,
                            std::vector<Passed_Container>    &passed_v);
             // -----------------------------------------------------------------
-
             // Function to save all written histograms to file
             void SavetoFile();
+            // -----------------------------------------------------------------
+            // Make final histogram plots
+            void MakeHistograms();
             // -----------------------------------------------------------------
 
     }; // END Class
