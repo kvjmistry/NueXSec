@@ -722,9 +722,11 @@ void selection::SavetoFile(){
 void selection::MakeHistograms(){
     std::cout << "Creating histograms and making plots" << std::endl;
 
+    // Loop over the cuts and plot histograms by plot type
     for (unsigned int i = 0 ; i < histogram_helper::k_cuts_MAX; i++){
         
         // Create a set of strings for creating a dynamic directory
+        // Directory structure that is created will take the form plots/<cut>/
         std::string a = "if [ ! -d \"plots/";
         std::string b = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
         std::string c = "; fi";

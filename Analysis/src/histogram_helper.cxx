@@ -365,13 +365,13 @@ void histogram_helper::SetStack(std::string hist_name, std::string cut_name, boo
     TPad * topPad    = new TPad("topPad", "", 0, 0.3, 1, 1.0);
     TPad * bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
     
-    topPad->SetBottomMargin(0.05);
+    topPad   ->SetBottomMargin(0.05);
     bottomPad->SetTopMargin(0.04);
     bottomPad->SetBottomMargin(0.25);
     bottomPad->SetGridy();
-    topPad->Draw();
+    topPad   ->Draw();
     bottomPad->Draw();
-    topPad->cd();
+    topPad   ->cd();
 
     THStack * h_stack = new THStack();
     
@@ -392,7 +392,7 @@ void histogram_helper::SetStack(std::string hist_name, std::string cut_name, boo
             continue;
         }
         
-        hist.at(0)->Scale(data_scale_factor);
+        hist.at(i)->Scale(data_scale_factor);
     }
 
     
@@ -410,8 +410,8 @@ void histogram_helper::SetStack(std::string hist_name, std::string cut_name, boo
     hist.at(k_leg_ext)      ->SetFillColor(41);
     hist.at(k_leg_ext)      ->SetFillStyle(3345);
 
-    hist.at(k_leg_dirt)      ->SetFillColor(2);
-    hist.at(k_leg_dirt)      ->SetFillStyle(3354);
+    hist.at(k_leg_dirt)     ->SetFillColor(2);
+    hist.at(k_leg_dirt)     ->SetFillStyle(3354);
 
     hist.at(k_leg_data)     ->SetMarkerStyle(20);
     hist.at(k_leg_data)     ->SetMarkerSize(0.5);
