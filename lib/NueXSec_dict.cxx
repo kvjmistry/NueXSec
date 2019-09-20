@@ -310,7 +310,7 @@ namespace {
     static const char* includePaths[] = {
 "/cvmfs/larsoft.opensciencegrid.org/products/root/v6_12_06a/Linux64bit+2.6-2.12-e17-prof/include",
 "/cvmfs/larsoft.opensciencegrid.org/products/root/v6_12_06a/Linux64bit+2.6-2.12-e17-prof/include",
-"/uboone/app/users/kmistry/MCC9_uboonecode_v08_00_00_19/srcs/ubana/ubana/NueXSec/Modules/",
+"/uboone/app/users/kmistry/MCC9_uboonecode_v08_00_00_22/srcs/ubana/ubana/NueXSec/Modules/",
 0
     };
     static const char* fwdDeclCode = R"DICTFWDDCLS(

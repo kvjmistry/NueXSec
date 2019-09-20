@@ -1,0 +1,597 @@
+Running with MC file: /uboone/data/users/kmistry/work/NueXSection_Outputs/files/filter_numi_cosmic_v4.root
+Running with Data file: /uboone/data/users/kmistry/work/NueXSection_Outputs/files/filter_data_v8_full.root
+Running with Dirt file: /uboone/data/users/chill2/filter_numi_dirt_v2_full.root
+Running with EXT file: /uboone/data/users/chill2/filter_ext_v8_full.root
+(Default) Parameter Config from header
+
+Initialising...
+Initalising Histogram Helper, creating TFile and directories...
+MC   File Path:      /uboone/data/users/kmistry/work/NueXSection_Outputs/files/filter_numi_cosmic_v4.root
+Ext  File Path:      /uboone/data/users/chill2/filter_ext_v8_full.root
+Data File Path:      /uboone/data/users/kmistry/work/NueXSection_Outputs/files/filter_data_v8_full.root
+Dirt File Path:      /uboone/data/users/chill2/filter_numi_dirt_v2_full.root
+Variation File Path: empty
+
+failed to get:	empty	This mode wont be used in the selection
+
+ --- Configuring Parameters --- 
+
+_x1                          : 20
+_x2                          : 20
+_y1                          : 20
+_y2                          : 20
+_z1                          : 20
+_z2                          : 20
+flash_pe_threshold           : 50
+flash_time_start             : 5.5
+flash_time_end               : 16
+tolerance                    : 80
+shwr_nue_tolerance           : 4
+trk_nue_tolerance            : 4
+shwr_hit_threshold           : 200
+shwr_hit_threshold_collection: 80
+tolerance_open_angle_min     : 2
+tolerance_open_angle_max     : 15
+tolerance_dedx_min           : 1.4
+tolerance_dedx_max           : 3
+dist_tolerance               : 22
+pfp_hits_length_tolerance    : 3
+ratio_tolerance              : 1
+detector_variations          : 0
+[0;31m-------------------------------[0m
+
+Initialising MC
+Total MC Entries: 728500
+MC Nue CC Counter      --- 20862
+MC Nue NC Counter      --- 6321
+MC Nue CC Counter Bar  --- 3778
+MC Nue NC Counter Bar  --- 1763
+MC Numu CC Counter     --- 430070
+MC Numu NC Counter     --- 148228
+MC Numu CC Counter Bar --- 76444
+MC Numu NC Counter Bar --- 41034
+-------------------------------
+Total Optical Entries:     789313
+Resized Optical List Size: 728500
+Total MC Events:           728500
+-------------------------------
+Initialisation of MC Complete!
+[0;31m-------------------------------[0m
+
+Initialising Data
+Total Optical Entries:     982904
+Resized Optical List Size: 904153
+Total Data Events:         904153
+-------------------------------
+Initialisation of Data Complete!
+[0;31m-------------------------------[0m
+
+Initialising EXT
+Total Optical Entries:     462393
+Resized Optical List Size: 427682
+Total ext Events:          427631
+-------------------------------
+Initialisation of EXT Complete!
+[0;31m-------------------------------[0m
+
+Initialising Dirt
+Total Optical Entries:     430106
+Resized Optical List Size: 407926
+Total dirt Events:         407926
+-------------------------------
+Initialisation of Dirt Complete!
+[0;31m-------------------------------[0m
+Now Running the selection!
+Starting Selection over MC
+On entry 000k On entry 100k On entry 200k On entry 300k On entry 400k On entry 500k On entry 600k On entry 700k 
+Ending Selection over MC
+Starting Selection over Data
+On entry 000k On entry 100k On entry 200k On entry 300k On entry 400k On entry 500k On entry 600k On entry 700k On entry 800k On entry 900k 
+Ending Selection over Data
+Starting Selection over EXT
+On entry 000k On entry 100k On entry 200k On entry 300k On entry 400k 
+Ending Selection over EXT
+Starting Selection over Dirt
+On entry 000k On entry 100k On entry 200k On entry 300k On entry 400k 
+Ending Selection over Dirt
+
+------------------------
+------------------------
+
+[0;33m <Pandora Output> [0m
+ Total Candidate Nue     : 0	 	 0
+ Number of Nue CC        : 0	 	 0
+ Number of Nue CC Mixed  : 0	 	 0
+ Number of Nue CC out FV : 0	 	 0
+ Number of Cosmic        : 0	 	 0
+ Number of Numu CC       : 0	 	 0
+ Number of Numu CC Mixed : 0	 	 0
+ Number of NC            : 0	 	 0
+ Number of NC Pi0        : 0	 	 0
+ Number of Unmatched     : 0	 	 0
+ Number of Other Mixed   : 0	 	 0
+ Number of InTime Cosmics: 0	 	 0
+ Number of Dirt          : 0	 	 0
+---------Unscaled----------
+ Nue CC QE               : 0
+ Nue CC Res              : 0
+ Nue CC DIS              : 0
+ Nue CC COH              : 0
+ Nue CC MEC              : 0
+ Numu CC QE              : 0
+ Numu CC Res             : 0
+ Numu CC DIS             : 0
+ Numu CC COH             : 0
+ Numu CC MEC             : 0
+---------------------------
+ Efficiency       : ( 0 / 7103 ) = 0
+ Purity           : ( 0 / 0 ) = -nan
+ [Data] Total Candidate Nue     : 0
+
+------------------------
+------------------------
+
+[0;33m <Flash PE and In Time> [0m
+ Total Candidate Nue     : 2786068	 	 2.78607e+06
+ Number of Nue CC        : 5388	 	 5388
+ Number of Nue CC Mixed  : 3191	 	 3191
+ Number of Nue CC out FV : 5359	 	 5359
+ Number of Cosmic        : 1230367	 	 1.23037e+06
+ Number of Numu CC       : 227242	 	 227242
+ Number of Numu CC Mixed : 61801	 	 61801
+ Number of NC            : 22500	 	 22500
+ Number of NC Pi0        : 16079	 	 16079
+ Number of Unmatched     : 9159	 	 9159
+ Number of Other Mixed   : 11775	 	 11775
+ Number of InTime Cosmics: 674199	 	 674199
+ Number of Dirt          : 519008	 	 519008
+---------Unscaled----------
+ Nue CC QE               : 2371
+ Nue CC Res              : 1458
+ Nue CC DIS              : 547
+ Nue CC COH              : 40
+ Nue CC MEC              : 972
+ Numu CC QE              : 91222
+ Numu CC Res             : 62128
+ Numu CC DIS             : 33950
+ Numu CC COH             : 1023
+ Numu CC MEC             : 38919
+---------------------------
+ Efficiency       : ( 5388 / 7103 ) = 0.758553
+ Purity           : ( 5388 / 2786068 ) = 0.00193391
+ [Data] Total Candidate Nue     : 1224635
+
+------------------------
+------------------------
+
+[0;33m <Has Pandora Nue> [0m
+ Total Candidate Nue     : 292609	 	 292609
+ Number of Nue CC        : 4080	 	 4080
+ Number of Nue CC Mixed  : 1682	 	 1682
+ Number of Nue CC out FV : 3586	 	 3586
+ Number of Cosmic        : 114060	 	 114060
+ Number of Numu CC       : 18224	 	 18224
+ Number of Numu CC Mixed : 6004	 	 6004
+ Number of NC            : 2379	 	 2379
+ Number of NC Pi0        : 10154	 	 10154
+ Number of Unmatched     : 4204	 	 4204
+ Number of Other Mixed   : 2919	 	 2919
+ Number of InTime Cosmics: 79488	 	 79488
+ Number of Dirt          : 45829	 	 45829
+---------Unscaled----------
+ Nue CC QE               : 1865
+ Nue CC Res              : 1047
+ Nue CC DIS              : 401
+ Nue CC COH              : 28
+ Nue CC MEC              : 739
+ Numu CC QE              : 2556
+ Numu CC Res             : 7210
+ Numu CC DIS             : 6888
+ Numu CC COH             : 57
+ Numu CC MEC             : 1513
+---------------------------
+ Efficiency       : ( 4080 / 7103 ) = 0.574405
+ Purity           : ( 4080 / 292609 ) = 0.0139435
+ [Data] Total Candidate Nue     : 180570
+
+------------------------
+------------------------
+
+[0;33m <In FV> [0m
+ Total Candidate Nue     : 152717	 	 152717
+ Number of Nue CC        : 3899	 	 3899
+ Number of Nue CC Mixed  : 1030	 	 1030
+ Number of Nue CC out FV : 716	 	 716
+ Number of Cosmic        : 59465	 	 59465
+ Number of Numu CC       : 10018	 	 10018
+ Number of Numu CC Mixed : 3432	 	 3432
+ Number of NC            : 1552	 	 1552
+ Number of NC Pi0        : 6487	 	 6487
+ Number of Unmatched     : 2958	 	 2958
+ Number of Other Mixed   : 1748	 	 1748
+ Number of InTime Cosmics: 37917	 	 37917
+ Number of Dirt          : 23495	 	 23495
+---------Unscaled----------
+ Nue CC QE               : 1772
+ Nue CC Res              : 1007
+ Nue CC DIS              : 388
+ Nue CC COH              : 28
+ Nue CC MEC              : 704
+ Numu CC QE              : 1524
+ Numu CC Res             : 3837
+ Numu CC DIS             : 3682
+ Numu CC COH             : 29
+ Numu CC MEC             : 946
+---------------------------
+ Efficiency       : ( 3899 / 7103 ) = 0.548923
+ Purity           : ( 3899 / 152717 ) = 0.0255309
+ [Data] Total Candidate Nue     : 87029
+
+------------------------
+------------------------
+
+[0;33m <Vertex to Flash> [0m
+ Total Candidate Nue     : 27051	 	 27051
+ Number of Nue CC        : 2699	 	 2699
+ Number of Nue CC Mixed  : 546	 	 546
+ Number of Nue CC out FV : 232	 	 232
+ Number of Cosmic        : 4717	 	 4717
+ Number of Numu CC       : 5464	 	 5464
+ Number of Numu CC Mixed : 1405	 	 1405
+ Number of NC            : 946	 	 946
+ Number of NC Pi0        : 4060	 	 4060
+ Number of Unmatched     : 622	 	 622
+ Number of Other Mixed   : 775	 	 775
+ Number of InTime Cosmics: 3129	 	 3129
+ Number of Dirt          : 2456	 	 2456
+---------Unscaled----------
+ Nue CC QE               : 1196
+ Nue CC Res              : 722
+ Nue CC DIS              : 263
+ Nue CC COH              : 16
+ Nue CC MEC              : 502
+ Numu CC QE              : 854
+ Numu CC Res             : 2070
+ Numu CC DIS             : 1957
+ Numu CC COH             : 12
+ Numu CC MEC             : 571
+---------------------------
+ Efficiency       : ( 2699 / 7103 ) = 0.37998
+ Purity           : ( 2699 / 27051 ) = 0.0997745
+ [Data] Total Candidate Nue     : 13751
+
+------------------------
+------------------------
+
+[0;33m <Shower to Nue Dist> [0m
+ Total Candidate Nue     : 20360	 	 20360
+ Number of Nue CC        : 2333	 	 2333
+ Number of Nue CC Mixed  : 404	 	 404
+ Number of Nue CC out FV : 192	 	 192
+ Number of Cosmic        : 3757	 	 3757
+ Number of Numu CC       : 4078	 	 4078
+ Number of Numu CC Mixed : 717	 	 717
+ Number of NC            : 738	 	 738
+ Number of NC Pi0        : 2913	 	 2913
+ Number of Unmatched     : 545	 	 545
+ Number of Other Mixed   : 405	 	 405
+ Number of InTime Cosmics: 2354	 	 2354
+ Number of Dirt          : 1924	 	 1924
+---------Unscaled----------
+ Nue CC QE               : 1036
+ Nue CC Res              : 630
+ Nue CC DIS              : 223
+ Nue CC COH              : 13
+ Nue CC MEC              : 431
+ Numu CC QE              : 754
+ Numu CC Res             : 1439
+ Numu CC DIS             : 1357
+ Numu CC COH             : 7
+ Numu CC MEC             : 521
+---------------------------
+ Efficiency       : ( 2333 / 7103 ) = 0.328453
+ Purity           : ( 2333 / 20360 ) = 0.114587
+ [Data] Total Candidate Nue     : 10355
+
+------------------------
+------------------------
+
+[0;33m <Track to Nue Dist> [0m
+ Total Candidate Nue     : 19040	 	 19040
+ Number of Nue CC        : 2239	 	 2239
+ Number of Nue CC Mixed  : 329	 	 329
+ Number of Nue CC out FV : 183	 	 183
+ Number of Cosmic        : 3515	 	 3515
+ Number of Numu CC       : 3881	 	 3881
+ Number of Numu CC Mixed : 613	 	 613
+ Number of NC            : 694	 	 694
+ Number of NC Pi0        : 2736	 	 2736
+ Number of Unmatched     : 537	 	 537
+ Number of Other Mixed   : 313	 	 313
+ Number of InTime Cosmics: 2199	 	 2199
+ Number of Dirt          : 1801	 	 1801
+---------Unscaled----------
+ Nue CC QE               : 1001
+ Nue CC Res              : 595
+ Nue CC DIS              : 217
+ Nue CC COH              : 11
+ Nue CC MEC              : 415
+ Numu CC QE              : 721
+ Numu CC Res             : 1365
+ Numu CC DIS             : 1279
+ Numu CC COH             : 5
+ Numu CC MEC             : 511
+---------------------------
+ Efficiency       : ( 2239 / 7103 ) = 0.315219
+ Purity           : ( 2239 / 19040 ) = 0.117595
+ [Data] Total Candidate Nue     : 9536
+
+------------------------
+------------------------
+
+[0;33m <Shower Hit_Threshold> [0m
+ Total Candidate Nue     : 8097	 	 8097
+ Number of Nue CC        : 1972	 	 1972
+ Number of Nue CC Mixed  : 294	 	 294
+ Number of Nue CC out FV : 91	 	 91
+ Number of Cosmic        : 862	 	 862
+ Number of Numu CC       : 1736	 	 1736
+ Number of Numu CC Mixed : 403	 	 403
+ Number of NC            : 187	 	 187
+ Number of NC Pi0        : 1507	 	 1507
+ Number of Unmatched     : 20	 	 20
+ Number of Other Mixed   : 178	 	 178
+ Number of InTime Cosmics: 476	 	 476
+ Number of Dirt          : 371	 	 371
+---------Unscaled----------
+ Nue CC QE               : 887
+ Nue CC Res              : 516
+ Nue CC DIS              : 191
+ Nue CC COH              : 11
+ Nue CC MEC              : 367
+ Numu CC QE              : 107
+ Numu CC Res             : 685
+ Numu CC DIS             : 863
+ Numu CC COH             : 3
+ Numu CC MEC             : 78
+---------------------------
+ Efficiency       : ( 1972 / 7103 ) = 0.277629
+ Purity           : ( 1972 / 8097 ) = 0.243547
+ [Data] Total Candidate Nue     : 3124
+
+------------------------
+------------------------
+
+[0;33m <Shower Hit Threshold Collection Plane> [0m
+ Total Candidate Nue     : 6899	 	 6899
+ Number of Nue CC        : 1855	 	 1855
+ Number of Nue CC Mixed  : 276	 	 276
+ Number of Nue CC out FV : 73	 	 73
+ Number of Cosmic        : 635	 	 635
+ Number of Numu CC       : 1515	 	 1515
+ Number of Numu CC Mixed : 365	 	 365
+ Number of NC            : 166	 	 166
+ Number of NC Pi0        : 1288	 	 1288
+ Number of Unmatched     : 14	 	 14
+ Number of Other Mixed   : 151	 	 151
+ Number of InTime Cosmics: 289	 	 289
+ Number of Dirt          : 272	 	 272
+---------Unscaled----------
+ Nue CC QE               : 840
+ Nue CC Res              : 487
+ Nue CC DIS              : 179
+ Nue CC COH              : 11
+ Nue CC MEC              : 338
+ Numu CC QE              : 75
+ Numu CC Res             : 580
+ Numu CC DIS             : 808
+ Numu CC COH             : 3
+ Numu CC MEC             : 49
+---------------------------
+ Efficiency       : ( 1855 / 7103 ) = 0.261157
+ Purity           : ( 1855 / 6899 ) = 0.26888
+ [Data] Total Candidate Nue     : 2334
+
+------------------------
+------------------------
+
+[0;33m <Shower Open Angle> [0m
+ Total Candidate Nue     : 5029	 	 5029
+ Number of Nue CC        : 1578	 	 1578
+ Number of Nue CC Mixed  : 231	 	 231
+ Number of Nue CC out FV : 59	 	 59
+ Number of Cosmic        : 404	 	 404
+ Number of Numu CC       : 1000	 	 1000
+ Number of Numu CC Mixed : 222	 	 222
+ Number of NC            : 107	 	 107
+ Number of NC Pi0        : 966	 	 966
+ Number of Unmatched     : 7	 	 7
+ Number of Other Mixed   : 101	 	 101
+ Number of InTime Cosmics: 187	 	 187
+ Number of Dirt          : 167	 	 167
+---------Unscaled----------
+ Nue CC QE               : 736
+ Nue CC Res              : 396
+ Nue CC DIS              : 146
+ Nue CC COH              : 9
+ Nue CC MEC              : 291
+ Numu CC QE              : 57
+ Numu CC Res             : 416
+ Numu CC DIS             : 490
+ Numu CC COH             : 2
+ Numu CC MEC             : 35
+---------------------------
+ Efficiency       : ( 1578 / 7103 ) = 0.22216
+ Purity           : ( 1578 / 5029 ) = 0.31378
+ [Data] Total Candidate Nue     : 1564
+
+------------------------
+------------------------
+
+[0;33m <Shower dEdx> [0m
+ Total Candidate Nue     : 2039	 	 2039
+ Number of Nue CC        : 938	 	 938
+ Number of Nue CC Mixed  : 135	 	 135
+ Number of Nue CC out FV : 26	 	 26
+ Number of Cosmic        : 120	 	 120
+ Number of Numu CC       : 333	 	 333
+ Number of Numu CC Mixed : 65	 	 65
+ Number of NC            : 31	 	 31
+ Number of NC Pi0        : 261	 	 261
+ Number of Unmatched     : 1	 	 1
+ Number of Other Mixed   : 35	 	 35
+ Number of InTime Cosmics: 56	 	 56
+ Number of Dirt          : 38	 	 38
+---------Unscaled----------
+ Nue CC QE               : 471
+ Nue CC Res              : 232
+ Nue CC DIS              : 63
+ Nue CC COH              : 4
+ Nue CC MEC              : 168
+ Numu CC QE              : 25
+ Numu CC Res             : 142
+ Numu CC DIS             : 148
+ Numu CC COH             : 1
+ Numu CC MEC             : 17
+---------------------------
+ Efficiency       : ( 938 / 7103 ) = 0.132057
+ Purity           : ( 938 / 2039 ) = 0.460029
+ [Data] Total Candidate Nue     : 563
+
+------------------------
+------------------------
+
+[0;33m <Dist Nue Vtx Secondary Showers> [0m
+ Total Candidate Nue     : 1459	 	 1459
+ Number of Nue CC        : 773	 	 773
+ Number of Nue CC Mixed  : 25	 	 25
+ Number of Nue CC out FV : 19	 	 19
+ Number of Cosmic        : 101	 	 101
+ Number of Numu CC       : 226	 	 226
+ Number of Numu CC Mixed : 17	 	 17
+ Number of NC            : 22	 	 22
+ Number of NC Pi0        : 184	 	 184
+ Number of Unmatched     : 1	 	 1
+ Number of Other Mixed   : 9	 	 9
+ Number of InTime Cosmics: 48	 	 48
+ Number of Dirt          : 34	 	 34
+---------Unscaled----------
+ Nue CC QE               : 411
+ Nue CC Res              : 173
+ Nue CC DIS              : 38
+ Nue CC COH              : 3
+ Nue CC MEC              : 148
+ Numu CC QE              : 23
+ Numu CC Res             : 107
+ Numu CC DIS             : 78
+ Numu CC COH             : 1
+ Numu CC MEC             : 17
+---------------------------
+ Efficiency       : ( 773 / 7103 ) = 0.108827
+ Purity           : ( 773 / 1459 ) = 0.529815
+ [Data] Total Candidate Nue     : 389
+
+------------------------
+------------------------
+
+[0;33m <Hits per Length> [0m
+ Total Candidate Nue     : 1249	 	 1249
+ Number of Nue CC        : 698	 	 698
+ Number of Nue CC Mixed  : 23	 	 23
+ Number of Nue CC out FV : 17	 	 17
+ Number of Cosmic        : 86	 	 86
+ Number of Numu CC       : 186	 	 186
+ Number of Numu CC Mixed : 11	 	 11
+ Number of NC            : 17	 	 17
+ Number of NC Pi0        : 137	 	 137
+ Number of Unmatched     : 1	 	 1
+ Number of Other Mixed   : 4	 	 4
+ Number of InTime Cosmics: 41	 	 41
+ Number of Dirt          : 28	 	 28
+---------Unscaled----------
+ Nue CC QE               : 374
+ Nue CC Res              : 153
+ Nue CC DIS              : 34
+ Nue CC COH              : 3
+ Nue CC MEC              : 134
+ Numu CC QE              : 16
+ Numu CC Res             : 86
+ Numu CC DIS             : 70
+ Numu CC COH             : 1
+ Numu CC MEC             : 13
+---------------------------
+ Efficiency       : ( 698 / 7103 ) = 0.0982683
+ Purity           : ( 698 / 1249 ) = 0.558847
+ [Data] Total Candidate Nue     : 335
+
+------------------------
+------------------------
+
+[0;33m <Longest Track over Leading Shower Length> [0m
+ Total Candidate Nue     : 1189	 	 1189
+ Number of Nue CC        : 688	 	 688
+ Number of Nue CC Mixed  : 17	 	 17
+ Number of Nue CC out FV : 17	 	 17
+ Number of Cosmic        : 84	 	 84
+ Number of Numu CC       : 150	 	 150
+ Number of Numu CC Mixed : 8	 	 8
+ Number of NC            : 17	 	 17
+ Number of NC Pi0        : 137	 	 137
+ Number of Unmatched     : 1	 	 1
+ Number of Other Mixed   : 3	 	 3
+ Number of InTime Cosmics: 39	 	 39
+ Number of Dirt          : 28	 	 28
+---------Unscaled----------
+ Nue CC QE               : 372
+ Nue CC Res              : 149
+ Nue CC DIS              : 30
+ Nue CC COH              : 3
+ Nue CC MEC              : 134
+ Numu CC QE              : 15
+ Numu CC Res             : 71
+ Numu CC DIS             : 50
+ Numu CC COH             : 1
+ Numu CC MEC             : 13
+---------------------------
+ Efficiency       : ( 688 / 7103 ) = 0.0968605
+ Purity           : ( 688 / 1189 ) = 0.578638
+ [Data] Total Candidate Nue     : 310
+
+------------------------
+------------------------
+
+[0;33m <Track Is Contained> [0m
+ Total Candidate Nue     : 1057	 	 1057
+ Number of Nue CC        : 642	 	 642
+ Number of Nue CC Mixed  : 2	 	 2
+ Number of Nue CC out FV : 14	 	 14
+ Number of Cosmic        : 78	 	 78
+ Number of Numu CC       : 109	 	 109
+ Number of Numu CC Mixed : 1	 	 1
+ Number of NC            : 16	 	 16
+ Number of NC Pi0        : 132	 	 132
+ Number of Unmatched     : 1	 	 1
+ Number of Other Mixed   : 3	 	 3
+ Number of InTime Cosmics: 33	 	 33
+ Number of Dirt          : 26	 	 26
+---------Unscaled----------
+ Nue CC QE               : 361
+ Nue CC Res              : 126
+ Nue CC DIS              : 27
+ Nue CC COH              : 2
+ Nue CC MEC              : 126
+ Numu CC QE              : 14
+ Numu CC Res             : 52
+ Numu CC DIS             : 30
+ Numu CC COH             : 0
+ Numu CC MEC             : 13
+---------------------------
+ Efficiency       : ( 642 / 7103 ) = 0.0903843
+ Purity           : ( 642 / 1057 ) = 0.607379
+ [Data] Total Candidate Nue     : 267
+Finished running the selection!
+Now Saving Histograms to file
+[0;32m*** 	 Exiting C++ Code... 	 *** [0m
+[0;31m*** 	 Warning shift of 1us is still set in flash times 	 *** [0m
+Time taken by function: 746 seconds
+Time taken by function: 12 minutes
