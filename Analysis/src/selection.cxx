@@ -480,7 +480,7 @@ void selection::make_selection(){
         for (unsigned int k = 0; k < mc_counter_v.size(); k++) {
             if (bool_use_ext)  num_ext  = ext_counter_v .at(k).at(0);
             if (bool_use_dirt) num_dirt = dirt_counter_v.at(k).at(0);
-            if (bool_use_mc)   selection_cuts_instance.at(histogram_helper::k_mc)  .PrintInfo(total_mc_entries_inFV, mc_counter_v.at(k), num_ext, 1, 1, num_dirt, 1, cut_names.at(k));
+            if (bool_use_mc)   selection_cuts_instance.at(histogram_helper::k_mc)  .PrintInfo(total_mc_entries_inFV, mc_counter_v.at(k), num_ext, intime_scale_factor, data_scale_factor, num_dirt, dirt_scale_factor, cut_names.at(k));
             if (bool_use_data) selection_cuts_instance.at(histogram_helper::k_data).PrintInfoData(data_counter_v.at(k).at(0), cut_names.at(k));
         }
     }
@@ -527,22 +527,36 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
     if (!slim) classification_index = histogram_helper_instance.IndexOfClassification(selection_cuts_instance.at(type).tpc_classification.first);
     
     
-    // Fill here for hitograms pre-selection -----------------------------------
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_pandora_output, tpc_obj);
-
     // Here we apply the selection cuts ----------------------------------------
     bool pass; // A flag to see if an event passes an event
 
     // *************************************************************************
-    // Flash is in time and has more than the required PE ----------------------
+    // Pandora Output ----------------------------------------------------------
     // *************************************************************************
-    pass = selection_cuts_instance.at(type).FlashinTime_FlashPE(flash_time_start, flash_time_end, flash_pe_threshold, optical_list_flash_time_v.at(event), optical_list_pe_v.at(event), type_str);
-    passed_v.at(event).cut_v.at(Passed_Container::k_flash_pe_intime) = pass;
+    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_pandora_output, tpc_obj);
+    selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_pandora_output), type_str); 
+
+    // *************************************************************************
+    // Flash is in time --------------------------------------------------------
+    // *************************************************************************
+    pass = selection_cuts_instance.at(type).FlashinTime(flash_time_start, flash_time_end, optical_list_flash_time_v.at(event), type_str);
+    passed_v.at(event).cut_v.at(Passed_Container::k_in_time) = pass;
     if(!pass) return false; // Failed the cut!
 
     // Set counters for how many passed the cut
-    selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_flash_pe_intime), type_str); 
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_flash_pe_intime, tpc_obj);
+    selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_in_time), type_str); 
+    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_in_time, tpc_obj);
+    
+    // *************************************************************************
+    // Flash has more than the required PE -------------------------------------
+    // *************************************************************************
+    pass = selection_cuts_instance.at(type).FlashPE(flash_pe_threshold, optical_list_pe_v.at(event), type_str);
+    passed_v.at(event).cut_v.at(Passed_Container::k_flash_pe) = pass;
+    if(!pass) return false; // Failed the cut!
+
+    // Set counters for how many passed the cut
+    selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_flash_pe), type_str); 
+    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_flash_pe, tpc_obj);
     
     // *************************************************************************
     // Has a valid Nue ---------------------------------------------------------

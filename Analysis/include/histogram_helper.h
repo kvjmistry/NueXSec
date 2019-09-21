@@ -15,11 +15,15 @@ class histogram_helper{
 
     // enum to switch file type 
     enum type {k_mc, k_data, k_ext, k_dirt, k_variation, k_type_MAX}; 
+
+    enum vertex {k_vtx_signal, k_vtx_data, k_vtx_ext, k_vtx_mc_ext, k_vertex_MAX};
+    std::vector<std::string> vertex_strings = {"Signal", "Data", "EXT", "MC_plus_EXT"};
     
     // enums for cut dirs
     enum enum_cut_dirs {
                 k_pandora_output,                  // The output TPC Objects from Pandora
-                k_flash_pe_intime,                 // Flash PE and In time flash
+                k_in_time,                         // In time flash
+                k_flash_pe,                        // Flash PE and In time flash
                 k_has_nue,                         // Pandora Nue 
                 k_in_fv,                           // Fiducial volume
                 k_vtx_to_flash,                    // Vertex to flash
@@ -39,7 +43,8 @@ class histogram_helper{
     // Cut directory names
     std::vector<std::string> cut_dirs = {
                 "Pandora_Output",                           // The output TPC Objects from Pandora
-                "Flash_PE_and_In_Time",                     // Flash PE and In time flash
+                "In_Time",                                  // In time flash
+                "Flash_PE",                                 // Flash PE 
                 "Has_Pandora_Nue",                          // Pandora Nue 
                 "In_FV",                                    // Fiducial volume
                 "Vertex_to_Flash",                          // Vertex to flash
@@ -58,6 +63,7 @@ class histogram_helper{
     // Names of the plot types
     std::vector<std::string> plot_types = {
                 "Truth",
+                "Reco",
                 "Optical",
                 "Stack"
                 };
@@ -175,9 +181,11 @@ class histogram_helper{
     enum flash_time{ k_flash_mc, k_flash_data, k_flash_ext, k_flash_dirt, k_flash_MAX };
 
     // Reco Plots
-    std::vector<std::vector<TH1D*>> h_reco_vtx_x;
-    std::vector<std::vector<TH1D*>> h_reco_vtx_y;
-    std::vector<std::vector<TH1D*>> h_reco_vtx_z;
+    std::vector<std::vector<TH1D*>> h_reco_vtx_x; // Reco Vertex X
+    std::vector<std::vector<TH1D*>> h_reco_vtx_y; // Reco Vertex Y
+    std::vector<std::vector<TH1D*>> h_reco_vtx_z; // Reco Vertex Z
+    std::vector<TH2D*> h_reco_vtx_zy; // Reco Vertex ZY Plane
+
 
 }; // End Class Histogram Helper
 

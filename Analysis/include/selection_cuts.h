@@ -58,8 +58,11 @@ class selection_cuts{
     // *************************************************************************
     // ------------------- Selection Cuts Functions ----------------------------
     // *************************************************************************
-    // Flash is in time and flash PE 
-    bool FlashinTime_FlashPE(double flash_time_start, double flash_time_end, double flash_pe_threshold, std::vector<double> &opt_time_v, std::vector<int> &opt_pe_v, std::string type);
+    // Flash is in time 
+    bool FlashinTime(double flash_time_start, double flash_time_end, std::vector<double> &opt_time_v, std::string type);
+    // -------------------------------------------------------------------------
+    // Flash has enough PE
+    bool FlashPE( double flash_pe_threshold, std::vector<int> &opt_pe_v, std::string type);
     // -------------------------------------------------------------------------
     // Pandora Reco Nue
     bool HasNue(xsecAna::TPCObjectContainer tpc_obj);

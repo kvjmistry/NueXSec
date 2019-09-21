@@ -163,13 +163,12 @@ std::pair<std::string, int> selection_cuts::TPCO_Classifier(xsecAna::TPCObjectCo
 // *****************************************************************************
 
 // -----------------------------------------------------------------------------
-bool selection_cuts::FlashinTime_FlashPE(double flash_time_start, double flash_time_end, double flash_pe_threshold, std::vector<double> &opt_time_v, std::vector<int> &opt_pe_v, std::string type){
+bool selection_cuts::FlashinTime(double flash_time_start, double flash_time_end, std::vector<double> &opt_time_v, std::string type){
 
-    bool in_time          = false;
-    bool sufficient_flash = false;
+    bool in_time = false;
     
     // Loop over the optical list vec
-    for (unsigned int j = 0; j < opt_pe_v.size(); j++) {
+    for (unsigned int j = 0; j < opt_time_v.size(); j++) {
         
         double opt_time;
         
@@ -177,17 +176,35 @@ bool selection_cuts::FlashinTime_FlashPE(double flash_time_start, double flash_t
         else if (type == "EXT") opt_time = opt_time_v.at(j) - 0.343;
         else                    opt_time = opt_time_v.at(j);
         
-        
-        auto opt_pe   = opt_pe_v.at(j);
-        
         // See if flash was in time
         in_time = (opt_time >= flash_time_start && opt_time <= flash_time_end) ? true : false;
+        
+        // Flash is both in time
+        if (in_time == true){
+            return true;
+            break; // once pased we are done, so dont loop any more otherwise we may overwrite this
+
+        }
+    }
+
+    return false;
+    
+}
+// -----------------------------------------------------------------------------
+bool selection_cuts::FlashPE(double flash_pe_threshold, std::vector<int> &opt_pe_v, std::string type){
+
+    bool sufficient_flash = false;
+    
+    // Loop over the optical list vec
+    for (unsigned int j = 0; j < opt_pe_v.size(); j++) {
+         
+        auto opt_pe   = opt_pe_v.at(j);
         
         // See if flash meets the threshold requirements
         sufficient_flash = (opt_pe >= flash_pe_threshold) ? true : false;
         
-        // Flash is both in time and over PE threshold
-        if(in_time == true && sufficient_flash == true){
+        // Flash is over PE threshold
+        if (sufficient_flash == true){
             return true;
             break; // once pased we are done, so dont loop any more otherwise we may overwrite this
 

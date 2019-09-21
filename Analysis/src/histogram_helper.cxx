@@ -100,17 +100,25 @@ void histogram_helper::Initialise(){
 // -----------------------------------------------------------------------------
 void histogram_helper::InitHistograms(){
     
+    // -------------------------------------------------------------------------
     // Flash Histograms
     h_flash_time_v.resize(k_flash_MAX);
     for (unsigned int i=0; i < h_flash_time_v.size();i++){
         h_flash_time_v.at(i) = new TH1D ( Form("h_flash_time_%s", type_prefix.at(i).c_str()) ,"", 80, 0, 20);
     }
+    // -------------------------------------------------------------------------
+    // Reco Vtx ZY
+    h_reco_vtx_zy.resize(k_vertex_MAX);
 
-    // Reco Vtx X
+    for (unsigned int i=0; i < h_reco_vtx_zy.size();i++){
+        h_reco_vtx_zy.at(i) = new TH2D ( Form("h_reco_vtx_zy_%s", vertex_strings.at(i).c_str()) ,"", 40, 0, 1038, 40, -117, 117);
+    }
+    // -------------------------------------------------------------------------
+    // Reco Vtx X, Y, Z
     h_reco_vtx_x.resize(k_cuts_MAX);
     h_reco_vtx_y.resize(k_cuts_MAX);
     h_reco_vtx_z.resize(k_cuts_MAX);
-    
+
     for (unsigned int i=0; i < cut_dirs.size();i++){
 
         h_reco_vtx_x.at(i).resize(k_classifications_MAX);
@@ -123,6 +131,7 @@ void histogram_helper::InitHistograms(){
             h_reco_vtx_z.at(i).at(j) = new TH1D ( Form("h_reco_vtx_z_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 20, -10, 1050);
         }
     }
+    // -------------------------------------------------------------------------
 
 }
 // -----------------------------------------------------------------------------
@@ -244,9 +253,9 @@ int histogram_helper::IndexOfClassification(std::string tpco_id){
     }
 
     // NuMu CC
-    if (tpco_id == "numu_cc_qe" || tpco_id == "numu_cc_res" ||
-       tpco_id == "numu_cc_dis" || tpco_id == "numu_cc_coh" || 
-       tpco_id == "numu_cc_mec" || tpco_id == "numu_cc_mixed"){
+    if (tpco_id == "numu_cc_qe"  || tpco_id == "numu_cc_res" ||
+        tpco_id == "numu_cc_dis" || tpco_id == "numu_cc_coh" || 
+        tpco_id == "numu_cc_mec" || tpco_id == "numu_cc_mixed"){
         return k_numu_cc;
     }
 
@@ -305,6 +314,11 @@ void histogram_helper::FillRecoVtx(int classification_index, int cut_index, cons
     h_reco_vtx_y.at(cut_index).at(classification_index)->Fill(tpc_obj.pfpVtxY());
     h_reco_vtx_z.at(cut_index).at(classification_index)->Fill(tpc_obj.pfpVtxZ());
 
+    if (classification_index == k_nue_cc)   h_reco_vtx_zy.at(k_vtx_signal)->Fill(tpc_obj.pfpVtxZ(),tpc_obj.pfpVtxY() ); // Signal
+    if (classification_index == k_leg_data) h_reco_vtx_zy.at(k_vtx_data)  ->Fill(tpc_obj.pfpVtxZ(),tpc_obj.pfpVtxY() ); // Data
+    if (classification_index == k_leg_ext)  h_reco_vtx_zy.at(k_vtx_ext)   ->Fill(tpc_obj.pfpVtxZ(),tpc_obj.pfpVtxY() ); // EXT
+    if (classification_index != k_leg_data && classification_index != k_leg_dirt ) h_reco_vtx_zy.at(k_vtx_mc_ext)  ->Fill(tpc_obj.pfpVtxZ(),tpc_obj.pfpVtxY() ); // MC + EXT
+
 }
 // -----------------------------------------------------------------------------
 void histogram_helper::WriteRecoVtx(int type){
@@ -313,24 +327,72 @@ void histogram_helper::WriteRecoVtx(int type){
 
     bool bool_dir;
     TDirectory *truth_dir; // e.g MC/Truth, Data/Truth, EXT/Truth
+    bool break_early{false};
 
     // loop over the cut directories
     for (unsigned int i = 0; i < cut_dirs.size(); i++){
-        
+
         // loop over the classification directories
         for (unsigned int j = 0; j < classification_dirs.size(); j++){
 
+            // Choose which folder to fill in based on the type
+            if (type == k_mc && ( j == k_leg_data || j == k_leg_ext || j == k_leg_dirt)){ 
+                break;
+            }
+            if (type == k_data){ 
+                j = k_leg_data;
+                break_early = true;
+            }
+            if (type == k_ext){ 
+                j = k_leg_ext;
+                break_early = true;
+            }
+            if (type == k_dirt){ 
+                j= k_leg_dirt;
+                break_early = true;
+            }
+
             // Get the classification directory and cd
             bool_dir = _utility_instance.GetDirectory(f_nuexsec, truth_dir ,Form("%s/%s/%s/%s", type_prefix.at(type).c_str(), "Stack", cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str() ) );
+            
             if (bool_dir) truth_dir->cd();
 
             // Now write the histogram
             h_reco_vtx_x.at(i).at(j)->Write("",TObject::kOverwrite);
             h_reco_vtx_y.at(i).at(j)->Write("",TObject::kOverwrite);
             h_reco_vtx_z.at(i).at(j)->Write("",TObject::kOverwrite);
+
+            if (break_early) break;
         }
 
     }
+
+    // Now fill the 2D reco vtx histograms -- had to hard code a bit since one of them is MC + EXT!!
+    for (unsigned int i = 0; i < vertex_strings.size(); i++){
+
+        if (i == k_vtx_signal || i == k_vtx_mc_ext) {
+            bool_dir = _utility_instance.GetDirectory(f_nuexsec, truth_dir , "MC/Reco" );
+            
+            if (bool_dir) truth_dir->cd();
+            h_reco_vtx_zy.at(i)->Write("",TObject::kOverwrite);
+        }
+        
+        if (i == k_vtx_data) {
+            bool_dir = _utility_instance.GetDirectory(f_nuexsec, truth_dir , "Data/Reco" );
+            
+            if (bool_dir) truth_dir->cd();
+            h_reco_vtx_zy.at(i)->Write("",TObject::kOverwrite);
+        }
+
+        if (i == k_vtx_ext) {
+            bool_dir = _utility_instance.GetDirectory(f_nuexsec, truth_dir , "EXT/Reco" );
+            
+            if (bool_dir) truth_dir->cd();
+            h_reco_vtx_zy.at(i)->Write("",TObject::kOverwrite);
+        }
+
+    }
+
     
 }
 // -----------------------------------------------------------------------------
@@ -394,7 +456,6 @@ void histogram_helper::SetStack(std::string hist_name, std::string cut_name, boo
         
         hist.at(i)->Scale(data_scale_factor);
     }
-
     
     // Customise the histogram
     hist.at(k_nue_cc)       ->SetFillColor(30);
@@ -491,6 +552,7 @@ void histogram_helper::SetStack(std::string hist_name, std::string cut_name, boo
     // Set the y axis of the stack
     if(!area_norm) h_stack->GetYaxis()->SetTitle("Entries");
     else           h_stack->GetYaxis()->SetTitle("Entries [A.U.]");
+    
     h_stack->GetYaxis()->SetTitleFont(45);
     h_stack->GetYaxis()->SetTitleSize(18);
     h_stack->GetYaxis()->SetTitleOffset(1.30);
@@ -500,7 +562,7 @@ void histogram_helper::SetStack(std::string hist_name, std::string cut_name, boo
     // MC error histogram
     TH1D * h_error_hist = (TH1D*) hist.at(k_nue_cc)->Clone("h_error_hist");
     for (unsigned int i=0; i < hist.size(); i++){
-        if (i == k_leg_data) continue; // Dont use the data
+        if (i == k_leg_data || i == k_nue_cc) continue; // Dont use the data
         h_error_hist->Add(hist.at(i), 1);
     }
     

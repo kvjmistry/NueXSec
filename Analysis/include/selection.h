@@ -92,7 +92,8 @@ namespace xsecSelection {
             // Vector containing the cut names
             std::vector<std::string> cut_names = {
                 "Pandora Output",                           // The output TPC Objects from Pandora
-                "Flash PE and In Time",                     // Flash PE and In time flash
+                "In Time",                                  // In time flash
+                "Flash PE",                                 // Flash PE 
                 "Has Pandora Nue",                          // Pandora Nue 
                 "In FV",                                    // Fiducial volume
                 "Vertex to Flash",                          // Vertex to flash
