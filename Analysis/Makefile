@@ -4,7 +4,7 @@ MODULESDIR = ../Modules
 
 # Compilation Flags
 CXX = g++
-CPPFLAGS = -I$(LIBDIR) -Wall
+CPPFLAGS = -I$(LIBDIR) -Wall -Wextra
 CXXFLAGS=$(shell root-config --cflags)
 
 # Libraries to inlcude e.g. ROOT, TPC Object Maker
@@ -27,10 +27,11 @@ $(MAIN): $(OBJ_FILES)
 	@echo -e  "\033[0;32mBuilding $(MAIN)\033[0;36m"
 	$(CXX) $(LIBS) -o $@ $^
 	@echo -e "\033[0;31mDone!"
+	@mv include/*.gch bin
 	@echo
 
 # Build the Object files
-bin/%.o: src/%.cxx
+bin/%.o: src/%.cxx include/%.h
 	@mkdir -p bin
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) -c $^
 	@mv *.o bin

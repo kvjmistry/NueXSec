@@ -242,9 +242,6 @@ namespace utilityNS {
             double largest_center_z   = 0;
             double largest_flash_time = 0;
             
-            // Cut Variables defined in main.h
-            int flash_pe_threshold = 50;
-
             // Loop through all flashes in event and find largest
             for (unsigned int j = 0; j < optical_list_pe_v.at(i).size(); j++) {
                 

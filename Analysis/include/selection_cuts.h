@@ -54,7 +54,7 @@ class selection_cuts{
                               int counter_dirt, double dirt_scale_factor, std::string cut_name);
     // -------------------------------------------------------------------------
     // Prints total selected in data
-    void PrintInfoData(int counter, std::string cut_name);
+    void PrintInfoData(int counter);
     // *************************************************************************
     // ------------------- Selection Cuts Functions ----------------------------
     // *************************************************************************
@@ -62,7 +62,7 @@ class selection_cuts{
     bool FlashinTime(double flash_time_start, double flash_time_end, std::vector<double> &opt_time_v, std::string type);
     // -------------------------------------------------------------------------
     // Flash has enough PE
-    bool FlashPE( double flash_pe_threshold, std::vector<int> &opt_pe_v, std::string type);
+    bool FlashPE( double flash_pe_threshold, std::vector<int> &opt_pe_v);
     // -------------------------------------------------------------------------
     // Pandora Reco Nue
     bool HasNue(xsecAna::TPCObjectContainer tpc_obj);
@@ -72,7 +72,7 @@ class selection_cuts{
     // -------------------------------------------------------------------------
     // Flash to vtx distance
     bool opt_vtx_distance(double tpc_vtx_y, double tpc_vtx_z, double flash_vtx_y, double flash_vtx_z, double tolerance);
-    bool flashRecoVtxDist(std::vector< double > largest_flash_v, double tolerance, const double tpc_vtx_x, const double tpc_vtx_y, const double tpc_vtx_z);
+    bool flashRecoVtxDist(std::vector< double > largest_flash_v, double tolerance, const double tpc_vtx_y, const double tpc_vtx_z);
     // -------------------------------------------------------------------------
     // Vertex to nu distance cut
     bool VtxNuDistance(xsecAna::TPCObjectContainer tpc_obj,int pfp_pdg_type , double tolerance);

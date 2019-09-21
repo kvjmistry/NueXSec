@@ -481,14 +481,14 @@ void selection::make_selection(){
             if (bool_use_ext)  num_ext  = ext_counter_v .at(k).at(0);
             if (bool_use_dirt) num_dirt = dirt_counter_v.at(k).at(0);
             if (bool_use_mc)   selection_cuts_instance.at(histogram_helper::k_mc)  .PrintInfo(total_mc_entries_inFV, mc_counter_v.at(k), num_ext, intime_scale_factor, data_scale_factor, num_dirt, dirt_scale_factor, cut_names.at(k));
-            if (bool_use_data) selection_cuts_instance.at(histogram_helper::k_data).PrintInfoData(data_counter_v.at(k).at(0), cut_names.at(k));
+            if (bool_use_data) selection_cuts_instance.at(histogram_helper::k_data).PrintInfoData(data_counter_v.at(k).at(0));
         }
     }
 
     // If no MC file specified then just print the data
     if (bool_use_data && !bool_use_mc) {
         for (unsigned int k = 0; k < data_counter_v.size(); k++) {
-            if (bool_use_data) selection_cuts_instance.at(histogram_helper::k_data).PrintInfoData(data_counter_v.at(k).at(0), cut_names.at(k));
+            if (bool_use_data) selection_cuts_instance.at(histogram_helper::k_data).PrintInfoData(data_counter_v.at(k).at(0));
         }
     }
 
@@ -550,7 +550,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
     // *************************************************************************
     // Flash has more than the required PE -------------------------------------
     // *************************************************************************
-    pass = selection_cuts_instance.at(type).FlashPE(flash_pe_threshold, optical_list_pe_v.at(event), type_str);
+    pass = selection_cuts_instance.at(type).FlashPE(flash_pe_threshold, optical_list_pe_v.at(event));
     passed_v.at(event).cut_v.at(Passed_Container::k_flash_pe) = pass;
     if(!pass) return false; // Failed the cut!
 
@@ -583,7 +583,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
     // *************************************************************************
     // Apply flash vtx cut -----------------------------------------------------
     // *************************************************************************
-    pass = selection_cuts_instance.at(type).flashRecoVtxDist(largest_flash_v_v.at(event), tolerance, tpc_obj.pfpVtxX(), tpc_obj.pfpVtxY(), tpc_obj.pfpVtxZ());
+    pass = selection_cuts_instance.at(type).flashRecoVtxDist(largest_flash_v_v.at(event), tolerance, tpc_obj.pfpVtxY(), tpc_obj.pfpVtxZ());
     passed_v.at(event).cut_v.at(Passed_Container::k_vtx_to_flash) = pass;
     if(!pass) return false; // Failed the cut!
 

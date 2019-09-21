@@ -187,6 +187,6 @@ class histogram_helper{
     std::vector<TH2D*> h_reco_vtx_zy; // Reco Vertex ZY Plane
 
 
-}; // End Class Histogram Helper
+}; // End Class Histogram Helper 
 
 #endif

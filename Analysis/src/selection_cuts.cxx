@@ -191,7 +191,7 @@ bool selection_cuts::FlashinTime(double flash_time_start, double flash_time_end,
     
 }
 // -----------------------------------------------------------------------------
-bool selection_cuts::FlashPE(double flash_pe_threshold, std::vector<int> &opt_pe_v, std::string type){
+bool selection_cuts::FlashPE(double flash_pe_threshold, std::vector<int> &opt_pe_v){
 
     bool sufficient_flash = false;
     
@@ -268,7 +268,7 @@ bool selection_cuts::opt_vtx_distance(double tpc_vtx_y, double tpc_vtx_z, double
     return false;
 }
 // -----------------------------------------------------------------------------
-bool selection_cuts::flashRecoVtxDist(std::vector< double > largest_flash_v, double tolerance, const double tpc_vtx_x, const double tpc_vtx_y, const double tpc_vtx_z){
+bool selection_cuts::flashRecoVtxDist(std::vector< double > largest_flash_v, double tolerance, const double tpc_vtx_y, const double tpc_vtx_z){
     bool is_close;
     
     // Flash is upstream
@@ -742,7 +742,7 @@ void selection_cuts::PrintInfo(int mc_nue_cc_counter, std::vector<double> counte
     std::cout << " Purity           : " << "( " << counter_nue_cc << " / " << counter           << " ) = " << purity << std::endl;
 }
 // -----------------------------------------------------------------------------
-void selection_cuts::PrintInfoData(int counter, std::string cut_name) {
+void selection_cuts::PrintInfoData(int counter) {
     std::cout << " [Data] Total Candidate Nue     : " << counter << std::endl;
 }
 // -----------------------------------------------------------------------------
