@@ -124,6 +124,57 @@ void histogram_helper::InitHistograms(){
     // dEdx
     h_reco_dEdx.resize(k_cuts_MAX);
 
+    // Largest flash Z
+    h_largest_flash_z.resize(k_cuts_MAX);
+
+    // Leading Shower Momentum
+    h_reco_leading_mom.resize(k_cuts_MAX);
+
+    // 2D distance largest flash to reco nu vertex
+    h_reco_flash_to_vtx_dist.resize(k_cuts_MAX);
+
+    // 2D distance shower vertex to reco nu vertex
+    h_reco_shower_to_vtx_dist.resize(k_cuts_MAX);
+
+    // 2D distance track vertex to reco nu vertex
+    h_reco_track_to_vtx_dist.resize(k_cuts_MAX);
+
+    // Leading Shower hits in all planes
+    h_reco_leading_shower_hits_all_planes.resize(k_cuts_MAX);
+
+    // Leading Shower hits in collection
+    h_reco_leading_shower_hits_collection_plane.resize(k_cuts_MAX);
+
+    // Leading Shower opening angle
+    h_reco_leading_shower_open_angle.resize(k_cuts_MAX);
+
+    // Secondary shower to vertex distance (for events with more than 1 shower)
+    h_reco_leading_shower_open_angle.resize(k_cuts_MAX);
+
+    // Leading Shower hits per length
+    h_reco_leading_shower_hits_per_length.resize(k_cuts_MAX);
+
+    // Longest track to leading shower length
+    h_reco_longest_track_eading_shower_length.resize(k_cuts_MAX);
+
+    // Track Containment
+    h_reco_track_contained.resize(k_cuts_MAX);
+
+    // Leading shower phi
+    h_reco_leading_shower_phi.resize(k_cuts_MAX);
+
+    // Leading shower theta
+    h_reco_leading_shower_theta.resize(k_cuts_MAX);
+
+    // Leading shower cos theta
+    h_reco_leading_shower_cos_theta.resize(k_cuts_MAX);
+
+    // Leading shower multiplicity
+    h_reco_shower_multiplicity.resize(k_cuts_MAX);
+
+    // Leading track multiplicity
+    h_reco_track_multiplicity.resize(k_cuts_MAX);
+
 
     for (unsigned int i=0; i < cut_dirs.size();i++){
 
@@ -135,6 +186,58 @@ void histogram_helper::InitHistograms(){
         // dEdx
         h_reco_dEdx.at(i).resize(k_classifications_MAX);
 
+        // Largest flash Z
+        h_largest_flash_z.resize(k_classifications_MAX));
+
+        // Leading Shower Momentum
+        h_reco_leading_mom.resize(k_classifications_MAX));
+
+        // 2D distance largest flash to reco nu vertex
+        h_reco_flash_to_vtx_dist.resize(k_classifications_MAX));
+
+        // 2D distance shower vertex to reco nu vertex
+        h_reco_shower_to_vtx_dist.resize(k_classifications_MAX));
+
+        // 2D distance track vertex to reco nu vertex
+        h_reco_track_to_vtx_dist.resize(k_classifications_MAX));
+
+        // Leading Shower hits in all planes
+        h_reco_leading_shower_hits_all_planes.resize(k_classifications_MAX));
+
+        // Leading Shower hits in collection
+        h_reco_leading_shower_hits_collection_plane.resize(k_classifications_MAX));
+
+        // Leading Shower opening angle
+        h_reco_leading_shower_open_angle.resize(k_classifications_MAX));
+
+        // Secondary shower to vertex distance (for events with more than 1 shower)
+        h_reco_leading_shower_open_angle.resize(k_classifications_MAX));
+
+        // Leading Shower hits per length
+        h_reco_leading_shower_hits_per_length.resize(k_classifications_MAX));
+
+        // Longest track to leading shower length
+        h_reco_longest_track_eading_shower_length.resize(k_classifications_MAX));
+
+        // Track Containment
+        h_reco_track_contained.resize(k_classifications_MAX));
+
+        // Leading shower phi
+        h_reco_leading_shower_phi.resize(k_classifications_MAX));
+
+        // Leading shower theta
+        h_reco_leading_shower_theta.resize(k_classifications_MAX));
+
+        // Leading shower cos theta
+        h_reco_leading_shower_cos_theta.resize(k_classifications_MAX));
+
+        // Leading shower multiplicity
+        h_reco_shower_multiplicity.resize(k_classifications_MAX));
+
+        // Leading track multiplicity
+        h_reco_track_multiplicity.resize(k_classifications_MAX));
+
+
         for (unsigned int j=0; j < classification_dirs.size();j++){
            
             // Reco Vtx X, Y, Z
@@ -144,6 +247,57 @@ void histogram_helper::InitHistograms(){
 
             // dEdx
             h_reco_dEdx.at(i).at(j) = new TH1D ( Form("h_reco_dEdx_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+
+            // Largest flash Z
+            h_largest_flash_z.at(i).at(j) = new TH1D ( Form("h_largest_flash_z_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 100, 0, 1040);
+
+            // Leading Shower Momentum
+            h_reco_leading_mom.at(i).at(j) = new TH1D ( Form("h_reco_leading_mom_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 20, 0, 2);
+
+            // 2D distance largest flash to reco nu vertex
+            h_reco_flash_to_vtx_dist.at(i).at(j) = new TH1D ( Form("h_reco_flash_to_vtx_dist._%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 40, 0, 200);
+
+            // 2D distance shower vertex to reco nu vertex
+            h_reco_shower_to_vtx_dist.at(i).at(j) = new TH1D ( Form("h_reco_shower_to_vtx_dist_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 20, 0, 20);
+
+            // 2D distance track vertex to reco nu vertex
+            h_reco_track_to_vtx_dist.at(i).at(j) = new TH1D ( Form("h_reco_track_to_vtx_dist_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 25, 0, 20);
+
+            // Leading Shower hits in all planes
+            h_reco_leading_shower_hits_all_planes.at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_hits_all_planes_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 30, 0, 600);
+
+            // Leading Shower hits in collection
+            h_reco_leading_shower_hits_collection_plane.at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_hits_collection_plane_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 20, 0, 250);
+
+            // Leading Shower opening angle
+            h_reco_leading_shower_open_angle.at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_open_angle_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 25, 0, 50);
+
+            // Secondary shower to vertex distance (for events with more than 1 shower)
+            h_reco_leading_shower_open_angle.at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_open_angle_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 20, 0, 80);
+
+            // Leading Shower hits per length
+            h_reco_leading_shower_hits_per_length.at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_hits_per_length_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 20, 0, 20);
+
+            // Longest track to leading shower length
+            h_reco_longest_track_eading_shower_length.at(i).at(j) = new TH1D ( Form("h_reco_longest_track_eading_shower_length_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 20, 0, 3);
+
+            // Track Containment
+            h_reco_track_contained.at(i).at(j) = new TH1D ( Form("h_reco_track_contained_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 2, 0, 2);
+
+            // Leading shower phi
+            h_reco_leading_shower_phi.at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_phi_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 12, -180, 180);
+
+            // Leading shower theta
+            h_reco_leading_shower_theta.at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_theta_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 12, 0, 180);
+
+            // Leading shower cos theta
+            h_reco_leading_shower_cos_theta.at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_cos_theta_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 16, -1, 1);
+
+            // Leading shower multiplicity
+            h_reco_shower_multiplicity.at(i).at(j) = new TH1D ( Form("h_reco_shower_multiplicity_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 5, 1, 6);
+
+            // Leading track multiplicity
+            h_reco_track_multiplicity.at(i).at(j) = new TH1D ( Form("h_reco_track_multiplicity_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 5, 0, 5);
         }
     }
     // -------------------------------------------------------------------------

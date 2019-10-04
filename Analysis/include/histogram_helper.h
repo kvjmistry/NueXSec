@@ -180,15 +180,64 @@ class histogram_helper{
 
     // Optical Plots
     std::vector<TH1D*> h_flash_time_v;
+    std::vector<std::vector<TH1D*>> h_largest_flash_z; // Largest flash Z --
    
-    // Reco Plots
+    // RecoPlots
     std::vector<std::vector<TH1D*>> h_reco_vtx_x; // Reco Vertex X
     std::vector<std::vector<TH1D*>> h_reco_vtx_y; // Reco Vertex Y
     std::vector<std::vector<TH1D*>> h_reco_vtx_z; // Reco Vertex Z
     std::vector<TH2D*> h_reco_vtx_zy;             // Reco Vertex ZY Plane
 
+    // Leading Shower Momentum
+    std::vector<std::vector<TH1D*>> h_reco_leading_mom; // --
+
+    // 2D distance largest flash to reco nu vertex
+    std::vector<std::vector<TH1D*>> h_reco_flash_to_vtx_dist; // --
+
+    // 2D distance shower vertex to reco nu vertex
+    std::vector<std::vector<TH1D*>> h_reco_shower_to_vtx_dist; // --
+
+    // 2D distance track vertex to reco nu vertex
+    std::vector<std::vector<TH1D*>> h_reco_track_to_vtx_dist; // --
+
+    // Leading Shower hits in all planes
+    std::vector<std::vector<TH1D*>> h_reco_leading_shower_hits_all_planes; // --
+
+    // Leading Shower hits in collection
+    std::vector<std::vector<TH1D*>> h_reco_leading_shower_hits_collection_plane; // --
+
+    // Leading Shower opening angle
+    std::vector<std::vector<TH1D*>> h_reco_leading_shower_open_angle; // --
+
     // dEdx
     std::vector<std::vector<TH1D*>> h_reco_dEdx;
+
+    // Secondary shower to vertex distance (for events with more than 1 shower)
+    std::vector<std::vector<TH1D*>> h_reco_leading_shower_open_angle; // --
+
+    // Leading Shower hits per length
+    std::vector<std::vector<TH1D*>> h_reco_leading_shower_hits_per_length; // --
+
+    // Longest track to leading shower length
+    std::vector<std::vector<TH1D*>> h_reco_longest_track_eading_shower_length; // --
+
+    // Track Containment
+    std::vector<std::vector<TH1D*>> h_reco_track_contained; // --
+
+    // Leading shower phi
+    std::vector<std::vector<TH1D*>> h_reco_leading_shower_phi; // --
+
+    // Leading shower theta
+    std::vector<std::vector<TH1D*>> h_reco_leading_shower_theta; // --
+
+    // Leading shower cos theta
+    std::vector<std::vector<TH1D*>> h_reco_leading_shower_cos_theta; // --
+
+    // Leading shower multiplicity
+    std::vector<std::vector<TH1D*>> h_reco_shower_multiplicity; // --
+
+    // Leading track multiplicity
+    std::vector<std::vector<TH1D*>> h_reco_track_multiplicity; // --
 
 }; // End Class Histogram Helper 
 
