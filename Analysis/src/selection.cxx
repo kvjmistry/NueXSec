@@ -522,10 +522,12 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
         selection_cuts_instance.at(type).SetTPCObjVariables(tpc_obj, mc_nu_vtx_x, mc_nu_vtx_y, mc_nu_vtx_z, fv_boundary_v, has_pi0, type_str);
     }
 
+    // Get some variables for filling histograms -- we can put these into a function to initalise the histogram helper and tidy this up later
+    int leading_shower_index = selection_cuts_instance.at(type).GetLeadingIndex();
+
     // Get the classification index for filling stacked histograms
     int classification_index;
     if (!slim) classification_index = histogram_helper_instance.IndexOfClassification(selection_cuts_instance.at(type).tpc_classification.first);
-    
     
     // Here we apply the selection cuts ----------------------------------------
     bool pass; // A flag to see if an event passes an event
@@ -533,7 +535,8 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
     // *************************************************************************
     // Pandora Output ----------------------------------------------------------
     // *************************************************************************
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_pandora_output, tpc_obj);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_pandora_output, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillRecoVtxZY(classification_index, tpc_obj);
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_pandora_output), type_str); 
 
     // *************************************************************************
@@ -545,7 +548,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_in_time), type_str); 
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_in_time, tpc_obj);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_in_time, tpc_obj, leading_shower_index, type_str);
     
     // *************************************************************************
     // Flash has more than the required PE -------------------------------------
@@ -556,7 +559,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_flash_pe), type_str); 
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_flash_pe, tpc_obj);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_flash_pe, tpc_obj, leading_shower_index, type_str);
     
     // *************************************************************************
     // Has a valid Nue ---------------------------------------------------------
@@ -567,7 +570,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_has_nue), type_str);
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_has_nue, tpc_obj);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_has_nue, tpc_obj, leading_shower_index, type_str);
 
     // *************************************************************************
     // Is in the FV ------------------------------------------------------------
@@ -578,7 +581,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_in_fv), type_str);
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_in_fv, tpc_obj);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_in_fv, tpc_obj, leading_shower_index, type_str);
 
     // *************************************************************************
     // Apply flash vtx cut -----------------------------------------------------
@@ -589,7 +592,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_vtx_to_flash), type_str);
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_vtx_to_flash, tpc_obj);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_vtx_to_flash, tpc_obj, leading_shower_index, type_str);
 
     // *************************************************************************
     // Apply vtx nu distance cut -----------------------------------------------
@@ -600,7 +603,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_shwr_nue_dist), type_str);
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_shwr_nue_dist, tpc_obj);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_shwr_nue_dist, tpc_obj, leading_shower_index, type_str);
 
     // *************************************************************************
     // Apply track vtx nu distance cut -----------------------------------------
@@ -611,7 +614,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_trk_nue_dist), type_str);
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_trk_nue_dist, tpc_obj);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_trk_nue_dist, tpc_obj, leading_shower_index, type_str);
 
     // *************************************************************************
     // Apply Hit threshold cut -------------------------------------------------
@@ -622,7 +625,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_shwr_hit_threshold), type_str);
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_shwr_hit_threshold, tpc_obj);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_shwr_hit_threshold, tpc_obj, leading_shower_index, type_str);
 
     // *************************************************************************
     // Apply Hit threshold collection cut --------------------------------------
@@ -633,7 +636,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_shwr_hit_threshold_collection), type_str);
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_shwr_hit_threshold_collection, tpc_obj);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_shwr_hit_threshold_collection, tpc_obj, leading_shower_index, type_str);
 
     // *************************************************************************
     // Apply Open Angle cut ----------------------------------------------------
@@ -644,7 +647,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_shwr_open_angle), type_str);
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_shwr_open_angle, tpc_obj);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_shwr_open_angle, tpc_obj, leading_shower_index, type_str);
 
     // *************************************************************************
     // Apply dEdx cut ----------------------------------------------------------
@@ -655,7 +658,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_shwr_dedx), type_str);
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_shwr_dedx, tpc_obj);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_shwr_dedx, tpc_obj, leading_shower_index, type_str);
 
     // *************************************************************************
     // Apply Secondary shower dist cut -----------------------------------------
@@ -666,7 +669,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_dist_nue_vtx), type_str); 
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_dist_nue_vtx, tpc_obj);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_dist_nue_vtx, tpc_obj, leading_shower_index, type_str);
 
     // *************************************************************************
     // Apply hit per lengh ratio cut -------------------------------------------
@@ -677,7 +680,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_pfp_hits_length), type_str);
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_pfp_hits_length, tpc_obj);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_pfp_hits_length, tpc_obj, leading_shower_index, type_str);
 
     // *************************************************************************
     // Apply Longest Track Leading Shower cut ----------------------------------
@@ -688,7 +691,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_longest_trk_leading_shwr_length), type_str);
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_longest_trk_leading_shwr_length, tpc_obj);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_longest_trk_leading_shwr_length, tpc_obj, leading_shower_index, type_str);
 
     // *************************************************************************
     // Apply Contained Track Cut -----------------------------------------------
@@ -699,7 +702,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_trk_contained), type_str);
-    if (!slim) histogram_helper_instance.FillRecoVtx(classification_index, histogram_helper::k_trk_contained, tpc_obj);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_trk_contained, tpc_obj, leading_shower_index, type_str);
 
     // *************************************************************************
     return true;
@@ -713,20 +716,20 @@ void selection::SavetoFile(){
     if (bool_use_mc) {
         histogram_helper_instance.WriteMCTruth("MC");
         histogram_helper_instance.WriteOptical(histogram_helper::k_mc);
-        histogram_helper_instance.WriteRecoVtx(histogram_helper::k_mc);
+        histogram_helper_instance.WriteReco(histogram_helper::k_mc);
     }
     if (bool_use_data) {
         histogram_helper_instance.WriteOptical(histogram_helper::k_data);
-        histogram_helper_instance.WriteRecoVtx(histogram_helper::k_data);
+        histogram_helper_instance.WriteReco(histogram_helper::k_data);
     }
     if (bool_use_ext) {
         histogram_helper_instance.WriteOptical(histogram_helper::k_ext);
-        histogram_helper_instance.WriteRecoVtx(histogram_helper::k_ext);
+        histogram_helper_instance.WriteReco(histogram_helper::k_ext);
     }
     if (bool_use_dirt) {
         histogram_helper_instance.WriteMCTruth("Dirt");
         histogram_helper_instance.WriteOptical(histogram_helper::k_dirt);
-        histogram_helper_instance.WriteRecoVtx(histogram_helper::k_dirt);
+        histogram_helper_instance.WriteReco(histogram_helper::k_dirt);
     }
 
     
@@ -748,19 +751,24 @@ void selection::MakeHistograms(){
         system(command.c_str()); 
 
         // Reco X
-        histogram_helper_instance.SetStack("h_reco_vtx_x",histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_vtx_x",histogram_helper_instance.cut_dirs.at(i).c_str(),
                                            false,  false, "Reco Vertex X [cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
                                            Form("plots/%s/reco_vtx_x.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
         
         // Reco Y
-        histogram_helper_instance.SetStack("h_reco_vtx_y",histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_vtx_y",histogram_helper_instance.cut_dirs.at(i).c_str(),
                                            false,  false, "Reco Vertex Y [cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
                                            Form("plots/%s/reco_vtx_y.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
 
         // Reco Z
-        histogram_helper_instance.SetStack("h_reco_vtx_z",histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_vtx_z",histogram_helper_instance.cut_dirs.at(i).c_str(),
                                            false,  false, "Reco Vertex Z [cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
                                            Form("plots/%s/reco_vtx_z.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+
+        // dEdx
+        histogram_plotter_instance.MakeStack("h_reco_dEdx",histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Collection Plane dEdx [Mev/cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_dEdx_collection.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
     }
     
 

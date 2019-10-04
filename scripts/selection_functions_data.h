@@ -1,8 +1,8 @@
 #ifndef SELECTION_FUNCTIONS_DATA_h
 #define SELECTION_FUNCTIONS_DATA_h
 
-#include "../xsecAna/TpcObjectContainer.h"
-#include "../xsecAna/ParticleContainer.h"
+#include "../Modules/TpcObjectContainer.h"
+#include "../Modules/ParticleContainer.h"
 
 #include "TFile.h"
 #include "TTree.h"
@@ -24,7 +24,7 @@
 #include <iostream>
 #include <vector>
 
-#include "../xsecAna/LinkDef.h"
+#include "../Modules/LinkDef.h"
 
 class selection_functions_data {
 

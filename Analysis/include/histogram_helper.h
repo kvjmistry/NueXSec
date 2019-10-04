@@ -13,9 +13,19 @@ class histogram_helper{
     // Destructor 
     ~histogram_helper(); 
 
+    // The output file
+    TFile* f_nuexsec = new TFile("nuexsec.root", "UPDATE");
+
+    // Class instances
+    utilityNS::utility _utility_instance;
+
     // enum to switch file type 
     enum type {k_mc, k_data, k_ext, k_dirt, k_variation, k_type_MAX}; 
 
+    // For creating histogram names
+    std::vector<std::string> type_prefix = {"MC", "Data", "EXT", "Dirt"};
+
+    // enum for vertex zy histograms
     enum vertex {k_vtx_signal, k_vtx_data, k_vtx_ext, k_vtx_mc_ext, k_vertex_MAX};
     std::vector<std::string> vertex_strings = {"Signal", "Data", "EXT", "MC_plus_EXT"};
     
@@ -39,6 +49,10 @@ class histogram_helper{
                 k_trk_contained,                   // Contained Tracks
                 k_cuts_MAX
                 };
+    
+    
+    // enums for flash times
+    enum flash_time{ k_flash_mc, k_flash_data, k_flash_ext, k_flash_dirt, k_flash_MAX };
 
     // Cut directory names
     std::vector<std::string> cut_dirs = {
@@ -60,6 +74,7 @@ class histogram_helper{
                 "Track_Is_Contained"                        // Contained Tracks
                 };
 
+    
     // Names of the plot types
     std::vector<std::string> plot_types = {
                 "Truth",
@@ -68,7 +83,6 @@ class histogram_helper{
                 "Stack"
                 };
     
-
     // Names of the classifications
     std::vector<std::string> classification_dirs = {
                 "nue_cc",
@@ -85,6 +99,7 @@ class histogram_helper{
                 "dirt"
                 };
 
+    
     enum legend {
                 k_nue_cc,
                 k_nue_cc_mixed,
@@ -131,16 +146,16 @@ class histogram_helper{
     // to fill the appropriate histogram
     int IndexOfClassification(std::string tpco_id);
     // -------------------------------------------------------------------------
-    // Fill the Reco Vertex histograms
-    void FillRecoVtx(int classification_index, int cut_index, const xsecAna::TPCObjectContainer &tpc_obj);
+    // Fill reco variables e.g vertex x,y,z, dEdx
+    void FillReco(int classification_index, int cut_index, const xsecAna::TPCObjectContainer &tpc_obj, int leading_shower_index, std::string type);
     // -------------------------------------------------------------------------
-    void WriteRecoVtx(int type);
+    // Fill reco variables e.g vertex x,y,z, dEdx
+    void WriteReco(int type);
     // -------------------------------------------------------------------------
-    void SetStack(std::string hist_name, std::string cut_name, bool area_norm,  bool logy, const char* x_axis_name,
-                                     double data_scale_factor, double y_scale_factor, double intime_scale_factor, double dirt_scale_factor, 
-                                     const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, const char* print_name );
+    // Fill reco vertex plot for ZY plane
+    void FillRecoVtxZY(int classification_index, const xsecAna::TPCObjectContainer &tpc_obj);
     // -------------------------------------------------------------------------
-    std::vector <double> Chi2Calc(TH1D * h_mc_ext, TH1D * h_data, const bool area_norm, const double return_norm);
+    
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
@@ -152,20 +167,7 @@ class histogram_helper{
     // -------------------------------------------------------------------------
     private:
 
-    // The output file
-    TFile* f_nuexsec = new TFile("nuexsec.root", "UPDATE");
-
-   
-
-    // Class instances
-    utilityNS::utility _utility_instance;
-
-
     // Here we create the histograms
-
-    // For creating histogram names
-    std::vector<std::string> type_prefix = {"MC", "Data", "EXT", "Dirt"};
-    
     // --------------------------- True plots ----------------------------------
     TH1D * h_nue_true_theta  = new TH1D ("h_nue_true_theta","True Nue; Theta [degrees]", 14,    0, 180);
     TH1D * h_nue_true_phi    = new TH1D ("h_nue_true_phi"  ,"True Nue; Phi [degrees]",   14, -180, 180);
@@ -178,14 +180,15 @@ class histogram_helper{
 
     // Optical Plots
     std::vector<TH1D*> h_flash_time_v;
-    enum flash_time{ k_flash_mc, k_flash_data, k_flash_ext, k_flash_dirt, k_flash_MAX };
-
+   
     // Reco Plots
     std::vector<std::vector<TH1D*>> h_reco_vtx_x; // Reco Vertex X
     std::vector<std::vector<TH1D*>> h_reco_vtx_y; // Reco Vertex Y
     std::vector<std::vector<TH1D*>> h_reco_vtx_z; // Reco Vertex Z
-    std::vector<TH2D*> h_reco_vtx_zy; // Reco Vertex ZY Plane
+    std::vector<TH2D*> h_reco_vtx_zy;             // Reco Vertex ZY Plane
 
+    // dEdx
+    std::vector<std::vector<TH1D*>> h_reco_dEdx;
 
 }; // End Class Histogram Helper 
 

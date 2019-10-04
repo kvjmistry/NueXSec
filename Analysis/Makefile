@@ -39,5 +39,5 @@ bin/%.o: src/%.cxx include/%.h
 # Clean compilation
 clean:
 	@echo -e "\033[0;31m"
-	rm nuexsec bin/*
+	rm nuexsec bin/* include/*.gch
 	@echo

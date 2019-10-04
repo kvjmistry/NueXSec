@@ -1,8 +1,8 @@
-XSECANADIR=../xsecAna
+XSECANADIR=../lib
 CXX=g++
 CXXFLAGS=$(shell root-config --cflags)
 CPPFLAGS=-I$(XSECANADIR)
-LIBS=$(shell root-config --libs) -L$(XSECANADIR) -luboonecode_uboone_NueXSecModules # -lxsecAna_dict
+LIBS=$(shell root-config --libs) -L$(XSECANADIR) -lNueXSec # -lxsecAna_dict
 LD=g++
 LDFLAGS=
 DEBUGFLAGS= -O0 -g -D _DEBUG

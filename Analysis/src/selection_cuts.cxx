@@ -172,9 +172,10 @@ bool selection_cuts::FlashinTime(double flash_time_start, double flash_time_end,
         
         double opt_time;
         
-        if      (type == "MC")  opt_time = opt_time_v.at(j) + 1.0;
-        else if (type == "EXT") opt_time = opt_time_v.at(j) - 0.343;
-        else                    opt_time = opt_time_v.at(j);
+        if      (type == "MC")   opt_time = opt_time_v.at(j) + 1.0;
+        else if (type == "Dirt") opt_time = opt_time_v.at(j) + 1.0;
+        else if (type == "EXT")  opt_time = opt_time_v.at(j) - 0.343;
+        else                     opt_time = opt_time_v.at(j);
         
         // See if flash was in time
         in_time = (opt_time >= flash_time_start && opt_time <= flash_time_end) ? true : false;
@@ -746,4 +747,5 @@ void selection_cuts::PrintInfoData(int counter) {
     std::cout << " [Data] Total Candidate Nue     : " << counter << std::endl;
 }
 // -----------------------------------------------------------------------------
+int selection_cuts::GetLeadingIndex() {return tpc_classification.second;}
 // -----------------------------------------------------------------------------

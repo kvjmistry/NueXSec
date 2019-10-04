@@ -51,7 +51,7 @@ class selection_cuts{
     // Prints the results of the cuts
     void PrintInfo(int mc_nue_cc_counter, std::vector<double> counter_v, int counter_intime_cosmics,
                               double intime_scale_factor, double data_scale_factor,
-                              int counter_dirt, double dirt_scale_factor, std::string cut_name);
+                              int counter_dirt, double dirt_scale_factor, std::string cut_name);           
     // -------------------------------------------------------------------------
     // Prints total selected in data
     void PrintInfoData(int counter);
@@ -103,6 +103,8 @@ class selection_cuts{
     bool ContainedTracksCut(std::vector<double> fv_boundary_v, xsecAna::TPCObjectContainer tpc_obj);
     // -------------------------------------------------------------------------
 
+    // Getter functions
+    int GetLeadingIndex();
 
 }; // End Class Selection Cuts
 

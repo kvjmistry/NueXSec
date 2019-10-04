@@ -14,8 +14,8 @@
 // ------------------------------------------------
 
 // Library and Other Includes
-#include "../xsecAna/TpcObjectContainer.h"
-#include "../xsecAna/ParticleContainer.h"
+#include "../Modules/TpcObjectContainer.h"
+#include "../Modules/ParticleContainer.h"
 // #include "histogram_functions.h"
 
 // ROOT includes
@@ -38,7 +38,7 @@
 #include <fstream>
 #include <math.h>
 
-#include "../xsecAna/LinkDef.h"
+#include "../Modules/LinkDef.h"
 
 class variation_output {
 	public:

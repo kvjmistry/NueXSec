@@ -60,7 +60,7 @@ namespace xsecSelection {
             utilityNS::utility _utility_instance;
             std::vector<selection_cuts> selection_cuts_instance; // One for each type e.g MC, Data, EXT..
             histogram_helper  histogram_helper_instance;
-            // histogram_plotter histogram_plotter_instance;
+            histogram_plotter histogram_plotter_instance;
 
             // Variables -------------------------------------------------------
 

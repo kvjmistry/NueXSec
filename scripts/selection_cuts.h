@@ -1,8 +1,8 @@
 #ifndef SELECTION_CUTS_h
 #define SELECTION_CUTS_h
 
-#include "../xsecAna/TpcObjectContainer.h"
-#include "../xsecAna/ParticleContainer.h"
+#include "../Modules/TpcObjectContainer.h"
+#include "../Modules/ParticleContainer.h"
 
 #include "TFile.h"
 #include "TTree.h"
@@ -11,7 +11,7 @@
 #include <iostream>
 #include <vector>
 
-#include "../xsecAna/LinkDef.h"
+#include "../Modules/LinkDef.h"
 
 class selection_cuts {
 
