@@ -149,13 +149,13 @@ void histogram_helper::InitHistograms(){
     h_reco_leading_shower_open_angle.resize(k_cuts_MAX);
 
     // Secondary shower to vertex distance (for events with more than 1 shower)
-    h_reco_leading_shower_open_angle.resize(k_cuts_MAX);
+    h_reco_secondary_shower_to_vtx_dist.resize(k_cuts_MAX);
 
     // Leading Shower hits per length
     h_reco_leading_shower_hits_per_length.resize(k_cuts_MAX);
 
     // Longest track to leading shower length
-    h_reco_longest_track_eading_shower_length.resize(k_cuts_MAX);
+    h_reco_longest_track_leading_shower_length.resize(k_cuts_MAX);
 
     // Track Containment
     h_reco_track_contained.resize(k_cuts_MAX);
@@ -187,55 +187,55 @@ void histogram_helper::InitHistograms(){
         h_reco_dEdx.at(i).resize(k_classifications_MAX);
 
         // Largest flash Z
-        h_largest_flash_z.resize(k_classifications_MAX));
+        h_largest_flash_z.at(i).resize(k_classifications_MAX);
 
         // Leading Shower Momentum
-        h_reco_leading_mom.resize(k_classifications_MAX));
+        h_reco_leading_mom.at(i).resize(k_classifications_MAX);
 
         // 2D distance largest flash to reco nu vertex
-        h_reco_flash_to_vtx_dist.resize(k_classifications_MAX));
+        h_reco_flash_to_vtx_dist.at(i).resize(k_classifications_MAX);
 
         // 2D distance shower vertex to reco nu vertex
-        h_reco_shower_to_vtx_dist.resize(k_classifications_MAX));
+        h_reco_shower_to_vtx_dist.at(i).resize(k_classifications_MAX);
 
         // 2D distance track vertex to reco nu vertex
-        h_reco_track_to_vtx_dist.resize(k_classifications_MAX));
+        h_reco_track_to_vtx_dist.at(i).resize(k_classifications_MAX);
 
         // Leading Shower hits in all planes
-        h_reco_leading_shower_hits_all_planes.resize(k_classifications_MAX));
+        h_reco_leading_shower_hits_all_planes.at(i).resize(k_classifications_MAX);
 
         // Leading Shower hits in collection
-        h_reco_leading_shower_hits_collection_plane.resize(k_classifications_MAX));
+        h_reco_leading_shower_hits_collection_plane.at(i).resize(k_classifications_MAX);
 
         // Leading Shower opening angle
-        h_reco_leading_shower_open_angle.resize(k_classifications_MAX));
+        h_reco_leading_shower_open_angle.at(i).resize(k_classifications_MAX);
 
         // Secondary shower to vertex distance (for events with more than 1 shower)
-        h_reco_leading_shower_open_angle.resize(k_classifications_MAX));
+        h_reco_secondary_shower_to_vtx_dist.at(i).resize(k_classifications_MAX);
 
         // Leading Shower hits per length
-        h_reco_leading_shower_hits_per_length.resize(k_classifications_MAX));
+        h_reco_leading_shower_hits_per_length.at(i).resize(k_classifications_MAX);
 
         // Longest track to leading shower length
-        h_reco_longest_track_eading_shower_length.resize(k_classifications_MAX));
+        h_reco_longest_track_leading_shower_length.at(i).resize(k_classifications_MAX);
 
         // Track Containment
-        h_reco_track_contained.resize(k_classifications_MAX));
+        h_reco_track_contained.at(i).resize(k_classifications_MAX);
 
         // Leading shower phi
-        h_reco_leading_shower_phi.resize(k_classifications_MAX));
+        h_reco_leading_shower_phi.at(i).resize(k_classifications_MAX);
 
         // Leading shower theta
-        h_reco_leading_shower_theta.resize(k_classifications_MAX));
+        h_reco_leading_shower_theta.at(i).resize(k_classifications_MAX);
 
         // Leading shower cos theta
-        h_reco_leading_shower_cos_theta.resize(k_classifications_MAX));
+        h_reco_leading_shower_cos_theta.at(i).resize(k_classifications_MAX);
 
         // Leading shower multiplicity
-        h_reco_shower_multiplicity.resize(k_classifications_MAX));
+        h_reco_shower_multiplicity.at(i).resize(k_classifications_MAX);
 
         // Leading track multiplicity
-        h_reco_track_multiplicity.resize(k_classifications_MAX));
+        h_reco_track_multiplicity.at(i).resize(k_classifications_MAX);
 
 
         for (unsigned int j=0; j < classification_dirs.size();j++){
@@ -273,13 +273,13 @@ void histogram_helper::InitHistograms(){
             h_reco_leading_shower_open_angle.at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_open_angle_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 25, 0, 50);
 
             // Secondary shower to vertex distance (for events with more than 1 shower)
-            h_reco_leading_shower_open_angle.at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_open_angle_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 20, 0, 80);
+            h_reco_secondary_shower_to_vtx_dist.at(i).at(j) = new TH1D ( Form("h_reco_secondary_shower_to_vtx_dist_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 20, 0, 80);
 
             // Leading Shower hits per length
             h_reco_leading_shower_hits_per_length.at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_hits_per_length_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 20, 0, 20);
 
             // Longest track to leading shower length
-            h_reco_longest_track_eading_shower_length.at(i).at(j) = new TH1D ( Form("h_reco_longest_track_eading_shower_length_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 20, 0, 3);
+            h_reco_longest_track_leading_shower_length.at(i).at(j) = new TH1D ( Form("h_reco_longest_track_leading_shower_length_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 20, 0, 3);
 
             // Track Containment
             h_reco_track_contained.at(i).at(j) = new TH1D ( Form("h_reco_track_contained_%s_%s",cut_dirs.at(i).c_str(), classification_dirs.at(j).c_str()) ,"", 2, 0, 2);
@@ -375,7 +375,7 @@ void histogram_helper::WriteMCTruth(std::string type){
 
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::FillOptical(std::vector<std::vector<double>> optical_list_flash_time_v, int type){
+void histogram_helper::FillOptical(std::vector<std::vector<double>> &optical_list_flash_time_v, int type){
 
     // Loop over the optical list events
     for (unsigned int i = 0; i < optical_list_flash_time_v.size();i++){
@@ -477,20 +477,72 @@ int histogram_helper::IndexOfClassification(std::string tpco_id){
     return k_classifications_MAX;
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::FillReco(int classification_index, int cut_index, const xsecAna::TPCObjectContainer &tpc_obj, int leading_shower_index, std::string type){
+void histogram_helper::FillReco(int classification_index, int cut_index, const xsecAna::TPCObjectContainer &tpc_obj, int leading_shower_index, std::vector<double> &largest_flash_v, std::vector<double> fv_boundary_v, std::string type){
 
     // For now skip cases where there is no leading shower index, need to invesitgate why
     if (leading_shower_index < 0) return;
+
+    const int n_pfp = tpc_obj.NumPFParticles();
+    double longest_track = _utility_instance.GetLongestTrackLength(n_pfp, tpc_obj);
+
+    double secondary_shower_dist = _utility_instance.GetSecondaryShowerDist(n_pfp, tpc_obj, leading_shower_index);
+
+    bool track_contained = _selection_cuts_instance.ContainedTracksCut(fv_boundary_v, tpc_obj);
+
+    double trk_vtx_dist = _utility_instance.GetTrackVtxDist(n_pfp, tpc_obj);
     
     auto const leading_shower = tpc_obj.GetParticle(leading_shower_index);
-    double leading_dedx = leading_shower.PfpdEdx().at(2);//just the collection plane!
+    double leading_dedx = leading_shower.PfpdEdx().at(2); // Just the collection plane!
     if (type == "MC" || type == "Dirt") leading_dedx = leading_dedx * (196.979 /242.72); // Only calibrate the MC
 
+    double flash_vtx_dist = sqrt( pow( (tpc_obj.pfpVtxY() - largest_flash_v.at(0) ) , 2) + pow((tpc_obj.pfpVtxZ() - largest_flash_v.at(1)), 2) );
+    
+    double shower_vtx_dist = sqrt( pow(( tpc_obj.pfpVtxY() - leading_shower.pfpVtxY()), 2) + pow((tpc_obj.pfpVtxZ() - leading_shower.pfpVtxZ()), 2) );
+
+    double pfp_hits_length_ratio = (leading_shower.NumPFPHits() / leading_shower.pfpLength());
+
+    double longest_trk_leading_shwr_ratio = longest_track / leading_shower.pfpLength();
+
+    // Now fill the histograms!
     h_reco_vtx_x.at(cut_index).at(classification_index)->Fill(tpc_obj.pfpVtxX());
     h_reco_vtx_y.at(cut_index).at(classification_index)->Fill(tpc_obj.pfpVtxY());
     h_reco_vtx_z.at(cut_index).at(classification_index)->Fill(tpc_obj.pfpVtxZ());
 
-    h_reco_dEdx.at(cut_index).at(classification_index)->Fill(leading_dedx); //just the collection plane!
+    h_reco_dEdx.at(cut_index).at(classification_index)->Fill(leading_dedx); // Just the collection plane!
+
+    h_largest_flash_z.at(cut_index).at(classification_index)->Fill(largest_flash_v.at(1));
+    
+    h_reco_leading_mom.at(cut_index).at(classification_index)->Fill(leading_shower.pfpMomentum());
+    
+    h_reco_flash_to_vtx_dist.at(cut_index).at(classification_index)->Fill(flash_vtx_dist);
+    
+    h_reco_shower_to_vtx_dist.at(cut_index).at(classification_index)->Fill(shower_vtx_dist);
+
+    h_reco_track_to_vtx_dist.at(cut_index).at(classification_index)->Fill(trk_vtx_dist);
+    
+    h_reco_leading_shower_hits_all_planes.at(cut_index).at(classification_index)->Fill(leading_shower.NumPFPHits());
+    
+    h_reco_leading_shower_hits_collection_plane.at(cut_index).at(classification_index)->Fill(leading_shower.NumPFPHitsW());
+
+    h_reco_secondary_shower_to_vtx_dist.at(cut_index).at(classification_index)->Fill(secondary_shower_dist);
+    
+    h_reco_leading_shower_open_angle.at(cut_index).at(classification_index)->Fill(leading_shower.pfpOpenAngle() * 180 / 3.14159);
+    
+    h_reco_leading_shower_hits_per_length.at(cut_index).at(classification_index)->Fill(pfp_hits_length_ratio);
+    
+    h_reco_longest_track_leading_shower_length.at(cut_index).at(classification_index)->Fill(longest_trk_leading_shwr_ratio);
+    
+    h_reco_track_contained.at(cut_index).at(classification_index)->Fill(track_contained); // We fill this once per tpc obj (only 1 track has to pass)
+    
+    h_reco_leading_shower_phi.at(cut_index).at(classification_index)->Fill(leading_shower.pfpPhi());
+    
+    h_reco_leading_shower_theta.at(cut_index).at(classification_index)->Fill(leading_shower.pfpTheta());
+    
+    h_reco_leading_shower_cos_theta.at(cut_index).at(classification_index)->Fill(std::cos(leading_shower.pfpTheta()));
+    
+    h_reco_shower_multiplicity.at(cut_index).at(classification_index)->Fill(tpc_obj.NPfpShowers());
+    
+    h_reco_track_multiplicity.at(cut_index).at(classification_index)->Fill(tpc_obj.NPfpTracks());
 
 }
 // -----------------------------------------------------------------------------
@@ -539,11 +591,28 @@ void histogram_helper::WriteReco(int type){
             
             if (bool_dir) truth_dir->cd();
 
-            // Now write the histogram
+            // Now write the histograms
             h_reco_vtx_x.at(i).at(j)->Write("",TObject::kOverwrite);
             h_reco_vtx_y.at(i).at(j)->Write("",TObject::kOverwrite);
             h_reco_vtx_z.at(i).at(j)->Write("",TObject::kOverwrite);
-            h_reco_dEdx.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_dEdx .at(i).at(j)->Write("",TObject::kOverwrite);
+            h_largest_flash_z.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_leading_mom.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_flash_to_vtx_dist.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_shower_to_vtx_dist.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_track_to_vtx_dist.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_leading_shower_hits_all_planes.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_leading_shower_hits_collection_plane.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_leading_shower_open_angle.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_secondary_shower_to_vtx_dist.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_leading_shower_hits_per_length.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_longest_track_leading_shower_length.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_track_contained.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_leading_shower_phi.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_leading_shower_theta.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_leading_shower_cos_theta.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_shower_multiplicity.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_track_multiplicity.at(i).at(j)->Write("",TObject::kOverwrite);
 
             if (break_early) break;
         }

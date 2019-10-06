@@ -84,7 +84,14 @@ namespace utilityNS {
         void GetLargestFlashVector(TTree* optical_tree, double flash_time_start, double flash_time_end, int flash_pe_threshold, 
                                    std::vector<std::vector<double>> &largest_flash_v_v, std::vector<std::vector<int>> &optical_list_pe_v, std::vector<std::vector<double>> &optical_list_flash_time_v);
         // ---------------------------------------------------------------------
-
+        // Gets the longest track length in the event
+        double GetLongestTrackLength(int n_pfp, const xsecAna::TPCObjectContainer &tpc_obj);
+        // ---------------------------------------------------------------------
+        // Gets the distance of the secondary shower to the nu vertex
+        double GetSecondaryShowerDist(int n_pfp, const xsecAna::TPCObjectContainer &tpc_obj, int leading_index);
+        // ---------------------------------------------------------------------
+        double GetTrackVtxDist(int n_pfp, const xsecAna::TPCObjectContainer &tpc_obj);
+        // ---------------------------------------------------------------------
 
     }; // End Class Utility
 } // End namespace

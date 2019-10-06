@@ -282,4 +282,74 @@ namespace utilityNS {
         return;
     }
     // -------------------------------------------------------------------------
+    double utility::GetLongestTrackLength(int n_pfp, const xsecAna::TPCObjectContainer &tpc_obj){
+        
+        double longest_track{-999};
+
+        // Get the track properties by looping over the pfp
+        for (int j = 0; j < n_pfp; j++) {
+            
+            auto const pfp = tpc_obj.GetParticle(j);
+            const int pfp_pdg = pfp.PFParticlePdgCode();
+            
+            if(pfp_pdg == 13) {
+                
+                const double trk_length = pfp.pfpLength();
+                
+                if (trk_length > longest_track) longest_track = trk_length;
+                
+            }
+        
+        } // End loop pfparticles
+
+        return longest_track;
+    }
+    // -------------------------------------------------------------------------
+    double utility::GetSecondaryShowerDist(int n_pfp, const xsecAna::TPCObjectContainer &tpc_obj, int leading_index){
+        
+        // Potential issue in the case of third shower, this gets missed?
+
+        double max_distance{0}; // Might want to set this to -999 for cases where secondary shower doesnt exist?
+        
+        for (int j = 0; j < n_pfp; j++) {
+            if (j == leading_index) continue;      //we assume leading shower == electron shower
+            
+            auto const part = tpc_obj.GetParticle(j);
+            const int pfp_pdg = part.PFParticlePdgCode();
+            const double distance = sqrt(pow((part.pfpVtxX() - tpc_obj.pfpVtxX()),2) +
+                                         pow((part.pfpVtxY() - tpc_obj.pfpVtxY()),2) +
+                                         pow((part.pfpVtxZ() - tpc_obj.pfpVtxZ()),2));
+            
+            if (pfp_pdg == 11 && distance > max_distance){
+                max_distance = distance;
+            }
+        }
+
+        return max_distance;
+
+    }
+    // -------------------------------------------------------------------------
+    double utility::GetTrackVtxDist(int n_pfp, const xsecAna::TPCObjectContainer &tpc_obj){
+        
+        double smallest_trk_vtx_dist{1000}; // Sets to 1000???
+
+        for (int j = 0; j < n_pfp; j++) {
+            
+            auto const part = tpc_obj.GetParticle(j);
+            const int pfp_pdg = part.PFParticlePdgCode();
+
+            // if it's a track
+            if (pfp_pdg == 13)  {
+                const double trk_vtx_dist = sqrt(((tpc_obj.pfpVtxX() - part.pfpVtxX()) * (tpc_obj.pfpVtxX() - part.pfpVtxX())) +
+                                                 ((tpc_obj.pfpVtxY() - part.pfpVtxY()) * (tpc_obj.pfpVtxY() - part.pfpVtxY())) +
+                                                 ((tpc_obj.pfpVtxZ() - part.pfpVtxZ()) * (tpc_obj.pfpVtxZ() - part.pfpVtxZ())));
+                
+                if (trk_vtx_dist < smallest_trk_vtx_dist) {smallest_trk_vtx_dist = trk_vtx_dist; }
+            }
+       
+        } // End pfp loop
+        
+        return smallest_trk_vtx_dist;
+    }
+    // -------------------------------------------------------------------------
 } // End namespace utlity

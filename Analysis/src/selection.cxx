@@ -535,7 +535,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
     // *************************************************************************
     // Pandora Output ----------------------------------------------------------
     // *************************************************************************
-    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_pandora_output, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_pandora_output, tpc_obj, leading_shower_index, largest_flash_v_v.at(event), fv_boundary_v, type_str);
     if (!slim) histogram_helper_instance.FillRecoVtxZY(classification_index, tpc_obj);
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_pandora_output), type_str); 
 
@@ -548,7 +548,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_in_time), type_str); 
-    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_in_time, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_in_time, tpc_obj, leading_shower_index, largest_flash_v_v.at(event), fv_boundary_v, type_str);
     
     // *************************************************************************
     // Flash has more than the required PE -------------------------------------
@@ -559,7 +559,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_flash_pe), type_str); 
-    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_flash_pe, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_flash_pe, tpc_obj, leading_shower_index, largest_flash_v_v.at(event), fv_boundary_v, type_str);
     
     // *************************************************************************
     // Has a valid Nue ---------------------------------------------------------
@@ -570,7 +570,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_has_nue), type_str);
-    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_has_nue, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_has_nue, tpc_obj, leading_shower_index, largest_flash_v_v.at(event), fv_boundary_v, type_str);
 
     // *************************************************************************
     // Is in the FV ------------------------------------------------------------
@@ -581,7 +581,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_in_fv), type_str);
-    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_in_fv, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_in_fv, tpc_obj, leading_shower_index, largest_flash_v_v.at(event), fv_boundary_v, type_str);
 
     // *************************************************************************
     // Apply flash vtx cut -----------------------------------------------------
@@ -592,7 +592,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_vtx_to_flash), type_str);
-    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_vtx_to_flash, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_vtx_to_flash, tpc_obj, leading_shower_index, largest_flash_v_v.at(event), fv_boundary_v, type_str);
 
     // *************************************************************************
     // Apply vtx nu distance cut -----------------------------------------------
@@ -603,7 +603,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_shwr_nue_dist), type_str);
-    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_shwr_nue_dist, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_shwr_nue_dist, tpc_obj, leading_shower_index, largest_flash_v_v.at(event), fv_boundary_v, type_str);
 
     // *************************************************************************
     // Apply track vtx nu distance cut -----------------------------------------
@@ -614,7 +614,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_trk_nue_dist), type_str);
-    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_trk_nue_dist, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_trk_nue_dist, tpc_obj, leading_shower_index, largest_flash_v_v.at(event), fv_boundary_v, type_str);
 
     // *************************************************************************
     // Apply Hit threshold cut -------------------------------------------------
@@ -625,7 +625,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_shwr_hit_threshold), type_str);
-    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_shwr_hit_threshold, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_shwr_hit_threshold, tpc_obj, leading_shower_index, largest_flash_v_v.at(event), fv_boundary_v, type_str);
 
     // *************************************************************************
     // Apply Hit threshold collection cut --------------------------------------
@@ -636,7 +636,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_shwr_hit_threshold_collection), type_str);
-    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_shwr_hit_threshold_collection, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_shwr_hit_threshold_collection, tpc_obj, leading_shower_index, largest_flash_v_v.at(event), fv_boundary_v, type_str);
 
     // *************************************************************************
     // Apply Open Angle cut ----------------------------------------------------
@@ -647,7 +647,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_shwr_open_angle), type_str);
-    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_shwr_open_angle, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_shwr_open_angle, tpc_obj, leading_shower_index, largest_flash_v_v.at(event), fv_boundary_v, type_str);
 
     // *************************************************************************
     // Apply dEdx cut ----------------------------------------------------------
@@ -658,7 +658,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_shwr_dedx), type_str);
-    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_shwr_dedx, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_shwr_dedx, tpc_obj, leading_shower_index, largest_flash_v_v.at(event), fv_boundary_v, type_str);
 
     // *************************************************************************
     // Apply Secondary shower dist cut -----------------------------------------
@@ -669,7 +669,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_dist_nue_vtx), type_str); 
-    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_dist_nue_vtx, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_dist_nue_vtx, tpc_obj, leading_shower_index, largest_flash_v_v.at(event), fv_boundary_v, type_str);
 
     // *************************************************************************
     // Apply hit per lengh ratio cut -------------------------------------------
@@ -680,7 +680,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_pfp_hits_length), type_str);
-    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_pfp_hits_length, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_pfp_hits_length, tpc_obj, leading_shower_index, largest_flash_v_v.at(event), fv_boundary_v, type_str);
 
     // *************************************************************************
     // Apply Longest Track Leading Shower cut ----------------------------------
@@ -691,7 +691,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_longest_trk_leading_shwr_length), type_str);
-    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_longest_trk_leading_shwr_length, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_longest_trk_leading_shwr_length, tpc_obj, leading_shower_index, largest_flash_v_v.at(event), fv_boundary_v, type_str);
 
     // *************************************************************************
     // Apply Contained Track Cut -----------------------------------------------
@@ -702,7 +702,7 @@ bool selection::ApplyCuts(int type, int event, const xsecAna::TPCObjectContainer
 
     // Set counters for how many passed the cut
     selection_cuts_instance.at(type).TabulateOrigins(counter_v.at(Passed_Container::k_trk_contained), type_str);
-    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_trk_contained, tpc_obj, leading_shower_index, type_str);
+    if (!slim) histogram_helper_instance.FillReco(classification_index, histogram_helper::k_trk_contained, tpc_obj, leading_shower_index, largest_flash_v_v.at(event), fv_boundary_v, type_str);
 
     // *************************************************************************
     return true;
@@ -767,8 +767,89 @@ void selection::MakeHistograms(){
 
         // dEdx
         histogram_plotter_instance.MakeStack("h_reco_dEdx",histogram_helper_instance.cut_dirs.at(i).c_str(),
-                                           false,  false, "Collection Plane dEdx [Mev/cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Collection Plane dEdx [MeV/cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
                                            Form("plots/%s/reco_dEdx_collection.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+   
+        // Leading Shower Momentum
+        histogram_plotter_instance.MakeStack("h_reco_leading_mom", histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Leading Shower Momentum [MeV/c]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_leading_mom.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+
+        // 2D distance largest flash to reco nu vertex
+        histogram_plotter_instance.MakeStack("h_reco_flash_to_vtx_dist", histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Flash to Vertex Distance [cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_flash_to_vtx_dist.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+
+        // 2D distance shower vertex to reco nu vertex
+        histogram_plotter_instance.MakeStack("h_reco_shower_to_vtx_dist", histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Shower to Vertex Distance [cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_shower_to_vtx_dist.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+
+        // 2D distance track vertex to reco nu vertex
+        histogram_plotter_instance.MakeStack("h_reco_track_to_vtx_dist", histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Track to Vertex Distance [cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_track_to_vtx_dist.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+
+        // Leading Shower hits in all planes
+        histogram_plotter_instance.MakeStack("h_reco_leading_shower_hits_all_planes", histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Leading Shower Hits All Planes", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_leading_shower_hits_all_planes.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+
+        // Leading Shower hits in collection
+        histogram_plotter_instance.MakeStack("h_reco_leading_shower_hits_collection_plane", histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Leading Shower Hits Collection Plane", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_leading_shower_hits_collection_plane.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+
+        // Leading Shower opening angle
+        histogram_plotter_instance.MakeStack("h_reco_leading_shower_open_angle", histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Leading Shower Open Angle [degrees]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_leading_shower_open_angle.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+
+        // Secondary shower to vertex distance (for events with more than 1 shower)
+        histogram_plotter_instance.MakeStack("h_reco_secondary_shower_to_vtx_dist", histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Secondary Shower to Vertex Distance (>1 shower) [cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_secondary_shower_to_vtx_dist.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+
+        // Leading Shower hits per length
+        histogram_plotter_instance.MakeStack("h_reco_leading_shower_hits_per_length", histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Leading Shower Hits / Length [cm^{-1}]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_leading_shower_hits_per_length.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+
+        // Longest track to leading shower length
+        histogram_plotter_instance.MakeStack("h_reco_longest_track_leading_shower_length", histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Longest Track Length / Leading Shower Length", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_longest_track_leading_shower_length.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+
+        // Track Containment
+        histogram_plotter_instance.MakeStack("h_reco_track_contained", histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Contained Tracks", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_track_contained.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+
+        // Leading shower phi
+        histogram_plotter_instance.MakeStack("h_reco_leading_shower_phi", histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Leading Shower Phi [degrees]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_leading_shower_phi.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+
+        // Leading shower theta
+        histogram_plotter_instance.MakeStack("h_reco_leading_shower_theta", histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Leading Shower Theta [degrees]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_leading_shower_theta.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+
+        // Leading shower cos theta
+        histogram_plotter_instance.MakeStack("h_reco_leading_shower_cos_theta", histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Leading Shower Cos(#theta)", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_leading_shower_cos_theta.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+
+        // Leading shower multiplicity
+        histogram_plotter_instance.MakeStack("h_reco_shower_multiplicity", histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Shower Multiplicty", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_shower_multiplicity.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+
+        // Leading track multiplicity
+        histogram_plotter_instance.MakeStack("h_reco_track_multiplicity", histogram_helper_instance.cut_dirs.at(i).c_str(),
+                                           false,  false, "Track Multiplicty", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           Form("plots/%s/reco_track_multiplicity.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+   
     }
     
 
