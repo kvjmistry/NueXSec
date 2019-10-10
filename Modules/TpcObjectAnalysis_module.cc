@@ -934,17 +934,6 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e) {
                     mc_vtx_y = the_mcpart->Vy();
                     mc_vtx_z = the_mcpart->Vz();
                 }
-                //if(mcOrigin == simb::kCosmicRay)
-                //{
-                //std::vector<art::Ptr<sim::MCTrack> > mc_tracks = mctracks_from_mcparticle.at(the_mcpart.key());
-                //if(mc_tracks.size() == 1)
-                //{
-                //	mc_vtx_x = mc_tracks.at(0)->Start().X();
-                //	mc_vtx_y = mc_tracks.at(0)->Start().Y();
-                //	mc_vtx_z = mc_tracks.at(0)->Start().Z();
-                //	//I can include the length and directions here!
-                //}
-                //}
                 particle_mode  = mode;
                 particle_is_cc = ccnc;
                 mcPdg          = the_mcpart->PdgCode();
@@ -1122,7 +1111,7 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e) {
             particle_container.SetpfpPhi(pfp_phi);
             particle_container.SetpfpLength(pfp_length);
             particle_container.SetpfpMomentum(pfp_momentum);
-            particle_container.SetpfpOpenAngle(pfp_open_angle);
+            particle_container.SetpfpOpenAngle(pfp_open_angle); // This is in radians, so will want to change this to degrees at some point
             particle_container.SetNumPFPHits(pfp_hits);
             particle_container.SetNumPFPHitsU(pfp_hits_u);
             particle_container.SetNumPFPHitsV(pfp_hits_v);

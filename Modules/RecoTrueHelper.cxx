@@ -385,51 +385,61 @@ void recotruehelper::GetRecoToTrueMatches(const lar_pandora::PFParticlesToHits &
 {
     bool foundMatches(false);
 
+    // Loop over the map of reco particles to hits
     for (lar_pandora::PFParticlesToHits::const_iterator iter1 = recoParticlesToHits.begin(), iterEnd1 = recoParticlesToHits.end();
-         iter1 != iterEnd1; ++iter1)
-    {
+         iter1 != iterEnd1; ++iter1) {
+
         const art::Ptr<recob::PFParticle> recoParticle = iter1->first;
+        
+        // Not sure what this does yet...
         if (vetoReco.count(recoParticle) > 0)
             continue;
 
         const lar_pandora::HitVector &hitVector = iter1->second;
 
+        // A temp map from MC Particle to Hits 
         lar_pandora::MCParticlesToHits truthContributionMap;
 
-        for (lar_pandora::HitVector::const_iterator iter2 = hitVector.begin(), iterEnd2 = hitVector.end(); iter2 != iterEnd2; ++iter2)
-        {
+        // Loop over the reco hits
+        for (lar_pandora::HitVector::const_iterator iter2 = hitVector.begin(), iterEnd2 = hitVector.end(); iter2 != iterEnd2; ++iter2) {
+            
+            // Get the hit
             const art::Ptr<recob::Hit> hit = *iter2;
 
+            // Find the hit in the Hit to MC Particle Map
             lar_pandora::HitsToMCParticles::const_iterator iter3 = trueHitsToParticles.find(hit);
+            
+            // Find the MCParticle that share this same hit (if any)
             if (trueHitsToParticles.end() == iter3)
                 continue;
 
+            // If exists, get the MCParticle
             const art::Ptr<simb::MCParticle> trueParticle = iter3->second;
             if (vetoTrue.count(trueParticle) > 0)
                 continue;
 
+            // This map will contain all the true particles that match some or all of the hits of the reco particle
             truthContributionMap[trueParticle].push_back(hit);
-        }
+        
+        } // End loop over the hits
 
+         // Now we want to find the true particle that has more hits in common with this reco particle than the others
         lar_pandora::MCParticlesToHits::const_iterator mIter = truthContributionMap.end();
 
-        for (lar_pandora::MCParticlesToHits::const_iterator iter4 = truthContributionMap.begin(), iterEnd4 = truthContributionMap.end();
-             iter4 != iterEnd4; ++iter4)
-        {
-            if ((truthContributionMap.end() == mIter) || (iter4->second.size() > mIter->second.size()))
-            {
+        // Loop over the temp MC Par to hit map and set iterator end
+        for (lar_pandora::MCParticlesToHits::const_iterator iter4 = truthContributionMap.begin(), iterEnd4 = truthContributionMap.end(); iter4 != iterEnd4; ++iter4) {
+            
+            if ((truthContributionMap.end() == mIter) || (iter4->second.size() > mIter->second.size())) {
                 mIter = iter4;
             }
         }
 
-        if (truthContributionMap.end() != mIter)
-        {
+        if (truthContributionMap.end() != mIter) {
             const art::Ptr<simb::MCParticle> trueParticle = mIter->first;
 
             lar_pandora::MCParticlesToHits::const_iterator iter5 = matchedHits.find(trueParticle);
 
-            if ((matchedHits.end() == iter5) || (mIter->second.size() > iter5->second.size()))
-            {
+            if ((matchedHits.end() == iter5) || (mIter->second.size() > iter5->second.size())) {
                 matchedParticles[trueParticle] = recoParticle;
                 matchedHits[trueParticle] = mIter->second;
                 foundMatches = true;

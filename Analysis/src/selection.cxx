@@ -1,4 +1,5 @@
 #include "../include/selection.h"
+#include <omp.h>
 
 namespace xsecSelection {
 // -----------------------------------------------------------------------------
@@ -309,7 +310,7 @@ void selection::make_selection(){
             mctruth_counter_tree->GetEntry(event); // MC Tree
 
             // Fill MC Truth Histograms
-            histogram_helper_instance.FillMCTruth( mc_nu_energy, mc_nu_momentum, mc_nu_id, true_in_tpc_v.at(event), mc_nu_vtx_x, mc_nu_vtx_y, mc_nu_vtx_z, mc_nu_dir_x, mc_nu_dir_y,
+            if (!slim) histogram_helper_instance.FillMCTruth( mc_nu_energy, mc_nu_momentum, mc_nu_id, true_in_tpc_v.at(event), mc_nu_vtx_x, mc_nu_vtx_y, mc_nu_vtx_z, mc_nu_dir_x, mc_nu_dir_y,
                                                    mc_nu_dir_z, mc_ele_dir_x, mc_ele_dir_y, mc_ele_dir_z, mc_ele_energy, mc_ele_momentum);
             
             // The total number of TPC Objects
@@ -856,4 +857,3 @@ void selection::MakeHistograms(){
 }
 // -----------------------------------------------------------------------------
 } // END NAMESPACE xsecSelection
-
