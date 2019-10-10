@@ -77,7 +77,6 @@ int main(int argc, char *argv[]){
         
     }
     // if(argc < 2 )  { std::cout << " \n Please include the input file path \n " << std::endl; exit(1); }
-
     // -------------------------------------------------------------------------
     std::vector<double> config;
     std::vector<double> input_config;

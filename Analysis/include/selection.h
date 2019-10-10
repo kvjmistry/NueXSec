@@ -6,6 +6,8 @@
 #include "histogram_helper.h"
 #include "histogram_plotter.h"
 
+#include <omp.h>
+#include "TThread.h"
 
 /* 
 Class is the main controller of the selection. Main.cxx will invoke the intilalisation
@@ -21,6 +23,10 @@ namespace xsecSelection {
 
         private:
     
+            // Parallel processing variables
+            int nthreads = 4;
+       
+
             // Scale factors
             const double data_scale_factor   = 0.1301; // v6 value - 0.12758;
             const double intime_scale_factor = 1.0154;
@@ -60,7 +66,6 @@ namespace xsecSelection {
             utilityNS::utility _utility_instance;
             std::vector<selection_cuts> selection_cuts_instance; // One for each type e.g MC, Data, EXT..
             histogram_helper  histogram_helper_instance;
-            histogram_plotter histogram_plotter_instance;
 
             // Variables -------------------------------------------------------
 

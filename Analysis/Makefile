@@ -3,7 +3,7 @@ LIBDIR = ../lib
 MODULESDIR = ../Modules
 
 # Compilation Flags
-CXX = g++
+CXX = g++ -fopenmp 
 CPPFLAGS = -I$(LIBDIR) -Wall -Wextra
 CXXFLAGS=$(shell root-config --cflags)
 

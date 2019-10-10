@@ -1,5 +1,4 @@
 #include "../include/selection.h"
-#include <omp.h>
 
 namespace xsecSelection {
 // -----------------------------------------------------------------------------
@@ -300,8 +299,13 @@ void selection::make_selection(){
         mc_counter_v.resize(Passed_Container::k_cuts_MAX);
         for (unsigned int i = 0; i < mc_counter_v.size(); i++) mc_counter_v.at(i).resize(24, 0.0 ); // Should remove hardcoded number
         
+
+        // Enable MultiThreading
+        // ROOT::EnableImplicitMT(nthreads);
         // Loop over the Events
+        // #pragma omp parallel for
         for (int event = 0; event < tree_total_entries; event++){
+            // TThread::Lock();
             // Alert the user
             if (event % 100000 == 0) std::cout << "On entry " << event/100000.0 <<"00k " << std::flush;
         
@@ -332,8 +336,8 @@ void selection::make_selection(){
                 if (!pass) continue;
 
             } // End loop over the TPC Objects
+            // TThread::UnLock();
 
-        
         } // End loop over the Events
         std::cout << std::endl;
         std::cout << "Ending Selection over MC" << std::endl;
@@ -739,6 +743,8 @@ void selection::SavetoFile(){
 // -----------------------------------------------------------------------------
 void selection::MakeHistograms(){
     std::cout << "Creating histograms and making plots" << std::endl;
+
+    histogram_plotter histogram_plotter_instance;
 
     // Loop over the cuts and plot histograms by plot type
     for (unsigned int i = 0 ; i < histogram_helper::k_cuts_MAX; i++){

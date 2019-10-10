@@ -4,7 +4,18 @@
 histogram_plotter::~histogram_plotter(){ 
     
     // Overwrite the destrctor of histogram helper
-    std::cout << " " << std::endl;
+    // If file is not already closed then close it
+    if (gROOT->GetListOfFiles()->FindObject("nuexsec.root") ) {
+        f_nuexsec->Close();
+    }
+}
+// -----------------------------------------------------------------------------
+histogram_plotter::histogram_plotter(){ 
+    
+    // File not already open, open the file
+    if (!gROOT->GetListOfFiles()->FindObject("nuexsec.root") ) {
+        f_nuexsec = new TFile("nuexsec.root", "UPDATE");
+    }
 }
 // -----------------------------------------------------------------------------
 void histogram_plotter::InitHistograms(){

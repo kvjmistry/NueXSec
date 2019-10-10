@@ -10,7 +10,7 @@ class histogram_plotter : public histogram_helper{
 
     public:
     // Default constructor
-    histogram_plotter(){};
+    histogram_plotter();
     
     // Destructor 
     ~histogram_plotter(); 
