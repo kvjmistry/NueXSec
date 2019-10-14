@@ -921,7 +921,7 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e) {
 
                 // std::cout << "Testing mcpar_from_mcghost size: " << mcpar_from_mcghost.size() << std::endl;
                 // If Overlay then we assume unmatched cases are Cosmic
-                if (mcpart.size() == 0 && is_overlay) {
+                if (mcpart.size() == 0 && _is_overlay) {
                     std::cout << "Unmatched MC Particle in Overlay file so assuming it is cosmic" << std::endl;            
                     mcOrigin = simb::kCosmicRay;
 
