@@ -1,0 +1,6 @@
+#include "run_nue_xsec.fcl"
+
+# Override the default configurations
+physics.producers.ProduceMCGhost.Mode: "MC"
+physics.producers.ProduceTPCO.Mode:    "MC"
+physics.analyzers.AnalyzeTPCO.Mode:    "MC"

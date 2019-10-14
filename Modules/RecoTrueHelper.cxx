@@ -36,12 +36,11 @@ void recotruehelper::Configure(art::Event const & e,
     lar_pandora::MCParticlesToHits trueParticlesToHits;
     lar_pandora::HitsToMCParticles trueHitsToParticles;
 
-    if (!e.isRealData()) {
-        lar_pandora::LArPandoraHelper::CollectMCParticles(e, _geantModuleLabel, trueParticleVector);
-        lar_pandora::LArPandoraHelper::CollectMCParticles(e, _geantModuleLabel, truthToParticles, particlesToTruth);
-        lar_pandora::LArPandoraHelper::BuildMCParticleHitMaps(e, _geantModuleLabel, hitVector, trueParticlesToHits,
-                                                              trueHitsToParticles, lar_pandora::LArPandoraHelper::kAddDaughters);
-    }
+    
+    lar_pandora::LArPandoraHelper::CollectMCParticles(e, _geantModuleLabel, trueParticleVector);
+    lar_pandora::LArPandoraHelper::CollectMCParticles(e, _geantModuleLabel, truthToParticles, particlesToTruth);
+    lar_pandora::LArPandoraHelper::BuildMCParticleHitMaps(e, _geantModuleLabel, hitVector, trueParticlesToHits,
+                                                            trueHitsToParticles, lar_pandora::LArPandoraHelper::kAddDaughters);
 
     if (_verbose) {
         std::cout << "[RecoTrueHelper] [Configure] TrueParticles: " << particlesToTruth.size() << std::endl;
@@ -124,89 +123,86 @@ void recotruehelper::Configure(art::Event const & e,
     lar_pandora::MCParticlesToMCTruth particlesToTruth;
     lar_pandora::MCParticlesToHits    trueParticlesToHits;
     lar_pandora::HitsToMCParticles    trueHitsToParticles; 
-
-    if (!e.isRealData()) {
         
-        // Create map from MCTruth to MCParticle
-        lar_pandora::LArPandoraHelper::CollectMCParticles(e, _geantModuleLabel, trueParticleVector);
+    // Create map from MCTruth to MCParticle
+    lar_pandora::LArPandoraHelper::CollectMCParticles(e, _geantModuleLabel, trueParticleVector);
 
-        // Create map from MCParticle to MCTruth
-        lar_pandora::LArPandoraHelper::CollectMCParticles(e, _geantModuleLabel, truthToParticles, particlesToTruth); 
+    // Create map from MCParticle to MCTruth
+    lar_pandora::LArPandoraHelper::CollectMCParticles(e, _geantModuleLabel, truthToParticles, particlesToTruth); 
 
-        // Create Map track ID to MCParticle
-        lar_pandora::MCParticleMap particleMap;
+    // Create Map track ID to MCParticle
+    lar_pandora::MCParticleMap particleMap;
 
-        // Loop over the map of MC Truth to MC Particles
-        for (lar_pandora::MCTruthToMCParticles::const_iterator iter1 = truthToParticles.begin(), iterEnd1 = truthToParticles.end(); iter1 != iterEnd1; ++iter1) {
+    // Loop over the map of MC Truth to MC Particles
+    for (lar_pandora::MCTruthToMCParticles::const_iterator iter1 = truthToParticles.begin(), iterEnd1 = truthToParticles.end(); iter1 != iterEnd1; ++iter1) {
+        
+        // Get the MC Particle vector
+        const lar_pandora::MCParticleVector &particleVector = iter1->second;
+        
+        // Loop over the MC Particle Vector and map to the track ID
+        for (lar_pandora::MCParticleVector::const_iterator iter2 = particleVector.begin(), iterEnd2 = particleVector.end(); iter2 != iterEnd2; ++iter2) {
+            const art::Ptr<simb::MCParticle> particle = *iter2;
+            particleMap[particle->TrackId()] = particle;
+        }
+    }
+
+    // anab::BackTrackerHitMatchingData: Store information from a reco-truth matching module (which is based on the BackTracker service)
+    // Stores the cleanliness and completeness of a match
+    // Cleanliness  = charge in reco object from true object / total charge in reco object
+    // Completeness = charge in reco object from true object / total charge deposited by true object
+    art::FindManyP<simb::MCParticle,anab::BackTrackerHitMatchingData> mcps_from_hit(hit_h, e, _hit_mcp_producer);
+    std::vector<art::Ptr<simb::MCParticle> >             mcp_v;   // MC Particle vector
+    std::vector<anab::BackTrackerHitMatchingData const*> match_v; // Data reference
+
+    // Loop over the hits, get the ass MCP, and then true to link
+    for (auto hit : hitVector) {
+
+        mcp_v.clear(); match_v.clear();
+        mcps_from_hit.get(hit.key(), mcp_v, match_v);
+
+        double max_energy = -1;
+        int best_match_id = -1;
+
+        // Loop over hit matched and get hit with largest energy of track ID
+        for (size_t m = 0; m < match_v.size(); m++) {
+            double this_energy = match_v[m]->energy;
             
-            // Get the MC Particle vector
-            const lar_pandora::MCParticleVector &particleVector = iter1->second;
-            
-            // Loop over the MC Particle Vector and map to the track ID
-            for (lar_pandora::MCParticleVector::const_iterator iter2 = particleVector.begin(), iterEnd2 = particleVector.end(); iter2 != iterEnd2; ++iter2) {
-                const art::Ptr<simb::MCParticle> particle = *iter2;
-                particleMap[particle->TrackId()] = particle;
+            if (this_energy > max_energy) {
+                best_match_id = m;
+                max_energy = this_energy;
             }
         }
 
-        // anab::BackTrackerHitMatchingData: Store information from a reco-truth matching module (which is based on the BackTracker service)
-        // Stores the cleanliness and completeness of a match
-        // Cleanliness  = charge in reco object from true object / total charge in reco object
-        // Completeness = charge in reco object from true object / total charge deposited by true object
-        art::FindManyP<simb::MCParticle,anab::BackTrackerHitMatchingData> mcps_from_hit(hit_h, e, _hit_mcp_producer);
-        std::vector<art::Ptr<simb::MCParticle> >             mcp_v;   // MC Particle vector
-        std::vector<anab::BackTrackerHitMatchingData const*> match_v; // Data reference
+        if (best_match_id > -1) {
 
-        // Loop over the hits, get the ass MCP, and then true to link
-        for (auto hit : hitVector) {
+            try {
 
-            mcp_v.clear(); match_v.clear();
-            mcps_from_hit.get(hit.key(), mcp_v, match_v);
+                const art::Ptr<simb::MCParticle> thisParticle = mcp_v.at(best_match_id);
+                const art::Ptr<simb::MCParticle> primaryParticle(lar_pandora::LArPandoraHelper::GetFinalStateMCParticle(particleMap, thisParticle));
 
-            double max_energy = -1;
-            int best_match_id = -1;
+                // If using the add daughter mode (daughters absorbed into parent), then return the primary particle, else return this particle
+                const art::Ptr<simb::MCParticle> selectedParticle((lar_pandora::LArPandoraHelper::kAddDaughters == daughterMode) ? primaryParticle : thisParticle); 
 
-            // Loop over hit matched and get hit with largest energy of track ID
-            for (size_t m = 0; m < match_v.size(); m++) {
-                double this_energy = match_v[m]->energy;
-                
-                if (this_energy > max_energy) {
-                    best_match_id = m;
-                    max_energy = this_energy;
-                }
-            }
+                if ((lar_pandora::LArPandoraHelper::kIgnoreDaughters == daughterMode) && (selectedParticle != primaryParticle))
+                    continue;
 
-            if (best_match_id > -1) {
+                // Skip the ones which are not visible
+                if (!(lar_pandora::LArPandoraHelper::IsVisible(selectedParticle)))
+                    continue;
 
-                try {
+                trueHitsToParticles[hit] = selectedParticle; // Assign the mapping of MC Particle to the hit
 
-                    const art::Ptr<simb::MCParticle> thisParticle = mcp_v.at(best_match_id);
-                    const art::Ptr<simb::MCParticle> primaryParticle(lar_pandora::LArPandoraHelper::GetFinalStateMCParticle(particleMap, thisParticle));
+            } 
+            
+            catch (cet::exception &e) {}
+            // const auto mct = UBXSecHelper::TrackIDToMCTruth(e, "largeant", selectedParticle->TrackId());
+            // if (mct->Origin() == simb::kBeamNeutrino && selectedParticle->PdgCode() == 13 && selectedParticle->Mother() == 0) {
+            //     std::cout << "Muon from neutrino ass to hit " << hit->PeakTime() << ", "<< hit->WireID () << std::endl;
+            // }
+        }
 
-                    // If using the add daughter mode (daughters absorbed into parent), then return the primary particle, else return this particle
-                    const art::Ptr<simb::MCParticle> selectedParticle((lar_pandora::LArPandoraHelper::kAddDaughters == daughterMode) ? primaryParticle : thisParticle); 
+    } // End loop over hits
 
-                    if ((lar_pandora::LArPandoraHelper::kIgnoreDaughters == daughterMode) && (selectedParticle != primaryParticle))
-                        continue;
-
-                    // Skip the ones which are not visible
-                    if (!(lar_pandora::LArPandoraHelper::IsVisible(selectedParticle)))
-                        continue;
-
-                    trueHitsToParticles[hit] = selectedParticle; // Assign the mapping of MC Particle to the hit
-
-                } 
-                
-                catch (cet::exception &e) {}
-                // const auto mct = UBXSecHelper::TrackIDToMCTruth(e, "largeant", selectedParticle->TrackId());
-                // if (mct->Origin() == simb::kBeamNeutrino && selectedParticle->PdgCode() == 13 && selectedParticle->Mother() == 0) {
-                //     std::cout << "Muon from neutrino ass to hit " << hit->PeakTime() << ", "<< hit->WireID () << std::endl;
-                // }
-            }
-
-        } // End loop over hits
-    
-    }
 
     // Now set the things we need for the future
     _trueHitsToParticles = trueHitsToParticles; // True Hits to True MC Particles

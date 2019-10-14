@@ -68,11 +68,12 @@ std::string _spacepointLabel;
 std::string _hitfinderLabel;
 std::string _geantModuleLabel;
 
-bool _is_data;
+bool _is_data{false};
 bool _debug;
-bool _cosmic_only;
+bool _cosmic_only{false};
 bool _use_premade_ass;
 std::string _mcpHitAssLabel;
+std::string _mode;
 };
 
 
@@ -86,7 +87,7 @@ xsecAna::RecoTrueMatching::RecoTrueMatching(fhicl::ParameterSet const & p) {
 	_spacepointLabel                = p.get<std::string>("SpacePointProducer");
 
 	_debug                          = p.get<bool>("Debug", true);
-	_cosmic_only                    = p.get<bool>("CosmicOnly", false);
+	_mode                           = p.get<std::string>("Mode");
 	_use_premade_ass                = p.get<bool>("UsePremadeAssociation", true);
 	_mcpHitAssLabel                 = p.get<std::string>("MCPHitAssProducer");
 
@@ -114,6 +115,9 @@ void xsecAna::RecoTrueMatching::produce(art::Event & e)
 	std::unique_ptr< art::Assns<simb::MCParticle, xsecAna::MCGhost> >  assnOutGhostMCP (new art::Assns<simb::MCParticle, xsecAna::MCGhost>);
 	std::unique_ptr< art::Assns<recob::PFParticle, xsecAna::MCGhost> > assnOutGhostPFP (new art::Assns<recob::PFParticle, xsecAna::MCGhost>);
 
+	if      (_mode == "EXT")     _cosmic_only = true;
+	else if (_mode == "Data")    _is_data     = true;
+	else if (_mode == "Overlay") _is_data     = false;
 
 	// ------- EXT -------
 	if(_cosmic_only)
@@ -126,7 +130,6 @@ void xsecAna::RecoTrueMatching::produce(art::Event & e)
 	}
 
 	// ------- DATA -------
-	_is_data = e.isRealData();
 	if (_is_data) {
 		std::cout << "[RecoTrueMatching] Running on a real data file. No MC-PFP matching will be attempted." << std::endl;
 		e.put(std::move(mcGhostVector));

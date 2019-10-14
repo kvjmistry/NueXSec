@@ -35,7 +35,7 @@ physics:
       SpacePointProducer:         "pandora"
       UsePremadeAssociation:      "true"
       MCPHitAssProducer:          "gaushitTruthMatch"
-      CosmicOnly:                 "false"
+      Mode:                       "MC" # MC/Overlay/Data/EXT
       Debug:                      "true"
     }
     ProduceTPCO:
@@ -51,7 +51,7 @@ physics:
       
       UsePremadeAssociation:      "true"
       MCPHitAssProducer:          "gaushitTruthMatch"
-      CosmicOnly:                 "false"
+      Mode:                       "MC" # MC/Overlay/Data/EXT
       Debug:                      "true"
       Verbose:                    "true"
     }
@@ -66,9 +66,7 @@ physics:
       TPCObjectProducer:         "ProduceTPCO"
       MCGhostProducer:           "ProduceMCGhost"
       SaveTruthInfo:             "false"
-
-      BeamSpillStart:            "5"
-      BeamSpillEnd:              "16"
+      Mode:                      "MC" # MC/Overlay/Data/EXT
 
       POTSummaryProducerMC:      "generator"
       POTSummaryProducerData:    "beamdata"

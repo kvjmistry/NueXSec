@@ -55,7 +55,7 @@ art_make( BASENAME_ONLY
                 ubana_AnalysisTree_MCTruth_AssociationsTruth_tool
                 ubana_AnalysisTree_MCTruth_MCTruthBase
 		ubana_BasicTool_GeoAlgo
-		ubana_MyClasses
+		#ubana_MyClasses
                 #ubana_UBXSec
                 ubobj_UBXSec
 		ubobj_Trigger

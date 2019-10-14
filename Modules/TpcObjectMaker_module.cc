@@ -68,11 +68,12 @@ private:
 
     bool _debug;
     bool _verbose;
-    bool isMC;
-    bool isData;
-    bool _cosmic_only;
+    bool _is_mc{false};
+    bool _is_data{false};
+    bool _cosmic_only{false};
     bool _use_premade_ass;
     std::string _mcpHitAssLabel;
+    std::string _mode;
 
     int run;
     int event;
@@ -96,7 +97,7 @@ xsecAna::TpcObjectMaker::TpcObjectMaker(fhicl::ParameterSet const & p) {
     _debug                          = p.get<bool>("Debug", false);
     _verbose                        = p.get<bool>("Verbose", false);
 
-    _cosmic_only                    = p.get<bool>("CosmicOnly", false);
+    _mode                           = p.get<std::string>("Mode");
     _use_premade_ass                = p.get<bool>("UsePremadeAssociation", true);
     _mcpHitAssLabel                 = p.get<std::string>("MCPHitAssProducer");
 
@@ -120,8 +121,11 @@ void xsecAna::TpcObjectMaker::produce(art::Event & e) {
 
     run           = e.id().run();
     event         = e.id().event();
-    bool _is_data = e.isRealData();
-    bool _is_mc   = !_is_data;
+
+    if      (_mode == "EXT")     _cosmic_only = true;
+	else if (_mode == "Data")    _is_data     = true;
+	else if (_mode == "Overlay") _is_mc       = true;
+    else _is_mc = true;
     
     // -------------------------------------------------------------------------
     // Don't use premade associations

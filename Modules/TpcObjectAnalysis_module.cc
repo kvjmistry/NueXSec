@@ -86,11 +86,13 @@ private:
 
     bool _debug;
     bool _verbose;
-    bool _cosmic_only;
+    bool _cosmic_only{false};
     bool _save_truth_info;
+    std::string _mode;
 
-    bool _is_mc;
-    bool _is_data;
+    bool _is_mc{false};
+    bool _is_data{false};
+    bool _is_overlay{false};
 
     // -------------------------------------------------------------------------
     TTree * myTree;
@@ -303,7 +305,7 @@ xsecAna::TpcObjectAnalysis::TpcObjectAnalysis(fhicl::ParameterSet const & p) :
 
     _debug                 = p.get<bool>("Debug", false);
     _verbose               = p.get<bool>("Verbose", false);
-    _cosmic_only           = p.get<bool>("CosmicOnly", false);
+    _mode                   = p.get<std::string>("Mode");
     
     // We set this to be false by default, as it severely inflates the size of the output file.
     // Instead we just count the most important truth events.
@@ -318,8 +320,14 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e) {
     run      = e.id().run();
     event    = e.id().event();
     subrun   = e.id().subRun();
-    _is_data = e.isRealData();
-    _is_mc   = !_is_data;
+    
+    if      (_mode == "EXT")     _cosmic_only = true;
+	else if (_mode == "Data")    _is_data     = true;
+	else if (_mode == "Overlay"){
+        _is_mc       = true;
+        _is_overlay  = true;
+    } 
+    else _is_mc = true;
 
     std::cout << "[Analyze] ------------------------------------------- [Analyze]" << std::endl;
     std::cout << "[Analyze] Running over entry: " << iteration << std::endl;
@@ -898,6 +906,7 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e) {
             // MC Ghosts do accounting for pfp to mcghost to mc particle
             const std::vector<art::Ptr<MCGhost> > mcghost = mcghost_from_pfp.at(pfp.key());
             std::vector<art::Ptr<simb::MCParticle> > mcpart;
+
             if(mcghost.size() == 0) {std::cout << "[Analyze] No matched MC Ghost to PFP!" << std::endl; }
             // -----------------------------------------------------------------
             // We don't want to just throw these events out!
@@ -909,48 +918,58 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e) {
             if (mcghost.size() >= 1) {
                 if(_verbose) {std::cout << "[Analyze] One MC Ghost Found!" << std::endl; }
                 mcpart = mcpar_from_mcghost.at(mcghost[0].key());
-                const art::Ptr<simb::MCParticle> the_mcpart = mcpart.at(0);
-                const art::Ptr<simb::MCTruth> mctruth = nue_xsec::recotruehelper::TrackIDToMCTruth(e, "largeant", the_mcpart->TrackId());
-                //bt->TrackIDToMCTruth(the_mcpart->TrackId());
-                simb::MCNeutrino mc_nu;
-                
-                if(!mctruth) {std::cout << "[Analyze] MCTruth Pointer Not Valid!" << std::endl; }
+
+                // std::cout << "Testing mcpar_from_mcghost size: " << mcpar_from_mcghost.size() << std::endl;
+                // If Overlay then we assume unmatched cases are Cosmic
+                if (mcpart.size() == 0 && is_overlay) {
+                    std::cout << "Unmatched MC Particle in Overlay file so assuming it is cosmic" << std::endl;            
+                    mcOrigin = simb::kCosmicRay;
+
+                }
                 else {
-                    mc_nu    = mctruth->GetNeutrino();
-                    mcOrigin = mctruth->Origin();
-                }
-                
-                if(mcOrigin != simb::kCosmicRay) {
-                    mode             = mc_nu.Mode();
-                    ccnc             = mc_nu.CCNC();
-                    mcParentPdg      = mc_nu.Nu().PdgCode();
-                    mcNeutrinoEnergy = mc_nu.Nu().E();
-                    mc_nu_vtx_x      = mc_nu.Nu().Position().X();
-                    mc_nu_vtx_y      = mc_nu.Nu().Position().Y();
-                    mc_nu_vtx_z      = mc_nu.Nu().Position().Z();
+                    const art::Ptr<simb::MCParticle> the_mcpart = mcpart.at(0);
+                    const art::Ptr<simb::MCTruth> mctruth = nue_xsec::recotruehelper::TrackIDToMCTruth(e, "largeant", the_mcpart->TrackId());
+                    simb::MCNeutrino mc_nu;
                     
-                    std::cout << mc_nu_vtx_x << ", " << mc_nu_vtx_y << ", " << mc_nu_vtx_z << std::endl;
-                    mc_vtx_x = the_mcpart->Vx();
-                    mc_vtx_y = the_mcpart->Vy();
-                    mc_vtx_z = the_mcpart->Vz();
+                    if(!mctruth) {std::cout << "[Analyze] MCTruth Pointer Not Valid!" << std::endl; }
+                    else {
+                        mc_nu    = mctruth->GetNeutrino();
+                        mcOrigin = mctruth->Origin();
+                    }
+                    
+                    if(mcOrigin != simb::kCosmicRay) {
+                        mode             = mc_nu.Mode();
+                        ccnc             = mc_nu.CCNC();
+                        mcParentPdg      = mc_nu.Nu().PdgCode();
+                        mcNeutrinoEnergy = mc_nu.Nu().E();
+                        mc_nu_vtx_x      = mc_nu.Nu().Position().X();
+                        mc_nu_vtx_y      = mc_nu.Nu().Position().Y();
+                        mc_nu_vtx_z      = mc_nu.Nu().Position().Z();
+                        
+                        std::cout << mc_nu_vtx_x << ", " << mc_nu_vtx_y << ", " << mc_nu_vtx_z << std::endl;
+                        mc_vtx_x = the_mcpart->Vx();
+                        mc_vtx_y = the_mcpart->Vy();
+                        mc_vtx_z = the_mcpart->Vz();
+                    }
+                    particle_mode  = mode;
+                    particle_is_cc = ccnc;
+                    mcPdg          = the_mcpart->PdgCode();
+                    if (is_neutrino == true) tpco_mc_pdg = mcPdg;
+                    mcMomentum = the_mcpart->P();
+                    mc_dir_x   = the_mcpart->Px() / mcMomentum;
+                    mc_dir_y   = the_mcpart->Py() / mcMomentum;
+                    mc_dir_z   = the_mcpart->Pz() / mcMomentum;
+                    mc_theta   = acos(mc_dir_z) * (180 / 3.1415);
+                    mc_phi     = atan2(mc_dir_y, mc_dir_x) * (180 / 3.1415);
+                    
+                    const double mc_length_x = the_mcpart->Position().X() - the_mcpart->EndPosition().X();
+                    const double mc_length_y = the_mcpart->Position().Y() - the_mcpart->EndPosition().Y();
+                    const double mc_length_z = the_mcpart->Position().Z() - the_mcpart->EndPosition().Z();
+                    
+                    mcLength = sqrt((mc_length_x * mc_length_x) + (mc_length_y * mc_length_y) + (mc_length_z * mc_length_z));
+                    mcEnergy = the_mcpart->E();
+
                 }
-                particle_mode  = mode;
-                particle_is_cc = ccnc;
-                mcPdg          = the_mcpart->PdgCode();
-                if (is_neutrino == true) tpco_mc_pdg = mcPdg;
-                mcMomentum = the_mcpart->P();
-                mc_dir_x   = the_mcpart->Px() / mcMomentum;
-                mc_dir_y   = the_mcpart->Py() / mcMomentum;
-                mc_dir_z   = the_mcpart->Pz() / mcMomentum;
-                mc_theta   = acos(mc_dir_z) * (180 / 3.1415);
-                mc_phi     = atan2(mc_dir_y, mc_dir_x) * (180 / 3.1415);
-                
-                const double mc_length_x = the_mcpart->Position().X() - the_mcpart->EndPosition().X();
-                const double mc_length_y = the_mcpart->Position().Y() - the_mcpart->EndPosition().Y();
-                const double mc_length_z = the_mcpart->Position().Z() - the_mcpart->EndPosition().Z();
-                
-                mcLength = sqrt((mc_length_x * mc_length_x) + (mc_length_y * mc_length_y) + (mc_length_z * mc_length_z));
-                mcEnergy = the_mcpart->E();
 
             } // End mcghost == 1
             // -----------------------------------------------------------------
@@ -959,9 +978,9 @@ void xsecAna::TpcObjectAnalysis::analyze(art::Event const & e) {
             //convert simb::Origin_t to std::string
             std::string str_mcorigin;
             
-            if(mcOrigin == simb::kUnknown) {str_mcorigin = "kUnknown"; }
-            if(mcOrigin == simb::kBeamNeutrino) {str_mcorigin = "kBeamNeutrino"; }
-            if(mcOrigin == simb::kCosmicRay) {str_mcorigin = "kCosmicRay"; }
+            if(mcOrigin == simb::kUnknown)      str_mcorigin = "kUnknown";
+            if(mcOrigin == simb::kBeamNeutrino) str_mcorigin = "kBeamNeutrino";
+            if(mcOrigin == simb::kCosmicRay)    str_mcorigin = "kCosmicRay"; 
             
             particle_container.SetOrigin(str_mcorigin);
             particle_container.SetmcPdgCode(mcPdg);
