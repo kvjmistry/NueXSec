@@ -282,91 +282,6 @@ void recotruehelper::GetRecoToTrueMatches(lar_pandora::MCParticlesToPFParticles 
                          matchedParticleHits);
 }
 
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void recotruehelper::GetRecoToTrueMatches(const lar_pandora::PFParticlesToHits &recoNeutrinosToHits, const lar_pandora::HitsToMCTruth &trueHitsToNeutrinos,
-                                          lar_pandora::MCTruthToPFParticles &matchedNeutrinos, lar_pandora::MCTruthToHits &matchedNeutrinoHits) const
-{
-    PFParticleSet recoVeto; MCTruthSet trueVeto;
-
-    this->GetRecoToTrueMatches(recoNeutrinosToHits, trueHitsToNeutrinos, matchedNeutrinos, matchedNeutrinoHits, recoVeto, trueVeto);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void recotruehelper::GetRecoToTrueMatches(const lar_pandora::PFParticlesToHits &recoNeutrinosToHits, const lar_pandora::HitsToMCTruth &trueHitsToNeutrinos,
-                                          lar_pandora::MCTruthToPFParticles &matchedNeutrinos, lar_pandora::MCTruthToHits &matchedNeutrinoHits,
-                                          PFParticleSet &vetoReco, MCTruthSet &vetoTrue) const
-{
-    bool foundMatches(false);
-
-    // Loop over map of PFP to True Hits
-    for (lar_pandora::PFParticlesToHits::const_iterator iter1 = recoNeutrinosToHits.begin(), iterEnd1 = recoNeutrinosToHits.end(); iter1 != iterEnd1; ++iter1) {
-        
-        const art::Ptr<recob::PFParticle> recoNeutrino = iter1->first;
-        if (vetoReco.count(recoNeutrino) > 0)
-            continue;
-
-        const lar_pandora::HitVector &hitVector = iter1->second;
-
-        lar_pandora::MCTruthToHits truthContributionMap;
-
-        // Loop over the hit vector
-        for (lar_pandora::HitVector::const_iterator iter2 = hitVector.begin(), iterEnd2 = hitVector.end(); iter2 != iterEnd2; ++iter2) {
-            const art::Ptr<recob::Hit> hit = *iter2;
-
-            lar_pandora::HitsToMCTruth::const_iterator iter3 = trueHitsToNeutrinos.find(hit);
-            if (trueHitsToNeutrinos.end() == iter3)
-                continue;
-
-            const art::Ptr<simb::MCTruth> trueNeutrino = iter3->second;
-            if (vetoTrue.count(trueNeutrino) > 0)
-                continue;
-
-            truthContributionMap[trueNeutrino].push_back(hit);
-        }
-
-        lar_pandora::MCTruthToHits::const_iterator mIter = truthContributionMap.end();
-
-        for (lar_pandora::MCTruthToHits::const_iterator iter4 = truthContributionMap.begin(), iterEnd4 = truthContributionMap.end();
-             iter4 != iterEnd4; ++iter4)
-        {
-            if ((truthContributionMap.end() == mIter) || (iter4->second.size() > mIter->second.size()))
-            {
-                mIter = iter4;
-            }
-        }
-
-        if (truthContributionMap.end() != mIter)
-        {
-            const art::Ptr<simb::MCTruth> trueNeutrino = mIter->first;
-
-            lar_pandora::MCTruthToHits::const_iterator iter5 = matchedNeutrinoHits.find(trueNeutrino);
-
-            if ((matchedNeutrinoHits.end() == iter5) || (mIter->second.size() > iter5->second.size()))
-            {
-                matchedNeutrinos[trueNeutrino] = recoNeutrino;
-                matchedNeutrinoHits[trueNeutrino] = mIter->second;
-                foundMatches = true;
-            }
-        }
-    }
-
-    if (!foundMatches)
-        return;
-
-    for (lar_pandora::MCTruthToPFParticles::const_iterator pIter = matchedNeutrinos.begin(), pIterEnd = matchedNeutrinos.end();
-         pIter != pIterEnd; ++pIter)
-    {
-        vetoTrue.insert(pIter->first);
-        vetoReco.insert(pIter->second);
-    }
-
-    if (_recursiveMatching)
-        this->GetRecoToTrueMatches(recoNeutrinosToHits, trueHitsToNeutrinos, matchedNeutrinos, matchedNeutrinoHits, vetoReco, vetoTrue);
-}
-
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 void recotruehelper::GetRecoToTrueMatches(const lar_pandora::PFParticlesToHits &recoParticlesToHits, const lar_pandora::HitsToMCParticles &trueHitsToParticles,
@@ -460,8 +375,6 @@ void recotruehelper::GetRecoToTrueMatches(const lar_pandora::PFParticlesToHits &
     if (_recursiveMatching)
         this->GetRecoToTrueMatches(recoParticlesToHits, trueHitsToParticles, matchedParticles, matchedHits, vetoReco, vetoTrue);
 }
-
-
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 

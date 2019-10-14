@@ -27,6 +27,8 @@ If anyone intends to apply these two container classes outside of this module's 
 
 If you find that you'd like to include all of the MC Truth information, then be sure to set the `SaveTruthInfo` fcl parameter to `true`. There are a very large number of MCParticles and this inflates the size of the output file, as such they're only saved when requested. This should keep the size of the output file more managable and improve speed of the analysis scritps.
 
+Warning: The Reco-Truth Matching uses Marco's method from MCC8 and utilises many larpandora helper functions. These helper functions unfortunately throw an exception on the isRealData() flag if its true which will break when running over an overlay file. To fix this, one must checkout the larpandora package by `mrb g -t LARSOFT_SUITE_vXXX larpandora` and comment out the lines in larpandora/LArPandoraInterface/LArPandorahelper.cxx which check the isRealData() flag.
+
 ## Analysis and Test Scripts
 There are two directories for the Analysis part of the selection, `scripts` and `Analysis`. The `scripts` directory contains the old MCC8 selection code. The Analysis area is a place where I am updating/developing the selection.
 

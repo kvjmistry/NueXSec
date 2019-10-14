@@ -83,31 +83,6 @@ void GetRecoToTrueMatches(lar_pandora::MCParticlesToPFParticles &matchedParticle
 
 
 /**
- *  @brief Perform matching between true and reconstructed neutrino events
- *
- *  @param recoNeutrinosToHits  the mapping from reconstructed neutrino events to hits
- *  @param trueHitsToNeutrinos  the mapping from hits to true neutrino events
- *  @param matchedNeutrinos  the output matches between reconstructed and true neutrinos
- *  @param matchedNeutrinoHits  the output matches between reconstructed neutrinos and hits
- */
-void GetRecoToTrueMatches(const lar_pandora::PFParticlesToHits &recoNeutrinosToHits, const lar_pandora::HitsToMCTruth &trueHitsToNeutrinos,
-                          lar_pandora::MCTruthToPFParticles &matchedNeutrinos, lar_pandora::MCTruthToHits &matchedNeutrinoHits) const;
-
-/**
- *  @brief Perform matching between true and reconstructed neutrino events
- *
- *  @param recoNeutrinosToHits  the mapping from reconstructed neutrino events to hits
- *  @param trueHitsToNeutrinos  the mapping from hits to true neutrino events
- *  @param matchedNeutrinos  the output matches between reconstructed and true neutrinos
- *  @param matchedNeutrinoHits  the output matches between reconstructed neutrinos and hits
- *  @param recoVeto  the veto list for reconstructed particles
- *  @param trueVeto  the veto list for true particles
- */
-void GetRecoToTrueMatches(const lar_pandora::PFParticlesToHits &recoNeutrinosToHits, const lar_pandora::HitsToMCTruth &trueHitsToNeutrinos,
-                          lar_pandora::MCTruthToPFParticles &matchedNeutrinos, lar_pandora::MCTruthToHits &matchedNeutrinoHits,
-                          PFParticleSet &recoVeto, MCTruthSet &trueVeto) const;
-
-/**
  *  @brief Perform matching between true and reconstructed particles
  *
  *  @param recoParticlesToHits the mapping from reconstructed particles to hits
