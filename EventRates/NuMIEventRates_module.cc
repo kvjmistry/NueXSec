@@ -172,6 +172,9 @@ private:
     TH1D*	hNuMu_bar_Theta;		 
     TH1D* 	hNuMu_bar_Phi;	
 
+    // Generated Time histogram
+    TH1D* h_generated_time;
+
     int NC_event{0};
 
     // Add Ttree variables 
@@ -189,6 +192,8 @@ private:
     double _sr_begintime, _sr_endtime;
     double _sr_pot;
     std::ofstream _run_subrun_list_file;
+
+    int iteration{0};
 
 };
 //______________________________________________________________________________
@@ -227,7 +232,9 @@ double NuMIEventRates::Calc_Phi(double Px, double Py, double P){
 }
 //______________________________________________________________________________
 void NuMIEventRates::beginJob() {
-   
+ 
+    std::cout << "Starting begin Job" << std::endl;
+    
     // Art TFile Service
     art::ServiceHandle<art::TFileService> tfs;
 
@@ -256,6 +263,9 @@ void NuMIEventRates::beginJob() {
     art::TFileDirectory NuMu_bar_dir  = tfs->mkdir( "NuMu_bar_dir"   );
 
     // Histograms 
+
+    // Generated neutrino time histogram
+    h_generated_time = tfs->make<TH1D>("h_generated_time", "Genie Generated time; Generated Time [us]; Entries",1200, 5, 17);
 
     // Nue All
     hNue_E_vs_Theta_All = Nue_All_dir.make<TH2D>("Nue_E_vs_Theta_All","Nue_E_vs_Theta_All; Energy [GeV]; Theta [degrees]",15., 0., 7. , 10., 0., 180);
@@ -328,12 +338,15 @@ void NuMIEventRates::beginJob() {
     MCTree->Branch("NuMuEnergy", &NuMuEnergy);
     MCTree->Branch("NuMuTheta",  &NuMuTheta);
     MCTree->Branch("NuMuPhi",    &NuMuPhi);
+    
+    std::cout << "Ending begin Job" << std::endl;
 
 }
 //______________________________________________________________________________
 void NuMIEventRates::analyze(art::Event const& e) {
 
-    std::cout << "Running over Event:\t" << e.event() << std::endl;
+    iteration+=1;
+    std::cout << "Running over Event:\t" << iteration << std::endl;
 
     // Determine run, subrun, event IDs
     run    = e.id().run();
@@ -367,7 +380,7 @@ void NuMIEventRates::analyze(art::Event const& e) {
 
         if (mclist[iList]->Origin() == simb::kBeamNeutrino){ // Require a beam neutrino
             
-            if (particle.PdgCode() < 2212) std::cout << "PDG:\t"<< particle.PdgCode()<< std::endl;
+            //if (particle.PdgCode() < 2212) std::cout << "PDG:\t"<< particle.PdgCode()<< std::endl;
             
             // BEGIN SELECTING PARTICLE BLOCK
             if (particle.PdgCode() == 12){ // nue in the event
@@ -451,6 +464,13 @@ void NuMIEventRates::analyze(art::Event const& e) {
                 PDG        =  particle.PdgCode();
 
             } // END IF CONDITION BLOCK  
+
+	    // Here we make a plot of the neutrino generation time for validation
+	    
+	    // Require a charged lepton or neutrino and require final state particles
+	    if ((particle.PdgCode() > 10 && particle.PdgCode() < 17) && particle.StatusCode() == 1){
+		    h_generated_time->Fill(particle.T()/1000);
+	    }
     
         } // END if a beam neutrino
 

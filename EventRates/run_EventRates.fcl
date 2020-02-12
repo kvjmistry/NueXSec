@@ -1,18 +1,18 @@
-#include "geometry.fcl"
-#include "services_microboone.fcl"
-#include "messageservice.fcl"
-#include "mctruthmatching_uboone.fcl"
-#include "mctruthassociations_uboone.fcl"
+##include "geometry.fcl"
+##include "services_microboone.fcl"
+##include "messageservice.fcl"
+##include "mctruthmatching_uboone.fcl"
+##include "mctruthassociations_uboone.fcl"
 
 process_name : NuMIEventRatesProcess
 
 services:
 {
   TFileService: {fileName: "NuMI_EventRate.root"}
-  @table::microboone_simulation_services
-  BackTrackerService:                       @local::microboone_backtrackerservice
-  ParticleInventoryService:                 @local::standard_particleinventoryservice
-  Geometry:                                 @local::standard_geo
+  #@table::microboone_simulation_services
+  #BackTrackerService:                       @local::microboone_backtrackerservice
+  #ParticleInventoryService:                 @local::standard_particleinventoryservice
+  #Geometry:                                 @local::standard_geo
 }#end services
 
 source:
@@ -32,8 +32,8 @@ physics:
 
       module_type: "NuMIEventRates"
 
-      MCTruthMatching:     @local::BackTrackerTruthTool
-      MCTruthAssociations: @local::MCTruthAssociations
+      #MCTruthMatching:     @local::BackTrackerTruthTool
+      #MCTruthAssociations: @local::MCTruthAssociations
 
       #SoftwareTriggerModuleLabel:        "swtrigger"
 
@@ -98,4 +98,4 @@ physics:
   end_paths: [analysis]
 }
 
-services.DetectorClocksService.InheritClockConfig: false
+#services.DetectorClocksService.InheritClockConfig: false
