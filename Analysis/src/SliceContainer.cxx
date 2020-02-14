@@ -9,6 +9,7 @@ void SliceContainer::Initialise(TTree *tree){
     tree->SetBranchAddress("run", &run);
     tree->SetBranchAddress("sub", &sub);
     tree->SetBranchAddress("evt", &evt);
+    
     tree->SetBranchAddress("shr_energy_tot", &shr_energy_tot);
     tree->SetBranchAddress("shr_energy", &shr_energy);
     tree->SetBranchAddress("shr_energy_tot_cali", &shr_energy_tot_cali);
@@ -51,12 +52,14 @@ void SliceContainer::Initialise(TTree *tree){
     tree->SetBranchAddress("shr_trkfitmedangle", &shr_trkfitmedangle);
     tree->SetBranchAddress("shrmoliereavg", &shrmoliereavg);
     tree->SetBranchAddress("shrmoliererms", &shrmoliererms);
+    
     tree->SetBranchAddress("merge_bestdot", &merge_bestdot);
     tree->SetBranchAddress("merge_bestdist", &merge_bestdist);
     tree->SetBranchAddress("merge_vtx_x", &merge_vtx_x);
     tree->SetBranchAddress("merge_vtx_y", &merge_vtx_y);
     tree->SetBranchAddress("merge_vtx_z", &merge_vtx_z);
     // tree->SetBranchAddress("merge_tk_ipfp", &merge_tk_ipfp);
+    
     tree->SetBranchAddress("shr_tkfit_2cm_dedx_Y", &shr_tkfit_2cm_dedx_Y);
     tree->SetBranchAddress("shr_tkfit_2cm_dedx_V", &shr_tkfit_2cm_dedx_V);
     tree->SetBranchAddress("shr_tkfit_2cm_dedx_U", &shr_tkfit_2cm_dedx_U);
@@ -82,14 +85,17 @@ void SliceContainer::Initialise(TTree *tree){
     tree->SetBranchAddress("shr_bragg_mip", &shr_bragg_mip);
     tree->SetBranchAddress("shr_bragg_kaon", &shr_bragg_kaon);
     tree->SetBranchAddress("shr_bragg_pion", &shr_bragg_pion);
+    
     tree->SetBranchAddress("tksh_distance", &tksh_distance);
     tree->SetBranchAddress("tksh_angle", &tksh_angle);
+    
     tree->SetBranchAddress("shr_distance", &shr_distance);
     tree->SetBranchAddress("shr_score", &shr_score);
     tree->SetBranchAddress("shr_bkt_pdg", &shr_bkt_pdg);
     tree->SetBranchAddress("shr_bkt_purity", &shr_bkt_purity);
     tree->SetBranchAddress("shr_bkt_completeness", &shr_bkt_completeness);
     tree->SetBranchAddress("shr_bkt_E", &shr_bkt_E);
+    
     tree->SetBranchAddress("trk_len", &trk_len);
     tree->SetBranchAddress("trk_theta", &trk_theta);
     tree->SetBranchAddress("trk_phi", &trk_phi);
@@ -127,6 +133,7 @@ void SliceContainer::Initialise(TTree *tree){
     // tree->SetBranchAddress("shrsubclusters0", &shrsubclusters0);
     // tree->SetBranchAddress("shrsubclusters1", &shrsubclusters1);
     // tree->SetBranchAddress("shrsubclusters2", &shrsubclusters2);
+    
     tree->SetBranchAddress("shrclusfrac0", &shrclusfrac0);
     tree->SetBranchAddress("shrclusfrac1", &shrclusfrac1);
     tree->SetBranchAddress("shrclusfrac2", &shrclusfrac2);
@@ -149,6 +156,7 @@ void SliceContainer::Initialise(TTree *tree){
     // tree->SetBranchAddress("elecclusters_Y_N", &elecclusters_Y_N);
     // tree->SetBranchAddress("n_tracks_contained", &n_tracks_contained);
     // tree->SetBranchAddress("n_showers_contained", &n_showers_contained);
+    
     tree->SetBranchAddress("matched_E", &matched_E);
     tree->SetBranchAddress("hits_ratio", &hits_ratio);
     tree->SetBranchAddress("contained_fraction", &contained_fraction);
@@ -173,13 +181,18 @@ void SliceContainer::Initialise(TTree *tree){
     tree->SetBranchAddress("true_p", &true_p);
     tree->SetBranchAddress("true_p_visible", &true_p_visible);
     tree->SetBranchAddress("true_e_visible", &true_e_visible);
+    
     // tree->SetBranchAddress("opfilter_pe_beam", &opfilter_pe_beam);
     // tree->SetBranchAddress("opfilter_pe_veto", &opfilter_pe_veto);
+    
     tree->SetBranchAddress("nu_pdg", &nu_pdg);
-    tree->SetBranchAddress("ccnc", &ccnc);
-    tree->SetBranchAddress("nu_e", &nu_e);
-    tree->SetBranchAddress("nu_pt", &nu_pt);
-    tree->SetBranchAddress("theta", &theta);
+    tree->SetBranchAddress("ccnc",   &ccnc);
+    tree->SetBranchAddress("nu_e",   &nu_e);
+    tree->SetBranchAddress("nu_pt",  &nu_pt);
+    tree->SetBranchAddress("theta",  &theta);
+    tree->Branch("isVtxInFiducial",  &isVtxInFiducial, "isVtxInFiducial/O");
+    tree->Branch("truthFiducial",    &truthFiducial,   "truthFiducial/O");
+    
     tree->SetBranchAddress("true_nu_vtx_t", &true_nu_vtx_t);
     tree->SetBranchAddress("true_nu_vtx_x", &true_nu_vtx_x);
     tree->SetBranchAddress("true_nu_vtx_y", &true_nu_vtx_y);
@@ -187,17 +200,20 @@ void SliceContainer::Initialise(TTree *tree){
     tree->SetBranchAddress("true_nu_vtx_sce_x", &true_nu_vtx_sce_x);
     tree->SetBranchAddress("true_nu_vtx_sce_y", &true_nu_vtx_sce_y);
     tree->SetBranchAddress("true_nu_vtx_sce_z", &true_nu_vtx_sce_z);
+    
     tree->SetBranchAddress("reco_nu_vtx_x", &reco_nu_vtx_x);
     tree->SetBranchAddress("reco_nu_vtx_y", &reco_nu_vtx_y);
     tree->SetBranchAddress("reco_nu_vtx_z", &reco_nu_vtx_z);
     tree->SetBranchAddress("reco_nu_vtx_sce_x", &reco_nu_vtx_sce_x);
     tree->SetBranchAddress("reco_nu_vtx_sce_y", &reco_nu_vtx_sce_y);
     tree->SetBranchAddress("reco_nu_vtx_sce_z", &reco_nu_vtx_sce_z);
+    
     tree->SetBranchAddress("nmuon", &nmuon);
     tree->SetBranchAddress("muon_e", &muon_e);
     tree->SetBranchAddress("muon_c", &muon_c);
     tree->SetBranchAddress("muon_p", &muon_p);
     tree->SetBranchAddress("nelec", &nelec);
+    
     tree->SetBranchAddress("elec_e", &elec_e);
     tree->SetBranchAddress("elec_c", &elec_c);
     tree->SetBranchAddress("elec_p", &elec_p);
@@ -207,15 +223,18 @@ void SliceContainer::Initialise(TTree *tree){
     tree->SetBranchAddress("elec_px", &elec_px);
     tree->SetBranchAddress("elec_py", &elec_py);
     tree->SetBranchAddress("elec_pz", &elec_pz);
+    
     tree->SetBranchAddress("npi0", &npi0);
     tree->SetBranchAddress("pi0_e", &pi0_e);
     tree->SetBranchAddress("pi0_c", &pi0_c);
     tree->SetBranchAddress("pi0_p", &pi0_p);
     tree->SetBranchAddress("nneutron", &nneutron);
     tree->SetBranchAddress("nproton", &nproton);
+    
     tree->SetBranchAddress("proton_e", &proton_e);
     tree->SetBranchAddress("proton_c", &proton_c);
     tree->SetBranchAddress("proton_p", &proton_p);
+    
     tree->SetBranchAddress("npion", &npion);
     tree->SetBranchAddress("pion_e", &pion_e);
     tree->SetBranchAddress("pion_c", &pion_c);
@@ -233,9 +252,11 @@ void SliceContainer::Initialise(TTree *tree){
     tree->SetBranchAddress("n_pfps", &n_pfps);
     tree->SetBranchAddress("n_tracks", &n_tracks);
     tree->SetBranchAddress("n_showers", &n_showers);
+    
     // tree->SetBranchAddress("hits_u", &hits_u);
     // tree->SetBranchAddress("hits_v", &hits_v);
     // tree->SetBranchAddress("hits_y", &hits_y);
+    
     tree->SetBranchAddress("topological_score", &topological_score);
     tree->SetBranchAddress("slclustfrac", &slclustfrac);
     tree->SetBranchAddress("endmuonmichel", &endmuonmichel);
@@ -247,76 +268,21 @@ void SliceContainer::Initialise(TTree *tree){
     tree->SetBranchAddress("flash_time", &flash_time);
     tree->SetBranchAddress("nu_flashmatch_score", &nu_flashmatch_score);
     tree->SetBranchAddress("best_cosmic_flashmatch_score", &best_cosmic_flashmatch_score);
+    
     tree->SetBranchAddress("NeutrinoEnergy0", &NeutrinoEnergy0);
     tree->SetBranchAddress("NeutrinoEnergy1", &NeutrinoEnergy1);
     tree->SetBranchAddress("NeutrinoEnergy2", &NeutrinoEnergy2);
+    
     tree->SetBranchAddress("SliceCaloEnergy0", &SliceCaloEnergy0);
     tree->SetBranchAddress("SliceCaloEnergy1", &SliceCaloEnergy1);
     tree->SetBranchAddress("SliceCaloEnergy2", &SliceCaloEnergy2);
-    tree->SetBranchAddress("pi0_mcgamma0_e", &pi0_mcgamma0_e);
-    tree->SetBranchAddress("pi0_mcgamma0_px", &pi0_mcgamma0_px);
-    tree->SetBranchAddress("pi0_mcgamma0_py", &pi0_mcgamma0_py);
-    tree->SetBranchAddress("pi0_mcgamma0_pz", &pi0_mcgamma0_pz);
-    tree->SetBranchAddress("pi0_mcrcdot0", &pi0_mcrcdot0);
-    tree->SetBranchAddress("pi0_mcrce0", &pi0_mcrce0);
-    tree->SetBranchAddress("pi0_mcgamma1_e", &pi0_mcgamma1_e);
-    tree->SetBranchAddress("pi0_mcgamma1_px", &pi0_mcgamma1_px);
-    tree->SetBranchAddress("pi0_mcgamma1_py", &pi0_mcgamma1_py);
-    tree->SetBranchAddress("pi0_mcgamma1_pz", &pi0_mcgamma1_pz);
-    tree->SetBranchAddress("pi0_mcrcdot1", &pi0_mcrcdot1);
-    tree->SetBranchAddress("pi0_mcrce1", &pi0_mcrce1);
-    tree->SetBranchAddress("pi0_nshower", &pi0_nshower);
-    tree->SetBranchAddress("pi0_ntrack", &pi0_ntrack);
-    tree->SetBranchAddress("pi0_ngamma", &pi0_ngamma);
-    tree->SetBranchAddress("pi0_radlen1", &pi0_radlen1);
-    tree->SetBranchAddress("pi0_radlen2", &pi0_radlen2);
-    tree->SetBranchAddress("pi0_dot1", &pi0_dot1);
-    tree->SetBranchAddress("pi0_dot2", &pi0_dot2);
-    tree->SetBranchAddress("pi0_energy1_Y", &pi0_energy1_Y);
-    tree->SetBranchAddress("pi0_energy2_Y", &pi0_energy2_Y);
-    tree->SetBranchAddress("pi0_dedx1_Y", &pi0_dedx1_Y);
-    tree->SetBranchAddress("pi0_dedx2_Y", &pi0_dedx2_Y);
-    tree->SetBranchAddress("pi0_dedx1_fit_Y", &pi0_dedx1_fit_Y);
-    tree->SetBranchAddress("pi0_dedx2_fit_Y", &pi0_dedx2_fit_Y);
-    tree->SetBranchAddress("pi0_energy1_V", &pi0_energy1_V);
-    tree->SetBranchAddress("pi0_energy2_V", &pi0_energy2_V);
-    tree->SetBranchAddress("pi0_dedx1_V", &pi0_dedx1_V);
-    tree->SetBranchAddress("pi0_dedx2_V", &pi0_dedx2_V);
-    tree->SetBranchAddress("pi0_dedx1_fit_V", &pi0_dedx1_fit_V);
-    tree->SetBranchAddress("pi0_dedx2_fit_V", &pi0_dedx2_fit_V);
-    tree->SetBranchAddress("pi0_energy1_U", &pi0_energy1_U);
-    tree->SetBranchAddress("pi0_energy2_U", &pi0_energy2_U);
-    tree->SetBranchAddress("pi0_dedx1_U", &pi0_dedx1_U);
-    tree->SetBranchAddress("pi0_dedx2_U", &pi0_dedx2_U);
-    tree->SetBranchAddress("pi0_dedx1_fit_U", &pi0_dedx1_fit_U);
-    tree->SetBranchAddress("pi0_dedx2_fit_U", &pi0_dedx2_fit_U);
-    tree->SetBranchAddress("pi0_shrscore1", &pi0_shrscore1);
-    tree->SetBranchAddress("pi0_shrscore2", &pi0_shrscore2);
-    tree->SetBranchAddress("pi0_gammadot", &pi0_gammadot);
-    tree->SetBranchAddress("pi0_mass_Y", &pi0_mass_Y);
-    tree->SetBranchAddress("pi0_mass_V", &pi0_mass_V);
-    tree->SetBranchAddress("pi0_mass_U", &pi0_mass_U);
-    tree->SetBranchAddress("pi0_rc_vtx_x", &pi0_rc_vtx_x);
-    tree->SetBranchAddress("pi0_rc_vtx_y", &pi0_rc_vtx_y);
-    tree->SetBranchAddress("pi0_rc_vtx_z", &pi0_rc_vtx_z);
-    tree->SetBranchAddress("pi0truth_gamma_parent", &pi0truth_gamma_parent);
-    tree->SetBranchAddress("pi0truth_elec_edep", &pi0truth_elec_edep);
-    tree->SetBranchAddress("pi0truth_elec_etot", &pi0truth_elec_etot);
-    tree->SetBranchAddress("pi0truth_elec_dist", &pi0truth_elec_dist);
-    tree->SetBranchAddress("pi0truth_elec_parent", &pi0truth_elec_parent);
-    tree->SetBranchAddress("pi0truth_gamma1_edep", &pi0truth_gamma1_edep);
-    tree->SetBranchAddress("pi0truth_gamma1_etot", &pi0truth_gamma1_etot);
-    tree->SetBranchAddress("pi0truth_gamma1_dist", &pi0truth_gamma1_dist);
-    tree->SetBranchAddress("pi0truth_gamma2_edep", &pi0truth_gamma2_edep);
-    tree->SetBranchAddress("pi0truth_gamma2_etot", &pi0truth_gamma2_etot);
-    tree->SetBranchAddress("pi0truth_gamma2_dist", &pi0truth_gamma2_dist);
-    tree->SetBranchAddress("pi0truth_gammadot", &pi0truth_gammadot);
-    tree->SetBranchAddress("nflag_pl1", &nflag_pl1);
+    
     tree->SetBranchAddress("nnoise_pl1", &nnoise_pl1);
     tree->SetBranchAddress("nslhits_pl1", &nslhits_pl1);
     tree->SetBranchAddress("nslnoise_pl1", &nslnoise_pl1);
     tree->SetBranchAddress("nhits_pl1", &nhits_pl1);
     tree->SetBranchAddress("frac_slnoise_pl1", &frac_slnoise_pl1);
+    
     tree->SetBranchAddress("secondshower_U_charge", &secondshower_U_charge);
     tree->SetBranchAddress("secondshower_U_nhit", &secondshower_U_nhit);
     tree->SetBranchAddress("secondshower_U_vtxdist", &secondshower_U_vtxdist);
@@ -335,6 +301,7 @@ void SliceContainer::Initialise(TTree *tree){
     tree->SetBranchAddress("secondshower_Y_eigenratio", &secondshower_Y_eigenratio);
     tree->SetBranchAddress("secondshower_Y_dot", &secondshower_Y_dot);
     tree->SetBranchAddress("secondshower_Y_dir", &secondshower_Y_dir);
+    
     tree->SetBranchAddress("evnunhits", &evnunhits);
     tree->SetBranchAddress("evlepnhits", &evlepnhits);
     tree->SetBranchAddress("evpronhits", &evpronhits);
@@ -343,6 +310,7 @@ void SliceContainer::Initialise(TTree *tree){
     tree->SetBranchAddress("evneunhits", &evneunhits);
     tree->SetBranchAddress("evgamnhits", &evgamnhits);
     tree->SetBranchAddress("evothnhits", &evothnhits);
+    
     tree->SetBranchAddress("slnunhits", &slnunhits);
     tree->SetBranchAddress("sllepnhits", &sllepnhits);
     tree->SetBranchAddress("slpronhits", &slpronhits);
@@ -351,16 +319,20 @@ void SliceContainer::Initialise(TTree *tree){
     tree->SetBranchAddress("slneunhits", &slneunhits);
     tree->SetBranchAddress("slgamnhits", &slgamnhits);
     tree->SetBranchAddress("slothnhits", &slothnhits);
+    
     tree->SetBranchAddress("nu_completeness_from_pfp", &nu_completeness_from_pfp);
     tree->SetBranchAddress("nu_purity_from_pfp", &nu_purity_from_pfp);
     // tree->SetBranchAddress("n_tracks_pandora", &n_tracks_pandora);
-    tree->SetBranchAddress("vtx_fit_pandora_x", &vtx_fit_pandora_x);
-    tree->SetBranchAddress("vtx_fit_pandora_y", &vtx_fit_pandora_y);
-    tree->SetBranchAddress("vtx_fit_pandora_z", &vtx_fit_pandora_z);
+    
+    // tree->SetBranchAddress("vtx_fit_pandora_x", &vtx_fit_pandora_x);
+    // tree->SetBranchAddress("vtx_fit_pandora_y", &vtx_fit_pandora_y);
+    // tree->SetBranchAddress("vtx_fit_pandora_z", &vtx_fit_pandora_z);
+    
     // tree->SetBranchAddress("n_tracks_tkfit", &n_tracks_tkfit);
-    tree->SetBranchAddress("vtx_fit_tkfit_x", &vtx_fit_tkfit_x);
-    tree->SetBranchAddress("vtx_fit_tkfit_y", &vtx_fit_tkfit_y);
-    tree->SetBranchAddress("vtx_fit_tkfit_z", &vtx_fit_tkfit_z);
+    // tree->SetBranchAddress("vtx_fit_tkfit_x", &vtx_fit_tkfit_x);
+    // tree->SetBranchAddress("vtx_fit_tkfit_y", &vtx_fit_tkfit_y);
+    // tree->SetBranchAddress("vtx_fit_tkfit_z", &vtx_fit_tkfit_z);
+    
     tree->SetBranchAddress("bdt_nuNCpi0", &bdt_nuNCpi0);
     tree->SetBranchAddress("bdt_numuCCpi0", &bdt_numuCCpi0);
     tree->SetBranchAddress("bdt_numuCC", &bdt_numuCC);

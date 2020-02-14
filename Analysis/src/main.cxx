@@ -83,7 +83,7 @@ int main(int argc, char *argv[]){
     xsecSelection::selection  _selection_instance;
 
     // Configure the cut values
-    utilityNS::utility _utility;
+    utility _utility;
     std::vector<double> default_config = _utility.configure_cuts(
             _x1, _x2, _y1, _y2, _z1, _z2,
             flash_pe_threshold,
@@ -156,7 +156,6 @@ int main(int argc, char *argv[]){
     // -------------------------------------------------------------------------
     // Finished!
     std::cout << "\033[0;32m*** \t Exiting C++ Code... \t *** \033[0m" << std::endl;
-    std::cout << "\033[0;31m*** \t Warning shift of 1us is still set in flash times \t *** \033[0m" << std::endl;
     auto stop = std::chrono::high_resolution_clock::now();  // end time of script
 	auto duration_sec = std::chrono::duration_cast<std::chrono::seconds>(stop - start); // time taken to run script
 	auto duration_min = std::chrono::duration_cast<std::chrono::minutes>(stop - start); // time taken to run script

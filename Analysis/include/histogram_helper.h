@@ -17,75 +17,9 @@ class histogram_helper{
     TFile* f_nuexsec = new TFile("nuexsec.root", "UPDATE");
 
     // Class instances
-    utilityNS::utility _utility_instance;
+    utility _util;
     selection_cuts _selection_cuts_instance;
 
-    // enum to switch file type 
-    enum type {k_mc, k_data, k_ext, k_dirt, k_variation, k_type_MAX}; 
-
-    // For creating histogram names
-    std::vector<std::string> type_prefix = {"MC", "Data", "EXT", "Dirt"};
-
-    // enum for vertex zy histograms
-    enum vertex {k_vtx_signal, k_vtx_data, k_vtx_ext, k_vtx_mc_ext, k_vertex_MAX};
-    std::vector<std::string> vertex_strings = {"Signal", "Data", "EXT", "MC_plus_EXT"};
-    
-    // enums for cut dirs
-    enum enum_cut_dirs {
-                k_in_fv,                           // Fiducial volume
-                k_cuts_MAX
-                };
-    
-    
-    // enums for flash times
-    enum flash_time{ k_flash_mc, k_flash_data, k_flash_ext, k_flash_dirt, k_flash_MAX };
-
-    // Cut directory names
-    std::vector<std::string> cut_dirs = {
-                "In_FV"                                    // Fiducial volume
-                };
-
-    
-    // Names of the plot types
-    std::vector<std::string> plot_types = {
-                "Truth",
-                "Reco",
-                "Optical",
-                "Stack"
-                };
-    
-    // Names of the classifications
-    std::vector<std::string> classification_dirs = {
-                "nue_cc",
-                "nue_cc_mixed",
-                "nue_cc_out_fv",
-                "cosmic",
-                "numu_cc",
-                "nc",
-                "nc_pi0",
-                "nc_mixed",
-                "unmatched",
-                "ext",
-                "data",
-                "dirt"
-                };
-
-    
-    enum legend {
-                k_nue_cc,
-                k_nue_cc_mixed,
-                k_nue_cc_out_fv,
-                k_cosmic,
-                k_numu_cc,
-                k_nc,
-                k_nc_pi0,
-                k_nc_mixed,
-                k_unmatched,
-                k_leg_ext,
-                k_leg_data,
-                k_leg_dirt,
-                k_classifications_MAX
-                };
 
     // -------------------------------------------------------------------------
     // Initialiser function

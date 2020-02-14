@@ -6,6 +6,7 @@
 #include "histogram_helper.h"
 #include "histogram_plotter.h"
 #include "SliceContainer.h"
+#include "Passed_Container.h"
 
 #include <omp.h>
 #include "TThread.h"
@@ -54,14 +55,17 @@ namespace xsecSelection {
             TTree * dirt_tree;    // Dirt Tree
 
             // Class Instances
-            utilityNS::utility _utility_instance;
+            utility _util;
             std::vector<selection_cuts> selection_cuts_instance; // One for each type e.g MC, Data, EXT..
             histogram_helper  histogram_helper_instance;
 
             // Variables -------------------------------------------------------
 
             // Slice Containers
+            SliceContainer mc_SC;
             SliceContainer data_SC;
+            SliceContainer ext_SC;
+            SliceContainer dirt_SC;
 
 
             // Selection Cut Values
@@ -85,7 +89,7 @@ namespace xsecSelection {
             std::vector<std::vector<double>> dirt_counter_v;
 
             // Counter variables
-            int tree_total_entries{0};       // MC
+            int mc_tree_total_entries{0};       // MC
             int data_tree_total_entries{0};  // Data
             int ext_tree_total_entries{0};   // EXT
             int dirt_tree_total_entries{0};  // Dirt
@@ -93,7 +97,7 @@ namespace xsecSelection {
         public:
             // -----------------------------------------------------------------
             // Allow the utility class to modify the private member data of this class
-            friend class utilityNS::utility;
+            friend class utility;
             // -----------------------------------------------------------------
             // Function to Initialise the selection class ----------------------
             void Initialise( const char * mc_file,

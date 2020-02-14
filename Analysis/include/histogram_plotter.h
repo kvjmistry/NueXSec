@@ -1,12 +1,12 @@
 #ifndef HISTOGRAM_PLOTTER_h
 #define HISTOGRAM_PLOTTER_h
 
-#include "histogram_helper.h"
+#include "utility.h"
 
 // Class for getting histograms which have been written to file and plot them 
 // in a pretty way
 // Inherits all tools from the histogram helper
-class histogram_plotter : public histogram_helper{
+class histogram_plotter{
 
     public:
     // Default constructor
@@ -15,6 +15,9 @@ class histogram_plotter : public histogram_helper{
     // Destructor 
     ~histogram_plotter(); 
 
+    TFile *f_nuexsec;
+
+    utility _util;
 
     // -------------------------------------------------------------------------
     // Initialise histograms

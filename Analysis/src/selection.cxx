@@ -23,7 +23,7 @@ void selection::Initialise( const char * mc_file,
     if (!_slim) histogram_helper_instance.InitHistograms();
 
     // Resize the selection cuts instance vector, one instance per type e.g MC, data, ..
-    selection_cuts_instance.resize(histogram_helper::k_type_MAX);
+    selection_cuts_instance.resize(_util.k_type_MAX);
 
     // Print the input files
     std::cout <<
@@ -35,11 +35,11 @@ void selection::Initialise( const char * mc_file,
     std::endl;
 
     // Now get the files, if file isnt specified then set bool to skip
-    bool_use_mc        = _utility_instance.GetFile(f_mc,        mc_file);
-    bool_use_ext       = _utility_instance.GetFile(f_ext,       ext_file);
-    bool_use_data      = _utility_instance.GetFile(f_data,      data_file);
-    bool_use_dirt      = _utility_instance.GetFile(f_dirt,      dirt_file);
-    bool_use_variation = _utility_instance.GetFile(f_variation, variation_file);
+    bool_use_mc        = _util.GetFile(f_mc,        mc_file);
+    bool_use_ext       = _util.GetFile(f_ext,       ext_file);
+    bool_use_data      = _util.GetFile(f_data,      data_file);
+    bool_use_dirt      = _util.GetFile(f_dirt,      dirt_file);
+    bool_use_variation = _util.GetFile(f_variation, variation_file);
 
     // Configure the externally configurable cut parameters
     std::cout << "\n --- Configuring Parameters --- \n" << std::endl;
@@ -47,7 +47,13 @@ void selection::Initialise( const char * mc_file,
     // Get MC variables --------------------------------------------------------
     if (bool_use_mc){
         std::cout << "\nInitialising MC" << std::endl;
-        // _utility_instance.GetTree(f_mc, mytree, "AnalyzeTPCO/tree");
+        _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
+
+        // Initialise all the data slice container
+        mc_SC.Initialise(mc_tree);
+        
+        mc_tree_total_entries = mc_tree->GetEntries();
+        std::cout << "Total MC Events:         " << mc_tree_total_entries << std::endl;
 
         std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of MC Complete!" << std::endl;
@@ -57,7 +63,7 @@ void selection::Initialise( const char * mc_file,
     // Initialise Data specific ------------------------------------------------
     if (bool_use_data){
         std::cout << "\nInitialising Data" << std::endl;
-        _utility_instance.GetTree(f_data, data_tree, "nuselection/NeutrinoSelectionFilter");
+        _util.GetTree(f_data, data_tree, "nuselection/NeutrinoSelectionFilter");
         
         // Initialise all the data slice container
         data_SC.Initialise(data_tree);
@@ -76,6 +82,14 @@ void selection::Initialise( const char * mc_file,
     if (bool_use_ext){
         std::cout << "\nInitialising EXT" << std::endl;
 
+        _util.GetTree(f_ext, ext_tree, "nuselection/NeutrinoSelectionFilter");
+
+        // Initialise all the data slice container
+        ext_SC.Initialise(ext_tree);
+        
+        ext_tree_total_entries = ext_tree->GetEntries();
+        std::cout << "Total MC Events:         " << ext_tree_total_entries << std::endl;
+
         std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of EXT Complete!" << std::endl;
         std::cout << "\033[0;31m-------------------------------\033[0m" << std::endl;
@@ -85,6 +99,14 @@ void selection::Initialise( const char * mc_file,
     // Initialise Dirt specific ------------------------------------------------
     if (bool_use_dirt){
         std::cout << "\nInitialising Dirt" << std::endl;
+
+        _util.GetTree(f_dirt, dirt_tree, "nuselection/NeutrinoSelectionFilter");
+
+        // Initialise all the data slice container
+        dirt_SC.Initialise(dirt_tree);
+        
+        dirt_tree_total_entries = dirt_tree->GetEntries();
+        std::cout << "Total MC Events:         " << dirt_tree_total_entries << std::endl;
 
         std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of Dirt Complete!" << std::endl;
@@ -109,6 +131,20 @@ void selection::make_selection(){
     if (bool_use_mc){
         std::cout << "Starting Selection over MC" << std::endl;
 
+        for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
+
+            // Alert the user
+            if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
+        
+            // Get the entry in the tree
+            mc_tree->GetEntry(ievent); // TPC Objects
+
+            if (mc_SC.slpdg > 0) std::cout << "run: " << mc_SC.run << "  subrun: " << mc_SC.sub << "  event: " << mc_SC.evt << std::endl;
+            if (mc_SC.slpdg > 0) std::cout << "slpdg: " << mc_SC.slpdg << "  topo score: " << mc_SC.topological_score << std::endl;
+            if (mc_SC.slpdg > 0) std::cout << "Category: " << mc_SC.category << "   interaction: "<< mc_SC.interaction <<  std::endl;
+        }
+
+
         std::cout << std::endl;
         std::cout << "Ending Selection over MC" << std::endl;
     }
@@ -126,6 +162,7 @@ void selection::make_selection(){
 
             if (data_SC.slpdg > 0) std::cout << "run: " << data_SC.run << "  subrun: " << data_SC.sub << "  event: " << data_SC.evt << std::endl;
             if (data_SC.slpdg > 0) std::cout << "slpdg: " << data_SC.slpdg << "  topo score: " << data_SC.topological_score << std::endl;
+            if (data_SC.slpdg > 0) std::cout << "Category: " << data_SC.category << std::endl;
         }
 
         std::cout << std::endl;
@@ -167,21 +204,21 @@ void selection::SavetoFile(){
     // std::cout << "Now Saving Histograms to file" << std::endl;
     // if (bool_use_mc) {
     //     histogram_helper_instance.WriteMCTruth("MC");
-    //     histogram_helper_instance.WriteOptical(histogram_helper::k_mc);
-    //     histogram_helper_instance.WriteReco(histogram_helper::k_mc);
+    //     histogram_helper_instance.WriteOptical(_util.k_mc);
+    //     histogram_helper_instance.WriteReco(_util.k_mc);
     // }
     // if (bool_use_data) {
-    //     histogram_helper_instance.WriteOptical(histogram_helper::k_data);
-    //     histogram_helper_instance.WriteReco(histogram_helper::k_data);
+    //     histogram_helper_instance.WriteOptical(_util.k_data);
+    //     histogram_helper_instance.WriteReco(_util.k_data);
     // }
     // if (bool_use_ext) {
-    //     histogram_helper_instance.WriteOptical(histogram_helper::k_ext);
-    //     histogram_helper_instance.WriteReco(histogram_helper::k_ext);
+    //     histogram_helper_instance.WriteOptical(_util.k_ext);
+    //     histogram_helper_instance.WriteReco(_util.k_ext);
     // }
     // if (bool_use_dirt) {
     //     histogram_helper_instance.WriteMCTruth("Dirt");
-    //     histogram_helper_instance.WriteOptical(histogram_helper::k_dirt);
-    //     histogram_helper_instance.WriteReco(histogram_helper::k_dirt);
+    //     histogram_helper_instance.WriteOptical(_util.k_dirt);
+    //     histogram_helper_instance.WriteReco(_util.k_dirt);
     // }
 
     
@@ -194,115 +231,115 @@ void selection::MakeHistograms(){
     histogram_plotter histogram_plotter_instance;
 
     // Loop over the cuts and plot histograms by plot type
-    for (unsigned int i = 0 ; i < histogram_helper::k_cuts_MAX; i++){
+    for (unsigned int i = 0 ; i < _util.k_cuts_MAX; i++){
         
         // Create a set of strings for creating a dynamic directory
         // Directory structure that is created will take the form plots/<cut>/
         std::string a = "if [ ! -d \"plots/";
         std::string b = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
         std::string c = "; fi";
-        std::string command = a +histogram_helper_instance.cut_dirs.at(i) + b + histogram_helper_instance.cut_dirs.at(i) + c ;
+        std::string command = a +_util.cut_dirs.at(i) + b + _util.cut_dirs.at(i) + c ;
         system(command.c_str()); 
 
         // Reco X
-        histogram_plotter_instance.MakeStack("h_reco_vtx_x",histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_vtx_x",_util.cut_dirs.at(i).c_str(),
                                            false,  false, "Reco Vertex X [cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_vtx_x.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_vtx_x.pdf", _util.cut_dirs.at(i).c_str()) );
         
         // Reco Y
-        histogram_plotter_instance.MakeStack("h_reco_vtx_y",histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_vtx_y",_util.cut_dirs.at(i).c_str(),
                                            false,  false, "Reco Vertex Y [cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_vtx_y.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_vtx_y.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Reco Z
-        histogram_plotter_instance.MakeStack("h_reco_vtx_z",histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_vtx_z",_util.cut_dirs.at(i).c_str(),
                                            false,  false, "Reco Vertex Z [cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_vtx_z.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_vtx_z.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // dEdx
-        histogram_plotter_instance.MakeStack("h_reco_dEdx",histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_dEdx",_util.cut_dirs.at(i).c_str(),
                                            false,  false, "Collection Plane dEdx [MeV/cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_dEdx_collection.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_dEdx_collection.pdf", _util.cut_dirs.at(i).c_str()) );
    
         // Leading Shower Momentum
-        histogram_plotter_instance.MakeStack("h_reco_leading_mom", histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_leading_mom", _util.cut_dirs.at(i).c_str(),
                                            false,  false, "Leading Shower Momentum [MeV/c]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_leading_mom.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_leading_mom.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // 2D distance largest flash to reco nu vertex
-        histogram_plotter_instance.MakeStack("h_reco_flash_to_vtx_dist", histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_flash_to_vtx_dist", _util.cut_dirs.at(i).c_str(),
                                            false,  false, "Flash to Vertex Distance [cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_flash_to_vtx_dist.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_flash_to_vtx_dist.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // 2D distance shower vertex to reco nu vertex
-        histogram_plotter_instance.MakeStack("h_reco_shower_to_vtx_dist", histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_shower_to_vtx_dist", _util.cut_dirs.at(i).c_str(),
                                            false,  false, "Shower to Vertex Distance [cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_shower_to_vtx_dist.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_shower_to_vtx_dist.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // 2D distance track vertex to reco nu vertex
-        histogram_plotter_instance.MakeStack("h_reco_track_to_vtx_dist", histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_trac_util.k_to_vtx_dist", _util.cut_dirs.at(i).c_str(),
                                            false,  false, "Track to Vertex Distance [cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_track_to_vtx_dist.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_trac_util.k_to_vtx_dist.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading Shower hits in all planes
-        histogram_plotter_instance.MakeStack("h_reco_leading_shower_hits_all_planes", histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_leading_shower_hits_all_planes", _util.cut_dirs.at(i).c_str(),
                                            false,  false, "Leading Shower Hits All Planes", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_leading_shower_hits_all_planes.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_leading_shower_hits_all_planes.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading Shower hits in collection
-        histogram_plotter_instance.MakeStack("h_reco_leading_shower_hits_collection_plane", histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_leading_shower_hits_collection_plane", _util.cut_dirs.at(i).c_str(),
                                            false,  false, "Leading Shower Hits Collection Plane", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_leading_shower_hits_collection_plane.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_leading_shower_hits_collection_plane.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading Shower opening angle
-        histogram_plotter_instance.MakeStack("h_reco_leading_shower_open_angle", histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_leading_shower_open_angle", _util.cut_dirs.at(i).c_str(),
                                            false,  false, "Leading Shower Open Angle [degrees]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_leading_shower_open_angle.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_leading_shower_open_angle.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Secondary shower to vertex distance (for events with more than 1 shower)
-        histogram_plotter_instance.MakeStack("h_reco_secondary_shower_to_vtx_dist", histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_secondary_shower_to_vtx_dist", _util.cut_dirs.at(i).c_str(),
                                            false,  false, "Secondary Shower to Vertex Distance (>1 shower) [cm]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_secondary_shower_to_vtx_dist.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_secondary_shower_to_vtx_dist.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading Shower hits per length
-        histogram_plotter_instance.MakeStack("h_reco_leading_shower_hits_per_length", histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_leading_shower_hits_per_length", _util.cut_dirs.at(i).c_str(),
                                            false,  false, "Leading Shower Hits / Length [cm^{-1}]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_leading_shower_hits_per_length.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_leading_shower_hits_per_length.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Longest track to leading shower length
-        histogram_plotter_instance.MakeStack("h_reco_longest_track_leading_shower_length", histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_longest_trac_util.k_leading_shower_length", _util.cut_dirs.at(i).c_str(),
                                            false,  false, "Longest Track Length / Leading Shower Length", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_longest_track_leading_shower_length.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_longest_trac_util.k_leading_shower_length.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Track Containment
-        histogram_plotter_instance.MakeStack("h_reco_track_contained", histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_trac_util.k_contained", _util.cut_dirs.at(i).c_str(),
                                            false,  false, "Contained Tracks", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_track_contained.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_trac_util.k_contained.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading shower phi
-        histogram_plotter_instance.MakeStack("h_reco_leading_shower_phi", histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_leading_shower_phi", _util.cut_dirs.at(i).c_str(),
                                            false,  false, "Leading Shower Phi [degrees]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_leading_shower_phi.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_leading_shower_phi.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading shower theta
-        histogram_plotter_instance.MakeStack("h_reco_leading_shower_theta", histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_leading_shower_theta", _util.cut_dirs.at(i).c_str(),
                                            false,  false, "Leading Shower Theta [degrees]", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_leading_shower_theta.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_leading_shower_theta.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading shower cos theta
-        histogram_plotter_instance.MakeStack("h_reco_leading_shower_cos_theta", histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_leading_shower_cos_theta", _util.cut_dirs.at(i).c_str(),
                                            false,  false, "Leading Shower Cos(#theta)", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_leading_shower_cos_theta.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_leading_shower_cos_theta.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading shower multiplicity
-        histogram_plotter_instance.MakeStack("h_reco_shower_multiplicity", histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_shower_multiplicity", _util.cut_dirs.at(i).c_str(),
                                            false,  false, "Shower Multiplicty", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_shower_multiplicity.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_shower_multiplicity.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading track multiplicity
-        histogram_plotter_instance.MakeStack("h_reco_track_multiplicity", histogram_helper_instance.cut_dirs.at(i).c_str(),
+        histogram_plotter_instance.MakeStack("h_reco_trac_util.k_multiplicity", _util.cut_dirs.at(i).c_str(),
                                            false,  false, "Track Multiplicty", data_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
-                                           Form("plots/%s/reco_track_multiplicity.pdf", histogram_helper_instance.cut_dirs.at(i).c_str()) );
+                                           Form("plots/%s/reco_trac_util.k_multiplicity.pdf", _util.cut_dirs.at(i).c_str()) );
    
     }
     

@@ -26,20 +26,20 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
                                      const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, const char* print_name ){
 
     
-    std::vector<TH1D*> hist(k_classifications_MAX);
+    std::vector<TH1D*> hist(_util.k_classifications_MAX);
     
-    for (unsigned int i=0; i <classification_dirs.size(); i++){
+    for (unsigned int i=0; i <_util.classification_dirs.size(); i++){
         
-        if (i == k_leg_data) 
-            _utility_instance.GetHist(f_nuexsec, hist.at(i), Form("Data/Stack/%s/%s/%s_%s_%s", cut_name.c_str(), classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), classification_dirs.at(i).c_str()));
-        if (i == k_leg_ext)
-            _utility_instance.GetHist(f_nuexsec, hist.at(i), Form("EXT/Stack/%s/%s/%s_%s_%s",  cut_name.c_str(), classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), classification_dirs.at(i).c_str()));
-        if (i == k_leg_dirt)
-            _utility_instance.GetHist(f_nuexsec, hist.at(i), Form("Dirt/Stack/%s/%s/%s_%s_%s", cut_name.c_str(), classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), classification_dirs.at(i).c_str()));
+        if (i == _util.k_leg_data) 
+            _util.GetHist(f_nuexsec, hist.at(i), Form("Data/Stack/%s/%s/%s_%s_%s", cut_name.c_str(), _util.classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.classification_dirs.at(i).c_str()));
+        if (i == _util.k_leg_ext)
+            _util.GetHist(f_nuexsec, hist.at(i), Form("EXT/Stack/%s/%s/%s_%s_%s",  cut_name.c_str(), _util.classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.classification_dirs.at(i).c_str()));
+        if (i == _util.k_leg_dirt)
+            _util.GetHist(f_nuexsec, hist.at(i), Form("Dirt/Stack/%s/%s/%s_%s_%s", cut_name.c_str(), _util.classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.classification_dirs.at(i).c_str()));
         
-        if (hist.at(i) != NULL && ( i == k_leg_data || i == k_leg_ext || i == k_leg_dirt)) continue;
+        if (hist.at(i) != NULL && ( i == _util.k_leg_data || i == _util.k_leg_ext || i == _util.k_leg_dirt)) continue;
 
-        _utility_instance.GetHist(f_nuexsec, hist.at(i), Form("MC/Stack/%s/%s/%s_%s_%s", cut_name.c_str(), classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), classification_dirs.at(i).c_str()));
+        _util.GetHist(f_nuexsec, hist.at(i), Form("MC/Stack/%s/%s/%s_%s_%s", cut_name.c_str(), _util.classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.classification_dirs.at(i).c_str()));
     
     }
 
@@ -69,15 +69,15 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     for (unsigned int i=0; i < hist.size(); i++){
         hist.at(i)->SetStats(kFALSE);
         
-        if (i == k_leg_data) continue; // Dont scale the data 
+        if (i == _util.k_leg_data) continue; // Dont scale the data 
         
         // Implement scaling here
-        if (i == k_leg_ext){
+        if (i == _util.k_leg_ext){
             hist.at(i)->Scale(intime_scale_factor);
             continue;
         }
 
-        if (i == k_leg_dirt){
+        if (i == _util.k_leg_dirt){
             hist.at(i)->Scale(dirt_scale_factor);
             continue;
         }
@@ -86,27 +86,27 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     }
     
     // Customise the histogram
-    hist.at(k_nue_cc)       ->SetFillColor(30);
-    hist.at(k_nue_cc_mixed) ->SetFillColor(38);
-    hist.at(k_numu_cc)      ->SetFillColor(28);
-    hist.at(k_nc_pi0)       ->SetFillColor(36);
-    hist.at(k_cosmic)       ->SetFillColor(1);
-    hist.at(k_nc)           ->SetFillColor(46);
-    hist.at(k_nue_cc_out_fv)->SetFillColor(kTeal);
-    hist.at(k_nc_mixed)     ->SetFillColor(42);
-    hist.at(k_unmatched)    ->SetFillColor(12);
-   
-    hist.at(k_leg_ext)      ->SetFillColor(41);
-    hist.at(k_leg_ext)      ->SetFillStyle(3345);
+    hist.at(_util.k_nue_cc)       ->SetFillColor(30);
+    hist.at(_util.k_nue_cc_mixed) ->SetFillColor(38);
+    hist.at(_util.k_numu_cc)      ->SetFillColor(28);
+    hist.at(_util.k_numu_cc_pi0)  ->SetFillColor(42);
+    hist.at(_util.k_nc_pi0)       ->SetFillColor(36);
+    hist.at(_util.k_cosmic)       ->SetFillColor(1);
+    hist.at(_util.k_nc)           ->SetFillColor(46);
+    hist.at(_util.k_nue_cc_out_fv)->SetFillColor(kTeal);
+    hist.at(_util.k_numu_cc_pi0)  ->SetFillColor(42);
+    hist.at(_util.k_unmatched)    ->SetFillColor(12);
+    hist.at(_util.k_leg_ext)      ->SetFillColor(41);
+    hist.at(_util.k_leg_ext)      ->SetFillStyle(3345);
 
-    hist.at(k_leg_dirt)     ->SetFillColor(2);
-    hist.at(k_leg_dirt)     ->SetFillStyle(3354);
+    hist.at(_util.k_leg_dirt)     ->SetFillColor(2);
+    hist.at(_util.k_leg_dirt)     ->SetFillStyle(3354);
 
-    hist.at(k_leg_data)     ->SetMarkerStyle(20);
-    hist.at(k_leg_data)     ->SetMarkerSize(0.5);
+    hist.at(_util.k_leg_data)     ->SetMarkerStyle(20);
+    hist.at(_util.k_leg_data)     ->SetMarkerSize(0.5);
 
 
-    double integral_data = hist.at(k_leg_data)->Integral();
+    double integral_data = hist.at(_util.k_leg_data)->Integral();
     double integral_mc_ext{0.0};
 
     // Normalisation
@@ -114,14 +114,14 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
 
         // Get the integral of the MC + EXT
         for (unsigned int i=0; i < hist.size(); i++){
-            if (i == k_leg_data) continue; // Dont use the data
+            if (i == _util.k_leg_data) continue; // Dont use the data
             integral_mc_ext += hist.at(i)->Integral();
         
         }
         
         // Check the integral of ON - EXT
-        TH1D * h_data_scaling_clone = (TH1D*) hist.at(k_leg_data)->Clone("h_data_scaling_clone");
-        h_data_scaling_clone->Add(  hist.at(k_leg_ext), -1);
+        TH1D * h_data_scaling_clone = (TH1D*) hist.at(_util.k_leg_data)->Clone("h_data_scaling_clone");
+        h_data_scaling_clone->Add(  hist.at(_util.k_leg_ext), -1);
         double integral_on_minus_off = h_data_scaling_clone->Integral();
         
         if (integral_on_minus_off == 0) {
@@ -131,7 +131,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         delete h_data_scaling_clone;
 
         for (unsigned int i=0; i < hist.size(); i++){
-            if (i == k_leg_data) continue; // Dont use the data
+            if (i == _util.k_leg_data) continue; // Dont use the data
             
             hist.at(i)->Scale(integral_on_minus_off / integral_mc_ext);
             hist.at(i)->Scale(1. / integral_data);
@@ -142,19 +142,19 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
 
     // Add the histograms to the stack
     for (unsigned int i=0; i < hist.size(); i++){
-        if (i == k_leg_data) continue; // Dont use the data
+        if (i == _util.k_leg_data) continue; // Dont use the data
         h_stack->Add(hist.at(i));
     }
 
-    const double y_maximum = std::max(hist.at(k_leg_data)->GetMaximum(), h_stack->GetMaximum());
+    const double y_maximum = std::max(hist.at(_util.k_leg_data)->GetMaximum(), h_stack->GetMaximum());
 
     // Set the axis in the case of a log plot
     if (logy == true){
-        TH1D * h_scale_axes = (TH1D*)hist.at(k_leg_data)->Clone("h_scale_axes");
+        TH1D * h_scale_axes = (TH1D*)hist.at(_util.k_leg_data)->Clone("h_scale_axes");
         
-        if(hist.at(k_nue_cc)->GetMinimum() != 0.0) {h_scale_axes->SetMinimum(hist.at(k_nue_cc)->GetMinimum() / 2.); }
+        if(hist.at(_util.k_nue_cc)->GetMinimum() != 0.0) {h_scale_axes->SetMinimum(hist.at(_util.k_nue_cc)->GetMinimum() / 2.); }
         
-        if(hist.at(k_nue_cc)->GetMinimum() == 0.0) {h_scale_axes->SetMinimum(hist.at(k_nue_cc)->GetMinimum() + 0.0001 / 2.); }
+        if(hist.at(_util.k_nue_cc)->GetMinimum() == 0.0) {h_scale_axes->SetMinimum(hist.at(_util.k_nue_cc)->GetMinimum() + 0.0001 / 2.); }
         
         h_scale_axes->SetMaximum(y_maximum * (y_scale_factor * 500));
         h_scale_axes->SetLineColor(0);
@@ -185,12 +185,12 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     h_stack->GetYaxis()->SetTitleSize(18);
     h_stack->GetYaxis()->SetTitleOffset(1.30);
     h_stack->GetXaxis()->SetLabelOffset(10);
-    hist.at(k_leg_data)->Draw("same PE");
+    hist.at(_util.k_leg_data)->Draw("same PE");
 
     // MC error histogram
-    TH1D * h_error_hist = (TH1D*) hist.at(k_nue_cc)->Clone("h_error_hist");
+    TH1D * h_error_hist = (TH1D*) hist.at(_util.k_nue_cc)->Clone("h_error_hist");
     for (unsigned int i=0; i < hist.size(); i++){
-        if (i == k_leg_data || i == k_nue_cc) continue; // Dont use the data
+        if (i == _util.k_leg_data || i == _util.k_nue_cc) continue; // Dont use the data
         h_error_hist->Add(hist.at(i), 1);
     }
     
@@ -200,17 +200,17 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     // Set the legend
     TLegend *leg_stack = new TLegend(leg_x1,leg_y1,leg_x2,leg_y2);
     //leg->SetHeader("The Legend Title","C"); // option "C" allows to center the header
-    leg_stack->AddEntry(hist.at(k_nue_cc),          "#nu_{e} CC",        "f");
-    leg_stack->AddEntry(hist.at(k_nue_cc_mixed),    "#nu_{e} CC Mixed",  "f");
-    leg_stack->AddEntry(hist.at(k_nue_cc_out_fv),   "#nu_{e} CC OutFV",  "f");
-    leg_stack->AddEntry(hist.at(k_cosmic),          "Cosmic",            "f");
-    leg_stack->AddEntry(hist.at(k_numu_cc),         "#nu_{#mu} CC",      "f");
-    leg_stack->AddEntry(hist.at(k_nc),              "NC",                "f");
-    leg_stack->AddEntry(hist.at(k_nc_pi0),          "NC #pi^{0}",        "f");
-    leg_stack->AddEntry(hist.at(k_nc_mixed),        "NC Mixed",          "f");
-    leg_stack->AddEntry(hist.at(k_unmatched),       "Unmatched",         "f");
-    leg_stack->AddEntry(hist.at(k_leg_dirt),        "Dirt",              "f");
-    leg_stack->AddEntry(hist.at(k_leg_ext),         "InTime (EXT)",      "f");
+    leg_stack->AddEntry(hist.at(_util.k_nue_cc),          "#nu_{e} CC",           "f");
+    leg_stack->AddEntry(hist.at(_util.k_nue_cc_mixed),    "#nu_{e} CC Mixed",     "f");
+    leg_stack->AddEntry(hist.at(_util.k_nue_cc_out_fv),   "#nu_{e} CC OutFV",     "f");
+    leg_stack->AddEntry(hist.at(_util.k_cosmic),          "Cosmic",               "f");
+    leg_stack->AddEntry(hist.at(_util.k_numu_cc),         "#nu_{#mu} CC",         "f");
+    leg_stack->AddEntry(hist.at(_util.k_numu_cc_pi0),     "#nu_{#mu} CC #pi^{0}", "f");
+    leg_stack->AddEntry(hist.at(_util.k_nc),              "NC",                   "f");
+    leg_stack->AddEntry(hist.at(_util.k_nc_pi0),          "NC #pi^{0}",           "f");
+    leg_stack->AddEntry(hist.at(_util.k_unmatched),       "Unmatched",            "f");
+    leg_stack->AddEntry(hist.at(_util.k_leg_dirt),        "Dirt",                 "f");
+    leg_stack->AddEntry(hist.at(_util.k_leg_ext),         "InTime (EXT)",         "f");
     leg_stack->Draw();
 
     if(!logy) h_stack->GetYaxis()->SetRangeUser(0, y_maximum * y_scale_factor);
@@ -218,7 +218,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     
     // Calculate the chi2
     TH1D * h_last = (TH1D*) h_stack->GetStack()->Last();
-    std::vector <double> chi2  = Chi2Calc(h_last, hist.at(k_leg_data), area_norm, integral_data);
+    std::vector <double> chi2  = Chi2Calc(h_last, hist.at(_util.k_leg_data), area_norm, integral_data);
     //chi2 : chi2/ndf, mc+ext, data
 
     
@@ -284,11 +284,11 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     bottomPad->cd();
 
     // Now create the ratio of data to MC
-    TH1D * ratioPlot = (TH1D*) hist.at(k_leg_data)->Clone("ratioPlot");
-    TH1D * h_mc_ext_sum = (TH1D*) hist.at(k_nue_cc)->Clone("h_mc_ext_sum");
+    TH1D * ratioPlot = (TH1D*) hist.at(_util.k_leg_data)->Clone("ratioPlot");
+    TH1D * h_mc_ext_sum = (TH1D*) hist.at(_util.k_nue_cc)->Clone("h_mc_ext_sum");
     
     for (unsigned int i=0; i < hist.size(); i++){
-        if (i == k_leg_data || i == k_nue_cc ) continue; // Dont use the data and nue cc because already been cloned
+        if (i == _util.k_leg_data || i == _util.k_nue_cc ) continue; // Dont use the data and nue cc because already been cloned
         h_mc_ext_sum->Add(hist.at(i), 1);
     }
    

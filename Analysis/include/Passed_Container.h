@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 
+#include "utility.h"
+
 /* 
 Class to hold information to whether a specific cut has passed the selection
 Main purpose is to be a container.
@@ -17,16 +19,11 @@ Default is to set true and change to false when cut fails
 // Passed Container Class
 class Passed_Container {
     public:
-        Passed_Container(){
-            cut_v.resize(k_cuts_MAX, false);
-            
-        };
-        
-        enum cuts{
-            k_in_fv,                           // Fiducial volume
-            k_cuts_MAX
-        };
 
+        utility _util;
+
+        Passed_Container();
+        
         std::vector<bool> cut_v;
         
 };
