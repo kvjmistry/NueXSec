@@ -1,14 +1,10 @@
-# Directory for TPC Object Libraries
-LIBDIR = ../lib
-MODULESDIR = ../Modules
-
 # Compilation Flags
 CXX = g++ -fopenmp 
 CPPFLAGS = -I$(LIBDIR) -Wall -Wextra
 CXXFLAGS=$(shell root-config --cflags)
 
-# Libraries to inlcude e.g. ROOT, TPC Object Maker
-LIBS=$(shell root-config --libs) -L$(LIBDIR) -lNueXSec
+# Libraries to inlcude e.g. ROOT
+LIBS=$(shell root-config --libs) 
 
 # Debug Flags
 DEBUGFLAGS= -O0 -g -D _DEBUG
@@ -17,7 +13,7 @@ DEBUGFLAGS= -O0 -g -D _DEBUG
 MAIN = nuexsec
 
 # List the object files here
-OBJ_FILES = bin/main.o bin/utility.o bin/selection.o bin/selection_cuts.o bin/Passed_Container.o bin/histogram_helper.o bin/histogram_plotter.o
+OBJ_FILES = bin/main.o bin/utility.o bin/selection.o bin/selection_cuts.o bin/Passed_Container.o bin/histogram_helper.o bin/histogram_plotter.o bin/SliceContainer.o
 
 # Main Target
 all: $(MAIN)

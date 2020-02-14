@@ -32,22 +32,7 @@ class histogram_helper{
     
     // enums for cut dirs
     enum enum_cut_dirs {
-                k_pandora_output,                  // The output TPC Objects from Pandora
-                k_in_time,                         // In time flash
-                k_flash_pe,                        // Flash PE and In time flash
-                k_has_nue,                         // Pandora Nue 
                 k_in_fv,                           // Fiducial volume
-                k_vtx_to_flash,                    // Vertex to flash
-                k_shwr_nue_dist,                   // Distance between pfp shower and nue object
-                k_trk_nue_dist,                    // Distance between pfp track and nue object
-                k_shwr_hit_threshold,              // Hit threshold for at least one shower
-                k_shwr_hit_threshold_collection,   // Hit threshold for at least one shower on collection plane
-                k_shwr_open_angle,                 // Tolerance for leading shower open angle
-                k_shwr_dedx,                       // Tolerance for dedx of leading shower
-                k_dist_nue_vtx,                    // Tolerance for distance from the reco nue vtx for TPCO w/ >3 showers
-                k_pfp_hits_length,                 // Tolerance for hits/length
-                k_longest_trk_leading_shwr_length, // Tolerance for longest track length / leading shower length
-                k_trk_contained,                   // Contained Tracks
                 k_cuts_MAX
                 };
     
@@ -57,22 +42,7 @@ class histogram_helper{
 
     // Cut directory names
     std::vector<std::string> cut_dirs = {
-                "Pandora_Output",                           // The output TPC Objects from Pandora
-                "In_Time",                                  // In time flash
-                "Flash_PE",                                 // Flash PE 
-                "Has_Pandora_Nue",                          // Pandora Nue 
-                "In_FV",                                    // Fiducial volume
-                "Vertex_to_Flash",                          // Vertex to flash
-                "Shower_to_Nue_Dist",                       // Distance between pfp shower and nue object
-                "Track_to_Nue_Dist",                        // Distance between pfp track and nue object
-                "Shower_Hit_Threshold",                     // Hit threshold for at least one shower
-                "Shower_Hit_Threshold_Collection_Plane",    // Hit threshold for at least one shower on collection plane
-                "Shower_Open_Angle",                        // Tolerance for leading shower open angle
-                "Shower_dEdx",                              // Tolerance for dedx of leading shower
-                "Dist_Nue_Vtx_Secondary_Showers",           // Tolerance for distance from the reco nue vtx for TPCO w/ >3 showers
-                "Hits_per_Length",                          // Tolerance for hits/length
-                "Longest_Track_over_Leading_Shower_Length", // Tolerance for longest track length / leading shower length
-                "Track_Is_Contained"                        // Contained Tracks
+                "In_FV"                                    // Fiducial volume
                 };
 
     
@@ -126,44 +96,6 @@ class histogram_helper{
     // -------------------------------------------------------------------------
     // Function to make the directory hirarchy
     void MakeDirectory(std::string type);
-    // -------------------------------------------------------------------------
-    // Fills histograms for truth variables
-    void FillMCTruth( double mc_nu_energy,  double mc_nu_momentum,  int mc_nu_id, bool in_tpc,
-                      double mc_nu_vtx_x,   double mc_nu_vtx_y,  double mc_nu_vtx_z,
-                      double mc_nu_dir_x,   double mc_nu_dir_y,  double mc_nu_dir_z,
-                      double mc_ele_dir_x,  double mc_ele_dir_y, double mc_ele_dir_z,
-                      double mc_ele_energy, double mc_ele_momentum );
-    // -------------------------------------------------------------------------
-    // Write MC Truth Variables to file
-    void WriteMCTruth(std::string type);
-    // -------------------------------------------------------------------------
-    // Fill the optical information histograms
-    void FillOptical(std::vector<std::vector<double>> &optical_list_flash_time_v, int type);
-    // -------------------------------------------------------------------------
-    // Write Optical information to file
-    void WriteOptical(int type);
-    // -------------------------------------------------------------------------
-    // Function to return the enum index of the classification type. This will be used
-    // to fill the appropriate histogram
-    int IndexOfClassification(std::string tpco_id);
-    // -------------------------------------------------------------------------
-    // Fill reco variables e.g vertex x,y,z, dEdx
-    void FillReco(int classification_index, int cut_index, const xsecAna::TPCObjectContainer &tpc_obj, int leading_shower_index, std::vector<double> &largest_flash_v, std::vector<double> fv_boundary_v, std::string type);
-    // -------------------------------------------------------------------------
-    // Fill reco variables e.g vertex x,y,z, dEdx
-    void WriteReco(int type);
-    // -------------------------------------------------------------------------
-    // Fill reco vertex plot for ZY plane
-    void FillRecoVtxZY(int classification_index, const xsecAna::TPCObjectContainer &tpc_obj);
-    // -------------------------------------------------------------------------
-    
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     private:

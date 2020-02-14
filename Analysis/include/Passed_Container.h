@@ -23,22 +23,7 @@ class Passed_Container {
         };
         
         enum cuts{
-            k_pandora_output,                  // The output TPC Objects from Pandora
-            k_in_time,                         // In time flash
-            k_flash_pe,                        // Flash PE and In time flash
-            k_has_nue,                         // Pandora Nue 
             k_in_fv,                           // Fiducial volume
-            k_vtx_to_flash,                    // Vertex to flash
-            k_shwr_nue_dist,                   // Distance between pfp shower and nue object
-            k_trk_nue_dist,                    // Distance between pfp track and nue object
-            k_shwr_hit_threshold,              // Hit threshold for at least one shower
-            k_shwr_hit_threshold_collection,   // Hit threshold for at least one shower on collection plane
-            k_shwr_open_angle,                 // Tolerance for leading shower open angle
-            k_shwr_dedx,                       // Tolerance for dedx of leading shower
-            k_dist_nue_vtx,                    // Tolerance for distance from the reco nue vtx for TPCO w/ >3 showers
-            k_pfp_hits_length,                 // Tolerance for hits/length
-            k_longest_trk_leading_shwr_length, // Tolerance for longest track length / leading shower length
-            k_trk_contained,                   // Contained Tracks
             k_cuts_MAX
         };
 

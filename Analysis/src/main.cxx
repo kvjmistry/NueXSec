@@ -149,9 +149,9 @@ int main(int argc, char *argv[]){
     _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config, using_slim_version );
 
     // now save all the outputs to file
-    if (!using_slim_version) _selection_instance.xsecSelection::selection::SavetoFile();
+    // if (!using_slim_version) _selection_instance.xsecSelection::selection::SavetoFile();
     
-    if (make_histos) _selection_instance.xsecSelection::selection::MakeHistograms();
+    // if (make_histos) _selection_instance.xsecSelection::selection::MakeHistograms();
 
     // -------------------------------------------------------------------------
     // Finished!
