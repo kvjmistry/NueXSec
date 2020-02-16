@@ -56,8 +56,8 @@ namespace xsecSelection {
 
             // Class Instances
             utility _util;
-            std::vector<selection_cuts> selection_cuts_instance; // One for each type e.g MC, Data, EXT..
-            histogram_helper  histogram_helper_instance;
+            std::vector<selection_cuts>    _scuts;   // One for each type e.g MC, Data, EXT..
+            std::vector<histogram_helper>  _hhelper; // One for each type e.g MC, Data, EXT..
 
             // Variables -------------------------------------------------------
 

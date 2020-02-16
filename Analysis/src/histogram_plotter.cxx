@@ -3,18 +3,49 @@
 // -----------------------------------------------------------------------------
 histogram_plotter::~histogram_plotter(){ 
     
-    // Overwrite the destrctor of histogram helper
-    // If file is not already closed then close it
-    if (gROOT->GetListOfFiles()->FindObject("nuexsec.root") ) {
-        f_nuexsec->Close();
-    }
+    // Make sure the file is closed
+    // f_nuexsec->Close();
 }
 // -----------------------------------------------------------------------------
-histogram_plotter::histogram_plotter(){ 
+void histogram_plotter::Initalise(int type){ 
     
-    // File not already open, open the file
-    if (!gROOT->GetListOfFiles()->FindObject("nuexsec.root") ) {
-        f_nuexsec = new TFile("nuexsec.root", "UPDATE");
+    std::cout << "Initalising Histogram Plotter..." << std::endl;
+
+
+    if (type == _util.k_mc){
+        
+        // File not already open, open the file
+        if (!gROOT->GetListOfFiles()->FindObject("files/nuexsec_mc.root") ) {
+            f_nuexsec = new TFile("files/nuexsec_mc.root", "UPDATE");
+        }
+    }
+    else if (type == _util.k_data){
+        
+        // File not already open, open the file
+        if (!gROOT->GetListOfFiles()->FindObject("files/nuexsec_data.root") ) {
+            f_nuexsec = new TFile("files/nuexsec_data.root", "UPDATE");
+        }
+
+    }
+    else if (type == _util.k_ext){
+        
+        // File not already open, open the file
+        if (!gROOT->GetListOfFiles()->FindObject("files/nuexsec_ext.root") ) {
+            f_nuexsec = new TFile("files/nuexsec_ext.root", "UPDATE");
+        }
+
+    }
+    else if (type == _util.k_dirt){
+        
+        // File not already open, open the file
+        if (!gROOT->GetListOfFiles()->FindObject("files/nuexsec_dirt.root") ) {
+            f_nuexsec = new TFile("files/nuexsec_dirt.root", "UPDATE");
+        }
+
+    }
+    else {
+        std::cout << "Unknown input type!! "<<  __PRETTY_FUNCTION__ << std::endl;
+        exit(1);
     }
 }
 // -----------------------------------------------------------------------------
@@ -93,7 +124,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     hist.at(_util.k_nc_pi0)       ->SetFillColor(36);
     hist.at(_util.k_cosmic)       ->SetFillColor(1);
     hist.at(_util.k_nc)           ->SetFillColor(46);
-    hist.at(_util.k_nue_cc_out_fv)->SetFillColor(kTeal);
+    hist.at(_util.k_nu_out_fv)    ->SetFillColor(kTeal);
     hist.at(_util.k_numu_cc_pi0)  ->SetFillColor(42);
     hist.at(_util.k_unmatched)    ->SetFillColor(12);
     hist.at(_util.k_leg_ext)      ->SetFillColor(41);
@@ -202,7 +233,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     //leg->SetHeader("The Legend Title","C"); // option "C" allows to center the header
     leg_stack->AddEntry(hist.at(_util.k_nue_cc),          "#nu_{e} CC",           "f");
     leg_stack->AddEntry(hist.at(_util.k_nue_cc_mixed),    "#nu_{e} CC Mixed",     "f");
-    leg_stack->AddEntry(hist.at(_util.k_nue_cc_out_fv),   "#nu_{e} CC OutFV",     "f");
+    leg_stack->AddEntry(hist.at(_util.k_nu_out_fv),       "#nu OutFV",            "f");
     leg_stack->AddEntry(hist.at(_util.k_cosmic),          "Cosmic",               "f");
     leg_stack->AddEntry(hist.at(_util.k_numu_cc),         "#nu_{#mu} CC",         "f");
     leg_stack->AddEntry(hist.at(_util.k_numu_cc_pi0),     "#nu_{#mu} CC #pi^{0}", "f");

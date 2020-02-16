@@ -124,7 +124,7 @@ utility::utility(){
     std::vector<std::string> classification_dirs = {
                 "nue_cc",
                 "nue_cc_mixed",
-                "nue_cc_out_fv",
+                "nu_out_fv",
                 "cosmic",
                 "numu_cc",
                 "numu_cc_pi0",

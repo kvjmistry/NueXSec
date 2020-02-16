@@ -26,6 +26,10 @@
 #include "TPaveText.h"
 #include "TSystem.h"
 
+// Class at the top level of the selection, so most classes will be including
+// from this class. Mainly provided useful functions.
+
+
 class utility{
 
 public:
@@ -57,19 +61,19 @@ public:
                                         bool do_variations
                                         );
 
-    // ---------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Get a TFile from a file
     bool GetFile(TFile* &f, TString string);
-    // ---------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Get a TTrees from a file
     void GetTree(TFile* f, TTree* &T, TString string);
-    // ---------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Get a TDirectory from a file
     bool GetDirectory(TFile* f, TDirectory* &d, TString string);
-    // ---------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Get a histogram from a file
     bool GetHist(TFile* f, TH1D* &h, TString string);
-    // ---------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     // Other definitions for code
 
@@ -94,11 +98,19 @@ public:
                 k_cuts_MAX
                 }; 
 
+    enum interactions {
+        k_qe  = 0,
+        k_res = 1,
+        k_dis = 2,
+        k_coh = 3,
+        k_mec = 10
+    };
+
     // enums for legend
     enum legend {
                 k_nue_cc,
                 k_nue_cc_mixed,
-                k_nue_cc_out_fv,
+                k_nu_out_fv,
                 k_cosmic,
                 k_numu_cc,
                 k_numu_cc_pi0,
@@ -110,6 +122,26 @@ public:
                 k_leg_dirt,
                 k_classifications_MAX
                 };
+    
+    enum pandora_classification {
+        k_pandora_nu_e_other = 1,
+        k_pandora_nu_e_cc0pi0p = 10,
+        k_pandora_nu_e_cc0pinp = 11,
+        k_pandora_nu_mu_other = 2,
+        k_pandora_nu_mu_pi0 = 21,
+        k_pandora_nc = 3,
+        k_pandora_nc_pi0 = 31,
+        k_pandora_cosmic = 4,
+        k_pandora_outfv = 5,
+        k_pandora_other = 6,
+        k_pandora_data = 0
+    };
+
+    // enums for checking if CC or NC interaction
+    enum CCNC {
+        k_CC,
+        k_NC
+    };
 
 }; // End Class Utility
 

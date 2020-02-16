@@ -4,7 +4,9 @@
 #include <vector>
 #include <string>
 #include <TTree.h>
-# include <iostream>
+#include <iostream>
+
+#include "utility.h"
 
 /* 
 Class to hold information for the eventslice in the pandora ntuples for ease of use
@@ -15,12 +17,25 @@ Class to hold information for the eventslice in the pandora ntuples for ease of 
 class SliceContainer {
 public:
 
+    // -------------------------------------------------------------------------
     // Initialise the class
     void Initialise(TTree* tree);
+    // -------------------------------------------------------------------------
+    // Function to classify the slice
+    std::string SliceClassifier(int type);
+    // -------------------------------------------------------------------------
+    // Returns the Category defined by the pandora team 
+    // (can be used as a cross check or making similar plots to them)
+    std::string SliceCategory();
+    // -------------------------------------------------------------------------
+    // Function to return the genie interaction mode, e.g. ccqe, ccmec etc.
+    std::string SliceInteractionType(int type);
+    // -------------------------------------------------------------------------
+    utility _util;
 
     int   selected;
     int   run;                   // Run
-    int   sub;                   // Subrum
+    int   sub;                   // Subrun
     int   evt;                   // Event
    
     // Shower Properties 

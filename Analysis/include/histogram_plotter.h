@@ -9,8 +9,7 @@
 class histogram_plotter{
 
     public:
-    // Default constructor
-    histogram_plotter();
+    
     
     // Destructor 
     ~histogram_plotter(); 
@@ -19,6 +18,9 @@ class histogram_plotter{
 
     utility _util;
 
+    // -------------------------------------------------------------------------
+    // Default constructor
+    void Initalise(int type);
     // -------------------------------------------------------------------------
     // Initialise histograms
     void InitHistograms();

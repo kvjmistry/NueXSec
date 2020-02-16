@@ -4,7 +4,7 @@
 histogram_helper::~histogram_helper() { 
     
     // Make sure the file is closed
-    f_nuexsec->Close();
+    // f_nuexsec->Close();
 }
 // -----------------------------------------------------------------------------
 void histogram_helper::MakeDirectory(std::string type){
@@ -83,14 +83,48 @@ void histogram_helper::MakeDirectory(std::string type){
    
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::Initialise(){
+void histogram_helper::Initialise(int type){
 
     std::cout << "Initalising Histogram Helper, creating TFile and directories..." << std::endl;
 
-    // File not already open, open the file
-    if (!gROOT->GetListOfFiles()->FindObject("nuexsec.root") ) {
-        f_nuexsec = new TFile("nuexsec.root", "UPDATE");
+
+    if (type == _util.k_mc){
+        
+        // File not already open, open the file
+        if (!gROOT->GetListOfFiles()->FindObject("files/nuexsec_mc.root") ) {
+            f_nuexsec = new TFile("files/nuexsec_mc.root", "UPDATE");
+        }
     }
+    else if (type == _util.k_data){
+        
+        // File not already open, open the file
+        if (!gROOT->GetListOfFiles()->FindObject("files/nuexsec_data.root") ) {
+            f_nuexsec = new TFile("files/nuexsec_data.root", "UPDATE");
+        }
+
+    }
+    else if (type == _util.k_ext){
+        
+        // File not already open, open the file
+        if (!gROOT->GetListOfFiles()->FindObject("files/nuexsec_ext.root") ) {
+            f_nuexsec = new TFile("files/nuexsec_ext.root", "UPDATE");
+        }
+
+    }
+    else if (type == _util.k_dirt){
+        
+        // File not already open, open the file
+        if (!gROOT->GetListOfFiles()->FindObject("files/nuexsec_dirt.root") ) {
+            f_nuexsec = new TFile("files/nuexsec_dirt.root", "UPDATE");
+        }
+
+    }
+    else {
+        std::cout << "Unknown input type!! "<<  __PRETTY_FUNCTION__ << std::endl;
+        exit(1);
+    }
+
+
 
     MakeDirectory("MC");
     MakeDirectory("Data");

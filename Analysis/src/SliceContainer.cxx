@@ -187,11 +187,12 @@ void SliceContainer::Initialise(TTree *tree){
     
     tree->SetBranchAddress("nu_pdg", &nu_pdg);
     tree->SetBranchAddress("ccnc",   &ccnc);
+    tree->SetBranchAddress("interaction", &interaction);
     tree->SetBranchAddress("nu_e",   &nu_e);
     tree->SetBranchAddress("nu_pt",  &nu_pt);
     tree->SetBranchAddress("theta",  &theta);
-    tree->Branch("isVtxInFiducial",  &isVtxInFiducial, "isVtxInFiducial/O");
-    tree->Branch("truthFiducial",    &truthFiducial,   "truthFiducial/O");
+    tree->SetBranchAddress("isVtxInFiducial",  &isVtxInFiducial);
+    tree->SetBranchAddress("truthFiducial",    &truthFiducial);
     
     tree->SetBranchAddress("true_nu_vtx_t", &true_nu_vtx_t);
     tree->SetBranchAddress("true_nu_vtx_x", &true_nu_vtx_x);
@@ -339,6 +340,169 @@ void SliceContainer::Initialise(TTree *tree){
     tree->SetBranchAddress("bdt_ext",    &bdt_ext);
     tree->SetBranchAddress("bdt_cosmic", &bdt_cosmic);
     tree->SetBranchAddress("bdt_global", &bdt_global);
+
+}
+// -----------------------------------------------------------------------------
+std::string SliceContainer::SliceClassifier(int type){
+    
+    // MC Specific classsifications
+    if (type == _util.k_mc){
+
+        // Out of Fiducial Volume Event
+        if (!isVtxInFiducial) return "nu_out_fv";
+
+        // Charged Current 
+        if (ccnc == _util.k_CC){
+
+            // NuMu CC
+            if (nu_pdg == 14 || nu_pdg == -14){
+                
+                if (npi0 > 0) return "numu_cc_pi0"; // has a pi0
+                else return "numu_cc";
+
+            }
+            // Nue CC
+            else if (nu_pdg == 12 || nu_pdg == -12){
+
+                // Check if the neutrino has a purity > 50%
+                if (nu_purity_from_pfp > 0.5) return "nue_cc";
+               
+                // Classify as a cosmic
+                else return "cosmic";
+
+            }
+            // Unknown Neutrino Type
+            else {
+                std::cout << "Unknown Neutrino Type..." << std::endl;
+                return "Unknown";
+            }
+
+        }
+        // Neutral Current
+        else {
+            if (npi0 > 0) return "nc_pi0";
+            else return "nc";
+        }
+
+    }
+    // Data
+    else if (type == _util.k_data){
+        return "Data";
+    }
+    // EXT
+    else if (type == _util.k_ext){
+        return "EXT";
+        
+    }
+    // Dirt
+    else if (type == _util.k_dirt){
+        return "Dirt";
+    }
+    // What is this type?
+    else return "Unknown";
+    
+}
+// -----------------------------------------------------------------------------
+std::string SliceContainer::SliceCategory(){
+
+    if (category == _util.k_pandora_nu_e_other) {
+        return "nue_other";
+
+    }
+    else if (category == _util.k_pandora_nu_e_cc0pi0p ) {
+        return "nu_e_cc0pi0p";
+
+    }
+    else if (category == _util.k_pandora_nu_e_cc0pinp ) {
+        return "nu_e_cc0pinp";
+
+    }
+    else if (category == _util.k_pandora_nu_mu_other) {
+        return "nu_mu_other";
+
+    }
+    else if (category == _util.k_pandora_nu_mu_pi0 ) {
+        return "nu_mu_pi0";
+
+    }
+    else if (category == _util.k_pandora_nc) {
+        return "nc";
+
+    }
+    else if (category == _util.k_pandora_nc_pi0 ) {
+        return "nc_pi0";
+
+    }
+    else if (category == _util.k_pandora_cosmic) {
+        return "cosmic";
+
+    }
+    else if (category == _util.k_pandora_outfv) {
+        return "outfv";
+
+    }
+    else if (category == _util.k_pandora_other) {
+        return "other";
+
+    }
+    else if (category == _util.k_pandora_data) {
+        return "data";
+    }
+    else {
+        std::cout << "Unknown Category type"<< std::endl;
+        return "unknown";
+    }
+}
+// -----------------------------------------------------------------------------
+std::string SliceContainer::SliceInteractionType(int type){
+
+    // Only do this for mc, otherwise return data type
+    if (type == _util.k_mc || type == _util.k_dirt){
+        
+        // The neutrino flavour
+        std::string nu;
+        std::string CCNC;
+
+        if (slpdg == 14 || slpdg == -14){
+            nu = "numu_";
+        }
+        else if (slpdg == 12 || slpdg == -12){
+            nu = "nue_";
+        }
+        else {
+            nu = "nu_out_fv_or_unknown_";
+        }
+
+        // The interaction type
+        if (ccnc == _util.k_CC){
+            CCNC = "cc_";
+        }
+        else CCNC = "nc_";
+
+
+        if (interaction == _util.k_qe) {
+            return nu + CCNC + "qe";
+
+        }
+        else if (interaction == _util.k_res ) {
+            return nu + CCNC + "res";
+
+        }
+        else if (interaction == _util.k_dis ) {
+            return nu + CCNC + "dis";
+
+        }
+        else if (interaction == _util.k_coh) {
+            return nu + CCNC + "coh";
+
+        }
+        else if (interaction == _util.k_mec) {
+            return nu + CCNC + "mec";
+
+        }
+    }
+    else return "data";
+
 
 }
 // -----------------------------------------------------------------------------
