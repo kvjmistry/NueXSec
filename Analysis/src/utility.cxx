@@ -1,7 +1,7 @@
 #include "../include/utility.h"
 
 
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 std::vector<double> utility::configure_cuts(
         double _x1,
         double _x2,
@@ -55,7 +55,7 @@ std::vector<double> utility::configure_cuts(
     return config;
 
 } // End config function
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 bool utility::GetFile(TFile* &f, TString string){
     f = TFile::Open(string);
     
@@ -67,7 +67,7 @@ bool utility::GetFile(TFile* &f, TString string){
         return true;
     }
 }
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 void utility::GetTree(TFile* f, TTree* &T, TString string){
     T = (TTree*) f->Get(string);
     if (T == NULL) {
@@ -78,7 +78,7 @@ void utility::GetTree(TFile* f, TTree* &T, TString string){
         return;
     }
 }
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 bool utility::GetHist(TFile* f, TH1D* &h, TString string){
     h = (TH1D*) f->Get(string);
     if (h == NULL) {
@@ -89,7 +89,7 @@ bool utility::GetHist(TFile* f, TH1D* &h, TString string){
         return true;
     }
 }
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 bool utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     d = (TDirectory*)f->Get(string);
     if (d == NULL) {
@@ -100,8 +100,7 @@ bool utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
         return true;
     }
 }
-// -------------------------------------------------------------------------
-
+// -----------------------------------------------------------------------------
 utility::utility(){
     // For creating histogram names
     std::vector<std::string> type_prefix = {"MC", "Data", "EXT", "Dirt"};
@@ -137,3 +136,143 @@ utility::utility(){
                 };
 
 }
+// -----------------------------------------------------------------------------
+void utility::Tabulate(std::string interaction, std::string classification, int type, std::vector<int> &counter_v) {
+    
+    if (type == k_mc){
+        
+        // Define the counters
+
+        // nue interaction types
+        int nue_cc_qe     = 0;
+        int nue_cc_res    = 0;
+        int nue_cc_dis    = 0;
+        int nue_cc_coh    = 0;
+        int nue_cc_mec    = 0;
+
+        // nue bar interaction types
+        int nue_bar_cc_qe     = 0;
+        int nue_bar_cc_res    = 0;
+        int nue_bar_cc_dis    = 0;
+        int nue_bar_cc_coh    = 0;
+        int nue_bar_cc_mec    = 0;
+
+        // total nue + nuebar interaction types
+        int total_nue_cc_qe     = 0;
+        int total_nue_cc_res    = 0;
+        int total_nue_cc_dis    = 0;
+        int total_nue_cc_coh    = 0;
+        int total_nue_cc_mec    = 0;
+
+        // total numu + numubar interaction types
+        int numu_cc_qe    = 0;
+        int numu_cc_res   = 0;
+        int numu_cc_dis   = 0;
+        int numu_cc_coh   = 0;
+        int numu_cc_mec   = 0;
+        
+        // Selection Categories
+        int nue_cc        = 0;
+        int nue_cc_mixed  = 0;
+        int cosmic        = 0;
+        int numu_cc       = 0;
+        int numu_cc_pi0   = 0;
+        int nu_out_fv     = 0;
+        int nc            = 0;
+        int nc_pi0        = 0;
+        int unmatched     = 0;
+        int total         = 0;
+
+        // Total nue or nuebar interaction types
+        int only_nue_cc     = 0;
+        int only_nue_bar_cc = 0;
+
+        if (interaction == "nue_cc_qe")  nue_cc_qe++; 
+        if (interaction == "nue_cc_res") nue_cc_res++;
+        if (interaction == "nue_cc_coh") nue_cc_coh++;
+        if (interaction == "nue_cc_dis") nue_cc_dis++;
+        if (interaction == "nue_cc_mec") nue_cc_mec++;
+
+        if (interaction == "nue_bar_cc_qe")  nue_bar_cc_qe++; 
+        if (interaction == "nue_bar_cc_res") nue_bar_cc_res++;
+        if (interaction == "nue_bar_cc_coh") nue_bar_cc_coh++;
+        if (interaction == "nue_bar_cc_dis") nue_bar_cc_dis++;
+        if (interaction == "nue_bar_cc_mec") nue_bar_cc_mec++;
+
+        if (classification == "numu_cc_qe"  || classification == "numu_bar_cc_qe")  numu_cc_qe++;
+        if (classification == "numu_cc_res" || classification == "numu_bar_cc_res") numu_cc_res++;
+        if (classification == "numu_cc_coh" || classification == "numu_bar_cc_coh") numu_cc_coh++;
+        if (classification == "numu_cc_dis" || classification == "numu_bar_cc_dis") numu_cc_dis++;
+        if (classification == "numu_cc_mec" || classification == "numu_bar_cc_mec") numu_cc_mec++;
+        if (classification == "numu_cc_pi0" || classification == "numu_bar_cc_pi0") numu_cc_pi0++;
+        
+        if (classification == "nu_out_fv")    nu_out_fv++;
+        if (classification == "nue_cc_mixed") nue_cc_mixed++;
+        if (classification == "nc")           nc++;
+        if (classification == "nc_pi0")       nc_pi0++;
+        if (classification == "cosmic")       cosmic++;
+        if (classification == "unmatched")    unmatched++;
+
+        only_nue_cc     = nue_cc_qe     + nue_cc_res     + nue_cc_dis     + nue_cc_coh     + nue_cc_mec;
+        only_nue_bar_cc = nue_bar_cc_qe + nue_bar_cc_res + nue_bar_cc_dis + nue_bar_cc_coh + nue_bar_cc_mec;
+
+        total_nue_cc_qe  = nue_cc_qe  + nue_bar_cc_qe;
+        total_nue_cc_res = nue_cc_res + nue_bar_cc_res;
+        total_nue_cc_dis = nue_cc_dis + nue_bar_cc_dis;
+        total_nue_cc_coh = nue_cc_coh + nue_bar_cc_coh;
+        total_nue_cc_mec = nue_cc_mec + nue_bar_cc_mec;
+
+        // Total nue + nuebar
+        nue_cc = only_nue_cc + only_nue_bar_cc;
+
+        // Total numu's
+        numu_cc = numu_cc_qe + numu_cc_res + numu_cc_dis + numu_cc_coh + numu_cc_mec;
+        
+        // Add up all the MC events selected including the backgrounds
+        total = nue_cc + nue_cc_mixed + nu_out_fv + cosmic + numu_cc + numu_cc_pi0 + nc + nc_pi0 + unmatched;
+        
+        // Now add counters to the vector
+        counter_v.at(k_count_total_nue_cc_qe)  += total_nue_cc_qe;
+        counter_v.at(k_count_total_nue_cc_res) += total_nue_cc_res;
+        counter_v.at(k_count_total_nue_cc_dis) += total_nue_cc_dis;
+        counter_v.at(k_count_total_nue_cc_coh) += total_nue_cc_coh;
+        counter_v.at(k_count_total_nue_cc_mec) += total_nue_cc_mec;
+
+        counter_v.at(k_count_only_nue_cc)      += only_nue_cc;
+        counter_v.at(k_count_only_nue_bar_cc)  += only_nue_bar_cc;
+
+        counter_v.at(k_count_numu_cc_qe)       += numu_cc_qe;
+        counter_v.at(k_count_numu_cc_res)      += numu_cc_res;
+        counter_v.at(k_count_numu_cc_dis)      += numu_cc_dis;
+        counter_v.at(k_count_numu_cc_coh)      += numu_cc_coh;
+        counter_v.at(k_count_numu_cc_mec)      += numu_cc_mec;
+        
+        counter_v.at(k_count_nue_cc)           += nue_cc;      
+        counter_v.at(k_count_nue_cc_mixed)     += nue_cc_mixed;
+        counter_v.at(k_count_nu_out_fv)        += nu_out_fv;
+        counter_v.at(k_count_cosmic)           += cosmic;
+        counter_v.at(k_count_numu_cc)          += numu_cc;
+        counter_v.at(k_count_numu_cc_pi0)      += numu_cc_pi0;
+        counter_v.at(k_count_nc)               += nc;
+        counter_v.at(k_count_nc_pi0)           += nc_pi0;
+        counter_v.at(k_count_unmatched)        += unmatched;
+        
+        counter_v.at(k_count_total)            += total;
+    
+    }
+    else if (type == k_data) {
+        counter_v.at(k_count_data) += 1;
+    }
+    else if (type == k_ext){
+        counter_v.at(k_count_ext)  += 1;
+    }
+    else if (type == k_dirt){
+        counter_v.at(k_count_dirt) += 1;
+    }
+    else {
+
+        std::cout << "unkown type specified!!!  " << __PRETTY_FUNCTION__ << std::endl;
+    }
+    
+}
+// -----------------------------------------------------------------------------

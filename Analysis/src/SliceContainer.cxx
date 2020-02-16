@@ -374,7 +374,7 @@ std::string SliceContainer::SliceClassifier(int type){
             // Unknown Neutrino Type
             else {
                 std::cout << "Unknown Neutrino Type..." << std::endl;
-                return "Unknown";
+                return "unknown";
             }
 
         }
@@ -399,7 +399,7 @@ std::string SliceContainer::SliceClassifier(int type){
         return "Dirt";
     }
     // What is this type?
-    else return "Unknown";
+    else return "unknown";
     
 }
 // -----------------------------------------------------------------------------
@@ -458,19 +458,24 @@ std::string SliceContainer::SliceInteractionType(int type){
 
     // Only do this for mc, otherwise return data type
     if (type == _util.k_mc || type == _util.k_dirt){
-        
-        // The neutrino flavour
         std::string nu;
         std::string CCNC;
 
-        if (slpdg == 14 || slpdg == -14){
+        // Get the nu flavour
+        if (nu_pdg == 14 ){
             nu = "numu_";
         }
-        else if (slpdg == 12 || slpdg == -12){
+        else if (nu_pdg == -14){
+            nu = "numu_bar_";
+        }
+        else if (nu_pdg == 12){
             nu = "nue_";
         }
+        else if (nu_pdg == -12){
+            nu = "nue_bar_";
+        }
         else {
-            nu = "nu_out_fv_or_unknown_";
+            nu = "unknown_";
         }
 
         // The interaction type

@@ -228,8 +228,8 @@ public:
     float opfilter_pe_veto;
     
     int   nu_pdg;      // True neutrino PDG
-    int   ccnc;        // CC or NC Interaction
-    int   interaction; // Interaction code from GENIE                -- empty???
+    int   ccnc;        // True CC or NC Interaction
+    int   interaction; // True Interaction code from GENIE
     float nu_e;        // True Neutrino Energy [GeV]
     float nu_pt;       // True Neutrino Transverse Energy of Interaction
     float theta;       // True Neutrino Theta
@@ -289,7 +289,7 @@ public:
     float pion_c;   // Pion Completeness
     float pion_p;   // Pion Purity
     
-    int   nslice;     // Number of Slices
+    int   nslice;     // Reco Number of Slices
     int   crtveto;    // CRT Veto
     float crthitpe;   // CRT Hit PE
     int   category;   // Truth Category
@@ -297,27 +297,27 @@ public:
     int   pass;
     int   swtrig;     // Software Trigger
     int   evnhits;
-    int   slpdg;      // Slice PDG of primary PFP
-    int   slnhits;    // Slice Number of Hits within it
-    int   n_pfps;     // Number of pfp's
-    int   n_tracks;   // Number of Tracks
-    int   n_showers;  // Number of Showers
+    int   slpdg;      // Reco Slice PDG of primary PFP
+    int   slnhits;    // Reco Slice Number of Hits within it
+    int   n_pfps;     // Reco?? Number of pfp's
+    int   n_tracks;   // Reco?? Number of Tracks
+    int   n_showers;  // Reco?? Number of Showers
     
     int   hits_u;
     int   hits_v;
     int   hits_y;
     
-    float topological_score;  // Topological Score
-    float slclustfrac;        // Fraction of Clustered hits in the slice
+    float topological_score;  // Reco Topological Score
+    float slclustfrac;        // Reco Fraction of Clustered hits in the slice
     float endmuonmichel;
     int   filter_antibdt;
     int   filter_ncpi0;
     int   filter_pi0;
     int   filter_ccinclusive;
-    float flash_pe;                     // Flash PE
-    float flash_time;                   // Flash Time
-    float nu_flashmatch_score;          // Neutrino Flashmatch Score
-    float best_cosmic_flashmatch_score; // Best Cosmic Flashmatch Score
+    float flash_pe;                     // Reco Flash PE
+    float flash_time;                   // Reco Flash Time
+    float nu_flashmatch_score;          // Reco Neutrino Flashmatch Score
+    float best_cosmic_flashmatch_score; // Reco Best Cosmic Flashmatch Score
     
     float NeutrinoEnergy0;
     float NeutrinoEnergy1;

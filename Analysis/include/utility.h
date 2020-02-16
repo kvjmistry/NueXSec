@@ -33,9 +33,10 @@
 class utility{
 
 public:
+    // -------------------------------------------------------------------------
     // Default Constructor
     utility();
-    // ---------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Function to configure the cut values from main.h
     std::vector<double> configure_cuts( double _x1,
                                         double _x2,
@@ -74,6 +75,10 @@ public:
     // Get a histogram from a file
     bool GetHist(TFile* f, TH1D* &h, TString string);
     // -------------------------------------------------------------------------
+    // Function to tabulate all the nuetrino types and flavours
+    void Tabulate(std::string interaction, std::string classification, int type, std::vector<int> &counter_v);
+    // -------------------------------------------------------------------------
+
 
     // Other definitions for code
 
@@ -98,6 +103,7 @@ public:
                 k_cuts_MAX
                 }; 
 
+    // Genie interaction enums
     enum interactions {
         k_qe  = 0,
         k_res = 1,
@@ -123,6 +129,7 @@ public:
                 k_classifications_MAX
                 };
     
+    // The PeLEE teams classifciation of events
     enum pandora_classification {
         k_pandora_nu_e_other = 1,
         k_pandora_nu_e_cc0pi0p = 10,
@@ -141,6 +148,36 @@ public:
     enum CCNC {
         k_CC,
         k_NC
+    };
+
+    // enum for counter vector
+    enum counters {
+        k_count_total_nue_cc_qe,
+        k_count_total_nue_cc_res,
+        k_count_total_nue_cc_dis,
+        k_count_total_nue_cc_coh,
+        k_count_total_nue_cc_mec,
+        k_count_only_nue_cc,
+        k_count_only_nue_bar_cc,
+        k_count_numu_cc_qe,
+        k_count_numu_cc_res,
+        k_count_numu_cc_dis,
+        k_count_numu_cc_coh,
+        k_count_numu_cc_mec,
+        
+        k_count_nue_cc,
+        k_count_nue_cc_mixed,
+        k_count_nu_out_fv,
+        k_count_cosmic,
+        k_count_numu_cc,
+        k_count_numu_cc_pi0,
+        k_count_nc,
+        k_count_nc_pi0,
+        k_count_unmatched,
+        k_count_total,
+        k_count_data,
+        k_count_ext,
+        k_count_dirt
     };
 
 }; // End Class Utility

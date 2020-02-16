@@ -152,18 +152,18 @@ void selection::make_selection(){
             // Get the entry in the tree
             mc_tree->GetEntry(ievent); // TPC Objects
 
+            // Classify the event
+            std::string classification = mc_SC.SliceClassifier(_util.k_mc);      // Classification of the event
+            std::string interaction    = mc_SC.SliceInteractionType(_util.k_mc); // Genie interaction type
+            std::string category       = mc_SC.SliceCategory();                  // The pandora group slice category
+
             // if (mc_SC.slpdg > 0) std::cout << "run: " << mc_SC.run << "  subrun: " << mc_SC.sub << "  event: " << mc_SC.evt << std::endl;
             // if (mc_SC.slpdg > 0) std::cout << "slpdg: " << mc_SC.slpdg << "  topo score: " << mc_SC.topological_score << std::endl;
             // if (mc_SC.slpdg > 0) std::cout << "Category: " << mc_SC.category << "   interaction: "<< mc_SC.interaction << "   Purity: " << mc_SC.nu_purity_from_pfp <<   std::endl;
             // if (mc_SC.slpdg > 0) std::cout << "ccnc: "<< mc_SC.ccnc << std::endl;
+            // if (mc_SC.slpdg < 0) std::cout << "Classification: " << classification  << "  Category: " << category2 << std::endl;
 
-            int category       = mc_SC.category;
-            std::string classification = mc_SC.SliceClassifier(_util.k_mc);
-            std::string category2      = mc_SC.SliceCategory();
-
-            if (mc_SC.slpdg < 0) std::cout << "Classification: " << classification  << "  Category: " << category2 << std::endl;
-
-            if (mc_SC.slpdg > 0) std::cout << "Interaction: " <<  mc_SC.SliceInteractionType(_util.k_mc) << std::endl;
+            if (mc_SC.slpdg < 0) std::cout << "Interaction: " <<  mc_SC.SliceInteractionType(_util.k_mc) << std::endl;
         }
 
         std::cout << std::endl;
