@@ -14,6 +14,7 @@ int main(int argc, char *argv[]){
     char * data_file_name        = (char *)"empty";
     char * dirt_file_name        = (char *)"empty";
     char * variation_file_name   = (char *)"empty";
+    int num_events{-1};
 
     // -------------------------------------------------------------------------
     // Loop over input arguments
@@ -70,8 +71,16 @@ int main(int argc, char *argv[]){
             variation_file_name = argv[i+1];
             std::string variation_type = variation_file_name;
         }
+
+        // Max number of events specified?
+        if(strcmp(arg, "-n") == 0){
+            std::cout << "Running with a maximum of : " << argv[i+1] << " events" <<std::endl;
+            num_events = atoi(argv[i+1]);
+        }
+
+
         if (strcmp(arg, "--h") == 0 || strcmp(arg, "-h") == 0|| strcmp(arg, "--help") == 0 || strcmp(arg, "--usage") == 0){
-            std::cout << " \n ./nuexsec --mc <mc file> [--data <data file>] [--ext <ext file>] [--dirt <dirt file>] [--var <variation file>] [-c <input config file>] [--slim] [--hist] \n " << std::endl; 
+            std::cout << " \n ./nuexsec --mc <mc file> [--data <data file>] [--ext <ext file>] [--dirt <dirt file>] [--var <variation file>] [-c <input config file>] [-n <num events>] [--slim] [--hist] \n " << std::endl; 
             exit(1);
         }
         
@@ -146,7 +155,7 @@ int main(int argc, char *argv[]){
     // -------------------------------------------------------------------------
 
     // Initialise the selction script
-    _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config, using_slim_version );
+    _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config, using_slim_version, num_events );
 
     // now save all the outputs to file
     // if (!using_slim_version) _selection_instance.xsecSelection::selection::SavetoFile();

@@ -8,7 +8,8 @@ void selection::Initialise( const char * mc_file,
                             const char * dirt_file,
                             const char * variation_file,
                             const std::vector<double> _config,
-                            bool _slim){
+                            bool _slim,
+                            int num_events){
     
     std::cout << "\nInitialising..." << std::endl;
     if (_slim){
@@ -17,6 +18,9 @@ void selection::Initialise( const char * mc_file,
         std::cout << "-------------------------------\033[0m" << std::endl;
         slim = _slim;
     }
+
+    // Set the maximum number of events tp process
+    if (num_events > 0 ) max_events = num_events;
 
     // Resize the selection cuts/histogram helper instance vectors, one instance per type e.g MC, data, ..
     _scuts.resize(_util.k_type_MAX);
@@ -136,10 +140,6 @@ void selection::Initialise( const char * mc_file,
 void selection::make_selection(){
     std::cout << "Now Running the selection!"<< std::endl;
     
-    // *************************************************************************
-    //  ----- Loop over the TPC Objects and Apply the selection cuts -----------
-    // *************************************************************************
-
     // MC ----------------------------------------------------------------------
     if (bool_use_mc){
         std::cout << "Starting Selection over MC" << std::endl;
@@ -148,6 +148,11 @@ void selection::make_selection(){
 
         // Event loop
         for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
+
+            // See if we want to process all the events
+            if (max_events > 0){
+                if (ievent >= max_events) break;
+            }
 
             // Alert the user
             if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
@@ -160,7 +165,7 @@ void selection::make_selection(){
             std::string interaction    = mc_SC.SliceInteractionType(_util.k_mc); // Genie interaction type
             std::string category       = mc_SC.SliceCategory();                  // The pandora group slice category
 
-            std::cout << "Interaction: " <<  interaction << "   classification: " << classification << std::endl;
+            std::cout << "Interaction: " <<  interaction << "   classification: " << classification << "   category: " << category<< std::endl;
             _util.Tabulate(interaction, classification, _util.k_mc, counter_test);
 
             // if (mc_SC.slpdg > 0) std::cout << "run: " << mc_SC.run << "  subrun: " << mc_SC.sub << "  event: " << mc_SC.evt << std::endl;
@@ -182,6 +187,11 @@ void selection::make_selection(){
         std::cout << "Starting Selection over Data" << std::endl;
 
         for (int ievent = 0; ievent < data_tree_total_entries; ievent++){
+
+            // See if we want to process all the events
+            if (max_events > 0){
+                if (ievent >= max_events) break;
+            }
 
             // Alert the user
             if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
