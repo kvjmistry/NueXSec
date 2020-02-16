@@ -1,0 +1,3 @@
+#include "run_flashvalidation.fcl"
+
+physics.analyzers.FlashValidate.Mode: "MC"

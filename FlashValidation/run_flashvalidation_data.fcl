@@ -1,0 +1,4 @@
+#include "run_flashvalidation.fcl"
+
+physics.analyzers.FlashValidate.Mode: "Data"
+
