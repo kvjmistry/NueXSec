@@ -1,6 +1,0 @@
-#include "run_nue_xsec.fcl"
-
-# Override the default configurations
-physics.producers.ProduceMCGhost.Mode: "Overlay"
-physics.producers.ProduceTPCO.Mode:    "Overlay"
-physics.analyzers.AnalyzeTPCO.Mode:    "Overlay"
