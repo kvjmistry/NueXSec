@@ -78,7 +78,9 @@ public:
     // Function to tabulate all the nuetrino types and flavours
     void Tabulate(std::string interaction, std::string classification, int type, std::vector<int> &counter_v);
     // -------------------------------------------------------------------------
-
+    // Function to print the tabulated events
+    void PrintInfo(std::vector<int> counter_v, double intime_scale_factor, double data_scale_factor, double dirt_scale_factor, std::string cut_name);
+    // -------------------------------------------------------------------------
 
     // Other definitions for code
 
@@ -164,6 +166,7 @@ public:
         k_count_numu_cc_dis,
         k_count_numu_cc_coh,
         k_count_numu_cc_mec,
+        k_count_tot_nue_numu_nc,
         
         k_count_nue_cc,
         k_count_nue_cc_mixed,
@@ -177,7 +180,8 @@ public:
         k_count_total,
         k_count_data,
         k_count_ext,
-        k_count_dirt
+        k_count_dirt,
+        k_COUNTER_MAX
     };
 
 }; // End Class Utility
