@@ -71,3 +71,4 @@ scripts/selected_events_for_truth_script_dirt.txt
 scripts/run_var_bkg.sh
 xsecAna/custom_run_subrun_list_data.txt
 *.gch
+nuexsec
