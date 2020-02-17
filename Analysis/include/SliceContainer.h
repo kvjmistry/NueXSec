@@ -22,7 +22,7 @@ public:
     void Initialise(TTree* tree);
     // -------------------------------------------------------------------------
     // Function to classify the slice
-    std::string SliceClassifier(int type);
+    std::pair<std::string, int>  SliceClassifier(int type);
     // -------------------------------------------------------------------------
     // Returns the Category defined by the pandora team 
     // (can be used as a cross check or making similar plots to them)

@@ -135,21 +135,6 @@ void histogram_helper::Initialise(int type){
 void histogram_helper::InitHistograms(){
     
     // -------------------------------------------------------------------------
-    // Flash Histograms
-    // h_flash_time_v.resize(k_flash_MAX);
-    // for (unsigned int i=0; i < h_flash_time_v.size();i++){
-    //     h_flash_time_v.at(i) = new TH1D ( Form("h_flash_time_%s", type_prefix.at(i).c_str()) ,"", 80, 0, 20);
-    // }
-
-    // -------------------------------------------------------------------------
-    // Reco Vtx ZY
-    // h_reco_vtx_zy.resize(k_vertex_MAX);
-
-    // for (unsigned int i=0; i < h_reco_vtx_zy.size();i++){
-    //     h_reco_vtx_zy.at(i) = new TH2D ( Form("h_reco_vtx_zy_%s", vertex_strings.at(i).c_str()) ,"", 40, 0, 1038, 40, -117, 117);
-    // }
-
-    // -------------------------------------------------------------------------
     // Reco Vtx X, Y, Z
     h_reco_vtx_x.resize(_util.k_cuts_MAX);
     h_reco_vtx_y.resize(_util.k_cuts_MAX);
@@ -158,14 +143,8 @@ void histogram_helper::InitHistograms(){
     // dEdx
     h_reco_dEdx.resize(_util.k_cuts_MAX);
 
-    // Largest flash Z
-    h_largest_flash_z.resize(_util.k_cuts_MAX);
-
     // Leading Shower Momentum
     h_reco_leading_mom.resize(_util.k_cuts_MAX);
-
-    // 2D distance largest flash to reco nu vertex
-    h_reco_flash_to_vtx_dist.resize(_util.k_cuts_MAX);
 
     // 2D distance shower vertex to reco nu vertex
     h_reco_shower_to_vtx_dist.resize(_util.k_cuts_MAX);
@@ -220,14 +199,8 @@ void histogram_helper::InitHistograms(){
         // dEdx
         h_reco_dEdx.at(i).resize(_util.k_classifications_MAX);
 
-        // Largest flash Z
-        h_largest_flash_z.at(i).resize(_util.k_classifications_MAX);
-
         // Leading Shower Momentum
         h_reco_leading_mom.at(i).resize(_util.k_classifications_MAX);
-
-        // 2D distance largest flash to reco nu vertex
-        h_reco_flash_to_vtx_dist.at(i).resize(_util.k_classifications_MAX);
 
         // 2D distance shower vertex to reco nu vertex
         h_reco_shower_to_vtx_dist.at(i).resize(_util.k_classifications_MAX);
@@ -282,14 +255,8 @@ void histogram_helper::InitHistograms(){
             // dEdx
             h_reco_dEdx.at(i).at(j) = new TH1D ( Form("h_reco_dEdx_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
 
-            // Largest flash Z
-            h_largest_flash_z.at(i).at(j) = new TH1D ( Form("h_largest_flash_z_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 100, 0, 1040);
-
             // Leading Shower Momentum
             h_reco_leading_mom.at(i).at(j) = new TH1D ( Form("h_reco_leading_mom_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 2);
-
-            // 2D distance largest flash to reco nu vertex
-            h_reco_flash_to_vtx_dist.at(i).at(j) = new TH1D ( Form("h_reco_flash_to_vtx_dist._%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 200);
 
             // 2D distance shower vertex to reco nu vertex
             h_reco_shower_to_vtx_dist.at(i).at(j) = new TH1D ( Form("h_reco_shower_to_vtx_dist_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 20);
@@ -338,9 +305,110 @@ void histogram_helper::InitHistograms(){
 
 }
 // -----------------------------------------------------------------------------
+void histogram_helper::FillReco(int classification_index, int cut_index, SliceContainer &SC){
 
+
+    // Now fill the histograms!
+    h_reco_vtx_x.at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x);
+    h_reco_vtx_y.at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_y);
+    h_reco_vtx_z.at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_z);
+
+    // h_reco_dEdx.at(cut_index).at(classification_index)->Fill(); // Just the collection plane!
+    
+    // h_reco_leading_mom.at(cut_index).at(classification_index)->Fill();
+    
+    // h_reco_shower_to_vtx_dist.at(cut_index).at(classification_index)->Fill();
+
+    // h_reco_track_to_vtx_dist.at(cut_index).at(classification_index)->Fill();
+    
+    // h_reco_leading_shower_hits_all_planes.at(cut_index).at(classification_index)->Fill();
+    
+    h_reco_leading_shower_hits_collection_plane.at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot);
+
+    // h_reco_secondary_shower_to_vtx_dist.at(cut_index).at(classification_index)->Fill();
+    
+    h_reco_leading_shower_open_angle.at(cut_index).at(classification_index)->Fill(SC.shr_openangle * 180/3.14159);
+    
+    // h_reco_leading_shower_hits_per_length.at(cut_index).at(classification_index)->Fill();
+    
+    // h_reco_longest_track_leading_shower_length.at(cut_index).at(classification_index)->Fill();
+    
+    // h_reco_track_contained.at(cut_index).at(classification_index)->Fill(); // We fill this once per tpc obj (only 1 track has to pass)
+    
+    h_reco_leading_shower_phi.at(cut_index).at(classification_index)->Fill(SC.shr_phi * 180/3.14159);
+    
+    h_reco_leading_shower_theta.at(cut_index).at(classification_index)->Fill(SC.shr_theta * 180/3.14159);
+    
+    h_reco_leading_shower_cos_theta.at(cut_index).at(classification_index)->Fill(std::cos(SC.shr_theta));
+    
+    // h_reco_shower_multiplicity.at(cut_index).at(classification_index)->Fill();
+    
+    // h_reco_track_multiplicity.at(cut_index).at(classification_index)->Fill();
+
+}
 // -----------------------------------------------------------------------------
+void histogram_helper::WriteReco(int type){
 
+    f_nuexsec->cd();
+
+    bool bool_dir;
+    TDirectory *truth_dir; // e.g MC/Truth, Data/Truth, EXT/Truth
+    bool break_early{false};
+
+    // loop over the cut directories
+    for (unsigned int i = 0; i < _util.cut_dirs.size(); i++){
+
+        // loop over the classification directories
+        for (unsigned int j = 0; j < _util.classification_dirs.size(); j++){
+
+            // Choose which folder to fill in based on the type
+            if (type == _util.k_mc && ( j == _util.k_leg_data || j == _util.k_leg_ext || j == _util.k_leg_dirt)){ 
+                break;
+            }
+            if (type == _util.k_data){ 
+                j = _util.k_leg_data;
+                break_early = true;
+            }
+            if (type == _util.k_ext){ 
+                j = _util.k_leg_ext;
+                break_early = true;
+            }
+            if (type == _util.k_dirt){ 
+                j= _util.k_leg_dirt;
+                break_early = true;
+            }
+
+            // Get the classification directory and cd
+            bool_dir = _util.GetDirectory(f_nuexsec, truth_dir ,Form("%s/%s/%s/%s", _util.type_prefix.at(type).c_str(), "Stack", _util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str() ) );
+            
+            if (bool_dir) truth_dir->cd();
+
+            // Now write the histograms
+            h_reco_vtx_x.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_vtx_y.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_vtx_z.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_dEdx .at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_leading_mom.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_shower_to_vtx_dist.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_track_to_vtx_dist.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_leading_shower_hits_all_planes.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_leading_shower_hits_collection_plane.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_leading_shower_open_angle.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_secondary_shower_to_vtx_dist.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_leading_shower_hits_per_length.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_longest_track_leading_shower_length.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_track_contained.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_leading_shower_phi.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_leading_shower_theta.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_leading_shower_cos_theta.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_shower_multiplicity.at(i).at(j)->Write("",TObject::kOverwrite);
+            h_reco_track_multiplicity.at(i).at(j)->Write("",TObject::kOverwrite);
+
+            if (break_early) break;
+        }
+
+    }
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

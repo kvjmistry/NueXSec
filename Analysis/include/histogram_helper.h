@@ -2,6 +2,7 @@
 #define HISTOGRAM_HELPER_h
 
 #include "selection_cuts.h"
+#include "SliceContainer.h"
 
 // Class for filling and saving histograms. 
 class histogram_helper{
@@ -31,7 +32,13 @@ class histogram_helper{
     // Function to make the directory hirarchy
     void MakeDirectory(std::string type);
     // -------------------------------------------------------------------------
+    // Function to fill the reco variables
+    void FillReco(int classification_index, int cut_index, SliceContainer &SC);
     // -------------------------------------------------------------------------
+    // Function to write the histograms to a file
+    void WriteReco(int type);
+    // -------------------------------------------------------------------------
+
     private:
 
     // Here we create the histograms
@@ -44,10 +51,6 @@ class histogram_helper{
     // TH2D * h_nue_true_energy_phi   = new TH2D("h_nue_true_energy_phi",   "True Nue; Theta [degrees]; Phi [degrees]", 20,   0, 10,  14, -180, 180);
     // TH2D * h_ele_true_energy_theta = new TH2D("h_ele_true_energy_theta", "True e; Theta [degrees]; Theta [degrees]", 20,   0, 10,  14,    0, 180);
     // TH2D * h_ele_true_energy_phi   = new TH2D("h_ele_true_energy_phi",   "True e; Theta [degrees]; Phi [degrees]",   20,   0, 10,  14, -180, 180);
-
-    // Optical Plots
-    std::vector<TH1D*> h_flash_time_v;
-    std::vector<std::vector<TH1D*>> h_largest_flash_z; // Largest flash Z --
    
     // RecoPlots
     std::vector<std::vector<TH1D*>> h_reco_vtx_x; // Reco Vertex X
@@ -57,9 +60,6 @@ class histogram_helper{
 
     // Leading Shower Momentum
     std::vector<std::vector<TH1D*>> h_reco_leading_mom;
-
-    // 2D distance largest flash to reco nu vertex
-    std::vector<std::vector<TH1D*>> h_reco_flash_to_vtx_dist;
 
     // 2D distance shower vertex to reco nu vertex
     std::vector<std::vector<TH1D*>> h_reco_shower_to_vtx_dist;

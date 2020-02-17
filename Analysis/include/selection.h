@@ -117,7 +117,9 @@ namespace xsecSelection {
             void make_selection();
             // -----------------------------------------------------------------
             // Template code to apply selection cuts
-            bool ApplyCuts();
+            bool ApplyCuts(int type, int ievent,std::vector<std::vector<int>> &counter_v,
+                           std::vector<Passed_Container> &passed_v, SliceContainer SC,
+                           std::string classification, std::string interaction);
             // -----------------------------------------------------------------
             // Function to save all written histograms to file
             void SavetoFile();

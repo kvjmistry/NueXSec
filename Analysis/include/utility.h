@@ -97,9 +97,7 @@ public:
 
     // Names of the plot types
     std::vector<std::string> plot_types = {
-                "Truth",
-                "Reco",
-                "Optical",
+                "2D",
                 "Stack"
                 };
 
@@ -130,7 +128,7 @@ public:
                 }; 
 
     // Genie interaction enums
-    enum interactions {
+    enum enum_interactions {
         k_qe  = 0,
         k_res = 1,
         k_dis = 2,
@@ -139,7 +137,7 @@ public:
     };
 
     // enums for legend
-    enum legend {
+    enum enum_classification {
                 k_nue_cc,
                 k_nue_cc_mixed,
                 k_nu_out_fv,
@@ -156,7 +154,7 @@ public:
                 };
     
     // The PeLEE teams classifciation of events
-    enum pandora_classification {
+    enum enum_pandora_classification {
         k_pandora_nu_e_other = 1,
         k_pandora_nu_e_cc0pi0p = 10,
         k_pandora_nu_e_cc0pinp = 11,
@@ -171,13 +169,13 @@ public:
     };
 
     // enums for checking if CC or NC interaction
-    enum CCNC {
+    enum enum_CCNC {
         k_CC,
         k_NC
     };
 
     // enum for counter vector
-    enum counters {
+    enum enum_counters {
         k_count_total_nue_cc_qe,
         k_count_total_nue_cc_res,
         k_count_total_nue_cc_dis,

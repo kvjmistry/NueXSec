@@ -67,6 +67,9 @@ void selection::Initialise( const char * mc_file,
             mc_counter_v.at(t).resize(_util.k_COUNTER_MAX, 0);
         }
 
+        // Resize the Passed vector
+        mc_passed_v.resize(mc_tree_total_entries);
+
         std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of MC Complete!" << std::endl;
         std::cout << "\033[0;31m-------------------------------\033[0m" << std::endl;
@@ -94,6 +97,8 @@ void selection::Initialise( const char * mc_file,
             data_counter_v.at(t).resize(_util.k_COUNTER_MAX, 0);
         }
 
+        // Resize the Passed vector
+        data_passed_v.resize(data_tree_total_entries);
 
         std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of Data Complete!" << std::endl;
@@ -124,6 +129,9 @@ void selection::Initialise( const char * mc_file,
             ext_counter_v.at(t).resize(_util.k_COUNTER_MAX, 0);
         }
 
+        // Resize the Passed vector
+        ext_passed_v.resize(ext_tree_total_entries);
+
         std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of EXT Complete!" << std::endl;
         std::cout << "\033[0;31m-------------------------------\033[0m" << std::endl;
@@ -152,6 +160,9 @@ void selection::Initialise( const char * mc_file,
         for (unsigned int t = 0; t < dirt_counter_v.size(); t++){
             dirt_counter_v.at(t).resize(_util.k_COUNTER_MAX, 0);
         }
+
+        // Resize the Passed vector
+        dirt_passed_v.resize(dirt_tree_total_entries);
 
         std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of Dirt Complete!" << std::endl;
@@ -187,13 +198,15 @@ void selection::make_selection(){
             mc_tree->GetEntry(ievent); // TPC Objects
 
             // Classify the event
-            std::string classification = mc_SC.SliceClassifier(_util.k_mc);      // Classification of the event
-            std::string interaction    = mc_SC.SliceInteractionType(_util.k_mc); // Genie interaction type
-            std::string category       = mc_SC.SliceCategory();                  // The pandora group slice category
+            std::pair<std::string, int> classification = mc_SC.SliceClassifier(_util.k_mc);      // Classification of the event
+            std::string interaction                    = mc_SC.SliceInteractionType(_util.k_mc); // Genie interaction type
+            std::string category                       = mc_SC.SliceCategory();                  // The pandora group slice category
 
             // std::cout << "Interaction: " <<  interaction << "   classification: " << classification << "   category: " << category<< std::endl;
             
-            _util.Tabulate(interaction, classification, _util.k_mc, mc_counter_v.at(_util.k_unselected) );
+            _util.Tabulate(interaction, classification.first, _util.k_mc, mc_counter_v.at(_util.k_unselected) );
+
+            if (!slim) _hhelper.at(_util.k_mc).FillReco(classification.second, _util.k_unselected, mc_SC);
 
             // if (mc_SC.slpdg > 0) std::cout << "run: " << mc_SC.run << "  subrun: " << mc_SC.sub << "  event: " << mc_SC.evt << std::endl;
             // if (mc_SC.slpdg > 0) std::cout << "slpdg: " << mc_SC.slpdg << "  topo score: " << mc_SC.topological_score << std::endl;
@@ -202,6 +215,11 @@ void selection::make_selection(){
             // if (mc_SC.slpdg < 0) std::cout << "Classification: " << classification  << "  Category: " << category2 << std::endl;
 
             // if (mc_SC.slpdg < 0) std::cout << "Interaction: " <<  mc_SC.SliceInteractionType(_util.k_mc) << std::endl;
+
+            // Apply the selection cuts 
+            bool pass = ApplyCuts(_util.k_mc, ievent, mc_counter_v, mc_passed_v, mc_SC, classification.first, interaction);
+            // if (!pass) continue;
+
         } // End Event loop
 
         std::cout << std::endl;
@@ -213,6 +231,10 @@ void selection::make_selection(){
                              mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_dis) + 
                              mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_coh) + 
                              mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_mec);
+
+        std::cout << "-------------------------------" << std::endl;
+        std::cout << "Total Nue's in the Cryostat: " << tot_true_cryo_nues << std::endl;
+        std::cout << "-------------------------------" << std::endl;
 
         _util.PrintInfo(mc_counter_v.at(_util.k_unselected), intime_scale_factor, data_scale_factor, dirt_scale_factor, _util.cut_dirs.at(_util.k_unselected), mc_counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc));
     }
@@ -262,8 +284,16 @@ void selection::make_selection(){
     return;
 } // End Selection
 // -----------------------------------------------------------------------------
-bool selection::ApplyCuts(){
+bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<int>> &counter_v,
+                           std::vector<Passed_Container> &passed_v, SliceContainer SC,
+                           std::string classification, std::string interaction){
 
+    // Here we apply the selection cuts ----------------------------------------
+    bool pass; // A flag to see if an event passes an event
+
+
+    // *************************************************************************
+    // Pandora Output ----------------------------------------------------------
     // *************************************************************************
 
     // *************************************************************************
@@ -273,28 +303,26 @@ bool selection::ApplyCuts(){
 // -----------------------------------------------------------------------------
 void selection::SavetoFile(){
 
-    // // Now saving histograms to file
-    // std::cout << "Now Saving Histograms to file" << std::endl;
-    // if (bool_use_mc) {
-    //     _hhelper.WriteMCTruth("MC");
-    //     _hhelper.WriteOptical(_util.k_mc);
-    //     _hhelper.WriteReco(_util.k_mc);
-    // }
-    // if (bool_use_data) {
-    //     _hhelper.WriteOptical(_util.k_data);
-    //     _hhelper.WriteReco(_util.k_data);
-    // }
-    // if (bool_use_ext) {
-    //     _hhelper.WriteOptical(_util.k_ext);
-    //     _hhelper.WriteReco(_util.k_ext);
-    // }
-    // if (bool_use_dirt) {
-    //     _hhelper.WriteMCTruth("Dirt");
-    //     _hhelper.WriteOptical(_util.k_dirt);
-    //     _hhelper.WriteReco(_util.k_dirt);
-    // }
-
-    
+    // Now saving histograms to file
+    std::cout << "Now Saving Histograms to file" << std::endl;
+    if (bool_use_mc) {
+        // _hhelper.WriteMCTruth("MC");
+        // _hhelper.WriteOptical(_util.k_mc);
+        _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
+    }
+    if (bool_use_data) {
+        // _hhelper.WriteOptical(_util.k_data);
+        _hhelper.at(_util.k_data).WriteReco(_util.k_data);
+    }
+    if (bool_use_ext) {
+        // _hhelper.WriteOptical(_util.k_ext);
+        _hhelper.at(_util.k_ext).WriteReco(_util.k_ext);
+    }
+    if (bool_use_dirt) {
+        // _hhelper.WriteMCTruth("Dirt");
+        // _hhelper.WriteOptical(_util.k_dirt);
+        _hhelper.at(_util.k_data).WriteReco(_util.k_dirt);
+    }
 
 } // End save to file
 // -----------------------------------------------------------------------------

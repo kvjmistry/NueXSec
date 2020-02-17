@@ -343,13 +343,13 @@ void SliceContainer::Initialise(TTree *tree){
 
 }
 // -----------------------------------------------------------------------------
-std::string SliceContainer::SliceClassifier(int type){
+std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
     
     // MC Specific classsifications
     if (type == _util.k_mc){
 
         // Out of Fiducial Volume Event
-        if (!isVtxInFiducial) return "nu_out_fv";
+        if (!isVtxInFiducial) return std::make_pair("nu_out_fv",_util.k_nu_out_fv);
 
         // Charged Current 
         if (ccnc == _util.k_CC){
@@ -357,49 +357,49 @@ std::string SliceContainer::SliceClassifier(int type){
             // NuMu CC
             if (nu_pdg == 14 || nu_pdg == -14){
                 
-                if (npi0 > 0) return "numu_cc_pi0"; // has a pi0
-                else return "numu_cc";
+                if (npi0 > 0) return std::make_pair("numu_cc_pi0", _util.k_numu_cc_pi0); // has a pi0
+                else return std::make_pair("numu_cc",_util.k_numu_cc);
 
             }
             // Nue CC
             else if (nu_pdg == 12 || nu_pdg == -12){
 
                 // Check if the neutrino has a purity > 50%
-                if (nu_purity_from_pfp > 0.5) return "nue_cc";
+                if (nu_purity_from_pfp > 0.5) return std::make_pair("nue_cc",_util.k_nue_cc);
                
                 // Classify as a cosmic
-                else return "cosmic";
+                else return std::make_pair("cosmic",_util.k_cosmic);
 
             }
             // Unknown Neutrino Type
             else {
                 std::cout << "Unknown Neutrino Type..." << std::endl;
-                return "unknown";
+                return std::make_pair("unmatched",_util.k_unmatched);
             }
 
         }
         // Neutral Current
         else {
-            if (npi0 > 0) return "nc_pi0";
-            else return "nc";
+            if (npi0 > 0) return std::make_pair("nc_pi0",_util.k_nc_pi0);
+            else return std::make_pair("nc",_util.k_nc);
         }
 
     }
     // Data
     else if (type == _util.k_data){
-        return "Data";
+        return std::make_pair("data",_util.k_leg_data);
     }
     // EXT
     else if (type == _util.k_ext){
-        return "EXT";
+        return std::make_pair("ext",_util.k_leg_ext);
         
     }
     // Dirt
     else if (type == _util.k_dirt){
-        return "Dirt";
+        return std::make_pair("dirt",_util.k_leg_dirt);
     }
     // What is this type?
-    else return "unknown";
+    else return std::make_pair("unmatched",_util.k_unmatched);
     
 }
 // -----------------------------------------------------------------------------
