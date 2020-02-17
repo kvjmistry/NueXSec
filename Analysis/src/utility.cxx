@@ -253,7 +253,7 @@ void utility::Tabulate(std::string interaction, std::string classification, int 
     
 }
 // -----------------------------------------------------------------------------
-void utility::PrintInfo(std::vector<int> counter_v, double intime_scale_factor, double data_scale_factor, double dirt_scale_factor, std::string cut_name, int tot_true_cryo_nues) {
+void utility::PrintInfo(std::vector<int> counter_v, double intime_scale_factor, double data_scale_factor, double dirt_scale_factor, std::string cut_name, int tot_true_infv_nues) {
 
     int counter_nue_cc_qe      = counter_v.at(k_count_total_nue_cc_qe);
     int counter_nue_cc_res     = counter_v.at(k_count_total_nue_cc_res);
@@ -324,9 +324,9 @@ void utility::PrintInfo(std::vector<int> counter_v, double intime_scale_factor, 
                                                   counter_tot_nue_numu_nc << std::endl;
 
     std::cout << "------------------------------------------------" << std::endl;
-    const double efficiency = double(counter_nue_cc) / double(tot_true_cryo_nues);
-    const double purity = double(counter_nue_cc) / double(counter);
-    std::cout << " Efficiency       : " << "( " << counter_nue_cc << " / " << tot_true_cryo_nues << " ) = " << efficiency << std::endl;
+    const double efficiency = double(counter_nue_cc) / double(tot_true_infv_nues);
+    const double purity     = double(counter_nue_cc) / double(counter);
+    std::cout << " Efficiency       : " << "( " << counter_nue_cc << " / " << tot_true_infv_nues << " ) = " << efficiency << std::endl;
     std::cout << " Purity           : " << "( " << counter_nue_cc << " / " << counter           << " ) = " << purity << std::endl;
 }
 // -----------------------------------------------------------------------------

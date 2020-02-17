@@ -207,13 +207,14 @@ void selection::make_selection(){
         std::cout << std::endl;
         std::cout << "Ending Selection over MC" << std::endl;
 
+        // Get the total number of in cryostat nues
         tot_true_cryo_nues = mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_qe)  + 
                              mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_res) + 
                              mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_dis) + 
                              mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_coh) + 
                              mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_mec);
 
-        _util.PrintInfo(mc_counter_v.at(_util.k_unselected), intime_scale_factor, data_scale_factor, dirt_scale_factor, _util.cut_dirs.at(_util.k_unselected), tot_true_cryo_nues );
+        _util.PrintInfo(mc_counter_v.at(_util.k_unselected), intime_scale_factor, data_scale_factor, dirt_scale_factor, _util.cut_dirs.at(_util.k_unselected), mc_counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc));
     }
     // Data --------------------------------------------------------------------
     if (bool_use_data){
