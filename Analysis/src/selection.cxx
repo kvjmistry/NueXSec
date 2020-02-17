@@ -50,7 +50,7 @@ void selection::Initialise( const char * mc_file,
         std::cout << "\nInitialising MC" << std::endl;
         _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
 
-        // Initialise all the data slice container
+        // Initialise all the mc slice container
         mc_SC.Initialise(mc_tree);
 
         // Initialise the histogram helper
@@ -59,6 +59,13 @@ void selection::Initialise( const char * mc_file,
         
         mc_tree_total_entries = mc_tree->GetEntries();
         std::cout << "Total MC Events:         " << mc_tree_total_entries << std::endl;
+
+        // Resize the counter vector
+        mc_counter_v.resize(_util.k_COUNTER_MAX);
+
+        for (unsigned int t = 0; t < mc_counter_v.size(); t++){
+            mc_counter_v.at(t).resize(_util.k_COUNTER_MAX, 0);
+        }
 
         std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of MC Complete!" << std::endl;
@@ -79,6 +86,13 @@ void selection::Initialise( const char * mc_file,
         
         data_tree_total_entries = data_tree->GetEntries();
         std::cout << "Total Data Events:         " << data_tree_total_entries << std::endl;
+
+        // Resize the counter vector
+        data_counter_v.resize(_util.k_COUNTER_MAX);
+
+        for (unsigned int t = 0; t < data_counter_v.size(); t++){
+            data_counter_v.at(t).resize(_util.k_COUNTER_MAX, 0);
+        }
 
 
         std::cout << "-------------------------------" << std::endl;
@@ -103,6 +117,13 @@ void selection::Initialise( const char * mc_file,
         ext_tree_total_entries = ext_tree->GetEntries();
         std::cout << "Total MC Events:         " << ext_tree_total_entries << std::endl;
 
+        // Resize the counter vector
+        ext_counter_v.resize(_util.k_COUNTER_MAX);
+
+        for (unsigned int t = 0; t < ext_counter_v.size(); t++){
+            ext_counter_v.at(t).resize(_util.k_COUNTER_MAX, 0);
+        }
+
         std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of EXT Complete!" << std::endl;
         std::cout << "\033[0;31m-------------------------------\033[0m" << std::endl;
@@ -125,6 +146,13 @@ void selection::Initialise( const char * mc_file,
         dirt_tree_total_entries = dirt_tree->GetEntries();
         std::cout << "Total MC Events:         " << dirt_tree_total_entries << std::endl;
 
+        // Resize the counter vector
+        dirt_counter_v.resize(_util.k_COUNTER_MAX);
+
+        for (unsigned int t = 0; t < dirt_counter_v.size(); t++){
+            dirt_counter_v.at(t).resize(_util.k_COUNTER_MAX, 0);
+        }
+
         std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of Dirt Complete!" << std::endl;
         std::cout << "\033[0;31m-------------------------------\033[0m" << std::endl;
@@ -143,8 +171,6 @@ void selection::make_selection(){
     // MC ----------------------------------------------------------------------
     if (bool_use_mc){
         std::cout << "Starting Selection over MC" << std::endl;
-
-        std::vector<int> counter_test;
 
         // Event loop
         for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
@@ -165,8 +191,9 @@ void selection::make_selection(){
             std::string interaction    = mc_SC.SliceInteractionType(_util.k_mc); // Genie interaction type
             std::string category       = mc_SC.SliceCategory();                  // The pandora group slice category
 
-            std::cout << "Interaction: " <<  interaction << "   classification: " << classification << "   category: " << category<< std::endl;
-            _util.Tabulate(interaction, classification, _util.k_mc, counter_test);
+            // std::cout << "Interaction: " <<  interaction << "   classification: " << classification << "   category: " << category<< std::endl;
+            
+            _util.Tabulate(interaction, classification, _util.k_mc, mc_counter_v.at(_util.k_unselected) );
 
             // if (mc_SC.slpdg > 0) std::cout << "run: " << mc_SC.run << "  subrun: " << mc_SC.sub << "  event: " << mc_SC.evt << std::endl;
             // if (mc_SC.slpdg > 0) std::cout << "slpdg: " << mc_SC.slpdg << "  topo score: " << mc_SC.topological_score << std::endl;
@@ -180,7 +207,13 @@ void selection::make_selection(){
         std::cout << std::endl;
         std::cout << "Ending Selection over MC" << std::endl;
 
-        _util.PrintInfo(counter_test,1 ,1 , 1, "unselected");
+        tot_true_cryo_nues = mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_qe)  + 
+                             mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_res) + 
+                             mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_dis) + 
+                             mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_coh) + 
+                             mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_mec);
+
+        _util.PrintInfo(mc_counter_v.at(_util.k_unselected), intime_scale_factor, data_scale_factor, dirt_scale_factor, _util.cut_dirs.at(_util.k_unselected), tot_true_cryo_nues );
     }
     // Data --------------------------------------------------------------------
     if (bool_use_data){

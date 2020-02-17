@@ -80,29 +80,52 @@ public:
     void Tabulate(std::string interaction, std::string classification, int type, std::vector<int> &counter_v);
     // -------------------------------------------------------------------------
     // Function to print the tabulated events
-    void PrintInfo(std::vector<int> counter_v, double intime_scale_factor, double data_scale_factor, double dirt_scale_factor, std::string cut_name);
+    void PrintInfo(std::vector<int> counter_v, double intime_scale_factor, double data_scale_factor, double dirt_scale_factor, std::string cut_name, int tot_true_cryo_nues);
     // -------------------------------------------------------------------------
 
     // Other definitions for code
 
     // For creating histogram names
-    std::vector<std::string> type_prefix;
+    std::vector<std::string> type_prefix = {"MC", "Data", "EXT", "Dirt"};
 
     // Cut directory names
-    std::vector<std::string> cut_dirs;
+    std::vector<std::string> cut_dirs = {
+            "Unselected",  // Unselected
+            "In_FV"        // Fiducial volume
+            };
+
 
     // Names of the plot types
-    std::vector<std::string> plot_types;
+    std::vector<std::string> plot_types = {
+                "Truth",
+                "Reco",
+                "Optical",
+                "Stack"
+                };
 
     // Names of the classifications
-    std::vector<std::string> classification_dirs;
+    std::vector<std::string> classification_dirs = {
+                "nue_cc",
+                "nue_cc_mixed",
+                "nu_out_fv",
+                "cosmic",
+                "numu_cc",
+                "numu_cc_pi0",
+                "nc",
+                "nc_pi0",
+                "unmatched",
+                "ext",
+                "data",
+                "dirt"
+                };
 
     // enum to switch file type 
     enum type {k_mc, k_data, k_ext, k_dirt, k_variation, k_type_MAX}; 
 
     // enums for cut dirs
     enum enum_cut_dirs {
-                k_in_fv,                           // Fiducial volume
+                k_unselected, // Unselected 
+                k_in_fv,      // Fiducial volume
                 k_cuts_MAX
                 }; 
 

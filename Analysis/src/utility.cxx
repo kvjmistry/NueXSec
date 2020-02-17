@@ -101,45 +101,9 @@ bool utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     }
 }
 // -----------------------------------------------------------------------------
-utility::utility(){
-    // For creating histogram names
-    std::vector<std::string> type_prefix = {"MC", "Data", "EXT", "Dirt"};
-
-    // Cut directory names
-    std::vector<std::string> cut_dirs = {
-            "In_FV"                            // Fiducial volume
-            };
-
-
-    // Names of the plot types
-    std::vector<std::string> plot_types = {
-                "Truth",
-                "Reco",
-                "Optical",
-                "Stack"
-                };
-
-    // Names of the classifications
-    std::vector<std::string> classification_dirs = {
-                "nue_cc",
-                "nue_cc_mixed",
-                "nu_out_fv",
-                "cosmic",
-                "numu_cc",
-                "numu_cc_pi0",
-                "nc",
-                "nc_pi0",
-                "unmatched",
-                "ext",
-                "data",
-                "dirt"
-                };
-
-}
+utility::utility(){}
 // -----------------------------------------------------------------------------
 void utility::Tabulate(std::string interaction, std::string classification, int type, std::vector<int> &counter_v) {
-    
-    if (counter_v.size() == 0) counter_v.resize(k_COUNTER_MAX, 0);
 
     if (type == k_mc){
         
@@ -289,8 +253,8 @@ void utility::Tabulate(std::string interaction, std::string classification, int 
     
 }
 // -----------------------------------------------------------------------------
-void utility::PrintInfo(std::vector<int> counter_v, double intime_scale_factor, double data_scale_factor, double dirt_scale_factor, std::string cut_name) {
-    
+void utility::PrintInfo(std::vector<int> counter_v, double intime_scale_factor, double data_scale_factor, double dirt_scale_factor, std::string cut_name, int tot_true_cryo_nues) {
+
     int counter_nue_cc_qe      = counter_v.at(k_count_total_nue_cc_qe);
     int counter_nue_cc_res     = counter_v.at(k_count_total_nue_cc_res);
     int counter_nue_cc_dis     = counter_v.at(k_count_total_nue_cc_dis);
@@ -360,9 +324,9 @@ void utility::PrintInfo(std::vector<int> counter_v, double intime_scale_factor, 
                                                   counter_tot_nue_numu_nc << std::endl;
 
     std::cout << "------------------------------------------------" << std::endl;
-    // const double efficiency = double(counter_nue_cc) / double(mc_nue_cc_counter);
-    // const double purity = double(counter_nue_cc) / double(counter);
-    // std::cout << " Efficiency       : " << "( " << counter_nue_cc << " / " << mc_nue_cc_counter << " ) = " << efficiency << std::endl;
-    // std::cout << " Purity           : " << "( " << counter_nue_cc << " / " << counter           << " ) = " << purity << std::endl;
+    const double efficiency = double(counter_nue_cc) / double(tot_true_cryo_nues);
+    const double purity = double(counter_nue_cc) / double(counter);
+    std::cout << " Efficiency       : " << "( " << counter_nue_cc << " / " << tot_true_cryo_nues << " ) = " << efficiency << std::endl;
+    std::cout << " Purity           : " << "( " << counter_nue_cc << " / " << counter           << " ) = " << purity << std::endl;
 }
 // -----------------------------------------------------------------------------

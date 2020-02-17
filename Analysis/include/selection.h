@@ -69,7 +69,6 @@ namespace xsecSelection {
             SliceContainer ext_SC;
             SliceContainer dirt_SC;
 
-
             // Selection Cut Values
             bool   detector_variations;
 
@@ -85,16 +84,19 @@ namespace xsecSelection {
             std::vector<Passed_Container> dirt_passed_v; // Dirt Passed Container
             
             // Counter Containers
-            std::vector<std::vector<double>> mc_counter_v;
-            std::vector<std::vector<double>> data_counter_v;
-            std::vector<std::vector<double>> ext_counter_v;
-            std::vector<std::vector<double>> dirt_counter_v;
+            std::vector<std::vector<int>> mc_counter_v;
+            std::vector<std::vector<int>> data_counter_v;
+            std::vector<std::vector<int>> ext_counter_v;
+            std::vector<std::vector<int>> dirt_counter_v;
 
             // Counter variables
-            int mc_tree_total_entries{0};       // MC
+            int mc_tree_total_entries{0};    // MC
             int data_tree_total_entries{0};  // Data
             int ext_tree_total_entries{0};   // EXT
             int dirt_tree_total_entries{0};  // Dirt
+
+            // Total nue's in the cryostat
+            int tot_true_cryo_nues;
 
         public:
             // -----------------------------------------------------------------
