@@ -1,17 +1,9 @@
-##include "services_microboone.fcl"
-#include "messageservice.fcl"
-#include "time_memory_tracker_microboone.fcl"
-
 process_name : FlashValidation
 
 services:
 {
   TFileService: {fileName: "flash_validation.root"}
-  #@table::microboone_services_reco
-  #@table::microboone_full_services
-  #message:       @local::microboone_message_services_prod_debug
 }
-#end services
 
 source:
 {
@@ -40,11 +32,3 @@ physics:
   trigger_paths: []
   end_paths: [analysis]
 }
-
-
-#we need these services to properly get the hits!
-#services.DetectorPropertiesService.NumberTimeSamples:        6400
-#services.DetectorPropertiesService.ReadOutWindowSize:        6400
-#services.DetectorClocksService.InheritClockConfig:           false
-#services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
-#services.DetectorClocksService.TrigModuleName:               "daq"

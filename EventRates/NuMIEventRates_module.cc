@@ -20,76 +20,18 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 
-//cetlib
-#include "cetlib/cpu_timer.h"
-#include "cetlib_except/exception.h"
 
-// LArSoft Includes
-
-// larcore
-#include "larcore/Geometry/Geometry.h"
-
-// larcorealg
-#include "larcorealg/Geometry/PlaneGeo.h"
-#include "larcorealg/Geometry/WireGeo.h"
-
-// larcoreobj
-#include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::Compress_t, raw::Channel_t
 #include "larcoreobj/SummaryData/POTSummary.h"
-#include "larcoreobj/SimpleTypesAndConstants/geo_types.h"
-#include "lardataobj/AnalysisBase/ParticleID_VariableTypeEnums.h"
-
-// lardata
-#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
-#include "lardata/DetectorInfoServices/LArPropertiesService.h"
-#include "lardata/DetectorInfoServices/DetectorClocksService.h"
-#include "lardata/Utilities/AssociationUtil.h"
-#include "lardata/Utilities/GeometryUtilities.h"
-
-// lardataobj
-#include "lardataobj/AnalysisBase/BackTrackerMatchingData.h"
-#include "lardataobj/AnalysisBase/Calorimetry.h"
-#include "lardataobj/RecoBase/Cluster.h"
-#include "lardataobj/AnalysisBase/ParticleID.h"
-#include "lardataobj/AnalysisBase/T0.h"
-#include "lardataobj/RecoBase/Hit.h"
-#include "lardataobj/MCBase/MCTrack.h"
-#include "lardataobj/RecoBase/OpFlash.h"
-#include "lardataobj/RecoBase/OpHit.h"
-#include "lardataobj/RecoBase/PFParticle.h"
-#include "lardataobj/Simulation/SimChannel.h"
-#include "lardataobj/RecoBase/SpacePoint.h"
-#include "lardataobj/RecoBase/Track.h"
-#include "lardataobj/RecoBase/Shower.h"
-#include "lardataobj/RecoBase/Vertex.h"
-
-// larsim
-#include "larsim/MCCheater/ParticleInventoryService.h"
-
-// nusim
 #include "nusimdata/SimulationBase/MCParticle.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "nusimdata/SimulationBase/GTruth.h"
 
-// nutools
-#include "nutools/ParticleNavigation/ParticleList.h"
-#include "nutools/ParticleNavigation/EveIdCalculator.h"
-
-// C++ Includes
-#include <cmath>
-#include <map>
-#include <iostream>
-#include <algorithm>
 
 // ROOT includes
 #include "TH1.h" 
 #include "TH2.h" 
 #include "TTree.h" 
-#include "TDatabasePDG.h" 
-#include "TParticlePDG.h" 
-#include "TCanvas.h" 
-#include "TF1.h" 
-#include "TMath.h"
+
 
 #define PI 3.14159265
 
@@ -126,13 +68,8 @@ private:
     std::string fMC_Particle_Module_Label;
     std::string fMC_Truth_Module_Label;
 
-    // SW Trigger product label
-    std::string fSoftware_Trigger_Algo;
-    std::string fSoftware_Trigger_Module_Label;
-
     // POT product labels
     std::string _potsum_producer_mc;
-    std::string _potsum_producer_data;
     std::string _potsum_instance;
     
     // Histograms
@@ -203,13 +140,9 @@ NuMIEventRates::NuMIEventRates(fhicl::ParameterSet const& p) : EDAnalyzer{p} {
     fMC_Particle_Module_Label = p.get<std::string>("MCParticleModuleLabel");
     fMC_Truth_Module_Label    = p.get<std::string>("MCTruthModuleLabel");
 
-    // SW Trigger product label
-    // fSoftware_Trigger_Algo         = p.get<std::string>("SoftwareTriggerAlgo");
-    // fSoftware_Trigger_Module_Label = p.get<std::string>("SoftwareTriggerModuleLabel");
-
     // POT product labels
-    _potsum_producer_mc             = p.get<std::string>("POTSummaryProducerMC");
-	_potsum_instance                = p.get<std::string>("POTSummaryInstance");
+    _potsum_producer_mc       = p.get<std::string>("POTSummaryProducerMC");
+	_potsum_instance          = p.get<std::string>("POTSummaryInstance");
 
 }
 //______________________________________________________________________________

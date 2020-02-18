@@ -1,26 +1,14 @@
-##include "geometry.fcl"
-##include "services_microboone.fcl"
-##include "messageservice.fcl"
-##include "mctruthmatching_uboone.fcl"
-##include "mctruthassociations_uboone.fcl"
-
 process_name : NuMIEventRatesProcess
 
 services:
 {
   TFileService: {fileName: "NuMI_EventRate.root"}
-  #@table::microboone_simulation_services
-  #BackTrackerService:                       @local::microboone_backtrackerservice
-  #ParticleInventoryService:                 @local::standard_particleinventoryservice
-  #Geometry:                                 @local::standard_geo
-}#end services
+}
 
 source:
 {
   module_type: RootInput
   maxEvents: -1
-  firstRun: 1
-  firstEvent: 1
 }
 
 physics:
@@ -31,71 +19,12 @@ physics:
     {
 
       module_type: "NuMIEventRates"
-
-      #MCTruthMatching:     @local::BackTrackerTruthTool
-      #MCTruthAssociations: @local::MCTruthAssociations
-
-      #SoftwareTriggerModuleLabel:        "swtrigger"
-
-      #TrackModuleLabel:                  "pandoraTrack"
-      # TrackModuleLabel:                  "pandora"
-
-      #ShowerModuleLabel:                 "pandoraShower"
-      # ShowerModuleLabel:                 "pandora"
-
-      HitModuleLabel:                    "gaushit"
-      # BeamFlashModuleLabel:              "simpleFlashBeam"
-      # CosmicFlashModuleLabel:            "simpleFlashCosmic"
-      # BeamOpHitModuleLabel:              "ophitBeam"
-      # CosmicOpHitModuleLabel:            "ophitCosmic"
-
-      #VertexModuleLabel:                 "pandoraTrack"
-      # VertexModuleLabel:                 "pandora"
-
-      #PFParticleModuleLabel:             "pandoraTrack"
-      # PFParticleModuleLabel:             "pandora"
-
-      MCParticleModuleLabel:             "largeant"
-      MCParticleToMCTruthAssModuleLabel: "largeant"
-      MCTruthModuleLabel:                "generator"
-      # GTruthModuleLabel:                 "generator"
-
-      #CalorimetryModuleLabel:            "pandoraTrackcalo"
-      #CalorimetryModuleLabel:            "pandoracalo"
-      #CalorimetryModuleLabel:            "pandoracali"
-      # CalorimetryModuleLabel:            "pandoracaliSCE"
-
-      #PIDaModuleLabel:                   "pandoraTrackpid"
-      #PIDaModuleLabel:                   "pandorapid"
-      #PIDaModuleLabel:                   "pandoracalipid"
-      # PIDaModuleLabel:                   "pandoracalipidSCE"
-
-      # MCSFitResultModuleLabel:           "pandoraMCSMu"
-
-      #HitsPerTrackAssModuleLabel:        "pandoraTrack"
-      HitsPerTrackAssModuleLabel:        "pandora"
-
-      #VertexToPFParticleAssModuleLabel:  "pandoraTrack"
-      # VertexToPFParticleAssModuleLabel:  "pandora"
-
-      #PFParticleToVertexAssModuleLabel:  "pandoraTrack"
-      # PFParticleToVertexAssModuleLabel:  "pandora"
-
-      #PFParticleToTrackAssModuleLabel:   "pandoraTrack"
-      # PFParticleToTrackAssModuleLabel:   "pandora"
-
-      #TrackToPFParticleAssModuleLabel:   "pandoraTrack"
-      # TrackToPFParticleAssModuleLabel:   "pandora"
-
-      # SoftwareTriggerAlgo:               "NUMI_FEMBeamTriggerAlgo"
-
-      POTSummaryProducerMC: "generator"
-      # POTSummaryProducerData: "beamdata"
-      POTSummaryInstance: ""
+      MCParticleModuleLabel: "largeant"
+      MCTruthModuleLabel:    "generator"
+      POTSummaryProducerMC:  "generator"
+      POTSummaryInstance:    ""
     }
   }
   analysis: [NuMIEventRates]
   end_paths: [analysis]
 }
-
-#services.DetectorClocksService.InheritClockConfig: false
