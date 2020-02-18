@@ -101,8 +101,6 @@ bool utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     }
 }
 // -----------------------------------------------------------------------------
-utility::utility(){}
-// -----------------------------------------------------------------------------
 void utility::Tabulate(std::string interaction, std::string classification, int type, std::vector<int> &counter_v) {
 
     if (type == k_mc){

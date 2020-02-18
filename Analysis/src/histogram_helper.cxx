@@ -348,7 +348,7 @@ void histogram_helper::WriteReco(int type){
         // loop over the classification directories
         for (unsigned int j = 0; j < _util.classification_dirs.size(); j++){
 
-            // Choose which folder to fill in based on the type
+            // Choose which folder to fill in based on the type (a re-mapping of enums)
             if (type == _util.k_mc && ( j == _util.k_leg_data || j == _util.k_leg_ext || j == _util.k_leg_dirt)){ 
                 break;
             }

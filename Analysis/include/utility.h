@@ -35,9 +35,6 @@ class utility{
 
 public:
     // -------------------------------------------------------------------------
-    // Default Constructor
-    utility();
-    // -------------------------------------------------------------------------
     // Function to configure the cut values from main.h
     std::vector<double> configure_cuts( double _x1,
                                         double _x2,
@@ -155,17 +152,17 @@ public:
     
     // The PeLEE teams classifciation of events
     enum enum_pandora_classification {
-        k_pandora_nu_e_other = 1,
+        k_pandora_nu_e_other   = 1,
         k_pandora_nu_e_cc0pi0p = 10,
         k_pandora_nu_e_cc0pinp = 11,
-        k_pandora_nu_mu_other = 2,
-        k_pandora_nu_mu_pi0 = 21,
-        k_pandora_nc = 3,
-        k_pandora_nc_pi0 = 31,
-        k_pandora_cosmic = 4,
-        k_pandora_outfv = 5,
-        k_pandora_other = 6,
-        k_pandora_data = 0
+        k_pandora_nu_mu_other  = 2,
+        k_pandora_nu_mu_pi0    = 21,
+        k_pandora_nc           = 3,
+        k_pandora_nc_pi0       = 31,
+        k_pandora_cosmic       = 4,
+        k_pandora_outfv        = 5,
+        k_pandora_other        = 6,
+        k_pandora_data         = 0
     };
 
     // enums for checking if CC or NC interaction
