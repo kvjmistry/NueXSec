@@ -233,7 +233,7 @@ public:
     float nu_e;        // True Neutrino Energy [GeV]
     float nu_pt;       // True Neutrino Transverse Energy of Interaction
     float theta;       // True Neutrino Theta
-    bool  isVtxInFiducial; // True Neutrino Vertex in FV?
+    bool  isVtxInFiducial; // True Neutrino Vertex in FV
     
     // Is the truth information contained? 
     // Require all track start/end point in FV and showers deposit > 60% of energy
@@ -390,6 +390,164 @@ public:
     float bdt_ext;
     float bdt_cosmic;
     float bdt_global;
+
+    std::vector<float> *pfp_generation_v          = nullptr;
+    std::vector<float> *pfp_trk_daughters_v       = nullptr;
+    std::vector<float> *pfp_shr_daughters_v       = nullptr;
+    std::vector<float> *trk_score_v               = nullptr;
+    std::vector<float> *pfpdg_v                   = nullptr;
+    std::vector<float> *pfnhits_v                 = nullptr;
+    std::vector<float> *pfnplanehits_U_v          = nullptr;
+    std::vector<float> *pfnplanehits_V_v          = nullptr;
+    std::vector<float> *pfnplanehits_Y_v          = nullptr;
+    std::vector<float> *pfpplanesubclusters_U_v   = nullptr;
+    std::vector<float> *pfpplanesubclusters_V_v   = nullptr;
+    std::vector<float> *pfpplanesubclusters_Y_v   = nullptr;
+    std::vector<float> *pfpplanesubhitfracmax_U_v = nullptr;
+    std::vector<float> *pfpplanesubhitfracmax_V_v = nullptr;
+    std::vector<float> *pfpplanesubhitfracmax_Y_v = nullptr;
+    
+    std::vector<int>   *mc_pdg_v  = nullptr;
+    std::vector<float> *mc_E_v    = nullptr;
+    std::vector<float> *mc_vx_v   = nullptr;
+    std::vector<float> *mc_vy_v   = nullptr;
+    std::vector<float> *mc_vz_v   = nullptr;
+    std::vector<float> *mc_endx_v = nullptr;
+    std::vector<float> *mc_endy_v = nullptr;
+    std::vector<float> *mc_endz_v = nullptr;
+    std::vector<float> *mc_px_v   = nullptr;
+    std::vector<float> *mc_py_v   = nullptr;
+    std::vector<float> *mc_pz_v   = nullptr;
+    std::vector<float> *mc_completeness_v = nullptr;
+    std::vector<float> *mc_purity_v       = nullptr;
+    
+    std::map<std::string, std::vector<double>> *weights_v = nullptr;
+    std::vector<double> *weightsFlux_v   = nullptr;
+    std::vector<double> *weightsGenie_v  = nullptr;
+    std::vector<double> *weightsReint_v  = nullptr;
+    
+    std::vector<float> *cosmic_flashmatch_score_v = nullptr;
+    std::vector<float> *peSpectrum_v              = nullptr;
+    std::vector<float> *peHypothesisNu_v          = nullptr;
+    std::vector<float> *peHypothesisCosmic_v      = nullptr;
+    
+    std::vector<float> *shr_dedx_u_v        = nullptr;
+    std::vector<float> *shr_dedx_v_v        = nullptr;
+    std::vector<float> *shr_dedx_y_v        = nullptr;
+    std::vector<float> *shr_energy_u_v      = nullptr;
+    std::vector<float> *shr_energy_v_v      = nullptr;
+    std::vector<float> *shr_energy_y_v      = nullptr;
+    std::vector<size_t> *shr_pfp_id_v       = nullptr;
+    std::vector<float> *shr_start_x_v       = nullptr;
+    std::vector<float> *shr_start_y_v       = nullptr;
+    std::vector<float> *shr_start_z_v       = nullptr;
+    std::vector<float> *shr_dist_v          = nullptr;
+    std::vector<float> *shr_start_U_v       = nullptr;
+    std::vector<float> *shr_start_V_v       = nullptr;
+    std::vector<float> *shr_px_v            = nullptr;
+    std::vector<float> *shr_py_v            = nullptr;
+    std::vector<float> *shr_pz_v            = nullptr;
+    std::vector<float> *shr_openangle_v     = nullptr;
+    std::vector<float> *shr_theta_v         = nullptr;
+    std::vector<float> *shr_phi_v           = nullptr;
+    std::vector<float> *shr_pitch_u_v       = nullptr;
+    std::vector<float> *shr_pitch_v_v       = nullptr;
+    std::vector<float> *shr_pitch_y_v       = nullptr;
+    std::vector<int> *shr_tkfit_nhits_v     = nullptr;
+    std::vector<float> *shr_tkfit_start_x_v = nullptr;
+    std::vector<float> *shr_tkfit_start_y_v = nullptr;
+    std::vector<float> *shr_tkfit_start_z_v = nullptr;
+    std::vector<float> *shr_tkfit_start_U_v = nullptr;
+    std::vector<float> *shr_tkfit_start_V_v = nullptr;
+    std::vector<float> *shr_tkfit_theta_v   = nullptr;
+    std::vector<float> *shr_tkfit_phi_v     = nullptr;
+    std::vector<float> *shr_tkfit_pitch_u_v = nullptr;
+    std::vector<float> *shr_tkfit_pitch_v_v = nullptr;
+    std::vector<float> *shr_tkfit_pitch_y_v = nullptr;
+    std::vector<float> *shr_tkfit_dedx_u_v  = nullptr;
+    std::vector<float> *shr_tkfit_dedx_v_v  = nullptr;
+    std::vector<float> *shr_tkfit_dedx_y_v  = nullptr;
+    std::vector<float> *shr_tkfit_gap10_dedx_u_v = nullptr;
+    std::vector<float> *shr_tkfit_gap10_dedx_v_v = nullptr;
+    std::vector<float> *shr_tkfit_gap10_dedx_y_v = nullptr;
+    std::vector<float> *shr_tkfit_dedx_nhits_u_v = nullptr;
+    std::vector<float> *shr_tkfit_dedx_nhits_v_v = nullptr;
+    std::vector<float> *shr_tkfit_dedx_nhits_y_v = nullptr;
+    std::vector<float> *shr_llr_pid_u_v     = nullptr;
+    std::vector<float> *shr_llr_pid_v_v     = nullptr;
+    std::vector<float> *shr_llr_pid_y_v     = nullptr;
+    std::vector<float> *shr_llr_pid_v       = nullptr;
+    std::vector<float> *shr_llr_pid_score_v = nullptr;
+    std::vector<float> *shr_moliere_avg_v   = nullptr;
+    std::vector<float> *shr_moliere_rms_v   = nullptr;
+    // std::vector<float> *shr_spacepoint_start_x_v = nullptr;
+    // std::vector<float> *shr_spacepoint_start_y_v = nullptr;
+    // std::vector<float> *shr_spacepoint_start_z_v = nullptr;
+    // std::vector<float> *shr_spacepoint_start_U_v = nullptr;
+    // std::vector<float> *shr_spacepoint_start_V_v = nullptr;
+    // std::vector<float> *shr_hits_start_U_wire_v = nullptr;
+    // std::vector<float> *shr_hits_start_U_x_v = nullptr;
+    // std::vector<float> *shr_hits_start_V_wire_v = nullptr;
+    // std::vector<float> *shr_hits_start_V_x_v = nullptr;
+    // std::vector<float> *shr_hits_start_Y_wire_v = nullptr;
+    // std::vector<float> *shr_hits_start_Y_x_v = nullptr;
+
+    std::vector<float> *trk_bragg_p_v     = nullptr;
+    std::vector<float> *trk_bragg_mu_v    = nullptr;
+    std::vector<float> *trk_bragg_mip_v   = nullptr;
+    std::vector<float> *trk_pida_v        = nullptr;
+    std::vector<float> *trk_pid_chipr_v   = nullptr;
+    std::vector<float> *trk_pid_chipi_v   = nullptr;
+    std::vector<float> *trk_pid_chika_v   = nullptr;
+    std::vector<float> *trk_pid_chimu_v   = nullptr;
+    std::vector<float> *trk_bragg_p_u_v   = nullptr;
+    std::vector<float> *trk_bragg_mu_u_v  = nullptr;
+    std::vector<float> *trk_bragg_mip_u_v = nullptr;
+    std::vector<float> *trk_pida_u_v      = nullptr;
+    std::vector<float> *trk_pid_chipr_u_v = nullptr;
+    std::vector<float> *trk_pid_chipi_u_v = nullptr;
+    std::vector<float> *trk_pid_chika_u_v = nullptr;
+    std::vector<float> *trk_pid_chimu_u_v = nullptr;
+    std::vector<float> *trk_bragg_p_v_v   = nullptr;
+    std::vector<float> *trk_bragg_mu_v_v  = nullptr;
+    std::vector<float> *trk_bragg_mip_v_v = nullptr;
+    std::vector<float> *trk_pida_v_v      = nullptr;
+    std::vector<float> *trk_pid_chipr_v_v = nullptr;
+    std::vector<float> *trk_pid_chipi_v_v = nullptr;
+    std::vector<float> *trk_pid_chika_v_v = nullptr;
+    std::vector<float> *trk_pid_chimu_v_v = nullptr;
+    std::vector<size_t> *trk_pfp_id_v     = nullptr;
+    std::vector<float> *trk_dir_x_v       = nullptr;
+    std::vector<float> *trk_dir_y_v       = nullptr;
+    std::vector<float> *trk_dir_z_v       = nullptr;
+    std::vector<float> *trk_start_x_v     = nullptr;
+    std::vector<float> *trk_start_y_v     = nullptr;
+    std::vector<float> *trk_start_z_v     = nullptr;
+    std::vector<float> *trk_sce_start_x_v = nullptr;
+    std::vector<float> *trk_sce_start_y_v = nullptr;
+    std::vector<float> *trk_sce_start_z_v = nullptr;
+    std::vector<float> *trk_end_x_v       = nullptr;
+    std::vector<float> *trk_end_y_v       = nullptr;
+    std::vector<float> *trk_end_z_v       = nullptr;
+    std::vector<float> *trk_sce_end_x_v   = nullptr;
+    std::vector<float> *trk_sce_end_y_v   = nullptr;
+    std::vector<float> *trk_sce_end_z_v   = nullptr;
+    std::vector<float> *trk_distance_v    = nullptr;
+    std::vector<float> *trk_theta_v       = nullptr;
+    std::vector<float> *trk_phi_v         = nullptr;
+    std::vector<float> *trk_len_v         = nullptr;
+    std::vector<float> *trk_mcs_muon_mom_v   = nullptr;
+    std::vector<float> *trk_range_muon_mom_v = nullptr;
+    std::vector<float> *trk_energy_proton_v  = nullptr;
+    std::vector<float> *trk_energy_muon_v    = nullptr;
+    std::vector<float> *trk_calo_energy_u_v  = nullptr;
+    std::vector<float> *trk_calo_energy_v_v  = nullptr;
+    std::vector<float> *trk_calo_energy_y_v  = nullptr;
+    std::vector<float> *trk_llr_pid_u_v      = nullptr;
+    std::vector<float> *trk_llr_pid_v_v      = nullptr;
+    std::vector<float> *trk_llr_pid_y_v      = nullptr;
+    std::vector<float> *trk_llr_pid_v        = nullptr;
+    std::vector<float> *trk_llr_pid_score_v  = nullptr;
     
 };
 

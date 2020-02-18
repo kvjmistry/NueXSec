@@ -1,3 +1,5 @@
+#include "services_microboone.fcl"
+
 process_name : NuMIEventRatesProcess
 
 services:

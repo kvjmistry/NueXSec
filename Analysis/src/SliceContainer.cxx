@@ -335,12 +335,178 @@ void SliceContainer::Initialise(TTree *tree){
     // tree->SetBranchAddress("vtx_fit_tkfit_y", &vtx_fit_tkfit_y);
     // tree->SetBranchAddress("vtx_fit_tkfit_z", &vtx_fit_tkfit_z);
     
-    tree->SetBranchAddress("bdt_nuNCpi0", &bdt_nuNCpi0);
+    tree->SetBranchAddress("bdt_nuNCpi0",   &bdt_nuNCpi0);
     tree->SetBranchAddress("bdt_numuCCpi0", &bdt_numuCCpi0);
-    tree->SetBranchAddress("bdt_numuCC", &bdt_numuCC);
-    tree->SetBranchAddress("bdt_ext",    &bdt_ext);
-    tree->SetBranchAddress("bdt_cosmic", &bdt_cosmic);
-    tree->SetBranchAddress("bdt_global", &bdt_global);
+    tree->SetBranchAddress("bdt_numuCC",    &bdt_numuCC);
+    tree->SetBranchAddress("bdt_ext",       &bdt_ext);
+    tree->SetBranchAddress("bdt_cosmic",    &bdt_cosmic);
+    tree->SetBranchAddress("bdt_global",    &bdt_global);
+
+    tree->SetBranchAddress("pfp_generation_v",        &pfp_generation_v);
+    tree->SetBranchAddress("pfp_trk_daughters_v",     &pfp_trk_daughters_v);
+    tree->SetBranchAddress("pfp_shr_daughters_v",     &pfp_shr_daughters_v);
+    tree->SetBranchAddress("trk_score_v",             &trk_score_v);
+    tree->SetBranchAddress("pfpdg",                   &pfpdg_v);
+    tree->SetBranchAddress("pfnhits",                 &pfnhits_v);
+    tree->SetBranchAddress("pfnplanehits_U",          &pfnplanehits_U_v);
+    tree->SetBranchAddress("pfnplanehits_V",          &pfnplanehits_V_v);
+    tree->SetBranchAddress("pfnplanehits_Y",          &pfnplanehits_Y_v);
+    tree->SetBranchAddress("pfpplanesubclusters_U",   &pfpplanesubclusters_U_v);
+    tree->SetBranchAddress("pfpplanesubclusters_V",   &pfpplanesubclusters_V_v);
+    tree->SetBranchAddress("pfpplanesubclusters_Y",   &pfpplanesubclusters_Y_v);
+    tree->SetBranchAddress("pfpplanesubhitfracmax_U", &pfpplanesubhitfracmax_U_v);
+    tree->SetBranchAddress("pfpplanesubhitfracmax_V", &pfpplanesubhitfracmax_V_v);
+    tree->SetBranchAddress("pfpplanesubhitfracmax_Y", &pfpplanesubhitfracmax_Y_v);
+    
+    tree->SetBranchAddress("mc_pdg",          &mc_pdg_v);
+    tree->SetBranchAddress("mc_E",            &mc_E_v);
+    tree->SetBranchAddress("mc_vx",           &mc_vx_v);
+    tree->SetBranchAddress("mc_vy",           &mc_vy_v);
+    tree->SetBranchAddress("mc_vz",           &mc_vz_v);
+    tree->SetBranchAddress("mc_endx",         &mc_endx_v);
+    tree->SetBranchAddress("mc_endy",         &mc_endy_v);
+    tree->SetBranchAddress("mc_endz",         &mc_endz_v);
+    tree->SetBranchAddress("mc_px",           &mc_px_v);
+    tree->SetBranchAddress("mc_py",           &mc_py_v);
+    tree->SetBranchAddress("mc_pz",           &mc_pz_v);
+    tree->SetBranchAddress("mc_completeness", &mc_completeness_v);
+    tree->SetBranchAddress("mc_purity",       &mc_purity_v);
+    
+    tree->SetBranchAddress("weights",         &weights_v);
+    tree->SetBranchAddress("weightsFlux",     &weightsFlux_v);
+    tree->SetBranchAddress("weightsGenie",    &weightsGenie_v);
+    tree->SetBranchAddress("weightsReint",    &weightsReint_v);
+    
+    tree->SetBranchAddress("cosmic_flashmatch_score_v",&cosmic_flashmatch_score_v);
+    // tree->SetBranchAddress("peSpectrum",               &peSpectrum_v);
+    // tree->SetBranchAddress("peHypothesisNu",           &peHypothesisNu_v);
+    // tree->SetBranchAddress("peHypothesisCosmic",       &peHypothesisCosmic_v);
+    
+    tree->SetBranchAddress("shr_dedx_u_v",             &shr_dedx_u_v);
+    tree->SetBranchAddress("shr_dedx_v_v",             &shr_dedx_v_v);
+    tree->SetBranchAddress("shr_dedx_y_v",             &shr_dedx_y_v);
+    tree->SetBranchAddress("shr_energy_u_v",           &shr_energy_u_v);
+    tree->SetBranchAddress("shr_energy_v_v",           &shr_energy_v_v);
+    tree->SetBranchAddress("shr_energy_y_v",           &shr_energy_y_v);
+    tree->SetBranchAddress("shr_pfp_id_v",             &shr_pfp_id_v);
+    tree->SetBranchAddress("shr_start_x_v",            &shr_start_x_v);
+    tree->SetBranchAddress("shr_start_y_v",            &shr_start_y_v);
+    tree->SetBranchAddress("shr_start_z_v",            &shr_start_z_v);
+    tree->SetBranchAddress("shr_dist_v",               &shr_dist_v);
+    tree->SetBranchAddress("shr_start_U_v",            &shr_start_U_v);
+    tree->SetBranchAddress("shr_start_V_v",            &shr_start_V_v);
+    tree->SetBranchAddress("shr_px_v",                 &shr_px_v);
+    tree->SetBranchAddress("shr_py_v",                 &shr_py_v);
+    tree->SetBranchAddress("shr_pz_v",                 &shr_pz_v);
+    tree->SetBranchAddress("shr_openangle_v",          &shr_openangle_v);
+    tree->SetBranchAddress("shr_theta_v",              &shr_theta_v);
+    tree->SetBranchAddress("shr_phi_v",                &shr_phi_v);
+    tree->SetBranchAddress("shr_pitch_u_v",            &shr_pitch_u_v);
+    tree->SetBranchAddress("shr_pitch_v_v",            &shr_pitch_v_v);
+    tree->SetBranchAddress("shr_pitch_y_v",            &shr_pitch_y_v);
+    tree->SetBranchAddress("shr_tkfit_nhits_v",        &shr_tkfit_nhits_v);
+    tree->SetBranchAddress("shr_tkfit_start_x_v",      &shr_tkfit_start_x_v);
+    tree->SetBranchAddress("shr_tkfit_start_y_v",      &shr_tkfit_start_y_v);
+    tree->SetBranchAddress("shr_tkfit_start_z_v",      &shr_tkfit_start_z_v);
+    tree->SetBranchAddress("shr_tkfit_start_U_v",      &shr_tkfit_start_U_v);
+    tree->SetBranchAddress("shr_tkfit_start_V_v",      &shr_tkfit_start_V_v);
+    tree->SetBranchAddress("shr_tkfit_theta_v",        &shr_tkfit_theta_v);
+    tree->SetBranchAddress("shr_tkfit_phi_v",          &shr_tkfit_phi_v);
+    tree->SetBranchAddress("shr_tkfit_pitch_u_v",      &shr_tkfit_pitch_u_v);
+    tree->SetBranchAddress("shr_tkfit_pitch_v_v",      &shr_tkfit_pitch_v_v);
+    tree->SetBranchAddress("shr_tkfit_pitch_y_v",      &shr_tkfit_pitch_y_v);
+    tree->SetBranchAddress("shr_tkfit_dedx_u_v",       &shr_tkfit_dedx_u_v);
+    tree->SetBranchAddress("shr_tkfit_dedx_v_v",       &shr_tkfit_dedx_v_v);
+    tree->SetBranchAddress("shr_tkfit_dedx_y_v",       &shr_tkfit_dedx_y_v);
+    tree->SetBranchAddress("shr_tkfit_gap10_dedx_u_v", &shr_tkfit_gap10_dedx_u_v);
+    tree->SetBranchAddress("shr_tkfit_gap10_dedx_v_v", &shr_tkfit_gap10_dedx_v_v);
+    tree->SetBranchAddress("shr_tkfit_gap10_dedx_y_v", &shr_tkfit_gap10_dedx_y_v);
+    tree->SetBranchAddress("shr_tkfit_dedx_nhits_u_v", &shr_tkfit_dedx_nhits_u_v);
+    tree->SetBranchAddress("shr_tkfit_dedx_nhits_v_v", &shr_tkfit_dedx_nhits_v_v);
+    tree->SetBranchAddress("shr_tkfit_dedx_nhits_y_v", &shr_tkfit_dedx_nhits_y_v);
+    tree->SetBranchAddress("shr_llr_pid_u_v",          &shr_llr_pid_u_v);
+    tree->SetBranchAddress("shr_llr_pid_v_v",          &shr_llr_pid_v_v);
+    tree->SetBranchAddress("shr_llr_pid_y_v",          &shr_llr_pid_y_v);
+    tree->SetBranchAddress("shr_llr_pid_v",            &shr_llr_pid_v);
+    tree->SetBranchAddress("shr_llr_pid_score_v",      &shr_llr_pid_score_v);
+    tree->SetBranchAddress("shr_moliere_avg_v",        &shr_moliere_avg_v);
+    tree->SetBranchAddress("shr_moliere_rms_v",        &shr_moliere_rms_v);
+    
+    // tree->SetBranchAddress("shr_spacepoint_start_x_v", &shr_spacepoint_start_x_v);
+    // tree->SetBranchAddress("shr_spacepoint_start_y_v", &shr_spacepoint_start_y_v);
+    // tree->SetBranchAddress("shr_spacepoint_start_z_v", &shr_spacepoint_start_z_v);
+    // tree->SetBranchAddress("shr_spacepoint_start_U_v", &shr_spacepoint_start_U_v);
+    // tree->SetBranchAddress("shr_spacepoint_start_V_v", &shr_spacepoint_start_V_v);
+    // tree->SetBranchAddress("shr_hits_start_U_wire_v",  &shr_hits_start_U_wire_v);
+    // tree->SetBranchAddress("shr_hits_start_U_x_v",     &shr_hits_start_U_x_v);
+    // tree->SetBranchAddress("shr_hits_start_V_wire_v",  &shr_hits_start_V_wire_v);
+    // tree->SetBranchAddress("shr_hits_start_V_x_v",     &shr_hits_start_V_x_v);
+    // tree->SetBranchAddress("shr_hits_start_Y_wire_v",  &shr_hits_start_Y_wire_v);
+    // tree->SetBranchAddress("shr_hits_start_Y_x_v",     &shr_hits_start_Y_x_v);
+    
+    tree->SetBranchAddress("trk_bragg_p_v",            &trk_bragg_p_v);
+    tree->SetBranchAddress("trk_bragg_mu_v",           &trk_bragg_mu_v);
+    tree->SetBranchAddress("trk_bragg_mip_v",          &trk_bragg_mip_v);
+    tree->SetBranchAddress("trk_pida_v",               &trk_pida_v);
+    
+    tree->SetBranchAddress("trk_pid_chipr_v",          &trk_pid_chipr_v);
+    tree->SetBranchAddress("trk_pid_chipi_v",          &trk_pid_chipi_v);
+    tree->SetBranchAddress("trk_pid_chika_v",          &trk_pid_chika_v);
+    tree->SetBranchAddress("trk_pid_chimu_v",          &trk_pid_chimu_v);
+    
+    tree->SetBranchAddress("trk_bragg_p_u_v",          &trk_bragg_p_u_v);
+    tree->SetBranchAddress("trk_bragg_mu_u_v",         &trk_bragg_mu_u_v);
+    tree->SetBranchAddress("trk_bragg_mip_u_v",        &trk_bragg_mip_u_v);
+    tree->SetBranchAddress("trk_pida_u_v",             &trk_pida_u_v);
+    tree->SetBranchAddress("trk_pid_chipr_u_v",        &trk_pid_chipr_u_v);
+    tree->SetBranchAddress("trk_pid_chipi_u_v",        &trk_pid_chipi_u_v);
+    tree->SetBranchAddress("trk_pid_chika_u_v",        &trk_pid_chika_u_v);
+    tree->SetBranchAddress("trk_pid_chimu_u_v",        &trk_pid_chimu_u_v);
+    tree->SetBranchAddress("trk_bragg_p_v_v",          &trk_bragg_p_v_v);
+    tree->SetBranchAddress("trk_bragg_mu_v_v",         &trk_bragg_mu_v_v);
+    tree->SetBranchAddress("trk_bragg_mip_v_v",        &trk_bragg_mip_v_v);
+    tree->SetBranchAddress("trk_pida_v_v",             &trk_pida_v_v);
+    tree->SetBranchAddress("trk_pid_chipr_v_v",        &trk_pid_chipr_v_v);
+    tree->SetBranchAddress("trk_pid_chipi_v_v",        &trk_pid_chipi_v_v);
+    tree->SetBranchAddress("trk_pid_chika_v_v",        &trk_pid_chika_v_v);
+    tree->SetBranchAddress("trk_pid_chimu_v_v",        &trk_pid_chimu_v_v);
+    tree->SetBranchAddress("trk_pfp_id_v",             &trk_pfp_id_v);
+    tree->SetBranchAddress("trk_dir_x_v",              &trk_dir_x_v);
+    tree->SetBranchAddress("trk_dir_y_v",              &trk_dir_y_v);
+    tree->SetBranchAddress("trk_dir_z_v",              &trk_dir_z_v);
+    tree->SetBranchAddress("trk_start_x_v",            &trk_start_x_v);
+    tree->SetBranchAddress("trk_start_y_v",            &trk_start_y_v);
+    tree->SetBranchAddress("trk_start_z_v",            &trk_start_z_v);
+    tree->SetBranchAddress("trk_sce_start_x_v",        &trk_sce_start_x_v);
+    tree->SetBranchAddress("trk_sce_start_y_v",        &trk_sce_start_y_v);
+    tree->SetBranchAddress("trk_sce_start_z_v",        &trk_sce_start_z_v);
+    tree->SetBranchAddress("trk_end_x_v",              &trk_end_x_v);
+    tree->SetBranchAddress("trk_end_y_v",              &trk_end_y_v);
+    tree->SetBranchAddress("trk_end_z_v",              &trk_end_z_v);
+    tree->SetBranchAddress("trk_sce_end_x_v",          &trk_sce_end_x_v);
+    tree->SetBranchAddress("trk_sce_end_y_v",          &trk_sce_end_y_v);
+    tree->SetBranchAddress("trk_sce_end_z_v",          &trk_sce_end_z_v);
+    tree->SetBranchAddress("trk_distance_v",           &trk_distance_v);
+    tree->SetBranchAddress("trk_theta_v",              &trk_theta_v);
+    tree->SetBranchAddress("trk_phi_v",                &trk_phi_v);
+    tree->SetBranchAddress("trk_len_v",                &trk_len_v);
+    tree->SetBranchAddress("trk_mcs_muon_mom_v",       &trk_mcs_muon_mom_v);
+    tree->SetBranchAddress("trk_range_muon_mom_v",     &trk_range_muon_mom_v);
+    tree->SetBranchAddress("trk_energy_proton_v",      &trk_energy_proton_v);
+    tree->SetBranchAddress("trk_energy_muon_v",        &trk_energy_muon_v);
+    tree->SetBranchAddress("trk_calo_energy_u_v",      &trk_calo_energy_u_v);
+    tree->SetBranchAddress("trk_calo_energy_v_v",      &trk_calo_energy_v_v);
+    tree->SetBranchAddress("trk_calo_energy_y_v",      &trk_calo_energy_y_v);
+    
+    tree->SetBranchAddress("trk_llr_pid_u_v",          &trk_llr_pid_u_v);
+    tree->SetBranchAddress("trk_llr_pid_v_v",          &trk_llr_pid_v_v);
+    tree->SetBranchAddress("trk_llr_pid_y_v",          &trk_llr_pid_y_v);
+    tree->SetBranchAddress("trk_llr_pid_v",            &trk_llr_pid_v);
+    tree->SetBranchAddress("trk_llr_pid_score_v",      &trk_llr_pid_score_v);
+
+
+// weightstree->SetBranchAddress("weights", &_mapWeight);
+
 
 }
 // -----------------------------------------------------------------------------

@@ -44,7 +44,7 @@ void selection::Initialise( const char * mc_file,
 
     // Configure the externally configurable cut parameters
     std::cout << "\n --- Configuring Parameters --- \n" << std::endl;
-
+    
     // Resize the counter vector
     counter_v.resize(_util.k_COUNTER_MAX);
 
