@@ -7,20 +7,12 @@ histogram_helper::~histogram_helper() {
     // f_nuexsec->Close();
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::MakeDirectory(std::string type){
+void histogram_helper::MakeDirectory(){
         
     f_nuexsec->cd();
 
-    TDirectory *top_dir; // e.g MC, Data, EXT
-    bool bool_dir;       // Check if directory exists already
-    TString type_tstr = type;
-   
-    // Create the top directory
-    bool_dir = _util.GetDirectory(f_nuexsec, top_dir, type_tstr );
-    if (!bool_dir) top_dir = f_nuexsec->mkdir(type.c_str());
-    
-    // Make the the top dir the current directory
-    top_dir->cd();
+    bool bool_dir; // Check if directory exists already
+
 
     // Create subdirectory for cut type
     TDirectory *dir_plot_types[_util.plot_types.size()];
@@ -36,10 +28,10 @@ void histogram_helper::MakeDirectory(std::string type){
     for (unsigned int k = 0; k < _util.plot_types.size(); k++) {
         
         // Get the directory 
-        bool_dir = _util.GetDirectory(f_nuexsec, dir_plot_types[k] ,Form("%s/%s", type.c_str(), _util.plot_types.at(k).c_str()) );
+        bool_dir = _util.GetDirectory(f_nuexsec, dir_plot_types[k] , _util.plot_types.at(k).c_str() );
 
         // Make the directory
-        if (!bool_dir) dir_plot_types[k] = top_dir->mkdir(_util.plot_types.at(k).c_str());
+        if (!bool_dir) dir_plot_types[k] = f_nuexsec->mkdir(_util.plot_types.at(k).c_str());
 
         dir_plot_types[k]->cd();
 
@@ -50,7 +42,7 @@ void histogram_helper::MakeDirectory(std::string type){
             for (int i = 0; i < ncuts; i++) {
                
                 // Get the directory 
-                bool_dir = _util.GetDirectory(f_nuexsec, dir_cut[i] ,Form("%s/%s/%s", type.c_str(), _util.plot_types.at(k).c_str(), _util.cut_dirs.at(i).c_str()));
+                bool_dir = _util.GetDirectory(f_nuexsec, dir_cut[i] ,Form("%s/%s", _util.plot_types.at(k).c_str(), _util.cut_dirs.at(i).c_str()));
 
                 // Make the directory
                 if (!bool_dir) dir_cut[i] = dir_plot_types[k]->mkdir(_util.cut_dirs.at(i).c_str());
@@ -60,26 +52,26 @@ void histogram_helper::MakeDirectory(std::string type){
                 for (unsigned int j = 0; j < _util.classification_dirs.size(); j++){
                 
                     // Get the directory 
-                    bool_dir = _util.GetDirectory(f_nuexsec, dir_classification[j] ,Form("%s/%s/%s/%s", type.c_str(), _util.plot_types.at(k).c_str(), _util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()));
+                    bool_dir = _util.GetDirectory(f_nuexsec, dir_classification[j] ,Form("%s/%s/%s", _util.plot_types.at(k).c_str(), _util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()));
 
                     // Make the directory
                     if (!bool_dir) dir_classification[j] = dir_cut[i]->mkdir(_util.classification_dirs.at(j).c_str());
                     dir_classification[j]->cd();
-                    top_dir->cd();    // change current directory to top
+                    f_nuexsec->cd();    // change current directory to top
 
                 } // End loop over the classifications -------------------------
                 
-                top_dir->cd();    // change current directory to top
+                f_nuexsec->cd();    // change current directory to top
                 
             } // End loop over the cuts ----------------------------------------
        
         }
          
-        top_dir->cd();    // change current directory to top
+        f_nuexsec->cd();    // change current directory to top
     
     } // End loop over plot types ----------------------------------------------
 
-    top_dir->Write("",TObject::kOverwrite);
+    f_nuexsec->Write("",TObject::kOverwrite);
    
 }
 // -----------------------------------------------------------------------------
@@ -124,12 +116,7 @@ void histogram_helper::Initialise(int type){
         exit(1);
     }
 
-
-
-    MakeDirectory("MC");
-    MakeDirectory("Data");
-    MakeDirectory("EXT");
-    MakeDirectory("Dirt");
+    MakeDirectory();
 }
 // -----------------------------------------------------------------------------
 void histogram_helper::InitHistograms(){
@@ -379,7 +366,7 @@ void histogram_helper::WriteReco(int type){
             }
 
             // Get the classification directory and cd
-            bool_dir = _util.GetDirectory(f_nuexsec, truth_dir ,Form("%s/%s/%s/%s", _util.type_prefix.at(type).c_str(), "Stack", _util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str() ) );
+            bool_dir = _util.GetDirectory(f_nuexsec, truth_dir ,Form("%s/%s/%s", "Stack", _util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str() ) );
             
             if (bool_dir) truth_dir->cd();
 

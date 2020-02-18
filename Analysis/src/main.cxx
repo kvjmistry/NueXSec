@@ -157,7 +157,7 @@ int main(int argc, char *argv[]){
     // Initialise the selction script
     _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config, using_slim_version, num_events );
     
-    // if (make_histos) _selection_instance.xsecSelection::selection::MakeHistograms();
+    if (make_histos) _selection_instance.xsecSelection::selection::MakeHistograms();
 
     // -------------------------------------------------------------------------
     // Finished!

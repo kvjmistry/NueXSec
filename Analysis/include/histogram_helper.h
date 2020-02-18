@@ -30,7 +30,7 @@ class histogram_helper{
     void InitHistograms();
     // -------------------------------------------------------------------------
     // Function to make the directory hirarchy
-    void MakeDirectory(std::string type);
+    void MakeDirectory();
     // -------------------------------------------------------------------------
     // Function to fill the reco variables
     void FillReco(int classification_index, int cut_index, SliceContainer &SC);
