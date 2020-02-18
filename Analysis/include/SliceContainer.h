@@ -41,7 +41,7 @@ public:
     // Shower Properties 
     float shr_energy_tot;        // Total Shower Energy
     float shr_energy;            // Shower Energy
-    float shr_energy_tot_cali;   // Total Shower Energy Cali
+    float shr_energy_tot_cali;   // Shower Sum of the energy of the calibrated showers (in GeV). Used only at pre-selection as a “Michel veto”.
     float shr_energy_cali;       // Shower Energy Cali
     float shr_theta;             // Shower Theta
     float shr_phi;               // Shower Phi
@@ -80,35 +80,35 @@ public:
     int   shr_tkfit_nhits_U_alt; // Shower TrackFit Total Hits U Plane 2 Alternate
     int   shr_tkfit_npoints;     // Shower TrackFit Number of Points
     float shr_trkfitmedangle;    // Shower TrackFit Median Angle
-    float shrmoliereavg;         // Shower Average Moliere Radius
+    float shrmoliereavg;         // Shower Average angle between the shower’s direction and its 3D spacepoints.
     float shrmoliererms;         // Shower Moliere RMS
     
-    // bool ismerged;
+    unsigned char  ismerged;     // Check if a proton is merged at the beginning of a shower.
     float merge_bestdot;
-    float merge_bestdist;
+    float merge_bestdist; // Distance between shower start point and track start (or end) point for the track in the slice that best matches the direction of the shower.
     float merge_vtx_x;
     float merge_vtx_y;
     float merge_vtx_z;
     int   merge_tk_ipfp;
     
-    float shr_tkfit_2cm_dedx_Y;
+    float shr_tkfit_2cm_dedx_Y;   // Median dE/dx computed over the first 2 cm of the shower’s trunk. Plane Y
     float shr_tkfit_2cm_dedx_V;
     float shr_tkfit_2cm_dedx_U;
-    int   shr_tkfit_2cm_nhits_Y;
-    int   shr_tkfit_2cm_nhits_V;
-    int   shr_tkfit_2cm_nhits_U;
+    unsigned int   shr_tkfit_2cm_nhits_Y;
+    unsigned int   shr_tkfit_2cm_nhits_V;
+    unsigned int   shr_tkfit_2cm_nhits_U;
     float shr_tkfit_gap05_dedx_Y;
     float shr_tkfit_gap05_dedx_V;
     float shr_tkfit_gap05_dedx_U;
-    int   shr_tkfit_gap05_nhits_Y;
-    int   shr_tkfit_gap05_nhits_V;
-    int   shr_tkfit_gap05_nhits_U;
-    float shr_tkfit_gap10_dedx_Y;
+    unsigned int   shr_tkfit_gap05_nhits_Y;
+    unsigned int   shr_tkfit_gap05_nhits_V;
+    unsigned int   shr_tkfit_gap05_nhits_U;
+    float shr_tkfit_gap10_dedx_Y;  // Median dE/dx computed over the [1,5] cm of the shower’s trunk. Plane Y
     float shr_tkfit_gap10_dedx_V;
     float shr_tkfit_gap10_dedx_U;
-    int   shr_tkfit_gap10_nhits_Y;
-    int   shr_tkfit_gap10_nhits_V;
-    int   shr_tkfit_gap10_nhits_U;
+    unsigned int   shr_tkfit_gap10_nhits_Y;
+    unsigned int   shr_tkfit_gap10_nhits_V;
+    unsigned int   shr_tkfit_gap10_nhits_U;
     
     float shr_chipr;            // Shower Chi Prob
     float shr_chimu;            // Shower Chi Mu
@@ -118,11 +118,11 @@ public:
     float shr_bragg_kaon;       // Shower Bragg Likelihood Kaon
     float shr_bragg_pion;       // Shower Bragg Likelihood Pion
     
-    float tksh_distance;        // Track Shower Distance
-    float tksh_angle;           // Track Shower Angle
+    float tksh_distance;        // Distance between leading shower and longest track start points.
+    float tksh_angle;           // Angle between leading shower and longest track directions.
     
-    float shr_distance;         // Shower Distance
-    float shr_score;            // Shower Score
+    float shr_distance;         // Shower Distance between the shower start and the neutrino vertex. Labelled as shower_vtx_dist in technote
+    float shr_score;            // Shower Pandora SVM track/shower score for the leading shower.
     int   shr_bkt_pdg;          // Shower Backtracked PDG
     float shr_bkt_purity;       // Shower Backtracked Purity
     float shr_bkt_completeness; // Shower Backtracked Completeness
@@ -136,7 +136,7 @@ public:
     float trk_energy_muon_mcs;  // Track Energy Muon MCS
     float trk_energy_tot;       // Track Energy Total
     float trk_energy_muon_tot;  // Track Energy Muon Total
-    float trk_distance;         // Track Distance
+    float trk_distance;         // Track Distance between the track start and the neutrino vertex.
     float trk_score;            // Track Score
     int   trk_bkt_pdg;          // Track Backtrack
     float trk_bkt_purity;       // Track Backtrack Purity
@@ -194,11 +194,11 @@ public:
     int   elecclusters_V_N;
     int   elecclusters_Y_N;
     
-    int   n_tracks_contained;    // Number of Tracks Contained
-    int   n_showers_contained;   // Number of Showers Contained
+    int   n_tracks_contained;    // Reco Number of tracks fully contained in the fiducial volume
+    int   n_showers_contained;   // Reco Number of showers with a starting point within the fiducial volume.
     float matched_E;
-    float hits_ratio;
-    float contained_fraction;
+    float hits_ratio;            // Reco Ratio between hits from showers and total number of hits in the slice.
+    float contained_fraction;    // Reco Hits in PFParticles contained in the fiducial volume over the total number of clustered hits in the slice.
     float sps_contained_fraction;
     float pt;
     float p;
@@ -208,7 +208,7 @@ public:
     float dtrk;
     float contained_sps_ratio;
     
-    float CosmicIP;
+    float CosmicIP;          // Reco Closest distance between shower start and space points associated to tracks flagged as cosmics.
     float CosmicIPAll3D;
     float CosmicDirAll3D;
     float CosmicIPAll2DEnds;
@@ -251,7 +251,7 @@ public:
     float reco_nu_vtx_x;         // Reco Neutrino Vtx x
     float reco_nu_vtx_y;         // Reco Neutrino Vtx y
     float reco_nu_vtx_z;         // Reco Neutrino Vtx z
-    float reco_nu_vtx_sce_x;     // Reco Neutrino Vtx Space Charge x
+    float reco_nu_vtx_sce_x;     // Reco Reconstructed neutrino interaction vertex in (x,y,z) coordinates. The space charged correction is applied
     float reco_nu_vtx_sce_y;     // Reco Neutrino Vtx Space Charge y
     float reco_nu_vtx_sce_z;     // Reco Neutrino Vtx Space Charge z
     
@@ -289,8 +289,8 @@ public:
     float pion_c;   // Pion Completeness
     float pion_p;   // Pion Purity
     
-    int   nslice;     // Reco Number of Slices
-    int   crtveto;    // CRT Veto
+    int   nslice;     // Reco Number of neutrino slices identified by the SliceID. Values are 0 or 1.
+    int   crtveto;    // Reco Boolean variable checking if the event passes the CRT veto.
     float crthitpe;   // CRT Hit PE
     int   category;   // Truth Category
     float lep_e;
@@ -299,16 +299,16 @@ public:
     int   evnhits;
     int   slpdg;      // Reco Slice PDG of primary PFP
     int   slnhits;    // Reco Slice Number of Hits within it
-    int   n_pfps;     // Reco?? Number of pfp's
-    int   n_tracks;   // Reco?? Number of Tracks
-    int   n_showers;  // Reco?? Number of Showers
+    int   n_pfps;     // Reco Number of pfp's
+    int   n_tracks;   // Reco Number of Tracks
+    int   n_showers;  // Reco Number of Showers
     
     int   hits_u;
     int   hits_v;
     int   hits_y;
     
     float topological_score;  // Reco Topological Score
-    float slclustfrac;        // Reco Fraction of Clustered hits in the slice
+    float slclustfrac;        // Reco Fraction of hits in the slice that are fully reconstructed to 3D particles.
     float endmuonmichel;
     int   filter_antibdt;
     int   filter_ncpi0;

@@ -45,6 +45,13 @@ void selection::Initialise( const char * mc_file,
     // Configure the externally configurable cut parameters
     std::cout << "\n --- Configuring Parameters --- \n" << std::endl;
 
+    // Resize the counter vector
+    counter_v.resize(_util.k_COUNTER_MAX);
+
+    for (unsigned int t = 0; t < counter_v.size(); t++){
+        counter_v.at(t).resize(_util.k_COUNTER_MAX, 0);
+    }
+
     // Get MC variables --------------------------------------------------------
     if (bool_use_mc){
         std::cout << "\nInitialising MC" << std::endl;
@@ -59,13 +66,6 @@ void selection::Initialise( const char * mc_file,
         
         mc_tree_total_entries = mc_tree->GetEntries();
         std::cout << "Total MC Events:         " << mc_tree_total_entries << std::endl;
-
-        // Resize the counter vector
-        mc_counter_v.resize(_util.k_COUNTER_MAX);
-
-        for (unsigned int t = 0; t < mc_counter_v.size(); t++){
-            mc_counter_v.at(t).resize(_util.k_COUNTER_MAX, 0);
-        }
 
         // Resize the Passed vector
         mc_passed_v.resize(mc_tree_total_entries);
@@ -89,13 +89,6 @@ void selection::Initialise( const char * mc_file,
         
         data_tree_total_entries = data_tree->GetEntries();
         std::cout << "Total Data Events:         " << data_tree_total_entries << std::endl;
-
-        // Resize the counter vector
-        data_counter_v.resize(_util.k_COUNTER_MAX);
-
-        for (unsigned int t = 0; t < data_counter_v.size(); t++){
-            data_counter_v.at(t).resize(_util.k_COUNTER_MAX, 0);
-        }
 
         // Resize the Passed vector
         data_passed_v.resize(data_tree_total_entries);
@@ -122,13 +115,6 @@ void selection::Initialise( const char * mc_file,
         ext_tree_total_entries = ext_tree->GetEntries();
         std::cout << "Total MC Events:         " << ext_tree_total_entries << std::endl;
 
-        // Resize the counter vector
-        ext_counter_v.resize(_util.k_COUNTER_MAX);
-
-        for (unsigned int t = 0; t < ext_counter_v.size(); t++){
-            ext_counter_v.at(t).resize(_util.k_COUNTER_MAX, 0);
-        }
-
         // Resize the Passed vector
         ext_passed_v.resize(ext_tree_total_entries);
 
@@ -153,13 +139,6 @@ void selection::Initialise( const char * mc_file,
         
         dirt_tree_total_entries = dirt_tree->GetEntries();
         std::cout << "Total MC Events:         " << dirt_tree_total_entries << std::endl;
-
-        // Resize the counter vector
-        dirt_counter_v.resize(_util.k_COUNTER_MAX);
-
-        for (unsigned int t = 0; t < dirt_counter_v.size(); t++){
-            dirt_counter_v.at(t).resize(_util.k_COUNTER_MAX, 0);
-        }
 
         // Resize the Passed vector
         dirt_passed_v.resize(dirt_tree_total_entries);
@@ -204,7 +183,7 @@ void selection::make_selection(){
 
             // std::cout << "Interaction: " <<  interaction << "   classification: " << classification << "   category: " << category<< std::endl;
             
-            _util.Tabulate(interaction, classification.first, _util.k_mc, mc_counter_v.at(_util.k_unselected) );
+            _util.Tabulate(interaction, classification.first, _util.k_mc, counter_v.at(_util.k_unselected) );
 
             if (!slim) _hhelper.at(_util.k_mc).FillReco(classification.second, _util.k_unselected, mc_SC);
 
@@ -217,7 +196,7 @@ void selection::make_selection(){
             // if (mc_SC.slpdg < 0) std::cout << "Interaction: " <<  mc_SC.SliceInteractionType(_util.k_mc) << std::endl;
 
             // Apply the selection cuts 
-            bool pass = ApplyCuts(_util.k_mc, ievent, mc_counter_v, mc_passed_v, mc_SC, classification.first, interaction);
+            bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC, classification.first, interaction);
             // if (!pass) continue;
 
         } // End Event loop
@@ -226,17 +205,15 @@ void selection::make_selection(){
         std::cout << "Ending Selection over MC" << std::endl;
 
         // Get the total number of in cryostat nues
-        tot_true_cryo_nues = mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_qe)  + 
-                             mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_res) + 
-                             mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_dis) + 
-                             mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_coh) + 
-                             mc_counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_mec);
+        tot_true_cryo_nues = counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_qe)  + 
+                             counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_res) + 
+                             counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_dis) + 
+                             counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_coh) + 
+                             counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_mec);
 
         std::cout << "-------------------------------" << std::endl;
         std::cout << "Total Nue's in the Cryostat: " << tot_true_cryo_nues << std::endl;
         std::cout << "-------------------------------" << std::endl;
-
-        _util.PrintInfo(mc_counter_v.at(_util.k_unselected), intime_scale_factor, data_scale_factor, dirt_scale_factor, _util.cut_dirs.at(_util.k_unselected), mc_counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc));
     }
     // Data --------------------------------------------------------------------
     if (bool_use_data){
@@ -255,9 +232,20 @@ void selection::make_selection(){
             // Get the entry in the tree
             data_tree->GetEntry(ievent); // TPC Objects
 
-            if (data_SC.slpdg > 0) std::cout << "run: " << data_SC.run << "  subrun: " << data_SC.sub << "  event: " << data_SC.evt << std::endl;
-            if (data_SC.slpdg > 0) std::cout << "slpdg: " << data_SC.slpdg << "  topo score: " << data_SC.topological_score << std::endl;
-            if (data_SC.slpdg > 0) std::cout << "Category: " << data_SC.category << std::endl;
+            // Classify the event
+            std::pair<std::string, int> classification = data_SC.SliceClassifier(_util.k_data);      // Classification of the event
+            std::string interaction                    = data_SC.SliceInteractionType(_util.k_data); // Genie interaction type
+            std::string category                       = data_SC.SliceCategory();                    // The pandora group slice category
+
+            // std::cout << "Interaction: " <<  interaction << "   classification: " << classification << "   category: " << category<< std::endl;
+            
+            _util.Tabulate(interaction, classification.first, _util.k_data, counter_v.at(_util.k_unselected) );
+
+            if (!slim) _hhelper.at(_util.k_data).FillReco(classification.second, _util.k_unselected, data_SC);
+
+            // if (data_SC.slpdg > 0) std::cout << "run: " << data_SC.run << "  subrun: " << data_SC.sub << "  event: " << data_SC.evt << std::endl;
+            // if (data_SC.slpdg > 0) std::cout << "slpdg: " << data_SC.slpdg << "  topo score: " << data_SC.topological_score << std::endl;
+            // if (data_SC.slpdg > 0) std::cout << "Category: " << data_SC.category << std::endl;
         }
 
         std::cout << std::endl;
@@ -281,6 +269,13 @@ void selection::make_selection(){
     }
     // -------------------------------------------------------------------------
     std::cout << "Finished running the selection!"<< std::endl;
+
+    // Print information from the selection
+    _util.PrintInfo(counter_v.at(_util.k_unselected), intime_scale_factor, data_scale_factor, dirt_scale_factor, _util.cut_dirs.at(_util.k_unselected), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc));
+
+    // Now save all the outputs to file
+    if (!slim) SavetoFile();
+
     return;
 } // End Selection
 // -----------------------------------------------------------------------------

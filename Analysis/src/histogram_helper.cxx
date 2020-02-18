@@ -313,13 +313,13 @@ void histogram_helper::FillReco(int classification_index, int cut_index, SliceCo
     h_reco_vtx_y.at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_y);
     h_reco_vtx_z.at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_z);
 
-    // h_reco_dEdx.at(cut_index).at(classification_index)->Fill(); // Just the collection plane!
+    h_reco_dEdx.at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y_cali); // Just the collection plane!
     
     // h_reco_leading_mom.at(cut_index).at(classification_index)->Fill();
     
-    // h_reco_shower_to_vtx_dist.at(cut_index).at(classification_index)->Fill();
+    h_reco_shower_to_vtx_dist.at(cut_index).at(classification_index)->Fill(SC.shr_distance);
 
-    // h_reco_track_to_vtx_dist.at(cut_index).at(classification_index)->Fill();
+    h_reco_track_to_vtx_dist.at(cut_index).at(classification_index)->Fill(SC.trk_distance);
     
     // h_reco_leading_shower_hits_all_planes.at(cut_index).at(classification_index)->Fill();
     
@@ -341,9 +341,9 @@ void histogram_helper::FillReco(int classification_index, int cut_index, SliceCo
     
     h_reco_leading_shower_cos_theta.at(cut_index).at(classification_index)->Fill(std::cos(SC.shr_theta));
     
-    // h_reco_shower_multiplicity.at(cut_index).at(classification_index)->Fill();
+    h_reco_shower_multiplicity.at(cut_index).at(classification_index)->Fill(SC.n_showers);
     
-    // h_reco_track_multiplicity.at(cut_index).at(classification_index)->Fill();
+    h_reco_track_multiplicity.at(cut_index).at(classification_index)->Fill(SC.n_tracks);
 
 }
 // -----------------------------------------------------------------------------

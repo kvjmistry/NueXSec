@@ -84,10 +84,7 @@ namespace xsecSelection {
             std::vector<Passed_Container> dirt_passed_v; // Dirt Passed Container
             
             // Counter Containers
-            std::vector<std::vector<int>> mc_counter_v;
-            std::vector<std::vector<int>> data_counter_v;
-            std::vector<std::vector<int>> ext_counter_v;
-            std::vector<std::vector<int>> dirt_counter_v;
+            std::vector<std::vector<int>> counter_v;
 
             // Counter variables
             int mc_tree_total_entries{0};    // MC

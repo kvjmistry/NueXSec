@@ -328,5 +328,8 @@ void utility::PrintInfo(std::vector<int> counter_v, double intime_scale_factor, 
     const double purity     = double(counter_nue_cc) / double(counter);
     std::cout << " Efficiency       : " << "( " << counter_nue_cc << " / " << tot_true_infv_nues << " ) = " << efficiency << std::endl;
     std::cout << " Purity           : " << "( " << counter_nue_cc << " / " << counter           << " ) = " << purity << std::endl;
+    std::cout << "------------------------------------------------" << std::endl;
+    std::cout << " Total Nue Candidates in data : " << counter_data << std::endl;
+    std::cout << "------------------------------------------------" << std::endl;
 }
 // -----------------------------------------------------------------------------
