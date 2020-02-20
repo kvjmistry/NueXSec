@@ -4,7 +4,7 @@ process_name : FlashValidation
 
 services:
 {
-  TFileService: {fileName: "flash_validation.root"}
+  TFileService: {fileName: "flash_validation_hist.root"}
 }
 
 source:
@@ -12,6 +12,19 @@ source:
   module_type: RootInput
   maxEvents: -1
 }
+
+outputs:
+{
+ out1:
+ {
+   module_type: RootOutput
+   #SelectEvents: {SelectEvents:[reco]}
+   fileName:    "%ifb_flash_validate.root"
+   dataTier:    "reco"
+   compressionLevel: 1
+ }
+}
+
 
 physics:
 {
@@ -30,7 +43,9 @@ physics:
       Shift_Times:               true
     }
   }
+  output:  [ out1 ]
   analysis: [FlashValidate]
   trigger_paths: []
-  end_paths: [analysis]
+  end_paths: [analysis, output]
 }
+

@@ -6,7 +6,7 @@
 <!ENTITY file_type "mc">
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
-<!ENTITY name "searchingfornues_run1_dirt_overlay">
+<!ENTITY name "searchingfornues_run1_overlay">
 <!ENTITY version "v1">
 ]>
 
@@ -48,7 +48,7 @@
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <schema>root</schema>
-    <inputdef>prodgenie_numi_uboone_overlay_dirt_fhc_mcc9_run1_v28_all_snapshot</inputdef>
+    <inputdef>prodgenie_numi_uboone_overlay_fhc_mcc9_run1_v28_v2_sample0</inputdef>
     <jobsub>--expected-lifetime=3h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
     <jobsub_start>  --expected-lifetime=short</jobsub_start>
   </stage>

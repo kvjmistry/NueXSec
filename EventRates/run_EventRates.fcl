@@ -4,13 +4,25 @@ process_name : NuMIEventRatesProcess
 
 services:
 {
-  TFileService: {fileName: "NuMI_EventRate.root"}
+  TFileService: {fileName: "NuMI_EventRate_hist.root"}
 }
 
 source:
 {
   module_type: RootInput
   maxEvents: -1
+}
+
+outputs:
+{
+ out1:
+ {
+   module_type: RootOutput
+   #SelectEvents: {SelectEvents:[reco]}
+   fileName:    "%ifb_eventrate.root"
+   dataTier:    "reco"
+   compressionLevel: 1
+ }
 }
 
 physics:
@@ -27,6 +39,7 @@ physics:
       POTSummaryInstance:    ""
     }
   }
+  output:  [ out1 ]
   analysis: [NuMIEventRates]
-  end_paths: [analysis]
+  end_paths: [analysis, output]
 }
