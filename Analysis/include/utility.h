@@ -88,7 +88,7 @@ public:
     // Cut directory names
     std::vector<std::string> cut_dirs = {
             "Unselected",  // Unselected
-            "In_FV"        // Fiducial volume
+            // "In_FV"        // Fiducial volume
             };
 
 
@@ -120,7 +120,7 @@ public:
     // enums for cut dirs
     enum enum_cut_dirs {
                 k_unselected, // Unselected 
-                k_in_fv,      // Fiducial volume
+                // k_in_fv,      // Fiducial volume
                 k_cuts_MAX
                 }; 
 

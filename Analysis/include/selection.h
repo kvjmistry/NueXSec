@@ -129,7 +129,7 @@ namespace xsecSelection {
             void SavetoFile();
             // -----------------------------------------------------------------
             // Make final histogram plots
-            void MakeHistograms();
+            void MakeHistograms(const char * hist_file_name);
             // -----------------------------------------------------------------
 
     }; // END Class

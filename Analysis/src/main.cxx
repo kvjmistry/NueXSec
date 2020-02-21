@@ -14,6 +14,7 @@ int main(int argc, char *argv[]){
     char * data_file_name        = (char *)"empty";
     char * dirt_file_name        = (char *)"empty";
     char * variation_file_name   = (char *)"empty";
+    char * hist_file_name        = (char *)"empty";
     int num_events{-1};
 
     // -------------------------------------------------------------------------
@@ -30,44 +31,45 @@ int main(int argc, char *argv[]){
         }
 
         if(strcmp(arg, "--hist") == 0) {
-            std::cout << "Making Histograms"<< std::endl;
+            std::cout << "Making Histograms, file to make histograms with: "<< argv[i+1] << std::endl;
             make_histos = true;
+            hist_file_name = argv[i+1];
         }
         
         // Configuration file
         if(strcmp(arg, "-c") == 0){
-            std::cout << "Running with input config file: " << argv[i+1]<< std::endl;
+            std::cout << "Running with input config file: " << argv[i+1] << std::endl;
             using_default_config = false;
             input_config_file_name = argv[i+1];
         }
         
         // MC file
         if(strcmp(arg, "--mc") == 0) {
-            std::cout << "Running with MC file: " << argv[i+1]<< std::endl;
+            std::cout << "Running with MC file: " << argv[i+1] << std::endl;
             mc_file_name = argv[i+1];
         }
 
         // EXT file
         if(strcmp(arg, "--ext") == 0){
-            std::cout << "Running with EXT file: " << argv[i+1]<< std::endl;
+            std::cout << "Running with EXT file: " << argv[i+1] << std::endl;
             ext_file_name = argv[i+1];
         }
 
         // Data file
         if(strcmp(arg, "--data") == 0){
-            std::cout << "Running with Data file: " << argv[i+1]<< std::endl;
+            std::cout << "Running with Data file: " << argv[i+1] << std::endl;
             data_file_name = argv[i+1];
         }
 
         // Dirt file overlay or not?
         if(strcmp(arg, "--dirt") == 0){
-            std::cout << "Running with Dirt file: " << argv[i+1]<< std::endl;
+            std::cout << "Running with Dirt file: " << argv[i+1] << std::endl;
             dirt_file_name = argv[i+1];
         }
 
         // Variation file
         if(strcmp(arg, "--var") == 0){
-            std::cout << "Running with Systematic Variation file: " << argv[i+1]<< std::endl;
+            std::cout << "Running with Systematic Variation file: " << argv[i+1] << std::endl;
             variation_file_name = argv[i+1];
             std::string variation_type = variation_file_name;
         }
@@ -80,7 +82,7 @@ int main(int argc, char *argv[]){
 
 
         if (strcmp(arg, "--h") == 0 || strcmp(arg, "-h") == 0|| strcmp(arg, "--help") == 0 || strcmp(arg, "--usage") == 0){
-            std::cout << " \n ./nuexsec --mc <mc file> [--data <data file>] [--ext <ext file>] [--dirt <dirt file>] [--var <variation file>] [-c <input config file>] [-n <num events>] [--slim] [--hist] \n " << std::endl; 
+            std::cout << " \n ./nuexsec --mc <mc file> [--data <data file>] [--ext <ext file>] [--dirt <dirt file>] [--var <variation file>] [-c <input config file>] [-n <num events>] [--slim] [--hist <input nuexsec file>] \n " << std::endl; 
             exit(1);
         }
         
@@ -155,9 +157,8 @@ int main(int argc, char *argv[]){
     // -------------------------------------------------------------------------
 
     // Initialise the selction script
-    _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config, using_slim_version, num_events );
-    
-    if (make_histos) _selection_instance.xsecSelection::selection::MakeHistograms();
+    if (!make_histos) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config, using_slim_version, num_events );
+    else _selection_instance.xsecSelection::selection::MakeHistograms(hist_file_name);
 
     // -------------------------------------------------------------------------
     // Finished!
