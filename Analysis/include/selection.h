@@ -28,12 +28,19 @@ namespace xsecSelection {
             int nthreads = 4;
 
             int max_events{-1};
-       
 
-            // Scale factors
-            const double data_scale_factor   = 1.0;
-            const double intime_scale_factor = 1.0;
-            const double dirt_scale_factor   = 1.0;
+            // POT and triggers
+            double MC_POT    = 1.0;    // The MC POT
+            double Dirt_POT  = 1.0;    // The dirt POT
+            double Data_POT  = 1.0;    // The Data POT (tortgt_wcut)
+            double Data_trig = 1.0;    // The data HW Triggers (EA9CNT_wcut)
+            double EXT_trig  = 1.0;    // The Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
+
+
+            // Scale factors (veverything is scaled to data)
+            double mc_scale_factor     = 1.0;
+            double intime_scale_factor = 1.0;
+            double dirt_scale_factor   = 1.0;
 
             // Bools
             bool bool_use_mc{false};
