@@ -428,7 +428,7 @@ public:
     std::vector<float> *pfpplanesubhitfracmax_V_v = nullptr;
     std::vector<float> *pfpplanesubhitfracmax_Y_v = nullptr;
     
-    std::vector<int>   *mc_pdg_v  = nullptr;
+    std::vector<int>   *mc_pdg_v  = nullptr;  // True: Vector of all MC particles
     std::vector<float> *mc_E_v    = nullptr;
     std::vector<float> *mc_vx_v   = nullptr;
     std::vector<float> *mc_vy_v   = nullptr;
