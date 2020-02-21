@@ -40,7 +40,6 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
             
             _util.GetHist(f_nuexsec, hist.at(i), Form("Stack/%s/%s/%s_%s_%s", cut_name.c_str(), _util.classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.classification_dirs.at(i).c_str()));
             if (hist.at(i) == NULL){
-                std::cout <<  "No data hist found in the file!" << std::endl;
                 found_data = false;
             }
         } 
@@ -49,7 +48,6 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
             
             _util.GetHist(f_nuexsec, hist.at(i), Form("Stack/%s/%s/%s_%s_%s",  cut_name.c_str(), _util.classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.classification_dirs.at(i).c_str()));
             if (hist.at(i) == NULL){
-                std::cout <<  "No ext hist found in the file!" << std::endl;
                 found_ext = false;
             } 
         }
@@ -59,7 +57,6 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
             _util.GetHist(f_nuexsec, hist.at(i), Form("Stack/%s/%s/%s_%s_%s", cut_name.c_str(), _util.classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.classification_dirs.at(i).c_str()));
             
             if (hist.at(i) == NULL){
-                std::cout <<  "No dirt file found in the file!" << std::endl;
                 found_dirt = false;
             } 
         }
@@ -80,17 +77,26 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     // Choose whether to use a pvalue
     const bool p_value = false;
 
+    TPad * topPad;
+    TPad * bottomPad;
     TCanvas* c       = new TCanvas();
-    TPad * topPad    = new TPad("topPad", "", 0, 0.3, 1, 1.0);
-    TPad * bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
     
-    topPad   ->SetBottomMargin(0.05);
-    bottomPad->SetTopMargin(0.04);
-    bottomPad->SetBottomMargin(0.25);
-    bottomPad->SetGridy();
-    topPad   ->Draw();
-    bottomPad->Draw();
-    topPad   ->cd();
+    if (found_data && found_ext){
+        topPad    = new TPad("topPad", "", 0, 0.3, 1, 1.0);
+        bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
+        
+        topPad   ->SetBottomMargin(0.05);
+        bottomPad->SetTopMargin(0.04);
+        bottomPad->SetBottomMargin(0.25);
+        bottomPad->SetGridy();
+        topPad   ->Draw();
+        bottomPad->Draw();
+        topPad   ->cd();
+    }
+    else {
+        gPad->SetLeftMargin(0.15);
+        gPad->SetRightMargin(0.20 );
+    }
 
     THStack * h_stack = new THStack();
     
@@ -137,7 +143,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     hist.at(_util.k_nc_pi0)       ->SetFillColor(36);
     hist.at(_util.k_cosmic)       ->SetFillColor(1);
     hist.at(_util.k_nc)           ->SetFillColor(46);
-    hist.at(_util.k_nu_out_fv)    ->SetFillColor(kTeal);
+    hist.at(_util.k_nu_out_fv)    ->SetFillColor(kViolet-7);
     hist.at(_util.k_numu_cc_pi0)  ->SetFillColor(42);
     hist.at(_util.k_unmatched)    ->SetFillColor(12);
     
@@ -195,6 +201,9 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     // Add the histograms to the stack
     for (unsigned int i=0; i < hist.size(); i++){
         if (i == _util.k_leg_data) continue; // Dont use the data
+        if (i == _util.k_leg_ext && !found_ext) continue;   // Skip ext if not there
+        if (i == _util.k_leg_dirt && !found_dirt) continue; // skip dirt if not there
+
         h_stack->Add(hist.at(i));
     }
 
@@ -239,13 +248,16 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     h_stack->GetYaxis()->SetTitleFont(45);
     h_stack->GetYaxis()->SetTitleSize(18);
     h_stack->GetYaxis()->SetTitleOffset(1.30);
-    h_stack->GetXaxis()->SetLabelOffset(10);
+    if (found_data && found_ext) h_stack->GetXaxis()->SetLabelOffset(10);
+    else h_stack->GetXaxis()->SetTitle(x_axis_name);
     if (found_data) hist.at(_util.k_leg_data)->Draw("same PE");
 
     // MC error histogram
     TH1D * h_error_hist = (TH1D*) hist.at(_util.k_nue_cc)->Clone("h_error_hist");
     for (unsigned int i=0; i < hist.size(); i++){
         if (i == _util.k_leg_data || i == _util.k_nue_cc) continue; // Dont use the data
+        if (i == _util.k_leg_ext && !found_ext) continue;   // Skip ext if not there
+        if (i == _util.k_leg_dirt && !found_dirt) continue; // skip dirt if not there
         h_error_hist->Add(hist.at(i), 1);
     }
     
@@ -254,6 +266,9 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
 
     // Set the legend
     TLegend *leg_stack = new TLegend(leg_x1,leg_y1,leg_x2,leg_y2);
+    leg_stack->SetBorderSize(0);
+    leg_stack->SetFillStyle(0);
+
     //leg->SetHeader("The Legend Title","C"); // option "C" allows to center the header
     leg_stack->AddEntry(hist.at(_util.k_nue_cc),          "#nu_{e} CC",           "f");
     leg_stack->AddEntry(hist.at(_util.k_nue_cc_mixed),    "#nu_{e} CC Mixed",     "f");
@@ -285,7 +300,6 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
 
     TH1D * ratioPlot;
     TH1D * h_mc_ext_sum;
-
 
     if (found_data) {
         chi2  = Chi2Calc(h_last, hist.at(_util.k_leg_data), area_norm, integral_data);

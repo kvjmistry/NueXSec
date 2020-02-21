@@ -364,102 +364,102 @@ void selection::MakeHistograms(const char * hist_file_name){
 
         // Reco X
         _hplot.MakeStack("h_reco_vtx_x",_util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Reco Vertex X [cm]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Reco Vertex X [cm]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_vtx_x.pdf", _util.cut_dirs.at(i).c_str()) );
         
         // Reco Y
          _hplot.MakeStack("h_reco_vtx_y",_util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Reco Vertex Y [cm]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Reco Vertex Y [cm]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_vtx_y.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Reco Z
          _hplot.MakeStack("h_reco_vtx_z",_util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Reco Vertex Z [cm]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Reco Vertex Z [cm]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_vtx_z.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // dEdx
          _hplot.MakeStack("h_reco_dEdx",_util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Collection Plane dEdx [MeV/cm]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Collection Plane dEdx [MeV/cm]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_dEdx_collection.pdf", _util.cut_dirs.at(i).c_str()) );
    
         // Leading Shower Momentum
          _hplot.MakeStack("h_reco_leading_mom", _util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Leading Shower Momentum [MeV/c]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Leading Shower Momentum [MeV/c]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_leading_mom.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // 2D distance largest flash to reco nu vertex
          _hplot.MakeStack("h_reco_flash_to_vtx_dist", _util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Flash to Vertex Distance [cm]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Flash to Vertex Distance [cm]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_flash_to_vtx_dist.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // 2D distance shower vertex to reco nu vertex
          _hplot.MakeStack("h_reco_shower_to_vtx_dist", _util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Shower to Vertex Distance [cm]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Shower to Vertex Distance [cm]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_shower_to_vtx_dist.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // 2D distance track vertex to reco nu vertex
          _hplot.MakeStack("h_reco_trac_util.k_to_vtx_dist", _util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Track to Vertex Distance [cm]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Track to Vertex Distance [cm]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_trac_util.k_to_vtx_dist.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading Shower hits in all planes
          _hplot.MakeStack("h_reco_leading_shower_hits_all_planes", _util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Leading Shower Hits All Planes", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Leading Shower Hits All Planes", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_leading_shower_hits_all_planes.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading Shower hits in collection
          _hplot.MakeStack("h_reco_leading_shower_hits_collection_plane", _util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Leading Shower Hits Collection Plane", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Leading Shower Hits Collection Plane", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_leading_shower_hits_collection_plane.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading Shower opening angle
          _hplot.MakeStack("h_reco_leading_shower_open_angle", _util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Leading Shower Open Angle [degrees]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Leading Shower Open Angle [degrees]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_leading_shower_open_angle.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Secondary shower to vertex distance (for events with more than 1 shower)
          _hplot.MakeStack("h_reco_secondary_shower_to_vtx_dist", _util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Secondary Shower to Vertex Distance (>1 shower) [cm]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Secondary Shower to Vertex Distance (>1 shower) [cm]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_secondary_shower_to_vtx_dist.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading Shower hits per length
          _hplot.MakeStack("h_reco_leading_shower_hits_per_length", _util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Leading Shower Hits / Length [cm^{-1}]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Leading Shower Hits / Length [cm^{-1}]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_leading_shower_hits_per_length.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Longest track to leading shower length
          _hplot.MakeStack("h_reco_longest_trac_util.k_leading_shower_length", _util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Longest Track Length / Leading Shower Length", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Longest Track Length / Leading Shower Length", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_longest_trac_util.k_leading_shower_length.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Track Containment
          _hplot.MakeStack("h_reco_trac_util.k_contained", _util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Contained Tracks", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Contained Tracks", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_trac_util.k_contained.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading shower phi
          _hplot.MakeStack("h_reco_leading_shower_phi", _util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Leading Shower Phi [degrees]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Leading Shower Phi [degrees]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_leading_shower_phi.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading shower theta
          _hplot.MakeStack("h_reco_leading_shower_theta", _util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Leading Shower Theta [degrees]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Leading Shower Theta [degrees]", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_leading_shower_theta.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading shower cos theta
          _hplot.MakeStack("h_reco_leading_shower_cos_theta", _util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Leading Shower Cos(#theta)", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Leading Shower Cos(#theta)", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_leading_shower_cos_theta.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading shower multiplicity
          _hplot.MakeStack("h_reco_shower_multiplicity", _util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Shower Multiplicty", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Shower Multiplicty", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_shower_multiplicity.pdf", _util.cut_dirs.at(i).c_str()) );
 
         // Leading track multiplicity
          _hplot.MakeStack("h_reco_trac_util.k_multiplicity", _util.cut_dirs.at(i).c_str(),
-                                           false,  false, "Track Multiplicty", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.98, 0.50,
+                                           false,  false, "Track Multiplicty", mc_scale_factor, 1.0, intime_scale_factor, dirt_scale_factor, 0.8, 0.98, 0.90, 0.35,
                                            Form("plots/%s/reco_trac_util.k_multiplicity.pdf", _util.cut_dirs.at(i).c_str()) );
    
     }
