@@ -55,6 +55,11 @@ int GetPOT(const char *_file1, std::string type){
 
         int run, subrun;
 
+        std::cout << "     "  << std::endl;
+        system("if test -f \"run_subrun_list_data.txt\"; then echo \"the run_subrun file list exists, removing as a safeguard...\"; fi");
+        system("if test -f \"run_subrun_list_data.txt\"; then rm run_subrun_list_data.txt; fi");
+        std::cout << "     "  << std::endl;
+
         std::ofstream run_subrun_file;
         run_subrun_file.open("run_subrun_list_data.txt");
 
