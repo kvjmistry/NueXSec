@@ -46,11 +46,12 @@
     <maxfilesperjob>10</maxfilesperjob>
     <numjobs>10</numjobs>
     <datatier>reconstructed</datatier>
-    <memory>2000</memory>
+    <memory>4000</memory>
     <schema>root</schema>
     <inputdef>prodgenie_numi_uboone_overlay_fhc_mcc9_run1_v28_v2_sample0</inputdef>
-    <jobsub>--expected-lifetime=3h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub>--expected-lifetime=12h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
     <jobsub_start>  --expected-lifetime=short</jobsub_start>
+    <blacklist>Lancaster</blacklist>
   </stage>
   
   <!-- file type -->

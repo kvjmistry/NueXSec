@@ -52,59 +52,32 @@ class histogram_helper{
     // TH2D * h_ele_true_energy_theta = new TH2D("h_ele_true_energy_theta", "True e; Theta [degrees]; Theta [degrees]", 20,   0, 10,  14,    0, 180);
     // TH2D * h_ele_true_energy_phi   = new TH2D("h_ele_true_energy_phi",   "True e; Theta [degrees]; Phi [degrees]",   20,   0, 10,  14, -180, 180);
    
-    // RecoPlots
-    std::vector<std::vector<TH1D*>> h_reco_vtx_x; // Reco Vertex X
-    std::vector<std::vector<TH1D*>> h_reco_vtx_y; // Reco Vertex Y
-    std::vector<std::vector<TH1D*>> h_reco_vtx_z; // Reco Vertex Z
-    std::vector<TH2D*> h_reco_vtx_zy;             // Reco Vertex ZY Plane
 
-    // Leading Shower Momentum
-    std::vector<std::vector<TH1D*>> h_reco_leading_mom;
+    // enum for histogram vars
+    enum TH1D_hist_vars {
+        k_reco_vtx_x,                                                           // Reco Vertex X
+        k_reco_vtx_y,                                                           // Reco Vertex Y
+        k_reco_vtx_z,                                                           // Reco Vertex Z
+        k_reco_dEdx,                                                            // dEdx
+        k_reco_leading_mom,                                                     // Leading Shower Momentum
+        k_reco_shower_to_vtx_dist,                                              // 2D distance shower vertex to reco nu vertex
+        k_reco_track_to_vtx_dist,                                               // 2D distance track vertex to reco nu vertex
+        k_reco_leading_shower_hits_all_planes,                                  // Leading Shower hits in all planes
+        k_reco_leading_shower_hits_collection_plane,                            // Leading Shower hits in collection
+        k_reco_leading_shower_open_angle,                                       // Leading Shower opening angle
+        k_reco_secondary_shower_to_vtx_dist,                                    // Secondary shower to vertex distance (for events with more than 1 shower)
+        k_reco_leading_shower_hits_per_length,                                  // Leading Shower hits per length
+        k_reco_longest_track_leading_shower_length,                             // Longest track to leading shower length
+        k_reco_track_contained,                                                 // Track Containment
+        k_reco_leading_shower_phi,                                              // Leading shower phi
+        k_reco_leading_shower_theta,                                            // Leading shower theta
+        k_reco_leading_shower_cos_theta,                                        // Leading shower cos theta
+        k_reco_shower_multiplicity,                                             // Leading shower multiplicity
+        k_reco_track_multiplicity,                                              // Leading track multiplicity
+        k_TH1D_MAX
+    };
 
-    // 2D distance shower vertex to reco nu vertex
-    std::vector<std::vector<TH1D*>> h_reco_shower_to_vtx_dist;
-
-    // 2D distance track vertex to reco nu vertex
-    std::vector<std::vector<TH1D*>> h_reco_track_to_vtx_dist;
-
-    // Leading Shower hits in all planes
-    std::vector<std::vector<TH1D*>> h_reco_leading_shower_hits_all_planes;
-
-    // Leading Shower hits in collection
-    std::vector<std::vector<TH1D*>> h_reco_leading_shower_hits_collection_plane;
-
-    // Leading Shower opening angle
-    std::vector<std::vector<TH1D*>> h_reco_leading_shower_open_angle;
-
-    // dEdx
-    std::vector<std::vector<TH1D*>> h_reco_dEdx;
-
-    // Secondary shower to vertex distance (for events with more than 1 shower)
-    std::vector<std::vector<TH1D*>> h_reco_secondary_shower_to_vtx_dist;
-
-    // Leading Shower hits per length
-    std::vector<std::vector<TH1D*>> h_reco_leading_shower_hits_per_length;
-
-    // Longest track to leading shower length
-    std::vector<std::vector<TH1D*>> h_reco_longest_track_leading_shower_length;
-
-    // Track Containment
-    std::vector<std::vector<TH1D*>> h_reco_track_contained;
-
-    // Leading shower phi
-    std::vector<std::vector<TH1D*>> h_reco_leading_shower_phi;
-
-    // Leading shower theta
-    std::vector<std::vector<TH1D*>> h_reco_leading_shower_theta;
-
-    // Leading shower cos theta
-    std::vector<std::vector<TH1D*>> h_reco_leading_shower_cos_theta;
-
-    // Leading shower multiplicity
-    std::vector<std::vector<TH1D*>> h_reco_shower_multiplicity;
-
-    // Leading track multiplicity
-    std::vector<std::vector<TH1D*>> h_reco_track_multiplicity;
+    std::vector<std::vector<std::vector<TH1D*>>> TH1D_hists; // vector of histograms to make, indexed by enums
 
 }; // End Class Histogram Helper 
 
