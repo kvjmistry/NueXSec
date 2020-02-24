@@ -33,6 +33,8 @@ class histogram_plotter{
     // Returns reduced chi2, num mc+ext scaled to data POT, num data, num degrees of freedom, p value in vector respectively
     std::vector<double> Chi2Calc(TH1D * h_mc_ext, TH1D * h_data, const bool area_norm, const double return_norm);
     // -------------------------------------------------------------------------
+    // Draw the run period on the plot
+    void Draw_Run_Period(TCanvas* c);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

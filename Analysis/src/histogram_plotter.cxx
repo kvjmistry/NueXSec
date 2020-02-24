@@ -25,16 +25,35 @@ void histogram_plotter::Initalise(const char * hist_file_name, const char *_run_
 }
 // -----------------------------------------------------------------------------
 void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, bool area_norm,  bool logy, const char* x_axis_name,
-                                     double data_scale_factor, double y_scale_factor, double intime_scale_factor, double dirt_scale_factor, 
+                                     double mc_scale_factor, double y_scale_factor, double intime_scale_factor, double dirt_scale_factor, 
                                      const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, const char* print_name ){
 
+    std::vector<TH1D*>  hist(_util.k_classifications_MAX);                      // The vector of histograms from the file for the plot
+    std::vector<double> hist_integrals(_util.k_classifications_MAX,0.0);        // The integrals of all the histograms
+    double integral_data{-1};                                                   // Integral of data histogram -- needs to be removed
+    double integral_mc_ext{0.0};                                                // Integral of MC + EXT -- needs to be removed
+    double y_maximum{0};                                                        // y max for scaling histogram scale
     
-    std::vector<TH1D*> hist(_util.k_classifications_MAX);
+    std::vector <double> chi2;
+    TPaveText * pt_bottom;
 
+    TH1D * ratioPlot;
+    TH1D * h_mc_ext_sum;
+
+
+    // bools for checking if plots exist in the file
     bool found_data = true;
     bool found_ext  = true;
     bool found_dirt = true;
     
+
+    const bool p_value = false; // Choose whether to use a pvalue
+
+    TPad * topPad;
+    TPad * bottomPad;
+    TCanvas* c       = new TCanvas();
+    THStack * h_stack = new THStack();
+
     // Loop over the classifications and get the histograms
     for (unsigned int i=0; i <_util.classification_dirs.size(); i++){
 
@@ -76,14 +95,8 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         }
     
     }
-
-    // Choose whether to use a pvalue
-    const bool p_value = false;
-
-    TPad * topPad;
-    TPad * bottomPad;
-    TCanvas* c       = new TCanvas();
     
+    // If there is data and ext, then we make the ratio plot too
     if (found_data && found_ext){
         topPad    = new TPad("topPad", "", 0, 0.3, 1, 1.0);
         bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
@@ -96,18 +109,20 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         bottomPad->Draw();
         topPad   ->cd();
     }
+    // Otherwise just use an unsplit canvas
     else {
         gPad->SetLeftMargin(0.15);
         gPad->SetRightMargin(0.20 );
     }
-
-    THStack * h_stack = new THStack();
     
     // Scaling and setting stats
     for (unsigned int i=0; i < hist.size(); i++){
         
         if (i == _util.k_leg_data){
-            if (found_data) hist.at(i)->SetStats(kFALSE);
+            if (found_data){
+                hist.at(i)->SetStats(kFALSE);
+                hist_integrals.at(i) = hist.at(i)->Integral();
+            } 
         } 
         
         // Scale EXT
@@ -116,6 +131,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
 
                 hist.at(i)->SetStats(kFALSE);
                 hist.at(i)->Scale(intime_scale_factor);
+                hist_integrals.at(i) = hist.at(i)->Integral();
             }
         }
 
@@ -125,6 +141,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
 
                 hist.at(i)->SetStats(kFALSE);
                 hist.at(i)->Scale(dirt_scale_factor);
+                hist_integrals.at(i) = hist.at(i)->Integral();
             }
         }
         
@@ -132,13 +149,14 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         else {
 
             hist.at(i)->SetStats(kFALSE);
-            hist.at(i)->Scale(data_scale_factor);
+            hist.at(i)->Scale(mc_scale_factor);
+            hist_integrals.at(i) = hist.at(i)->Integral();
+            // std::cout <<  hist.at(i)->Integral()<< std::endl;
         }
 
     }
 
-
-    // Customise the histogram
+    // Customise the histograms -- put in a function
     hist.at(_util.k_nue_cc)       ->SetFillColor(30);
     hist.at(_util.k_nue_cc_mixed) ->SetFillColor(38);
     hist.at(_util.k_numu_cc)      ->SetFillColor(28);
@@ -164,13 +182,11 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         hist.at(_util.k_leg_dirt)     ->SetFillStyle(3354);
     }
 
-    double integral_data{-1};
     
+    // This needs to be updated to new vector value
     if (found_data) integral_data = hist.at(_util.k_leg_data)->Integral();
     
-    double integral_mc_ext{0.0};
-
-    // Normalisation
+    // Normalisation by area
     if (area_norm && integral_data != 0 && found_data && found_ext) {
 
         // Get the integral of the MC + EXT
@@ -210,8 +226,8 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         h_stack->Add(hist.at(i));
     }
 
-    double y_maximum{0};
-    
+
+    // Get the maximum y value for scaling
     if (found_data) y_maximum = std::max(hist.at(_util.k_leg_data)->GetMaximum(), h_stack->GetMaximum());
     else y_maximum = h_stack->GetMaximum();
 
@@ -248,6 +264,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     if(!area_norm) h_stack->GetYaxis()->SetTitle("Entries");
     else           h_stack->GetYaxis()->SetTitle("Entries [A.U.]");
     
+    // Customise the stacked histogram
     h_stack->GetYaxis()->SetTitleFont(45);
     h_stack->GetYaxis()->SetTitleSize(18);
     h_stack->GetYaxis()->SetTitleOffset(1.30);
@@ -271,109 +288,35 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     TLegend *leg_stack = new TLegend(leg_x1,leg_y1,leg_x2,leg_y2);
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
+    leg_stack->AddEntry(hist.at(_util.k_nue_cc),                   Form("#nu_{e} CC (%2.1f)",          hist_integrals.at(_util.k_nue_cc)),       "f");
+    leg_stack->AddEntry(hist.at(_util.k_nue_cc_mixed),             Form("#nu_{e} CC Mixed (%2.1f)",    hist_integrals.at(_util.k_nue_cc_mixed)), "f");
+    leg_stack->AddEntry(hist.at(_util.k_nu_out_fv),                Form("#nu OutFV (%2.1f)",           hist_integrals.at(_util.k_nu_out_fv)),    "f");
+    leg_stack->AddEntry(hist.at(_util.k_cosmic),                   Form("Cosmic (%2.1f)",              hist_integrals.at(_util.k_cosmic)),       "f");
+    leg_stack->AddEntry(hist.at(_util.k_numu_cc),                  Form("#nu_{#mu} CC (%2.1f)",        hist_integrals.at(_util.k_numu_cc)),      "f");
+    leg_stack->AddEntry(hist.at(_util.k_numu_cc_pi0),              Form("#nu_{#mu} CC #pi^{0} (%2.1f)",hist_integrals.at(_util.k_numu_cc_pi0)),  "f");
+    leg_stack->AddEntry(hist.at(_util.k_nc),                       Form("NC (%2.1f)",                  hist_integrals.at(_util.k_nc)),           "f");
+    leg_stack->AddEntry(hist.at(_util.k_nc_pi0),                   Form("NC #pi^{0} (%2.1f)",          hist_integrals.at(_util.k_nc_pi0)),       "f");
+    leg_stack->AddEntry(hist.at(_util.k_unmatched),                Form("Unmatched (%2.1f)",           hist_integrals.at(_util.k_unmatched)),    "f");
+    if (found_dirt) leg_stack->AddEntry(hist.at(_util.k_leg_dirt), Form("Dirt (%2.1f)",                hist_integrals.at(_util.k_dirt)),         "f");
+    if (found_ext)  leg_stack->AddEntry(hist.at(_util.k_leg_ext),  Form("InTime (EXT) (%2.1f)",        hist_integrals.at(_util.k_ext)),          "f");
+    if (found_data) leg_stack->AddEntry(hist.at(_util.k_leg_data), Form("Data (%2.1f)",                hist_integrals.at(_util.k_data)),         "lep");
 
-    //leg->SetHeader("The Legend Title","C"); // option "C" allows to center the header
-    leg_stack->AddEntry(hist.at(_util.k_nue_cc),          "#nu_{e} CC",           "f");
-    leg_stack->AddEntry(hist.at(_util.k_nue_cc_mixed),    "#nu_{e} CC Mixed",     "f");
-    leg_stack->AddEntry(hist.at(_util.k_nu_out_fv),       "#nu OutFV",            "f");
-    leg_stack->AddEntry(hist.at(_util.k_cosmic),          "Cosmic",               "f");
-    leg_stack->AddEntry(hist.at(_util.k_numu_cc),         "#nu_{#mu} CC",         "f");
-    leg_stack->AddEntry(hist.at(_util.k_numu_cc_pi0),     "#nu_{#mu} CC #pi^{0}", "f");
-    leg_stack->AddEntry(hist.at(_util.k_nc),              "NC",                   "f");
-    leg_stack->AddEntry(hist.at(_util.k_nc_pi0),          "NC #pi^{0}",           "f");
-    leg_stack->AddEntry(hist.at(_util.k_unmatched),       "Unmatched",            "f");
-    
-    if (found_dirt) leg_stack->AddEntry(hist.at(_util.k_leg_dirt),        "Dirt",                 "f");
-    if (found_ext)  leg_stack->AddEntry(hist.at(_util.k_leg_ext),         "InTime (EXT)",         "f");
-    
     leg_stack->Draw();
 
     if (!logy) h_stack->GetYaxis()->SetRangeUser(0, y_maximum * y_scale_factor);
-    else      topPad->SetLogy();
+    else       topPad->SetLogy();
     
     // Calculate the chi2
     TH1D * h_last = (TH1D*) h_stack->GetStack()->Last();
     
-    std::vector <double> chi2;
-    TPaveText * pt;
-    TPaveText * pt2;
-    TPaveText * pt3;
-    TPaveText * pt4;
-    TPaveText * pt_bottom;
-
-    TH1D * ratioPlot;
-    TH1D * h_mc_ext_sum;
-
     if (found_data) {
         chi2  = Chi2Calc(h_last, hist.at(_util.k_leg_data), area_norm, integral_data);
-        //chi2 : chi2/ndf, mc+ext, data
-
         
-        // Plot the Reduced Chi2
-        pt = new TPaveText(.46,.80,.73,1.06, "NBNDC");
-        std::ostringstream o_string;
-        o_string.precision(3);
-        o_string << std::fixed;
-        o_string << float(chi2.at(0));
-        std::string convert_string = o_string.str();
-        std::string chi2_string = "#chi_{Stat}^{2}/DOF=" + convert_string;
-        pt->AddText(chi2_string.c_str());
-        pt->SetFillStyle(0);
-        pt->SetBorderSize(0);
-        pt->Draw();
-
-        // Num events
-        pt2 = new TPaveText(.13,.80,.46,1.06, "NBNDC");
-        std::ostringstream o_string2a;
-        std::ostringstream o_string2b;
-        if(!area_norm) {
-            o_string2a << int(chi2.at(2));
-            o_string2b << int(chi2.at(1));
-        }
-        if(area_norm) {
-            o_string2a << int(chi2.at(2) * integral_data);
-            o_string2b << int(chi2.at(1) * integral_data);
-        }
-
-        std::string convert_string2a = o_string2a.str();
-        std::string convert_string2b = o_string2b.str();
-        std::string chi2_string2 = "Data: " + convert_string2a + "|MC+EXT:" + convert_string2b;
-        pt2->AddText(chi2_string2.c_str());
-        pt2->SetFillStyle(0);
-        pt2->SetBorderSize(0);
-        // This is removed for public distributions
-        pt2->Draw();
-
-        // Num bins
-        pt3 = new TPaveText(.60,.80,.73,.973, "NBNDC");
-        std::ostringstream o_string3;
-        o_string3 << int(chi2.at(3));
-        std::string convert_string3 = o_string3.str();
-        std::string ndf_string = "DOF=" + convert_string3;
-        pt3->AddText(ndf_string.c_str());
-        pt3->SetFillStyle(0);
-        pt3->SetBorderSize(0);
-        pt3->Draw();
-
-        // p value -- optional
-        pt4 = new TPaveText(.45,.80,.60,.973, "NBNDC");
-        std::ostringstream o_string4;
-        o_string4.precision(4);
-        o_string4 << std::fixed;
-        o_string4 << chi2.at(4);
-        std::string convert_string4 = o_string4.str();
-        std::string p_string = "P=" + convert_string4;
-        pt4->AddText(p_string.c_str());
-        pt4->SetFillStyle(0);
-        pt4->SetBorderSize(0);
-        if(p_value) {pt4->Draw(); }
-    
-
         bottomPad->cd();
 
         // Now create the ratio of data to MC
         ratioPlot    = (TH1D*) hist.at(_util.k_leg_data)->Clone("ratioPlot");
-        h_mc_ext_sum = (TH1D*) hist.at(_util.k_nue_cc)->Clone("h_mc_ext_sum");
+        h_mc_ext_sum = (TH1D*) hist.at(_util.k_nue_cc)  ->Clone("h_mc_ext_sum");
         
         for (unsigned int i=0; i < hist.size(); i++){
             if (i == _util.k_leg_data || i == _util.k_nue_cc ) continue; // Dont use the data and nue cc because already been cloned
@@ -419,6 +362,9 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         pt_bottom->SetBorderSize(0);
         // pt_bottom->Draw();
     }
+
+    // Draw the run period on the plot
+    Draw_Run_Period(c);
 
     c->Print(print_name);
 
@@ -486,3 +432,32 @@ std::vector<double> histogram_plotter::Chi2Calc(TH1D * h_mc_ext, TH1D * h_data, 
     chi2.push_back(p);
     return chi2;
 }
+// -----------------------------------------------------------------------------
+void histogram_plotter::Draw_Run_Period(TCanvas* c){
+    c->cd();
+
+    TPaveText *pt;
+
+    if (run_period == "1"){
+        pt = new TPaveText(0.66, 0.89, 0.86, 0.96,"NDC");
+        pt->AddText("Run1");
+        pt->SetTextColor(kRed+2);
+    }
+    else if (run_period == "3b"){
+        pt = new TPaveText(0.66, 0.89, 0.86, 0.96,"NDC");
+        pt->AddText("Run3b");
+        pt->SetTextColor(kBlue+2);
+    }
+    else {
+        pt = new TPaveText(0.66, 0.89, 0.86, 0.96,"NDC");
+        pt->AddText("RunXXX");
+        pt->SetTextColor(kGreen+2);
+    }
+    
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.04);
+    pt->Draw();
+}
+// -----------------------------------------------------------------------------
