@@ -59,7 +59,6 @@ public:
                                         double ratio_tolerance,
                                         bool do_variations
                                         );
-
     // -------------------------------------------------------------------------
     // Get a TFile from a file
     bool GetFile(TFile* &f, TString string);
@@ -81,6 +80,7 @@ public:
     // -------------------------------------------------------------------------
 
     // Other definitions for code
+    bool verbose = false; // This should be set in the config file
 
     // For creating histogram names
     std::vector<std::string> type_prefix = {"MC", "Data", "EXT", "Dirt"};

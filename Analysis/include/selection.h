@@ -115,7 +115,8 @@ namespace xsecSelection {
                              const char * variation_file,
                              const std::vector<double> _config,
                              bool _slim,
-                             int num_events);
+                             int num_events,
+                             const char * run_period);
             // -----------------------------------------------------------------
             // Main function for selection
             void make_selection();
@@ -129,7 +130,7 @@ namespace xsecSelection {
             void SavetoFile();
             // -----------------------------------------------------------------
             // Make final histogram plots
-            void MakeHistograms(const char * hist_file_name);
+            void MakeHistograms(const char * hist_file_name, const char *run_period);
             // -----------------------------------------------------------------
 
     }; // END Class

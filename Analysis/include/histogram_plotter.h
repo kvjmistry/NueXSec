@@ -18,9 +18,11 @@ class histogram_plotter{
 
     utility _util;
 
+    std::string run_period;
+
     // -------------------------------------------------------------------------
     // Initalise the file input
-    void Initalise(const char *hist_file_name);
+    void Initalise(const char *hist_file_name, const char* _run_period);
     // -------------------------------------------------------------------------
     // Function to make a stacked histogram and save as a pdf
     void MakeStack(std::string hist_name, std::string cut_name, bool area_norm,  bool logy, const char* x_axis_name,

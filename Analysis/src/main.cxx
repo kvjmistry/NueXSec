@@ -15,7 +15,10 @@ int main(int argc, char *argv[]){
     char * dirt_file_name        = (char *)"empty";
     char * variation_file_name   = (char *)"empty";
     char * hist_file_name        = (char *)"empty";
+    char * run_period            = (char *)"empty";
     int num_events{-1};
+
+    std::string usage = " \n ./nuexsec --run <run period num> [--mc <mc file>] [--data <data file>] [--ext <ext file>] [--dirt <dirt file>] [--var <variation file>] [-c <input config file>] [-n <num events>] [--slim] [--hist <input nuexsec file>] \n ";
 
     // -------------------------------------------------------------------------
     // Loop over input arguments
@@ -80,14 +83,27 @@ int main(int argc, char *argv[]){
             num_events = atoi(argv[i+1]);
         }
 
+        // Set the run period
+        if(strcmp(arg, "--run") == 0){
+            std::cout << "Setting the run period as : run" << argv[i+1] <<std::endl;
+            run_period = argv[i+1];
+        }
 
         if (strcmp(arg, "--h") == 0 || strcmp(arg, "-h") == 0|| strcmp(arg, "--help") == 0 || strcmp(arg, "--usage") == 0){
-            std::cout << " \n ./nuexsec --mc <mc file> [--data <data file>] [--ext <ext file>] [--dirt <dirt file>] [--var <variation file>] [-c <input config file>] [-n <num events>] [--slim] [--hist <input nuexsec file>] \n " << std::endl; 
+            std::cout << usage << std::endl; 
             exit(1);
         }
         
     }
     // if(argc < 2 )  { std::cout << " \n Please include the input file path \n " << std::endl; exit(1); }
+
+    // Add catches for default input
+    if ((run_period == "empty") ){
+        std::cout << "Error, must provide a run period as input!" << std::endl;
+        std::cout << "USAGE:" << usage << std::endl; 
+        exit(1);
+    }
+
     // -------------------------------------------------------------------------
     std::vector<double> config;
     std::vector<double> input_config;
@@ -157,8 +173,8 @@ int main(int argc, char *argv[]){
     // -------------------------------------------------------------------------
 
     // Initialise the selction script
-    if (!make_histos) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config, using_slim_version, num_events );
-    else _selection_instance.xsecSelection::selection::MakeHistograms(hist_file_name);
+    if (!make_histos) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config, using_slim_version, num_events, run_period );
+    else _selection_instance.xsecSelection::selection::MakeHistograms(hist_file_name, run_period);
 
     // -------------------------------------------------------------------------
     // Finished!

@@ -122,7 +122,7 @@ void FlashValidation::beginJob() {
   optical_tree->Branch("SubRun",           &fSubRun,              "fSubRun/I"        );
   optical_tree->Branch("OpFlashPE",        &fOpFlashPE,           "fOpFlashPE/I"     );
   optical_tree->Branch("OpFlashTime",      &fOpFlashTime,         "fOpFlashTime/D"   );
-  optical_tree->Branch("OpFlashWidhtY",    &fOpFlashWidthY,       "fOpFlashWidthY/D" );
+  optical_tree->Branch("OpFlashWidthY",    &fOpFlashWidthY,       "fOpFlashWidthY/D" );
   optical_tree->Branch("OpFlashWidthZ",    &fOpFlashWidthZ,       "fOpFlashWidthZ/D" );
   optical_tree->Branch("OpFlashCenterY",   &fOpFlashCenterY,      "fOpFlashCenterY/D");
   optical_tree->Branch("OpFlashCenterZ",   &fOpFlashCenterZ,      "fOpFlashCenterZ/D");

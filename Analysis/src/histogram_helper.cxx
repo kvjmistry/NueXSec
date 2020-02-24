@@ -75,39 +75,38 @@ void histogram_helper::MakeDirectory(){
    
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::Initialise(int type){
+void histogram_helper::Initialise(int type, const char* run_period ){
 
     std::cout << "Initalising Histogram Helper, creating TFile and directories..." << std::endl;
-
 
     if (type == _util.k_mc){
         
         // File not already open, open the file
-        if (!gROOT->GetListOfFiles()->FindObject("files/nuexsec_mc.root") ) {
-            f_nuexsec = new TFile("files/nuexsec_mc.root", "UPDATE");
+        if (!gROOT->GetListOfFiles()->FindObject( Form("files/nuexsec_mc_run%s.root", run_period) ) ) {
+            f_nuexsec = new TFile(Form("files/nuexsec_mc_run%s.root", run_period), "UPDATE");
         }
     }
     else if (type == _util.k_data){
         
         // File not already open, open the file
-        if (!gROOT->GetListOfFiles()->FindObject("files/nuexsec_data.root") ) {
-            f_nuexsec = new TFile("files/nuexsec_data.root", "UPDATE");
+        if (!gROOT->GetListOfFiles()->FindObject(Form("files/nuexsec_data_run%s.root", run_period)) ) {
+            f_nuexsec = new TFile(Form("files/nuexsec_data_run%s.root", run_period), "UPDATE");
         }
 
     }
     else if (type == _util.k_ext){
         
         // File not already open, open the file
-        if (!gROOT->GetListOfFiles()->FindObject("files/nuexsec_ext.root") ) {
-            f_nuexsec = new TFile("files/nuexsec_ext.root", "UPDATE");
+        if (!gROOT->GetListOfFiles()->FindObject(Form("files/nuexsec_ext_run%s.root", run_period)) ) {
+            f_nuexsec = new TFile(Form("files/nuexsec_ext_run%s.root", run_period), "UPDATE");
         }
 
     }
     else if (type == _util.k_dirt){
         
         // File not already open, open the file
-        if (!gROOT->GetListOfFiles()->FindObject("files/nuexsec_dirt.root") ) {
-            f_nuexsec = new TFile("files/nuexsec_dirt.root", "UPDATE");
+        if (!gROOT->GetListOfFiles()->FindObject(Form("files/nuexsec_dirt_run%s.root", run_period)) ) {
+            f_nuexsec = new TFile(Form("files/nuexsec_dirt_run%s.root", run_period), "UPDATE");
         }
 
     }

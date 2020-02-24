@@ -7,10 +7,12 @@ histogram_plotter::~histogram_plotter(){
     // f_nuexsec->Close();
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Initalise(const char * hist_file_name){ 
+void histogram_plotter::Initalise(const char * hist_file_name, const char *_run_period){ 
     
     std::cout << "Initalising Histogram Plotter..." << std::endl;
 
+    // Set the run period
+    run_period = _run_period;
 
     // File not already open, open the file
     if (!gROOT->GetListOfFiles()->FindObject(hist_file_name) ) {
@@ -33,6 +35,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     bool found_ext  = true;
     bool found_dirt = true;
     
+    // Loop over the classifications and get the histograms
     for (unsigned int i=0; i <_util.classification_dirs.size(); i++){
 
         // Data
