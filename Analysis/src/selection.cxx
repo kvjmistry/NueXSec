@@ -416,7 +416,7 @@ void selection::MakeHistograms(const char * hist_file_name, const char *run_peri
    
         // Leading Shower Momentum
         _hplot.MakeStack("h_reco_leading_mom", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Leading Shower Momentum [MeV/c]", 0.8, 0.98, 0.90, 0.35,
+                         false,  true, 1.0, "Leading Shower Momentum [MeV/c]", 0.8, 0.98, 0.90, 0.35,
                          Form("plots/run%s/%s/reco_leading_mom.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // 2D distance largest flash to reco nu vertex
@@ -446,7 +446,7 @@ void selection::MakeHistograms(const char * hist_file_name, const char *run_peri
 
         // Leading Shower opening angle
         _hplot.MakeStack("h_reco_leading_shower_open_angle", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Leading Shower Open Angle [degrees]", 0.8, 0.98, 0.90, 0.35,
+                         false,  true, 1.0, "Leading Shower Open Angle [degrees]", 0.8, 0.98, 0.90, 0.35,
                          Form("plots/run%s/%s/reco_leading_shower_open_angle.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Secondary shower to vertex distance (for events with more than 1 shower)
@@ -498,7 +498,38 @@ void selection::MakeHistograms(const char * hist_file_name, const char *run_peri
         _hplot.MakeStack("h_reco_topological_score", _util.cut_dirs.at(i).c_str(),
                          false,  true, 1.0, "Topological Score", 0.8, 0.98, 0.90, 0.35,
                          Form("plots/run%s/%s/reco_topological_score.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
+
+        // Track shower dist
+        _hplot.MakeStack("h_reco_track_shower_dist", _util.cut_dirs.at(i).c_str(),
+                         false,  false, 1.0, "Longest Track Leading Shower Distance [cm]", 0.8, 0.98, 0.90, 0.35,
+                         Form("plots/run%s/%s/reco_track_shower_dist.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
+        
+        // Track shower angle
+        _hplot.MakeStack("h_reco_track_shower_angle", _util.cut_dirs.at(i).c_str(),
+                         false,  true, 1.0, "Longest Track Leading Shower Angle [degrees]", 0.8, 0.98, 0.90, 0.35,
+                         Form("plots/run%s/%s/reco_track_shower_angle.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
    
+        // Ratio hits from showers to slice
+        _hplot.MakeStack("h_reco_hits_ratio", _util.cut_dirs.at(i).c_str(),
+                         false,  true, 1.0, "Hit ratio of all Showers and Slice", 0.8, 0.98, 0.90, 0.35,
+                         Form("plots/run%s/%s/reco_hits_ratio.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
+        
+         // Shower score
+        _hplot.MakeStack("h_reco_shower_score", _util.cut_dirs.at(i).c_str(),
+                         false,  false, 1.0, "Shower Score", 0.8, 0.98, 0.90, 0.35,
+                         Form("plots/run%s/%s/reco_shower_score.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
+
+        // Track score
+        _hplot.MakeStack("h_reco_track_score", _util.cut_dirs.at(i).c_str(),
+                         false,  false, 1.0, "Track Score", 0.8, 0.98, 0.90, 0.35,
+                         Form("plots/run%s/%s/reco_track_score.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
+
+        // Calibrated energy of all the showers
+        _hplot.MakeStack("h_reco_shower_energy_tot_cali", _util.cut_dirs.at(i).c_str(),
+                         false,  true, 1.0, "Total Calibrated Energy of all Showers [GeV]", 0.8, 0.98, 0.90, 0.35,
+                         Form("plots/run%s/%s/reco_shower_energy_tot_cali.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
+        
+
     }
     
 

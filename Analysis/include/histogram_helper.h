@@ -81,6 +81,12 @@ class histogram_helper{
         k_reco_shower_multiplicity,                                             // Leading shower multiplicity
         k_reco_track_multiplicity,                                              // Leading track multiplicity
         k_reco_topological_score,                                               // Pandora Topological Score
+        k_reco_track_shower_dist,                                               // Track shower dist
+        k_reco_track_shower_angle,                                              // Track shower angle
+        k_reco_hits_ratio,                                                      // Ratio hits from showers to slice
+        k_reco_shower_score,                                                    // Shower score
+        k_reco_track_score,                                                     // Track score
+        k_reco_shower_energy_tot_cali,                                          // Calibrated energy of all the showers
         k_TH1D_MAX
     };
 
