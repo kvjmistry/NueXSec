@@ -26,6 +26,7 @@
 #include "TPad.h"
 #include "TPaveText.h"
 #include "TSystem.h"
+#include "TEfficiency.h"
 
 // Class at the top level of the selection, so most classes will be including
 // from this class. Mainly provided useful functions.
@@ -88,12 +89,13 @@ public:
     // Cut directory names
     std::vector<std::string> cut_dirs = {
             "Unselected",  // Unselected
-            // "In_FV"        // Fiducial volume
+            "Slice_ID",    // Slice ID
             };
 
 
     // Names of the plot types
     std::vector<std::string> plot_types = {
+                "TEff",
                 "2D",
                 "Stack"
                 };
@@ -120,7 +122,7 @@ public:
     // enums for cut dirs
     enum enum_cut_dirs {
                 k_unselected, // Unselected 
-                // k_in_fv,      // Fiducial volume
+                k_slice_id,      // Slice ID
                 k_cuts_MAX
                 }; 
 

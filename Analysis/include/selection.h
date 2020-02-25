@@ -65,7 +65,7 @@ namespace xsecSelection {
 
             // Class Instances
             utility _util;
-            std::vector<selection_cuts>    _scuts;   // One for each type e.g MC, Data, EXT..
+            selection_cuts    _scuts;
             std::vector<histogram_helper>  _hhelper; // One for each type e.g MC, Data, EXT..
 
             // Variables -------------------------------------------------------
@@ -123,8 +123,7 @@ namespace xsecSelection {
             // -----------------------------------------------------------------
             // Template code to apply selection cuts
             bool ApplyCuts(int type, int ievent,std::vector<std::vector<int>> &counter_v,
-                           std::vector<Passed_Container> &passed_v, SliceContainer SC,
-                           std::string classification, std::string interaction);
+                           std::vector<Passed_Container> &passed_v, SliceContainer &SC);
             // -----------------------------------------------------------------
             // Function to save all written histograms to file
             void SavetoFile();

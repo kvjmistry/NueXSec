@@ -105,6 +105,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
         
         topPad   ->SetBottomMargin(0.05);
+        topPad   ->SetTopMargin(0.15);
         bottomPad->SetTopMargin(0.04);
         bottomPad->SetBottomMargin(0.25);
         bottomPad->SetGridy();

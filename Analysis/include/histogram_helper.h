@@ -20,6 +20,7 @@ class histogram_helper{
     // Class instances
     utility _util;
     selection_cuts _scuts;
+    int _type;
 
     // weight variable (will equal multiple of all weights)
     double weight{1.0};
@@ -40,6 +41,12 @@ class histogram_helper{
     // Function to write the histograms to a file
     void WriteReco(int type);
     // -------------------------------------------------------------------------
+    // Function to fill the true neutrino in FV graphs
+    void FillTEfficiency(int cut_index, std::string classification, SliceContainer &SC);
+    // -------------------------------------------------------------------------
+    // Function to write the TEfficiency Graphs to file
+    void WriteTEfficiency();
+    // -------------------------------------------------------------------------
 
     private:
 
@@ -54,6 +61,12 @@ class histogram_helper{
     // TH2D * h_ele_true_energy_theta = new TH2D("h_ele_true_energy_theta", "True e; Theta [degrees]; Theta [degrees]", 20,   0, 10,  14,    0, 180);
     // TH2D * h_ele_true_energy_phi   = new TH2D("h_ele_true_energy_phi",   "True e; Theta [degrees]; Phi [degrees]",   20,   0, 10,  14, -180, 180);
    
+    // vector of histograms to make, indexed by enums
+    std::vector<std::vector<std::vector<TH1D*>>> TH1D_hists; 
+
+    // Histograms for the efficiency plot
+    std::vector<TH1D*> TEfficiency_hists;
+    TH1D* h_true_nu_E; // The true neutrino energy for nu's in the cryostat
 
     // enum for histogram vars
     enum TH1D_hist_vars {
@@ -87,10 +100,11 @@ class histogram_helper{
         k_reco_shower_score,                                                    // Shower score
         k_reco_track_score,                                                     // Track score
         k_reco_shower_energy_tot_cali,                                          // Calibrated energy of all the showers
+        k_reco_shower_hits,                                                     // Total number of hits for the leading shower
+        k_reco_shower_hits_y_plane,                                             // Total number of hits for the leading shower in the collection plane
         k_TH1D_MAX
     };
 
-    std::vector<std::vector<std::vector<TH1D*>>> TH1D_hists; // vector of histograms to make, indexed by enums
 
 }; // End Class Histogram Helper 
 

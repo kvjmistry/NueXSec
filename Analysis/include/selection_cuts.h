@@ -2,6 +2,7 @@
 #define SELECTION_CUTS_h
 
 #include "utility.h"
+#include "SliceContainer.h"
 
 // Class for applying the selection cuts. Cut classes will inherit
 // from this one and override function
@@ -12,11 +13,11 @@ class selection_cuts{
     public:
     selection_cuts(){}; // Default constructor
 
-    // *************************************************************************
-    // ------------------- Selection Cuts Functions ----------------------------
-    // *************************************************************************
+    utility _util;
+
     // -------------------------------------------------------------------------
-    
+    // Require pass for the slice ID
+    bool slice_id(SliceContainer &SC);
     // -------------------------------------------------------------------------
 
 }; // End Class Selection Cuts

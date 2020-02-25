@@ -115,6 +115,9 @@ void histogram_helper::Initialise(int type, const char* run_period ){
         exit(1);
     }
 
+    // Set the type
+    _type = type;
+
     MakeDirectory();
 }
 // -----------------------------------------------------------------------------
@@ -219,12 +222,35 @@ void histogram_helper::InitHistograms(){
             
             // Calibrated energy of all the showers
             TH1D_hists.at(k_reco_shower_energy_tot_cali).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_tot_cali_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 3);
+            
+            // Total number of hits for the leading shower
+            TH1D_hists.at(k_reco_shower_hits).at(i).at(j) = new TH1D (Form("h_reco_shower_hits_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 600);
+            
+            // Total number of hits for the leading shower in the collection plane
+            TH1D_hists.at(k_reco_shower_hits_y_plane).at(i).at(j) = new TH1D (Form("h_reco_shower_hits_y_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 250);
 
 
         }
         
     }
     // -------------------------------------------------------------------------
+
+    // Intialising true histograms in here
+    if (_type == _util.k_mc){
+        
+        // Initalise the histograms for the TEfficency
+        TEfficiency_hists.resize(_util.k_cuts_MAX);
+
+        for (unsigned int l = 0; l < _util.k_cuts_MAX; l++ ){
+            TEfficiency_hists.at(l) = new TH1D( Form("h_true_nu_E_%s",_util.cut_dirs.at(l).c_str() ), "", 40, 0, 4 );
+        }
+
+        h_true_nu_E =  new TH1D("h_true_nu_E", "True Neutrino in FV Energy; Energy [GeV]; Entries", 40, 0, 4);
+
+    }
+
+    // -------------------------------------------------------------------------
+    
 
 }
 // -----------------------------------------------------------------------------
@@ -291,6 +317,10 @@ void histogram_helper::FillReco(int type, int classification_index, int cut_inde
 
     TH1D_hists.at(k_reco_shower_energy_tot_cali).at(cut_index).at(classification_index)->Fill(SC.shr_energy_tot_cali, weight);
 
+    TH1D_hists.at(k_reco_shower_hits).at(cut_index).at(classification_index)->Fill(SC.shr_hits_max, weight);
+
+    TH1D_hists.at(k_reco_shower_hits_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot, weight);
+
 }
 // -----------------------------------------------------------------------------
 void histogram_helper::WriteReco(int type){
@@ -342,5 +372,24 @@ void histogram_helper::WriteReco(int type){
     }
 }
 // -----------------------------------------------------------------------------
+void histogram_helper::FillTEfficiency(int cut_index, std::string classification, SliceContainer &SC){
+
+    // Fill the histogram at the specified cut
+    if (classification == "nue_cc") TEfficiency_hists.at(cut_index)->Fill(SC.nu_e);
+
+}
+// -----------------------------------------------------------------------------
+void histogram_helper::WriteTEfficiency(){
+    
+    TDirectory *dir;
+    bool bool_dir = _util.GetDirectory(f_nuexsec, dir ,"TEff");
+    if (bool_dir) dir->cd();
+    
+    for (unsigned int p = 0; p < TEfficiency_hists.size(); p++){
+        TEfficiency * teff = new TEfficiency(*TEfficiency_hists.at(p), *TEfficiency_hists.at(p));
+        teff->Write("",TObject::kOverwrite);
+    }
+    
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

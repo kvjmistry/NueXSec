@@ -35,8 +35,7 @@ void selection::Initialise( const char * mc_file,
     // Set the maximum number of events tp process
     if (num_events > 0 ) max_events = num_events;
 
-    // Resize the selection cuts/histogram helper instance vectors, one instance per type e.g MC, data, ..
-    _scuts.resize(_util.k_type_MAX);
+    // Resize the histogram helper instance vectors, one instance per type e.g MC, data, ..
     _hhelper.resize(_util.k_type_MAX);
 
     // Print the input files
@@ -191,41 +190,8 @@ void selection::make_selection(){
             // Get the entry in the tree
             mc_tree->GetEntry(ievent); // TPC Objects
 
-            // Classify the event
-            std::pair<std::string, int> classification = mc_SC.SliceClassifier(_util.k_mc);      // Classification of the event
-            std::string interaction                    = mc_SC.SliceInteractionType(_util.k_mc); // Genie interaction type
-            std::string category                       = mc_SC.SliceCategory();                  // The pandora group slice category
-
-            if (mc_SC.nslice == 0) continue;
-
-            // Tabulate the selection
-            _util.Tabulate(interaction, classification.first, _util.k_mc, counter_v.at(_util.k_unselected) );
-
-            // Fill the reco histograms
-            if (!slim) _hhelper.at(_util.k_mc).FillReco(_util.k_mc, classification.second, _util.k_unselected, mc_SC);
-
-            // std::cout << "Interaction: " <<  interaction << "   classification: " << classification << "   category: " << category<< std::endl;
-            // if (mc_SC.slpdg > 0) std::cout << "run: " << mc_SC.run << "  subrun: " << mc_SC.sub << "  event: " << mc_SC.evt << std::endl;
-            // if (mc_SC.slpdg > 0) std::cout << "slpdg: " << mc_SC.slpdg << "  topo score: " << mc_SC.topological_score << std::endl;
-            // if (mc_SC.slpdg > 0) std::cout << "Category: " << mc_SC.category << "   interaction: "<< mc_SC.interaction << "   Purity: " << mc_SC.nu_purity_from_pfp <<   std::endl;
-            // if (mc_SC.slpdg > 0) std::cout << "ccnc: "<< mc_SC.ccnc << std::endl;
-            // if (mc_SC.slpdg < 0) std::cout << "Classification: " << classification  << "  Category: " << category2 << std::endl;
-            // if (mc_SC.slpdg < 0) std::cout << "Interaction: " <<  mc_SC.SliceInteractionType(_util.k_mc) << std::endl;
-
-            // std::cout << "Shower daughter vector size: " << mc_SC.pfp_shr_daughters_v->size() << "   num showers: " << mc_SC.n_showers << std::endl;
-            if (mc_SC.slpdg > 0){
-                for (unsigned int k=0 ; k < mc_SC.trk_score_v->size();k++){
-                    // if (mc_SC.trk_score_v->at(k) < 0.5) std::cout << mc_SC.trk_score_v->at(k) << std::endl;
-                }
-
-            }
-
-            // if (category == "data") std::cout << classification.first << std::endl;
-
-            
-
             // Apply the selection cuts 
-            bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC, classification.first, interaction);
+            bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
             if (!pass) continue;
 
         } // End Event loop
@@ -261,20 +227,8 @@ void selection::make_selection(){
             // Get the entry in the tree
             data_tree->GetEntry(ievent); // TPC Objects
 
-            // Classify the event
-            std::pair<std::string, int> classification = data_SC.SliceClassifier(_util.k_data);      // Classification of the event
-            std::string interaction                    = data_SC.SliceInteractionType(_util.k_data); // Genie interaction type
-            std::string category                       = data_SC.SliceCategory();                    // The pandora group slice category
-
-            // Tabulate the selection
-            _util.Tabulate(interaction, classification.first, _util.k_data, counter_v.at(_util.k_unselected) );
-
-            // Fill reconstructed histograms
-            if (!slim) _hhelper.at(_util.k_data).FillReco(_util.k_data, classification.second, _util.k_unselected, data_SC);
-            // std::cout << "Interaction: " <<  interaction << "   classification: " << classification << "   category: " << category<< std::endl;
-            // if (data_SC.slpdg > 0) std::cout << "run: " << data_SC.run << "  subrun: " << data_SC.sub << "  event: " << data_SC.evt << std::endl;
-            // if (data_SC.slpdg > 0) std::cout << "slpdg: " << data_SC.slpdg << "  topo score: " << data_SC.topological_score << std::endl;
-            // if (data_SC.slpdg > 0) std::cout << "Category: " << data_SC.category << std::endl;
+            bool pass = ApplyCuts(_util.k_data, ievent, counter_v, data_passed_v, data_SC);
+            if (!pass) continue;
         }
 
         std::cout << std::endl;
@@ -297,16 +251,8 @@ void selection::make_selection(){
             // Get the entry in the tree
             ext_tree->GetEntry(ievent); // TPC Objects
 
-            // Classify the event
-            std::pair<std::string, int> classification = ext_SC.SliceClassifier(_util.k_ext);      // Classification of the event
-            std::string interaction                    = ext_SC.SliceInteractionType(_util.k_ext); // Genie interaction type
-            std::string category                       = ext_SC.SliceCategory();                    // The pandora group slice category
-
-            // Tabulate the selection
-            _util.Tabulate(interaction, classification.first, _util.k_ext, counter_v.at(_util.k_unselected) );
-
-            // Fill reconstructed histograms
-            if (!slim) _hhelper.at(_util.k_ext).FillReco(_util.k_data, classification.second, _util.k_unselected, ext_SC);
+            bool pass = ApplyCuts(_util.k_ext, ievent, counter_v, ext_passed_v, ext_SC);
+            if (!pass) continue;
         }
          
         std::cout << std::endl;
@@ -316,6 +262,23 @@ void selection::make_selection(){
     // Dirt --------------------------------------------------------------------
     if (bool_use_dirt){
         std::cout << "Starting Selection over Dirt" << std::endl;
+
+        for (int ievent = 0; ievent < dirt_tree_total_entries; ievent++){
+
+            // See if we want to process all the events
+            if (max_events > 0){
+                if (ievent >= max_events) break;
+            }
+
+            // Alert the user
+            if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
+        
+            // Get the entry in the tree
+            dirt_tree->GetEntry(ievent); // TPC Objects
+
+            bool pass = ApplyCuts(_util.k_dirt, ievent, counter_v, dirt_passed_v, dirt_SC);
+            if (!pass) continue;
+        }
          
         std::cout << std::endl;
         std::cout << "Ending Selection over Dirt" << std::endl;
@@ -324,7 +287,7 @@ void selection::make_selection(){
     // -------------------------------------------------------------------------
     std::cout << "Finished running the selection!"<< std::endl;
 
-    // Print information from the selection
+    // Print information from the selection -- need a loop for all cuts!
     _util.PrintInfo(counter_v.at(_util.k_unselected), intime_scale_factor, mc_scale_factor, dirt_scale_factor, _util.cut_dirs.at(_util.k_unselected), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc));
 
     // Now save all the outputs to file
@@ -334,18 +297,45 @@ void selection::make_selection(){
 } // End Selection
 // -----------------------------------------------------------------------------
 bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<int>> &counter_v,
-                           std::vector<Passed_Container> &passed_v, SliceContainer SC,
-                           std::string classification, std::string interaction){
+                           std::vector<Passed_Container> &passed_v, SliceContainer &SC){
 
     // Here we apply the selection cuts ----------------------------------------
     bool pass; // A flag to see if an event passes an event
 
+    // Classify the event
+    std::pair<std::string, int> classification = SC.SliceClassifier(type);      // Classification of the event
+    std::string interaction                    = SC.SliceInteractionType(type); // Genie interaction type
+    std::string category                       = SC.SliceCategory();            // The pandora group slice category
 
     // *************************************************************************
-    // Pandora Output ----------------------------------------------------------
-    // *************************************************************************
+    // Unselected---------------------------------------------------------------
+    
+    // Fill reconstructed histograms
+    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_unselected, SC);
+    
+    // Tabulate the selection
+    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_unselected) );
 
+    // Fill the hists for making the efficiency plot
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_unselected, classification.first, SC);
+    
     // *************************************************************************
+    
+    // *************************************************************************
+    // Slice ID ----------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.slice_id(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_slice_id) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_slice_id, SC);
+    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_slice_id) );
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_slice_id, classification.first, SC);
+    
+    // *************************************************************************
+    // Cut2 ----------------------------------------------------------------
+    // *************************************************************************
+    
     return true;
 
 }
@@ -356,7 +346,7 @@ void selection::SavetoFile(){
     std::cout << "Now Saving Histograms to file" << std::endl;
     if (bool_use_mc) {
         // _hhelper.WriteMCTruth("MC");
-        // _hhelper.WriteOptical(_util.k_mc);
+        _hhelper.at(_util.k_mc).WriteTEfficiency();
         _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
     }
     if (bool_use_data) {
@@ -553,6 +543,17 @@ void selection::MakeHistograms(const char * hist_file_name, const char *run_peri
         _hplot.MakeStack("h_reco_shower_energy_tot_cali", _util.cut_dirs.at(i).c_str(),
                          false,  true, 1.0, "Total Calibrated Energy of all Showers [GeV]", 0.8, 0.98, 0.90, 0.35,
                          Form("plots/run%s/%s/reco_shower_energy_tot_cali.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
+
+        // Total number of hits for the leading showe
+        _hplot.MakeStack("h_reco_shower_hits", _util.cut_dirs.at(i).c_str(),
+                         false,  true, 1.0, "Total Num of hits for the leading Shower", 0.8, 0.98, 0.90, 0.35,
+                         Form("plots/run%s/%s/reco_shower_hits.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
+
+        
+        // Total number of hits for the leading shower in the collection plane
+        _hplot.MakeStack("h_reco_shower_hits_y_plane", _util.cut_dirs.at(i).c_str(),
+                         false,  true, 1.0, "Total Num of hits for the leading Shower in Collection Plane", 0.8, 0.98, 0.90, 0.35,
+                         Form("plots/run%s/%s/reco_shower_hits_y_plane.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
         
 
     }
