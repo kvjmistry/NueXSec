@@ -7,12 +7,16 @@ histogram_plotter::~histogram_plotter(){
     // f_nuexsec->Close();
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Initalise(const char * hist_file_name, const char *_run_period){ 
+void histogram_plotter::Initalise(const char * hist_file_name, const char *_run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor){ 
     
     std::cout << "Initalising Histogram Plotter..." << std::endl;
 
     // Set the run period
     run_period = _run_period;
+
+    mc_scale_factor = _mc_scale_factor;
+    intime_scale_factor = _intime_scale_factor;
+    dirt_scale_factor = _dirt_scale_factor;
 
     // File not already open, open the file
     if (!gROOT->GetListOfFiles()->FindObject(hist_file_name) ) {
@@ -24,8 +28,7 @@ void histogram_plotter::Initalise(const char * hist_file_name, const char *_run_
     }
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, bool area_norm,  bool logy, const char* x_axis_name,
-                                     double mc_scale_factor, double y_scale_factor, double intime_scale_factor, double dirt_scale_factor, 
+void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, double y_scale_factor, const char* x_axis_name,
                                      const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, const char* print_name ){
 
     std::vector<TH1D*>  hist(_util.k_classifications_MAX);                      // The vector of histograms from the file for the plot

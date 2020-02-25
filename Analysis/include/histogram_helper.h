@@ -58,7 +58,11 @@ class histogram_helper{
         k_reco_vtx_x,                                                           // Reco Vertex X
         k_reco_vtx_y,                                                           // Reco Vertex Y
         k_reco_vtx_z,                                                           // Reco Vertex Z
-        k_reco_dEdx,                                                            // dEdx
+        k_reco_vtx_x_sce,                                                       // Reco Vertex X Space Charge Corrected
+        k_reco_vtx_y_sce,                                                       // Reco Vertex Y Space Charge Corrected
+        k_reco_vtx_z_sce,                                                       // Reco Vertex Z Space Charge Corrected
+        k_reco_dEdx_y_plane,                                                    // dEdx on Collection Plane (uncalibrated)
+        k_reco_dEdx_cali_y_plane,                                               // dEdx Cali on Collection Plane
         k_reco_leading_mom,                                                     // Leading Shower Momentum
         k_reco_shower_to_vtx_dist,                                              // 2D distance shower vertex to reco nu vertex
         k_reco_track_to_vtx_dist,                                               // 2D distance track vertex to reco nu vertex

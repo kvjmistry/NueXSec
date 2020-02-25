@@ -317,7 +317,7 @@ public:
     float lep_e;
     int   pass;
     int   swtrig;     // Software Trigger
-    int   evnhits;
+    int   evnhits;    // Reco Number of hits in the event
     int   slpdg;      // Reco Slice PDG of primary PFP
     int   slnhits;    // Reco Slice Number of Hits within it
     int   n_pfps;     // Reco Number of pfp's

@@ -20,13 +20,14 @@ class histogram_plotter{
 
     std::string run_period;
 
+    double mc_scale_factor, intime_scale_factor, dirt_scale_factor;
+
     // -------------------------------------------------------------------------
     // Initalise the file input
-    void Initalise(const char *hist_file_name, const char* _run_period);
+    void Initalise(const char *hist_file_name, const char* _run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor);
     // -------------------------------------------------------------------------
     // Function to make a stacked histogram and save as a pdf
-    void MakeStack(std::string hist_name, std::string cut_name, bool area_norm,  bool logy, const char* x_axis_name,
-                                     double data_scale_factor, double y_scale_factor, double intime_scale_factor, double dirt_scale_factor, 
+    void MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, double y_scale_factor, const char* x_axis_name,
                                      const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, const char* print_name );
     // -------------------------------------------------------------------------
     // Calculates the chi2

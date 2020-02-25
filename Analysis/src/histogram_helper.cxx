@@ -144,8 +144,15 @@ void histogram_helper::InitHistograms(){
             
             TH1D_hists.at(k_reco_vtx_z).at(i).at(j) = new TH1D ( Form("h_reco_vtx_z_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, -10, 1050);
 
+            TH1D_hists.at(k_reco_vtx_x_sce).at(i).at(j) = new TH1D ( Form("h_reco_vtx_x_sce_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, -10, 270);
+
+            TH1D_hists.at(k_reco_vtx_y_sce).at(i).at(j) = new TH1D ( Form("h_reco_vtx_y_sce_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, -10, 120);
+            
+            TH1D_hists.at(k_reco_vtx_z_sce).at(i).at(j) = new TH1D ( Form("h_reco_vtx_z_sce_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, -10, 1050);
+
             // dEdx
-            TH1D_hists.at(k_reco_dEdx).at(i).at(j) = new TH1D ( Form("h_reco_dEdx_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_dEdx_cali_y_plane).at(i).at(j) = new TH1D ( Form("h_reco_dEdx_cali_y_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_dEdx_y_plane).at(i).at(j) = new TH1D ( Form("h_reco_dEdx_y_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
 
             // Leading Shower Momentum
             TH1D_hists.at(k_reco_leading_mom).at(i).at(j) = new TH1D ( Form("h_reco_leading_mom_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 2);
@@ -207,15 +214,21 @@ void histogram_helper::FillReco(int classification_index, int cut_index, SliceCo
     TH1D_hists.at(k_reco_vtx_y).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_y);
     TH1D_hists.at(k_reco_vtx_z).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_z);
 
-    TH1D_hists.at(k_reco_dEdx).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y_cali); // Just the collection plane!
+    TH1D_hists.at(k_reco_vtx_x_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_x);
+    TH1D_hists.at(k_reco_vtx_y_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_y);
+    TH1D_hists.at(k_reco_vtx_z_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_z);
+
+     TH1D_hists.at(k_reco_dEdx_cali_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y_cali); // Just the collection plane!
+
+    TH1D_hists.at(k_reco_dEdx_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y); // Just the collection plane!
     
-    // TH1D_hists.at(k_reco_leading_mom).at(cut_index).at(classification_index)->Fill();
+    TH1D_hists.at(k_reco_leading_mom).at(cut_index).at(classification_index)->Fill(std::sqrt(SC.shr_px*SC.shr_px+SC.shr_py*SC.shr_py+SC.shr_pz*SC.shr_pz));
     
     TH1D_hists.at(k_reco_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.shr_distance);
 
     TH1D_hists.at(k_reco_track_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.trk_distance);
     
-    // TH1D_hists.at(k_reco_leading_shower_hits_all_planes).at(cut_index).at(classification_index)->Fill();
+    TH1D_hists.at(k_reco_leading_shower_hits_all_planes).at(cut_index).at(classification_index)->Fill(SC.shr_hits_tot);
     
     TH1D_hists.at(k_reco_leading_shower_hits_collection_plane).at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot);
 
@@ -227,13 +240,13 @@ void histogram_helper::FillReco(int classification_index, int cut_index, SliceCo
     
     // TH1D_hists.at(k_reco_longest_track_leading_shower_length).at(cut_index).at(classification_index)->Fill();
     
-    // TH1D_hists.at(k_reco_track_contained).at(cut_index).at(classification_index)->Fill(); // We fill this once per tpc obj (only 1 track has to pass)
+    // TH1D_hists.at(k_reco_track_contained).at(cut_index).at(classification_index)->Fill();
     
     TH1D_hists.at(k_reco_leading_shower_phi).at(cut_index).at(classification_index)->Fill(SC.shr_phi * 180/3.14159);
     
     TH1D_hists.at(k_reco_leading_shower_theta).at(cut_index).at(classification_index)->Fill(SC.shr_theta * 180/3.14159);
     
-    TH1D_hists.at(k_reco_leading_shower_cos_theta).at(cut_index).at(classification_index)->Fill(std::cos(SC.shr_theta));
+    TH1D_hists.at(k_reco_leading_shower_cos_theta).at(cut_index).at(classification_index)->Fill(std::cos(SC.shr_theta * 180/3.14159));
     
     TH1D_hists.at(k_reco_shower_multiplicity).at(cut_index).at(classification_index)->Fill(SC.n_showers);
     
