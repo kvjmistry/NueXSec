@@ -108,9 +108,14 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         bottomPad->SetTopMargin(0.04);
         bottomPad->SetBottomMargin(0.25);
         bottomPad->SetGridy();
+        topPad->SetLeftMargin(0.15);
+        topPad->SetRightMargin(0.20 );
+        bottomPad->SetLeftMargin(0.15);
+        bottomPad->SetRightMargin(0.20 );
         topPad   ->Draw();
         bottomPad->Draw();
         topPad   ->cd();
+        
     }
     // Otherwise just use an unsplit canvas
     else {

@@ -69,6 +69,7 @@ int GetPOT(const char *_file1, std::string type){
 
         // Get the tree
         TTree * mytree = (TTree*)f->Get("nuselection/SubRun");
+	if (mytree == NULL) mytree = (TTree*)f->Get("FlashValidate/pottree");
 
         if (mytree == NULL){
             std::cout << "help can't get the branch so exiting..." << std::endl;
@@ -77,6 +78,7 @@ int GetPOT(const char *_file1, std::string type){
 
         mytree->SetBranchAddress("run", &run);
         mytree->SetBranchAddress("subRun", &subrun);
+        //mytree->SetBranchAddress("subrun", &subrun);
 
         for (int i = 0; i < mytree->GetEntries(); i++){
             mytree->GetEntry(i);
@@ -86,6 +88,9 @@ int GetPOT(const char *_file1, std::string type){
         run_subrun_file.close();
 
         gSystem->Exec("/uboone/app/users/zarko/getDataInfo.py -v2 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt"); 
+
+        gSystem->Exec("rm run_subrun_list_data.txt");
+
         return 0;
 
     }

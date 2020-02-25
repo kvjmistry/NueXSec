@@ -30,11 +30,11 @@ namespace xsecSelection {
             int max_events{-1};
 
             // POT and triggers
-            double MC_POT    = 1.0;    // The MC POT
+            double MC_POT    = 2.54342e+18;    // The MC POT
             double Dirt_POT  = 1.0;    // The dirt POT
-            double Data_POT  = 1.0;    // The Data POT (tortgt_wcut)
-            double Data_trig = 1.0;    // The data HW Triggers (EA9CNT_wcut)
-            double EXT_trig  = 1.0;    // The Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
+            double Data_POT  = 3.783e+19;    // The Data POT (tortgt_wcut)
+            double Data_trig = 974369.0;    // The data HW Triggers (EA9CNT_wcut)
+            double EXT_trig  = 852789.220000;    // The Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
 
 
             // Scale factors (veverything is scaled to data)

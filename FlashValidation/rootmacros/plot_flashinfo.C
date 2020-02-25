@@ -27,17 +27,17 @@ void plot_flashinfo(){
 	// Define POT scalings and HW trigger amounts for each sample
 	double MC_POT    = 3.56691e+20;
 	double Dirt_POT  = 2.85818e+20;
-	double Data_POT  = 5.484e+18;
-	double Data_trig = 143056.0;
-	double EXT_trig  = 160597.675000;
+	double Data_POT  = 3.918e+19;
+	double Data_trig = 1009015.0;
+	double EXT_trig  = 1552360.000000;
 
 	// Scale the histograms
 	h_flash_overlay ->Scale(Data_POT / MC_POT);
-	h_flash_dirt    ->Scale(Data_POT / MC_POT);
+	h_flash_dirt    ->Scale(Data_POT / Dirt_POT);
 	h_flash_ext     ->Scale(Data_trig / EXT_trig);
 
         h_flash_pe_overlay ->Scale(Data_POT / MC_POT);
-        h_flash_pe_dirt    ->Scale(Data_POT / MC_POT);
+        h_flash_pe_dirt    ->Scale(Data_POT / Dirt_POT);
         h_flash_pe_ext     ->Scale(Data_trig / EXT_trig);
 
 	// Make the stack
@@ -75,8 +75,8 @@ void plot_flashinfo(){
 	leg_stack->AddEntry(h_flash_dirt,     "Dirt",    "f");
 	
 	TCanvas* c       = new TCanvas();
-	h_stack->Draw("hist");
 	h_flash_data->Draw("same PE");
+	h_stack->Draw("hist,same");
 	leg_stack ->Draw();
 
         TCanvas* c2       = new TCanvas();

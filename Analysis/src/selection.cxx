@@ -69,8 +69,8 @@ void selection::Initialise( const char * mc_file,
     // Get MC variables --------------------------------------------------------
     if (bool_use_mc){
         std::cout << "\nInitialising MC" << std::endl;
-        // _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
-        _util.GetTree(f_mc, mc_tree, "NeutrinoSelectionFilter");
+        _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
+        // _util.GetTree(f_mc, mc_tree, "NeutrinoSelectionFilter");
 
         // Initialise all the mc slice container
         mc_SC.Initialise(mc_tree);
@@ -283,6 +283,31 @@ void selection::make_selection(){
     // EXT ---------------------------------------------------------------------
     if (bool_use_ext){
         std::cout << "Starting Selection over EXT" << std::endl;
+
+        for (int ievent = 0; ievent < ext_tree_total_entries; ievent++){
+
+            // See if we want to process all the events
+            if (max_events > 0){
+                if (ievent >= max_events) break;
+            }
+
+            // Alert the user
+            if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
+        
+            // Get the entry in the tree
+            ext_tree->GetEntry(ievent); // TPC Objects
+
+            // Classify the event
+            std::pair<std::string, int> classification = ext_SC.SliceClassifier(_util.k_ext);      // Classification of the event
+            std::string interaction                    = ext_SC.SliceInteractionType(_util.k_ext); // Genie interaction type
+            std::string category                       = ext_SC.SliceCategory();                    // The pandora group slice category
+
+            // Tabulate the selection
+            _util.Tabulate(interaction, classification.first, _util.k_ext, counter_v.at(_util.k_unselected) );
+
+            // Fill reconstructed histograms
+            if (!slim) _hhelper.at(_util.k_ext).FillReco(_util.k_data, classification.second, _util.k_unselected, ext_SC);
+        }
          
         std::cout << std::endl;
         std::cout << "Ending Selection over EXT" << std::endl;
