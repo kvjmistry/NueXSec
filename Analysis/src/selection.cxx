@@ -202,7 +202,7 @@ void selection::make_selection(){
             _util.Tabulate(interaction, classification.first, _util.k_mc, counter_v.at(_util.k_unselected) );
 
             // Fill the reco histograms
-            if (!slim) _hhelper.at(_util.k_mc).FillReco(classification.second, _util.k_unselected, mc_SC);
+            if (!slim) _hhelper.at(_util.k_mc).FillReco(_util.k_mc, classification.second, _util.k_unselected, mc_SC);
 
             // std::cout << "Interaction: " <<  interaction << "   classification: " << classification << "   category: " << category<< std::endl;
             // if (mc_SC.slpdg > 0) std::cout << "run: " << mc_SC.run << "  subrun: " << mc_SC.sub << "  event: " << mc_SC.evt << std::endl;
@@ -270,7 +270,7 @@ void selection::make_selection(){
             _util.Tabulate(interaction, classification.first, _util.k_data, counter_v.at(_util.k_unselected) );
 
             // Fill reconstructed histograms
-            if (!slim) _hhelper.at(_util.k_data).FillReco(classification.second, _util.k_unselected, data_SC);
+            if (!slim) _hhelper.at(_util.k_data).FillReco(_util.k_data, classification.second, _util.k_unselected, data_SC);
             // std::cout << "Interaction: " <<  interaction << "   classification: " << classification << "   category: " << category<< std::endl;
             // if (data_SC.slpdg > 0) std::cout << "run: " << data_SC.run << "  subrun: " << data_SC.sub << "  event: " << data_SC.evt << std::endl;
             // if (data_SC.slpdg > 0) std::cout << "slpdg: " << data_SC.slpdg << "  topo score: " << data_SC.topological_score << std::endl;
@@ -370,8 +370,7 @@ void selection::MakeHistograms(const char * hist_file_name, const char *run_peri
         std::string command = a + b + c + d + e ;
         system(command.c_str()); 
 
-        // MakeStack(std::string hist_name, std::string cut_name, bool area_norm,  bool logy, const char* x_axis_name,
-        //                             double mc_scale_factor, double y_scale_factor, double intime_scale_factor, double dirt_scale_factor, 
+        // MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, const char* x_axis_name, double y_scale_factor, 
         //                             const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, const char* print_name )
 
         // Reco X
@@ -463,12 +462,12 @@ void selection::MakeHistograms(const char * hist_file_name, const char *run_peri
         // Longest track to leading shower length
         _hplot.MakeStack("h_reco_longest_trac_util.k_leading_shower_length", _util.cut_dirs.at(i).c_str(),
                          false,  false, 1.0, "Longest Track Length / Leading Shower Length", 0.8, 0.98, 0.90, 0.35,
-                         Form("plots/run%s/%s/reco_longest_trac_util.k_leading_shower_length.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
+                         Form("plots/run%s/%s/reco_longest_track_leading_shower_length.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Track Containment
-        _hplot.MakeStack("h_reco_trac_util.k_contained", _util.cut_dirs.at(i).c_str(),
+        _hplot.MakeStack("h_reco_track_contained", _util.cut_dirs.at(i).c_str(),
                          false,  false, 1.0, "Contained Tracks", 0.8, 0.98, 0.90, 0.35,
-                         Form("plots/run%s/%s/reco_trac_util.k_contained.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
+                         Form("plots/run%s/%s/reco_track_contained.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Leading shower phi
         _hplot.MakeStack("h_reco_leading_shower_phi", _util.cut_dirs.at(i).c_str(),
@@ -491,9 +490,14 @@ void selection::MakeHistograms(const char * hist_file_name, const char *run_peri
                          Form("plots/run%s/%s/reco_shower_multiplicity.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Leading track multiplicity
-        _hplot.MakeStack("h_reco_trac_util.k_multiplicity", _util.cut_dirs.at(i).c_str(),
+        _hplot.MakeStack("h_reco_track_multiplicity", _util.cut_dirs.at(i).c_str(),
                          false,  false, 1.0, "Track Multiplicty", 0.8, 0.98, 0.90, 0.35,
-                         Form("plots/run%s/%s/reco_trac_util.k_multiplicity.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
+                         Form("plots/run%s/%s/reco_track_multiplicity.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
+
+        // Topological Score
+        _hplot.MakeStack("h_reco_topological_score", _util.cut_dirs.at(i).c_str(),
+                         false,  true, 1.0, "Topological Score", 0.8, 0.98, 0.90, 0.35,
+                         Form("plots/run%s/%s/reco_topological_score.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
    
     }
     

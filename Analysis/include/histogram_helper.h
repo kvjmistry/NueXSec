@@ -21,6 +21,8 @@ class histogram_helper{
     utility _util;
     selection_cuts _scuts;
 
+    // weight variable (will equal multiple of all weights)
+    double weight{1.0};
 
     // -------------------------------------------------------------------------
     // Initialiser function
@@ -33,7 +35,7 @@ class histogram_helper{
     void MakeDirectory();
     // -------------------------------------------------------------------------
     // Function to fill the reco variables
-    void FillReco(int classification_index, int cut_index, SliceContainer &SC);
+    void FillReco(int type, int classification_index, int cut_index, SliceContainer &SC);
     // -------------------------------------------------------------------------
     // Function to write the histograms to a file
     void WriteReco(int type);
@@ -78,6 +80,7 @@ class histogram_helper{
         k_reco_leading_shower_cos_theta,                                        // Leading shower cos theta
         k_reco_shower_multiplicity,                                             // Leading shower multiplicity
         k_reco_track_multiplicity,                                              // Leading track multiplicity
+        k_reco_topological_score,                                               // Pandora Topological Score
         k_TH1D_MAX
     };
 

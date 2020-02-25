@@ -199,6 +199,9 @@ void histogram_helper::InitHistograms(){
             // Leading track multiplicity
             TH1D_hists.at(k_reco_track_multiplicity).at(i).at(j) = new TH1D ( Form("h_reco_track_multiplicity_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 5, 0, 5);
 
+            // Pandora topological score
+            TH1D_hists.at(k_reco_topological_score).at(i).at(j) = new TH1D ( Form("h_reco_topological_score_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 100, 0, 1);
+
         }
         
     }
@@ -206,35 +209,38 @@ void histogram_helper::InitHistograms(){
 
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::FillReco(int classification_index, int cut_index, SliceContainer &SC){
+void histogram_helper::FillReco(int type, int classification_index, int cut_index, SliceContainer &SC){
+
+    if (type == _util.k_mc || type == _util.k_dirt) weight = 1.0; // Here define the weight
+    else weight == 1.0;
 
 
     // Now fill the histograms!
-    TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x);
-    TH1D_hists.at(k_reco_vtx_y).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_y);
-    TH1D_hists.at(k_reco_vtx_z).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_z);
+    TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x, weight);
+    TH1D_hists.at(k_reco_vtx_y).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_y, weight);
+    TH1D_hists.at(k_reco_vtx_z).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_z, weight);
 
-    TH1D_hists.at(k_reco_vtx_x_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_x);
-    TH1D_hists.at(k_reco_vtx_y_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_y);
-    TH1D_hists.at(k_reco_vtx_z_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_z);
+    TH1D_hists.at(k_reco_vtx_x_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_x, weight);
+    TH1D_hists.at(k_reco_vtx_y_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_y, weight);
+    TH1D_hists.at(k_reco_vtx_z_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_z, weight);
 
-     TH1D_hists.at(k_reco_dEdx_cali_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y_cali); // Just the collection plane!
+    TH1D_hists.at(k_reco_dEdx_cali_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y_cali, weight); // Just the collection plane!
 
-    TH1D_hists.at(k_reco_dEdx_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y); // Just the collection plane!
+    TH1D_hists.at(k_reco_dEdx_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y, weight); // Just the collection plane!
     
-    TH1D_hists.at(k_reco_leading_mom).at(cut_index).at(classification_index)->Fill(std::sqrt(SC.shr_px*SC.shr_px+SC.shr_py*SC.shr_py+SC.shr_pz*SC.shr_pz));
+    TH1D_hists.at(k_reco_leading_mom).at(cut_index).at(classification_index)->Fill(std::sqrt(SC.shr_px*SC.shr_px+SC.shr_py*SC.shr_py+SC.shr_pz*SC.shr_pz), weight);
     
-    TH1D_hists.at(k_reco_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.shr_distance);
+    TH1D_hists.at(k_reco_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.shr_distance, weight);
 
-    TH1D_hists.at(k_reco_track_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.trk_distance);
+    TH1D_hists.at(k_reco_track_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.trk_distance, weight);
     
-    TH1D_hists.at(k_reco_leading_shower_hits_all_planes).at(cut_index).at(classification_index)->Fill(SC.shr_hits_tot);
+    TH1D_hists.at(k_reco_leading_shower_hits_all_planes).at(cut_index).at(classification_index)->Fill(SC.shr_hits_tot, weight);
     
-    TH1D_hists.at(k_reco_leading_shower_hits_collection_plane).at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot);
+    TH1D_hists.at(k_reco_leading_shower_hits_collection_plane).at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot, weight);
 
     // TH1D_hists.at(k_reco_secondary_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill();
     
-    TH1D_hists.at(k_reco_leading_shower_open_angle).at(cut_index).at(classification_index)->Fill(SC.shr_openangle * 180/3.14159);
+    TH1D_hists.at(k_reco_leading_shower_open_angle).at(cut_index).at(classification_index)->Fill(SC.shr_openangle * 180/3.14159, weight);
     
     // TH1D_hists.at(k_reco_leading_shower_hits_per_length).at(cut_index).at(classification_index)->Fill();
     
@@ -242,15 +248,17 @@ void histogram_helper::FillReco(int classification_index, int cut_index, SliceCo
     
     // TH1D_hists.at(k_reco_track_contained).at(cut_index).at(classification_index)->Fill();
     
-    TH1D_hists.at(k_reco_leading_shower_phi).at(cut_index).at(classification_index)->Fill(SC.shr_phi * 180/3.14159);
+    TH1D_hists.at(k_reco_leading_shower_phi).at(cut_index).at(classification_index)->Fill(SC.shr_phi * 180/3.14159, weight);
     
-    TH1D_hists.at(k_reco_leading_shower_theta).at(cut_index).at(classification_index)->Fill(SC.shr_theta * 180/3.14159);
+    TH1D_hists.at(k_reco_leading_shower_theta).at(cut_index).at(classification_index)->Fill(SC.shr_theta * 180/3.14159, weight);
     
-    TH1D_hists.at(k_reco_leading_shower_cos_theta).at(cut_index).at(classification_index)->Fill(std::cos(SC.shr_theta * 180/3.14159));
+    TH1D_hists.at(k_reco_leading_shower_cos_theta).at(cut_index).at(classification_index)->Fill(std::cos(SC.shr_theta * 180/3.14159), weight);
     
-    TH1D_hists.at(k_reco_shower_multiplicity).at(cut_index).at(classification_index)->Fill(SC.n_showers);
+    TH1D_hists.at(k_reco_shower_multiplicity).at(cut_index).at(classification_index)->Fill(SC.n_showers, weight);
     
-    TH1D_hists.at(k_reco_track_multiplicity).at(cut_index).at(classification_index)->Fill(SC.n_tracks);
+    TH1D_hists.at(k_reco_track_multiplicity).at(cut_index).at(classification_index)->Fill(SC.n_tracks, weight);
+
+    TH1D_hists.at(k_reco_topological_score).at(cut_index).at(classification_index)->Fill(SC.topological_score, weight);
 
 }
 // -----------------------------------------------------------------------------

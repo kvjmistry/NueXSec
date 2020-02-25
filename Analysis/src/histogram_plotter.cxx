@@ -255,9 +255,12 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
 
         h_scale_axes->GetYaxis()->SetTitle("Entries [A.U.]");
     }
-
-    // Set the axis in the case of a non-log plot
-    if(!logy) {
+    else if(logy && !found_data) {
+        h_stack->SetMinimum(0.1);
+        c->SetLogy();
+        h_stack->Draw("hist");
+    }
+    else { // Set the axis in the case of a non-log plot
         h_stack->SetMinimum(0);
         h_stack->SetMaximum(y_maximum * y_scale_factor);
         h_stack->Draw("hist");
@@ -307,7 +310,8 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     leg_stack->Draw();
 
     if (!logy) h_stack->GetYaxis()->SetRangeUser(0, y_maximum * y_scale_factor);
-    else       topPad->SetLogy();
+    else if (logy && found_data)    topPad->SetLogy();
+    
     
     // Calculate the chi2
     TH1D * h_last = (TH1D*) h_stack->GetStack()->Last();

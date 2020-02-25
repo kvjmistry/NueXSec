@@ -78,7 +78,7 @@ int main(int argc, char *argv[]){
         }
 
         // Max number of events specified?
-        if(strcmp(arg, "-n") == 0){
+        if(strcmp(arg, "-n") == 0 || strcmp(arg, "--n") == 0){
             std::cout << "Running with a maximum of : " << argv[i+1] << " events" <<std::endl;
             num_events = atoi(argv[i+1]);
         }
