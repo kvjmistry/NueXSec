@@ -59,17 +59,17 @@ void selection::Initialise( const char * mc_file,
     std::cout << "\n --- Configuring Parameters --- \n" << std::endl;
     
     // Resize the counter vector
-    counter_v.resize(_util.k_COUNTER_MAX);
+    counter_v.resize(_util.k_cuts_MAX);
 
     for (unsigned int t = 0; t < counter_v.size(); t++){
-        counter_v.at(t).resize(_util.k_COUNTER_MAX, 0);
+        counter_v.at(t).resize(_util.k_COUNTER_MAX, 0.0);
     }
 
     // Get MC variables --------------------------------------------------------
     if (bool_use_mc){
         std::cout << "\nInitialising MC" << std::endl;
-        _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
-        // _util.GetTree(f_mc, mc_tree, "NeutrinoSelectionFilter");
+        // _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
+        _util.GetTree(f_mc, mc_tree, "NeutrinoSelectionFilter");
 
         // Initialise all the mc slice container
         mc_SC.Initialise(mc_tree);
@@ -152,7 +152,7 @@ void selection::Initialise( const char * mc_file,
         if (!_slim) _hhelper.at(_util.k_dirt).InitHistograms();
         
         dirt_tree_total_entries = dirt_tree->GetEntries();
-        std::cout << "Total MC Events:         " << dirt_tree_total_entries << std::endl;
+        std::cout << "Total Dirt Events:         " << dirt_tree_total_entries << std::endl;
 
         // Resize the Passed vector
         dirt_passed_v.resize(dirt_tree_total_entries);
@@ -188,7 +188,7 @@ void selection::make_selection(){
             if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
         
             // Get the entry in the tree
-            mc_tree->GetEntry(ievent); // TPC Objects
+            mc_tree->GetEntry(ievent); 
 
             // Apply the selection cuts 
             bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
@@ -288,7 +288,10 @@ void selection::make_selection(){
     std::cout << "Finished running the selection!"<< std::endl;
 
     // Print information from the selection -- need a loop for all cuts!
-    _util.PrintInfo(counter_v.at(_util.k_unselected), intime_scale_factor, mc_scale_factor, dirt_scale_factor, _util.cut_dirs.at(_util.k_unselected), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc));
+    for (unsigned int p=0; p < counter_v.size();p++){
+        _util.PrintInfo(counter_v.at(p), intime_scale_factor, mc_scale_factor, dirt_scale_factor, _util.cut_dirs.at(p), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc));
+    }
+    
 
     // Now save all the outputs to file
     if (!slim) SavetoFile();
@@ -296,7 +299,7 @@ void selection::make_selection(){
     return;
 } // End Selection
 // -----------------------------------------------------------------------------
-bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<int>> &counter_v,
+bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> &counter_v,
                            std::vector<Passed_Container> &passed_v, SliceContainer &SC){
 
     // Here we apply the selection cuts ----------------------------------------
@@ -317,7 +320,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<int>> &co
     _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_unselected) );
 
     // Fill the hists for making the efficiency plot
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_unselected, classification.first, SC);
+    // if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_unselected, classification.first, SC);
     
     // *************************************************************************
     
@@ -330,7 +333,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<int>> &co
     
     if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_slice_id, SC);
     _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_slice_id) );
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_slice_id, classification.first, SC);
+    // if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_slice_id, classification.first, SC);
     
     // *************************************************************************
     // Cut2 ----------------------------------------------------------------
@@ -346,7 +349,7 @@ void selection::SavetoFile(){
     std::cout << "Now Saving Histograms to file" << std::endl;
     if (bool_use_mc) {
         // _hhelper.WriteMCTruth("MC");
-        _hhelper.at(_util.k_mc).WriteTEfficiency();
+        // _hhelper.at(_util.k_mc).WriteTEfficiency();
         _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
     }
     if (bool_use_data) {
@@ -360,7 +363,7 @@ void selection::SavetoFile(){
     if (bool_use_dirt) {
         // _hhelper.WriteMCTruth("Dirt");
         // _hhelper.WriteOptical(_util.k_dirt);
-        _hhelper.at(_util.k_data).WriteReco(_util.k_dirt);
+        _hhelper.at(_util.k_dirt).WriteReco(_util.k_dirt);
     }
 
 } // End save to file

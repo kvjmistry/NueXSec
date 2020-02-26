@@ -101,7 +101,7 @@ bool utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     }
 }
 // -----------------------------------------------------------------------------
-void utility::Tabulate(std::string interaction, std::string classification, int type, std::vector<int> &counter_v) {
+void utility::Tabulate(std::string interaction, std::string classification, int type, std::vector<double> &counter_v) {
 
     if (type == k_mc){
         
@@ -138,16 +138,16 @@ void utility::Tabulate(std::string interaction, std::string classification, int 
         int tot_nue_numu_nc = 0;
         
         // Selection Categories
-        int nue_cc        = 0;
-        int nue_cc_mixed  = 0;
-        int cosmic        = 0;
-        int numu_cc       = 0;
-        int numu_cc_pi0   = 0;
-        int nu_out_fv     = 0;
-        int nc            = 0;
-        int nc_pi0        = 0;
-        int unmatched     = 0;
-        int total         = 0;
+        double nue_cc        = 0.0;
+        double nue_cc_mixed  = 0.0;
+        double cosmic        = 0.0;
+        double numu_cc       = 0.0;
+        double numu_cc_pi0   = 0.0;
+        double nu_out_fv     = 0.0;
+        double nc            = 0.0;
+        double nc_pi0        = 0.0;
+        double unmatched     = 0.0;
+        double total         = 0.0;
 
         // Total nue or nuebar interaction types
         int only_nue_cc     = 0;
@@ -251,36 +251,36 @@ void utility::Tabulate(std::string interaction, std::string classification, int 
     
 }
 // -----------------------------------------------------------------------------
-void utility::PrintInfo(std::vector<int> counter_v, double intime_scale_factor, double data_scale_factor, double dirt_scale_factor, std::string cut_name, int tot_true_infv_nues) {
+void utility::PrintInfo(std::vector<double> counter_v, double intime_scale_factor, double data_scale_factor, double dirt_scale_factor, std::string cut_name, int tot_true_infv_nues) {
 
-    int counter_nue_cc_qe      = counter_v.at(k_count_total_nue_cc_qe);
-    int counter_nue_cc_res     = counter_v.at(k_count_total_nue_cc_res);
-    int counter_nue_cc_dis     = counter_v.at(k_count_total_nue_cc_dis);
-    int counter_nue_cc_coh     = counter_v.at(k_count_total_nue_cc_coh);
-    int counter_nue_cc_mec     = counter_v.at(k_count_total_nue_cc_mec);
+    double counter_nue_cc_qe      = counter_v.at(k_count_total_nue_cc_qe);
+    double counter_nue_cc_res     = counter_v.at(k_count_total_nue_cc_res);
+    double counter_nue_cc_dis     = counter_v.at(k_count_total_nue_cc_dis);
+    double counter_nue_cc_coh     = counter_v.at(k_count_total_nue_cc_coh);
+    double counter_nue_cc_mec     = counter_v.at(k_count_total_nue_cc_mec);
     
-    int counter_numu_cc_qe     = counter_v.at(k_count_numu_cc_qe);
-    int counter_numu_cc_res    = counter_v.at(k_count_numu_cc_res);
-    int counter_numu_cc_dis    = counter_v.at(k_count_numu_cc_dis);
-    int counter_numu_cc_coh    = counter_v.at(k_count_numu_cc_coh);
-    int counter_numu_cc_mec    = counter_v.at(k_count_numu_cc_mec);
+    double counter_numu_cc_qe     = counter_v.at(k_count_numu_cc_qe);
+    double counter_numu_cc_res    = counter_v.at(k_count_numu_cc_res);
+    double counter_numu_cc_dis    = counter_v.at(k_count_numu_cc_dis);
+    double counter_numu_cc_coh    = counter_v.at(k_count_numu_cc_coh);
+    double counter_numu_cc_mec    = counter_v.at(k_count_numu_cc_mec);
 
-    int counter_tot_nue_numu_nc = counter_v.at(k_count_tot_nue_numu_nc);
+    double counter_tot_nue_numu_nc = counter_v.at(k_count_tot_nue_numu_nc);
 
-    int counter_nue_cc         = counter_v.at(k_count_nue_cc);
-    int counter_nue_cc_mixed   = counter_v.at(k_count_nue_cc_mixed);
-    int counter_nu_out_fv      = counter_v.at(k_count_nu_out_fv);
-    int counter_cosmic         = counter_v.at(k_count_cosmic);
-    int counter_numu_cc        = counter_v.at(k_count_numu_cc);
-    int counter_numu_cc_pi0    = counter_v.at(k_count_numu_cc_pi0);
-    int counter_nc             = counter_v.at(k_count_nc);
-    int counter_nc_pi0         = counter_v.at(k_count_nc_pi0);
-    int counter_unmatched      = counter_v.at(k_count_unmatched);
-    int counter                = counter_v.at(k_count_total);
+    double counter_nue_cc         = counter_v.at(k_count_nue_cc);
+    double counter_nue_cc_mixed   = counter_v.at(k_count_nue_cc_mixed);
+    double counter_nu_out_fv      = counter_v.at(k_count_nu_out_fv);
+    double counter_cosmic         = counter_v.at(k_count_cosmic);
+    double counter_numu_cc        = counter_v.at(k_count_numu_cc);
+    double counter_numu_cc_pi0    = counter_v.at(k_count_numu_cc_pi0);
+    double counter_nc             = counter_v.at(k_count_nc);
+    double counter_nc_pi0         = counter_v.at(k_count_nc_pi0);
+    double counter_unmatched      = counter_v.at(k_count_unmatched);
+    double counter                = counter_v.at(k_count_total);
     
-    int counter_data           = counter_v.at(k_count_data);
-    int counter_ext            = counter_v.at(k_count_ext);
-    int counter_dirt           = counter_v.at(k_count_dirt);
+    double counter_data           = counter_v.at(k_count_data);
+    double counter_ext            = counter_v.at(k_count_ext);
+    double counter_dirt           = counter_v.at(k_count_dirt);
 
     counter = counter + (counter_ext * (intime_scale_factor / data_scale_factor)) + (counter_dirt * (dirt_scale_factor / data_scale_factor));
 

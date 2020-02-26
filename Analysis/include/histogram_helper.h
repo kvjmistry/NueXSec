@@ -20,7 +20,7 @@ class histogram_helper{
     // Class instances
     utility _util;
     selection_cuts _scuts;
-    int _type;
+    int _type{1};
 
     // weight variable (will equal multiple of all weights)
     double weight{1.0};
