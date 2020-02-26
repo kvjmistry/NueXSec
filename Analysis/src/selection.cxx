@@ -68,8 +68,8 @@ void selection::Initialise( const char * mc_file,
     // Get MC variables --------------------------------------------------------
     if (bool_use_mc){
         std::cout << "\nInitialising MC" << std::endl;
-        // _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
-        _util.GetTree(f_mc, mc_tree, "NeutrinoSelectionFilter");
+        _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
+        // _util.GetTree(f_mc, mc_tree, "NeutrinoSelectionFilter");
 
         // Initialise all the mc slice container
         mc_SC.Initialise(mc_tree, _util.k_mc);
@@ -320,25 +320,33 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_unselected) );
 
     // Fill the hists for making the efficiency plot
-    // if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_unselected, classification.first, SC);
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_unselected, classification.first, SC);
     
     // *************************************************************************
     
     // *************************************************************************
     // Slice ID ----------------------------------------------------------------
     // *************************************************************************
-    // pass = _scuts.slice_id(SC);
-    // passed_v.at(ievent).cut_v.at(_util.k_slice_id) = pass;
-    // if(!pass) return false; // Failed the cut!
+    pass = _scuts.slice_id(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_slice_id) = pass;
+    if(!pass) return false; // Failed the cut!
     
-    // if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_slice_id, SC);
-    // _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_slice_id) );
-    // if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_slice_id, classification.first, SC);
+    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_slice_id, SC);
+    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_slice_id) );
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_slice_id, classification.first, SC);
     
     // *************************************************************************
-    // Cut2 ----------------------------------------------------------------
+    // In FV -------------------------------------------------------------------
     // *************************************************************************
+    pass = _scuts.in_fv(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_in_fv) = pass;
+    if(!pass) return false; // Failed the cut!
     
+    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_in_fv, SC);
+    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_in_fv) );
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_in_fv, classification.first, SC);
+    
+    // *************************************************************************
     return true;
 
 }
@@ -349,7 +357,7 @@ void selection::SavetoFile(){
     std::cout << "Now Saving Histograms to file" << std::endl;
     if (bool_use_mc) {
         // _hhelper.WriteMCTruth("MC");
-        // _hhelper.at(_util.k_mc).WriteTEfficiency();
+        _hhelper.at(_util.k_mc).WriteTEfficiency();
         _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
     }
     if (bool_use_data) {

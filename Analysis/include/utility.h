@@ -90,6 +90,7 @@ public:
     std::vector<std::string> cut_dirs = {
             "Unselected",  // Unselected
             "Slice_ID",    // Slice ID
+            "In_FV"
             };
 
 
@@ -122,7 +123,8 @@ public:
     // enums for cut dirs
     enum enum_cut_dirs {
                 k_unselected, // Unselected 
-                k_slice_id,      // Slice ID
+                k_slice_id,   // Slice ID
+                k_in_fv,      // Reco Nu Vtx (SC Corr) In the FV 
                 k_cuts_MAX
                 }; 
 

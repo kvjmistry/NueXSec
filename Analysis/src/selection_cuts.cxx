@@ -5,6 +5,15 @@ bool selection_cuts::slice_id(SliceContainer &SC){
     else return false;               // fail
 }
 // -----------------------------------------------------------------------------
+bool selection_cuts::in_fv(SliceContainer &SC){
+    if ( SC.reco_nu_vtx_sce_x >= 22 && SC.reco_nu_vtx_sce_x <= 234.35 &&
+        SC.reco_nu_vtx_sce_y >= -75.1 && SC.reco_nu_vtx_sce_y <= 75.1 &&
+        ( (SC.reco_nu_vtx_sce_z >= 35 && SC.reco_nu_vtx_sce_z <= 665) || (SC.reco_nu_vtx_sce_z >= 785 && SC.reco_nu_vtx_sce_z <= 941.8))
+        ){
+        return true; // pass
+    }  
+    else return false;               // fail
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
