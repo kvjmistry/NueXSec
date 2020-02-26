@@ -90,7 +90,12 @@ public:
     std::vector<std::string> cut_dirs = {
             "Unselected",  // Unselected
             "Slice_ID",    // Slice ID
-            "In_FV"
+            "e_candidate", // Electron Candidate
+            "Topo_Score",  // Topological Score
+            "In_FV",       // In FV
+            "Cluster_Frac",// Cluster Fraction 
+            "Shower_Score",// Track Score
+            "Michel_Rej"   // Michel Rejection
             };
 
 
@@ -122,9 +127,14 @@ public:
 
     // enums for cut dirs
     enum enum_cut_dirs {
-                k_unselected, // Unselected 
-                k_slice_id,   // Slice ID
-                k_in_fv,      // Reco Nu Vtx (SC Corr) In the FV 
+                k_unselected,   // Unselected 
+                k_slice_id,     // Slice ID
+                k_e_candidate,  // Electron Candidate
+                k_topo_score,   // Topo Score
+                k_in_fv,        // Reco Nu Vtx (SC Corr) In the FV 
+                k_cluster_frac, // Cluster Fraction
+                k_shower_score, // Shower Score
+                k_michel_rej,   // Michel Rejection
                 k_cuts_MAX
                 }; 
 

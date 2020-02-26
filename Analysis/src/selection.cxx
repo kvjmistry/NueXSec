@@ -84,6 +84,10 @@ void selection::Initialise( const char * mc_file,
         // Resize the Passed vector
         mc_passed_v.resize(mc_tree_total_entries);
 
+        for (unsigned int y = 0; y < mc_passed_v.size(); y++ ){
+            mc_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
+        }
+
         std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of MC Complete!" << std::endl;
         std::cout << "\033[0;31m-------------------------------\033[0m" << std::endl;
@@ -106,6 +110,10 @@ void selection::Initialise( const char * mc_file,
 
         // Resize the Passed vector
         data_passed_v.resize(data_tree_total_entries);
+        
+        for (unsigned int y = 0; y < data_passed_v.size(); y++ ){
+            data_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
+        }
 
         std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of Data Complete!" << std::endl;
@@ -132,6 +140,10 @@ void selection::Initialise( const char * mc_file,
         // Resize the Passed vector
         ext_passed_v.resize(ext_tree_total_entries);
 
+        for (unsigned int y = 0; y < ext_passed_v.size(); y++ ){
+            ext_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
+        }
+
         std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of EXT Complete!" << std::endl;
         std::cout << "\033[0;31m-------------------------------\033[0m" << std::endl;
@@ -156,6 +168,10 @@ void selection::Initialise( const char * mc_file,
 
         // Resize the Passed vector
         dirt_passed_v.resize(dirt_tree_total_entries);
+        
+        for (unsigned int y = 0; y < dirt_passed_v.size(); y++ ){
+            dirt_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
+        }
 
         std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of Dirt Complete!" << std::endl;
@@ -225,12 +241,42 @@ void selection::make_selection(){
             if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
         
             // Get the entry in the tree
-            data_tree->GetEntry(ievent); // TPC Objects
+            data_tree->GetEntry(ievent);
 
             bool pass = ApplyCuts(_util.k_data, ievent, counter_v, data_passed_v, data_SC);
             if (!pass) continue;
         }
 
+        // Make the run subrun event file list after the selection 
+        if (make_list){
+
+            std::cout << "Making the run subrun list for selected data events..." << std::endl;
+
+            int run, subrun, event;
+            std::ofstream run_subrun_file;
+            run_subrun_file.open("files/run_subrun_list_data.txt");
+
+            // Loop over the data events and make a run_subrun_event filelist
+            for (int ievent = 0; ievent < data_tree_total_entries; ievent++){
+            
+                if (data_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true ){
+                    
+                    // Get the entry in the tree
+                    data_tree->GetEntry(ievent);
+
+                    run    = data_SC.run;
+                    subrun = data_SC.sub;
+                    event  = data_SC.evt;
+
+                    run_subrun_file << run << " " << subrun << " " << event << '\n';
+
+                }
+                
+            }
+
+            run_subrun_file.close();
+        }
+        
         std::cout << std::endl;
         std::cout << "Ending Selection over Data" << std::endl;
     }
@@ -336,6 +382,28 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_slice_id, classification.first, SC);
     
     // *************************************************************************
+    // Electron Candidate ------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.e_candidate(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_e_candidate) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_e_candidate, SC);
+    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_e_candidate) );
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_e_candidate, classification.first, SC);
+
+    // *************************************************************************
+    // Topological Score -------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.topo_score(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_topo_score) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_topo_score, SC);
+    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_topo_score) );
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_topo_score, classification.first, SC);
+
+    // *************************************************************************
     // In FV -------------------------------------------------------------------
     // *************************************************************************
     pass = _scuts.in_fv(SC);
@@ -345,6 +413,39 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_in_fv, SC);
     _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_in_fv) );
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_in_fv, classification.first, SC);
+
+    // *************************************************************************
+    // Cluster Fraction --------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.cluster_frac(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_cluster_frac) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_cluster_frac, SC);
+    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_cluster_frac) );
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_cluster_frac, classification.first, SC);
+
+    // *************************************************************************
+    // Shower Score ------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.shower_score(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_shower_score) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_shower_score, SC);
+    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_shower_score) );
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_shower_score, classification.first, SC);
+
+    // *************************************************************************
+    // Michel Rejection --------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.michel_rej(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_michel_rej) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_michel_rej, SC);
+    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_michel_rej) );
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_michel_rej, classification.first, SC);
     
     // *************************************************************************
     return true;

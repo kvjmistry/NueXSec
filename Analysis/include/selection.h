@@ -50,6 +50,9 @@ namespace xsecSelection {
             bool bool_use_variation{false};
             bool slim{false};               // Flag to decide whether to make, fill and plot histograms
 
+            // Decide whether to make a run subrun event filelist for the selected data events
+            bool make_list{true};
+
             // TFiles
             TFile * f_mc;        // The MC file
             TFile * f_data;      // The data file

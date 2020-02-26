@@ -22,7 +22,20 @@ class selection_cuts{
     // Require the space charge corrected reco nu vertex in the FV
     bool in_fv(SliceContainer &SC);
     // -------------------------------------------------------------------------
+    // Electron Candidate Cut
+    bool e_candidate(SliceContainer &SC);
     // -------------------------------------------------------------------------
+    // Cut on the topological score
+    bool topo_score(SliceContainer &SC);
+    // -------------------------------------------------------------------------
+    // Cut on the cluster fraction in the slice
+    bool cluster_frac(SliceContainer &SC);
+    // -------------------------------------------------------------------------
+    // Cut on the shower score
+    bool shower_score(SliceContainer &SC);
+    // -------------------------------------------------------------------------
+    // Cut on the total shower energy to reject michels
+    bool michel_rej(SliceContainer &SC);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

@@ -72,3 +72,4 @@ scripts/run_var_bkg.sh
 xsecAna/custom_run_subrun_list_data.txt
 *.gch
 nuexsec
+Analysis/files
