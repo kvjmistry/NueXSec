@@ -1,7 +1,7 @@
 #include "../include/SliceContainer.h"
 
 // -----------------------------------------------------------------------------
-void SliceContainer::Initialise(TTree *tree){
+void SliceContainer::Initialise(TTree *tree, int type){
 
     std::cout << "Initalising Slice Container" << std::endl;
 
@@ -372,10 +372,14 @@ void SliceContainer::Initialise(TTree *tree){
     tree->SetBranchAddress("mc_completeness", &mc_completeness_v);
     tree->SetBranchAddress("mc_purity",       &mc_purity_v);
     
-    tree->SetBranchAddress("weights",         &weights_v);
-    tree->SetBranchAddress("weightsFlux",     &weightsFlux_v);
-    tree->SetBranchAddress("weightsGenie",    &weightsGenie_v);
-    tree->SetBranchAddress("weightsReint",    &weightsReint_v);
+    // MC specific branches
+    if (type == _util.k_mc || type == _util.k_dirt){
+        tree->SetBranchAddress("weights",         &weights_v);
+        tree->SetBranchAddress("weightsFlux",     &weightsFlux_v);
+        tree->SetBranchAddress("weightsGenie",    &weightsGenie_v);
+        tree->SetBranchAddress("weightsReint",    &weightsReint_v);
+    }
+    
     
     tree->SetBranchAddress("cosmic_flashmatch_score_v",&cosmic_flashmatch_score_v);
     // tree->SetBranchAddress("peSpectrum",               &peSpectrum_v);

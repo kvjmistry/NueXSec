@@ -19,7 +19,7 @@ public:
 
     // -------------------------------------------------------------------------
     // Initialise the class
-    void Initialise(TTree* tree);
+    void Initialise(TTree* tree, int type);
     // -------------------------------------------------------------------------
     // Function to classify the slice
     std::pair<std::string, int>  SliceClassifier(int type);

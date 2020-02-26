@@ -72,7 +72,7 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_mc, mc_tree, "NeutrinoSelectionFilter");
 
         // Initialise all the mc slice container
-        mc_SC.Initialise(mc_tree);
+        mc_SC.Initialise(mc_tree, _util.k_mc);
 
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period);
@@ -95,7 +95,7 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_data, data_tree, "nuselection/NeutrinoSelectionFilter");
         
         // Initialise all the data slice container
-        data_SC.Initialise(data_tree);
+        data_SC.Initialise(data_tree, _util.k_data);
 
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, run_period);
@@ -120,7 +120,7 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_ext, ext_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
-        ext_SC.Initialise(ext_tree);
+        ext_SC.Initialise(ext_tree, _util.k_ext);
 
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, run_period);
@@ -145,7 +145,7 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_dirt, dirt_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
-        dirt_SC.Initialise(dirt_tree);
+        dirt_SC.Initialise(dirt_tree, _util.k_dirt);
 
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period);
@@ -327,12 +327,12 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     // Slice ID ----------------------------------------------------------------
     // *************************************************************************
-    pass = _scuts.slice_id(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_slice_id) = pass;
-    if(!pass) return false; // Failed the cut!
+    // pass = _scuts.slice_id(SC);
+    // passed_v.at(ievent).cut_v.at(_util.k_slice_id) = pass;
+    // if(!pass) return false; // Failed the cut!
     
-    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_slice_id, SC);
-    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_slice_id) );
+    // if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_slice_id, SC);
+    // _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_slice_id) );
     // if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_slice_id, classification.first, SC);
     
     // *************************************************************************
