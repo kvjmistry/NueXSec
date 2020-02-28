@@ -334,12 +334,6 @@ void selection::make_selection(){
             // Get the entry in the tree
             dirt_tree->GetEntry(ievent);
 
-            // Skip the current faulty events in the file
-            if (dirt_SC.evt == 44268) {
-                std::cout << "Skipping event that has been flagged as bad before" << std::endl;
-                continue;
-            }
-
             bool pass = ApplyCuts(_util.k_dirt, ievent, counter_v, dirt_passed_v, dirt_SC);
             if (!pass) continue;
         }
@@ -670,7 +664,7 @@ void selection::MakeHistograms(const char * hist_file_name, const char *run_peri
    
         // Ratio hits from showers to slice
         _hplot.MakeStack("h_reco_hits_ratio", _util.cut_dirs.at(i).c_str(),
-                         false,  true, 1.0, "Hit ratio of all Showers and Slice", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                         false,  true, 1.0, "Hit Ratio of all Showers and the Slice", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_hits_ratio.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
         
          // Shower score
