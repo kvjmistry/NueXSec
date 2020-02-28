@@ -245,7 +245,6 @@ void histogram_helper::InitHistograms(){
             TEfficiency_hists.at(l) = new TH1D( Form("h_true_nu_E_%s",_util.cut_dirs.at(l).c_str() ), "", 40, 0, 4 );
         }
 
-        h_true_nu_E =  new TH1D("h_true_nu_E", "True Neutrino in FV Energy; Energy [GeV]; Entries", 40, 0, 4);
 
     }
 
@@ -254,10 +253,10 @@ void histogram_helper::InitHistograms(){
 
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::FillReco(int type, int classification_index, int cut_index, SliceContainer &SC){
+void histogram_helper::FillReco(int type, int classification_index, int cut_index, SliceContainer SC){
 
     if (type == _util.k_mc || type == _util.k_dirt) weight = 1.0; // Here define the weight
-    else weight == 1.0;
+    else weight = 1.0;
 
 
     // Now fill the histograms!
@@ -372,7 +371,7 @@ void histogram_helper::WriteReco(int type){
     }
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::FillTEfficiency(int cut_index, std::string classification, SliceContainer &SC){
+void histogram_helper::FillTEfficiency(int cut_index, std::string classification, SliceContainer SC){
 
     // Fill the histogram at the specified cut
     if (classification == "nue_cc") TEfficiency_hists.at(cut_index)->Fill(SC.nu_e);
@@ -386,8 +385,10 @@ void histogram_helper::WriteTEfficiency(){
     if (bool_dir) dir->cd();
     
     for (unsigned int p = 0; p < TEfficiency_hists.size(); p++){
-        TEfficiency * teff = new TEfficiency(*TEfficiency_hists.at(p), *TEfficiency_hists.at(p));
-        teff->Write("",TObject::kOverwrite);
+
+        TEfficiency * teff = new TEfficiency(*TEfficiency_hists.at(p), *TEfficiency_hists.at(_util.k_unselected));
+        teff->Write( Form("h_true_nu_E_%s",_util.cut_dirs.at(p).c_str()) , TObject::kOverwrite);
+        TEfficiency_hists.at(p)->Write("test",TObject::kOverwrite);
     }
     
 }

@@ -29,11 +29,10 @@ void histogram_plotter::Initalise(const char * hist_file_name, const char *_run_
 }
 // -----------------------------------------------------------------------------
 void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, double y_scale_factor, const char* x_axis_name,
-                                     const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, const char* print_name ){
+                                     const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, double Data_POT, const char* print_name ){
 
     std::vector<TH1D*>  hist(_util.k_classifications_MAX);                      // The vector of histograms from the file for the plot
     std::vector<double> hist_integrals(_util.k_classifications_MAX,0.0);        // The integrals of all the histograms
-    double integral_data{-1};                                                   // Integral of data histogram -- needs to be removed
     double integral_mc_ext{0.0};                                                // Integral of MC + EXT -- needs to be removed
     double y_maximum{0};                                                        // y max for scaling histogram scale
     
@@ -141,6 +140,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
                 hist.at(i)->SetStats(kFALSE);
                 hist.at(i)->Scale(intime_scale_factor);
                 hist_integrals.at(i) = hist.at(i)->Integral();
+                integral_mc_ext      += hist.at(i)->Integral();
             }
         }
 
@@ -151,6 +151,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
                 hist.at(i)->SetStats(kFALSE);
                 hist.at(i)->Scale(dirt_scale_factor);
                 hist_integrals.at(i) = hist.at(i)->Integral();
+                integral_mc_ext      += hist.at(i)->Integral();
             }
         }
         
@@ -160,6 +161,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
             hist.at(i)->SetStats(kFALSE);
             hist.at(i)->Scale(mc_scale_factor);
             hist_integrals.at(i) = hist.at(i)->Integral();
+            integral_mc_ext      += hist.at(i)->Integral();
             // std::cout <<  hist.at(i)->Integral()<< std::endl;
         }
 
@@ -190,20 +192,9 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         hist.at(_util.k_leg_dirt)     ->SetFillColor(2);
         hist.at(_util.k_leg_dirt)     ->SetFillStyle(3354);
     }
-
-    
-    // This needs to be updated to new vector value
-    if (found_data) integral_data = hist.at(_util.k_leg_data)->Integral();
     
     // Normalisation by area
-    if (area_norm && integral_data != 0 && found_data && found_ext) {
-
-        // Get the integral of the MC + EXT
-        for (unsigned int i=0; i < hist.size(); i++){
-            if (i == _util.k_leg_data) continue; // Dont use the data
-            integral_mc_ext += hist.at(i)->Integral();
-        
-        }
+    if (area_norm && hist_integrals.at(_util.k_data) != 0 && found_data && found_ext) {
         
         // Check the integral of ON - EXT
         TH1D * h_data_scaling_clone = (TH1D*) hist.at(_util.k_leg_data)->Clone("h_data_scaling_clone");
@@ -220,7 +211,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
             if (i == _util.k_leg_data) continue; // Dont use the data
             
             hist.at(i)->Scale(integral_on_minus_off / integral_mc_ext);
-            hist.at(i)->Scale(1. / integral_data);
+            hist.at(i)->Scale(1. / hist_integrals.at(_util.k_data));
         
         }
 
@@ -300,9 +291,10 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     TLegend *leg_stack = new TLegend(leg_x1,leg_y1,leg_x2,leg_y2);
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
-    if (found_data) leg_stack->AddEntry(hist.at(_util.k_leg_data), Form("Data (%2.1f)",                hist_integrals.at(_util.k_data)),         "lep");
-    if (found_dirt) leg_stack->AddEntry(hist.at(_util.k_leg_dirt), Form("Dirt (%2.1f)",                hist_integrals.at(_util.k_dirt)),         "f");
-    if (found_ext)  leg_stack->AddEntry(hist.at(_util.k_leg_ext),  Form("InTime (EXT) (%2.1f)",        hist_integrals.at(_util.k_ext)),          "f");
+
+    if (found_data) leg_stack->AddEntry(hist.at(_util.k_leg_data), Form("Data (%2.1f)",                hist_integrals.at(_util.k_leg_data)),     "lep");
+    if (found_dirt) leg_stack->AddEntry(hist.at(_util.k_leg_dirt), Form("Dirt (%2.1f)",                hist_integrals.at(_util.k_leg_dirt)),     "f");
+    if (found_ext)  leg_stack->AddEntry(hist.at(_util.k_leg_ext),  Form("InTime (EXT) (%2.1f)",        hist_integrals.at(_util.k_leg_ext)),      "f");
     leg_stack->AddEntry(hist.at(_util.k_unmatched),                Form("Unmatched (%2.1f)",           hist_integrals.at(_util.k_unmatched)),    "f");
     leg_stack->AddEntry(hist.at(_util.k_nc_pi0),                   Form("NC #pi^{0} (%2.1f)",          hist_integrals.at(_util.k_nc_pi0)),       "f");
     leg_stack->AddEntry(hist.at(_util.k_nc),                       Form("NC (%2.1f)",                  hist_integrals.at(_util.k_nc)),           "f");
@@ -310,7 +302,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     leg_stack->AddEntry(hist.at(_util.k_numu_cc),                  Form("#nu_{#mu} CC (%2.1f)",        hist_integrals.at(_util.k_numu_cc)),      "f");
     leg_stack->AddEntry(hist.at(_util.k_cosmic),                   Form("Cosmic (%2.1f)",              hist_integrals.at(_util.k_cosmic)),       "f");
     leg_stack->AddEntry(hist.at(_util.k_nu_out_fv),                Form("#nu OutFV (%2.1f)",           hist_integrals.at(_util.k_nu_out_fv)),    "f");
-    leg_stack->AddEntry(hist.at(_util.k_nue_cc_mixed),             Form("#nu_{e} CC Mixed (%2.1f)",    hist_integrals.at(_util.k_nue_cc_mixed)), "f");
+    // leg_stack->AddEntry(hist.at(_util.k_nue_cc_mixed),             Form("#nu_{e} CC Mixed (%2.1f)",    hist_integrals.at(_util.k_nue_cc_mixed)), "f"); // This isnt filled anymore
     leg_stack->AddEntry(hist.at(_util.k_nue_cc),                   Form("#nu_{e} CC (%2.1f)",          hist_integrals.at(_util.k_nue_cc)),       "f");
 
     leg_stack->Draw();
@@ -323,7 +315,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     TH1D * h_last = (TH1D*) h_stack->GetStack()->Last();
     
     if (found_data) {
-        chi2  = Chi2Calc(h_last, hist.at(_util.k_leg_data), area_norm, integral_data);
+        chi2  = Chi2Calc(h_last, hist.at(_util.k_leg_data), area_norm, hist_integrals.at(_util.k_data));
         
         bottomPad->cd();
 
@@ -378,7 +370,13 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
 
     // Draw the run period on the plot
     Draw_Run_Period(c);
-
+    
+    // Draw other data specifc quantities
+    if (found_data){
+        Draw_Data_MC_Ratio(c, hist_integrals.at(_util.k_leg_data)/integral_mc_ext );
+        Draw_Data_POT(c, Data_POT);
+    }
+    
     c->Print(print_name);
 
 
@@ -471,6 +469,37 @@ void histogram_plotter::Draw_Run_Period(TCanvas* c){
     pt->SetFillColor(0);
     pt->SetFillStyle(0);
     pt->SetTextSize(0.04);
+    pt->Draw();
+}
+// -----------------------------------------------------------------------------
+void histogram_plotter::Draw_Data_MC_Ratio(TCanvas* c, double ratio){
+    c->cd();
+
+    TPaveText *pt;
+
+    pt = new TPaveText(0.16, 0.88, 0.3, 0.95,"NDC");
+    pt->AddText(Form("Data/MC Ratio: %2.1f", ratio));
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.03);
+    pt->Draw();
+}
+// -----------------------------------------------------------------------------
+void histogram_plotter::Draw_Data_POT(TCanvas* c, double pot){
+    c->cd();
+
+    TPaveText *pt;
+
+    // Change scale of POT
+    double POT = pot/1.0e20;
+
+    pt = new TPaveText(0.849, 0.485, 0.919, 0.485,"NDC");
+    pt->AddText(Form("Data POT: %2.1fe20", POT));
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.03);
     pt->Draw();
 }
 // -----------------------------------------------------------------------------

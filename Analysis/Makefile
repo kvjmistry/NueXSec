@@ -1,5 +1,5 @@
 # Compilation Flags
-CXX = g++ -fopenmp 
+CXX = g++
 CPPFLAGS = -I$(LIBDIR) -Wall -Wextra
 CXXFLAGS=$(shell root-config --cflags)
 

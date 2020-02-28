@@ -28,7 +28,7 @@ class histogram_plotter{
     // -------------------------------------------------------------------------
     // Function to make a stacked histogram and save as a pdf
     void MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, double y_scale_factor, const char* x_axis_name,
-                                     const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, const char* print_name );
+                                     const double leg_x1, const double leg_x2, const double leg_y1, double Data_POT, const double leg_y2, const char* print_name );
     // -------------------------------------------------------------------------
     // Calculates the chi2
     // Returns reduced chi2, num mc+ext scaled to data POT, num data, num degrees of freedom, p value in vector respectively
@@ -37,7 +37,11 @@ class histogram_plotter{
     // Draw the run period on the plot
     void Draw_Run_Period(TCanvas* c);
     // -------------------------------------------------------------------------
+    // Draw the Ratio to MC ratio
+    void Draw_Data_MC_Ratio(TCanvas* c, double ratio);
     // -------------------------------------------------------------------------
+    // Draw the data POT
+    void Draw_Data_POT(TCanvas* c, double pot);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

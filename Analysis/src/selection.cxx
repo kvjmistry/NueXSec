@@ -68,8 +68,8 @@ void selection::Initialise( const char * mc_file,
     // Get MC variables --------------------------------------------------------
     if (bool_use_mc){
         std::cout << "\nInitialising MC" << std::endl;
-        _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
-        // _util.GetTree(f_mc, mc_tree, "NeutrinoSelectionFilter");
+        // _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
+        _util.GetTree(f_mc, mc_tree, "NeutrinoSelectionFilter");
 
         // Initialise all the mc slice container
         mc_SC.Initialise(mc_tree, _util.k_mc);
@@ -188,6 +188,8 @@ void selection::Initialise( const char * mc_file,
 void selection::make_selection(){
     std::cout << "Now Running the selection!"<< std::endl;
     
+    int counter = 0;
+
     // MC ----------------------------------------------------------------------
     if (bool_use_mc){
         std::cout << "Starting Selection over MC" << std::endl;
@@ -202,6 +204,16 @@ void selection::make_selection(){
 
             // Alert the user
             if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
+
+            // std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
+
+            // Skip the current faulty events in the file
+            // if (mc_SC.run == 6811) {
+            //     std::cout << "Skipping event that has been flagged as bad before" << std::endl;
+            //     counter ++;
+            //     std::cout << "Counter:" << counter << std::endl;
+            //     continue;
+            // }
         
             // Get the entry in the tree
             mc_tree->GetEntry(ievent); 
@@ -320,7 +332,13 @@ void selection::make_selection(){
             if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
         
             // Get the entry in the tree
-            dirt_tree->GetEntry(ievent); // TPC Objects
+            dirt_tree->GetEntry(ievent);
+
+            // Skip the current faulty events in the file
+            if (dirt_SC.evt == 44268) {
+                std::cout << "Skipping event that has been flagged as bad before" << std::endl;
+                continue;
+            }
 
             bool pass = ApplyCuts(_util.k_dirt, ievent, counter_v, dirt_passed_v, dirt_SC);
             if (!pass) continue;
@@ -358,6 +376,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
+    // *************************************************************************
     
     // Fill reconstructed histograms
     if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_unselected, SC);
@@ -368,11 +387,10 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Fill the hists for making the efficiency plot
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_unselected, classification.first, SC);
     
-    // *************************************************************************
-    
-    // *************************************************************************
-    // Slice ID ----------------------------------------------------------------
-    // *************************************************************************
+
+    // // *************************************************************************
+    // // Slice ID ----------------------------------------------------------------
+    // // *************************************************************************
     pass = _scuts.slice_id(SC);
     passed_v.at(ievent).cut_v.at(_util.k_slice_id) = pass;
     if(!pass) return false; // Failed the cut!
@@ -447,7 +465,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_michel_rej) );
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_michel_rej, classification.first, SC);
     
-    // *************************************************************************
+    // // *************************************************************************
     return true;
 
 }
@@ -480,6 +498,20 @@ void selection::SavetoFile(){
 void selection::MakeHistograms(const char * hist_file_name, const char *run_period){
     std::cout << "Creating histograms and making plots" << std::endl;
 
+    // Set the scale factors
+    mc_scale_factor     = Data_POT  / MC_POT;
+    dirt_scale_factor   = Data_POT  / Dirt_POT;
+    intime_scale_factor = Data_trig / EXT_trig;
+
+    mc_scale_factor = 0.01;
+
+    std::cout << "\033[0;32m-------------------------------" << std::endl;
+    std::cout << "Scale Factors:\n" <<
+    "MC Scale factor:   "   << mc_scale_factor     << "\n" <<
+    "Dirt Scale factor: "   << dirt_scale_factor   << "\n" <<
+    "EXT Scale factor:  "   << intime_scale_factor << std::endl;
+    std::cout << "-------------------------------\033[0m" << std::endl;
+
     histogram_plotter _hplot; // One for each type e.g MC, Data, EXT..
 
     _hplot.Initalise(hist_file_name, run_period, mc_scale_factor, intime_scale_factor, dirt_scale_factor);
@@ -502,169 +534,169 @@ void selection::MakeHistograms(const char * hist_file_name, const char *run_peri
 
         // Reco X
         _hplot.MakeStack("h_reco_vtx_x",_util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Reco Vertex X [cm]", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Reco Vertex X [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_vtx_x.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
         
         // Reco Y
          _hplot.MakeStack("h_reco_vtx_y",_util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Reco Vertex Y [cm]", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Reco Vertex Y [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_vtx_y.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Reco Z
         _hplot.MakeStack("h_reco_vtx_z",_util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Reco Vertex Z [cm]", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Reco Vertex Z [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_vtx_z.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Reco X SCE
         _hplot.MakeStack("h_reco_vtx_x_sce",_util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Reco Vertex X (Space Charge Corr) [cm]", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Reco Vertex X (Space Charge Corr) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_vtx_x_sce.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
         
         // Reco Y SCE
          _hplot.MakeStack("h_reco_vtx_y_sce",_util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Reco Vertex Y (Space Charge Corr) [cm]", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Reco Vertex Y (Space Charge Corr) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_vtx_y_sce.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Reco Z SCE
         _hplot.MakeStack("h_reco_vtx_z_sce",_util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Reco Vertex Z (Space Charge Corr) [cm]", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Reco Vertex Z (Space Charge Corr) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_vtx_z_sce.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
 
         // dEdx
         _hplot.MakeStack("h_reco_dEdx_y_plane",_util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Collection Plane dEdx (uncalibrated) [MeV/cm]", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Collection Plane dEdx (uncalibrated) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_dEdx_y_plane.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // dEdx cali
         _hplot.MakeStack("h_reco_dEdx_cali_y_plane",_util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Collection Plane dEdx (calibrated) [MeV/cm]", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Collection Plane dEdx (calibrated) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_dEdx_cali_y_plane.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
    
         // Leading Shower Momentum
         _hplot.MakeStack("h_reco_leading_mom", _util.cut_dirs.at(i).c_str(),
-                         false,  true, 1.0, "Leading Shower Momentum [MeV/c]", 0.8, 0.98, 0.90, 0.35,
+                         false,  true, 1.0, "Leading Shower Momentum [MeV/c]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_leading_mom.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // 2D distance largest flash to reco nu vertex
         _hplot.MakeStack("h_reco_flash_to_vtx_dist", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Flash to Vertex Distance [cm]", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Flash to Vertex Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_flash_to_vtx_dist.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // 2D distance shower vertex to reco nu vertex
         _hplot.MakeStack("h_reco_shower_to_vtx_dist", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Shower to Vertex Distance [cm]", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Shower to Vertex Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_shower_to_vtx_dist.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // 2D distance track vertex to reco nu vertex
         _hplot.MakeStack("h_reco_trac_util.k_to_vtx_dist", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Track to Vertex Distance [cm]", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Track to Vertex Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_trac_util.k_to_vtx_dist.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Leading Shower hits in all planes
         _hplot.MakeStack("h_reco_leading_shower_hits_all_planes", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Leading Shower Hits All Planes", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Leading Shower Hits All Planes", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_leading_shower_hits_all_planes.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Leading Shower hits in collection
         _hplot.MakeStack("h_reco_leading_shower_hits_collection_plane", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Leading Shower Hits Collection Plane", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Leading Shower Hits Collection Plane", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_leading_shower_hits_collection_plane.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Leading Shower opening angle
         _hplot.MakeStack("h_reco_leading_shower_open_angle", _util.cut_dirs.at(i).c_str(),
-                         false,  true, 1.0, "Leading Shower Open Angle [degrees]", 0.8, 0.98, 0.90, 0.35,
+                         false,  true, 1.0, "Leading Shower Open Angle [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_leading_shower_open_angle.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Secondary shower to vertex distance (for events with more than 1 shower)
         _hplot.MakeStack("h_reco_secondary_shower_to_vtx_dist", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Secondary Shower to Vertex Distance (>1 shower) [cm]", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Secondary Shower to Vertex Distance (>1 shower) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_secondary_shower_to_vtx_dist.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Leading Shower hits per length
         _hplot.MakeStack("h_reco_leading_shower_hits_per_length", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Leading Shower Hits / Length [cm^{-1}]", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Leading Shower Hits / Length [cm^{-1}]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_leading_shower_hits_per_length.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Longest track to leading shower length
         _hplot.MakeStack("h_reco_longest_trac_util.k_leading_shower_length", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Longest Track Length / Leading Shower Length", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Longest Track Length / Leading Shower Length", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_longest_track_leading_shower_length.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Track Containment
         _hplot.MakeStack("h_reco_track_contained", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Contained Tracks", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Contained Tracks", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_track_contained.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Leading shower phi
         _hplot.MakeStack("h_reco_leading_shower_phi", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Leading Shower Phi [degrees]", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Leading Shower Phi [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_leading_shower_phi.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Leading shower theta
         _hplot.MakeStack("h_reco_leading_shower_theta", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Leading Shower Theta [degrees]", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Leading Shower Theta [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_leading_shower_theta.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Leading shower cos theta
         _hplot.MakeStack("h_reco_leading_shower_cos_theta", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Leading Shower Cos(#theta)", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Leading Shower Cos(#theta)", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_leading_shower_cos_theta.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Leading shower multiplicity
         _hplot.MakeStack("h_reco_shower_multiplicity", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Shower Multiplicty", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Shower Multiplicty", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_shower_multiplicity.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Leading track multiplicity
         _hplot.MakeStack("h_reco_track_multiplicity", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Track Multiplicty", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Track Multiplicty", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_track_multiplicity.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Topological Score
         _hplot.MakeStack("h_reco_topological_score", _util.cut_dirs.at(i).c_str(),
-                         false,  true, 1.0, "Topological Score", 0.8, 0.98, 0.90, 0.35,
+                         false,  true, 1.0, "Topological Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_topological_score.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Track shower dist
         _hplot.MakeStack("h_reco_track_shower_dist", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Longest Track Leading Shower Distance [cm]", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Longest Track Leading Shower Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_track_shower_dist.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
         
         // Track shower angle
         _hplot.MakeStack("h_reco_track_shower_angle", _util.cut_dirs.at(i).c_str(),
-                         false,  true, 1.0, "Longest Track Leading Shower Angle [degrees]", 0.8, 0.98, 0.90, 0.35,
+                         false,  true, 1.0, "Longest Track Leading Shower Angle [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_track_shower_angle.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
    
         // Ratio hits from showers to slice
         _hplot.MakeStack("h_reco_hits_ratio", _util.cut_dirs.at(i).c_str(),
-                         false,  true, 1.0, "Hit ratio of all Showers and Slice", 0.8, 0.98, 0.90, 0.35,
+                         false,  true, 1.0, "Hit ratio of all Showers and Slice", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_hits_ratio.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
         
          // Shower score
         _hplot.MakeStack("h_reco_shower_score", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Shower Score", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Shower Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_shower_score.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Track score
         _hplot.MakeStack("h_reco_track_score", _util.cut_dirs.at(i).c_str(),
-                         false,  false, 1.0, "Track Score", 0.8, 0.98, 0.90, 0.35,
+                         false,  false, 1.0, "Track Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_track_score.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Calibrated energy of all the showers
         _hplot.MakeStack("h_reco_shower_energy_tot_cali", _util.cut_dirs.at(i).c_str(),
-                         false,  true, 1.0, "Total Calibrated Energy of all Showers [GeV]", 0.8, 0.98, 0.90, 0.35,
+                         false,  true, 1.0, "Total Calibrated Energy of all Showers [GeV]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_shower_energy_tot_cali.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Total number of hits for the leading showe
         _hplot.MakeStack("h_reco_shower_hits", _util.cut_dirs.at(i).c_str(),
-                         false,  true, 1.0, "Total Num of hits for the leading Shower", 0.8, 0.98, 0.90, 0.35,
+                         false,  true, 1.0, "Total Num of hits for the leading Shower", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_shower_hits.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         
         // Total number of hits for the leading shower in the collection plane
         _hplot.MakeStack("h_reco_shower_hits_y_plane", _util.cut_dirs.at(i).c_str(),
-                         false,  true, 1.0, "Total Num of hits for the leading Shower in Collection Plane", 0.8, 0.98, 0.90, 0.35,
+                         false,  true, 1.0, "Total Num of hits for the leading Shower in Collection Plane", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_shower_hits_y_plane.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
         
 

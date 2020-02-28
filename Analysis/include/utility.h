@@ -138,6 +138,15 @@ public:
                 k_cuts_MAX
                 }; 
 
+                // to add
+                // shr_distance -- shower vertex distance
+                // shr tkfit 2cm dedx Y
+                // shr tkfit 2cm dedx ALL
+                // shr tkfit gap10 dedx Y
+                // secondshower Y vtxdist
+                
+
+
     // Genie interaction enums
     enum enum_interactions {
         k_qe  = 0,

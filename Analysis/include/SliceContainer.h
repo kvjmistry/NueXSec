@@ -310,7 +310,7 @@ public:
     float pion_c;   // Pion Completeness
     float pion_p;   // Pion Purity
     
-    int   nslice;     // Reco Number of neutrino slices identified by the SliceID. Values are 0 or 1.
+    int   nslice{0};     // Reco Number of neutrino slices identified by the SliceID. Values are 0 or 1.
     int   crtveto;    // Reco Boolean variable checking if the event passes the CRT veto.
     float crthitpe;   // CRT Hit PE
     int   category;   // Truth Category

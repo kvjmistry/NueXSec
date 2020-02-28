@@ -36,13 +36,13 @@ class histogram_helper{
     void MakeDirectory();
     // -------------------------------------------------------------------------
     // Function to fill the reco variables
-    void FillReco(int type, int classification_index, int cut_index, SliceContainer &SC);
+    void FillReco(int type, int classification_index, int cut_index, SliceContainer SC);
     // -------------------------------------------------------------------------
     // Function to write the histograms to a file
     void WriteReco(int type);
     // -------------------------------------------------------------------------
     // Function to fill the true neutrino in FV graphs
-    void FillTEfficiency(int cut_index, std::string classification, SliceContainer &SC);
+    void FillTEfficiency(int cut_index, std::string classification, SliceContainer SC);
     // -------------------------------------------------------------------------
     // Function to write the TEfficiency Graphs to file
     void WriteTEfficiency();
@@ -66,7 +66,6 @@ class histogram_helper{
 
     // Histograms for the efficiency plot
     std::vector<TH1D*> TEfficiency_hists;
-    TH1D* h_true_nu_E; // The true neutrino energy for nu's in the cryostat
 
     // enum for histogram vars
     enum TH1D_hist_vars {
