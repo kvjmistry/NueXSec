@@ -214,6 +214,8 @@ void selection::make_selection(){
             //     std::cout << "Counter:" << counter << std::endl;
             //     continue;
             // }
+
+            // std::cout << mc_SC.opfilter_pe_veto << std::endl;
         
             // Get the entry in the tree
             mc_tree->GetEntry(ievent); 
@@ -382,9 +384,33 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_unselected, classification.first, SC);
     
 
-    // // *************************************************************************
-    // // Slice ID ----------------------------------------------------------------
-    // // *************************************************************************
+    // Notes: opfilter pe and veto variables seem to be not working. Need to investigate...
+
+    // *************************************************************************
+    // Op Filt PE --------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.opfilt_pe(SC, type);
+    passed_v.at(ievent).cut_v.at(_util.k_opfilt_pe) = pass;
+    // if(!pass) return false; // Failed the cut!
+    
+    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_opfilt_pe, SC);
+    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_opfilt_pe) );
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_opfilt_pe, classification.first, SC);
+
+    // *************************************************************************
+    // Op Filt Michel Veto -----------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.opfilt_veto(SC, type);
+    passed_v.at(ievent).cut_v.at(_util.k_opfilt_veto) = pass;
+    // if(!pass) return false; // Failed the cut!
+    
+    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_opfilt_veto, SC);
+    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_opfilt_veto) );
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_opfilt_veto, classification.first, SC);
+
+    // *************************************************************************
+    // Slice ID ----------------------------------------------------------------
+    // *************************************************************************
     pass = _scuts.slice_id(SC);
     passed_v.at(ievent).cut_v.at(_util.k_slice_id) = pass;
     if(!pass) return false; // Failed the cut!
@@ -497,7 +523,7 @@ void selection::MakeHistograms(const char * hist_file_name, const char *run_peri
     dirt_scale_factor   = Data_POT  / Dirt_POT;
     intime_scale_factor = Data_trig / EXT_trig;
 
-    mc_scale_factor = 0.01;
+    // mc_scale_factor = 0.01;
 
     std::cout << "\033[0;32m-------------------------------" << std::endl;
     std::cout << "Scale Factors:\n" <<

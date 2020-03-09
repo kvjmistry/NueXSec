@@ -16,6 +16,12 @@ class selection_cuts{
     utility _util;
 
     // -------------------------------------------------------------------------
+    // Common Optical Filter PE
+    bool opfilt_pe(SliceContainer &SC, int type);
+    // -------------------------------------------------------------------------
+    // Common Optical Filter Michel Veto
+    bool opfilt_veto(SliceContainer &SC, int type);
+    // -------------------------------------------------------------------------
     // Require pass for the slice ID
     bool slice_id(SliceContainer &SC);
     // -------------------------------------------------------------------------

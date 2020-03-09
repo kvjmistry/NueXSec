@@ -88,14 +88,16 @@ public:
 
     // Cut directory names
     std::vector<std::string> cut_dirs = {
-            "Unselected",  // Unselected
-            "Slice_ID",    // Slice ID
-            "e_candidate", // Electron Candidate
-            "Topo_Score",  // Topological Score
-            "In_FV",       // In FV
-            "Cluster_Frac",// Cluster Fraction 
-            "Shower_Score",// Track Score
-            "Michel_Rej"   // Michel Rejection
+            "Unselected",    // Unselected
+            "Op_Filter_PE",  // Common Optical Filter PE
+            "Op_Filter_Veto",// Common Optical Filter Michel Veto
+            "Slice_ID",      // Slice ID
+            "e_candidate",   // Electron Candidate
+            "Topo_Score",    // Topological Score
+            "In_FV",         // In FV
+            "Cluster_Frac",  // Cluster Fraction 
+            "Shower_Score",  // Track Score
+            "Michel_Rej"     // Michel Rejection
             };
 
 
@@ -128,6 +130,8 @@ public:
     // enums for cut dirs
     enum enum_cut_dirs {
                 k_unselected,   // Unselected 
+                k_opfilt_pe,    // Common Optical Filter PE
+                k_opfilt_veto,  // Common Optical Filter Michel Veto
                 k_slice_id,     // Slice ID
                 k_e_candidate,  // Electron Candidate
                 k_topo_score,   // Topo Score
@@ -144,7 +148,7 @@ public:
                 // shr tkfit 2cm dedx ALL
                 // shr tkfit gap10 dedx Y
                 // secondshower Y vtxdist
-                
+
 
 
     // Genie interaction enums
