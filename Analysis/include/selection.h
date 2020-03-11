@@ -29,14 +29,6 @@ namespace xsecSelection {
 
             int max_events{-1};
 
-            // POT and triggers
-            double MC_POT    = 1.2e21;            // The MC POT
-            double Dirt_POT  = 1.02486e+20;       // The dirt POT
-            double Data_POT  = 3.783e+19;         // The Data POT (tortgt_wcut)
-            double Data_trig = 974369.0;          // The data HW Triggers (EA9CNT_wcut)
-            double EXT_trig  = 852789.220000;     // The Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
-
-
             // Scale factors (veverything is scaled to data)
             double mc_scale_factor     = 1.0;
             double intime_scale_factor = 1.0;
@@ -81,11 +73,6 @@ namespace xsecSelection {
 
             // Selection Cut Values
             bool   detector_variations;
-
-            // Vector containing the cut names
-            std::vector<std::string> cut_names = {
-                "In FV"                                    // Fiducial volume
-            };
 
             // Passed Containers
             std::vector<Passed_Container> mc_passed_v;   // MC Passed Container
@@ -132,7 +119,7 @@ namespace xsecSelection {
             void SavetoFile();
             // -----------------------------------------------------------------
             // Make final histogram plots
-            void MakeHistograms(const char * hist_file_name, const char *run_period);
+            void MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config);
             // -----------------------------------------------------------------
 
     }; // END Class

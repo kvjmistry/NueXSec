@@ -37,29 +37,19 @@ class utility{
 public:
     // -------------------------------------------------------------------------
     // Function to configure the cut values from main.h
-    std::vector<double> configure_cuts( double _x1,
-                                        double _x2,
-                                        double _y1,
-                                        double _y2,
-                                        double _z1,
-                                        double _z2,
-                                        double flash_pe_threshold,
-                                        double flash_time_start,
-                                        double flash_time_end,
-                                        double tolerance,
-                                        double shwr_nue_tolerance,
-                                        double trk_nue_tolerance,
-                                        double shwr_hit_threshold,
-                                        double shwr_hit_threshold_collection,
-                                        double tolerance_open_angle_min,
-                                        double tolerance_open_angle_max,
-                                        double tolerance_dedx_min,
-                                        double tolerance_dedx_max,
-                                        double dist_tolerance,
-                                        double pfp_hits_length_tolerance,
-                                        double ratio_tolerance,
-                                        bool do_variations
-                                        );
+    std::vector<double> configure( 
+                                   double _MC_POT,
+                                   double _Dirt_POT,
+                                   double _Data_POT,
+                                   double _Data_trig,
+                                   double _EXT_trig,
+                                   double _x1,
+                                   double _x2,
+                                   double _y1,
+                                   double _y2,
+                                   double _z1,
+                                   double _z2
+                                  );
     // -------------------------------------------------------------------------
     // Get a TFile from a file
     bool GetFile(TFile* &f, TString string);
@@ -149,6 +139,21 @@ public:
                 // shr tkfit gap10 dedx Y
                 // secondshower Y vtxdist
 
+    // Config enums
+    enum enum_config {
+        k_config_Run1_MC_POT,
+        k_config_Run1_Dirt_POT,
+        k_config_Run1_Data_POT,
+        k_config_Run1_Data_trig,
+        k_config_Run1_EXT_trig,
+        k_config_x1,
+        k_config_x2,
+        k_config_y1,
+        k_config_y2,
+        k_config_z1,
+        k_config_z2,
+        k_config_MAX
+    };
 
 
     // Genie interaction enums

@@ -33,7 +33,7 @@ public:
     // -------------------------------------------------------------------------
     utility _util;
 
-    int   selected;
+    int   selected;              // Adds at least 1 shower and containment????
     int   run;                   // Run
     int   sub;                   // Subrun
     int   evt;                   // Event

@@ -4,11 +4,10 @@ int main(int argc, char *argv[]){
 
     auto start = std::chrono::high_resolution_clock::now(); // Start time of script
 
-    const char * input_config_file_name;
-    bool using_default_config      = true;
     bool using_slim_version        = false;
     bool make_histos               = false;
 
+    // inputs 
     char * mc_file_name          = (char *)"empty";
     char * ext_file_name         = (char *)"empty";
     char * data_file_name        = (char *)"empty";
@@ -18,13 +17,20 @@ int main(int argc, char *argv[]){
     char * run_period            = (char *)"empty";
     int num_events{-1};
 
-    std::string usage = " \n ./nuexsec --run <run period num> [--mc <mc file>] [--data <data file>] [--ext <ext file>] [--dirt <dirt file>] [--var <variation file>] [-c <input config file>] [-n <num events>] [--slim] [--hist <input nuexsec file>] \n ";
+    // Configurations from main.h will be stored in here and passed to the selection
+    std::vector<double> config;
+    
+    // Class instances
+    xsecSelection::selection  _selection_instance;
+    utility _utility;
+
+    std::string usage = "\n First run the selection with the options: \n\n ./nuexsec --run <run period num> [--mc <mc file>] [--data <data file>] [--ext <ext file>] [--dirt <dirt file>] [--var <variation file>] [-n <num events>] [--slim] \n\n After this, to make the histograms after running selection, run: \n\n ./nuexsec --run <run period num> --hist <input merged nuexsec file> \n ";
 
     // -------------------------------------------------------------------------
     // Loop over input arguments
     for (int i =1; i < argc; i++){
         auto const arg = argv[i];
-        //std::cout << arg << std::endl; //this is for debugging
+        //std::cout << arg << std::endl; // This is for debugging
         
         // Slim input
         if(strcmp(arg, "--slim") == 0) {
@@ -37,13 +43,6 @@ int main(int argc, char *argv[]){
             std::cout << "Making Histograms, file to make histograms with: "<< argv[i+1] << std::endl;
             make_histos = true;
             hist_file_name = argv[i+1];
-        }
-        
-        // Configuration file
-        if(strcmp(arg, "-c") == 0){
-            std::cout << "Running with input config file: " << argv[i+1] << std::endl;
-            using_default_config = false;
-            input_config_file_name = argv[i+1];
         }
         
         // MC file
@@ -95,7 +94,6 @@ int main(int argc, char *argv[]){
         }
         
     }
-    // if(argc < 2 )  { std::cout << " \n Please include the input file path \n " << std::endl; exit(1); }
 
     // Add catches for default input
     if ((run_period == "empty") ){
@@ -105,76 +103,22 @@ int main(int argc, char *argv[]){
     }
 
     // -------------------------------------------------------------------------
-    std::vector<double> config;
-    std::vector<double> input_config;
-    xsecSelection::selection  _selection_instance;
-
-    // Configure the cut values
-    utility _utility;
-    std::vector<double> default_config = _utility.configure_cuts(
-            _x1, _x2, _y1, _y2, _z1, _z2,
-            flash_pe_threshold,
-            flash_time_start,
-            flash_time_end,
-            tolerance,
-            shwr_nue_tolerance,
-            trk_nue_tolerance,
-            shwr_hit_threshold,
-            shwr_hit_threshold_collection,
-            tolerance_open_angle_min,
-            tolerance_open_angle_max,
-            tolerance_dedx_min,
-            tolerance_dedx_max,
-            dist_tolerance,
-            pfp_hits_length_tolerance,
-            ratio_tolerance,
-            detector_variations
-            );
-    // -------------------------------------------------------------------------
-
-    // Check if a config file has been used for the cuts
-    std::ifstream input_config_file;
-    if(using_default_config == false) {
-        input_config_file.open(input_config_file_name);
-        
-        // Bad file
-        if( !input_config_file.is_open()) {
-            std::cout << "*** \t File did not open! Quitting \t ***" << std::endl;
-            exit(1);
-        }
-        
-        // Good file
-        if (input_config_file.is_open()) {
-            std::cout << "*** \t File Opened \t *** " << std::endl;
-            std::string line;
-
-            // Loop over the lines in the file
-            while (!input_config_file.eof()) {
-                std::getline (input_config_file, line);
-                if(!line.empty()) {
-                    input_config.push_back(std::stof(line));
-                }
-            }
-            input_config_file.close();
-            std::cout << "*** \t File Closed \t *** " << std::endl;
-        }
-    }
-    // -------------------------------------------------------------------------
-    // Set the config
-    if(using_default_config == true) {
-        config = default_config;
-        std::cout << "(Default) Parameter Config from header" << std::endl;
-    }
     
-    if(using_default_config == false) {
-        config = input_config;
-        std::cout << "Paramerter Config from input file" << std::endl;
-    }
+    // Configure the cut values
+    config = _utility.configure(
+        _Run1_MC_POT,
+        _Run1_Dirt_POT,
+        _Run1_Data_POT,
+        _Run1_Data_trig,
+        _Run1_EXT_trig,
+        _x1, _x2, _y1, _y2, _z1, _z2
+        );
+
     // -------------------------------------------------------------------------
 
     // Initialise the selction script
     if (!make_histos) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config, using_slim_version, num_events, run_period );
-    else _selection_instance.xsecSelection::selection::MakeHistograms(hist_file_name, run_period);
+    else _selection_instance.xsecSelection::selection::MakeHistograms(hist_file_name, run_period, config);
 
     // -------------------------------------------------------------------------
     // Finished!

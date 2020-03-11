@@ -7,7 +7,7 @@
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
 <!ENTITY name "searchingfornues_run1_dirt_overlay">
-<!ENTITY version "v1">
+<!ENTITY version "v2">
 ]>
 
 <job>
@@ -35,22 +35,21 @@
   
   <!-- Project stages -->
   <stage name="ntuple">
-    <fcl>run_EventRates.fcl</fcl>
     <fcl>run_flashvalidation_mc.fcl</fcl>
-    <fcl>reco_uboone_mcc9_8_driver_overlay_numi_optical_updated.fcl</fcl>
-    <fcl>run_neutrinoselectionfilter_run1_overlay_cc0pinp_numi.fcl</fcl>
+    <fcl>standard_overlay_optical_numi_uboone_updated.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run1_overlay_cc0pinp_numi_dirt.fcl</fcl>
     <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</outdir>
     <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</logdir>
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <maxfilesperjob>1</maxfilesperjob>
-    <numjobs>6000</numjobs>
+    <numjobs>10</numjobs>
     <datatier>reconstructed</datatier>
     <memory>1000</memory>
     <disk>25GB</disk>
     <schema>root</schema>
     <inputdef>prodgenie_numi_uboone_overlay_dirt_fhc_mcc9_run1_v28_all_snapshot</inputdef>
-    <jobsub>--expected-lifetime=30h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub>--expected-lifetime=12h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
     <jobsub_start>  --expected-lifetime=short</jobsub_start>
     <blacklist>Lancaster</blacklist>
   </stage>

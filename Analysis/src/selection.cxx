@@ -21,9 +21,9 @@ void selection::Initialise( const char * mc_file,
     }
 
     // Set the scale factors
-    mc_scale_factor     = Data_POT  / MC_POT;
-    dirt_scale_factor   = Data_POT  / Dirt_POT;
-    intime_scale_factor = Data_trig / EXT_trig;
+    mc_scale_factor     = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_MC_POT);
+    dirt_scale_factor   = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_Dirt_POT);
+    intime_scale_factor = _config.at(_util.k_config_Run1_Data_trig) / _config.at(_util.k_config_Run1_EXT_trig);
 
     std::cout << "\033[0;32m-------------------------------" << std::endl;
     std::cout << "Scale Factors:\n" <<
@@ -515,15 +515,16 @@ void selection::SavetoFile(){
 
 } // End save to file
 // -----------------------------------------------------------------------------
-void selection::MakeHistograms(const char * hist_file_name, const char *run_period){
+void selection::MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config){
     std::cout << "Creating histograms and making plots" << std::endl;
 
     // Set the scale factors
-    mc_scale_factor     = Data_POT  / MC_POT;
-    dirt_scale_factor   = Data_POT  / Dirt_POT;
-    intime_scale_factor = Data_trig / EXT_trig;
+    mc_scale_factor     = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_MC_POT);
+    dirt_scale_factor   = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_Dirt_POT);
+    intime_scale_factor = _config.at(_util.k_config_Run1_Data_trig) / _config.at(_util.k_config_Run1_EXT_trig);
 
-    // mc_scale_factor = 0.01;
+    // Define this variable here for easier reading
+    double Data_POT = _config.at(_util.k_config_Run1_Data_POT);
 
     std::cout << "\033[0;32m-------------------------------" << std::endl;
     std::cout << "Scale Factors:\n" <<
