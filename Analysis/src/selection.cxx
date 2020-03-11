@@ -21,9 +21,15 @@ void selection::Initialise( const char * mc_file,
     }
 
     // Set the scale factors
-    mc_scale_factor     = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_MC_POT);
-    dirt_scale_factor   = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_Dirt_POT);
-    intime_scale_factor = _config.at(_util.k_config_Run1_Data_trig) / _config.at(_util.k_config_Run1_EXT_trig);
+    if (strcmp(run_period, "1") == 0){
+        mc_scale_factor     = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_MC_POT);
+        dirt_scale_factor   = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_Dirt_POT);
+        intime_scale_factor = _config.at(_util.k_config_Run1_Data_trig) / _config.at(_util.k_config_Run1_EXT_trig);
+    }
+    else {
+        std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;
+        exit(1);
+    }
 
     std::cout << "\033[0;32m-------------------------------" << std::endl;
     std::cout << "Scale Factors:\n" <<
@@ -517,14 +523,21 @@ void selection::SavetoFile(){
 // -----------------------------------------------------------------------------
 void selection::MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config){
     std::cout << "Creating histograms and making plots" << std::endl;
+    
+    double Data_POT;
 
     // Set the scale factors
-    mc_scale_factor     = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_MC_POT);
-    dirt_scale_factor   = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_Dirt_POT);
-    intime_scale_factor = _config.at(_util.k_config_Run1_Data_trig) / _config.at(_util.k_config_Run1_EXT_trig);
-
-    // Define this variable here for easier reading
-    double Data_POT = _config.at(_util.k_config_Run1_Data_POT);
+    if (strcmp(run_period, "1") == 0){
+        mc_scale_factor     = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_MC_POT);
+        dirt_scale_factor   = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_Dirt_POT);
+        intime_scale_factor = _config.at(_util.k_config_Run1_Data_trig) / _config.at(_util.k_config_Run1_EXT_trig);
+        Data_POT = _config.at(_util.k_config_Run1_Data_POT); // Define this variable here for easier reading
+    }
+    else {
+        std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;
+        exit(1);
+    }
+    
 
     std::cout << "\033[0;32m-------------------------------" << std::endl;
     std::cout << "Scale Factors:\n" <<

@@ -33,57 +33,57 @@ int main(int argc, char *argv[]){
         //std::cout << arg << std::endl; // This is for debugging
         
         // Slim input
-        if(strcmp(arg, "--slim") == 0) {
+        if (strcmp(arg, "--slim") == 0) {
             std::cout << "Running with slim mode"<< std::endl;
             using_slim_version = true;
             std::cout << " *** \t Running with Slimmed Selection (no histograms will be made)\t *** " << std::endl;
         }
 
-        if(strcmp(arg, "--hist") == 0) {
+        if (strcmp(arg, "--hist") == 0) {
             std::cout << "Making Histograms, file to make histograms with: "<< argv[i+1] << std::endl;
             make_histos = true;
             hist_file_name = argv[i+1];
         }
         
         // MC file
-        if(strcmp(arg, "--mc") == 0) {
+        if (strcmp(arg, "--mc") == 0) {
             std::cout << "Running with MC file: " << argv[i+1] << std::endl;
             mc_file_name = argv[i+1];
         }
 
         // EXT file
-        if(strcmp(arg, "--ext") == 0){
+        if (strcmp(arg, "--ext") == 0){
             std::cout << "Running with EXT file: " << argv[i+1] << std::endl;
             ext_file_name = argv[i+1];
         }
 
         // Data file
-        if(strcmp(arg, "--data") == 0){
+        if (strcmp(arg, "--data") == 0){
             std::cout << "Running with Data file: " << argv[i+1] << std::endl;
             data_file_name = argv[i+1];
         }
 
         // Dirt file overlay or not?
-        if(strcmp(arg, "--dirt") == 0){
+        if (strcmp(arg, "--dirt") == 0){
             std::cout << "Running with Dirt file: " << argv[i+1] << std::endl;
             dirt_file_name = argv[i+1];
         }
 
         // Variation file
-        if(strcmp(arg, "--var") == 0){
+        if (strcmp(arg, "--var") == 0){
             std::cout << "Running with Systematic Variation file: " << argv[i+1] << std::endl;
             variation_file_name = argv[i+1];
             std::string variation_type = variation_file_name;
         }
 
         // Max number of events specified?
-        if(strcmp(arg, "-n") == 0 || strcmp(arg, "--n") == 0){
+        if (strcmp(arg, "-n") == 0 || strcmp(arg, "--n") == 0){
             std::cout << "Running with a maximum of : " << argv[i+1] << " events" <<std::endl;
             num_events = atoi(argv[i+1]);
         }
 
         // Set the run period
-        if(strcmp(arg, "--run") == 0){
+        if (strcmp(arg, "--run") == 0){
             std::cout << "Setting the run period as : run" << argv[i+1] <<std::endl;
             run_period = argv[i+1];
         }
