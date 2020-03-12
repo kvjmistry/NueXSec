@@ -378,6 +378,7 @@ void SliceContainer::Initialise(TTree *tree, int type){
         tree->SetBranchAddress("weightsFlux",     &weightsFlux_v);
         tree->SetBranchAddress("weightsGenie",    &weightsGenie_v);
         tree->SetBranchAddress("weightsReint",    &weightsReint_v);
+	tree->SetBranchAddress("weightTune",     &weightTune);
     }
     
     
