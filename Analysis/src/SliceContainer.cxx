@@ -183,8 +183,8 @@ void SliceContainer::Initialise(TTree *tree, int type){
     tree->SetBranchAddress("true_p_visible", &true_p_visible);
     tree->SetBranchAddress("true_e_visible", &true_e_visible);
     
-    // tree->SetBranchAddress("opfilter_pe_beam", &opfilter_pe_beam);
-    // tree->SetBranchAddress("opfilter_pe_veto", &opfilter_pe_veto);
+    tree->SetBranchAddress("_opfilter_pe_beam", &opfilter_pe_beam);
+    tree->SetBranchAddress("_opfilter_pe_veto", &opfilter_pe_veto);
     
     tree->SetBranchAddress("nu_pdg", &nu_pdg);
     tree->SetBranchAddress("ccnc",   &ccnc);

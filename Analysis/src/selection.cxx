@@ -74,8 +74,8 @@ void selection::Initialise( const char * mc_file,
     // Get MC variables --------------------------------------------------------
     if (bool_use_mc){
         std::cout << "\nInitialising MC" << std::endl;
-        // _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
-        _util.GetTree(f_mc, mc_tree, "NeutrinoSelectionFilter");
+         _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
+        //_util.GetTree(f_mc, mc_tree, "NeutrinoSelectionFilter");
 
         // Initialise all the mc slice container
         mc_SC.Initialise(mc_tree, _util.k_mc);
@@ -397,7 +397,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     pass = _scuts.opfilt_pe(SC, type);
     passed_v.at(ievent).cut_v.at(_util.k_opfilt_pe) = pass;
-    // if(!pass) return false; // Failed the cut!
+    if(!pass) return false; // Failed the cut!
     
     if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_opfilt_pe, SC);
     _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_opfilt_pe) );
@@ -408,7 +408,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     pass = _scuts.opfilt_veto(SC, type);
     passed_v.at(ievent).cut_v.at(_util.k_opfilt_veto) = pass;
-    // if(!pass) return false; // Failed the cut!
+    //if(!pass) return false; // Failed the cut!
     
     if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_opfilt_veto, SC);
     _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_opfilt_veto) );

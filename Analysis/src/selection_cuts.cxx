@@ -4,7 +4,7 @@ bool selection_cuts::opfilt_pe(SliceContainer &SC, int type){
     
     // Common optical is already applied to data
     if (type == _util.k_mc || type == _util.k_dirt){
-        if (SC.opfilter_pe_beam >= 0) return true; // pass 
+        if (SC.opfilter_pe_beam > 0) return true; // pass 
         else return false;               // fail
     }
     else return true;
