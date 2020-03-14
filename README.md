@@ -40,10 +40,16 @@ Configuration quantities such as the POT and cut values can be found in `main.h`
 
 Also, the default running condition is to use the full selection and produce many many plots - use `--slim` to run more quickly and simply see the cut's performances.
 
-The output of the selection will be in the files directory. We make 1 file for each type (mc/dirt/ext/data). To make the full plots we combine these files with `hadd out_file_run1.root *run1*`. We can then run the histogram maker:
-`./nuexsec --run 1 --hist <merged_file.root>`
+The output of the selection will be in the files directory. We make 1 file for each type (mc/dirt/ext/data). To make the full plots we combine these files with `hadd merged_file_run1.root *run1*`. We can then run the histogram maker:
+`./nuexsec --run 1 --hist <merged_file_runX.root>`
 
 I will try to make some scripts to make the merging more seamless once the selection is in less of a chaotic state.
+
+With the merged file, we can make the plots with:
+
+`./nuexsec --run <1/3b> --hist <merged_file_runX.root>`
+
+This will create a plots folder with all the histograms.
 
 ## Other Modules
 

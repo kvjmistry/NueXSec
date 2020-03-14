@@ -121,7 +121,6 @@ void selection::Initialise( const char * mc_file,
             data_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
         }
 
-        std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of Data Complete!" << std::endl;
         std::cout << "\033[0;31m-------------------------------\033[0m" << std::endl;
 
@@ -150,7 +149,6 @@ void selection::Initialise( const char * mc_file,
             ext_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
         }
 
-        std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of EXT Complete!" << std::endl;
         std::cout << "\033[0;31m-------------------------------\033[0m" << std::endl;
 
@@ -179,7 +177,6 @@ void selection::Initialise( const char * mc_file,
             dirt_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
         }
 
-        std::cout << "-------------------------------" << std::endl;
         std::cout << "Initialisation of Dirt Complete!" << std::endl;
         std::cout << "\033[0;31m-------------------------------\033[0m" << std::endl;
 

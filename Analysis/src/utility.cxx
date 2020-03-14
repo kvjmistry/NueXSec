@@ -267,7 +267,7 @@ void utility::PrintInfo(std::vector<double> counter_v, double intime_scale_facto
     std::cout << "\n------------------------------------------------" << std::endl;
     std::cout << "------------------------------------------------" << std::endl;
     std::cout << "\n\033[0;33m <" << cut_name << "> \033[0m" << std::endl;
-    std::cout << " Total Candidate Nue     : " << counter                << "\t \t " << double(counter                * data_scale_factor  ) << std::endl;
+    std::cout << " Total Candidate Nue     : " << counter                << "\t " << double(counter                   * data_scale_factor  ) << std::endl;
     std::cout << " Number of Nue CC        : " << counter_nue_cc         << "\t \t " << double(counter_nue_cc         * data_scale_factor  ) << std::endl;
     std::cout << " Number of Nue CC Mixed  : " << counter_nue_cc_mixed   << "\t \t " << double(counter_nue_cc_mixed   * data_scale_factor  ) << std::endl;
     std::cout << " Number of Nu out FV     : " << counter_nu_out_fv      << "\t \t " << double(counter_nu_out_fv      * data_scale_factor  ) << std::endl;
@@ -278,9 +278,9 @@ void utility::PrintInfo(std::vector<double> counter_v, double intime_scale_facto
     std::cout << " Number of NC Pi0        : " << counter_nc_pi0         << "\t \t " << double(counter_nc_pi0         * data_scale_factor  ) << std::endl;
     std::cout << " Number of Unmatched     : " << counter_unmatched      << "\t \t " << double(counter_unmatched      * data_scale_factor  ) << std::endl;
     std::cout << " Number of InTime Cosmics: " << double(counter_ext * (intime_scale_factor / data_scale_factor))
-              << "\t \t " << double(counter_ext * intime_scale_factor) << std::endl;
+              << "\t " << double(counter_ext * intime_scale_factor) << std::endl;
     std::cout << " Number of Dirt          : " << double(counter_dirt * dirt_scale_factor / data_scale_factor)
-              << "\t \t " << double (counter_dirt * dirt_scale_factor)<< std::endl;
+              << "\t " << double (counter_dirt * dirt_scale_factor)<< std::endl;
     std::cout << "--------- Neutrinos Selected in Truth ----------" << std::endl;
     std::cout << " Nue CC QE               : " << counter_nue_cc_qe   << std::endl;
     std::cout << " Nue CC Res              : " << counter_nue_cc_res  << std::endl;
