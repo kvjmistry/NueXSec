@@ -1,5 +1,16 @@
 #include "../include/selection_cuts.h"
 // -----------------------------------------------------------------------------
+bool selection_cuts::swtrig(SliceContainer &SC, int type){
+    
+    // Common optical is already applied to data
+    if (type == _util.k_mc || type == _util.k_dirt){
+        if (SC.swtrig > 0) return true;  // pass 
+        else return false;               // fail
+    }
+    else return true;
+    
+}
+// -----------------------------------------------------------------------------
 bool selection_cuts::opfilt_pe(SliceContainer &SC, int type){
     
     // Common optical is already applied to data
@@ -22,6 +33,7 @@ bool selection_cuts::opfilt_veto(SliceContainer &SC, int type){
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::slice_id(SliceContainer &SC){
+
     if (SC.nslice == 1) return true; // pass 
     else return false;               // fail
 }

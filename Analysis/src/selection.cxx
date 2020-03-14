@@ -212,17 +212,6 @@ void selection::make_selection(){
             if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
 
             // std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
-
-            // Skip the current faulty events in the file
-            // if (mc_SC.run == 6811) {
-            //     std::cout << "Skipping event that has been flagged as bad before" << std::endl;
-            //     counter ++;
-            //     std::cout << "Counter:" << counter << std::endl;
-            //     continue;
-            // }
-
-            // std::cout << mc_SC.opfilter_pe_veto << std::endl;
-        
             // Get the entry in the tree
             mc_tree->GetEntry(ievent); 
 
@@ -379,8 +368,6 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
     // *************************************************************************
-
-    if (SC.selected != 1) return false;
     
     // Fill reconstructed histograms
     if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_unselected, SC);
@@ -391,11 +378,22 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Fill the hists for making the efficiency plot
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_unselected, classification.first, SC);
     
+    // *************************************************************************
+    // Software Trigger -- MC Only  --------------------------------------------
+    // *************************************************************************
+    pass = _scuts.swtrig(SC, type);
+    passed_v.at(ievent).cut_v.at(_util.k_swtrig) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_swtrig, SC);
+    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_swtrig) );
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_swtrig, classification.first, SC);
+
 
     // Notes: opfilter pe and veto variables seem to be not working. Need to investigate...
 
     // *************************************************************************
-    // Op Filt PE --------------------------------------------------------------
+    // Op Filt PE -- MC Only ---------------------------------------------------
     // *************************************************************************
     pass = _scuts.opfilt_pe(SC, type);
     passed_v.at(ievent).cut_v.at(_util.k_opfilt_pe) = pass;
@@ -406,7 +404,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_opfilt_pe, classification.first, SC);
 
     // *************************************************************************
-    // Op Filt Michel Veto -----------------------------------------------------
+    // Op Filt Michel Veto -- MC Only ------------------------------------------
     // *************************************************************************
     pass = _scuts.opfilt_veto(SC, type);
     passed_v.at(ievent).cut_v.at(_util.k_opfilt_veto) = pass;

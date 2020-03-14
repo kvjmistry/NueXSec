@@ -14,12 +14,14 @@ class selection_cuts{
     selection_cuts(){}; // Default constructor
 
     utility _util;
-
     // -------------------------------------------------------------------------
-    // Common Optical Filter PE
+    // Software Trigger -- MC Only
+    bool swtrig(SliceContainer &SC, int type);
+    // -------------------------------------------------------------------------
+    // Common Optical Filter PE -- MC Only
     bool opfilt_pe(SliceContainer &SC, int type);
     // -------------------------------------------------------------------------
-    // Common Optical Filter Michel Veto
+    // Common Optical Filter Michel Veto -- MC Only
     bool opfilt_veto(SliceContainer &SC, int type);
     // -------------------------------------------------------------------------
     // Require pass for the slice ID

@@ -82,6 +82,7 @@ public:
     // Cut directory names
     std::vector<std::string> cut_dirs = {
             "Unselected",    // Unselected
+            "SoftwareTrig",  // Software Trigger
             "Op_Filter_PE",  // Common Optical Filter PE
             "Op_Filter_Veto",// Common Optical Filter Michel Veto
             "Slice_ID",      // Slice ID
@@ -125,6 +126,7 @@ public:
     // enums for cut dirs
     enum enum_cut_dirs {
                 k_unselected,   // Unselected 
+                k_swtrig,       // Software Trigger
                 k_opfilt_pe,    // Common Optical Filter PE
                 k_opfilt_veto,  // Common Optical Filter Michel Veto
                 k_slice_id,     // Slice ID
