@@ -43,7 +43,11 @@ class selection_cuts{
     // Cut on the total shower energy to reject michels
     bool michel_rej(SliceContainer &SC);
     // -------------------------------------------------------------------------
+    // Cut on the dEcx
+    bool dEdx(SliceContainer &SC);
     // -------------------------------------------------------------------------
+    // Selected variable in PeLEE tree
+    bool selected(SliceContainer &SC);
     // -------------------------------------------------------------------------
 
 }; // End Class Selection Cuts

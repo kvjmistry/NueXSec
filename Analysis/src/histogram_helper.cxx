@@ -255,16 +255,18 @@ void histogram_helper::InitHistograms(){
 // -----------------------------------------------------------------------------
 void histogram_helper::FillReco(int type, int classification_index, int cut_index, SliceContainer SC){
 
-    if (type == _util.k_mc || type == _util.k_dirt) weight = SC.weightTune; // Here define the weight
+    // Get the necessary weight
+    if (type == _util.k_mc || type == _util.k_dirt){
+        
+        weight = SC.weightTune; // Here define the weight
+        
+        // Catch infinate/nan/unreasonably large tune weights
+        if (std::isinf(weight))      weight = 1.0; 
+        if (std::isnan(weight) == 1) weight = 1.0;
+        if (weight > 100)            weight = 1.0;
+
+    } 
     else weight = 1.0;
-
-    // Catch infinate tune weights
-    if (std::isinf(weight)) weight = 1.0;
-    if (std::isnan(weight) == 1) { // catch NaN values
-		weight = 1.0;
-    }
-
-    //weight = 1.0; // kill the weight for now its not working!
 
     // Now fill the histograms!
     TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x, weight);

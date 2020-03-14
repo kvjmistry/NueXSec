@@ -69,6 +69,9 @@ public:
     // Function to print the tabulated events
     void PrintInfo(std::vector<double> counter_v, double intime_scale_factor, double data_scale_factor, double dirt_scale_factor, std::string cut_name, int tot_true_infv_nues);
     // -------------------------------------------------------------------------
+    // Function to get the PPFX CV weight correction
+    // void GetPPFXCVWeight(SliceContainer &SC);
+    // -------------------------------------------------------------------------
 
     // Other definitions for code
     bool verbose = false; // This should be set in the config file
@@ -87,7 +90,9 @@ public:
             "In_FV",         // In FV
             "Cluster_Frac",  // Cluster Fraction 
             "Shower_Score",  // Track Score
-            "Michel_Rej"     // Michel Rejection
+            "Michel_Rej",    // Michel Rejection
+            "dEdx",          // dEdx
+            "Selected"       // Selected 
             };
 
 
@@ -129,6 +134,8 @@ public:
                 k_cluster_frac, // Cluster Fraction
                 k_shower_score, // Shower Score
                 k_michel_rej,   // Michel Rejection
+                k_dEdx,         // dEdx
+                k_selected,     // Selected
                 k_cuts_MAX
                 }; 
 

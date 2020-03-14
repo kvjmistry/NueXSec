@@ -72,7 +72,15 @@ bool selection_cuts::michel_rej(SliceContainer &SC){
     else return false;                               // fail
 }
 // -----------------------------------------------------------------------------
+bool selection_cuts::dEdx(SliceContainer &SC){
+    if (SC.shr_dedx_Y_cali > 1.8 && SC.shr_dedx_Y_cali < 3.0) return true; // pass 
+    else return false;                                                     // fail
+}
 // -----------------------------------------------------------------------------
+bool selection_cuts::selected(SliceContainer &SC){
+    if (SC.selected == 1 ) return true; // pass 
+    else return false;                  // fail
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

@@ -141,7 +141,7 @@ void selection::Initialise( const char * mc_file,
         if (!_slim) _hhelper.at(_util.k_ext).InitHistograms();
         
         ext_tree_total_entries = ext_tree->GetEntries();
-        std::cout << "Total MC Events:         " << ext_tree_total_entries << std::endl;
+        std::cout << "Total EXT Events:        " << ext_tree_total_entries << std::endl;
 
         // Resize the Passed vector
         ext_passed_v.resize(ext_tree_total_entries);
@@ -379,6 +379,8 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
     // *************************************************************************
+
+    if (SC.selected != 1) return false;
     
     // Fill reconstructed histograms
     if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_unselected, SC);
@@ -490,6 +492,29 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_michel_rej, SC);
     _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_michel_rej) );
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_michel_rej, classification.first, SC);
+
+    // *************************************************************************
+    // dEdx --------------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.dEdx(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_dEdx) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_dEdx, SC);
+    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_dEdx) );
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_dEdx, classification.first, SC);
+
+    // *************************************************************************
+    // Selected ----------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.selected(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_selected) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_selected, SC);
+    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_selected) );
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_selected, classification.first, SC);
+    
     
     // // *************************************************************************
     return true;
@@ -528,7 +553,7 @@ void selection::MakeHistograms(const char * hist_file_name, const char *run_peri
 
     // Set the scale factors
     if (strcmp(run_period, "1") == 0){
-        mc_scale_factor     = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_MC_POT);
+        mc_scale_factor     = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_MC_POT) ;
         dirt_scale_factor   = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_Dirt_POT);
         intime_scale_factor = _config.at(_util.k_config_Run1_Data_trig) / _config.at(_util.k_config_Run1_EXT_trig);
         Data_POT = _config.at(_util.k_config_Run1_Data_POT); // Define this variable here for easier reading
@@ -609,7 +634,7 @@ void selection::MakeHistograms(const char * hist_file_name, const char *run_peri
    
         // Leading Shower Momentum
         _hplot.MakeStack("h_reco_leading_mom", _util.cut_dirs.at(i).c_str(),
-                         false,  true, 1.0, "Leading Shower Momentum [MeV/c]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                         false, false, 1.0, "Leading Shower Momentum [MeV/c]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_leading_mom.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // 2D distance largest flash to reco nu vertex
@@ -639,7 +664,7 @@ void selection::MakeHistograms(const char * hist_file_name, const char *run_peri
 
         // Leading Shower opening angle
         _hplot.MakeStack("h_reco_leading_shower_open_angle", _util.cut_dirs.at(i).c_str(),
-                         false,  true, 1.0, "Leading Shower Open Angle [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                         false,  false, 1.0, "Leading Shower Open Angle [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_leading_shower_open_angle.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Secondary shower to vertex distance (for events with more than 1 shower)
@@ -689,7 +714,7 @@ void selection::MakeHistograms(const char * hist_file_name, const char *run_peri
 
         // Topological Score
         _hplot.MakeStack("h_reco_topological_score", _util.cut_dirs.at(i).c_str(),
-                         false,  true, 1.0, "Topological Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                         false,  false, 1.0, "Topological Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_topological_score.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Track shower dist
@@ -704,7 +729,7 @@ void selection::MakeHistograms(const char * hist_file_name, const char *run_peri
    
         // Ratio hits from showers to slice
         _hplot.MakeStack("h_reco_hits_ratio", _util.cut_dirs.at(i).c_str(),
-                         false,  true, 1.0, "Hit Ratio of all Showers and the Slice", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                         false,  false, 1.0, "Hit Ratio of all Showers and the Slice", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_hits_ratio.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
         
          // Shower score
@@ -719,18 +744,18 @@ void selection::MakeHistograms(const char * hist_file_name, const char *run_peri
 
         // Calibrated energy of all the showers
         _hplot.MakeStack("h_reco_shower_energy_tot_cali", _util.cut_dirs.at(i).c_str(),
-                         false,  true, 1.0, "Total Calibrated Energy of all Showers [GeV]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                         false,  false, 1.0, "Total Calibrated Energy of all Showers [GeV]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_shower_energy_tot_cali.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         // Total number of hits for the leading showe
         _hplot.MakeStack("h_reco_shower_hits", _util.cut_dirs.at(i).c_str(),
-                         false,  true, 1.0, "Total Num of hits for the leading Shower", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                         false,  false, 1.0, "Total Num of hits for the leading Shower", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_shower_hits.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
 
         
         // Total number of hits for the leading shower in the collection plane
         _hplot.MakeStack("h_reco_shower_hits_y_plane", _util.cut_dirs.at(i).c_str(),
-                         false,  true, 1.0, "Total Num of hits for the leading Shower in Collection Plane", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                         false,  false, 1.0, "Total Num of hits for the leading Shower in Collection Plane", 0.8, 0.98, 0.87, 0.32, Data_POT,
                          Form("plots/run%s/%s/reco_shower_hits_y_plane.pdf", run_period, _util.cut_dirs.at(i).c_str()) );
         
 
