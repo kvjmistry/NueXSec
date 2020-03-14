@@ -389,9 +389,6 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_swtrig) );
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_swtrig, classification.first, SC);
 
-
-    // Notes: opfilter pe and veto variables seem to be not working. Need to investigate...
-
     // *************************************************************************
     // Op Filt PE -- MC Only ---------------------------------------------------
     // *************************************************************************
@@ -408,7 +405,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     pass = _scuts.opfilt_veto(SC, type);
     passed_v.at(ievent).cut_v.at(_util.k_opfilt_veto) = pass;
-    //if(!pass) return false; // Failed the cut!
+    if(!pass) return false; // Failed the cut!
     
     if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_opfilt_veto, SC);
     _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_opfilt_veto) );

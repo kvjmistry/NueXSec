@@ -26,7 +26,7 @@ bool selection_cuts::opfilt_veto(SliceContainer &SC, int type){
 
     // Common optical is already applied to data
     if (type == _util.k_mc || type == _util.k_dirt){
-        if (SC.opfilter_pe_veto > 20) return true; // pass 
+        if (SC.opfilter_pe_veto < 20) return true; // pass 
         else return false;               // fail
     }
     else return true;
