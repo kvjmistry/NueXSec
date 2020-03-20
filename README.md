@@ -1,6 +1,16 @@
 # NueXSec
 A repository for a Nue XSec Selection using the NuMI Beam
 
+## Setup instructions
+Clone the repository by doing `git clone https://github.com/kvjmistry/NueXSec.git`
+If you want the current branch I am working on, then you can do `git checkout pandora`
+
+next source the setup script: `source setup_nuexsec.sh`
+
+and thats it!
+
+What follows is whats in this repository and how to use it.
+
 ## Input to Code
 This repository uses the input n-tuples written by the pandora LEE team. Please see this link for more info. 
 
