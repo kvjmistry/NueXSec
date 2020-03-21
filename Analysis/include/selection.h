@@ -13,7 +13,7 @@
 
 /* 
 Class is the main controller of the selection. Main.cxx will invoke the intilalisation
-of this class. After the initialisation, the make_selection() function will be
+of this class. After the initialisation, the MakeSelection() function will be
 run.
 
 */
@@ -112,7 +112,7 @@ namespace xsecSelection {
                              const char * run_period);
             // -----------------------------------------------------------------
             // Main function for selection
-            void make_selection();
+            void MakeSelection();
             // -----------------------------------------------------------------
             // Template code to apply selection cuts
             bool ApplyCuts(int type, int ievent,std::vector<std::vector<double>> &counter_v,

@@ -191,12 +191,12 @@ void selection::Initialise( const char * mc_file,
     
     
     // Invoke main selection function
-    make_selection();
+    MakeSelection();
 
 } // END Initialise function
 // -----------------------------------------------------------------------------
 // Main function for selection
-void selection::make_selection(){
+void selection::MakeSelection(){
     std::cout << "Now Running the selection!"<< std::endl;
     
     int counter = 0;
