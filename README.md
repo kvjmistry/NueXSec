@@ -58,3 +58,15 @@ I will try to make some scripts to make the merging more seamless once the selec
 ## Other Modules
 
 FlashValidation contains a LArSoft Module for analysing the flash information in the events. EventRate contains a LArSoft module to make the eventrate distribution. If you need to use these then ask me and I will document this further. 
+
+## Systematics
+
+This folder contains scripts related to doing systematics. For now it contains a root script to make the weight histogrmas needed for the flux.
+
+## Tools
+
+This folder contains scripts not directly related to the selection, but are useful. It currently contains a script for converting a run subrun list to a filelist which can be filtered on to get all the selected nue events.
+
+
+
+
