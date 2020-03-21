@@ -19,7 +19,7 @@ public:
 
     // -------------------------------------------------------------------------
     // Initialise the class
-    void Initialise(TTree* tree, int type);
+    void Initialise(TTree* tree, int type, TFile *f_flux_weights);
     // -------------------------------------------------------------------------
     // Function to classify the slice
     std::pair<std::string, int>  SliceClassifier(int type);
@@ -31,6 +31,10 @@ public:
     // Function to return the genie interaction mode, e.g. ccqe, ccmec etc.
     std::string SliceInteractionType(int type);
     // -------------------------------------------------------------------------
+    // Function to Get the PPFX CV correction weight
+    double GetPPFXCVWeight();
+    // -------------------------------------------------------------------------
+
     utility _util;
 
     int   selected;              // Adds at least 1 shower and containment????
@@ -269,6 +273,9 @@ public:
     float true_nu_vtx_sce_x;     // True Neutrino Vtx Space Charge x
     float true_nu_vtx_sce_y;     // True Neutrino Vtx Space Charge y
     float true_nu_vtx_sce_z;     // True Neutrino Vtx Space Charge z
+    float true_nu_px;            // True Neutrino Px
+    float true_nu_py;            // True Neutrino Py
+    float true_nu_pz;            // True Neutrino Pz
     
     float reco_nu_vtx_x;         // Reco Neutrino Vtx x
     float reco_nu_vtx_y;         // Reco Neutrino Vtx y
@@ -571,6 +578,11 @@ public:
     std::vector<float> *trk_llr_pid_v        = nullptr;
     std::vector<float> *trk_llr_pid_score_v  = nullptr;
     
+    TH1D* h_2D_CV_UW_PPFX_ratio_nue;
+    TH1D* h_2D_CV_UW_PPFX_ratio_nuebar;
+    TH1D* h_2D_CV_UW_PPFX_ratio_numu;
+    TH1D* h_2D_CV_UW_PPFX_ratio_numubar;
+
 };
 
 #endif

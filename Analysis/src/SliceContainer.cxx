@@ -1,7 +1,7 @@
 #include "../include/SliceContainer.h"
 
 // -----------------------------------------------------------------------------
-void SliceContainer::Initialise(TTree *tree, int type){
+void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights){
 
     std::cout << "Initalising Slice Container" << std::endl;
 
@@ -202,6 +202,9 @@ void SliceContainer::Initialise(TTree *tree, int type){
     tree->SetBranchAddress("true_nu_vtx_sce_x", &true_nu_vtx_sce_x);
     tree->SetBranchAddress("true_nu_vtx_sce_y", &true_nu_vtx_sce_y);
     tree->SetBranchAddress("true_nu_vtx_sce_z", &true_nu_vtx_sce_z);
+    tree->SetBranchAddress("true_nu_px", &true_nu_px);
+    tree->SetBranchAddress("true_nu_py", &true_nu_py);
+    tree->SetBranchAddress("true_nu_pz", &true_nu_pz);
     
     tree->SetBranchAddress("reco_nu_vtx_x", &reco_nu_vtx_x);
     tree->SetBranchAddress("reco_nu_vtx_y", &reco_nu_vtx_y);
@@ -378,7 +381,7 @@ void SliceContainer::Initialise(TTree *tree, int type){
         tree->SetBranchAddress("weightsFlux",     &weightsFlux_v);
         tree->SetBranchAddress("weightsGenie",    &weightsGenie_v);
         tree->SetBranchAddress("weightsReint",    &weightsReint_v);
-	tree->SetBranchAddress("weightTune",     &weightTune);
+        tree->SetBranchAddress("weightTune",      &weightTune);
     }
     
     
@@ -511,6 +514,15 @@ void SliceContainer::Initialise(TTree *tree, int type){
 
 
     // weightstree->SetBranchAddress("weights", &_mapWeight);
+
+    // Initalise the flux histograms if MC only
+    if (type == _util.k_mc){
+        bool boolhist;
+        boolhist = _util.GetHist(f_flux_weights, h_2D_CV_UW_PPFX_ratio_nue,     "h_2D_CV_UW_PPFX_ratio_nue");     if (boolhist == false) exit(2); 
+        boolhist = _util.GetHist(f_flux_weights, h_2D_CV_UW_PPFX_ratio_nuebar,  "h_2D_CV_UW_PPFX_ratio_nuebar");  if (boolhist == false) exit(2);
+        boolhist = _util.GetHist(f_flux_weights, h_2D_CV_UW_PPFX_ratio_numu,    "h_2D_CV_UW_PPFX_ratio_numu");    if (boolhist == false) exit(2);
+        boolhist = _util.GetHist(f_flux_weights, h_2D_CV_UW_PPFX_ratio_numubar, "h_2D_CV_UW_PPFX_ratio_numubar"); if (boolhist == false) exit(2);
+    }
 
 
 }
@@ -681,5 +693,39 @@ std::string SliceContainer::SliceInteractionType(int type){
     else return "data";
 
 
+}
+// -----------------------------------------------------------------------------
+double SliceContainer::GetPPFXCVWeight(){
+    
+    double weight = 1.0;
+
+    double nu_theta = _util.GetTheta(true_nu_px, true_nu_py, true_nu_pz);
+
+    double xbin{1.0},ybin{1.0};
+
+    if (nu_pdg == 14) {
+        xbin = h_2D_CV_UW_PPFX_ratio_numu->GetXaxis()->FindBin(nu_e);
+        ybin = h_2D_CV_UW_PPFX_ratio_numu->GetYaxis()->FindBin(nu_theta);
+        weight = h_2D_CV_UW_PPFX_ratio_numu->GetBinContent(xbin, ybin);
+    }
+    if (nu_pdg == -14) {
+        xbin = h_2D_CV_UW_PPFX_ratio_numubar->GetXaxis()->FindBin(nu_e);
+        ybin = h_2D_CV_UW_PPFX_ratio_numubar->GetYaxis()->FindBin(nu_theta);
+        weight = h_2D_CV_UW_PPFX_ratio_numubar->GetBinContent(xbin, ybin);
+    }
+    if (nu_pdg == 12) {
+        xbin = h_2D_CV_UW_PPFX_ratio_nue->GetXaxis()->FindBin(nu_e);
+        ybin = h_2D_CV_UW_PPFX_ratio_nue->GetYaxis()->FindBin(nu_theta);
+        weight = h_2D_CV_UW_PPFX_ratio_nue->GetBinContent(xbin, ybin);
+    }
+    if (nu_pdg == 12) {
+        xbin = h_2D_CV_UW_PPFX_ratio_nuebar->GetXaxis()->FindBin(nu_e);
+        ybin = h_2D_CV_UW_PPFX_ratio_nuebar->GetYaxis()->FindBin(nu_theta);
+        weight = h_2D_CV_UW_PPFX_ratio_nuebar->GetBinContent(xbin, ybin);
+    }
+
+    // std::cout << nu_theta << "  " << nu_e <<  "  " << weight<< std::endl;
+
+    return weight;
 }
 // -----------------------------------------------------------------------------

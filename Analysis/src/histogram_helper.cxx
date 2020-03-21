@@ -255,6 +255,8 @@ void histogram_helper::InitHistograms(){
 // -----------------------------------------------------------------------------
 void histogram_helper::FillReco(int type, int classification_index, int cut_index, SliceContainer SC){
 
+    double weight = 1.0;
+
     // Get the necessary weight
     if (type == _util.k_mc || type == _util.k_dirt){
         
@@ -267,6 +269,14 @@ void histogram_helper::FillReco(int type, int classification_index, int cut_inde
 
     } 
     else weight = 1.0;
+
+    // Get the PPFX CV fux orrection weight
+    if (type == _util.k_mc){
+        double weight_flux = SC.GetPPFXCVWeight();
+        weight = weight * weight_flux;
+    }
+
+   
 
     // Now fill the histograms!
     TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x, weight);

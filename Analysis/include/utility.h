@@ -69,9 +69,10 @@ public:
     // Function to print the tabulated events
     void PrintInfo(std::vector<double> counter_v, double intime_scale_factor, double data_scale_factor, double dirt_scale_factor, std::string cut_name, int tot_true_infv_nues);
     // -------------------------------------------------------------------------
-    // Function to get the PPFX CV weight correction
-    // void GetPPFXCVWeight(SliceContainer &SC);
+    // Function calculate theta
+    double GetTheta(double px, double py, double pz);
     // -------------------------------------------------------------------------
+
 
     // Other definitions for code
     bool verbose = false; // This should be set in the config file

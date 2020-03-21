@@ -51,6 +51,7 @@ namespace xsecSelection {
             TFile * f_ext;       // The ext file
             TFile * f_dirt;      // The dirt file
             TFile * f_variation; // The variation file
+            TFile * f_flux_weights; // The file with the flux weights
 
             // TTrees
             TTree * mc_tree;      // MC   Tree
@@ -91,6 +92,8 @@ namespace xsecSelection {
 
             // Total nue's in the cryostat
             int tot_true_cryo_nues;
+
+            int _run_period;
 
         public:
             // -----------------------------------------------------------------

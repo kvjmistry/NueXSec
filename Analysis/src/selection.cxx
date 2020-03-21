@@ -25,11 +25,13 @@ void selection::Initialise( const char * mc_file,
         mc_scale_factor     = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_MC_POT);
         dirt_scale_factor   = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_Dirt_POT);
         intime_scale_factor = _config.at(_util.k_config_Run1_Data_trig) / _config.at(_util.k_config_Run1_EXT_trig);
+        _run_period = 1;
     }
     else {
         std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;
         exit(1);
     }
+
 
     std::cout << "\033[0;32m-------------------------------" << std::endl;
     std::cout << "Scale Factors:\n" <<
@@ -61,6 +63,10 @@ void selection::Initialise( const char * mc_file,
     bool_use_dirt      = _util.GetFile(f_dirt,      dirt_file);
     bool_use_variation = _util.GetFile(f_variation, variation_file);
 
+    // Load in the flux weights file
+    std::cout << "Getting the CV flux file..."<< std::endl;
+    f_flux_weights = new TFile("../Systematics/f_flux_CV_weights.root", "READ");
+
     // Configure the externally configurable cut parameters
     std::cout << "\n --- Configuring Parameters --- \n" << std::endl;
     
@@ -78,7 +84,7 @@ void selection::Initialise( const char * mc_file,
         //_util.GetTree(f_mc, mc_tree, "NeutrinoSelectionFilter");
 
         // Initialise all the mc slice container
-        mc_SC.Initialise(mc_tree, _util.k_mc);
+        mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights);
 
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period);
@@ -105,7 +111,7 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_data, data_tree, "nuselection/NeutrinoSelectionFilter");
         
         // Initialise all the data slice container
-        data_SC.Initialise(data_tree, _util.k_data);
+        data_SC.Initialise(data_tree, _util.k_data, f_flux_weights);
 
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, run_period);
@@ -133,7 +139,7 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_ext, ext_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
-        ext_SC.Initialise(ext_tree, _util.k_ext);
+        ext_SC.Initialise(ext_tree, _util.k_ext, f_flux_weights);
 
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, run_period);
@@ -161,7 +167,7 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_dirt, dirt_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
-        dirt_SC.Initialise(dirt_tree, _util.k_dirt);
+        dirt_SC.Initialise(dirt_tree, _util.k_dirt, f_flux_weights);
 
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period);
@@ -181,6 +187,8 @@ void selection::Initialise( const char * mc_file,
         std::cout << "\033[0;31m-------------------------------\033[0m" << std::endl;
 
     } // End intialisation of dirt variables
+
+    
     
     // Invoke main selection function
     make_selection();
@@ -260,7 +268,7 @@ void selection::make_selection(){
 
             int run, subrun, event;
             std::ofstream run_subrun_file;
-            run_subrun_file.open("files/run_subrun_list_data.txt");
+            run_subrun_file.open(Form("files/run%i_run_subrun_list_data.txt",_run_period));
 
             // Loop over the data events and make a run_subrun_event filelist
             for (int ievent = 0; ievent < data_tree_total_entries; ievent++){

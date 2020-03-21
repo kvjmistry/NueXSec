@@ -49,6 +49,8 @@ void CalcRatio(TFile *fin, TFile *fout,int flav, const char* mode){
     
     fin->cd();
     
+
+    
     std::cout << "Calculating Histograms...\t" << mode << std::endl;
 
     // 2D
