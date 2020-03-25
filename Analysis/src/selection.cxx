@@ -377,15 +377,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
     // *************************************************************************
-    
-    // Fill reconstructed histograms
-    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_unselected, SC);
-    
-    // Tabulate the selection
-    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_unselected) );
-
-    // Fill the hists for making the efficiency plot
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_unselected, classification.first, SC);
+    SelectionFill(type, SC, classification, interaction, _util.k_unselected, counter_v );
     
     // *************************************************************************
     // Software Trigger -- MC Only  --------------------------------------------
@@ -394,9 +386,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_swtrig) = pass;
     if(!pass) return false; // Failed the cut!
     
-    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_swtrig, SC);
-    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_swtrig) );
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_swtrig, classification.first, SC);
+    SelectionFill(type, SC, classification, interaction, _util.k_swtrig, counter_v );
 
     // *************************************************************************
     // Op Filt PE -- MC Only ---------------------------------------------------
@@ -405,9 +395,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_opfilt_pe) = pass;
     if(!pass) return false; // Failed the cut!
     
-    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_opfilt_pe, SC);
-    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_opfilt_pe) );
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_opfilt_pe, classification.first, SC);
+    SelectionFill(type, SC, classification, interaction, _util.k_opfilt_pe, counter_v );
 
     // *************************************************************************
     // Op Filt Michel Veto -- MC Only ------------------------------------------
@@ -416,9 +404,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_opfilt_veto) = pass;
     if(!pass) return false; // Failed the cut!
     
-    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_opfilt_veto, SC);
-    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_opfilt_veto) );
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_opfilt_veto, classification.first, SC);
+    SelectionFill(type, SC, classification, interaction, _util.k_opfilt_veto, counter_v );
 
     // *************************************************************************
     // Slice ID ----------------------------------------------------------------
@@ -427,9 +413,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_slice_id) = pass;
     if(!pass) return false; // Failed the cut!
     
-    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_slice_id, SC);
-    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_slice_id) );
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_slice_id, classification.first, SC);
+    SelectionFill(type, SC, classification, interaction, _util.k_slice_id, counter_v );
     
     // *************************************************************************
     // Electron Candidate ------------------------------------------------------
@@ -438,10 +422,8 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_e_candidate) = pass;
     if(!pass) return false; // Failed the cut!
     
-    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_e_candidate, SC);
-    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_e_candidate) );
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_e_candidate, classification.first, SC);
-
+    SelectionFill(type, SC, classification, interaction, _util.k_e_candidate, counter_v );
+    
     // *************************************************************************
     // Topological Score -------------------------------------------------------
     // *************************************************************************
@@ -449,9 +431,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_topo_score) = pass;
     if(!pass) return false; // Failed the cut!
     
-    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_topo_score, SC);
-    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_topo_score) );
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_topo_score, classification.first, SC);
+    SelectionFill(type, SC, classification, interaction, _util.k_topo_score, counter_v );
 
     // *************************************************************************
     // In FV -------------------------------------------------------------------
@@ -460,9 +440,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_in_fv) = pass;
     if(!pass) return false; // Failed the cut!
     
-    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_in_fv, SC);
-    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_in_fv) );
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_in_fv, classification.first, SC);
+    SelectionFill(type, SC, classification, interaction, _util.k_in_fv, counter_v );
 
     // *************************************************************************
     // Cluster Fraction --------------------------------------------------------
@@ -471,9 +449,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_cluster_frac) = pass;
     if(!pass) return false; // Failed the cut!
     
-    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_cluster_frac, SC);
-    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_cluster_frac) );
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_cluster_frac, classification.first, SC);
+    SelectionFill(type, SC, classification, interaction, _util.k_cluster_frac, counter_v );
 
     // *************************************************************************
     // Shower Score ------------------------------------------------------------
@@ -482,9 +458,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_shower_score) = pass;
     if(!pass) return false; // Failed the cut!
     
-    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_shower_score, SC);
-    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_shower_score) );
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_shower_score, classification.first, SC);
+    SelectionFill(type, SC, classification, interaction, _util.k_shower_score, counter_v );
 
     // *************************************************************************
     // Michel Rejection --------------------------------------------------------
@@ -493,9 +467,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_michel_rej) = pass;
     if(!pass) return false; // Failed the cut!
     
-    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_michel_rej, SC);
-    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_michel_rej) );
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_michel_rej, classification.first, SC);
+    SelectionFill(type, SC, classification, interaction, _util.k_michel_rej, counter_v );
 
     // *************************************************************************
     // dEdx --------------------------------------------------------------------
@@ -504,9 +476,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_dEdx) = pass;
     if(!pass) return false; // Failed the cut!
     
-    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_dEdx, SC);
-    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_dEdx) );
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_dEdx, classification.first, SC);
+    SelectionFill(type, SC, classification, interaction, _util.k_dEdx, counter_v );
 
     // *************************************************************************
     // Selected ----------------------------------------------------------------
@@ -515,10 +485,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_selected) = pass;
     if(!pass) return false; // Failed the cut!
     
-    if (!slim) _hhelper.at(type).FillReco(type, classification.second, _util.k_selected, SC);
-    _util.Tabulate(interaction, classification.first, type, counter_v.at(_util.k_selected) );
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(_util.k_selected, classification.first, SC);
-    
+    SelectionFill(type, SC, classification, interaction, _util.k_selected, counter_v );
     
     // // *************************************************************************
     return true;
@@ -549,6 +516,19 @@ void selection::SavetoFile(){
     }
 
 } // End save to file
+// -----------------------------------------------------------------------------
+void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, int cut_index, std::vector<std::vector<double>> &counter_v){
+
+    // Fill Reco Histograms
+    if (!slim) _hhelper.at(type).FillReco(type, classification.second, cut_index, SC);
+    
+    // Set counters for the cut
+    _util.Tabulate(interaction, classification.first, type, counter_v.at(cut_index) );
+    
+    // Fill Plots for Efficiency
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC);
+
+}
 // -----------------------------------------------------------------------------
 void selection::MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config){
     std::cout << "Creating histograms and making plots" << std::endl;

@@ -255,28 +255,12 @@ void histogram_helper::InitHistograms(){
 // -----------------------------------------------------------------------------
 void histogram_helper::FillReco(int type, int classification_index, int cut_index, SliceContainer SC){
 
-    double weight = 1.0;
+    // Get the CV weight
+    double weight = GetCVWeight(type, SC);
 
-    // Get the necessary weight
-    if (type == _util.k_mc || type == _util.k_dirt){
-        
-        weight = SC.weightTune; // Here define the weight
-        
-        // Catch infinate/nan/unreasonably large tune weights
-        if (std::isinf(weight))      weight = 1.0; 
-        if (std::isnan(weight) == 1) weight = 1.0;
-        if (weight > 100)            weight = 1.0;
-
-    } 
-    else weight = 1.0;
-
-    // Get the PPFX CV fux orrection weight
-    if (type == _util.k_mc){
-        double weight_flux = SC.GetPPFXCVWeight();
-        weight = weight * weight_flux;
-    }
-
-   
+    // Calculate some variables
+    double reco_shr_p = std::sqrt(SC.shr_px*SC.shr_px + SC.shr_py*SC.shr_py + SC.shr_pz*SC.shr_pz);
+    // if(cut_index == 0) std::cout << SC.shr_hits_tot << std::endl;
 
     // Now fill the histograms!
     TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x, weight);
@@ -291,7 +275,7 @@ void histogram_helper::FillReco(int type, int classification_index, int cut_inde
 
     TH1D_hists.at(k_reco_dEdx_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y, weight); // Just the collection plane!
     
-    TH1D_hists.at(k_reco_leading_mom).at(cut_index).at(classification_index)->Fill(std::sqrt(SC.shr_px*SC.shr_px+SC.shr_py*SC.shr_py+SC.shr_pz*SC.shr_pz), weight);
+    TH1D_hists.at(k_reco_leading_mom).at(cut_index).at(classification_index)->Fill(reco_shr_p, weight);
     
     TH1D_hists.at(k_reco_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.shr_distance, weight);
 
@@ -412,4 +396,30 @@ void histogram_helper::WriteTEfficiency(){
     
 }
 // -----------------------------------------------------------------------------
+double histogram_helper::GetCVWeight(int type, SliceContainer SC){
+    
+    double weight = 1.0;
+
+    // Get the tune weight
+    if (type == _util.k_mc || type == _util.k_dirt){
+        
+        weight = SC.weightTune; // Here define the weight
+        
+        // Catch infinate/nan/unreasonably large tune weights
+        if (std::isinf(weight))      weight = 1.0; 
+        if (std::isnan(weight) == 1) weight = 1.0;
+        if (weight > 100)            weight = 1.0;
+
+    } 
+    else weight = 1.0;
+
+    // Get the PPFX CV fux correction weight
+    if (type == _util.k_mc){
+        double weight_flux = SC.GetPPFXCVWeight();
+        weight = weight * weight_flux;
+    }
+
+    return weight;
+
+}
 // -----------------------------------------------------------------------------

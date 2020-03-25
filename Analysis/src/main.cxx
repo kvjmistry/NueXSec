@@ -27,7 +27,7 @@ int main(int argc, char *argv[]){
 
     std::string usage = "\n First run the selection with the options: \n\n ./nuexsec --run <run period num> [--mc <mc file>] [--data <data file>] [--ext <ext file>] [--dirt <dirt file>] [--var <variation file>] [-n <num events>] [--slim] [--verbose <verbose level>] \n\n After this, to make the histograms after running selection, run: \n\n ./nuexsec --run <run period num> --hist <input merged nuexsec file> \n ";
 
-    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------    
     // Loop over input arguments
     for (int i =1; i < argc; i++){
         auto const arg = argv[i];

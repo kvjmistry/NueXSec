@@ -124,6 +124,9 @@ namespace xsecSelection {
             // Function to save all written histograms to file
             void SavetoFile();
             // -----------------------------------------------------------------
+            // Function to implement counters and fillings of histograms for each cut
+            void SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, int cut_index, std::vector<std::vector<double>> &counter_v);
+            // -----------------------------------------------------------------
             // Make final histogram plots
             void MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config);
             // -----------------------------------------------------------------

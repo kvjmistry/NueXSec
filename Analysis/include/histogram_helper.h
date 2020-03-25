@@ -47,6 +47,9 @@ class histogram_helper{
     // Function to write the TEfficiency Graphs to file
     void WriteTEfficiency();
     // -------------------------------------------------------------------------
+    // Get the CV weights for histograms
+    double GetCVWeight(int type, SliceContainer SC);
+    // -------------------------------------------------------------------------
 
     private:
 
