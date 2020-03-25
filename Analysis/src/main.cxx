@@ -6,6 +6,7 @@ int main(int argc, char *argv[]){
 
     bool using_slim_version        = false;
     bool make_histos               = false;
+    bool run_selection             = true;
 
     // inputs 
     char * mc_file_name          = (char *)"empty";
@@ -24,6 +25,7 @@ int main(int argc, char *argv[]){
     // Class instances
     xsecSelection::selection  _selection_instance;
     utility _utility;
+    histogram_plotter _hplot;
 
     std::string usage = "\n First run the selection with the options: \n\n ./nuexsec --run <run period num> [--mc <mc file>] [--data <data file>] [--ext <ext file>] [--dirt <dirt file>] [--var <variation file>] [-n <num events>] [--slim] [--verbose <verbose level>] \n\n After this, to make the histograms after running selection, run: \n\n ./nuexsec --run <run period num> --hist <input merged nuexsec file> \n ";
 
@@ -43,6 +45,7 @@ int main(int argc, char *argv[]){
         if (strcmp(arg, "--hist") == 0) {
             std::cout << "Making Histograms, file to make histograms with: "<< argv[i+1] << std::endl;
             make_histos = true;
+            run_selection = false; // switch this bool out
             hist_file_name = argv[i+1];
         }
         
@@ -124,17 +127,19 @@ int main(int argc, char *argv[]){
     // -------------------------------------------------------------------------
 
     // Initialise the selction script
-    if (!make_histos) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config, using_slim_version, num_events, run_period, verbose );
-    else _selection_instance.xsecSelection::selection::MakeHistograms(hist_file_name, run_period, config);
+    if (run_selection) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config, using_slim_version, num_events, run_period, verbose );
+    
+    // Run the make histogram function
+    if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, config);
 
     // -------------------------------------------------------------------------
     // Finished!
     std::cout << "\033[0;32m*** \t Exiting C++ Code... \t *** \033[0m" << std::endl;
     auto stop = std::chrono::high_resolution_clock::now();  // end time of script
-	auto duration_sec = std::chrono::duration_cast<std::chrono::seconds>(stop - start); // time taken to run script
-	auto duration_min = std::chrono::duration_cast<std::chrono::minutes>(stop - start); // time taken to run script
-	std::cout << "Time taken by function: " << duration_sec.count() << " seconds" << std::endl; 
-	std::cout << "Time taken by function: " << duration_min.count() << " minutes" << std::endl; 
+    auto duration_sec = std::chrono::duration_cast<std::chrono::seconds>(stop - start); // time taken to run script
+    auto duration_min = std::chrono::duration_cast<std::chrono::minutes>(stop - start); // time taken to run script
+    std::cout << "Time taken by function: " << duration_sec.count() << " seconds" << std::endl; 
+    std::cout << "Time taken by function: " << duration_min.count() << " minutes" << std::endl; 
     
     return 0;
 }

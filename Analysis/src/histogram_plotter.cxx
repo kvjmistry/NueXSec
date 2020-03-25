@@ -6,6 +6,54 @@ histogram_plotter::~histogram_plotter(){
     // Make sure the file is closed
     // f_nuexsec->Close();
 }
+void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config){
+
+    std::cout << "Creating histograms and making plots" << std::endl;
+    
+    double Data_POT;
+
+    // Set the scale factors
+    if (strcmp(run_period, "1") == 0){
+        mc_scale_factor     = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_MC_POT) ;
+        dirt_scale_factor   = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_Dirt_POT);
+        intime_scale_factor = _config.at(_util.k_config_Run1_Data_trig) / _config.at(_util.k_config_Run1_EXT_trig);
+        Data_POT = _config.at(_util.k_config_Run1_Data_POT); // Define this variable here for easier reading
+    }
+    else {
+        std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;
+        exit(1);
+    }
+    
+
+    std::cout << "\033[0;32m-------------------------------" << std::endl;
+    std::cout << "Scale Factors:\n" <<
+    "MC Scale factor:   "   << mc_scale_factor     << "\n" <<
+    "Dirt Scale factor: "   << dirt_scale_factor   << "\n" <<
+    "EXT Scale factor:  "   << intime_scale_factor << std::endl;
+    std::cout << "-------------------------------\033[0m" << std::endl;
+
+    Initalise(hist_file_name, run_period, mc_scale_factor, intime_scale_factor, dirt_scale_factor);
+
+    // Loop over the cuts and plot histograms by plot type
+    for (unsigned int i = 0 ; i < _util.k_cuts_MAX; i++){
+        
+        // Create a set of strings for creating a dynamic directory
+        // Directory structure that is created will take the form plots/<cut>/
+        std::string a = "if [ ! -d \"plots/";
+        std::string b = "run" + std::string(run_period) + "/" + _util.cut_dirs.at(i);
+        std::string c = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
+        std::string d = "run" + std::string(run_period) + "/" + _util.cut_dirs.at(i);
+        std::string e = "; fi";
+        std::string command = a + b + c + d + e ;
+        system(command.c_str()); 
+
+        // Call the Make stack function for all the plots we want
+        CallMakeStack(run_period, i, Data_POT);
+        
+    }
+
+
+}
 // -----------------------------------------------------------------------------
 void histogram_plotter::Initalise(const char * hist_file_name, const char *_run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor){ 
     

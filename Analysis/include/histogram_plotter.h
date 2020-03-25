@@ -20,8 +20,12 @@ class histogram_plotter{
 
     std::string run_period;
 
+    // Scale factors (veverything is scaled to data)
     double mc_scale_factor, intime_scale_factor, dirt_scale_factor;
-
+    
+    // -------------------------------------------------------------------------
+    // Main function call to control this class
+    void MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config);
     // -------------------------------------------------------------------------
     // Initalise the file input
     void Initalise(const char *hist_file_name, const char* _run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor);
