@@ -16,6 +16,7 @@ int main(int argc, char *argv[]){
     char * hist_file_name        = (char *)"empty";
     char * run_period            = (char *)"empty";
     int num_events{-1};
+    int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
 
     // Configurations from main.h will be stored in here and passed to the selection
     std::vector<double> config;
@@ -24,7 +25,7 @@ int main(int argc, char *argv[]){
     xsecSelection::selection  _selection_instance;
     utility _utility;
 
-    std::string usage = "\n First run the selection with the options: \n\n ./nuexsec --run <run period num> [--mc <mc file>] [--data <data file>] [--ext <ext file>] [--dirt <dirt file>] [--var <variation file>] [-n <num events>] [--slim] \n\n After this, to make the histograms after running selection, run: \n\n ./nuexsec --run <run period num> --hist <input merged nuexsec file> \n ";
+    std::string usage = "\n First run the selection with the options: \n\n ./nuexsec --run <run period num> [--mc <mc file>] [--data <data file>] [--ext <ext file>] [--dirt <dirt file>] [--var <variation file>] [-n <num events>] [--slim] [--verbose <verbose level>] \n\n After this, to make the histograms after running selection, run: \n\n ./nuexsec --run <run period num> --hist <input merged nuexsec file> \n ";
 
     // -------------------------------------------------------------------------
     // Loop over input arguments
@@ -76,6 +77,12 @@ int main(int argc, char *argv[]){
             std::string variation_type = variation_file_name;
         }
 
+        // Whats the verbose?
+        if (strcmp(arg, "-v") == 0 || strcmp(arg, "--verbose") == 0){
+            std::cout << "Setting Verbose Level to : " << argv[i+1] << std::endl;
+            verbose = atoi(argv[i+1]);
+        }
+
         // Max number of events specified?
         if (strcmp(arg, "-n") == 0 || strcmp(arg, "--n") == 0){
             std::cout << "Running with a maximum of : " << argv[i+1] << " events" <<std::endl;
@@ -117,7 +124,7 @@ int main(int argc, char *argv[]){
     // -------------------------------------------------------------------------
 
     // Initialise the selction script
-    if (!make_histos) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config, using_slim_version, num_events, run_period );
+    if (!make_histos) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config, using_slim_version, num_events, run_period, verbose );
     else _selection_instance.xsecSelection::selection::MakeHistograms(hist_file_name, run_period, config);
 
     // -------------------------------------------------------------------------

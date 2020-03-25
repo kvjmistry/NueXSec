@@ -27,6 +27,8 @@ namespace xsecSelection {
             // Parallel processing variables
             int nthreads = 4;
 
+            int verbose = 1;
+
             int max_events{-1};
 
             // Scale factors (veverything is scaled to data)
@@ -109,7 +111,8 @@ namespace xsecSelection {
                              const std::vector<double> _config,
                              bool _slim,
                              int num_events,
-                             const char * run_period);
+                             const char * run_period,
+                             int _verbose);
             // -----------------------------------------------------------------
             // Main function for selection
             void MakeSelection();

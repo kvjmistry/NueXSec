@@ -10,7 +10,8 @@ void selection::Initialise( const char * mc_file,
                             const std::vector<double> _config,
                             bool _slim,
                             int num_events,
-                            const char * run_period){
+                            const char * run_period,
+                            int _verbose){
     
     std::cout << "\nInitialising..." << std::endl;
     if (_slim){
@@ -19,6 +20,9 @@ void selection::Initialise( const char * mc_file,
         std::cout << "-------------------------------\033[0m" << std::endl;
         slim = _slim;
     }
+
+    std::cout << "\nSetting verbose level to: " << _verbose << std::endl;
+    verbose = _verbose;
 
     // Set the scale factors
     if (strcmp(run_period, "1") == 0){
@@ -349,7 +353,7 @@ void selection::MakeSelection(){
 
     // Print information from the selection -- need a loop for all cuts!
     for (unsigned int p=0; p < counter_v.size();p++){
-        _util.PrintInfo(counter_v.at(p), intime_scale_factor, mc_scale_factor, dirt_scale_factor, _util.cut_dirs.at(p), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc));
+        if (verbose == 1) _util.PrintInfo(counter_v.at(p), intime_scale_factor, mc_scale_factor, dirt_scale_factor, _util.cut_dirs.at(p), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc));
     }
     
 
