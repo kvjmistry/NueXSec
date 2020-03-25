@@ -22,7 +22,7 @@ class histogram_plotter{
 
     // Scale factors (veverything is scaled to data)
     double mc_scale_factor, intime_scale_factor, dirt_scale_factor;
-    
+
     // -------------------------------------------------------------------------
     // Main function call to control this class
     void MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config);
@@ -46,6 +46,9 @@ class histogram_plotter{
     // -------------------------------------------------------------------------
     // Draw the data POT
     void Draw_Data_POT(TCanvas* c, double pot);
+    // -------------------------------------------------------------------------
+    // Draw area norm text 
+    void Draw_Area_Norm(TCanvas* c);
     // -------------------------------------------------------------------------
     // Call make stacked histograms
     void CallMakeStack(const char *run_period, int cut_index, double Data_POT);

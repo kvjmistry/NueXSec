@@ -508,7 +508,7 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_ext).WriteReco(_util.k_ext);
     }
     if (bool_use_dirt) {
-        _hhelper.at(_util.k_dirt).WriteTrue();
+        // _hhelper.at(_util.k_dirt).WriteTrue(); // Only turn this on to inspect. It wont merge since the file names are not uniique yet!!
         _hhelper.at(_util.k_dirt).WriteReco(_util.k_dirt);
     }
 

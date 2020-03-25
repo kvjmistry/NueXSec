@@ -6,6 +6,7 @@ histogram_plotter::~histogram_plotter(){
     // Make sure the file is closed
     // f_nuexsec->Close();
 }
+// -----------------------------------------------------------------------------
 void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config){
 
     std::cout << "Creating histograms and making plots" << std::endl;
@@ -242,24 +243,14 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     }
     
     // Normalisation by area
-    if (area_norm && hist_integrals.at(_util.k_data) != 0 && found_data && found_ext) {
+    if (area_norm && found_data) {
         
-        // Check the integral of ON - EXT
-        TH1D * h_data_scaling_clone = (TH1D*) hist.at(_util.k_leg_data)->Clone("h_data_scaling_clone");
-        h_data_scaling_clone->Add(  hist.at(_util.k_leg_ext), -1);
-        double integral_on_minus_off = h_data_scaling_clone->Integral();
-        
-        if (integral_on_minus_off == 0) {
-            std::cout << "unable to area normalise" << std::endl;
-            integral_on_minus_off = 1;
-        }
-        delete h_data_scaling_clone;
-
         for (unsigned int i=0; i < hist.size(); i++){
             if (i == _util.k_leg_data) continue; // Dont use the data
             
-            hist.at(i)->Scale(integral_on_minus_off / integral_mc_ext);
-            hist.at(i)->Scale(1. / hist_integrals.at(_util.k_data));
+            hist.at(i)->Scale( hist_integrals.at(_util.k_leg_data) / integral_mc_ext );
+
+            std::cout << hist_integrals.at(_util.k_leg_data) / integral_mc_ext << std::endl;
         
         }
 
@@ -423,6 +414,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     if (found_data){
         Draw_Data_MC_Ratio(c, hist_integrals.at(_util.k_leg_data)/integral_mc_ext );
         Draw_Data_POT(c, Data_POT);
+        if (area_norm) Draw_Area_Norm(c);
     }
     
     c->Print(print_name);
@@ -551,6 +543,21 @@ void histogram_plotter::Draw_Data_POT(TCanvas* c, double pot){
     pt->Draw();
 }
 // -----------------------------------------------------------------------------
+void histogram_plotter::Draw_Area_Norm(TCanvas* c){
+    c->cd();
+
+    TPaveText *pt;
+
+    pt = new TPaveText(0.4, 0.916, 0.4, 0.916,"NDC");
+    pt->AddText("Area Normalised");
+    pt->SetTextColor(kGreen+2);
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.03);
+    pt->Draw();
+}
+// -----------------------------------------------------------------------------
 void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, double Data_POT){
 
     // MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, const char* x_axis_name, double y_scale_factor, 
@@ -594,7 +601,7 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
     // dEdx cali
     MakeStack("h_reco_dEdx_cali_y_plane",_util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Collection Plane dEdx (calibrated) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        true,  false, 1.0, "Collection Plane dEdx (calibrated) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_dEdx_cali_y_plane.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Leading Shower Momentum
