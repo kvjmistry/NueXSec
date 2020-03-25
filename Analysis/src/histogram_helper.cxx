@@ -236,13 +236,15 @@ void histogram_helper::InitHistograms(){
     // -------------------------------------------------------------------------
 
     // Intialising true histograms in here
-    if (_type == _util.k_mc){
+    if (_type == _util.k_mc || _type == _util.k_dirt){
         
-        // Initalise the histograms for the TEfficency
-        TEfficiency_hists.resize(_util.k_cuts_MAX);
+        if (_type == _util.k_mc){
+            // Initalise the histograms for the TEfficency
+            TEfficiency_hists.resize(_util.k_cuts_MAX);
 
-        for (unsigned int l = 0; l < _util.k_cuts_MAX; l++ ){
-            TEfficiency_hists.at(l) = new TH1D( Form("h_true_nu_E_%s",_util.cut_dirs.at(l).c_str() ), "", 40, 0, 4 );
+            for (unsigned int l = 0; l < _util.k_cuts_MAX; l++ ){
+                TEfficiency_hists.at(l) = new TH1D( Form("h_true_nu_E_%s",_util.cut_dirs.at(l).c_str() ), "", 40, 0, 4 );
+            }
         }
 
         // Initalise the True Nue

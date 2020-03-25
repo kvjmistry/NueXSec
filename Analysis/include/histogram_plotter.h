@@ -43,6 +43,8 @@ class histogram_plotter{
     // Draw the data POT
     void Draw_Data_POT(TCanvas* c, double pot);
     // -------------------------------------------------------------------------
+    // Call make stacked histograms
+    void CallMakeStack(const char *run_period, int cut_index, double Data_POT);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
