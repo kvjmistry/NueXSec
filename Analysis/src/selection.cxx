@@ -497,21 +497,18 @@ void selection::SavetoFile(){
     // Now saving histograms to file
     std::cout << "Now Saving Histograms to file" << std::endl;
     if (bool_use_mc) {
-        // _hhelper.WriteMCTruth("MC");
+        _hhelper.at(_util.k_mc).WriteTrue();
         _hhelper.at(_util.k_mc).WriteTEfficiency();
         _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
     }
     if (bool_use_data) {
-        // _hhelper.WriteOptical(_util.k_data);
         _hhelper.at(_util.k_data).WriteReco(_util.k_data);
     }
     if (bool_use_ext) {
-        // _hhelper.WriteOptical(_util.k_ext);
         _hhelper.at(_util.k_ext).WriteReco(_util.k_ext);
     }
     if (bool_use_dirt) {
-        // _hhelper.WriteMCTruth("Dirt");
-        // _hhelper.WriteOptical(_util.k_dirt);
+        _hhelper.at(_util.k_mc).WriteTrue();
         _hhelper.at(_util.k_dirt).WriteReco(_util.k_dirt);
     }
 
@@ -519,11 +516,16 @@ void selection::SavetoFile(){
 // -----------------------------------------------------------------------------
 void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, int cut_index, std::vector<std::vector<double>> &counter_v){
 
-    // Fill Reco Histograms
-    if (!slim) _hhelper.at(type).FillReco(type, classification.second, cut_index, SC);
-    
     // Set counters for the cut
     _util.Tabulate(interaction, classification.first, type, counter_v.at(cut_index) );
+
+    // Fill Reco Histograms
+    if (!slim) _hhelper.at(type).FillReco(type, classification.second, cut_index, SC);
+
+    // Fill the true histograms -- only for unselected
+    if (!slim) {
+        if (cut_index == _util.k_unselected) _hhelper.at(type).FillTrue(type, classification.second,  cut_index, SC);
+    }
     
     // Fill Plots for Efficiency
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC);

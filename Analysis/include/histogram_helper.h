@@ -47,6 +47,12 @@ class histogram_helper{
     // Function to write the TEfficiency Graphs to file
     void WriteTEfficiency();
     // -------------------------------------------------------------------------
+    // Function to fill the truth varibles
+    void FillTrue(int type, int classification_index, int cut_index, SliceContainer SC);
+    // -------------------------------------------------------------------------
+    // Function to write the truth histograms to file
+    void WriteTrue();
+    // -------------------------------------------------------------------------
     // Get the CV weights for histograms
     double GetCVWeight(int type, SliceContainer SC);
     // -------------------------------------------------------------------------
@@ -54,15 +60,6 @@ class histogram_helper{
     private:
 
     // Here we create the histograms
-    // --------------------------- True plots ----------------------------------
-    // TH1D * h_nue_true_theta  = new TH1D ("h_nue_true_theta","True Nue; Theta [degrees]", 14,    0, 180);
-    // TH1D * h_nue_true_phi    = new TH1D ("h_nue_true_phi"  ,"True Nue; Phi [degrees]",   14, -180, 180);
-    
-    // TH2D * h_nue_true_theta_phi    = new TH2D("h_nue_true_theta_phi",    "True Nue; Phi [degrees]; Theta [degrees]", 14, -20,100,  14,   20, 140);
-    // TH2D * h_nue_true_energy_theta = new TH2D("h_nue_true_energy_theta", "True Nue; Energy [GeV]; Theta[degrees]",   20,   0, 10,  14,    0, 180);
-    // TH2D * h_nue_true_energy_phi   = new TH2D("h_nue_true_energy_phi",   "True Nue; Theta [degrees]; Phi [degrees]", 20,   0, 10,  14, -180, 180);
-    // TH2D * h_ele_true_energy_theta = new TH2D("h_ele_true_energy_theta", "True e; Theta [degrees]; Theta [degrees]", 20,   0, 10,  14,    0, 180);
-    // TH2D * h_ele_true_energy_phi   = new TH2D("h_ele_true_energy_phi",   "True e; Theta [degrees]; Phi [degrees]",   20,   0, 10,  14, -180, 180);
    
     // vector of histograms to make, indexed by enums
     std::vector<std::vector<std::vector<TH1D*>>> TH1D_hists; 
@@ -70,6 +67,10 @@ class histogram_helper{
     // Histograms for the efficiency plot
     std::vector<TH1D*> TEfficiency_hists;
 
+    // True histograms
+    std::vector<TH1D*> TH1D_true_hists;
+    std::vector<TH2D*> TH2D_true_hists;
+    
     // enum for histogram vars
     enum TH1D_hist_vars {
         k_reco_vtx_x,                                                           // Reco Vertex X
@@ -105,6 +106,34 @@ class histogram_helper{
         k_reco_shower_hits,                                                     // Total number of hits for the leading shower
         k_reco_shower_hits_y_plane,                                             // Total number of hits for the leading shower in the collection plane
         k_TH1D_MAX
+    };
+
+    enum TH1D_true_hist_vars {
+        k_true_nue_theta,     // True nue in BNB theta coordinates (up from beam dir)
+        k_true_nue_phi,       // True nue in BNB phi coordinates (around beam dir)
+        k_true_nue_angle,     // True nue angle from numi beamline 
+        k_true_nue_px,        // True nue px
+        k_true_nue_py,        // True nue py
+        k_true_nue_pz,        // True nue pz
+        k_true_nue_e,         // True nue energy
+        k_true_nue_p,         // True nue momentum
+        k_true_vtx_x,         // True Vertex X
+        k_true_vtx_y,         // True Vertex Y
+        k_true_vtx_z,         // True Vertex Z
+        k_true_vtx_x_sce,     // True Vertex X Space Charge Corrected
+        k_true_vtx_y_sce,     // True Vertex Y Space Charge Corrected
+        k_true_vtx_z_sce,     // True Vertex Z Space Charge Corrected
+        k_TH1D_true_MAX
+    };
+
+    enum TH2D_true_hist_vars {
+        k_true_nue_theta_phi, 
+        k_true_nue_energy_theta,
+        k_true_nue_energy_phi,
+        k_true_nue_energy_angle,
+        k_true_nue_vtx_z_y,
+        k_true_nue_vtx_z_y_sce,
+        k_TH2D_true_MAX
     };
 
 

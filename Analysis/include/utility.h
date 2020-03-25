@@ -101,7 +101,7 @@ public:
     // Names of the plot types
     std::vector<std::string> plot_types = {
                 "TEff",
-                "2D",
+                "True",
                 "Stack"
                 };
 
