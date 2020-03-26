@@ -567,7 +567,7 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
     // MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, const char* x_axis_name, double y_scale_factor, 
     //                             const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, const char* print_name )
 
-    bool area_norm = true;
+    bool area_norm = false;
 
     // Reco X
     MakeStack("h_reco_vtx_x",_util.cut_dirs.at(cut_index).c_str(),
@@ -692,7 +692,7 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
     // Topological Score
     MakeStack("h_reco_topological_score", _util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Topological Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  true, 1.0, "Topological Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_topological_score.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Track shower dist

@@ -17,7 +17,7 @@ This repository uses the input n-tuples written by the pandora LEE team. Please 
 https://github.com/ubneutrinos/searchingfornues
 
 I have forked this repository from the v30branch to make some numi chages. You can find the modified code in the numi branch of this fork:
-https://github.com/kvjmistry/searchingfornues/tree/numi
+https://github.com/kvjmistry/searchingfornues/tree/numi_tag_022820
 
 ## POT Counting
 To get the POT and number of trigers from the pandora ntuples, go to the POT directory and do `source run_GetPOT.sh <input file> <mc/data>`
