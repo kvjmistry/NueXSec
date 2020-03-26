@@ -88,7 +88,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     std::vector <double> chi2;
     TPaveText * pt_bottom;
 
-    TH1D * ratioPlot;
+    TH1D * h_ratio;
     TH1D * h_mc_ext_sum;
 
 
@@ -245,14 +245,17 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     // Normalisation by area
     if (area_norm && found_data) {
         
-        for (unsigned int i=0; i < hist.size(); i++){
-            if (i == _util.k_leg_data) continue; // Dont use the data
+        if (integral_mc_ext != 0) {
             
-            hist.at(i)->Scale( hist_integrals.at(_util.k_leg_data) / integral_mc_ext );
+            for (unsigned int i=0; i < hist.size(); i++){
+                if (i == _util.k_leg_data) continue; // Dont scale the data 
+                hist.at(i)->Scale( hist_integrals.at(_util.k_leg_data) / integral_mc_ext );
+            }
 
-            std::cout << hist_integrals.at(_util.k_leg_data) / integral_mc_ext << std::endl;
-        
         }
+
+
+        
 
     }
 
@@ -272,24 +275,16 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
 
     // Set the axis in the case of a log plot
     if (logy == true && found_data){
-        TH1D * h_scale_axes = (TH1D*)hist.at(_util.k_leg_data)->Clone("h_scale_axes");
         
-        if(hist.at(_util.k_nue_cc)->GetMinimum() != 0.0) {h_scale_axes->SetMinimum(hist.at(_util.k_nue_cc)->GetMinimum() / 2.); }
+        if (hist.at(_util.k_nue_cc)->GetMinimum() != 0.0) hist.at(_util.k_leg_data)->SetMinimum(hist.at(_util.k_nue_cc)->GetMinimum() / 2.); 
         
-        if(hist.at(_util.k_nue_cc)->GetMinimum() == 0.0) {h_scale_axes->SetMinimum(hist.at(_util.k_nue_cc)->GetMinimum() + 0.0001 / 2.); }
+        if (hist.at(_util.k_nue_cc)->GetMinimum() == 0.0) hist.at(_util.k_leg_data)->SetMinimum(hist.at(_util.k_nue_cc)->GetMinimum() + 0.0001 / 2.); 
         
-        h_scale_axes->SetMaximum(y_maximum * (y_scale_factor * 500));
-        h_scale_axes->SetLineColor(0);
-        h_scale_axes->SetFillColor(0);
-        h_scale_axes->GetYaxis()->SetTitle("Entries [A.U.]");
-        h_scale_axes->SetTitle(" ");
-        h_scale_axes->GetXaxis()->SetTitle(" ");
-        h_scale_axes->GetXaxis()->SetLabelSize(0);
-        h_scale_axes->GetXaxis()->SetLabelFont(0); // Absolute font size in pixel (precision 3)
-        h_scale_axes->Draw();
-        h_stack->Draw("same hist");
+        hist.at(_util.k_leg_data)->SetMaximum(y_maximum * (y_scale_factor * 500));
+        
 
-        h_scale_axes->GetYaxis()->SetTitle("Entries [A.U.]");
+        h_stack->Draw("hist");
+
     }
     else if(logy && !found_data) {
         h_stack->SetMinimum(0.1);
@@ -310,23 +305,29 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     h_stack->GetYaxis()->SetTitleFont(45);
     h_stack->GetYaxis()->SetTitleSize(18);
     h_stack->GetYaxis()->SetTitleOffset(1.30);
+    
     if (found_data && found_ext) h_stack->GetXaxis()->SetLabelOffset(10);
     else h_stack->GetXaxis()->SetTitle(x_axis_name);
+    
     if (found_data) hist.at(_util.k_leg_data)->Draw("same PE");
 
-    // MC error histogram
+    // MC error histogram ------------------------------------------------------
     TH1D * h_error_hist = (TH1D*) hist.at(_util.k_nue_cc)->Clone("h_error_hist");
+
     for (unsigned int i=0; i < hist.size(); i++){
         if (i == _util.k_leg_data || i == _util.k_nue_cc) continue; // Dont use the data
-        if (i == _util.k_leg_ext && !found_ext) continue;   // Skip ext if not there
-        if (i == _util.k_leg_dirt && !found_dirt) continue; // skip dirt if not there
+        if (i == _util.k_leg_ext && !found_ext) continue;           // Skip ext if not there
+        if (i == _util.k_leg_dirt && !found_dirt) continue;         // skip dirt if not there
+        
+        if (i == _util.k_nue_cc) continue; // Aleady got this histogram from the clone
+        
         h_error_hist->Add(hist.at(i), 1);
     }
     
     h_error_hist->SetFillColorAlpha(12, 0.15);
     h_error_hist->Draw("e2 hist same");
 
-    // Set the legend
+    // Set the legend ----------------------------------------------------------
     TLegend *leg_stack = new TLegend(leg_x1,leg_y1,leg_x2,leg_y2);
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
@@ -349,42 +350,45 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     if (!logy) h_stack->GetYaxis()->SetRangeUser(0, y_maximum * y_scale_factor);
     else if (logy && found_data)    topPad->SetLogy();
     
-    
-    // Calculate the chi2
-    TH1D * h_last = (TH1D*) h_stack->GetStack()->Last();
-    
+    // Calculate the chi2 
     if (found_data) {
+        TH1D * h_last = (TH1D*) h_stack->GetStack()->Last();
         chi2  = Chi2Calc(h_last, hist.at(_util.k_leg_data), area_norm, hist_integrals.at(_util.k_data));
+    }
+    
+    // Now create the ratio of data to MC ----------------------------------
+    if (found_data) {
         
         bottomPad->cd();
 
-        // Now create the ratio of data to MC
-        ratioPlot    = (TH1D*) hist.at(_util.k_leg_data)->Clone("ratioPlot");
+        h_ratio    = (TH1D*) hist.at(_util.k_leg_data)->Clone("h_ratio");
         h_mc_ext_sum = (TH1D*) hist.at(_util.k_nue_cc)  ->Clone("h_mc_ext_sum");
         
         for (unsigned int i=0; i < hist.size(); i++){
             if (i == _util.k_leg_data || i == _util.k_nue_cc ) continue; // Dont use the data and nue cc because already been cloned
             h_mc_ext_sum->Add(hist.at(i), 1);
         }
+
+        h_ratio->Add(h_mc_ext_sum, -1);
+        h_ratio->Divide(h_mc_ext_sum);
     
-        ratioPlot->GetXaxis()->SetLabelSize(12);
-        ratioPlot->GetXaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
-        ratioPlot->GetYaxis()->SetLabelSize(11);
-        ratioPlot->GetYaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
-        ratioPlot->GetXaxis()->SetTitleOffset(3.0);
-        ratioPlot->GetXaxis()->SetTitleSize(17);
-        ratioPlot->GetXaxis()->SetTitleFont(46);
-        ratioPlot->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
-        ratioPlot->Add(h_mc_ext_sum, -1);
-        ratioPlot->Divide(h_mc_ext_sum);
-        ratioPlot->GetYaxis()->SetRangeUser(-1,1);
-        ratioPlot->GetXaxis()->SetTitle(x_axis_name);
-        ratioPlot->GetYaxis()->SetTitle("(Data - MC) / MC ");
-        ratioPlot->GetYaxis()->SetTitleSize(13);
-        ratioPlot->GetYaxis()->SetTitleFont(44);
-        ratioPlot->GetYaxis()->SetTitleOffset(1.5);
-        ratioPlot->SetTitle(" ");
-        ratioPlot->Draw();
+        h_ratio->GetXaxis()->SetLabelSize(12);
+        h_ratio->GetXaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+        h_ratio->GetYaxis()->SetLabelSize(11);
+        h_ratio->GetYaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+        h_ratio->GetXaxis()->SetTitleOffset(3.0);
+        h_ratio->GetXaxis()->SetTitleSize(17);
+        h_ratio->GetXaxis()->SetTitleFont(46);
+        h_ratio->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
+
+        h_ratio->GetYaxis()->SetRangeUser(-1,1);
+        h_ratio->GetXaxis()->SetTitle(x_axis_name);
+        h_ratio->GetYaxis()->SetTitle("(Data - MC) / MC ");
+        h_ratio->GetYaxis()->SetTitleSize(13);
+        h_ratio->GetYaxis()->SetTitleFont(44);
+        h_ratio->GetYaxis()->SetTitleOffset(1.5);
+        h_ratio->SetTitle(" ");
+        h_ratio->Draw();
 
         // Now doing this stuff on the bottom pad
         //x_min, y_min, x_max, y_max
@@ -563,171 +567,173 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
     // MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, const char* x_axis_name, double y_scale_factor, 
     //                             const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, const char* print_name )
 
+    bool area_norm = true;
+
     // Reco X
     MakeStack("h_reco_vtx_x",_util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Reco Vertex X [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Reco Vertex X [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_vtx_x.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
     
     // Reco Y
     MakeStack("h_reco_vtx_y",_util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Reco Vertex Y [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Reco Vertex Y [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_vtx_y.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Reco Z
     MakeStack("h_reco_vtx_z",_util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Reco Vertex Z [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Reco Vertex Z [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_vtx_z.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Reco X SCE
     MakeStack("h_reco_vtx_x_sce",_util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Reco Vertex X (Space Charge Corr) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Reco Vertex X (Space Charge Corr) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_vtx_x_sce.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
     
     // Reco Y SCE
     MakeStack("h_reco_vtx_y_sce",_util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Reco Vertex Y (Space Charge Corr) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Reco Vertex Y (Space Charge Corr) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_vtx_y_sce.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Reco Z SCE
     MakeStack("h_reco_vtx_z_sce",_util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Reco Vertex Z (Space Charge Corr) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Reco Vertex Z (Space Charge Corr) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_vtx_z_sce.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
 
     // dEdx
     MakeStack("h_reco_dEdx_y_plane",_util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Collection Plane dEdx (uncalibrated) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Collection Plane dEdx (uncalibrated) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_dEdx_y_plane.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // dEdx cali
     MakeStack("h_reco_dEdx_cali_y_plane",_util.cut_dirs.at(cut_index).c_str(),
-                        true,  false, 1.0, "Collection Plane dEdx (calibrated) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Collection Plane dEdx (calibrated) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_dEdx_cali_y_plane.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Leading Shower Momentum
     MakeStack("h_reco_leading_mom", _util.cut_dirs.at(cut_index).c_str(),
-                        false, false, 1.0, "Leading Shower Momentum [MeV/c]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm, false, 1.0, "Leading Shower Momentum [MeV/c]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_leading_mom.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // 2D distance largest flash to reco nu vertex
     MakeStack("h_reco_flash_to_vtx_dist", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Flash to Vertex Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Flash to Vertex Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_flash_to_vtx_dist.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // 2D distance shower vertex to reco nu vertex
     MakeStack("h_reco_shower_to_vtx_dist", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Shower to Vertex Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Shower to Vertex Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_shower_to_vtx_dist.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // 2D distance track vertex to reco nu vertex
     MakeStack("h_reco_trac_util.k_to_vtx_dist", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Track to Vertex Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Track to Vertex Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_trac_util.k_to_vtx_dist.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Leading Shower hits in all planes
     MakeStack("h_reco_leading_shower_hits_all_planes", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Leading Shower Hits All Planes", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Leading Shower Hits All Planes", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_leading_shower_hits_all_planes.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Leading Shower hits in collection
     MakeStack("h_reco_leading_shower_hits_collection_plane", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Leading Shower Hits Collection Plane", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Leading Shower Hits Collection Plane", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_leading_shower_hits_collection_plane.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Leading Shower opening angle
     MakeStack("h_reco_leading_shower_open_angle", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Leading Shower Open Angle [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Leading Shower Open Angle [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_leading_shower_open_angle.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Secondary shower to vertex distance (for events with more than 1 shower)
     MakeStack("h_reco_secondary_shower_to_vtx_dist", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Secondary Shower to Vertex Distance (>1 shower) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Secondary Shower to Vertex Distance (>1 shower) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_secondary_shower_to_vtx_dist.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Leading Shower hits per length
     MakeStack("h_reco_leading_shower_hits_per_length", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Leading Shower Hits / Length [cm^{-1}]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Leading Shower Hits / Length [cm^{-1}]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_leading_shower_hits_per_length.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Longest track to leading shower length
     MakeStack("h_reco_longest_trac_util.k_leading_shower_length", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Longest Track Length / Leading Shower Length", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Longest Track Length / Leading Shower Length", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_longest_track_leading_shower_length.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Track Containment
     MakeStack("h_reco_track_contained", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Contained Tracks", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Contained Tracks", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_track_contained.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Leading shower phi
     MakeStack("h_reco_leading_shower_phi", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Leading Shower Phi [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Leading Shower Phi [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_leading_shower_phi.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Leading shower theta
     MakeStack("h_reco_leading_shower_theta", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Leading Shower Theta [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Leading Shower Theta [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_leading_shower_theta.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Leading shower cos theta
     MakeStack("h_reco_leading_shower_cos_theta", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Leading Shower Cos(#theta)", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Leading Shower Cos(#theta)", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_leading_shower_cos_theta.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Leading shower multiplicity
     MakeStack("h_reco_shower_multiplicity", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Shower Multiplicty", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Shower Multiplicty", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_shower_multiplicity.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Leading track multiplicity
     MakeStack("h_reco_track_multiplicity", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Track Multiplicty", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Track Multiplicty", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_track_multiplicity.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Topological Score
     MakeStack("h_reco_topological_score", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Topological Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Topological Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_topological_score.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Track shower dist
     MakeStack("h_reco_track_shower_dist", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Longest Track Leading Shower Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Longest Track Leading Shower Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_track_shower_dist.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
     
     // Track shower angle
     MakeStack("h_reco_track_shower_angle", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  true, 1.0, "Longest Track Leading Shower Angle [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  true, 1.0, "Longest Track Leading Shower Angle [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_track_shower_angle.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Ratio hits from showers to slice
     MakeStack("h_reco_hits_ratio", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Hit Ratio of all Showers and the Slice", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Hit Ratio of all Showers and the Slice", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_hits_ratio.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
     
         // Shower score
     MakeStack("h_reco_shower_score", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Shower Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Shower Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_shower_score.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Track score
     MakeStack("h_reco_track_score", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Track Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Track Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_track_score.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Calibrated energy of all the showers
     MakeStack("h_reco_shower_energy_tot_cali", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Total Calibrated Energy of all Showers [GeV]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Total Calibrated Energy of all Showers [GeV]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_shower_energy_tot_cali.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Total number of hits for the leading showe
     MakeStack("h_reco_shower_hits", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Total Num of hits for the leading Shower", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Total Num of hits for the leading Shower", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_shower_hits.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     
     // Total number of hits for the leading shower in the collection plane
     MakeStack("h_reco_shower_hits_y_plane", _util.cut_dirs.at(cut_index).c_str(),
-                        false,  false, 1.0, "Total Num of hits for the leading Shower in Collection Plane", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Total Num of hits for the leading Shower in Collection Plane", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/%s/reco_shower_hits_y_plane.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
 

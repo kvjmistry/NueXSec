@@ -490,17 +490,17 @@ double histogram_helper::GetCVWeight(int type, SliceContainer SC){
     double weight = 1.0;
 
     // Get the tune weight
-    // if (type == _util.k_mc || type == _util.k_dirt){
+    if (type == _util.k_mc || type == _util.k_dirt){
         
-    //     weight = SC.weightTune; // Here define the weight
+        weight = SC.weightTune; // Here define the weight
         
-    //     // Catch infinate/nan/unreasonably large tune weights
-    //     if (std::isinf(weight))      weight = 1.0; 
-    //     if (std::isnan(weight) == 1) weight = 1.0;
-    //     if (weight > 100)            weight = 1.0;
+        // Catch infinate/nan/unreasonably large tune weights
+        if (std::isinf(weight))      weight = 1.0; 
+        if (std::isnan(weight) == 1) weight = 1.0;
+        if (weight > 100)            weight = 1.0;
 
-    // } 
-    // else weight = 1.0;
+    } 
+    else weight = 1.0;
     
 
     // Get the PPFX CV fux correction weight
