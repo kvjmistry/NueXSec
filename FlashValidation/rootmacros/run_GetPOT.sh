@@ -1,1 +1,1 @@
-root -l 'GetPOT.C("'$1'")'
+root -l 'GetPOT_v2.C("'$1'", "'$2'")'
