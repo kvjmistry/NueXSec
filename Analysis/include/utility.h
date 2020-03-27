@@ -102,6 +102,7 @@ public:
     std::vector<std::string> plot_types = {
                 "TEff",
                 "True",
+                "Flash",
                 "Stack"
                 };
 
@@ -122,7 +123,7 @@ public:
                 };
 
     // enum to switch file type 
-    enum type {k_mc, k_data, k_ext, k_dirt, k_variation, k_type_MAX}; 
+    enum type {k_mc, k_data, k_ext, k_dirt, k_type_MAX}; 
 
     // enums for cut dirs
     enum enum_cut_dirs {

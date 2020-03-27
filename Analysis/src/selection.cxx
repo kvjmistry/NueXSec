@@ -500,16 +500,20 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_mc).WriteTrue();
         _hhelper.at(_util.k_mc).WriteTEfficiency();
         _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
+        _hhelper.at(_util.k_mc).WriteFlash();
     }
     if (bool_use_data) {
         _hhelper.at(_util.k_data).WriteReco(_util.k_data);
+       _hhelper.at(_util.k_data).WriteFlash();
     }
     if (bool_use_ext) {
         _hhelper.at(_util.k_ext).WriteReco(_util.k_ext);
+        _hhelper.at(_util.k_ext).WriteFlash();
     }
     if (bool_use_dirt) {
         // _hhelper.at(_util.k_dirt).WriteTrue(); // Only turn this on to inspect. It wont merge since the file names are not uniique yet!!
         _hhelper.at(_util.k_dirt).WriteReco(_util.k_dirt);
+        _hhelper.at(_util.k_dirt).WriteFlash();
     }
 
 } // End save to file
@@ -519,14 +523,9 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     // Set counters for the cut
     _util.Tabulate(interaction, classification.first, type, counter_v.at(cut_index) );
 
-    // Fill Reco Histograms
-    if (!slim) _hhelper.at(type).FillReco(type, classification.second, cut_index, SC);
+    // Fill Histograms
+    if (!slim) _hhelper.at(type).FillHists(type, classification.second, cut_index, SC);
 
-    // Fill the true histograms -- only for unselected
-    if (!slim) {
-        if (cut_index == _util.k_unselected) _hhelper.at(type).FillTrue(type, classification.second,  cut_index, SC);
-    }
-    
     // Fill Plots for Efficiency
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC);
 

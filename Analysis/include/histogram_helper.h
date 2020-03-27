@@ -36,7 +36,7 @@ class histogram_helper{
     void MakeDirectory();
     // -------------------------------------------------------------------------
     // Function to fill the reco variables
-    void FillReco(int type, int classification_index, int cut_index, SliceContainer SC);
+    void FillHists(int type, int classification_index, int cut_index, SliceContainer SC);
     // -------------------------------------------------------------------------
     // Function to write the histograms to a file
     void WriteReco(int type);
@@ -47,11 +47,11 @@ class histogram_helper{
     // Function to write the TEfficiency Graphs to file
     void WriteTEfficiency();
     // -------------------------------------------------------------------------
-    // Function to fill the truth varibles
-    void FillTrue(int type, int classification_index, int cut_index, SliceContainer SC);
-    // -------------------------------------------------------------------------
     // Function to write the truth histograms to file
     void WriteTrue();
+    // -------------------------------------------------------------------------
+    // Function to write the flash histograms
+    void WriteFlash();
     // -------------------------------------------------------------------------
     // Get the CV weights for histograms
     double GetCVWeight(int type, SliceContainer SC);
@@ -71,6 +71,9 @@ class histogram_helper{
     std::vector<TH1D*> TH1D_true_hists;
     std::vector<TH2D*> TH2D_true_hists;
     
+    // Flash Histograms
+    std::vector<TH1D*> TH1D_flash_hists;
+
     // enum for histogram vars
     enum TH1D_hist_vars {
         k_reco_vtx_x,                                                           // Reco Vertex X
@@ -124,6 +127,12 @@ class histogram_helper{
         k_true_vtx_y_sce,     // True Vertex Y Space Charge Corrected
         k_true_vtx_z_sce,     // True Vertex Z Space Charge Corrected
         k_TH1D_true_MAX
+    };
+
+    enum TH1D_flash_hist_vars {
+        k_flash_time,
+        k_flash_pe,
+        k_TH1D_flash_MAX
     };
 
     enum TH2D_true_hist_vars {

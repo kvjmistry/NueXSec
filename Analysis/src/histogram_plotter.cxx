@@ -49,9 +49,21 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
         system(command.c_str()); 
 
         // Call the Make stack function for all the plots we want
-        CallMakeStack(run_period, i, Data_POT);
+        // CallMakeStack(run_period, i, Data_POT);
         
     }
+
+    // Create a set of strings for creating a dynamic directory
+    // Directory structure that is created will take the form plots/<cut>/
+    std::string a = "if [ ! -d \"plots/";
+    std::string b = "run" + std::string(run_period) + "/" + "Flash";
+    std::string c = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
+    std::string d = "run" + std::string(run_period) + "/" + "Flash";
+    std::string e = "; fi";
+    std::string command = a + b + c + d + e ;
+    system(command.c_str()); 
+
+    MakeFlashPlot(run_period, Data_POT, Form("plots/run%s/Flash/flash_time.pdf", run_period));
 
 
 }
@@ -102,7 +114,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
 
     TPad * topPad;
     TPad * bottomPad;
-    TCanvas* c       = new TCanvas();
+    TCanvas * c       = new TCanvas();
     THStack * h_stack = new THStack();
 
     // Loop over the classifications and get the histograms
@@ -740,3 +752,154 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
 }
 // -----------------------------------------------------------------------------
+void histogram_plotter::MakeFlashPlot(const char *run_period, double Data_POT, const char* print_name){
+
+
+    std::vector<TH1D*>  hist_flash_time(_util.k_type_MAX);
+    TH1D * h_ratio;
+    TH1D * h_mc_ext_sum;
+
+    TPad * topPad;
+    TPad * bottomPad;
+    TCanvas * c       = new TCanvas();
+    THStack * h_stack = new THStack();
+
+    for (unsigned int k = 0; k < _util.type_prefix.size(); k++){
+        _util.GetHist(f_nuexsec, hist_flash_time.at(k), Form("Flash/h_flash_time_%s", _util.type_prefix.at(k).c_str() ));
+        if (hist_flash_time.at(k) == NULL){
+            std::cout << "Couldn't get all the flash histograms so exiting function..."<< std::endl;
+            return;
+        }
+    }
+
+
+    topPad    = new TPad("topPad", "", 0, 0.3, 1, 1.0);
+    bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
+    
+    topPad   ->SetBottomMargin(0.05);
+    topPad   ->SetTopMargin(0.15);
+    bottomPad->SetTopMargin(0.04);
+    bottomPad->SetBottomMargin(0.25);
+    bottomPad->SetGridy();
+    topPad->SetLeftMargin(0.15);
+    topPad->SetRightMargin(0.20 );
+    bottomPad->SetLeftMargin(0.15);
+    bottomPad->SetRightMargin(0.20 );
+    topPad   ->Draw();
+    bottomPad->Draw();
+    topPad   ->cd();
+        
+    for (unsigned int i=0; i < hist_flash_time.size(); i++){
+        
+        if (i == _util.k_data){
+            
+            hist_flash_time.at(i)->SetStats(kFALSE);
+            hist_flash_time.at(_util.k_data)     ->SetMarkerStyle(20);
+            hist_flash_time.at(_util.k_data)     ->SetMarkerSize(0.5);
+        } 
+        
+        // Scale EXT
+        else if (i == _util.k_ext){
+            
+            hist_flash_time.at(i)->SetStats(kFALSE);
+            hist_flash_time.at(i)->Scale(intime_scale_factor);
+            hist_flash_time.at(_util.k_ext)      ->SetFillColor(41);
+            hist_flash_time.at(_util.k_ext)      ->SetFillStyle(3345);
+
+        }
+
+        // Scale Dirt
+        else if (i == _util.k_dirt){
+
+            hist_flash_time.at(i)->SetStats(kFALSE);
+            hist_flash_time.at(i)->Scale(dirt_scale_factor);
+            hist_flash_time.at(_util.k_dirt)     ->SetFillColor(2);
+            hist_flash_time.at(_util.k_dirt)     ->SetFillStyle(3354);
+
+        }
+        
+        // Scale MC
+        else {
+            hist_flash_time.at(i)->SetStats(kFALSE);
+            hist_flash_time.at(i)->Scale(mc_scale_factor);
+            hist_flash_time.at(i)->SetFillColor(30);
+        }
+
+    }
+
+    // Add the histograms to the stack
+    h_stack->Add(hist_flash_time.at(_util.k_ext));
+    h_stack->Add(hist_flash_time.at(_util.k_mc));
+    h_stack->Add(hist_flash_time.at(_util.k_dirt));
+    
+    h_stack->Draw("hist");
+    hist_flash_time.at(_util.k_data)->Draw("same PE");
+
+    // MC error histogram ------------------------------------------------------
+    TH1D * h_error_hist = (TH1D*) hist_flash_time.at(_util.k_mc)->Clone("h_error_hist");
+
+    for (unsigned int i=0; i < hist_flash_time.size(); i++){
+        if (i == _util.k_data) continue; // Dont use the data
+        if (i == _util.k_mc) continue;   // Aleady got this histogram from the clone
+        
+        h_error_hist->Add(hist_flash_time.at(i), 1);
+    }
+    
+    h_error_hist->SetFillColorAlpha(12, 0.15);
+    h_error_hist->Draw("e2 hist same");
+
+    
+
+    TLegend *leg_stack = new TLegend(0.8, 0.91, 0.95, 0.32);
+    leg_stack->SetBorderSize(0);
+    leg_stack->SetFillStyle(0);
+
+    leg_stack->AddEntry(hist_flash_time.at(_util.k_data), "Data",   "lep");
+    leg_stack->AddEntry(hist_flash_time.at(_util.k_dirt), "Dirt",   "f");
+    leg_stack->AddEntry(hist_flash_time.at(_util.k_mc),   "Overlay","f");
+    leg_stack->AddEntry(hist_flash_time.at(_util.k_ext),  "InTime", "f");
+
+
+    leg_stack->Draw();
+
+    bottomPad->cd();
+
+    
+
+    h_ratio      = (TH1D*) hist_flash_time.at(_util.k_data)->Clone("h_ratio");
+    h_mc_ext_sum = (TH1D*) hist_flash_time.at(_util.k_mc)  ->Clone("h_mc_ext_sum");
+    
+    for (unsigned int i=0; i < hist_flash_time.size(); i++){
+        if (i == _util.k_data || i == _util.k_mc ) continue; // Dont use the data and nue cc because already been cloned
+        h_mc_ext_sum->Add(hist_flash_time.at(i), 1);
+    }
+
+    h_ratio->Add(h_mc_ext_sum, -1);
+    h_ratio->Divide(h_mc_ext_sum);
+
+    h_ratio->GetXaxis()->SetLabelSize(12);
+    h_ratio->GetXaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+    h_ratio->GetYaxis()->SetLabelSize(11);
+    h_ratio->GetYaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+    h_ratio->GetXaxis()->SetTitleOffset(3.0);
+    h_ratio->GetXaxis()->SetTitleSize(17);
+    h_ratio->GetXaxis()->SetTitleFont(46);
+    h_ratio->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
+
+    h_ratio->GetYaxis()->SetRangeUser(-0.5,0.5);
+    // h_ratio->GetXaxis()->SetTitle("Flash To");
+    h_ratio->GetYaxis()->SetTitle("(Data - MC) / MC ");
+    h_ratio->GetYaxis()->SetTitleSize(13);
+    h_ratio->GetYaxis()->SetTitleFont(44);
+    h_ratio->GetYaxis()->SetTitleOffset(1.5);
+    h_ratio->SetTitle(" ");
+    h_ratio->Draw();
+
+    // Draw the run period on the plot
+    Draw_Run_Period(c);
+    
+    // Draw other data specifc quantities
+    Draw_Data_POT(c, Data_POT);
+    
+    c->Print(print_name);
+}

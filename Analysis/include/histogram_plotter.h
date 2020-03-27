@@ -53,6 +53,7 @@ class histogram_plotter{
     // Call make stacked histograms
     void CallMakeStack(const char *run_period, int cut_index, double Data_POT);
     // -------------------------------------------------------------------------
+    void MakeFlashPlot(const char *run_period, double Data_POT, const char* print_name);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     private:
