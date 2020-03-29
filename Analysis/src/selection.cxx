@@ -6,6 +6,10 @@ void selection::Initialise( const char * mc_file,
                             const char * ext_file,
                             const char * data_file,
                             const char * dirt_file,
+                            const char * mc_file_out,
+                            const char * ext_file_out,
+                            const char * data_file_out,
+                            const char * dirt_file_out,
                             const char * variation_file,
                             const std::vector<double> _config,
                             bool _slim,
@@ -91,7 +95,7 @@ void selection::Initialise( const char * mc_file,
         mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period);
+        if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_file_out);
         if (!_slim) _hhelper.at(_util.k_mc).InitHistograms();
         
         mc_tree_total_entries = mc_tree->GetEntries();
@@ -118,7 +122,7 @@ void selection::Initialise( const char * mc_file,
         data_SC.Initialise(data_tree, _util.k_data, f_flux_weights);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, run_period);
+        if (!_slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, run_period, data_file_out);
         if (!_slim) _hhelper.at(_util.k_data).InitHistograms();
         
         data_tree_total_entries = data_tree->GetEntries();
@@ -146,7 +150,7 @@ void selection::Initialise( const char * mc_file,
         ext_SC.Initialise(ext_tree, _util.k_ext, f_flux_weights);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, run_period);
+        if (!_slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, ext_file_out);
         if (!_slim) _hhelper.at(_util.k_ext).InitHistograms();
         
         ext_tree_total_entries = ext_tree->GetEntries();
@@ -174,7 +178,7 @@ void selection::Initialise( const char * mc_file,
         dirt_SC.Initialise(dirt_tree, _util.k_dirt, f_flux_weights);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period);
+        if (!_slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, dirt_file_out);
         if (!_slim) _hhelper.at(_util.k_dirt).InitHistograms();
         
         dirt_tree_total_entries = dirt_tree->GetEntries();

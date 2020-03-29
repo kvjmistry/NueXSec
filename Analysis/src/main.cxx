@@ -13,6 +13,10 @@ int main(int argc, char *argv[]){
     char * ext_file_name         = (char *)"empty";
     char * data_file_name        = (char *)"empty";
     char * dirt_file_name        = (char *)"empty";
+    char * mc_file_name_out      = (char *)"empty";
+    char * ext_file_name_out     = (char *)"empty";
+    char * data_file_name_out    = (char *)"empty";
+    char * dirt_file_name_out    = (char *)"empty";
     char * variation_file_name   = (char *)"empty";
     char * hist_file_name        = (char *)"empty";
     char * run_period            = (char *)"empty";
@@ -55,10 +59,22 @@ int main(int argc, char *argv[]){
             mc_file_name = argv[i+1];
         }
 
+        // Overwrite output mc file name
+        if (strcmp(arg, "--mc_out") == 0) {
+            std::cout << "New Output MC File name: " << argv[i+1] << std::endl;
+            mc_file_name_out = argv[i+1];
+        }
+
         // EXT file
         if (strcmp(arg, "--ext") == 0){
             std::cout << "Running with EXT file: " << argv[i+1] << std::endl;
             ext_file_name = argv[i+1];
+        }
+
+        // Overwrite output ext file name
+        if (strcmp(arg, "--ext_out") == 0) {
+            std::cout << "New Output EXT File name: " << argv[i+1] << std::endl;
+            ext_file_name_out = argv[i+1];
         }
 
         // Data file
@@ -66,11 +82,23 @@ int main(int argc, char *argv[]){
             std::cout << "Running with Data file: " << argv[i+1] << std::endl;
             data_file_name = argv[i+1];
         }
+        
+        // Overwrite output data file name
+        if (strcmp(arg, "--data_out") == 0) {
+            std::cout << "New Output Data File name: " << argv[i+1] << std::endl;
+            data_file_name_out = argv[i+1];
+        }
 
-        // Dirt file overlay or not?
+        // Dirt file overlay
         if (strcmp(arg, "--dirt") == 0){
             std::cout << "Running with Dirt file: " << argv[i+1] << std::endl;
             dirt_file_name = argv[i+1];
+        }
+
+        // Overwrite output dirt file name
+        if (strcmp(arg, "--dirt_out") == 0) {
+            std::cout << "New Output Dirt File name: " << argv[i+1] << std::endl;
+            dirt_file_name_out = argv[i+1];
         }
 
         // Variation file
@@ -127,7 +155,7 @@ int main(int argc, char *argv[]){
     // -------------------------------------------------------------------------
 
     // Initialise the selction script
-    if (run_selection) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, variation_file_name, config, using_slim_version, num_events, run_period, verbose );
+    if (run_selection) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, mc_file_name_out, ext_file_name_out, data_file_name_out, dirt_file_name_out, variation_file_name, config, using_slim_version, num_events, run_period, verbose );
     
     // Run the make histogram function
     if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, config);

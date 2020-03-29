@@ -75,38 +75,58 @@ void histogram_helper::MakeDirectory(){
    
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::Initialise(int type, const char* run_period ){
+void histogram_helper::Initialise(int type, const char* run_period, const char * file_out ){
 
     std::cout << "Initalising Histogram Helper, creating TFile and directories..." << std::endl;
 
+    std::string file_out_str = file_out;
+
+    std::string file_name;
+
     if (type == _util.k_mc){
+
+        // If the file name is empty then we use the default file name
+        if (file_out_str == "empty") file_name = Form("files/nuexsec_mc_run%s.root", run_period);
+        else file_name = "files/" + file_out_str;
         
         // File not already open, open the file
-        if (!gROOT->GetListOfFiles()->FindObject( Form("files/nuexsec_mc_run%s.root", run_period) ) ) {
-            f_nuexsec = new TFile(Form("files/nuexsec_mc_run%s.root", run_period), "UPDATE");
+        if (!gROOT->GetListOfFiles()->FindObject( file_name.c_str() ) ) {
+            f_nuexsec = new TFile( file_name.c_str(), "UPDATE");
         }
     }
     else if (type == _util.k_data){
         
+        // If the file name is empty then we use the default file name
+        if (file_out_str == "empty") file_name = Form("files/nuexsec_data_run%s.root", run_period);
+        else file_name = "files/" + file_out_str;
+
         // File not already open, open the file
-        if (!gROOT->GetListOfFiles()->FindObject(Form("files/nuexsec_data_run%s.root", run_period)) ) {
-            f_nuexsec = new TFile(Form("files/nuexsec_data_run%s.root", run_period), "UPDATE");
+        if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
+            f_nuexsec = new TFile(file_name.c_str(), "UPDATE");
         }
 
     }
     else if (type == _util.k_ext){
+
+        // If the file name is empty then we use the default file name
+        if (file_out_str == "empty") file_name = Form("files/nuexsec_ext_run%s.root", run_period);
+        else file_name = "files/" + file_out_str;
         
         // File not already open, open the file
-        if (!gROOT->GetListOfFiles()->FindObject(Form("files/nuexsec_ext_run%s.root", run_period)) ) {
-            f_nuexsec = new TFile(Form("files/nuexsec_ext_run%s.root", run_period), "UPDATE");
+        if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
+            f_nuexsec = new TFile(file_name.c_str(), "UPDATE");
         }
 
     }
     else if (type == _util.k_dirt){
         
+        // If the file name is empty then we use the default file name
+        if (file_out_str == "empty") file_name = Form("files/nuexsec_dirt_run%s.root", run_period);
+        else file_name = "files/" + file_out_str;
+
         // File not already open, open the file
-        if (!gROOT->GetListOfFiles()->FindObject(Form("files/nuexsec_dirt_run%s.root", run_period)) ) {
-            f_nuexsec = new TFile(Form("files/nuexsec_dirt_run%s.root", run_period), "UPDATE");
+        if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
+            f_nuexsec = new TFile(file_name.c_str(), "UPDATE");
         }
 
     }
@@ -401,7 +421,7 @@ void histogram_helper::FillHists(int type, int classification_index, int cut_ind
     if (cut_index == _util.k_unselected){
 
         // Only look at the slice candidates
-        if (SC.nslice == 0){
+        if (SC.nslice == 0 || SC.nslice == 1){
             // Flash histograms
             if (type == _util.k_mc){
                 TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean

@@ -231,7 +231,7 @@ void utility::Tabulate(std::string interaction, std::string classification, int 
     
 }
 // -----------------------------------------------------------------------------
-void utility::PrintInfo(std::vector<double> counter_v, double intime_scale_factor, double data_scale_factor, double dirt_scale_factor, std::string cut_name, int tot_true_infv_nues) {
+void utility::PrintInfo(std::vector<double> counter_v, double intime_scale_factor, double mc_scale_factor, double dirt_scale_factor, std::string cut_name, int tot_true_infv_nues) {
 
     double counter_nue_cc_qe      = counter_v.at(k_count_total_nue_cc_qe);
     double counter_nue_cc_res     = counter_v.at(k_count_total_nue_cc_res);
@@ -262,24 +262,24 @@ void utility::PrintInfo(std::vector<double> counter_v, double intime_scale_facto
     double counter_ext            = counter_v.at(k_count_ext);
     double counter_dirt           = counter_v.at(k_count_dirt);
 
-    counter = counter + (counter_ext * (intime_scale_factor / data_scale_factor)) + (counter_dirt * (dirt_scale_factor / data_scale_factor));
+    counter = counter + (counter_ext * (intime_scale_factor / mc_scale_factor)) + (counter_dirt * (dirt_scale_factor / mc_scale_factor));
 
     std::cout << "\n------------------------------------------------" << std::endl;
     std::cout << "------------------------------------------------" << std::endl;
     std::cout << "\n\033[0;33m <" << cut_name << "> \033[0m" << std::endl;
-    std::cout << " Total Candidate Nue     : " << counter                << "\t " << double(counter                   * data_scale_factor  ) << std::endl;
-    std::cout << " Number of Nue CC        : " << counter_nue_cc         << "\t \t " << double(counter_nue_cc         * data_scale_factor  ) << std::endl;
-    std::cout << " Number of Nue CC Mixed  : " << counter_nue_cc_mixed   << "\t \t " << double(counter_nue_cc_mixed   * data_scale_factor  ) << std::endl;
-    std::cout << " Number of Nu out FV     : " << counter_nu_out_fv      << "\t \t " << double(counter_nu_out_fv      * data_scale_factor  ) << std::endl;
-    std::cout << " Number of Cosmic        : " << counter_cosmic         << "\t \t " << double(counter_cosmic         * data_scale_factor  ) << std::endl;
-    std::cout << " Number of Numu CC       : " << counter_numu_cc        << "\t \t " << double(counter_numu_cc        * data_scale_factor  ) << std::endl;
-    std::cout << " Number of Numu CC Pi0   : " << counter_numu_cc_pi0    << "\t \t " << double(counter_numu_cc_pi0    * data_scale_factor  ) << std::endl;
-    std::cout << " Number of NC            : " << counter_nc             << "\t \t " << double(counter_nc             * data_scale_factor  ) << std::endl;
-    std::cout << " Number of NC Pi0        : " << counter_nc_pi0         << "\t \t " << double(counter_nc_pi0         * data_scale_factor  ) << std::endl;
-    std::cout << " Number of Unmatched     : " << counter_unmatched      << "\t \t " << double(counter_unmatched      * data_scale_factor  ) << std::endl;
-    std::cout << " Number of InTime Cosmics: " << double(counter_ext * (intime_scale_factor / data_scale_factor))
-              << "\t " << double(counter_ext * intime_scale_factor) << std::endl;
-    std::cout << " Number of Dirt          : " << double(counter_dirt * dirt_scale_factor / data_scale_factor)
+    std::cout << " Total Candidate Nue     : " << counter                << "\t " << double(counter                   * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Nue CC        : " << counter_nue_cc         << "\t \t " << double(counter_nue_cc         * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Nue CC Mixed  : " << counter_nue_cc_mixed   << "\t \t " << double(counter_nue_cc_mixed   * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Nu out FV     : " << counter_nu_out_fv      << "\t \t " << double(counter_nu_out_fv      * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Cosmic        : " << counter_cosmic         << "\t \t " << double(counter_cosmic         * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Numu CC       : " << counter_numu_cc        << "\t \t " << double(counter_numu_cc        * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Numu CC Pi0   : " << counter_numu_cc_pi0    << "\t \t " << double(counter_numu_cc_pi0    * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of NC            : " << counter_nc             << "\t \t " << double(counter_nc             * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of NC Pi0        : " << counter_nc_pi0         << "\t \t " << double(counter_nc_pi0         * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Unmatched     : " << counter_unmatched      << "\t \t " << double(counter_unmatched      * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of InTime Cosmics: " << double(counter_ext * (intime_scale_factor / mc_scale_factor))
+              << "\t " << double(counter_ext * intime_scale_factor) << "\t " << counter_ext << " (unscaled)" << std::endl;
+    std::cout << " Number of Dirt          : " << double(counter_dirt * dirt_scale_factor / mc_scale_factor)
               << "\t " << double (counter_dirt * dirt_scale_factor)<< std::endl;
     std::cout << "--------- Neutrinos Selected in Truth ----------" << std::endl;
     std::cout << " Nue CC QE               : " << counter_nue_cc_qe   << std::endl;

@@ -49,7 +49,7 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
         system(command.c_str()); 
 
         // Call the Make stack function for all the plots we want
-        // CallMakeStack(run_period, i, Data_POT);
+        CallMakeStack(run_period, i, Data_POT);
         
     }
 
@@ -400,7 +400,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         h_ratio->GetYaxis()->SetTitleFont(44);
         h_ratio->GetYaxis()->SetTitleOffset(1.5);
         h_ratio->SetTitle(" ");
-        h_ratio->Draw();
+        h_ratio->Draw("E");
 
         // Now doing this stuff on the bottom pad
         //x_min, y_min, x_max, y_max
@@ -420,7 +420,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         pt_bottom->AddText(chi2_string_bottom.c_str());
         pt_bottom->SetFillStyle(0);
         pt_bottom->SetBorderSize(0);
-        // pt_bottom->Draw();
+        pt_bottom->Draw();
     }
 
     // Draw the run period on the plot
@@ -846,9 +846,7 @@ void histogram_plotter::MakeFlashPlot(const char *run_period, double Data_POT, c
     }
     
     h_error_hist->SetFillColorAlpha(12, 0.15);
-    h_error_hist->Draw("e2 hist same");
-
-    
+    h_error_hist->Draw("e2 hist same");    
 
     TLegend *leg_stack = new TLegend(0.8, 0.91, 0.95, 0.32);
     leg_stack->SetBorderSize(0);
@@ -893,7 +891,7 @@ void histogram_plotter::MakeFlashPlot(const char *run_period, double Data_POT, c
     h_ratio->GetYaxis()->SetTitleFont(44);
     h_ratio->GetYaxis()->SetTitleOffset(1.5);
     h_ratio->SetTitle(" ");
-    h_ratio->Draw();
+    h_ratio->Draw("E");
 
     // Draw the run period on the plot
     Draw_Run_Period(c);

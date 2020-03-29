@@ -27,7 +27,7 @@ class histogram_helper{
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(int type, const char *run_period );
+    void Initialise(int type, const char *run_period, const char * file_out );
     // -------------------------------------------------------------------------
     // Initialise histograms
     void InitHistograms();
