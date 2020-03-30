@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+
+<!-- Production Project -->
+<!DOCTYPE project [
+<!ENTITY release "v08_00_00_33">
+<!ENTITY file_type "mc">
+<!ENTITY run_type "physics">
+<!ENTITY user "kmistry">
+<!ENTITY name "searchingfornues_run3b_beamoff_offset1_mcc9_v33">
+<!ENTITY indef "numi_uboone_run3b_beamoff_offset1_mcc9_reco2_v08_00_00_28_sample0_all_v2">
+<!ENTITY version "v1">
+]>
+
+<job>
+
+<project name="&name;">
+
+  <!-- Project size -->
+  <numevents>-1</numevents>
+
+  <!-- Operating System -->
+  <os>SL7</os>
+
+  <!-- Batch resources -->
+  <resource>DEDICATED,OPPORTUNISTIC,OFFSITE</resource>
+
+  <!-- Larsoft information -->
+  <larsoft>
+    <tag>&release;</tag>
+    <qual>e17:prof</qual>
+    <local>/pnfs/uboone/resilient/users/kmistry/tars/uboonecode_mcc9_v08_00_00_33_sl7.tar</local>
+  </larsoft>
+
+  <!-- Project stages -->
+  <stage name="ntuple">
+    <fcl>run_neutrinoselectionfilter_run3_dataOFF_cc0pinp.fcl</fcl>
+    <datafiletypes>root,pndr</datafiletypes>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
+    <inputdef>&indef;</inputdef>
+    <maxfilesperjob>10</maxfilesperjob>
+    <numjobs>385</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <disk>25GB</disk>
+    <schema>root</schema>
+    <jobsub>--expected-lifetime=12h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub_start> --expected-lifetime=short</jobsub_start>
+    <blacklist>Lancaster</blacklist>
+  </stage>
+
+  <!-- file type -->
+  <filetype>&file_type;</filetype>
+
+  <!-- run type -->
+  <runtype>&run_type;</runtype>
+
+</project>
+
+</job>

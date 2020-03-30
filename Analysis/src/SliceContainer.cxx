@@ -724,7 +724,12 @@ double SliceContainer::GetPPFXCVWeight(){
         weight = h_2D_CV_UW_PPFX_ratio_nuebar->GetBinContent(xbin, ybin);
     }
 
-    // std::cout << nu_theta << "  " << nu_e <<  "  " << weight<< std::endl;
+    // Add some catches to remove unphysical weights
+    if (std::isinf(weight))      weight = 1.0; 
+    if (std::isnan(weight) == 1) weight = 1.0;
+    if (weight > 100)            weight = 1.0;
+
+    // std::cout << nu_theta << "  " << nu_e <<  "  " << weight << std::endl;
 
     return weight;
 }

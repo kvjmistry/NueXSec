@@ -568,7 +568,7 @@ double histogram_helper::GetCVWeight(int type, SliceContainer SC){
     else weight = 1.0;
     
 
-    // Get the PPFX CV fux correction weight
+    // Get the PPFX CV flux correction weight
     if (type == _util.k_mc){
         double weight_flux = SC.GetPPFXCVWeight();
         weight = weight * weight_flux;
