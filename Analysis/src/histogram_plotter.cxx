@@ -420,7 +420,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         pt_bottom->AddText(chi2_string_bottom.c_str());
         pt_bottom->SetFillStyle(0);
         pt_bottom->SetBorderSize(0);
-        pt_bottom->Draw();
+        // pt_bottom->Draw();
     }
 
     // Draw the run period on the plot
@@ -579,7 +579,7 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
     // MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, const char* x_axis_name, double y_scale_factor, 
     //                             const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, const char* print_name )
 
-    bool area_norm = true;
+    bool area_norm = false;
 
     // Reco X
     MakeStack("h_reco_vtx_x",_util.cut_dirs.at(cut_index).c_str(),

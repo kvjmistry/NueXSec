@@ -31,7 +31,22 @@ int main(int argc, char *argv[]){
     utility _utility;
     histogram_plotter _hplot;
 
-    std::string usage = "\n First run the selection with the options: \n\n ./nuexsec --run <run period num> [--mc <mc file>] [--data <data file>] [--ext <ext file>] [--dirt <dirt file>] [--var <variation file>] [-n <num events>] [--slim] [--verbose <verbose level>] \n\n After this, to make the histograms after running selection, run: \n\n ./nuexsec --run <run period num> --hist <input merged nuexsec file> \n ";
+    std::string usage = "\nFirst run the selection with the options: \n\n\033[0;31m./nuexsec --run <run period num> [options (see below)]\033[0m \n\n"
+    "\033[0;34m[--mc <mc file>]\033[0m                                       \033[0;32mThe input overlay root file\033[0m\n\n"
+    "\033[0;34m[--data <data file>]\033[0m                                   \033[0;32mThe input on beam root file. Will also create a run subrun list in the ./files/ directory of selected data events.\033[0m\n\n"
+    "\033[0;34m[--ext <ext file>]\033[0m                                     \033[0;32mThe input off beam root file\033[0m\n\n"
+    "\033[0;34m[--dirt <dirt file>]\033[0m                                   \033[0;32mThe input dirt overlay root file\033[0m\n\n"
+    "\033[0;34m[--mc_out <mc file output name>]\033[0m                       \033[0;32mThe output overlay root file name (will put in the ./files/ folder)\033[0m\n\n"
+    "\033[0;34m[--data_out <data file output name>]\033[0m                   \033[0;32mThe output on beam root file name (will put in the ./files/ folder)\033[0m\n\n"
+    "\033[0;34m[--ext_out <ext file output name>]\033[0m                     \033[0;32mThe output off beam root file name (will put in the ./files/ folder\033[0m)\n\n"
+    "\033[0;34m[--dirt_out <dirt file output name>]\033[0m                   \033[0;32mThe output dirt overlay root file name (will put in the ./files/ folder)\033[0m\n\n"
+    "\033[0;34m[--var <variation file>]\033[0m                               \033[0;31mNot yet supported\033[0m\n\n"
+    "\033[0;33m[-n <num events>]\033[0m                                      \033[0;32mThe number of events to run over. This is good for checking if the code doesn't segfault. All the POT scalings will not work.\033[0m\n\n"
+    "\033[0;33m[--slim]\033[0m                                               \033[0;32mWhen this extension is added, the histogram helper class is not initalised and no histograms will be filled or saved. This is to speed up the selection code if you just want to run the selection.\033[0m\n\n"
+    "\033[0;33m[--verbose <verbose level>]\033[0m                            \033[0;32m0 does not print the selection cut results, 1 (default) currently prints everything\033[0m\n\n"
+    "\n\nTo make the histograms after running selection, run: \n\n "
+    "\033[0;31m./nuexsec --run <run period num> --hist <input merged nuexsec file>\033[0m \n\n"
+    "The <input merged nuexsec file> corresponds to hadd merged file of the mc, data, ext and dirt. See the bash script merge_run1_files.sh for more details\n\n";
 
     // -------------------------------------------------------------------------    
     // Loop over input arguments
