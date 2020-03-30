@@ -49,7 +49,7 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
         system(command.c_str()); 
 
         // Call the Make stack function for all the plots we want
-        CallMakeStack(run_period, i, Data_POT);
+        // CallMakeStack(run_period, i, Data_POT);
         
     }
 
@@ -63,7 +63,9 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
     std::string command = a + b + c + d + e ;
     system(command.c_str()); 
 
-    MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time.pdf", run_period));
+    MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time.pdf", run_period), "h_flash_time");
+    MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time_sid1.pdf", run_period), "h_flash_time_sid1"); // Slice ID 1
+    MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time_sid0.pdf", run_period), "h_flash_time_sid0"); // Slice ID 0
 
 
 }
@@ -164,18 +166,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         topPad    = new TPad("topPad", "", 0, 0.3, 1, 1.0);
         bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
         
-        topPad   ->SetBottomMargin(0.05);
-        topPad   ->SetTopMargin(0.15);
-        bottomPad->SetTopMargin(0.04);
-        bottomPad->SetBottomMargin(0.25);
-        bottomPad->SetGridy();
-        topPad->SetLeftMargin(0.15);
-        topPad->SetRightMargin(0.20 );
-        bottomPad->SetLeftMargin(0.15);
-        bottomPad->SetRightMargin(0.20 );
-        topPad   ->Draw();
-        bottomPad->Draw();
-        topPad   ->cd();
+        SetTPadOptions(topPad, bottomPad );
         
     }
     // Otherwise just use an unsplit canvas
@@ -265,9 +256,6 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
             }
 
         }
-
-
-        
 
     }
 
@@ -534,7 +522,7 @@ void histogram_plotter::Draw_Data_MC_Ratio(TCanvas* c, double ratio){
     TPaveText *pt;
 
     pt = new TPaveText(0.16, 0.88, 0.3, 0.95,"NDC");
-    pt->AddText(Form("Data/MC Ratio: %2.1f", ratio));
+    pt->AddText(Form("Data/MC Ratio: %2.2f", ratio));
     pt->SetBorderSize(0);
     pt->SetFillColor(0);
     pt->SetFillStyle(0);
@@ -572,6 +560,23 @@ void histogram_plotter::Draw_Area_Norm(TCanvas* c){
     pt->SetFillStyle(0);
     pt->SetTextSize(0.03);
     pt->Draw();
+}
+// -----------------------------------------------------------------------------
+void histogram_plotter::SetTPadOptions(TPad * topPad, TPad * bottomPad ){
+
+    topPad   ->SetBottomMargin(0.05);
+    topPad   ->SetTopMargin(0.15);
+    bottomPad->SetTopMargin(0.04);
+    bottomPad->SetBottomMargin(0.25);
+    bottomPad->SetGridy();
+    topPad->SetLeftMargin(0.15);
+    topPad->SetRightMargin(0.20 );
+    bottomPad->SetLeftMargin(0.15);
+    bottomPad->SetRightMargin(0.20 );
+    topPad   ->Draw();
+    bottomPad->Draw();
+    topPad   ->cd();
+
 }
 // -----------------------------------------------------------------------------
 void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, double Data_POT){
@@ -752,10 +757,12 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name){
+void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name, std::string histname){
 
-
-    std::vector<TH1D*>  hist_flash_time(_util.k_type_MAX);
+    std::vector<TH1D*>  hist(_util.k_type_MAX);
+    std::vector<double> hist_integrals(_util.k_type_MAX,0.0);        // The integrals of all the histograms
+    double integral_mc_ext = 0.0;
+    
     TH1D * h_ratio;
     TH1D * h_mc_ext_sum;
 
@@ -765,84 +772,81 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name){
     THStack * h_stack = new THStack();
 
     for (unsigned int k = 0; k < _util.type_prefix.size(); k++){
-        _util.GetHist(f_nuexsec, hist_flash_time.at(k), Form("Flash/h_flash_time_%s", _util.type_prefix.at(k).c_str() ));
-        if (hist_flash_time.at(k) == NULL){
+        _util.GetHist(f_nuexsec, hist.at(k), Form("Flash/%s_%s", histname.c_str(),_util.type_prefix.at(k).c_str() ));
+        if (hist.at(k) == NULL){
             std::cout << "Couldn't get all the flash histograms so exiting function..."<< std::endl;
             return;
         }
     }
 
-
     topPad    = new TPad("topPad", "", 0, 0.3, 1, 1.0);
     bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
     
-    topPad   ->SetBottomMargin(0.05);
-    topPad   ->SetTopMargin(0.15);
-    bottomPad->SetTopMargin(0.04);
-    bottomPad->SetBottomMargin(0.25);
-    bottomPad->SetGridy();
-    topPad->SetLeftMargin(0.15);
-    topPad->SetRightMargin(0.20 );
-    bottomPad->SetLeftMargin(0.15);
-    bottomPad->SetRightMargin(0.20 );
-    topPad   ->Draw();
-    bottomPad->Draw();
-    topPad   ->cd();
+    SetTPadOptions(topPad, bottomPad );
         
-    for (unsigned int i=0; i < hist_flash_time.size(); i++){
+    for (unsigned int i=0; i < hist.size(); i++){
         
         if (i == _util.k_data){
             
-            hist_flash_time.at(i)->SetStats(kFALSE);
-            hist_flash_time.at(_util.k_data)     ->SetMarkerStyle(20);
-            hist_flash_time.at(_util.k_data)     ->SetMarkerSize(0.5);
+            hist.at(i)->SetStats(kFALSE);
+            hist.at(_util.k_data)     ->SetMarkerStyle(20);
+            hist.at(_util.k_data)     ->SetMarkerSize(0.5);
+            hist_integrals.at(_util.k_data) = hist.at(_util.k_data)->Integral();
         } 
         
         // Scale EXT
         else if (i == _util.k_ext){
             
-            hist_flash_time.at(i)->SetStats(kFALSE);
-            hist_flash_time.at(i)->Scale(intime_scale_factor);
-            hist_flash_time.at(_util.k_ext)      ->SetFillColor(41);
-            hist_flash_time.at(_util.k_ext)      ->SetFillStyle(3345);
+            hist.at(i)->SetStats(kFALSE);
+            hist.at(i)->Scale(intime_scale_factor);
+            hist.at(_util.k_ext)      ->SetFillColor(41);
+            hist.at(_util.k_ext)      ->SetFillStyle(3345);
+            hist_integrals.at(_util.k_ext) = hist.at(_util.k_ext)->Integral();
+            integral_mc_ext += hist_integrals.at(_util.k_ext);
 
         }
 
         // Scale Dirt
         else if (i == _util.k_dirt){
 
-            hist_flash_time.at(i)->SetStats(kFALSE);
-            hist_flash_time.at(i)->Scale(dirt_scale_factor);
-            hist_flash_time.at(_util.k_dirt)     ->SetFillColor(2);
-            hist_flash_time.at(_util.k_dirt)     ->SetFillStyle(3354);
+            hist.at(i)->SetStats(kFALSE);
+            hist.at(i)->Scale(dirt_scale_factor);
+            hist.at(_util.k_dirt)     ->SetFillColor(2);
+            hist.at(_util.k_dirt)     ->SetFillStyle(3354);
+            hist_integrals.at(_util.k_dirt) = hist.at(_util.k_dirt)->Integral();
+            integral_mc_ext += hist_integrals.at(_util.k_dirt);
 
         }
         
         // Scale MC
         else {
-            hist_flash_time.at(i)->SetStats(kFALSE);
-            hist_flash_time.at(i)->Scale(mc_scale_factor);
-            hist_flash_time.at(i)->SetFillColor(30);
+            hist.at(i)->SetStats(kFALSE);
+            hist.at(i)->Scale(mc_scale_factor);
+            hist.at(i)->SetFillColor(30);
+            hist_integrals.at(_util.k_mc) = hist.at(_util.k_mc)->Integral();
+            integral_mc_ext += hist_integrals.at(_util.k_mc);
         }
 
     }
 
     // Add the histograms to the stack
-    h_stack->Add(hist_flash_time.at(_util.k_ext));
-    h_stack->Add(hist_flash_time.at(_util.k_mc));
-    h_stack->Add(hist_flash_time.at(_util.k_dirt));
-    
+    h_stack->Add(hist.at(_util.k_ext));
+    h_stack->Add(hist.at(_util.k_mc));
+    h_stack->Add(hist.at(_util.k_dirt));
+
     h_stack->Draw("hist");
-    hist_flash_time.at(_util.k_data)->Draw("same PE");
+    hist.at(_util.k_data)->Draw("same PE");
+
+    h_stack->GetYaxis()->SetTitle("Entries");
 
     // MC error histogram ------------------------------------------------------
-    TH1D * h_error_hist = (TH1D*) hist_flash_time.at(_util.k_mc)->Clone("h_error_hist");
+    TH1D * h_error_hist = (TH1D*) hist.at(_util.k_mc)->Clone("h_error_hist");
 
-    for (unsigned int i=0; i < hist_flash_time.size(); i++){
+    for (unsigned int i=0; i < hist.size(); i++){
         if (i == _util.k_data) continue; // Dont use the data
         if (i == _util.k_mc) continue;   // Aleady got this histogram from the clone
         
-        h_error_hist->Add(hist_flash_time.at(i), 1);
+        h_error_hist->Add(hist.at(i), 1);
     }
     
     h_error_hist->SetFillColorAlpha(12, 0.15);
@@ -852,10 +856,10 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name){
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
 
-    leg_stack->AddEntry(hist_flash_time.at(_util.k_data), "Data",   "lep");
-    leg_stack->AddEntry(hist_flash_time.at(_util.k_dirt), "Dirt",   "f");
-    leg_stack->AddEntry(hist_flash_time.at(_util.k_mc),   "Overlay","f");
-    leg_stack->AddEntry(hist_flash_time.at(_util.k_ext),  "InTime", "f");
+    leg_stack->AddEntry(hist.at(_util.k_data), "Data",   "lep");
+    leg_stack->AddEntry(hist.at(_util.k_dirt), "Dirt",   "f");
+    leg_stack->AddEntry(hist.at(_util.k_mc),   "Overlay","f");
+    leg_stack->AddEntry(hist.at(_util.k_ext),  "InTime", "f");
 
 
     leg_stack->Draw();
@@ -864,12 +868,12 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name){
 
     
 
-    h_ratio      = (TH1D*) hist_flash_time.at(_util.k_data)->Clone("h_ratio");
-    h_mc_ext_sum = (TH1D*) hist_flash_time.at(_util.k_mc)  ->Clone("h_mc_ext_sum");
+    h_ratio      = (TH1D*) hist.at(_util.k_data)->Clone("h_ratio");
+    h_mc_ext_sum = (TH1D*) hist.at(_util.k_mc)  ->Clone("h_mc_ext_sum");
     
-    for (unsigned int i=0; i < hist_flash_time.size(); i++){
+    for (unsigned int i=0; i < hist.size(); i++){
         if (i == _util.k_data || i == _util.k_mc ) continue; // Dont use the data and nue cc because already been cloned
-        h_mc_ext_sum->Add(hist_flash_time.at(i), 1);
+        h_mc_ext_sum->Add(hist.at(i), 1);
     }
 
     h_ratio->Add(h_mc_ext_sum, -1);
@@ -885,7 +889,6 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name){
     h_ratio->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
 
     h_ratio->GetYaxis()->SetRangeUser(-0.5,0.5);
-    // h_ratio->GetXaxis()->SetTitle("Flash To");
     h_ratio->GetYaxis()->SetTitle("(Data - MC) / MC ");
     h_ratio->GetYaxis()->SetTitleSize(13);
     h_ratio->GetYaxis()->SetTitleFont(44);
@@ -895,6 +898,9 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name){
 
     // Draw the run period on the plot
     Draw_Run_Period(c);
+
+    // Draw Data to MC ratio
+    Draw_Data_MC_Ratio(c, double(hist_integrals.at(_util.k_data)*1.0/integral_mc_ext*1.0) );
     
     // Draw other data specifc quantities
     Draw_Data_POT(c, Data_POT);

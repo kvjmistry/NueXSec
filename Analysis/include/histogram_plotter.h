@@ -50,10 +50,13 @@ class histogram_plotter{
     // Draw area norm text 
     void Draw_Area_Norm(TCanvas* c);
     // -------------------------------------------------------------------------
+    // Set the TPad Options
+    void SetTPadOptions(TPad * topPad, TPad * bottomPad );
+    // -------------------------------------------------------------------------
     // Call make stacked histograms
     void CallMakeStack(const char *run_period, int cut_index, double Data_POT);
     // -------------------------------------------------------------------------
-    void MakeFlashPlot(double Data_POT, const char* print_name);
+    void MakeFlashPlot(double Data_POT, const char* print_name, std::string histname);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     private:

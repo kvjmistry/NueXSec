@@ -301,6 +301,12 @@ void histogram_helper::InitHistograms(){
     TH1D_flash_hists.resize(k_TH1D_flash_MAX);
     TH1D_flash_hists.at(k_flash_time) = new TH1D( Form("h_flash_time_%s", _util.type_prefix.at(_type).c_str()), "; Flash Time [us]; Entries", 100, 0, 25 );
     TH1D_flash_hists.at(k_flash_pe)   = new TH1D( Form("h_flash_pe_%s", _util.type_prefix.at(_type).c_str()),   "; Flash PE [PE]; Entries", 100, 0, 5000 );
+
+    TH1D_flash_hists.at(k_flash_time_sid1) = new TH1D( Form("h_flash_time_sid1_%s", _util.type_prefix.at(_type).c_str()), "; Flash Time Neutrino Candiate [us]; Entries", 100, 0, 25 );
+    TH1D_flash_hists.at(k_flash_pe_sid1)   = new TH1D( Form("h_flash_pe_sid1_%s", _util.type_prefix.at(_type).c_str()),   "; Flash PE Neutrino Candiate [PE]; Entries", 100, 0, 5000 );
+
+    TH1D_flash_hists.at(k_flash_time_sid0) = new TH1D( Form("h_flash_time_sid0_%s", _util.type_prefix.at(_type).c_str()), "; Flash Time Non Neutrino Canidatec[us]; Entries", 100, 0, 25 );
+    TH1D_flash_hists.at(k_flash_pe_sid0)   = new TH1D( Form("h_flash_pe_sid0_%s", _util.type_prefix.at(_type).c_str()),   "; Flash PE Non Neutrino Canidatec[PE]; Entries", 100, 0, 5000 );
     
 
 }
@@ -312,7 +318,6 @@ void histogram_helper::FillHists(int type, int classification_index, int cut_ind
 
     // Calculate some variables
     double reco_shr_p = std::sqrt(SC.shr_px*SC.shr_px + SC.shr_py*SC.shr_py + SC.shr_pz*SC.shr_pz);
-    // if(cut_index == 0) std::cout << SC.shr_hits_tot << std::endl;
 
     // Now fill the histograms!
     TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x, weight);
@@ -420,23 +425,66 @@ void histogram_helper::FillHists(int type, int classification_index, int cut_ind
     // Only do this for the unselected histograms
     if (cut_index == _util.k_unselected){
 
-        // Only look at the slice candidates
-        if (SC.nslice == 0 || SC.nslice == 1){
-            // Flash histograms
-            if (type == _util.k_mc){
-                TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
+        // Flash histograms
+        if (type == _util.k_mc){
+            TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
+            TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight); // See numi documentation page to see what these numbers mean
+           
+            if (SC.nslice == 1){
+                TH1D_flash_hists.at(k_flash_time_sid1)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
+                TH1D_flash_hists.at(k_flash_pe_sid1)->Fill(SC.flash_pe, weight); // See numi documentation page to see what these numbers mean
+
             }
-            if (type == _util.k_dirt){
-                TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + 0.055 -0.359, weight);
-            }
-            if (type == _util.k_ext){
-                TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + -0.359, weight);
-            }
-            if (type == _util.k_data){
-                TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time, weight);
+            if (SC.nslice == 0){
+                TH1D_flash_hists.at(k_flash_time_sid0)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
+                TH1D_flash_hists.at(k_flash_pe_sid0)->Fill(SC.flash_pe, weight); // See numi documentation page to see what these numbers mean
+
             }
         }
+        if (type == _util.k_dirt){
+            TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + 0.055 -0.359, weight);
+            TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
+           
+            if (SC.nslice == 1){
+                TH1D_flash_hists.at(k_flash_time_sid1)->Fill(SC.flash_time + 0.055 -0.359, weight);
+                TH1D_flash_hists.at(k_flash_pe_sid1)->Fill(SC.flash_pe, weight);
 
+            }
+            if (SC.nslice == 0){
+                TH1D_flash_hists.at(k_flash_time_sid0)->Fill(SC.flash_time + 0.055 -0.359, weight);
+                TH1D_flash_hists.at(k_flash_pe_sid0)->Fill(SC.flash_pe, weight);
+                
+            }
+        }
+        if (type == _util.k_ext){
+            TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + -0.359, weight);
+            TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
+           
+            if (SC.nslice == 1){
+                TH1D_flash_hists.at(k_flash_time_sid1)->Fill(SC.flash_time + -0.359, weight);
+                TH1D_flash_hists.at(k_flash_pe_sid1)->Fill(SC.flash_pe, weight);
+
+            }
+            if (SC.nslice == 0){
+                TH1D_flash_hists.at(k_flash_time_sid0)->Fill(SC.flash_time + -0.359, weight);
+                TH1D_flash_hists.at(k_flash_pe_sid0)->Fill(SC.flash_pe, weight);
+                
+            }
+        }
+        if (type == _util.k_data){
+            TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time, weight);
+            TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
+            
+            if (SC.nslice == 1){
+                TH1D_flash_hists.at(k_flash_time_sid1)->Fill(SC.flash_time, weight);
+                TH1D_flash_hists.at(k_flash_pe_sid1)->Fill(SC.flash_pe, weight);
+
+            }
+            if (SC.nslice == 0){
+                TH1D_flash_hists.at(k_flash_time_sid0)->Fill(SC.flash_time, weight);
+                TH1D_flash_hists.at(k_flash_pe_sid0)->Fill(SC.flash_pe, weight);
+            }
+        }
         
     }
     
