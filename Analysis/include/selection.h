@@ -116,7 +116,8 @@ namespace xsecSelection {
                              bool _slim,
                              int num_events,
                              const char * run_period,
-                             int _verbose);
+                             int _verbose,
+                             int weight_cfg);
             // -----------------------------------------------------------------
             // Main function for selection
             void MakeSelection();

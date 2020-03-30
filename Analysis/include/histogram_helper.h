@@ -25,9 +25,12 @@ class histogram_helper{
     // weight variable (will equal multiple of all weights)
     double weight{1.0};
 
+    bool weight_tune = true; // Apply genie tune weight
+    bool weight_ppfx = true; // Apply ppfx cv weight
+
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(int type, const char *run_period, const char * file_out );
+    void Initialise(int type, const char *run_period, const char * file_out, int weight_cfg );
     // -------------------------------------------------------------------------
     // Initialise histograms
     void InitHistograms();

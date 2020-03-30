@@ -15,7 +15,8 @@ void selection::Initialise( const char * mc_file,
                             bool _slim,
                             int num_events,
                             const char * run_period,
-                            int _verbose){
+                            int _verbose,
+                            int weight_cfg){
     
     std::cout << "\nInitialising..." << std::endl;
     if (_slim){
@@ -27,6 +28,9 @@ void selection::Initialise( const char * mc_file,
 
     std::cout << "\nSetting verbose level to: " << _verbose << std::endl;
     verbose = _verbose;
+
+    std::cout << "\nUsing a weight setting of: " << weight_cfg << std::endl;
+    std::cout << "If this is set to 1 (default) then we apply the Genie Tune and PPFX weights to the CV" << std::endl;
 
     // Set the scale factors
     if (strcmp(run_period, "1") == 0){
@@ -95,7 +99,7 @@ void selection::Initialise( const char * mc_file,
         mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_file_out);
+        if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_file_out, weight_cfg);
         if (!_slim) _hhelper.at(_util.k_mc).InitHistograms();
         
         mc_tree_total_entries = mc_tree->GetEntries();
@@ -122,7 +126,7 @@ void selection::Initialise( const char * mc_file,
         data_SC.Initialise(data_tree, _util.k_data, f_flux_weights);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, run_period, data_file_out);
+        if (!_slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, run_period, data_file_out, weight_cfg);
         if (!_slim) _hhelper.at(_util.k_data).InitHistograms();
         
         data_tree_total_entries = data_tree->GetEntries();
@@ -150,7 +154,7 @@ void selection::Initialise( const char * mc_file,
         ext_SC.Initialise(ext_tree, _util.k_ext, f_flux_weights);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, ext_file_out);
+        if (!_slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, ext_file_out, weight_cfg);
         if (!_slim) _hhelper.at(_util.k_ext).InitHistograms();
         
         ext_tree_total_entries = ext_tree->GetEntries();
@@ -178,7 +182,7 @@ void selection::Initialise( const char * mc_file,
         dirt_SC.Initialise(dirt_tree, _util.k_dirt, f_flux_weights);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, dirt_file_out);
+        if (!_slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, dirt_file_out, weight_cfg);
         if (!_slim) _hhelper.at(_util.k_dirt).InitHistograms();
         
         dirt_tree_total_entries = dirt_tree->GetEntries();
@@ -194,9 +198,7 @@ void selection::Initialise( const char * mc_file,
         std::cout << "Initialisation of Dirt Complete!" << std::endl;
         std::cout << "\033[0;31m-------------------------------\033[0m" << std::endl;
 
-    } // End intialisation of dirt variables
-
-    
+    } // End intialisation of dirt variables    
     
     // Invoke main selection function
     MakeSelection();

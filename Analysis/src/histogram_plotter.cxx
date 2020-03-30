@@ -49,7 +49,7 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
         system(command.c_str()); 
 
         // Call the Make stack function for all the plots we want
-        // CallMakeStack(run_period, i, Data_POT);
+        CallMakeStack(run_period, i, Data_POT);
         
     }
 

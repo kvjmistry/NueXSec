@@ -75,7 +75,7 @@ void histogram_helper::MakeDirectory(){
    
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::Initialise(int type, const char* run_period, const char * file_out ){
+void histogram_helper::Initialise(int type, const char* run_period, const char * file_out, int weight_cfg ){
 
     std::cout << "Initalising Histogram Helper, creating TFile and directories..." << std::endl;
 
@@ -137,6 +137,28 @@ void histogram_helper::Initialise(int type, const char* run_period, const char *
 
     // Set the type
     _type = type;
+
+    // Set the weight settings
+    if (weight_cfg == 0){
+        weight_tune = false;
+        weight_ppfx = false;
+    }
+    else if (weight_cfg == 1){
+        weight_tune = true;
+        weight_ppfx = true;
+    }
+    else if (weight_cfg == 2){
+        weight_tune = true;
+        weight_ppfx = false;
+    }
+    else if (weight_cfg == 3){
+        weight_tune = false;
+        weight_ppfx = true;
+    }
+    else {
+        std::cout << "Unknown weight setting specified, using defaults" << std::endl;
+    }
+
 
     MakeDirectory();
 }
@@ -613,6 +635,9 @@ double histogram_helper::GetCVWeight(int type, SliceContainer SC){
         if (std::isnan(weight) == 1) weight = 1.0;
         if (weight > 100)            weight = 1.0;
 
+        // If tune weight turned off, just set weight to 1.0
+        if (!weight_tune) weight = 1.0;
+
     } 
     else weight = 1.0;
     
@@ -620,7 +645,10 @@ double histogram_helper::GetCVWeight(int type, SliceContainer SC){
     // Get the PPFX CV flux correction weight
     if (type == _util.k_mc){
         double weight_flux = SC.GetPPFXCVWeight();
-        weight = weight * weight_flux;
+        
+        // If we want ppfx weight then add this into the weight
+        if (weight_ppfx) weight = weight * weight_flux;
+
     }
 
     return weight;

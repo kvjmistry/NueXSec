@@ -22,6 +22,7 @@ int main(int argc, char *argv[]){
     char * run_period            = (char *)"empty";
     int num_events{-1};
     int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
+    int weight{1};  // level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only
 
     // Configurations from main.h will be stored in here and passed to the selection
     std::vector<double> config;
@@ -42,6 +43,7 @@ int main(int argc, char *argv[]){
     "\033[0;34m[--dirt_out <dirt file output name>]\033[0m                   \033[0;32mThe output dirt overlay root file name (will put in the ./files/ folder)\033[0m\n\n"
     "\033[0;34m[--var <variation file>]\033[0m                               \033[0;31mNot yet supported\033[0m\n\n"
     "\033[0;33m[-n <num events>]\033[0m                                      \033[0;32mThe number of events to run over. This is good for checking if the code doesn't segfault. All the POT scalings will not work.\033[0m\n\n"
+    "\033[0;33m[--weight <weight setting>]\033[0m                            \033[0;32mChange the Weight level. level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only \033[0m\n\n"
     "\033[0;33m[--slim]\033[0m                                               \033[0;32mWhen this extension is added, the histogram helper class is not initalised and no histograms will be filled or saved. This is to speed up the selection code if you just want to run the selection.\033[0m\n\n"
     "\033[0;33m[--verbose <verbose level>]\033[0m                            \033[0;32m0 does not print the selection cut results, 1 (default) currently prints everything\033[0m\n\n"
     "\n\nTo make the histograms after running selection, run: \n\n "
@@ -123,6 +125,12 @@ int main(int argc, char *argv[]){
             std::string variation_type = variation_file_name;
         }
 
+        // Variation file
+        if (strcmp(arg, "--weight") == 0){
+            std::cout << "Running with weight configuration setting of: " << argv[i+1] << std::endl;
+            weight = atoi(argv[i+1]);
+        }
+
         // Whats the verbose?
         if (strcmp(arg, "-v") == 0 || strcmp(arg, "--verbose") == 0){
             std::cout << "Setting Verbose Level to : " << argv[i+1] << std::endl;
@@ -170,7 +178,7 @@ int main(int argc, char *argv[]){
     // -------------------------------------------------------------------------
 
     // Initialise the selction script
-    if (run_selection) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, mc_file_name_out, ext_file_name_out, data_file_name_out, dirt_file_name_out, variation_file_name, config, using_slim_version, num_events, run_period, verbose );
+    if (run_selection) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, mc_file_name_out, ext_file_name_out, data_file_name_out, dirt_file_name_out, variation_file_name, config, using_slim_version, num_events, run_period, verbose, weight );
     
     // Run the make histogram function
     if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, config);
