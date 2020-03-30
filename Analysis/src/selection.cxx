@@ -508,7 +508,7 @@ void selection::SavetoFile(){
     }
     if (bool_use_data) {
         _hhelper.at(_util.k_data).WriteReco(_util.k_data);
-       _hhelper.at(_util.k_data).WriteFlash();
+        _hhelper.at(_util.k_data).WriteFlash();
     }
     if (bool_use_ext) {
         _hhelper.at(_util.k_ext).WriteReco(_util.k_ext);
@@ -524,11 +524,12 @@ void selection::SavetoFile(){
 // -----------------------------------------------------------------------------
 void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, int cut_index, std::vector<std::vector<double>> &counter_v){
 
-    // Set counters for the cut
-    _util.Tabulate(interaction, classification.first, type, counter_v.at(cut_index) );
+    // Fill Histograms -- also returns the cv weight for tabulating 
+    double weight = 1.0;
+    if (!slim) _hhelper.at(type).FillHists(type, classification.second, cut_index, SC, weight);
 
-    // Fill Histograms
-    if (!slim) _hhelper.at(type).FillHists(type, classification.second, cut_index, SC);
+    // Set counters for the cut
+    _util.Tabulate(interaction, classification.first, type, counter_v.at(cut_index), weight );
 
     // Fill Plots for Efficiency
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC);

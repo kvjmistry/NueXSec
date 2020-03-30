@@ -63,10 +63,12 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
     std::string command = a + b + c + d + e ;
     system(command.c_str()); 
 
+    // Flash time plots
     MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time.pdf", run_period), "h_flash_time");
     MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time_sid1.pdf", run_period), "h_flash_time_sid1"); // Slice ID 1
     MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time_sid0.pdf", run_period), "h_flash_time_sid0"); // Slice ID 0
 
+    // Flash PE plots
     MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_pe.pdf", run_period), "h_flash_pe");
     MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_pe_sid1.pdf", run_period), "h_flash_pe_sid1"); // Slice ID 1
     MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_pe_sid0.pdf", run_period), "h_flash_pe_sid0"); // Slice ID 0

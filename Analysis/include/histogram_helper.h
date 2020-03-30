@@ -36,7 +36,7 @@ class histogram_helper{
     void MakeDirectory();
     // -------------------------------------------------------------------------
     // Function to fill the reco variables
-    void FillHists(int type, int classification_index, int cut_index, SliceContainer SC);
+    void FillHists(int type, int classification_index, int cut_index, SliceContainer SC, double &_weight);
     // -------------------------------------------------------------------------
     // Function to write the histograms to a file
     void WriteReco(int type);

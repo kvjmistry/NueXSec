@@ -311,10 +311,11 @@ void histogram_helper::InitHistograms(){
 
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::FillHists(int type, int classification_index, int cut_index, SliceContainer SC){
+void histogram_helper::FillHists(int type, int classification_index, int cut_index, SliceContainer SC, double &_weight){
 
     // Get the CV weight
     double weight = GetCVWeight(type, SC);
+    _weight = weight;
 
     // Calculate some variables
     double reco_shr_p = std::sqrt(SC.shr_px*SC.shr_px + SC.shr_py*SC.shr_py + SC.shr_pz*SC.shr_pz);

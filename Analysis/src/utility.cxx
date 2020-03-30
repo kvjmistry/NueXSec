@@ -81,7 +81,7 @@ bool utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     }
 }
 // -----------------------------------------------------------------------------
-void utility::Tabulate(std::string interaction, std::string classification, int type, std::vector<double> &counter_v) {
+void utility::Tabulate(std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight) {
 
     if (type == k_mc){
         
@@ -133,38 +133,38 @@ void utility::Tabulate(std::string interaction, std::string classification, int 
         int only_nue_cc     = 0;
         int only_nue_bar_cc = 0;
 
-        if (interaction == "nue_cc_qe")  nue_cc_qe++; 
-        if (interaction == "nue_cc_res") nue_cc_res++;
-        if (interaction == "nue_cc_coh") nue_cc_coh++;
-        if (interaction == "nue_cc_dis") nue_cc_dis++;
-        if (interaction == "nue_cc_mec") nue_cc_mec++;
+        if (interaction == "nue_cc_qe")  nue_cc_qe  += weight; 
+        if (interaction == "nue_cc_res") nue_cc_res += weight;
+        if (interaction == "nue_cc_coh") nue_cc_coh += weight;
+        if (interaction == "nue_cc_dis") nue_cc_dis += weight;
+        if (interaction == "nue_cc_mec") nue_cc_mec += weight;
 
-        if (interaction == "nue_bar_cc_qe")  nue_bar_cc_qe++; 
-        if (interaction == "nue_bar_cc_res") nue_bar_cc_res++;
-        if (interaction == "nue_bar_cc_coh") nue_bar_cc_coh++;
-        if (interaction == "nue_bar_cc_dis") nue_bar_cc_dis++;
-        if (interaction == "nue_bar_cc_mec") nue_bar_cc_mec++;
+        if (interaction == "nue_bar_cc_qe")  nue_bar_cc_qe  += weight; 
+        if (interaction == "nue_bar_cc_res") nue_bar_cc_res += weight;
+        if (interaction == "nue_bar_cc_coh") nue_bar_cc_coh += weight;
+        if (interaction == "nue_bar_cc_dis") nue_bar_cc_dis += weight;
+        if (interaction == "nue_bar_cc_mec") nue_bar_cc_mec += weight;
 
-        if (interaction == "numu_cc_qe"  || interaction == "numu_bar_cc_qe")  numu_cc_qe++;
-        if (interaction == "numu_cc_res" || interaction == "numu_bar_cc_res") numu_cc_res++;
-        if (interaction == "numu_cc_coh" || interaction == "numu_bar_cc_coh") numu_cc_coh++;
-        if (interaction == "numu_cc_dis" || interaction == "numu_bar_cc_dis") numu_cc_dis++;
-        if (interaction == "numu_cc_mec" || interaction == "numu_bar_cc_mec") numu_cc_mec++;
+        if (interaction == "numu_cc_qe"  || interaction == "numu_bar_cc_qe")  numu_cc_qe  += weight;
+        if (interaction == "numu_cc_res" || interaction == "numu_bar_cc_res") numu_cc_res += weight;
+        if (interaction == "numu_cc_coh" || interaction == "numu_bar_cc_coh") numu_cc_coh += weight;
+        if (interaction == "numu_cc_dis" || interaction == "numu_bar_cc_dis") numu_cc_dis += weight;
+        if (interaction == "numu_cc_mec" || interaction == "numu_bar_cc_mec") numu_cc_mec += weight;
         
         // Check if string contains "NC"
         if (interaction.find("nc") != std::string::npos) {
-            tot_nue_numu_nc++;
+            tot_nue_numu_nc += weight;
         }
 
-        if (classification == "nue_cc")       nue_cc++;
-        if (classification == "nue_cc_mixed") nue_cc_mixed++;
-        if (classification == "nu_out_fv")    nu_out_fv++;
-        if (classification == "nc")           nc++;
-        if (classification == "nc_pi0")       nc_pi0++;
-        if (classification == "numu_cc")      numu_cc++;
-        if (classification == "numu_cc_pi0")  numu_cc_pi0++;
-        if (classification == "cosmic")       cosmic++;
-        if (classification == "unmatched")    unmatched++;
+        if (classification == "nue_cc")       nue_cc       += weight;
+        if (classification == "nue_cc_mixed") nue_cc_mixed += weight;
+        if (classification == "nu_out_fv")    nu_out_fv    += weight;
+        if (classification == "nc")           nc           += weight;
+        if (classification == "nc_pi0")       nc_pi0       += weight;
+        if (classification == "numu_cc")      numu_cc      += weight;
+        if (classification == "numu_cc_pi0")  numu_cc_pi0  += weight;
+        if (classification == "cosmic")       cosmic       += weight;
+        if (classification == "unmatched")    unmatched    += weight;
 
         only_nue_cc     = nue_cc_qe     + nue_cc_res     + nue_cc_dis     + nue_cc_coh     + nue_cc_mec;
         only_nue_bar_cc = nue_bar_cc_qe + nue_bar_cc_res + nue_bar_cc_dis + nue_bar_cc_coh + nue_bar_cc_mec;
@@ -185,16 +185,16 @@ void utility::Tabulate(std::string interaction, std::string classification, int 
         total = nue_cc + nue_cc_mixed + nu_out_fv + cosmic + numu_cc + numu_cc_pi0 + nc + nc_pi0 + unmatched;
         
         // Now add counters to the vector
-        counter_v.at(k_count_total_nue_cc_qe)  += total_nue_cc_qe;
+        counter_v.at(k_count_total_nue_cc_qe)  += total_nue_cc_qe ;
         counter_v.at(k_count_total_nue_cc_res) += total_nue_cc_res;
         counter_v.at(k_count_total_nue_cc_dis) += total_nue_cc_dis;
         counter_v.at(k_count_total_nue_cc_coh) += total_nue_cc_coh;
         counter_v.at(k_count_total_nue_cc_mec) += total_nue_cc_mec;
 
-        counter_v.at(k_count_only_nue_cc)      += only_nue_cc;
+        counter_v.at(k_count_only_nue_cc)      += only_nue_cc    ;
         counter_v.at(k_count_only_nue_bar_cc)  += only_nue_bar_cc;
 
-        counter_v.at(k_count_numu_cc_qe)       += numu_cc_qe;
+        counter_v.at(k_count_numu_cc_qe)       += numu_cc_qe ;
         counter_v.at(k_count_numu_cc_res)      += numu_cc_res;
         counter_v.at(k_count_numu_cc_dis)      += numu_cc_dis;
         counter_v.at(k_count_numu_cc_coh)      += numu_cc_coh;
@@ -202,15 +202,15 @@ void utility::Tabulate(std::string interaction, std::string classification, int 
 
         counter_v.at(k_count_tot_nue_numu_nc)  += tot_nue_numu_nc;
         
-        counter_v.at(k_count_nue_cc)           += nue_cc;      
+        counter_v.at(k_count_nue_cc)           += nue_cc      ;
         counter_v.at(k_count_nue_cc_mixed)     += nue_cc_mixed;
-        counter_v.at(k_count_nu_out_fv)        += nu_out_fv;
-        counter_v.at(k_count_cosmic)           += cosmic;
-        counter_v.at(k_count_numu_cc)          += numu_cc;
-        counter_v.at(k_count_numu_cc_pi0)      += numu_cc_pi0;
-        counter_v.at(k_count_nc)               += nc;
-        counter_v.at(k_count_nc_pi0)           += nc_pi0;
-        counter_v.at(k_count_unmatched)        += unmatched;
+        counter_v.at(k_count_nu_out_fv)        += nu_out_fv   ;
+        counter_v.at(k_count_cosmic)           += cosmic      ;
+        counter_v.at(k_count_numu_cc)          += numu_cc     ;
+        counter_v.at(k_count_numu_cc_pi0)      += numu_cc_pi0 ;
+        counter_v.at(k_count_nc)               += nc          ;
+        counter_v.at(k_count_nc_pi0)           += nc_pi0      ;
+        counter_v.at(k_count_unmatched)        += unmatched   ;
         
         counter_v.at(k_count_total)            += total;
     
@@ -222,7 +222,7 @@ void utility::Tabulate(std::string interaction, std::string classification, int 
         counter_v.at(k_count_ext)  += 1;
     }
     else if (type == k_dirt){
-        counter_v.at(k_count_dirt) += 1;
+        counter_v.at(k_count_dirt) += weight;
     }
     else {
 
@@ -231,7 +231,7 @@ void utility::Tabulate(std::string interaction, std::string classification, int 
     
 }
 // -----------------------------------------------------------------------------
-void utility::PrintInfo(std::vector<double> counter_v, double intime_scale_factor, double mc_scale_factor, double dirt_scale_factor, std::string cut_name, int tot_true_infv_nues) {
+void utility::PrintInfo(std::vector<double> counter_v, double intime_scale_factor, double mc_scale_factor, double dirt_scale_factor, std::string cut_name, double tot_true_infv_nues) {
 
     double counter_nue_cc_qe      = counter_v.at(k_count_total_nue_cc_qe);
     double counter_nue_cc_res     = counter_v.at(k_count_total_nue_cc_res);
@@ -262,11 +262,12 @@ void utility::PrintInfo(std::vector<double> counter_v, double intime_scale_facto
     double counter_ext            = counter_v.at(k_count_ext);
     double counter_dirt           = counter_v.at(k_count_dirt);
 
-    counter = counter + (counter_ext * (intime_scale_factor / mc_scale_factor)) + (counter_dirt * (dirt_scale_factor / mc_scale_factor));
+    counter = counter + (counter_ext * (intime_scale_factor / mc_scale_factor)) + (counter_dirt * (dirt_scale_factor / mc_scale_factor)); // Add in the EXT and dirt counters with the scalings to MC POT
 
     std::cout << "\n------------------------------------------------" << std::endl;
     std::cout << "------------------------------------------------" << std::endl;
     std::cout << "\n\033[0;33m <" << cut_name << "> \033[0m" << std::endl;
+    std::cout << "                    Scaled to MC POT | Scaled to Data POT | Unscaled" << std::endl;
     std::cout << " Total Candidate Nue     : " << counter                << "\t " << double(counter                   * mc_scale_factor  ) << std::endl;
     std::cout << " Number of Nue CC        : " << counter_nue_cc         << "\t \t " << double(counter_nue_cc         * mc_scale_factor  ) << std::endl;
     std::cout << " Number of Nue CC Mixed  : " << counter_nue_cc_mixed   << "\t \t " << double(counter_nue_cc_mixed   * mc_scale_factor  ) << std::endl;
@@ -277,10 +278,13 @@ void utility::PrintInfo(std::vector<double> counter_v, double intime_scale_facto
     std::cout << " Number of NC            : " << counter_nc             << "\t \t " << double(counter_nc             * mc_scale_factor  ) << std::endl;
     std::cout << " Number of NC Pi0        : " << counter_nc_pi0         << "\t \t " << double(counter_nc_pi0         * mc_scale_factor  ) << std::endl;
     std::cout << " Number of Unmatched     : " << counter_unmatched      << "\t \t " << double(counter_unmatched      * mc_scale_factor  ) << std::endl;
+    
     std::cout << " Number of InTime Cosmics: " << double(counter_ext * (intime_scale_factor / mc_scale_factor))
-              << "\t " << double(counter_ext * intime_scale_factor) << "\t " << counter_ext << " (unscaled)" << std::endl;
+              << "\t " << double(counter_ext * intime_scale_factor) << "\t " << counter_ext << std::endl;
+    
     std::cout << " Number of Dirt          : " << double(counter_dirt * dirt_scale_factor / mc_scale_factor)
-              << "\t " << double (counter_dirt * dirt_scale_factor)<< std::endl;
+              << "\t "                         << double(counter_dirt * dirt_scale_factor) << "\t " << counter_dirt << std::endl;
+
     std::cout << "--------- Neutrinos Selected in Truth ----------" << std::endl;
     std::cout << " Nue CC QE               : " << counter_nue_cc_qe   << std::endl;
     std::cout << " Nue CC Res              : " << counter_nue_cc_res  << std::endl;
