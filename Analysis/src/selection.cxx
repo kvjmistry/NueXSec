@@ -213,7 +213,7 @@ void selection::MakeSelection(){
 
     // MC ----------------------------------------------------------------------
     if (bool_use_mc){
-        std::cout << "Starting Selection over MC" << std::endl;
+        std::cout << "\nStarting Selection over MC" << std::endl;
 
         // Event loop
         for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
@@ -235,8 +235,7 @@ void selection::MakeSelection(){
             if (!pass) continue;
 
         } // End Event loop
-
-        std::cout << std::endl;
+        
         std::cout << "Ending Selection over MC" << std::endl;
 
         // Get the total number of in cryostat nues
@@ -252,7 +251,7 @@ void selection::MakeSelection(){
     }
     // Data --------------------------------------------------------------------
     if (bool_use_data){
-        std::cout << "Starting Selection over Data" << std::endl;
+        std::cout << "\nStarting Selection over Data" << std::endl;
 
         for (int ievent = 0; ievent < data_tree_total_entries; ievent++){
 
@@ -301,12 +300,11 @@ void selection::MakeSelection(){
             run_subrun_file.close();
         }
         
-        std::cout << std::endl;
         std::cout << "Ending Selection over Data" << std::endl;
     }
     // EXT ---------------------------------------------------------------------
     if (bool_use_ext){
-        std::cout << "Starting Selection over EXT" << std::endl;
+        std::cout << "\nStarting Selection over EXT" << std::endl;
 
         for (int ievent = 0; ievent < ext_tree_total_entries; ievent++){
 
@@ -325,13 +323,12 @@ void selection::MakeSelection(){
             if (!pass) continue;
         }
          
-        std::cout << std::endl;
         std::cout << "Ending Selection over EXT" << std::endl;
 
     }
     // Dirt --------------------------------------------------------------------
     if (bool_use_dirt){
-        std::cout << "Starting Selection over Dirt" << std::endl;
+        std::cout << "\nStarting Selection over Dirt" << std::endl;
 
         for (int ievent = 0; ievent < dirt_tree_total_entries; ievent++){
 
@@ -350,7 +347,6 @@ void selection::MakeSelection(){
             if (!pass) continue;
         }
          
-        std::cout << std::endl;
         std::cout << "Ending Selection over Dirt" << std::endl;
 
     }

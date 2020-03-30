@@ -179,8 +179,8 @@ public:
     float trk_bragg_kaon;       // Track Bragg Likelihood Kaon
     float trk_bragg_pion;       // Track Bragg Likelihood Pion
     
-    int   trk_hits_max;         // Track:  Number of hits of the leading track
-    int   shr_hits_max;         // Shower: Number of hits of the leading shower
+    unsigned int   trk_hits_max;         // Track:  Number of hits of the leading track
+    unsigned int   shr_hits_max;         // Shower: Number of hits of the leading shower
     
     float trkshrhitdist0;       // distance between hits of shower and track in 2D on each palne based on hit-hit distances
     float trkshrhitdist1;      
@@ -202,15 +202,15 @@ public:
     float shrclusdir1; 
     float shrclusdir2;
     
-    int   shr_hits_tot;         // Shower: Total number of shower hits
-    int   shr_hits_y_tot;       // Shower: Total number of shower hits on the Y Plane 0
-    int   shr_hits_u_tot;       // Shower: Total number of shower hits on the U Plane 1 
-    int   shr_hits_v_tot;       // Shower: Total number of shower hits on the V Plane 2
+    unsigned int   shr_hits_tot;         // Shower: Total number of shower hits
+    unsigned int   shr_hits_y_tot;       // Shower: Total number of shower hits on the Y Plane 0
+    unsigned int   shr_hits_u_tot;       // Shower: Total number of shower hits on the U Plane 1 
+    unsigned int   shr_hits_v_tot;       // Shower: Total number of shower hits on the V Plane 2
     
-    int   trk_hits_tot;         // Track: Total number of track hits
-    int   trk_hits_y_tot;       // Track: Total number of track hits on the Y Plane 0
-    int   trk_hits_u_tot;       // Track: Total number of track hits on the U Plane 2
-    int   trk_hits_v_tot;       // Track: Total number of track hits on the V Plane 1
+    unsigned int   trk_hits_tot;         // Track: Total number of track hits
+    unsigned int   trk_hits_y_tot;       // Track: Total number of track hits on the Y Plane 0
+    unsigned int   trk_hits_u_tot;       // Track: Total number of track hits on the U Plane 2
+    unsigned int   trk_hits_v_tot;       // Track: Total number of track hits on the V Plane 1
     
     float elecclusters_U_charge;
     float elecclusters_V_charge;

@@ -209,10 +209,10 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_track_to_vtx_dist).at(i).at(j) = new TH1D ( Form("h_reco_track_to_vtx_dist_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 20);
 
             // Leading Shower hits in all planes
-            TH1D_hists.at(k_reco_leading_shower_hits_all_planes).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_hits_all_planes_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 600);
+            TH1D_hists.at(k_reco_leading_shower_hits_all_planes).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_hits_all_planes_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 2000);
 
             // Leading Shower hits in collection
-            TH1D_hists.at(k_reco_leading_shower_hits_collection_plane).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_hits_collection_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 250);
+            TH1D_hists.at(k_reco_leading_shower_hits_collection_plane).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_hits_collection_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 800);
 
             // Leading Shower opening angle
             TH1D_hists.at(k_reco_leading_shower_open_angle).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_open_angle_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 50);
@@ -266,10 +266,10 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_shower_energy_tot_cali).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_tot_cali_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 3);
             
             // Total number of hits for the leading shower
-            TH1D_hists.at(k_reco_shower_hits).at(i).at(j) = new TH1D (Form("h_reco_shower_hits_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 600);
+            TH1D_hists.at(k_reco_shower_hits).at(i).at(j) = new TH1D (Form("h_reco_shower_hits_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 800);
             
             // Total number of hits for the leading shower in the collection plane
-            TH1D_hists.at(k_reco_shower_hits_y_plane).at(i).at(j) = new TH1D (Form("h_reco_shower_hits_y_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 250);
+            TH1D_hists.at(k_reco_shower_hits_y_plane).at(i).at(j) = new TH1D (Form("h_reco_shower_hits_y_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 800);
 
 
         }
@@ -294,16 +294,16 @@ void histogram_helper::InitHistograms(){
         TH2D_true_hists.resize(k_TH2D_true_MAX);
 
         TH1D_true_hists.at(k_true_nue_theta) = new TH1D( Form("h_nue_true_theta_%s", _util.type_prefix.at(_type).c_str() ), ";True #nu_{e} Theta [degrees]; Entries",           14, 0, 180 );
-        TH1D_true_hists.at(k_true_nue_phi)   = new TH1D( Form("h_true_nue_phi_%s", _util.type_prefix.at(_type).c_str() ),   ";True #nu_{e} Phi [degrees]; Entries",             14, -180, 180 );
+        TH1D_true_hists.at(k_true_nue_phi)   = new TH1D( Form("h_true_nue_phi_%s",   _util.type_prefix.at(_type).c_str() ), ";True #nu_{e} Phi [degrees]; Entries",             14, -180, 180 );
         TH1D_true_hists.at(k_true_nue_angle) = new TH1D( Form("h_true_nue_angle_%s", _util.type_prefix.at(_type).c_str() ), ";True #nu_{e} Angle from NuMI [degrees]; Entries", 18, 0, 180 );
-        TH1D_true_hists.at(k_true_nue_px)    = new TH1D( Form("h_true_nue_px_%s", _util.type_prefix.at(_type).c_str() ),    ";True #nu_{e} Px [GeV/c]; Entries", 14, 0, 5);
-        TH1D_true_hists.at(k_true_nue_py)    = new TH1D( Form("h_true_nue_py_%s", _util.type_prefix.at(_type).c_str() ),    ";True #nu_{e} Px [GeV/c]; Entries", 14, 0, 5);
-        TH1D_true_hists.at(k_true_nue_pz)    = new TH1D( Form("h_true_nue_pz_%s", _util.type_prefix.at(_type).c_str() ),    ";True #nu_{e} Px [GeV/c]; Entries", 14, 0, 5);
-        TH1D_true_hists.at(k_true_nue_e)     = new TH1D( Form("h_true_nue_e_%s", _util.type_prefix.at(_type).c_str() ),     ";True #nu_{e} E [GeV]; Entries",    25, 0, 5);
-        TH1D_true_hists.at(k_true_nue_p)     = new TH1D( Form("h_true_nue_p_%s", _util.type_prefix.at(_type).c_str() ),     ";True #nu_{e} P [GeV/c]; Entries",  14, 0, 5);
-        TH1D_true_hists.at(k_true_vtx_x)     = new TH1D( Form("h_true_vtx_x_%s", _util.type_prefix.at(_type).c_str() ) ,    ";True #nu_{e} Vtx x [cm]; Entries", 20, -10, 270);
-        TH1D_true_hists.at(k_true_vtx_y)     = new TH1D( Form("h_true_vtx_y_%s", _util.type_prefix.at(_type).c_str() ) ,    ";True #nu_{e} Vtx y [cm]; Entries", 20, -10, 120);
-        TH1D_true_hists.at(k_true_vtx_z)     = new TH1D( Form("h_true_vtx_z_%s", _util.type_prefix.at(_type).c_str() ) ,    ";True #nu_{e} Vtx z [cm]; Entries", 40, -10, 1050);
+        TH1D_true_hists.at(k_true_nue_px)    = new TH1D( Form("h_true_nue_px_%s",    _util.type_prefix.at(_type).c_str() ), ";True #nu_{e} Px [GeV/c]; Entries", 14, 0, 5);
+        TH1D_true_hists.at(k_true_nue_py)    = new TH1D( Form("h_true_nue_py_%s",    _util.type_prefix.at(_type).c_str() ), ";True #nu_{e} Px [GeV/c]; Entries", 14, 0, 5);
+        TH1D_true_hists.at(k_true_nue_pz)    = new TH1D( Form("h_true_nue_pz_%s",    _util.type_prefix.at(_type).c_str() ), ";True #nu_{e} Px [GeV/c]; Entries", 14, 0, 5);
+        TH1D_true_hists.at(k_true_nue_e)     = new TH1D( Form("h_true_nue_e_%s",     _util.type_prefix.at(_type).c_str() ), ";True #nu_{e} E [GeV]; Entries",    25, 0, 5);
+        TH1D_true_hists.at(k_true_nue_p)     = new TH1D( Form("h_true_nue_p_%s",     _util.type_prefix.at(_type).c_str() ), ";True #nu_{e} P [GeV/c]; Entries",  14, 0, 5);
+        TH1D_true_hists.at(k_true_vtx_x)     = new TH1D( Form("h_true_vtx_x_%s",     _util.type_prefix.at(_type).c_str() ) ,";True #nu_{e} Vtx x [cm]; Entries", 20, -10, 270);
+        TH1D_true_hists.at(k_true_vtx_y)     = new TH1D( Form("h_true_vtx_y_%s",     _util.type_prefix.at(_type).c_str() ) ,";True #nu_{e} Vtx y [cm]; Entries", 20, -10, 120);
+        TH1D_true_hists.at(k_true_vtx_z)     = new TH1D( Form("h_true_vtx_z_%s",     _util.type_prefix.at(_type).c_str() ) ,";True #nu_{e} Vtx z [cm]; Entries", 40, -10, 1050);
         TH1D_true_hists.at(k_true_vtx_x_sce) = new TH1D( Form("h_true_vtx_x_sce_%s", _util.type_prefix.at(_type).c_str() ) ,";True #nu_{e} Vtx x Space Charge Corr. [cm]; Entries", 20, -10, 270);
         TH1D_true_hists.at(k_true_vtx_y_sce) = new TH1D( Form("h_true_vtx_y_sce_%s", _util.type_prefix.at(_type).c_str() ) ,";True #nu_{e} Vtx y Space Charge Corr. [cm]; Entries", 20, -10, 120);
         TH1D_true_hists.at(k_true_vtx_z_sce) = new TH1D( Form("h_true_vtx_z_sce_%s", _util.type_prefix.at(_type).c_str() ) ,";True #nu_{e} Vtx z Space Charge Corr. [cm]; Entries", 40, -10, 1050);
@@ -367,7 +367,7 @@ void histogram_helper::FillHists(int type, int classification_index, int cut_ind
 
     // TH1D_hists.at(k_reco_secondary_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill();
     
-    TH1D_hists.at(k_reco_leading_shower_open_angle).at(cut_index).at(classification_index)->Fill(SC.shr_openangle * 180/3.14159, weight);
+    TH1D_hists.at(k_reco_leading_shower_open_angle).at(cut_index).at(classification_index)->Fill(SC.shr_openangle, weight);
     
     // TH1D_hists.at(k_reco_leading_shower_hits_per_length).at(cut_index).at(classification_index)->Fill();
     
