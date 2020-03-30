@@ -41,7 +41,7 @@
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <inputdef>&indef;</inputdef>
     <maxfilesperjob>10</maxfilesperjob>
-    <numjobs>385</numjobs>
+    <numjobs>378</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <disk>25GB</disk>

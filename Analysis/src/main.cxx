@@ -37,16 +37,16 @@ int main(int argc, char *argv[]){
     "\033[0;34m[--data <data file>]\033[0m                                   \033[0;32mThe input on beam root file. Will also create a run subrun list in the ./files/ directory of selected data events.\033[0m\n\n"
     "\033[0;34m[--ext <ext file>]\033[0m                                     \033[0;32mThe input off beam root file\033[0m\n\n"
     "\033[0;34m[--dirt <dirt file>]\033[0m                                   \033[0;32mThe input dirt overlay root file\033[0m\n\n"
-    "\033[0;34m[--mc_out <mc file output name>]\033[0m                       \033[0;32mThe output overlay root file name (will put in the ./files/ folder)\033[0m\n\n"
-    "\033[0;34m[--data_out <data file output name>]\033[0m                   \033[0;32mThe output on beam root file name (will put in the ./files/ folder)\033[0m\n\n"
-    "\033[0;34m[--ext_out <ext file output name>]\033[0m                     \033[0;32mThe output off beam root file name (will put in the ./files/ folder\033[0m)\n\n"
-    "\033[0;34m[--dirt_out <dirt file output name>]\033[0m                   \033[0;32mThe output dirt overlay root file name (will put in the ./files/ folder)\033[0m\n\n"
-    "\033[0;34m[--var <variation file>]\033[0m                               \033[0;31mNot yet supported\033[0m\n\n"
+    "\033[0;33m[--mc_out <mc file output name>]\033[0m                       \033[0;32mThe output overlay root file name (will put in the ./files/ folder)\033[0m\n\n"
+    "\033[0;33m[--data_out <data file output name>]\033[0m                   \033[0;32mThe output on beam root file name (will put in the ./files/ folder)\033[0m\n\n"
+    "\033[0;33m[--ext_out <ext file output name>]\033[0m                     \033[0;32mThe output off beam root file name (will put in the ./files/ folder)\033[0m\n\n"
+    "\033[0;33m[--dirt_out <dirt file output name>]\033[0m                   \033[0;32mThe output dirt overlay root file name (will put in the ./files/ folder)\033[0m\n\n"
+    "\033[0;33m[--var <variation file>]\033[0m                               \033[0;31mNot yet supported\033[0m\n\n"
     "\033[0;33m[-n <num events>]\033[0m                                      \033[0;32mThe number of events to run over. This is good for checking if the code doesn't segfault. All the POT scalings will not work.\033[0m\n\n"
     "\033[0;33m[--weight <weight setting>]\033[0m                            \033[0;32mChange the Weight level. level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only \033[0m\n\n"
     "\033[0;33m[--slim]\033[0m                                               \033[0;32mWhen this extension is added, the histogram helper class is not initalised and no histograms will be filled or saved. This is to speed up the selection code if you just want to run the selection.\033[0m\n\n"
     "\033[0;33m[--verbose <verbose level>]\033[0m                            \033[0;32m0 does not print the selection cut results, 1 (default) currently prints everything\033[0m\n\n"
-    "\n\nTo make the histograms after running selection, run: \n\n "
+    "\n\nTo make the histograms after running selection, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --hist <input merged nuexsec file>\033[0m \n\n"
     "The <input merged nuexsec file> corresponds to hadd merged file of the mc, data, ext and dirt. See the bash script merge_run1_files.sh for more details\n\n";
 
@@ -181,7 +181,7 @@ int main(int argc, char *argv[]){
     if (run_selection) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, mc_file_name_out, ext_file_name_out, data_file_name_out, dirt_file_name_out, variation_file_name, config, using_slim_version, num_events, run_period, verbose, weight );
     
     // Run the make histogram function
-    if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, config);
+    if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, config, weight);
 
     // -------------------------------------------------------------------------
     // Finished!

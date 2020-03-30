@@ -7,7 +7,7 @@ histogram_plotter::~histogram_plotter(){
     // f_nuexsec->Close();
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config){
+void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config, int weight_cfg){
 
     std::cout << "Creating histograms and making plots" << std::endl;
     
@@ -33,7 +33,7 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
     "EXT Scale factor:  "   << intime_scale_factor << std::endl;
     std::cout << "-------------------------------\033[0m" << std::endl;
 
-    Initalise(hist_file_name, run_period, mc_scale_factor, intime_scale_factor, dirt_scale_factor);
+    Initalise(hist_file_name, run_period, mc_scale_factor, intime_scale_factor, dirt_scale_factor, weight_cfg);
 
     // Loop over the cuts and plot histograms by plot type
     for (unsigned int i = 0 ; i < _util.k_cuts_MAX; i++){
@@ -49,7 +49,7 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
         system(command.c_str()); 
 
         // Call the Make stack function for all the plots we want
-        CallMakeStack(run_period, i, Data_POT);
+        // CallMakeStack(run_period, i, Data_POT);
         
     }
 
@@ -73,10 +73,20 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
     MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_pe_sid1.pdf", run_period), "h_flash_pe_sid1"); // Slice ID 1
     MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_pe_sid0.pdf", run_period), "h_flash_pe_sid0"); // Slice ID 0
 
+    // On beam minus off beam plots
+    MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_time_OMO.pdf", run_period), "h_flash_time");
+    MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_time_OMO_sid1.pdf", run_period), "h_flash_time_sid1"); // Slice ID 1
+    MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_time_OMO_sid0.pdf", run_period), "h_flash_time_sid0"); // Slice ID 0
+
+    // Flash PE plots
+    MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_pe_OMO.pdf", run_period), "h_flash_pe");
+    MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_pe_OMO_sid1.pdf", run_period), "h_flash_pe_sid1"); // Slice ID 1
+    MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_pe_OMO_sid0.pdf", run_period), "h_flash_pe_sid0"); // Slice ID 0
+
 
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Initalise(const char * hist_file_name, const char *_run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor){ 
+void histogram_plotter::Initalise(const char * hist_file_name, const char *_run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor, int weight_cfg){ 
     
     std::cout << "Initalising Histogram Plotter..." << std::endl;
 
@@ -94,6 +104,27 @@ void histogram_plotter::Initalise(const char * hist_file_name, const char *_run_
     else {
         std::cout << "Can't find histogram file!! "<<  __PRETTY_FUNCTION__ << std::endl;
         exit(1);
+    }
+
+    // Set the weight settings
+    if (weight_cfg == 0){
+        weight_tune = false;
+        weight_ppfx = false;
+    }
+    else if (weight_cfg == 1){
+        weight_tune = true;
+        weight_ppfx = true;
+    }
+    else if (weight_cfg == 2){
+        weight_tune = true;
+        weight_ppfx = false;
+    }
+    else if (weight_cfg == 3){
+        weight_tune = false;
+        weight_ppfx = true;
+    }
+    else {
+        std::cout << "Unknown weight setting specified, using defaults" << std::endl;
     }
 }
 // -----------------------------------------------------------------------------
@@ -425,6 +456,8 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         Draw_Data_MC_Ratio(c, hist_integrals.at(_util.k_leg_data)/integral_mc_ext );
         Draw_Data_POT(c, Data_POT);
         if (area_norm) Draw_Area_Norm(c);
+        // Add the weight labels
+        Draw_WeightLabels(c);
     }
     
     c->Print(print_name);
@@ -551,6 +584,29 @@ void histogram_plotter::Draw_Data_POT(TCanvas* c, double pot){
     pt->SetFillStyle(0);
     pt->SetTextSize(0.03);
     pt->Draw();
+}
+// -----------------------------------------------------------------------------
+void histogram_plotter::Draw_WeightLabels(TCanvas* c){
+    c->cd();
+
+    TPaveText *pt, *pt2;
+
+    pt = new TPaveText(0.840, 0.44, 0.91, 0.44,"NDC");
+    pt->AddText(Form("#muB Genie Tune"));
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.03);
+    if (weight_tune) pt->Draw();
+
+    pt2 = new TPaveText(0.839, 0.40, 0.909, 0.40,"NDC");
+    pt2->AddText(Form("PPFX CV Corr."));
+    pt2->SetBorderSize(0);
+    pt2->SetFillColor(0);
+    pt2->SetFillStyle(0);
+    pt2->SetTextSize(0.03);
+    if (weight_ppfx) pt2->Draw();
+
 }
 // -----------------------------------------------------------------------------
 void histogram_plotter::Draw_Area_Norm(TCanvas* c){
@@ -910,6 +966,155 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name, s
     
     // Draw other data specifc quantities
     Draw_Data_POT(c, Data_POT);
+
+    // Add the weight labels
+    Draw_WeightLabels(c);
     
     c->Print(print_name);
+
+}
+// -----------------------------------------------------------------------------
+void histogram_plotter::MakeFlashPlotOMO(double Data_POT, const char* print_name, std::string histname){
+
+    std::vector<TH1D*>  hist(_util.k_type_MAX);
+    std::vector<double> hist_integrals(_util.k_type_MAX,0.0);        // The integrals of all the histograms
+    double integral_mc_ext = 0.0;
+    
+    TH1D * h_ratio;
+    TH1D * h_mc_ext_sum;
+
+    TPad * topPad;
+    TPad * bottomPad;
+    TCanvas * c       = new TCanvas();
+    THStack * h_stack = new THStack();
+
+    for (unsigned int k = 0; k < _util.type_prefix.size(); k++){
+        _util.GetHist(f_nuexsec, hist.at(k), Form("Flash/%s_%s", histname.c_str(),_util.type_prefix.at(k).c_str() ));
+        if (hist.at(k) == NULL){
+            std::cout << "Couldn't get all the flash histograms so exiting function..."<< std::endl;
+            return;
+        }
+    }
+
+    topPad    = new TPad("topPad", "", 0, 0.3, 1, 1.0);
+    bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
+    
+    SetTPadOptions(topPad, bottomPad );
+        
+    for (unsigned int i=0; i < hist.size(); i++){
+        
+        if (i == _util.k_data){
+            
+            hist.at(i)->SetStats(kFALSE);
+            hist.at(i)     ->SetMarkerStyle(20);
+            hist.at(i)     ->SetMarkerSize(0.5);
+        } 
+        
+        // Scale EXT
+        else if (i == _util.k_ext){
+            
+            hist.at(i)->SetStats(kFALSE);
+            // hist.at(i)->Scale(intime_scale_factor);
+
+        }
+
+        // Scale Dirt
+        else if (i == _util.k_dirt){
+
+            hist.at(i)->SetStats(kFALSE);
+            // hist.at(i)->Scale(dirt_scale_factor);
+            hist.at(i)     ->SetFillColor(2);
+            hist.at(i)     ->SetFillStyle(3354);
+            hist_integrals.at(i) = hist.at(i)->Integral();
+            integral_mc_ext += hist_integrals.at(_util.k_dirt);
+
+        }
+        
+        // Scale MC
+        else {
+            hist.at(i)->SetStats(kFALSE);
+            // hist.at(i)->Scale(mc_scale_factor);
+            hist.at(i)->SetFillColor(30);
+            hist_integrals.at(i) = hist.at(i)->Integral();
+            integral_mc_ext += hist_integrals.at(i);
+        }
+
+    }
+
+    // Subtract the off beam from the on beam
+    hist.at(_util.k_data)->Add(hist.at(_util.k_ext), -1);
+    hist_integrals.at(_util.k_data) = hist.at(_util.k_data)->Integral();
+
+    // Add the histograms to the stack
+    h_stack->Add(hist.at(_util.k_mc));
+    h_stack->Add(hist.at(_util.k_dirt)); 
+
+    
+    h_stack->Draw("hist");
+    hist.at(_util.k_data)->Draw("same PE");
+
+    // h_stack->GetYaxis()->SetTitle("Entries");
+
+    // MC error histogram ------------------------------------------------------
+    TH1D * h_error_hist = (TH1D*) hist.at(_util.k_mc)->Clone("h_error_hist");    
+    h_error_hist->Add(hist.at(_util.k_dirt), 1);
+    
+    
+    h_error_hist->SetFillColorAlpha(12, 0.15);
+    h_error_hist->Draw("e2 hist same");    
+
+    TLegend *leg_stack = new TLegend(0.8, 0.91, 0.95, 0.32);
+    leg_stack->SetBorderSize(0);
+    leg_stack->SetFillStyle(0);
+
+    leg_stack->AddEntry(hist.at(_util.k_data), "Data - EXT",   "lep");
+    leg_stack->AddEntry(hist.at(_util.k_dirt), "Dirt",   "f");
+    leg_stack->AddEntry(hist.at(_util.k_mc),   "Overlay","f");
+
+
+    leg_stack->Draw();
+
+    bottomPad->cd();
+
+    h_ratio      = (TH1D*) hist.at(_util.k_data)->Clone("h_ratio");
+    h_mc_ext_sum = (TH1D*) hist.at(_util.k_mc)  ->Clone("h_mc_ext_sum");
+    
+    // Add the dirt to overlay
+    h_mc_ext_sum->Add(hist.at(_util.k_dirt), 1);
+    
+
+    h_ratio->Add(h_mc_ext_sum, -1);
+    h_ratio->Divide(h_mc_ext_sum);
+
+    h_ratio->GetXaxis()->SetLabelSize(12);
+    h_ratio->GetXaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+    h_ratio->GetYaxis()->SetLabelSize(11);
+    h_ratio->GetYaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+    h_ratio->GetXaxis()->SetTitleOffset(3.0);
+    h_ratio->GetXaxis()->SetTitleSize(17);
+    h_ratio->GetXaxis()->SetTitleFont(46);
+    h_ratio->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
+
+    h_ratio->GetYaxis()->SetRangeUser(-0.5,0.5);
+    h_ratio->GetYaxis()->SetTitle("(Data - MC) / MC ");
+    h_ratio->GetYaxis()->SetTitleSize(13);
+    h_ratio->GetYaxis()->SetTitleFont(44);
+    h_ratio->GetYaxis()->SetTitleOffset(1.5);
+    h_ratio->SetTitle(" ");
+    h_ratio->Draw("E");
+
+    // Draw the run period on the plot
+    Draw_Run_Period(c);
+
+    // Draw Data to MC ratio
+    Draw_Data_MC_Ratio(c, double(hist_integrals.at(_util.k_data)*1.0/integral_mc_ext*1.0) );
+    
+    // Draw other data specifc quantities
+    Draw_Data_POT(c, Data_POT);
+
+    // Add the weight labels
+    Draw_WeightLabels(c);
+    
+    c->Print(print_name);
+
 }

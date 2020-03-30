@@ -22,13 +22,16 @@ class histogram_plotter{
 
     // Scale factors (veverything is scaled to data)
     double mc_scale_factor, intime_scale_factor, dirt_scale_factor;
+    
+    bool weight_tune = true; // Apply genie tune weight
+    bool weight_ppfx = true; // Apply ppfx cv weight
 
     // -------------------------------------------------------------------------
     // Main function call to control this class
-    void MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config);
+    void MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config, int weight_cfg);
     // -------------------------------------------------------------------------
     // Initalise the file input
-    void Initalise(const char *hist_file_name, const char* _run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor);
+    void Initalise(const char *hist_file_name, const char* _run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor, int weight_cfg);
     // -------------------------------------------------------------------------
     // Function to make a stacked histogram and save as a pdf
     void MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, double y_scale_factor, const char* x_axis_name,
@@ -50,6 +53,9 @@ class histogram_plotter{
     // Draw area norm text 
     void Draw_Area_Norm(TCanvas* c);
     // -------------------------------------------------------------------------
+    // Add the labels for weights
+    void Draw_WeightLabels(TCanvas* c);
+    // -------------------------------------------------------------------------
     // Set the TPad Options
     void SetTPadOptions(TPad * topPad, TPad * bottomPad );
     // -------------------------------------------------------------------------
@@ -58,6 +64,8 @@ class histogram_plotter{
     // -------------------------------------------------------------------------
     void MakeFlashPlot(double Data_POT, const char* print_name, std::string histname);
     // -------------------------------------------------------------------------
+    // Flash plot for on beam minus off beam
+    void MakeFlashPlotOMO(double Data_POT, const char* print_name, std::string histname);
     // -------------------------------------------------------------------------
     private:
 
