@@ -14,10 +14,9 @@ sure that there is nothing hardcoded in the code further down.
 */
 
 // POT and Trigger 
-//double _Run1_MC_POT    = 1.2e21;            // Run 1 MC POT v28
-// double _Run1_MC_POT    = 3.37458e+20;      // Run1 MC POT v33
+double _Run1_MC_POT    = 3.37458e+20;      // Run1 MC POT v33
 
-double _Run1_MC_POT    = 1.26178e+20;       // Run1 MC POT v33 --elena's sample
+// double _Run1_MC_POT    = 1.26178e+20;       // Run1 MC POT v33 --elena's sample
 double _Run1_Dirt_POT  = 6.43292e+20;       // Run 1 dirt POT
 
 

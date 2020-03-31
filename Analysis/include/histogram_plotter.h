@@ -68,8 +68,10 @@ class histogram_plotter{
     void MakeFlashPlotOMO(double Data_POT, const char* print_name, std::string histname);
     // -------------------------------------------------------------------------
     // Make efficiency plots
-    void MakeEfficiencyPlot(const char* print_name, std::string histname);
+    void MakeEfficiencyPlot(const char* print_name);
     // -------------------------------------------------------------------------
+    // The efficiency made by each cut
+    void MakeEfficiencyPlotByCut(const char* print_name, const char *run_period);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

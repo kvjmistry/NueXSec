@@ -94,7 +94,9 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
     system(command.c_str()); 
 
 
-    MakeEfficiencyPlot(" ", "  ");
+    MakeEfficiencyPlot(Form("plots/run%s/Efficiency/Integrated_Efficiency_Purity.pdf", run_period));
+
+    MakeEfficiencyPlotByCut(Form("plots/run%s/Efficiency/TEff.pdf", run_period), run_period);
 
 
 }
@@ -1132,12 +1134,13 @@ void histogram_plotter::MakeFlashPlotOMO(double Data_POT, const char* print_name
 
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeEfficiencyPlot(const char* print_name, std::string histname){
+void histogram_plotter::MakeEfficiencyPlot(const char* print_name){
 
     TTree *mc_tree;
 
     TFile *f_mc;
 
+    // The uglyest hardcoded monstosity known to the universe. SORT this out KRISH...
     f_mc = TFile::Open("files/nuexsec_mc_run1.root");
 
     std::vector<double> *efficiency_v = nullptr; // efficiency vector
@@ -1170,8 +1173,8 @@ void histogram_plotter::MakeEfficiencyPlot(const char* print_name, std::string h
         h_pur->SetBinError(k+1, 0);
     }
     
-    leg_stack->AddEntry(h_eff, "Efficiency",   "lp");
-    leg_stack->AddEntry(h_pur, "Purity",   "lp");
+    leg_stack->AddEntry(h_eff, "Efficiency","lp");
+    leg_stack->AddEntry(h_pur, "Purity",    "lp");
 
     h_eff->GetYaxis()->SetRangeUser(0,1.1);
     h_eff->SetStats(kFALSE);
@@ -1199,12 +1202,75 @@ void histogram_plotter::MakeEfficiencyPlot(const char* print_name, std::string h
         line->Draw();
     }
 
+    // Draw the run period on the plot
+    Draw_Run_Period(c);
 
-    c->Print("plots/run1/Efficiency/Integrated_Efficiency_Purity.pdf");
+    c->Print(print_name);
 
 
 }
 // -----------------------------------------------------------------------------
+void histogram_plotter::MakeEfficiencyPlotByCut(const char* print_name,const char *run_period ){
+
+    std::vector<TH1D*>  hist(_util.k_cuts_MAX); // The vector of histograms from the file for the plot
+    std::vector<TEfficiency*> TEff_v(_util.k_cuts_MAX);
+
+    TH1D* h_clone;
+
+    TCanvas * c;
+
+    // Loop over the classifications and get the histograms
+    for (unsigned int i=0; i <_util.k_cuts_MAX; i++){
+
+        // MC
+        _util.GetHist(f_nuexsec, hist.at(i), Form("TEff/h_true_nu_E_%s", _util.cut_dirs.at(i).c_str()));
+        if (hist.at(i) == NULL) return;
+    }
+
+    
+    
+    for (int p = 1; p < _util.k_cuts_MAX; p++){
+
+        c = new TCanvas();
+
+        // TEff_v.at(p) = new TEfficiency(*hist.at(p), *hist.at(_util.k_unselected));
+        // TEff_v.at(p)->Draw("AP,same");
+        h_clone = (TH1D*)hist.at(p)->Clone("h_clone");
+        h_clone->Sumw2();
+        h_clone->Divide(hist.at(_util.k_unselected));
+
+        h_clone->SetStats(kFALSE);
+        h_clone->SetTitle(Form("%s;True #nu_{e} Energy [GeV]; Efficiency", _util.cut_dirs.at(p).c_str()));
+        h_clone->GetYaxis()->SetRangeUser(0,1);
+        h_clone->SetLineColor(kBlack);
+        h_clone->SetLineWidth(2);
+        h_clone->Draw("E same");
+
+        TH1D* h_true_nue = (TH1D*)hist.at(_util.k_unselected)->Clone("h_clone_true_nue");
+
+        Float_t rightmax = 1.1*h_true_nue->GetMaximum();
+        Float_t scale = gPad->GetUymax()/rightmax;
+        h_true_nue ->SetLineColor(kRed+2);
+        h_true_nue ->SetLineWidth(2);
+        h_true_nue->Scale(scale);
+        h_true_nue->Draw("hist,same");
+
+        TGaxis *axis = new TGaxis(gPad->GetUxmax()+3,gPad->GetUymin(),gPad->GetUxmax()+3, gPad->GetUymax(),0,rightmax,510,"+L");
+        axis->SetLineColor(kRed+2);
+        axis->SetLabelColor(kRed+2);
+        axis->SetTitle("True #nu_{e} Events in FV");
+        axis->Draw();
+
+
+        c->Print(Form("plots/run%s/Efficiency/TEff_%s.pdf", run_period, _util.cut_dirs.at(p).c_str() ));
+
+    }
+    
+   
+
+
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

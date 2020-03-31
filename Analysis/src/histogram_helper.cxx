@@ -285,7 +285,7 @@ void histogram_helper::InitHistograms(){
             TEfficiency_hists.resize(_util.k_cuts_MAX);
 
             for (unsigned int l = 0; l < _util.k_cuts_MAX; l++ ){
-                TEfficiency_hists.at(l) = new TH1D( Form("h_true_nu_E_%s",_util.cut_dirs.at(l).c_str() ), "", 40, 0, 4 );
+                TEfficiency_hists.at(l) = new TH1D( Form("h_true_nu_E_%s",_util.cut_dirs.at(l).c_str() ), "", 10, 0, 4 );
             }
         }
 
