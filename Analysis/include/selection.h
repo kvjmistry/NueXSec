@@ -61,6 +61,8 @@ namespace xsecSelection {
             TTree * ext_tree;     // EXT  Tree
             TTree * dirt_tree;    // Dirt Tree
 
+            TTree * mc_tree_out; // TTree to write to the file for plotting
+
             // Class Instances
             utility _util;
             selection_cuts    _scuts;
@@ -83,8 +85,12 @@ namespace xsecSelection {
             std::vector<Passed_Container> ext_passed_v;  // EXT Passed Container
             std::vector<Passed_Container> dirt_passed_v; // Dirt Passed Container
             
-            // Counter Containers
+            // Counter Container
             std::vector<std::vector<double>> counter_v;
+            
+            // Containers for the effiency and purity
+            std::vector<double> efficiency_v;
+            std::vector<double> purity_v;
 
             // Counter variables
             int mc_tree_total_entries{0};    // MC

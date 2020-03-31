@@ -17,6 +17,7 @@ int main(int argc, char *argv[]){
     char * ext_file_name_out     = (char *)"empty";
     char * data_file_name_out    = (char *)"empty";
     char * dirt_file_name_out    = (char *)"empty";
+    char * variation             = (char *)"empty";
     char * variation_file_name   = (char *)"empty";
     char * hist_file_name        = (char *)"empty";
     char * run_period            = (char *)"empty";
@@ -120,9 +121,9 @@ int main(int argc, char *argv[]){
 
         // Variation file
         if (strcmp(arg, "--var") == 0){
-            std::cout << "Running with Systematic Variation file: " << argv[i+1] << std::endl;
-            variation_file_name = argv[i+1];
-            std::string variation_type = variation_file_name;
+            std::cout << "Using Variation: " << argv[i+1] << std::endl;
+            variation = argv[i+1];
+            variation_file_name = argv[i+2];
         }
 
         // Variation file
@@ -178,7 +179,10 @@ int main(int argc, char *argv[]){
     // -------------------------------------------------------------------------
 
     // Initialise the selction script
-    if (run_selection) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name, mc_file_name_out, ext_file_name_out, data_file_name_out, dirt_file_name_out, variation_file_name, config, using_slim_version, num_events, run_period, verbose, weight );
+    if (run_selection) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name,
+                                                                                mc_file_name_out, ext_file_name_out, data_file_name_out, dirt_file_name_out,
+                                                                                variation_file_name, config, using_slim_version, num_events, run_period,
+                                                                                verbose, weight );
     
     // Run the make histogram function
     if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, config, weight);

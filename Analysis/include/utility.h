@@ -67,7 +67,7 @@ public:
     void Tabulate(std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight);
     // -------------------------------------------------------------------------
     // Function to print the tabulated events
-    void PrintInfo(std::vector<double> counter_v, double intime_scale_factor, double mc_scale_factor, double dirt_scale_factor, std::string cut_name, double tot_true_infv_nues);
+    void PrintInfo(std::vector<double> counter_v, double intime_scale_factor, double mc_scale_factor, double dirt_scale_factor, std::string cut_name, double tot_true_infv_nues, double &efficiency, double &purity);
     // -------------------------------------------------------------------------
     // Function calculate theta
     double GetTheta(double px, double py, double pz);

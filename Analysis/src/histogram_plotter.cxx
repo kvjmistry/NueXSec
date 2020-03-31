@@ -49,7 +49,7 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
         system(command.c_str()); 
 
         // Call the Make stack function for all the plots we want
-        CallMakeStack(run_period, i, Data_POT);
+        // CallMakeStack(run_period, i, Data_POT);
         
     }
 
@@ -74,6 +74,8 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
     MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_pe_sid0.pdf", run_period), "h_flash_pe_sid0"); // Slice ID 0
 
     // On beam minus off beam plots
+
+    // Flash time
     MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_time_OMO.pdf", run_period), "h_flash_time");
     MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_time_OMO_sid1.pdf", run_period), "h_flash_time_sid1"); // Slice ID 1
     MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_time_OMO_sid0.pdf", run_period), "h_flash_time_sid0"); // Slice ID 0
@@ -82,6 +84,17 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
     MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_pe_OMO.pdf", run_period), "h_flash_pe");
     MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_pe_OMO_sid1.pdf", run_period), "h_flash_pe_sid1"); // Slice ID 1
     MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_pe_OMO_sid0.pdf", run_period), "h_flash_pe_sid0"); // Slice ID 0
+
+    a = "if [ ! -d \"plots/";
+    b = "run" + std::string(run_period) + "/" + "Efficiency";
+    c = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
+    d = "run" + std::string(run_period) + "/" + "Efficiency";
+    e = "; fi";
+    command = a + b + c + d + e ;
+    system(command.c_str()); 
+
+
+    MakeEfficiencyPlot(" ", "  ");
 
 
 }
@@ -126,6 +139,182 @@ void histogram_plotter::Initalise(const char * hist_file_name, const char *_run_
     else {
         std::cout << "Unknown weight setting specified, using defaults" << std::endl;
     }
+}
+// -----------------------------------------------------------------------------
+std::vector<double> histogram_plotter::Chi2Calc(TH1D * h_mc_ext, TH1D * h_data, const bool area_norm, const double return_norm){
+    const int n_bins = h_mc_ext->GetNbinsX();
+
+    const double f_1 = h_mc_ext->Integral();
+    const double f_2 = h_data  ->Integral();
+
+    //area normalised?
+    TH1D * h_mc_ext_clone = (TH1D*)h_mc_ext->Clone("h_mc_ext_clone");
+    TH1D * h_data_clone   = (TH1D*)h_data  ->Clone("h_data_clone");
+    
+    if(!area_norm) {h_mc_ext_clone->Scale(f_2/f_1); }
+    
+    if(area_norm) {
+        //this keeps them area normalised,
+        //but at the original values, not 0->1
+        //which messes with the chi2 and p calc
+        h_mc_ext_clone->Scale(return_norm);
+        h_data_clone  ->Scale(return_norm);
+
+        const double f_1_adj = h_mc_ext->Integral();
+        const double f_2_adj = h_data->Integral();
+        h_mc_ext_clone->Scale(f_2_adj/f_1_adj);
+
+    }
+    
+    //h_data_clone->Scale(1./f_2);
+
+    std::vector <double> chi2;
+    double chi2_val     = 0;
+    double n_mc_ext_val = 0;
+    double n_data_val   = 0;
+    
+    // Loop over each bin
+    for ( int i = 1; i < n_bins; i++) {
+        const double n_mc_ext = h_mc_ext_clone->GetBinContent(i);
+        const double n_data   = h_data_clone  ->GetBinContent(i);
+
+        //don't calculate chi2 for bins where no comparison possible
+        if(n_data == 0 || n_mc_ext == 0) { continue; }
+
+        //chi2_val += (pow((n_mc_ext - n_data),2) / n_mc_ext);
+        //chi2_val += (pow((n_data - n_mc_ext),2)) / (((n_data * f_2) / pow(f_2, 2)) + ((n_mc_ext * f_1) / pow(f_1, 2)));
+        chi2_val += 2 * (n_mc_ext - n_data + (n_data * TMath::Log(n_data/n_mc_ext)));
+
+        n_mc_ext_val += n_mc_ext;
+        n_data_val   += n_data;
+    }
+    
+    const double reduced_chi2 = chi2_val / (n_bins - 1);
+    const double p = TMath::Prob(chi2_val, n_bins);
+
+    chi2.push_back(reduced_chi2);
+    //correct this value back to the un-normalised
+    //chi2.push_back(n_mc_ext_val * f_1);
+    //chi2.push_back(n_data_val * f_2);
+    chi2.push_back(n_mc_ext_val * (f_1 / f_2));
+    chi2.push_back(n_data_val);
+    chi2.push_back(n_bins - 1);
+    chi2.push_back(p);
+    return chi2;
+}
+// -----------------------------------------------------------------------------
+void histogram_plotter::Draw_Run_Period(TCanvas* c){
+    c->cd();
+
+    TPaveText *pt;
+
+    if (run_period == "1"){
+        pt = new TPaveText(0.66, 0.89, 0.86, 0.96,"NDC");
+        pt->AddText("Run1");
+        pt->SetTextColor(kRed+2);
+    }
+    else if (run_period == "3b"){
+        pt = new TPaveText(0.66, 0.89, 0.86, 0.96,"NDC");
+        pt->AddText("Run3b");
+        pt->SetTextColor(kBlue+2);
+    }
+    else {
+        pt = new TPaveText(0.66, 0.89, 0.86, 0.96,"NDC");
+        pt->AddText("RunXXX");
+        pt->SetTextColor(kGreen+2);
+    }
+    
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.04);
+    pt->Draw();
+}
+// -----------------------------------------------------------------------------
+void histogram_plotter::Draw_Data_MC_Ratio(TCanvas* c, double ratio){
+    c->cd();
+
+    TPaveText *pt;
+
+    pt = new TPaveText(0.16, 0.88, 0.3, 0.95,"NDC");
+    pt->AddText(Form("Data/MC Ratio: %2.2f", ratio));
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.03);
+    pt->Draw();
+}
+// -----------------------------------------------------------------------------
+void histogram_plotter::Draw_Data_POT(TCanvas* c, double pot){
+    c->cd();
+
+    TPaveText *pt;
+
+    // Change scale of POT
+    double POT = pot/1.0e20;
+
+    pt = new TPaveText(0.849, 0.485, 0.919, 0.485,"NDC");
+    pt->AddText(Form("Data POT: %2.1fe20", POT));
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.03);
+    pt->Draw();
+}
+// -----------------------------------------------------------------------------
+void histogram_plotter::Draw_WeightLabels(TCanvas* c){
+    c->cd();
+
+    TPaveText *pt, *pt2;
+
+    pt = new TPaveText(0.840, 0.44, 0.91, 0.44,"NDC");
+    pt->AddText(Form("#muB Genie Tune"));
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.03);
+    if (weight_tune) pt->Draw();
+
+    pt2 = new TPaveText(0.839, 0.40, 0.909, 0.40,"NDC");
+    pt2->AddText(Form("PPFX CV Corr."));
+    pt2->SetBorderSize(0);
+    pt2->SetFillColor(0);
+    pt2->SetFillStyle(0);
+    pt2->SetTextSize(0.03);
+    if (weight_ppfx) pt2->Draw();
+
+}
+// -----------------------------------------------------------------------------
+void histogram_plotter::Draw_Area_Norm(TCanvas* c){
+    c->cd();
+
+    TPaveText *pt;
+
+    pt = new TPaveText(0.4, 0.916, 0.4, 0.916,"NDC");
+    pt->AddText("Area Normalised");
+    pt->SetTextColor(kGreen+2);
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.03);
+    pt->Draw();
+}
+// -----------------------------------------------------------------------------
+void histogram_plotter::SetTPadOptions(TPad * topPad, TPad * bottomPad ){
+
+    topPad   ->SetBottomMargin(0.05);
+    topPad   ->SetTopMargin(0.15);
+    bottomPad->SetTopMargin(0.04);
+    bottomPad->SetBottomMargin(0.25);
+    bottomPad->SetGridy();
+    topPad->SetLeftMargin(0.15);
+    topPad->SetRightMargin(0.20 );
+    bottomPad->SetLeftMargin(0.15);
+    bottomPad->SetRightMargin(0.20 );
+    topPad   ->Draw();
+    bottomPad->Draw();
+    topPad   ->cd();
+
 }
 // -----------------------------------------------------------------------------
 void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, double y_scale_factor, const char* x_axis_name,
@@ -462,182 +651,6 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     
     c->Print(print_name);
 
-
-}
-// -----------------------------------------------------------------------------
-std::vector<double> histogram_plotter::Chi2Calc(TH1D * h_mc_ext, TH1D * h_data, const bool area_norm, const double return_norm){
-    const int n_bins = h_mc_ext->GetNbinsX();
-
-    const double f_1 = h_mc_ext->Integral();
-    const double f_2 = h_data  ->Integral();
-
-    //area normalised?
-    TH1D * h_mc_ext_clone = (TH1D*)h_mc_ext->Clone("h_mc_ext_clone");
-    TH1D * h_data_clone   = (TH1D*)h_data  ->Clone("h_data_clone");
-    
-    if(!area_norm) {h_mc_ext_clone->Scale(f_2/f_1); }
-    
-    if(area_norm) {
-        //this keeps them area normalised,
-        //but at the original values, not 0->1
-        //which messes with the chi2 and p calc
-        h_mc_ext_clone->Scale(return_norm);
-        h_data_clone  ->Scale(return_norm);
-
-        const double f_1_adj = h_mc_ext->Integral();
-        const double f_2_adj = h_data->Integral();
-        h_mc_ext_clone->Scale(f_2_adj/f_1_adj);
-
-    }
-    
-    //h_data_clone->Scale(1./f_2);
-
-    std::vector <double> chi2;
-    double chi2_val     = 0;
-    double n_mc_ext_val = 0;
-    double n_data_val   = 0;
-    
-    // Loop over each bin
-    for ( int i = 1; i < n_bins; i++) {
-        const double n_mc_ext = h_mc_ext_clone->GetBinContent(i);
-        const double n_data   = h_data_clone  ->GetBinContent(i);
-
-        //don't calculate chi2 for bins where no comparison possible
-        if(n_data == 0 || n_mc_ext == 0) { continue; }
-
-        //chi2_val += (pow((n_mc_ext - n_data),2) / n_mc_ext);
-        //chi2_val += (pow((n_data - n_mc_ext),2)) / (((n_data * f_2) / pow(f_2, 2)) + ((n_mc_ext * f_1) / pow(f_1, 2)));
-        chi2_val += 2 * (n_mc_ext - n_data + (n_data * TMath::Log(n_data/n_mc_ext)));
-
-        n_mc_ext_val += n_mc_ext;
-        n_data_val   += n_data;
-    }
-    
-    const double reduced_chi2 = chi2_val / (n_bins - 1);
-    const double p = TMath::Prob(chi2_val, n_bins);
-
-    chi2.push_back(reduced_chi2);
-    //correct this value back to the un-normalised
-    //chi2.push_back(n_mc_ext_val * f_1);
-    //chi2.push_back(n_data_val * f_2);
-    chi2.push_back(n_mc_ext_val * (f_1 / f_2));
-    chi2.push_back(n_data_val);
-    chi2.push_back(n_bins - 1);
-    chi2.push_back(p);
-    return chi2;
-}
-// -----------------------------------------------------------------------------
-void histogram_plotter::Draw_Run_Period(TCanvas* c){
-    c->cd();
-
-    TPaveText *pt;
-
-    if (run_period == "1"){
-        pt = new TPaveText(0.66, 0.89, 0.86, 0.96,"NDC");
-        pt->AddText("Run1");
-        pt->SetTextColor(kRed+2);
-    }
-    else if (run_period == "3b"){
-        pt = new TPaveText(0.66, 0.89, 0.86, 0.96,"NDC");
-        pt->AddText("Run3b");
-        pt->SetTextColor(kBlue+2);
-    }
-    else {
-        pt = new TPaveText(0.66, 0.89, 0.86, 0.96,"NDC");
-        pt->AddText("RunXXX");
-        pt->SetTextColor(kGreen+2);
-    }
-    
-    pt->SetBorderSize(0);
-    pt->SetFillColor(0);
-    pt->SetFillStyle(0);
-    pt->SetTextSize(0.04);
-    pt->Draw();
-}
-// -----------------------------------------------------------------------------
-void histogram_plotter::Draw_Data_MC_Ratio(TCanvas* c, double ratio){
-    c->cd();
-
-    TPaveText *pt;
-
-    pt = new TPaveText(0.16, 0.88, 0.3, 0.95,"NDC");
-    pt->AddText(Form("Data/MC Ratio: %2.2f", ratio));
-    pt->SetBorderSize(0);
-    pt->SetFillColor(0);
-    pt->SetFillStyle(0);
-    pt->SetTextSize(0.03);
-    pt->Draw();
-}
-// -----------------------------------------------------------------------------
-void histogram_plotter::Draw_Data_POT(TCanvas* c, double pot){
-    c->cd();
-
-    TPaveText *pt;
-
-    // Change scale of POT
-    double POT = pot/1.0e20;
-
-    pt = new TPaveText(0.849, 0.485, 0.919, 0.485,"NDC");
-    pt->AddText(Form("Data POT: %2.1fe20", POT));
-    pt->SetBorderSize(0);
-    pt->SetFillColor(0);
-    pt->SetFillStyle(0);
-    pt->SetTextSize(0.03);
-    pt->Draw();
-}
-// -----------------------------------------------------------------------------
-void histogram_plotter::Draw_WeightLabels(TCanvas* c){
-    c->cd();
-
-    TPaveText *pt, *pt2;
-
-    pt = new TPaveText(0.840, 0.44, 0.91, 0.44,"NDC");
-    pt->AddText(Form("#muB Genie Tune"));
-    pt->SetBorderSize(0);
-    pt->SetFillColor(0);
-    pt->SetFillStyle(0);
-    pt->SetTextSize(0.03);
-    if (weight_tune) pt->Draw();
-
-    pt2 = new TPaveText(0.839, 0.40, 0.909, 0.40,"NDC");
-    pt2->AddText(Form("PPFX CV Corr."));
-    pt2->SetBorderSize(0);
-    pt2->SetFillColor(0);
-    pt2->SetFillStyle(0);
-    pt2->SetTextSize(0.03);
-    if (weight_ppfx) pt2->Draw();
-
-}
-// -----------------------------------------------------------------------------
-void histogram_plotter::Draw_Area_Norm(TCanvas* c){
-    c->cd();
-
-    TPaveText *pt;
-
-    pt = new TPaveText(0.4, 0.916, 0.4, 0.916,"NDC");
-    pt->AddText("Area Normalised");
-    pt->SetTextColor(kGreen+2);
-    pt->SetBorderSize(0);
-    pt->SetFillColor(0);
-    pt->SetFillStyle(0);
-    pt->SetTextSize(0.03);
-    pt->Draw();
-}
-// -----------------------------------------------------------------------------
-void histogram_plotter::SetTPadOptions(TPad * topPad, TPad * bottomPad ){
-
-    topPad   ->SetBottomMargin(0.05);
-    topPad   ->SetTopMargin(0.15);
-    bottomPad->SetTopMargin(0.04);
-    bottomPad->SetBottomMargin(0.25);
-    bottomPad->SetGridy();
-    topPad->SetLeftMargin(0.15);
-    topPad->SetRightMargin(0.20 );
-    bottomPad->SetLeftMargin(0.15);
-    bottomPad->SetRightMargin(0.20 );
-    topPad   ->Draw();
-    bottomPad->Draw();
-    topPad   ->cd();
 
 }
 // -----------------------------------------------------------------------------
@@ -1118,3 +1131,86 @@ void histogram_plotter::MakeFlashPlotOMO(double Data_POT, const char* print_name
     c->Print(print_name);
 
 }
+// -----------------------------------------------------------------------------
+void histogram_plotter::MakeEfficiencyPlot(const char* print_name, std::string histname){
+
+    TTree *mc_tree;
+
+    TFile *f_mc;
+
+    f_mc = TFile::Open("files/nuexsec_mc_run1.root");
+
+    std::vector<double> *efficiency_v = nullptr; // efficiency vector
+    std::vector<double> *purity_v     = nullptr; // purity vector
+
+    _util.GetTree(f_mc, mc_tree, "mc_tree_out");
+    mc_tree->SetBranchAddress("efficiency_v", &efficiency_v);
+    mc_tree->SetBranchAddress("purity_v",     &purity_v);
+
+    mc_tree->GetEntry(0); 
+
+    TCanvas *c = new TCanvas();
+    TH1D* h_eff = new TH1D("h_efficiency", "", efficiency_v->size(), 0, efficiency_v->size());
+    TH1D* h_pur = new TH1D("h_purity", "", efficiency_v->size(), 0, efficiency_v->size());
+
+    // c->SetGrid();
+    c->SetGridy();
+
+    TLegend *leg_stack = new TLegend(0.8, 0.91, 0.90, 0.72);
+    leg_stack->SetBorderSize(0);
+    leg_stack->SetFillStyle(0);
+
+    
+    
+    
+    for (unsigned int k=0; k < efficiency_v->size();k++){
+        h_eff ->Fill(_util.cut_dirs.at(k).c_str(), efficiency_v->at(k));
+        h_pur ->Fill(_util.cut_dirs.at(k).c_str(), purity_v->at(k));
+        h_eff->SetBinError(k+1, 0);
+        h_pur->SetBinError(k+1, 0);
+    }
+    
+    leg_stack->AddEntry(h_eff, "Efficiency",   "lp");
+    leg_stack->AddEntry(h_pur, "Purity",   "lp");
+
+    h_eff->GetYaxis()->SetRangeUser(0,1.1);
+    h_eff->SetStats(kFALSE);
+    h_eff->SetMarkerStyle(20);
+    h_eff->SetMarkerSize(0.5);
+    h_eff->SetLineWidth(2);
+
+    h_eff->Draw("LP");
+
+    h_pur->SetLineColor(kRed+2);
+    h_pur->SetStats(kFALSE);
+    h_pur->SetMarkerStyle(20);
+    h_pur->SetMarkerSize(0.5);
+    h_pur->SetLineWidth(2);
+    h_pur->Draw("LP,same");
+
+    leg_stack->Draw();
+
+    // Draw vertical lines to help the eye
+    TLine *line;
+    for (unsigned int l=1; l < efficiency_v->size()+1; l++){
+        line  = new TLine( h_eff->GetBinCenter(l) ,   0 , h_eff->GetBinCenter(l)  ,  1.1);
+        line->SetLineColor(12);
+        line->SetLineStyle(kDotted);
+        line->Draw();
+    }
+
+
+    c->Print("plots/run1/Efficiency/Integrated_Efficiency_Purity.pdf");
+
+
+}
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

@@ -41,7 +41,7 @@ public:
     int   run;                   // Run
     int   sub;                   // Subrun
     int   evt;                   // Event
-   
+    
     // Shower Properties 
     float shr_energy_tot;        // Shower: the energy of the showers (in GeV)
     float shr_energy;            // Shower: Energy of the shower with the largest number of hits (in GeV)

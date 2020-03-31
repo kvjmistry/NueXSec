@@ -89,6 +89,10 @@ void selection::Initialise( const char * mc_file,
         counter_v.at(t).resize(_util.k_COUNTER_MAX, 0.0);
     }
 
+    // Resize the efficiency and purity vector
+    efficiency_v.resize(_util.k_cuts_MAX, 0.0);
+    purity_v.resize(_util.k_cuts_MAX, 0.0);
+
     // Get MC variables --------------------------------------------------------
     if (bool_use_mc){
         std::cout << "\nInitialising MC" << std::endl;
@@ -112,9 +116,12 @@ void selection::Initialise( const char * mc_file,
             mc_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
         }
 
-        std::cout << "-------------------------------" << std::endl;
+        // Create the TTree to write to the file -- only initalise for mc
+        mc_tree_out = new TTree("mc_tree_out","mc_tree_out");
+        mc_tree_out->Branch("efficiency_v", "std::vector<double>", &efficiency_v);
+        mc_tree_out->Branch("purity_v",     "std::vector<double>", &purity_v);
+
         std::cout << "Initialisation of MC Complete!" << std::endl;
-        std::cout << "\033[0;31m-------------------------------\033[0m" << std::endl;
     } // End getting MC variables
 
     // Initialise Data specific ------------------------------------------------
@@ -140,7 +147,6 @@ void selection::Initialise( const char * mc_file,
         }
 
         std::cout << "Initialisation of Data Complete!" << std::endl;
-        std::cout << "\033[0;31m-------------------------------\033[0m" << std::endl;
 
     } // End intialisation of Data variables
 
@@ -168,7 +174,6 @@ void selection::Initialise( const char * mc_file,
         }
 
         std::cout << "Initialisation of EXT Complete!" << std::endl;
-        std::cout << "\033[0;31m-------------------------------\033[0m" << std::endl;
 
     } // End intialisation of ext variables
 
@@ -196,7 +201,7 @@ void selection::Initialise( const char * mc_file,
         }
 
         std::cout << "Initialisation of Dirt Complete!" << std::endl;
-        std::cout << "\033[0;31m-------------------------------\033[0m" << std::endl;
+
 
     } // End intialisation of dirt variables    
     
@@ -207,7 +212,7 @@ void selection::Initialise( const char * mc_file,
 // -----------------------------------------------------------------------------
 // Main function for selection
 void selection::MakeSelection(){
-    std::cout << "Now Running the selection!"<< std::endl;
+    std::cout << "\n\033[0;32mNow Running the selection!\033[0m"<< std::endl;
     
     int counter = 0;
 
@@ -235,7 +240,7 @@ void selection::MakeSelection(){
             if (!pass) continue;
 
         } // End Event loop
-        
+
         std::cout << "Ending Selection over MC" << std::endl;
 
         // Get the total number of in cryostat nues
@@ -353,12 +358,17 @@ void selection::MakeSelection(){
     // -------------------------------------------------------------------------
     std::cout << "Finished running the selection!"<< std::endl;
 
-    // Print information from the selection -- need a loop for all cuts!
+    // Print information from the selection, loop over the cuts
     for (unsigned int p=0; p < counter_v.size();p++){
-        if (verbose == 1) _util.PrintInfo(counter_v.at(p), intime_scale_factor, mc_scale_factor, dirt_scale_factor, _util.cut_dirs.at(p), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc));
+        
+        if (verbose == 1) {
+            _util.PrintInfo(counter_v.at(p), intime_scale_factor, mc_scale_factor, dirt_scale_factor,
+                            _util.cut_dirs.at(p), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc),
+                             efficiency_v.at(p), purity_v.at(p));
+        }
+    
     }
     
-
     // Now save all the outputs to file
     if (!slim) SavetoFile();
 
@@ -499,10 +509,16 @@ void selection::SavetoFile(){
     // Now saving histograms to file
     std::cout << "Now Saving Histograms to file" << std::endl;
     if (bool_use_mc) {
+
+        // Fill the Output TTree
+        mc_tree_out->Fill();
+        mc_tree_out->Write("",TObject::kOverwrite);
+
         _hhelper.at(_util.k_mc).WriteTrue();
         _hhelper.at(_util.k_mc).WriteTEfficiency();
         _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
         _hhelper.at(_util.k_mc).WriteFlash();
+
     }
     if (bool_use_data) {
         _hhelper.at(_util.k_data).WriteReco(_util.k_data);
