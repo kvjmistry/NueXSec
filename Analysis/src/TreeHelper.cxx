@@ -21,7 +21,7 @@ void TreeHelper::Initialise(int type, const char* run_period, std::string file_o
         }
 
         // Create the TTree
-        tree     = new TTree("mc_tree", "mc_tree");
+        tree     = new TTree("mc_tree",    "mc_tree");
         eff_tree = new TTree("mc_eff_tree","mc_eff_tree");
     }
     else if (type == _util.k_data){
@@ -106,8 +106,45 @@ void TreeHelper::Initialise(int type, const char* run_period, std::string file_o
     tree->Branch("weight", &weight, "weight/D");
     tree->Branch("classifcation",   &classifcation);
 
+    if (type == _util.k_mc){
+        eff_tree->Branch("efficiency", &efficiency, "efficiency/D");
+        eff_tree->Branch("purity", &purity, "purity/D");
+    }
+
 }
 // -----------------------------------------------------------------------------
+void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _classification, bool _gen, double _weight){
+
+    f_nuexsec->cd();
+
+    run    = SC.run;
+    subrun = SC.sub;
+    event  = SC.evt;
+    gen    = _gen;
+    classifcation = _classification.first;
+    weight = _weight;
+
+    tree->Fill();
+
+}
 // -----------------------------------------------------------------------------
+void TreeHelper::FillEff(double _efficiency, double _purity){
+
+    efficiency = _efficiency;
+    purity     = _purity;
+
+    eff_tree->Fill();
+
+}
 // -----------------------------------------------------------------------------
+void TreeHelper::WriteTree(int type){
+
+    f_nuexsec->cd();
+
+    tree->Write("",TObject::kOverwrite);
+
+    // Write the efficiency tree only if its MC
+    if (type == _util.k_mc) eff_tree->Write("",TObject::kOverwrite);
+
+}
 // -----------------------------------------------------------------------------

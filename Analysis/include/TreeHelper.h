@@ -28,8 +28,14 @@ class TreeHelper{
     // Tree variables
     int run{0}, subrun{0}, event{0};
     std::string classifcation; // The classification of the event
-    bool gen{false};           // Is the event a true signal event in the FV? This is the efficiency denominator
+    
+    // Is the event a true signal event in the FV that was not selected?
+    // We still need these for the efficiency
+    bool gen{false};           
+    
     double weight{0.0};        // This is not going to be integer if we already weight the CV
+
+    double efficiency{0.0}, purity{0.0};
 
     TTree * tree;     // Main tree with the selected events
     TTree * eff_tree; // Efficiency and Purity tree
@@ -38,8 +44,14 @@ class TreeHelper{
     // Initialiser function
     void Initialise(int type, const char *run_period, std::string file_out, int weight_cfg );
     // -------------------------------------------------------------------------
+    // Function to fill the tree vars
+    void FillVars(SliceContainer &SC, std::pair<std::string, int> _classification, bool _gen, double _weight);
     // -------------------------------------------------------------------------
+    // Fills the Efficiency and Purity
+    void FillEff(double _efficiency, double _purity);
     // -------------------------------------------------------------------------
+    // Writes the tree to file
+    void WriteTree(int type);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

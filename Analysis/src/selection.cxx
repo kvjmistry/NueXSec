@@ -92,10 +92,6 @@ void selection::Initialise( const char * mc_file,
         counter_v.at(t).resize(_util.k_COUNTER_MAX, 0.0);
     }
 
-    // Resize the efficiency and purity vector
-    efficiency_v.resize(_util.k_cuts_MAX, 0.0);
-    purity_v.resize(_util.k_cuts_MAX, 0.0);
-
     // Get MC variables --------------------------------------------------------
     if (bool_use_mc){
         std::cout << "\nInitialising MC" << std::endl;
@@ -120,11 +116,6 @@ void selection::Initialise( const char * mc_file,
         for (unsigned int y = 0; y < mc_passed_v.size(); y++ ){
             mc_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
         }
-
-        // Create the TTree to write to the file -- only initalise for mc
-        eff_tree_out = new TTree("eff_tree_out","eff_tree_out");
-        eff_tree_out->Branch("efficiency_v", "std::vector<double>", &efficiency_v);
-        eff_tree_out->Branch("purity_v",     "std::vector<double>", &purity_v);
 
         std::cout << "Initialisation of MC Complete!" << std::endl;
     } // End getting MC variables
@@ -371,11 +362,15 @@ void selection::MakeSelection(){
 
     // Print information from the selection, loop over the cuts
     for (unsigned int p=0; p < counter_v.size();p++){
+
+        double efficiency{0.0}, purity{0.0};
         
         if (verbose == 1) {
             _util.PrintInfo(counter_v.at(p), intime_scale_factor, mc_scale_factor, dirt_scale_factor,
                             _util.cut_dirs.at(p), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc),
-                             efficiency_v.at(p), purity_v.at(p));
+                             efficiency, purity);
+            
+            _thelper.at(_util.k_mc).FillEff(efficiency, purity);
 
         }
     
@@ -522,28 +517,35 @@ void selection::SavetoFile(){
     std::cout << "Now Saving Histograms to file" << std::endl;
     if (bool_use_mc) {
 
-        // Fill the Output TTree
-        eff_tree_out->Fill();
-        eff_tree_out->Write("",TObject::kOverwrite);
-
         _hhelper.at(_util.k_mc).WriteTrue();
         _hhelper.at(_util.k_mc).WriteTEfficiency();
         _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
         _hhelper.at(_util.k_mc).WriteFlash();
 
+        _thelper.at(_util.k_mc).WriteTree(_util.k_mc);
+
     }
     if (bool_use_data) {
         _hhelper.at(_util.k_data).WriteReco(_util.k_data);
         _hhelper.at(_util.k_data).WriteFlash();
+
+        _thelper.at(_util.k_data).WriteTree(_util.k_data);
+
     }
     if (bool_use_ext) {
         _hhelper.at(_util.k_ext).WriteReco(_util.k_ext);
         _hhelper.at(_util.k_ext).WriteFlash();
+
+        _thelper.at(_util.k_ext).WriteTree(_util.k_ext);
+
     }
     if (bool_use_dirt) {
         // _hhelper.at(_util.k_dirt).WriteTrue(); // Only turn this on to inspect. It wont merge since the file names are not uniique yet!!
         _hhelper.at(_util.k_dirt).WriteReco(_util.k_dirt);
         _hhelper.at(_util.k_dirt).WriteFlash();
+
+        _thelper.at(_util.k_dirt).WriteTree(_util.k_dirt);
+
     }
 
 } // End save to file
@@ -559,6 +561,19 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
 
     // Fill Plots for Efficiency
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC, weight);
+
+    // For the last cut we fill the tree  or the first cut and nue_cc (generated and unselected)
+    if ( (cut_index == _util.k_cuts_MAX - 1) || (cut_index == _util.k_unselected && classification.second == _util.k_nue_cc) ){
+
+        // This is a generated event, but unselected
+        if (cut_index == _util.k_unselected && classification.second == _util.k_nue_cc){
+            _thelper.at(type).FillVars(SC, classification, true, weight);
+        }
+        else {
+            _thelper.at(type).FillVars(SC, classification, false, weight);
+        }
+
+    }
 
 }
 // -----------------------------------------------------------------------------

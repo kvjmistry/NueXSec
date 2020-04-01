@@ -94,7 +94,7 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
     system(command.c_str()); 
 
 
-    MakeEfficiencyPlot(Form("plots/run%s/Efficiency/Integrated_Efficiency_Purity.pdf", run_period));
+    MakeEfficiencyPlot(Form("plots/run%s/Efficiency/Integrated_Efficiency_Purity.pdf", run_period), run_period);
 
     MakeEfficiencyPlotByCut(Form("plots/run%s/Efficiency/TEff.pdf", run_period), run_period);
 
@@ -1134,30 +1134,36 @@ void histogram_plotter::MakeFlashPlotOMO(double Data_POT, const char* print_name
 
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeEfficiencyPlot(const char* print_name){
+void histogram_plotter::MakeEfficiencyPlot(const char* print_name, const char *run_period){
 
     TTree *mc_tree;
 
     TFile *f_mc;
 
     // The uglyest hardcoded monstosity known to the universe. SORT this out KRISH...
-    f_mc = TFile::Open("files/nuexsec_mc_run1.root");
+    f_mc = TFile::Open(Form("files/trees/nuexsec_selected_tree_mc_run%s.root",run_period));
 
-    std::vector<double> *efficiency_v = nullptr; // efficiency vector
-    std::vector<double> *purity_v     = nullptr; // purity vector
+    std::vector<double> efficiency_v; // efficiency vector
+    std::vector<double> purity_v    ; // purity vector
 
-    _util.GetTree(f_mc, mc_tree, "mc_tree_out");
-    mc_tree->SetBranchAddress("efficiency_v", &efficiency_v);
-    mc_tree->SetBranchAddress("purity_v",     &purity_v);
+    double efficiency, purity;
 
-    mc_tree->GetEntry(0); 
+    _util.GetTree(f_mc, mc_tree, "mc_eff_tree");
+    mc_tree->SetBranchAddress("efficiency", &efficiency);
+    mc_tree->SetBranchAddress("purity",     &purity);
 
-    for (unsigned int k=0; k < efficiency_v->size(); k++) std::cout << efficiency_v->at(k) << "  " << purity_v->at(k) << std::endl;
+    int num_entries = mc_tree->GetEntries();
 
-
+    // Fill the efficiency and purity vectors
+    for (int y=0; y < num_entries; y++){
+        mc_tree->GetEntry(y); 
+        efficiency_v.push_back(efficiency);
+        purity_v.push_back(purity);
+    }
+    
     TCanvas *c = new TCanvas();
-    TH1D* h_eff = new TH1D("h_efficiency", "", efficiency_v->size(), 0, efficiency_v->size());
-    TH1D* h_pur = new TH1D("h_purity", "", efficiency_v->size(), 0, efficiency_v->size());
+    TH1D* h_eff = new TH1D("h_efficiency", "", efficiency_v.size(), 0, efficiency_v.size());
+    TH1D* h_pur = new TH1D("h_purity", "", efficiency_v.size(), 0, efficiency_v.size());
 
     // c->SetGrid();
     c->SetGridy();
@@ -1166,12 +1172,10 @@ void histogram_plotter::MakeEfficiencyPlot(const char* print_name){
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
 
-    
-    
-    
-    for (unsigned int k=0; k < efficiency_v->size();k++){
-        h_eff ->Fill(_util.cut_dirs.at(k).c_str(), efficiency_v->at(k));
-        h_pur ->Fill(_util.cut_dirs.at(k).c_str(), purity_v->at(k));
+
+    for (unsigned int k=0; k < efficiency_v.size();k++){
+        h_eff ->Fill(_util.cut_dirs.at(k).c_str(), efficiency_v.at(k));
+        h_pur ->Fill(_util.cut_dirs.at(k).c_str(), purity_v.at(k));
         h_eff->SetBinError(k+1, 0);
         h_pur->SetBinError(k+1, 0);
     }
@@ -1198,7 +1202,7 @@ void histogram_plotter::MakeEfficiencyPlot(const char* print_name){
 
     // Draw vertical lines to help the eye
     TLine *line;
-    for (unsigned int l=1; l < efficiency_v->size()+1; l++){
+    for (unsigned int l=1; l < efficiency_v.size()+1; l++){
         line  = new TLine( h_eff->GetBinCenter(l) ,   0 , h_eff->GetBinCenter(l)  ,  1.1);
         line->SetLineColor(12);
         line->SetLineStyle(kDotted);
@@ -1213,7 +1217,7 @@ void histogram_plotter::MakeEfficiencyPlot(const char* print_name){
 
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeEfficiencyPlotByCut(const char* print_name,const char *run_period ){
+void histogram_plotter::MakeEfficiencyPlotByCut(const char* print_name, const char *run_period ){
 
     std::vector<TH1D*>  hist(_util.k_cuts_MAX); // The vector of histograms from the file for the plot
     std::vector<TEfficiency*> TEff_v(_util.k_cuts_MAX);

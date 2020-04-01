@@ -90,10 +90,6 @@ namespace xsecSelection {
             // Counter Container
             std::vector<std::vector<double>> counter_v;
             
-            // Containers for the effiency and purity
-            std::vector<double> efficiency_v;
-            std::vector<double> purity_v;
-
             // Counter variables
             int mc_tree_total_entries{0};    // MC
             int data_tree_total_entries{0};  // Data
