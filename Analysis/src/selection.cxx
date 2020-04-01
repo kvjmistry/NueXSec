@@ -78,9 +78,6 @@ void selection::Initialise( const char * mc_file,
     // Load in the flux weights file
     std::cout << "Getting the CV flux file..."<< std::endl;
     f_flux_weights = new TFile("../Systematics/f_flux_CV_weights.root", "READ");
-
-    // Configure the externally configurable cut parameters
-    std::cout << "\n --- Configuring Parameters --- \n" << std::endl;
     
     // Resize the counter vector
     counter_v.resize(_util.k_cuts_MAX);
@@ -117,9 +114,9 @@ void selection::Initialise( const char * mc_file,
         }
 
         // Create the TTree to write to the file -- only initalise for mc
-        mc_tree_out = new TTree("mc_tree_out","mc_tree_out");
-        mc_tree_out->Branch("efficiency_v", "std::vector<double>", &efficiency_v);
-        mc_tree_out->Branch("purity_v",     "std::vector<double>", &purity_v);
+        eff_tree_out = new TTree("eff_tree_out","eff_tree_out");
+        eff_tree_out->Branch("efficiency_v", "std::vector<double>", &efficiency_v);
+        eff_tree_out->Branch("purity_v",     "std::vector<double>", &purity_v);
 
         std::cout << "Initialisation of MC Complete!" << std::endl;
     } // End getting MC variables
@@ -365,6 +362,7 @@ void selection::MakeSelection(){
             _util.PrintInfo(counter_v.at(p), intime_scale_factor, mc_scale_factor, dirt_scale_factor,
                             _util.cut_dirs.at(p), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc),
                              efficiency_v.at(p), purity_v.at(p));
+
         }
     
     }
@@ -511,8 +509,8 @@ void selection::SavetoFile(){
     if (bool_use_mc) {
 
         // Fill the Output TTree
-        mc_tree_out->Fill();
-        mc_tree_out->Write("",TObject::kOverwrite);
+        eff_tree_out->Fill();
+        eff_tree_out->Write("",TObject::kOverwrite);
 
         _hhelper.at(_util.k_mc).WriteTrue();
         _hhelper.at(_util.k_mc).WriteTEfficiency();
@@ -546,7 +544,7 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     _util.Tabulate(interaction, classification.first, type, counter_v.at(cut_index), weight );
 
     // Fill Plots for Efficiency
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC);
+    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC, weight);
 
 }
 // -----------------------------------------------------------------------------

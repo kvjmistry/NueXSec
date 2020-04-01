@@ -45,7 +45,7 @@ class histogram_helper{
     void WriteReco(int type);
     // -------------------------------------------------------------------------
     // Function to fill the true neutrino in FV graphs
-    void FillTEfficiency(int cut_index, std::string classification, SliceContainer SC);
+    void FillTEfficiency(int cut_index, std::string classification, SliceContainer SC, double weight);
     // -------------------------------------------------------------------------
     // Function to write the TEfficiency Graphs to file
     void WriteTEfficiency();

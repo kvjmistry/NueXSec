@@ -564,10 +564,10 @@ void histogram_helper::WriteReco(int type){
     }
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::FillTEfficiency(int cut_index, std::string classification, SliceContainer SC){
+void histogram_helper::FillTEfficiency(int cut_index, std::string classification, SliceContainer SC, double weight){
 
     // Fill the histogram at the specified cut
-    if (classification == "nue_cc") TEfficiency_hists.at(cut_index)->Fill(SC.nu_e);
+    if (classification == "nue_cc") TEfficiency_hists.at(cut_index)->Fill(SC.nu_e, weight);
 
 }
 // -----------------------------------------------------------------------------

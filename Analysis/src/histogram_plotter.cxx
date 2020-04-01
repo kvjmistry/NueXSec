@@ -1152,6 +1152,9 @@ void histogram_plotter::MakeEfficiencyPlot(const char* print_name){
 
     mc_tree->GetEntry(0); 
 
+    for (unsigned int k=0; k < efficiency_v->size(); k++) std::cout << efficiency_v->at(k) << "  " << purity_v->at(k) << std::endl;
+
+
     TCanvas *c = new TCanvas();
     TH1D* h_eff = new TH1D("h_efficiency", "", efficiency_v->size(), 0, efficiency_v->size());
     TH1D* h_pur = new TH1D("h_purity", "", efficiency_v->size(), 0, efficiency_v->size());
@@ -1236,7 +1239,6 @@ void histogram_plotter::MakeEfficiencyPlotByCut(const char* print_name,const cha
         // TEff_v.at(p) = new TEfficiency(*hist.at(p), *hist.at(_util.k_unselected));
         // TEff_v.at(p)->Draw("AP,same");
         h_clone = (TH1D*)hist.at(p)->Clone("h_clone");
-        h_clone->Sumw2();
         h_clone->Divide(hist.at(_util.k_unselected));
 
         h_clone->SetStats(kFALSE);
@@ -1256,9 +1258,11 @@ void histogram_plotter::MakeEfficiencyPlotByCut(const char* print_name,const cha
         h_true_nue->Draw("hist,same");
 
         TGaxis *axis = new TGaxis(gPad->GetUxmax()+3,gPad->GetUymin(),gPad->GetUxmax()+3, gPad->GetUymax(),0,rightmax,510,"+L");
+        axis->SetTitle("True #nu_{e} Events in FV");
         axis->SetLineColor(kRed+2);
         axis->SetLabelColor(kRed+2);
-        axis->SetTitle("True #nu_{e} Events in FV");
+        axis->SetTitleColor(kRed+2);
+        
         axis->Draw();
 
 

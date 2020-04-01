@@ -61,7 +61,7 @@ namespace xsecSelection {
             TTree * ext_tree;     // EXT  Tree
             TTree * dirt_tree;    // Dirt Tree
 
-            TTree * mc_tree_out; // TTree to write to the file for plotting
+            TTree * eff_tree_out; // TTree to write to the efficiency vec to file for plotting
 
             // Class Instances
             utility _util;
