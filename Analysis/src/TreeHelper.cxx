@@ -1,7 +1,7 @@
 #include "../include/TreeHelper.h"
 
 // -----------------------------------------------------------------------------
-void TreeHelper::Initialise(const char* run_period, const char * file_out, int weight_cfg ){
+void TreeHelper::Initialise(int type, const char* run_period, std::string file_out, int weight_cfg ){
 
     std::cout << "Initalising Tree Helper..." << std::endl;
 
@@ -9,14 +9,73 @@ void TreeHelper::Initialise(const char* run_period, const char * file_out, int w
 
     std::string file_name;
 
-    // If the file name is empty then we use the default file name
-    if (file_out_str == "empty") file_name = Form("files/nuexsec_selected_tree_mc_run%s.root", run_period);
-    else file_name = "files/" + file_out_str;
-    
-    // File not already open, open the file
-    if (!gROOT->GetListOfFiles()->FindObject( file_name.c_str() ) ) {
-        f_nuexsec = new TFile( file_name.c_str(), "UPDATE");
+    if (type == _util.k_mc){
+
+        // If the file name is empty then we use the default file name
+        if (file_out_str == "empty") file_name = Form("files/trees/nuexsec_selected_tree_mc_run%s.root", run_period);
+        else file_name = "files/trees/" + file_out_str;
+        
+        // File not already open, open the file
+        if (!gROOT->GetListOfFiles()->FindObject( file_name.c_str() ) ) {
+            f_nuexsec = new TFile( file_name.c_str(), "UPDATE");
+        }
+
+        // Create the TTree
+        tree     = new TTree("mc_tree", "mc_tree");
+        eff_tree = new TTree("mc_eff_tree","mc_eff_tree");
     }
+    else if (type == _util.k_data){
+        
+        // If the file name is empty then we use the default file name
+        if (file_out_str == "empty") file_name = Form("files/trees/nuexsec_selected_tree_data_run%s.root", run_period);
+        else file_name = "files/trees/" + file_out_str;
+
+        // File not already open, open the file
+        if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
+            f_nuexsec = new TFile(file_name.c_str(), "UPDATE");
+        }
+
+        // Create the TTree
+        tree = new TTree("data_tree","data_tree");
+
+    }
+    else if (type == _util.k_ext){
+
+        // If the file name is empty then we use the default file name
+        if (file_out_str == "empty") file_name = Form("files/trees/nuexsec_selected_tree_ext_run%s.root", run_period);
+        else file_name = "files/trees/" + file_out_str;
+        
+        // File not already open, open the file
+        if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
+            f_nuexsec = new TFile(file_name.c_str(), "UPDATE");
+        }
+
+        // Create the TTree
+        tree = new TTree("ext_tree","ext_tree");
+
+    }
+    else if (type == _util.k_dirt){
+        
+        // If the file name is empty then we use the default file name
+        if (file_out_str == "empty") file_name = Form("files/trees/nuexsec_selected_tree_dirt_run%s.root", run_period);
+        else file_name = "files/trees/" + file_out_str;
+
+        // File not already open, open the file
+        if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
+            f_nuexsec = new TFile(file_name.c_str(), "UPDATE");
+        }
+
+        // Create the TTree
+        tree = new TTree("dirt_tree","dirt_tree");
+
+    }
+    else {
+        std::cout << "Unknown input type!! "<<  __PRETTY_FUNCTION__ << std::endl;
+        exit(1);
+    }
+
+    // Set the type
+    _type = type;
     
     // Set the weight settings
     if (weight_cfg == 0){
@@ -38,6 +97,14 @@ void TreeHelper::Initialise(const char* run_period, const char * file_out, int w
     else {
         std::cout << "Unknown weight setting specified, using defaults" << std::endl;
     }
+
+    // Set the tree branches
+    tree->Branch("run",    &run,    "run/I");
+    tree->Branch("subrun", &subrun, "subrun/I");
+    tree->Branch("event",  &event,  "event/I");
+    tree->Branch("gen",    &gen,    "gen/O");
+    tree->Branch("weight", &weight, "weight/D");
+    tree->Branch("classifcation",   &classifcation);
 
 }
 // -----------------------------------------------------------------------------

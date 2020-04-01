@@ -32,6 +32,9 @@ void selection::Initialise( const char * mc_file,
     std::cout << "\nUsing a weight setting of: " << weight_cfg << std::endl;
     std::cout << "If this is set to 1 (default) then we apply the Genie Tune and PPFX weights to the CV" << std::endl;
 
+    // Create the file directory if it does not exist already
+    gSystem->Exec("if [ ! -d \"files/trees/\" ]; then echo \"\nfiles folder does not exist... creating\"; mkdir -p files/trees; fi"); 
+
     // Set the scale factors
     if (strcmp(run_period, "1") == 0){
         mc_scale_factor     = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_MC_POT);
@@ -57,6 +60,9 @@ void selection::Initialise( const char * mc_file,
 
     // Resize the histogram helper instance vectors, one instance per type e.g MC, data, ..
     _hhelper.resize(_util.k_type_MAX);
+    
+    // Resize the tree helper instance vectors, one instance per type e.g MC, data, ..
+    _thelper.resize(_util.k_type_MAX);
 
     // Print the input files
     std::cout <<
@@ -102,6 +108,8 @@ void selection::Initialise( const char * mc_file,
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_file_out, weight_cfg);
         if (!_slim) _hhelper.at(_util.k_mc).InitHistograms();
+
+        _thelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, "empty", weight_cfg);
         
         mc_tree_total_entries = mc_tree->GetEntries();
         std::cout << "Total MC Events:         " << mc_tree_total_entries << std::endl;
@@ -133,6 +141,8 @@ void selection::Initialise( const char * mc_file,
         if (!_slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, run_period, data_file_out, weight_cfg);
         if (!_slim) _hhelper.at(_util.k_data).InitHistograms();
         
+        _thelper.at(_util.k_data).Initialise(_util.k_data, run_period, "empty", weight_cfg);
+
         data_tree_total_entries = data_tree->GetEntries();
         std::cout << "Total Data Events:         " << data_tree_total_entries << std::endl;
 
@@ -160,6 +170,8 @@ void selection::Initialise( const char * mc_file,
         if (!_slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, ext_file_out, weight_cfg);
         if (!_slim) _hhelper.at(_util.k_ext).InitHistograms();
         
+        _thelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, "empty", weight_cfg);
+
         ext_tree_total_entries = ext_tree->GetEntries();
         std::cout << "Total EXT Events:        " << ext_tree_total_entries << std::endl;
 
@@ -187,6 +199,8 @@ void selection::Initialise( const char * mc_file,
         if (!_slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, dirt_file_out, weight_cfg);
         if (!_slim) _hhelper.at(_util.k_dirt).InitHistograms();
         
+        _thelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, "empty", weight_cfg);
+
         dirt_tree_total_entries = dirt_tree->GetEntries();
         std::cout << "Total Dirt Events:         " << dirt_tree_total_entries << std::endl;
 

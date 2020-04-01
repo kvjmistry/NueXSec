@@ -7,6 +7,7 @@
 #include "histogram_plotter.h"
 #include "SliceContainer.h"
 #include "Passed_Container.h"
+#include "TreeHelper.h"
 
 #include <omp.h>
 #include "TThread.h"
@@ -67,6 +68,7 @@ namespace xsecSelection {
             utility _util;
             selection_cuts    _scuts;
             std::vector<histogram_helper>  _hhelper; // One for each type e.g MC, Data, EXT..
+            std::vector<TreeHelper>        _thelper; // One for each type e.g MC, Data, EXT..
 
             // Variables -------------------------------------------------------
 
