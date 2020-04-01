@@ -105,6 +105,7 @@ void selection::Initialise( const char * mc_file,
         if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_file_out, weight_cfg);
         if (!_slim) _hhelper.at(_util.k_mc).InitHistograms();
 
+        // Initialise the Tree Helper
         _thelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, "empty", weight_cfg);
         
         mc_tree_total_entries = mc_tree->GetEntries();
@@ -132,6 +133,7 @@ void selection::Initialise( const char * mc_file,
         if (!_slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, run_period, data_file_out, weight_cfg);
         if (!_slim) _hhelper.at(_util.k_data).InitHistograms();
         
+        // Initialise the Tree Helper
         _thelper.at(_util.k_data).Initialise(_util.k_data, run_period, "empty", weight_cfg);
 
         data_tree_total_entries = data_tree->GetEntries();
@@ -161,6 +163,7 @@ void selection::Initialise( const char * mc_file,
         if (!_slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, ext_file_out, weight_cfg);
         if (!_slim) _hhelper.at(_util.k_ext).InitHistograms();
         
+        // Initialise the Tree Helper
         _thelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, "empty", weight_cfg);
 
         ext_tree_total_entries = ext_tree->GetEntries();
@@ -190,6 +193,7 @@ void selection::Initialise( const char * mc_file,
         if (!_slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, dirt_file_out, weight_cfg);
         if (!_slim) _hhelper.at(_util.k_dirt).InitHistograms();
         
+        // Initialise the Tree Helper
         _thelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, "empty", weight_cfg);
 
         dirt_tree_total_entries = dirt_tree->GetEntries();
@@ -370,6 +374,7 @@ void selection::MakeSelection(){
                             _util.cut_dirs.at(p), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc),
                              efficiency, purity);
             
+            // Fill the efficiency and purity for the output mc tree file
             _thelper.at(_util.k_mc).FillEff(efficiency, purity);
 
         }
@@ -521,21 +526,18 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_mc).WriteTEfficiency();
         _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
         _hhelper.at(_util.k_mc).WriteFlash();
-
         _thelper.at(_util.k_mc).WriteTree(_util.k_mc);
 
     }
     if (bool_use_data) {
         _hhelper.at(_util.k_data).WriteReco(_util.k_data);
         _hhelper.at(_util.k_data).WriteFlash();
-
         _thelper.at(_util.k_data).WriteTree(_util.k_data);
 
     }
     if (bool_use_ext) {
         _hhelper.at(_util.k_ext).WriteReco(_util.k_ext);
         _hhelper.at(_util.k_ext).WriteFlash();
-
         _thelper.at(_util.k_ext).WriteTree(_util.k_ext);
 
     }
@@ -543,7 +545,6 @@ void selection::SavetoFile(){
         // _hhelper.at(_util.k_dirt).WriteTrue(); // Only turn this on to inspect. It wont merge since the file names are not uniique yet!!
         _hhelper.at(_util.k_dirt).WriteReco(_util.k_dirt);
         _hhelper.at(_util.k_dirt).WriteFlash();
-
         _thelper.at(_util.k_dirt).WriteTree(_util.k_dirt);
 
     }

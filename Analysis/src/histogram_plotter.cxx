@@ -1256,16 +1256,16 @@ void histogram_plotter::MakeEfficiencyPlotByCut(const char* print_name, const ch
 
         Float_t rightmax = 1.1*h_true_nue->GetMaximum();
         Float_t scale = gPad->GetUymax()/rightmax;
-        h_true_nue ->SetLineColor(kRed+2);
+        h_true_nue ->SetLineColor(kAzure-6);
         h_true_nue ->SetLineWidth(2);
         h_true_nue->Scale(scale);
         h_true_nue->Draw("hist,same");
 
         TGaxis *axis = new TGaxis(gPad->GetUxmax()+3,gPad->GetUymin(),gPad->GetUxmax()+3, gPad->GetUymax(),0,rightmax,510,"+L");
         axis->SetTitle("True #nu_{e} Events in FV");
-        axis->SetLineColor(kRed+2);
-        axis->SetLabelColor(kRed+2);
-        axis->SetTitleColor(kRed+2);
+        axis->SetLineColor(kAzure-6);
+        axis->SetLabelColor(kAzure-6);
+        axis->SetTitleColor(kAzure-6);
         
         axis->Draw();
 
