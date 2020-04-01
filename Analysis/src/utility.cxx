@@ -8,6 +8,11 @@ std::vector<double> utility::configure(
         double _Run1_Data_POT,
         double _Run1_Data_trig,
         double _Run1_EXT_trig,
+        double _Run3_MC_POT,
+        double _Run3_Dirt_POT,
+        double _Run3_Data_POT,
+        double _Run3_Data_trig,
+        double _Run3_EXT_trig,
         double _x1,
         double _x2,
         double _y1,
@@ -23,6 +28,12 @@ std::vector<double> utility::configure(
     config.at(k_config_Run1_Data_POT)   = _Run1_Data_POT;
     config.at(k_config_Run1_Data_trig)  = _Run1_Data_trig;
     config.at(k_config_Run1_EXT_trig)   = _Run1_EXT_trig;
+
+    config.at(k_config_Run3_MC_POT)     = _Run3_MC_POT;
+    config.at(k_config_Run3_Dirt_POT)   = _Run3_Dirt_POT;
+    config.at(k_config_Run3_Data_POT)   = _Run3_Data_POT;
+    config.at(k_config_Run3_Data_trig)  = _Run3_Data_trig;
+    config.at(k_config_Run3_EXT_trig)   = _Run3_EXT_trig;
 
     config.at(k_config_x1)  = _x1;
     config.at(k_config_x2)  = _x2;

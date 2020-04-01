@@ -20,6 +20,11 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
         intime_scale_factor = _config.at(_util.k_config_Run1_Data_trig) / _config.at(_util.k_config_Run1_EXT_trig);
         Data_POT = _config.at(_util.k_config_Run1_Data_POT); // Define this variable here for easier reading
     }
+    else if (strcmp(run_period, "3") == 0){
+        mc_scale_factor     = _config.at(_util.k_config_Run3_Data_POT)  / _config.at(_util.k_config_Run3_MC_POT);
+        dirt_scale_factor   = _config.at(_util.k_config_Run3_Data_POT)  / _config.at(_util.k_config_Run3_Dirt_POT);
+        intime_scale_factor = _config.at(_util.k_config_Run3_Data_trig) / _config.at(_util.k_config_Run3_EXT_trig);
+    }
     else {
         std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;
         exit(1);
@@ -49,7 +54,7 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
         system(command.c_str()); 
 
         // Call the Make stack function for all the plots we want
-        // CallMakeStack(run_period, i, Data_POT);
+        CallMakeStack(run_period, i, Data_POT);
         
     }
 

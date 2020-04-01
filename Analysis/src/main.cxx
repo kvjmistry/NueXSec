@@ -146,6 +146,7 @@ int main(int argc, char *argv[]){
 
         // Set the run period
         if (strcmp(arg, "--run") == 0){
+
             std::cout << "Setting the run period as : run" << argv[i+1] <<std::endl;
             run_period = argv[i+1];
         }
@@ -173,6 +174,11 @@ int main(int argc, char *argv[]){
         _Run1_Data_POT,
         _Run1_Data_trig,
         _Run1_EXT_trig,
+        _Run3_MC_POT,
+        _Run3_Dirt_POT,
+        _Run3_Data_POT,
+        _Run3_Data_trig,
+        _Run3_EXT_trig,
         _x1, _x2, _y1, _y2, _z1, _z2
         );
 

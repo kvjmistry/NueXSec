@@ -42,6 +42,12 @@ void selection::Initialise( const char * mc_file,
         intime_scale_factor = _config.at(_util.k_config_Run1_Data_trig) / _config.at(_util.k_config_Run1_EXT_trig);
         _run_period = 1;
     }
+    else if (strcmp(run_period, "3") == 0){
+        mc_scale_factor     = _config.at(_util.k_config_Run3_Data_POT)  / _config.at(_util.k_config_Run3_MC_POT);
+        dirt_scale_factor   = _config.at(_util.k_config_Run3_Data_POT)  / _config.at(_util.k_config_Run3_Dirt_POT);
+        intime_scale_factor = _config.at(_util.k_config_Run3_Data_trig) / _config.at(_util.k_config_Run3_EXT_trig);
+        _run_period = 3;
+    }
     else {
         std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;
         exit(1);
@@ -96,7 +102,6 @@ void selection::Initialise( const char * mc_file,
     if (bool_use_mc){
         std::cout << "\nInitialising MC" << std::endl;
          _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
-        //_util.GetTree(f_mc, mc_tree, "NeutrinoSelectionFilter");
 
         // Initialise all the mc slice container
         mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights);

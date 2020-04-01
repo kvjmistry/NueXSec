@@ -579,8 +579,8 @@ void histogram_helper::WriteTEfficiency(){
     
     for (unsigned int p = 0; p < TEfficiency_hists.size(); p++){
 
-        TEfficiency * teff = new TEfficiency(*TEfficiency_hists.at(p), *TEfficiency_hists.at(_util.k_unselected));
-        teff->Write( Form("h_true_nu_E_%s",_util.cut_dirs.at(p).c_str()) , TObject::kOverwrite);
+        // TEfficiency * teff = new TEfficiency(*TEfficiency_hists.at(p), *TEfficiency_hists.at(_util.k_unselected));
+        // teff->Write( Form("h_true_nu_E_%s",_util.cut_dirs.at(p).c_str()) , TObject::kOverwrite);
         TEfficiency_hists.at(p)->Write("",TObject::kOverwrite);
     }
     
