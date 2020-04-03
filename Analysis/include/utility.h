@@ -99,8 +99,11 @@ public:
             "Cluster_Frac",  // Cluster Fraction 
             "Shower_Score",  // Track Score
             "Michel_Rej",    // Michel Rejection
-            "dEdx",          // dEdx
-            "Selected"       // Selected 
+            "ShrHits",       // Shower Hits
+            "ShrHitsYplane", // Shower hits in the y plane
+            "ShrVtxDistance",// Shower to vertex distance
+            "HitRatio",      // Ratio of shr hits and slice hits
+            "dEdx"           // dEdx
             };
 
 
@@ -144,14 +147,16 @@ public:
                 k_cluster_frac, // Cluster Fraction
                 k_shower_score, // Shower Score
                 k_michel_rej,   // Michel Rejection
-                k_dEdx,         // dEdx
-                k_selected,     // Selected
+                k_shr_hits,     // Shower Hits
+                k_shr_hits_y_plane, // Shower Hits in the y plane
+                k_shr_distance,    // Shower to reco nu vertex distance
+                k_hit_ratio,       // Ratio of shr hits and slice hits
+                k_dEdx,            // dEdx
                 k_cuts_MAX
                 }; 
 
                 // to add
-                // shr_distance -- shower vertex distance
-                // shr tkfit 2cm dedx Y
+                // shr tkfit 2cm dedx Ys
                 // shr tkfit 2cm dedx ALL
                 // shr tkfit gap10 dedx Y
                 // secondshower Y vtxdist

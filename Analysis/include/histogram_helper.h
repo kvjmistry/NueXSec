@@ -96,7 +96,8 @@ class histogram_helper{
         k_reco_secondary_shower_to_vtx_dist,                                    // Secondary shower to vertex distance (for events with more than 1 shower)
         k_reco_leading_shower_hits_per_length,                                  // Leading Shower hits per length
         k_reco_longest_track_leading_shower_length,                             // Longest track to leading shower length
-        k_reco_track_contained,                                                 // Track Containment
+        k_reco_n_track_contained,                                               // Number of Tracks Contained
+        k_reco_n_shower_contained,                                              // Number of Showers Contained
         k_reco_leading_shower_phi,                                              // Leading shower phi
         k_reco_leading_shower_theta,                                            // Leading shower theta
         k_reco_leading_shower_cos_theta,                                        // Leading shower cos theta

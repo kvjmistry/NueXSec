@@ -499,6 +499,43 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SelectionFill(type, SC, classification, interaction, _util.k_michel_rej, counter_v );
 
     // *************************************************************************
+    // Shower Hits -------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.shr_hits(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_shr_hits) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    SelectionFill(type, SC, classification, interaction, _util.k_shr_hits, counter_v );
+
+    // *************************************************************************
+    // Shower Hits Collection Plane --------------------------------------------
+    // *************************************************************************
+    pass = _scuts.shr_hits_y_plane(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_shr_hits_y_plane) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    SelectionFill(type, SC, classification, interaction, _util.k_shr_hits_y_plane, counter_v );
+
+    // *************************************************************************
+    // Shower to Vertex Distance --------------------------------------------
+    // *************************************************************************
+    pass = _scuts.shr_distance(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_shr_distance) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    SelectionFill(type, SC, classification, interaction, _util.k_shr_distance, counter_v );
+
+    // *************************************************************************
+    // Shower Hit Ratio  -------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.shr_hitratio(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_hit_ratio) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    SelectionFill(type, SC, classification, interaction, _util.k_hit_ratio, counter_v );
+
+
+    // *************************************************************************
     // dEdx --------------------------------------------------------------------
     // *************************************************************************
     pass = _scuts.dEdx(SC);
@@ -506,17 +543,8 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, classification, interaction, _util.k_dEdx, counter_v );
-
-    // *************************************************************************
-    // Selected ----------------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.selected(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_selected) = pass;
-    if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_selected, counter_v );
-    
-    // // *************************************************************************
+    // *************************************************************************
     return true;
 
 }

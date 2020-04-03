@@ -15,7 +15,7 @@ for line in $(cat $runlist); do
 	    subrun=$line
 	    runsubrun="$run.$subrun"
             #echo "$runsubrun"
-	    samweb list-files "defname:$samdef and run_number $runsubrun" | tee -a ../bin/files_$(basename $runlist)
+	    samweb list-files "defname:$samdef and run_number $runsubrun and data_stream beam_good, beam_bad" | tee -a ../bin/files_$(basename $runlist)
     fi
 
     counter=$(($counter+1))

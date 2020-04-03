@@ -24,6 +24,7 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
         mc_scale_factor     = _config.at(_util.k_config_Run3_Data_POT)  / _config.at(_util.k_config_Run3_MC_POT);
         dirt_scale_factor   = _config.at(_util.k_config_Run3_Data_POT)  / _config.at(_util.k_config_Run3_Dirt_POT);
         intime_scale_factor = _config.at(_util.k_config_Run3_Data_trig) / _config.at(_util.k_config_Run3_EXT_trig);
+        Data_POT = _config.at(_util.k_config_Run3_Data_POT); // Define this variable here for easier reading
     }
     else {
         std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;
@@ -220,7 +221,7 @@ void histogram_plotter::Draw_Run_Period(TCanvas* c){
         pt->AddText("Run1");
         pt->SetTextColor(kRed+2);
     }
-    else if (run_period == "3b"){
+    else if (run_period == "3"){
         pt = new TPaveText(0.66, 0.89, 0.86, 0.96,"NDC");
         pt->AddText("Run3b");
         pt->SetTextColor(kBlue+2);
@@ -759,10 +760,15 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
                         area_norm,  false, 1.0, "Longest Track Length / Leading Shower Length", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_longest_track_leading_shower_length.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
-    // Track Containment
-    MakeStack("h_reco_track_contained", _util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Contained Tracks", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_track_contained.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
+    // Number of Tracks Contained
+    MakeStack("h_reco_n_track_contained", _util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Number of Tracks Contained", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_n_track_contained.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
+
+    // Number of Showers Contained
+    MakeStack("h_reco_n_shower_contained", _util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Number of Showers Contained", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_n_shower_contained.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Leading shower phi
     MakeStack("h_reco_leading_shower_phi", _util.cut_dirs.at(cut_index).c_str(),

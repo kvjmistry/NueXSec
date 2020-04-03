@@ -85,7 +85,7 @@ bool selection_cuts::michel_rej(SliceContainer &SC){
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::dEdx(SliceContainer &SC){
-    if (SC.shr_dedx_Y_cali > 1.8 && SC.shr_dedx_Y_cali < 3.0) return true; // pass 
+    if (SC.shr_dedx_Y_cali > 1.7 && SC.shr_dedx_Y_cali < 3.2) return true; // pass 
     else return false;                                                     // fail
 }
 // -----------------------------------------------------------------------------
@@ -94,8 +94,24 @@ bool selection_cuts::selected(SliceContainer &SC){
     else return false;                  // fail
 }
 // -----------------------------------------------------------------------------
+bool selection_cuts::shr_hits(SliceContainer &SC){
+    if (SC.shr_hits_tot > 220 ) return true; // pass 
+    else return false;                  // fail
+}
 // -----------------------------------------------------------------------------
+bool selection_cuts::shr_hits_y_plane(SliceContainer &SC){
+    if (SC.shr_hits_y_tot > 200 ) return true; // pass 
+    else return false;                  // fail
+}
 // -----------------------------------------------------------------------------
+bool selection_cuts::shr_distance(SliceContainer &SC){
+    if (SC.shr_distance < 10 ) return true; // pass 
+    else return false;                      // fail
+}
 // -----------------------------------------------------------------------------
+bool selection_cuts::shr_hitratio(SliceContainer &SC){
+    if (SC.hits_ratio > 0.7 ) return true; // pass 
+    else return false;                     // fail
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

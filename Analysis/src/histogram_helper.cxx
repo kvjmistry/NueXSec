@@ -226,8 +226,11 @@ void histogram_helper::InitHistograms(){
             // Longest track to leading shower length
             TH1D_hists.at(k_reco_longest_track_leading_shower_length).at(i).at(j) = new TH1D ( Form("h_reco_longest_track_leading_shower_length_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 3);
 
-            // Track Containment
-            TH1D_hists.at(k_reco_track_contained).at(i).at(j) = new TH1D ( Form("h_reco_track_contained_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 2, 0, 2);
+            // Number of Tracks Contained
+            TH1D_hists.at(k_reco_n_track_contained).at(i).at(j) = new TH1D ( Form("h_reco_n_track_contained_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 5, 0, 5);
+
+            // Number of Showers
+            TH1D_hists.at(k_reco_n_shower_contained).at(i).at(j) = new TH1D ( Form("h_reco_n_shower_contained_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 5, 0, 5);
 
             // Leading shower phi
             TH1D_hists.at(k_reco_leading_shower_phi).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_phi_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 12, -180, 180);
@@ -373,7 +376,9 @@ void histogram_helper::FillHists(int type, int classification_index, int cut_ind
     
     // TH1D_hists.at(k_reco_longest_track_leading_shower_length).at(cut_index).at(classification_index)->Fill();
     
-    // TH1D_hists.at(k_reco_track_contained).at(cut_index).at(classification_index)->Fill();
+    TH1D_hists.at(k_reco_n_track_contained).at(cut_index).at(classification_index)->Fill(SC.n_tracks_contained, weight);
+    
+    TH1D_hists.at(k_reco_n_shower_contained).at(cut_index).at(classification_index)->Fill(SC.n_showers_contained, weight);
     
     TH1D_hists.at(k_reco_leading_shower_phi).at(cut_index).at(classification_index)->Fill(SC.shr_phi * 180/3.14159, weight);
     
@@ -568,7 +573,6 @@ void histogram_helper::FillTEfficiency(int cut_index, std::string classification
 
     // Fill the histogram at the specified cut
     if (classification == "nue_cc") TEfficiency_hists.at(cut_index)->Fill(SC.nu_e, weight);
-
 }
 // -----------------------------------------------------------------------------
 void histogram_helper::WriteTEfficiency(){

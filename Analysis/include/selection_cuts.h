@@ -51,6 +51,19 @@ class selection_cuts{
     // Selected variable in PeLEE tree
     bool selected(SliceContainer &SC);
     // -------------------------------------------------------------------------
+    // Cut on the total hits for the leading shower
+    bool shr_hits(SliceContainer &SC);
+    // -------------------------------------------------------------------------
+    // Cut on the total hits for the leading shower on the y plane
+    bool shr_hits_y_plane(SliceContainer &SC);
+    // -------------------------------------------------------------------------
+    // Cut on the shower to nu vertex distance
+    bool shr_distance(SliceContainer &SC);
+    // -------------------------------------------------------------------------
+    // Cut on the ratio of shower hits to slice hits
+    bool shr_hitratio(SliceContainer &SC);
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
 }; // End Class Selection Cuts
 
