@@ -512,6 +512,8 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         
         if (hist.at(_util.k_nue_cc)->GetMinimum() != 0.0) hist.at(_util.k_leg_data)->SetMinimum(hist.at(_util.k_nue_cc)->GetMinimum() / 2.); 
         
+
+        h_stack->SetMinimum(0.1);
         if (hist.at(_util.k_nue_cc)->GetMinimum() == 0.0) hist.at(_util.k_leg_data)->SetMinimum(hist.at(_util.k_nue_cc)->GetMinimum() + 0.0001 / 2.); 
         
         hist.at(_util.k_leg_data)->SetMaximum(y_maximum * (y_scale_factor * 500));
@@ -841,7 +843,56 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
                         area_norm,  false, 1.0, "Total Num of hits for the leading Shower in Collection Plane", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_shower_hits_y_plane.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
+    // dEdx Trackfit first 2cm All Planes
+    MakeStack("h_reco_shr_trkfit_2cm_dEdx",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Shower dEdx First 2cm Fit All Planes [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shr_trkfit_2cm_dEdx.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
+    // dEdx Trackfit first 2cm y Planes
+    MakeStack("h_reco_shr_trkfit_2cm_dEdx_y",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Shower dEdx First 2cm Fit Collection Plane [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shr_trkfit_2cm_dEdx_y.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
+
+
+    // dEdx Fit 1x4cm box skip 5mm
+    MakeStack("h_reco_shr_trkfit_gap05_dEdx",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Shower dEdx 1x4cm Box Fit All Planes (skip first 5mm) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shr_trkfit_gap05_dEdx.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
+
+    // dEdx Fit 1x4cm box skip 5mm y Plane
+    MakeStack("h_reco_shr_trkfit_gap05_dEdx",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Shower dEdx 1x4cm Box Fit Coll. Plane (skip first 5mm) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shr_trkfit_gap05_dEdx_y.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
+
+    // dEdx Fit 1x4cm box skip 10mm
+    MakeStack("h_reco_shr_trkfit_gap10_dEdx",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Shower dEdx 1x4cm Box Fit All Planes (skip first 10mm) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shr_trkfit_gap10_dEdx.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
+
+    // dEdx Fit 1x4cm box skip 5mm y Plane
+    MakeStack("h_reco_shr_trkfit_gap10_dEdx",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Shower dEdx 1x4cm Box Fit Coll. Plane (skip first 10mm) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shr_trkfit_gap10_dEdx_y.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
+
+    // Optical Filter Beam
+    MakeStack("h_reco_opfilter_beam",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  true, 1.0, "Common Optical Filter PE [PE]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_opfilter_beam.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
+
+    // Optical Filter Veto
+    MakeStack("h_reco_opfilter_veto",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  true, 1.0, "Common Optical Filter Michel Veto [PE]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_opfilter_veto.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
+
+    // Software trigger
+    MakeStack("h_reco_softwaretrig",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  true, 1.0, "Software Trigger", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_softwaretrig.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
+
+    // Slice ID
+    MakeStack("h_reco_nslice",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  true, 1.0, "Pandora Slice ID", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_nslice.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
 }
 // -----------------------------------------------------------------------------

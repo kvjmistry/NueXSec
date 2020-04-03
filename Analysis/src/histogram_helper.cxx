@@ -274,7 +274,23 @@ void histogram_helper::InitHistograms(){
             // Total number of hits for the leading shower in the collection plane
             TH1D_hists.at(k_reco_shower_hits_y_plane).at(i).at(j) = new TH1D (Form("h_reco_shower_hits_y_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 800);
 
+            // Shower Track fit dEdx variables
+            TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx).at(i).at(j)     = new TH1D ( Form("h_reco_shr_trkfit_2cm_dEdx_%s_%s",_util.cut_dirs.at(i).c_str(),     _util.classification_dirs.at(j).c_str()) ,"", 60, 0, 20);
+            TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_y).at(i).at(j)   = new TH1D ( Form("h_reco_shr_trkfit_2cm_dEdx_y_%s_%s",_util.cut_dirs.at(i).c_str(),   _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx).at(i).at(j)    = new TH1D ( Form("h_reco_shr_trkfit_gap05_dEdx_%s_%s",_util.cut_dirs.at(i).c_str(),    _util.classification_dirs.at(j).c_str()) ,"", 60, 0, 20);
+            TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx_y).at(i).at(j)  = new TH1D ( Form("h_reco_shr_trkfit_gap05_dEdx_y_%s_%s",_util.cut_dirs.at(i).c_str(),  _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx).at(i).at(j)   = new TH1D ( Form("h_reco_shr_trkfit_gap10_dEdx_%s_%s",_util.cut_dirs.at(i).c_str(),   _util.classification_dirs.at(j).c_str()) ,"", 60, 0, 20);
+            TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx_y).at(i).at(j) = new TH1D ( Form("h_reco_shr_trkfit_gap10_dEdx_y_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
 
+            // Op Filter
+            TH1D_hists.at(k_reco_opfilter_beam).at(i).at(j) = new TH1D ( Form("h_reco_opfilter_beam_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 500);
+            TH1D_hists.at(k_reco_opfilter_veto).at(i).at(j) = new TH1D ( Form("h_reco_opfilter_veto_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 75, 0, 200);
+
+            // Software Trigger
+            TH1D_hists.at(k_reco_softwaretrig).at(i).at(j) = new TH1D ( Form("h_reco_softwaretrig_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 2, 0, 2);
+        
+            // Slice ID
+            TH1D_hists.at(k_reco_nslice).at(i).at(j) = new TH1D ( Form("h_reco_nslice_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 2, 0, 2);
         }
         
     }
@@ -407,6 +423,21 @@ void histogram_helper::FillHists(int type, int classification_index, int cut_ind
     TH1D_hists.at(k_reco_shower_hits).at(cut_index).at(classification_index)->Fill(SC.shr_hits_max, weight);
 
     TH1D_hists.at(k_reco_shower_hits_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot, weight);
+
+    TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_2cm_dedx_Y + SC.shr_tkfit_2cm_dedx_V + SC.shr_tkfit_2cm_dedx_U, weight);
+    TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_2cm_dedx_Y, weight);
+    TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap05_dedx_Y + SC.shr_tkfit_gap05_dedx_V + SC.shr_tkfit_gap05_dedx_U, weight);
+    TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap05_dedx_Y, weight);
+    TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap10_dedx_Y + SC.shr_tkfit_gap10_dedx_V + SC.shr_tkfit_gap10_dedx_U, weight);
+    TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap10_dedx_Y, weight);
+
+
+    TH1D_hists.at(k_reco_opfilter_beam).at(cut_index).at(classification_index)->Fill(SC.opfilter_pe_beam, weight);
+    TH1D_hists.at(k_reco_opfilter_veto).at(cut_index).at(classification_index)->Fill(SC.opfilter_pe_veto, weight);
+    
+    TH1D_hists.at(k_reco_softwaretrig).at(cut_index).at(classification_index)->Fill(SC.swtrig, weight);
+    
+    TH1D_hists.at(k_reco_nslice).at(cut_index).at(classification_index)->Fill(SC.nslice, weight);
 
     // -------------------------------------------------------------------------
     // Fill truth histograms

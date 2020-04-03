@@ -41,11 +41,11 @@
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <inputdef>&indef;</inputdef>
     <maxfilesperjob>10</maxfilesperjob>
-    <numjobs>381</numjobs>
+    <numjobs>219</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <disk>25GB</disk>
-    <schema>root</schema>
+    <schema>gsiftp</schema>
     <jobsub>--expected-lifetime=12h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
     <jobsub_start> --expected-lifetime=short</jobsub_start>
     <blacklist>Lancaster</blacklist>

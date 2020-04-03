@@ -112,6 +112,16 @@ class histogram_helper{
         k_reco_shower_energy_tot_cali,                                          // Calibrated energy of all the showers
         k_reco_shower_hits,                                                     // Total number of hits for the leading shower
         k_reco_shower_hits_y_plane,                                             // Total number of hits for the leading shower in the collection plane
+        k_reco_shr_trkfit_2cm_dEdx,                                             // dE/dx of the leading shower on the Y plane with the track fitting, use first 2 cm
+        k_reco_shr_trkfit_2cm_dEdx_y,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use first 2 cm y plane
+        k_reco_shr_trkfit_gap05_dEdx,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use 1x4 cm box, skip first 10mm
+        k_reco_shr_trkfit_gap05_dEdx_y,                                         // dE/dx of the leading shower on the Y plane with the track fitting, use 1x4 cm box, skip first 5mm y plane
+        k_reco_shr_trkfit_gap10_dEdx,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use 1x4 cm box, skip first 5mm
+        k_reco_shr_trkfit_gap10_dEdx_y,                                         // dE/dx of the leading shower on the Y plane with the track fitting, use 1x4 cm box, skip first 10mm y plane
+        k_reco_opfilter_beam,                                                   // Common optical filter beam
+        k_reco_opfilter_veto,                                                   // Common Optical filter michel veto
+        k_reco_softwaretrig,                                                    // Software Trigger
+        k_reco_nslice,                                                          // Pandora Slice ID
         k_TH1D_MAX
     };
 
