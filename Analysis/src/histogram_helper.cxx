@@ -357,7 +357,7 @@ void histogram_helper::InitHistograms(){
     TH1D_flash_hists.at(k_flash_pe_sid0)   = new TH1D( Form("h_flash_pe_sid0_%s", _util.type_prefix.at(_type).c_str()),   "; Flash PE Non Neutrino Canidate [PE]; Entries", 100, 0, 5000 );
     
     // Interaction Histograms
-    TH1D_interaction_hists.resize(k_interactions_MAX);
+    TH1D_interaction_hists.resize(_util.k_interactions_MAX);
     for (unsigned int p =0 ; p < TH1D_interaction_hists.size(); p++ ){
         TH1D_interaction_hists.at(p) = new TH1D( Form("h_true_nue_E_%s", _util.interaction_types.at(p).c_str() ), "; True #nu_{e} Energy; Entries", 25, 0, 5 );
     }
@@ -500,23 +500,23 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
             
                 // True nue interaction histograms
                 if (interaction == "nue_cc_qe" || interaction == "nue_bar_cc_qe"){
-                    TH1D_interaction_hists.at(k_plot_qe)->Fill(SC.nu_e, weight);
+                    TH1D_interaction_hists.at(_util.k_plot_qe)->Fill(SC.nu_e, weight);
                 }
                 else if (interaction == "nue_cc_res" || interaction == "nue_bar_cc_res"){
-                    TH1D_interaction_hists.at(k_plot_res)->Fill(SC.nu_e, weight);
+                    TH1D_interaction_hists.at(_util.k_plot_res)->Fill(SC.nu_e, weight);
                 }
                 else if (interaction == "nue_cc_dis" || interaction == "nue_bar_cc_dis"){
-                    TH1D_interaction_hists.at(k_plot_dis)->Fill(SC.nu_e, weight);
+                    TH1D_interaction_hists.at(_util.k_plot_dis)->Fill(SC.nu_e, weight);
                 }
                 else if (interaction == "nue_cc_coh" || interaction == "nue_bar_cc_coh"){
-                    TH1D_interaction_hists.at(k_plot_coh)->Fill(SC.nu_e, weight);
+                    TH1D_interaction_hists.at(_util.k_plot_coh)->Fill(SC.nu_e, weight);
                 }
                 else if (interaction == "nue_cc_mec" || interaction == "nue_bar_cc_mec"){
-                    TH1D_interaction_hists.at(k_plot_mec)->Fill(SC.nu_e, weight);
+                    TH1D_interaction_hists.at(_util.k_plot_mec)->Fill(SC.nu_e, weight);
                 }
                 // NC
                 else {
-                    TH1D_interaction_hists.at(k_plot_nc)->Fill(SC.nu_e, weight);
+                    TH1D_interaction_hists.at(_util.k_plot_nc)->Fill(SC.nu_e, weight);
                 }
             }
 

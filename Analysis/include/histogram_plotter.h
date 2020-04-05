@@ -73,6 +73,8 @@ class histogram_plotter{
     // The efficiency made by each cut
     void MakeEfficiencyPlotByCut(const char* print_name, const char *run_period);
     // -------------------------------------------------------------------------
+    // True Neutino energy for nues broken down by genie interaction type
+    void MakeInteractionPlot(const char* print_name, const char *run_period);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

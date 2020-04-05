@@ -104,6 +104,16 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
 
     MakeEfficiencyPlotByCut(Form("plots/run%s/Efficiency/TEff.pdf", run_period), run_period);
 
+    a = "if [ ! -d \"plots/";
+    b = "run" + std::string(run_period) + "/" + "Interaction";
+    c = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
+    d = "run" + std::string(run_period) + "/" + "Interaction";
+    e = "; fi";
+    command = a + b + c + d + e ;
+    system(command.c_str());
+
+    // Interaction Plot
+    MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction.pdf", run_period), run_period);
 
 }
 // -----------------------------------------------------------------------------
@@ -1355,6 +1365,71 @@ void histogram_plotter::MakeEfficiencyPlotByCut(const char* print_name, const ch
 
 }
 // -----------------------------------------------------------------------------
+void histogram_plotter::MakeInteractionPlot(const char* print_name, const char *run_period){
+
+    std::vector<TH1D*>  hist(_util.interaction_types.size());
+    
+    TCanvas * c       = new TCanvas();
+    THStack * h_stack = new THStack();
+
+    for (unsigned int k = 0; k < hist.size(); k++){
+        _util.GetHist(f_nuexsec, hist.at(k), Form("Interaction/h_true_nue_E_%s", _util.interaction_types.at(k).c_str() ));
+        if (hist.at(k) == NULL){
+            std::cout << "Couldn't get all the interaction histograms so exiting function..."<< std::endl;
+            return;
+        }
+    }
+
+    hist.at(_util.k_plot_qe)  ->SetFillColor(30);
+    hist.at(_util.k_plot_res) ->SetFillColor(38);
+    hist.at(_util.k_plot_dis) ->SetFillColor(28);
+    hist.at(_util.k_plot_coh) ->SetFillColor(42);
+    hist.at(_util.k_plot_mec) ->SetFillColor(36);
+    hist.at(_util.k_plot_nc)  ->SetFillColor(1);
+
+    // Add the histograms to the stack
+   
+    for (unsigned int k = 0; k < hist.size(); k++){
+        h_stack->Add(hist.at(k));
+    }
+
+    h_stack->Draw("hist");
+    
+
+    h_stack->GetXaxis()->SetTitle("True #nu_{e} Energy");
+    h_stack->GetYaxis()->SetTitle("Entries");
+
+
+    TH1D *h_sum = (TH1D*) hist.at(_util.k_plot_qe)->Clone("h_sum");
+        
+    for (unsigned int i=1; i < hist.size(); i++){
+        h_sum->Add(hist.at(i), 1);
+    }
+
+    h_sum->Draw("same E");
+
+    TLegend *leg_stack = new TLegend(0.75, 0.89, 0.87, 0.6);
+    leg_stack->SetBorderSize(0);
+    leg_stack->SetFillStyle(0);
+
+    leg_stack->AddEntry(hist.at(_util.k_plot_nc),  "NC",       "f");
+    leg_stack->AddEntry(hist.at(_util.k_plot_mec), "CC MEC",   "f");
+    leg_stack->AddEntry(hist.at(_util.k_plot_coh), "CC Coh",   "f");
+    leg_stack->AddEntry(hist.at(_util.k_plot_dis), "CC DIC",   "f");
+    leg_stack->AddEntry(hist.at(_util.k_plot_res), "CC Res",   "f");
+    leg_stack->AddEntry(hist.at(_util.k_plot_qe),  "CC QE",    "f");
+        
+    leg_stack->Draw();
+
+    // Draw the run period on the plot
+    Draw_Run_Period(c);
+
+    // Add the weight labels
+    // Draw_WeightLabels(c);
+    
+    c->Print(print_name);
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

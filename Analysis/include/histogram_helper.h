@@ -171,16 +171,7 @@ class histogram_helper{
         k_TH2D_true_MAX
     };
 
-    // Genie interaction enums
-    enum enum_plot_interactions {
-        k_plot_qe,
-        k_plot_res,
-        k_plot_dis,
-        k_plot_coh,
-        k_plot_mec,
-        k_plot_nc,
-        k_interactions_MAX
-    };
+    
 
 
 }; // End Class Histogram Helper 

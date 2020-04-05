@@ -203,6 +203,17 @@ public:
         k_mec = 10
     };
 
+    // Genie interaction enums
+    enum enum_plot_interactions {
+        k_plot_qe,
+        k_plot_res,
+        k_plot_dis,
+        k_plot_coh,
+        k_plot_mec,
+        k_plot_nc,
+        k_interactions_MAX
+    };
+
     // enums for legend
     enum enum_classification {
                 k_nue_cc,
