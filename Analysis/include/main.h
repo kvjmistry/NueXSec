@@ -28,9 +28,9 @@ double _Run1_EXT_trig  = 2987202.860000;    // Run 1 Number of EXT HW Triggers (
 
 // POT and Trigger 
 double _Run3_MC_POT    = 3.69363e+20;      // Run 3 MC POT v33
-double _Run3_Dirt_POT  = 1.65878e+20;      // Run 3 dirt POT
-double _Run3_Data_POT  = 1.867e+19;       // Run 3 Data POT (tortgt) beam good and bad file
-double _Run3_Data_trig = 381401.0;         // Run 3 data HW Triggers (EA9CNT)  beam good and bad file
+double _Run3_Dirt_POT  = 4.32295e+20;      // Run 3 dirt POT
+double _Run3_Data_POT  = 3.872e+19;       // Run 3 Data POT (tortgt) beam good and bad file
+double _Run3_Data_trig = 791168.0 ;         // Run 3 data HW Triggers (EA9CNT)  beam good and bad file
 double _Run3_EXT_trig  = 1558577.475000;   // Run 1 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
 
 

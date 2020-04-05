@@ -559,6 +559,7 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_mc).WriteTEfficiency();
         _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
         _hhelper.at(_util.k_mc).WriteFlash();
+        _hhelper.at(_util.k_mc).WriteInteractions();
         _thelper.at(_util.k_mc).WriteTree(_util.k_mc);
 
     }
@@ -588,7 +589,7 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
 
     // Fill Histograms -- also returns the cv weight for tabulating 
     double weight = 1.0;
-    if (!slim) _hhelper.at(type).FillHists(type, classification.second, cut_index, SC, weight);
+    if (!slim) _hhelper.at(type).FillHists(type, classification.second, interaction, cut_index, SC, weight);
 
     // Set counters for the cut
     _util.Tabulate(interaction, classification.first, type, counter_v.at(cut_index), weight );

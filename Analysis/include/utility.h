@@ -112,6 +112,7 @@ public:
                 "TEff",
                 "True",
                 "Flash",
+                "Interaction",
                 "Stack"
                 };
 
@@ -129,6 +130,16 @@ public:
                 "ext",
                 "data",
                 "dirt"
+                };
+
+    // Names of the genie interaction types
+    std::vector<std::string> interaction_types = {
+                "CC_QE",
+                "CC_Res",
+                "CC_DIS",
+                "CC_Coh",
+                "CC_MEC",
+                "NC"
                 };
 
     // enum to switch file type 

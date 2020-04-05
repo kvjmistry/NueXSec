@@ -55,7 +55,7 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
         system(command.c_str()); 
 
         // Call the Make stack function for all the plots we want
-        CallMakeStack(run_period, i, Data_POT);
+        // CallMakeStack(run_period, i, Data_POT);
         
     }
 
@@ -789,7 +789,7 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
     // Leading shower multiplicity
     MakeStack("h_reco_shower_multiplicity", _util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Shower Multiplicty", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  true, 1.0, "Shower Multiplicty", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_shower_multiplicity.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Leading track multiplicity
@@ -817,9 +817,9 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
                         area_norm,  false, 1.0, "Hit Ratio of all Showers and the Slice", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_hits_ratio.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
     
-        // Shower score
+    // Shower score
     MakeStack("h_reco_shower_score", _util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Shower Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  true, 1.0, "Shower Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_shower_score.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Track score
@@ -829,7 +829,7 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
     // Calibrated energy of all the showers
     MakeStack("h_reco_shower_energy_tot_cali", _util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Total Calibrated Energy of all Showers [GeV]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  true, 1.0, "Total Calibrated Energy of all Showers [GeV]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_shower_energy_tot_cali.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
     // Total number of hits for the leading showe
@@ -893,6 +893,16 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
     MakeStack("h_reco_nslice",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  true, 1.0, "Pandora Slice ID", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_nslice.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
+
+    // Slice Cluster Fraction
+    MakeStack("h_reco_slclustfrac",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Slice Cluster Fraction", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_slclustfrac.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
+
+    // Cosmic Inpact Parameter
+    MakeStack("h_reco_cosmicIP",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Pandora Cosmic Inpact Parameter [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_cosmicIP.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()) );
 
 }
 // -----------------------------------------------------------------------------
@@ -1270,6 +1280,9 @@ void histogram_plotter::MakeEfficiencyPlot(const char* print_name, const char *r
         line->SetLineStyle(kDotted);
         line->Draw();
     }
+
+    h_eff->GetXaxis()->SetTickLength(0.00);
+    h_pur->GetXaxis()->SetTickLength(0.00);
 
     // Draw the run period on the plot
     Draw_Run_Period(c);

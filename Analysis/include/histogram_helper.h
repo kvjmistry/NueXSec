@@ -39,7 +39,7 @@ class histogram_helper{
     void MakeDirectory();
     // -------------------------------------------------------------------------
     // Function to fill the reco variables
-    void FillHists(int type, int classification_index, int cut_index, SliceContainer SC, double &_weight);
+    void FillHists(int type, int classification_index, std::string interaction, int cut_index, SliceContainer SC, double &_weight);
     // -------------------------------------------------------------------------
     // Function to write the histograms to a file
     void WriteReco(int type);
@@ -55,6 +55,9 @@ class histogram_helper{
     // -------------------------------------------------------------------------
     // Function to write the flash histograms
     void WriteFlash();
+    // -------------------------------------------------------------------------
+    // Function to write the interaction histograms
+    void WriteInteractions();
     // -------------------------------------------------------------------------
     // Get the CV weights for histograms
     double GetCVWeight(int type, SliceContainer SC);
@@ -76,6 +79,9 @@ class histogram_helper{
     
     // Flash Histograms
     std::vector<TH1D*> TH1D_flash_hists;
+
+    // Interaction Histograms
+    std::vector<TH1D*> TH1D_interaction_hists;
 
     // enum for histogram vars
     enum TH1D_hist_vars {
@@ -122,6 +128,8 @@ class histogram_helper{
         k_reco_opfilter_veto,                                                   // Common Optical filter michel veto
         k_reco_softwaretrig,                                                    // Software Trigger
         k_reco_nslice,                                                          // Pandora Slice ID
+        k_reco_slclustfrac,                                                     // Reco Fraction of hits in the slice that are fully reconstructed to 3D particles.
+        k_reco_cosmicIP,                                                        // Reco Closest distance between shower start and space points associated to tracks flagged as cosmics.
         k_TH1D_MAX
     };
 
@@ -161,6 +169,17 @@ class histogram_helper{
         k_true_nue_vtx_z_y,
         k_true_nue_vtx_z_y_sce,
         k_TH2D_true_MAX
+    };
+
+    // Genie interaction enums
+    enum enum_plot_interactions {
+        k_plot_qe,
+        k_plot_res,
+        k_plot_dis,
+        k_plot_coh,
+        k_plot_mec,
+        k_plot_nc,
+        k_interactions_MAX
     };
 
 
