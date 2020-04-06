@@ -927,6 +927,11 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
                         area_norm,  false, 1.0, "Pandora Cosmic Inpact Parameter [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_cosmicIP.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
+    // Shower dEdx with the track fitter
+    MakeStack("h_reco_shr_tkfit_dedx_Y",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Collection Plane dEdx (track fitter) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shr_tkfit_dedx_Y.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+
 }
 // -----------------------------------------------------------------------------
 void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name, std::string histname){

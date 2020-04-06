@@ -298,6 +298,9 @@ void histogram_helper::InitHistograms(){
             // Cosmic Inpact Parameter
             TH1D_hists.at(k_reco_cosmicIP).at(i).at(j) = new TH1D ( Form("h_reco_cosmicIP_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 100, 0, 500);
 
+            // dEdx with the trackfit variable
+            TH1D_hists.at(k_reco_shr_tkfit_dedx_Y).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_Y_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+
         }
         
     }
@@ -311,7 +314,7 @@ void histogram_helper::InitHistograms(){
             TEfficiency_hists.resize(_util.k_cuts_MAX);
 
             for (unsigned int l = 0; l < _util.k_cuts_MAX; l++ ){
-                TEfficiency_hists.at(l) = new TH1D( Form("h_true_nu_E_%s",_util.cut_dirs.at(l).c_str() ), "", 10, 0, 4 );
+                TEfficiency_hists.at(l) = new TH1D( Form("h_true_nu_E_%s",_util.cut_dirs.at(l).c_str() ), "", 15, 0, 5 );
             }
         }
 
@@ -451,6 +454,8 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     TH1D_hists.at(k_reco_slclustfrac).at(cut_index).at(classification_index)->Fill(SC.slclustfrac, weight);
 
     TH1D_hists.at(k_reco_cosmicIP).at(cut_index).at(classification_index)->Fill(SC.CosmicIP, weight);
+
+    TH1D_hists.at(k_reco_shr_tkfit_dedx_Y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
 
     // -------------------------------------------------------------------------
     // Fill truth histograms

@@ -72,13 +72,13 @@ public:
     float shr_start_y;           // Shower: Start y coordinate of the leading shower
     float shr_start_z;           // Shower: Start z coordinate of the leading shower
     
-    float shr_dedx_Y;            // Shower: dE/dx of the leading shower on the Y plane with the 1x4 cm box method| Plane 0
+    float shr_dedx_Y;            // Shower: dE/dx of the leading shower on the Y plane with the 1x4 cm box method| Plane 2
     float shr_dedx_V;            // Shower: dE/dx of the leading shower on the V plane with the 1x4 cm box method| Plane 1
-    float shr_dedx_U;            // Shower: dE/dx of the leading shower on the U plane with the 1x4 cm box method| Plane 2
+    float shr_dedx_U;            // Shower: dE/dx of the leading shower on the U plane with the 1x4 cm box method| Plane 0
     
-    float shr_dedx_Y_cali;       // Shower: Calibrated dE/dx of the leading shower on the Y plane with the 1x4 cm box method| Plane 0
+    float shr_dedx_Y_cali;       // Shower: Calibrated dE/dx of the leading shower on the Y plane with the 1x4 cm box method| Plane 2
     float shr_dedx_V_cali;       // Shower: Calibrated dE/dx of the leading shower on the V plane with the 1x4 cm box method| Plane 1
-    float shr_dedx_U_cali;       // Shower: Calibrated dE/dx of the leading shower on the U plane with the 1x4 cm box method| Plane 2
+    float shr_dedx_U_cali;       // Shower: Calibrated dE/dx of the leading shower on the U plane with the 1x4 cm box method| Plane 0
     
     float shr_tkfit_dedx_Y;      // Shower: dE/dx of the leading shower on the Y plane with the track fitting
     float shr_tkfit_dedx_V;      // Shower: dE/dx of the leading shower on the V plane with the track fitting
@@ -203,13 +203,13 @@ public:
     float shrclusdir2;
     
     unsigned int   shr_hits_tot;         // Shower: Total number of shower hits
-    unsigned int   shr_hits_y_tot;       // Shower: Total number of shower hits on the Y Plane 0
+    unsigned int   shr_hits_y_tot;       // Shower: Total number of shower hits on the Y Plane 2
     unsigned int   shr_hits_u_tot;       // Shower: Total number of shower hits on the U Plane 1 
-    unsigned int   shr_hits_v_tot;       // Shower: Total number of shower hits on the V Plane 2
+    unsigned int   shr_hits_v_tot;       // Shower: Total number of shower hits on the V Plane 0
     
     unsigned int   trk_hits_tot;         // Track: Total number of track hits
-    unsigned int   trk_hits_y_tot;       // Track: Total number of track hits on the Y Plane 0
-    unsigned int   trk_hits_u_tot;       // Track: Total number of track hits on the U Plane 2
+    unsigned int   trk_hits_y_tot;       // Track: Total number of track hits on the Y Plane 2
+    unsigned int   trk_hits_u_tot;       // Track: Total number of track hits on the U Plane 0
     unsigned int   trk_hits_v_tot;       // Track: Total number of track hits on the V Plane 1
     
     float elecclusters_U_charge;

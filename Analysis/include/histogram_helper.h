@@ -127,6 +127,7 @@ class histogram_helper{
         k_reco_nslice,                                                          // Pandora Slice ID
         k_reco_slclustfrac,                                                     // Reco Fraction of hits in the slice that are fully reconstructed to 3D particles.
         k_reco_cosmicIP,                                                        // Reco Closest distance between shower start and space points associated to tracks flagged as cosmics.
+        k_reco_shr_tkfit_dedx_Y,                                                // The dEdx using the trackfit variable
         k_TH1D_MAX
     };
 
