@@ -31,6 +31,7 @@ void selection::Initialise( const char * mc_file,
 
     std::cout << "\nUsing a weight setting of: " << weight_cfg << std::endl;
     std::cout << "If this is set to 1 (default) then we apply the Genie Tune and PPFX weights to the CV" << std::endl;
+    _weight_cfg = weight_cfg;
 
     // Create the file directory if it does not exist already
     gSystem->Exec("if [ ! -d \"files/trees/\" ]; then echo \"\nfiles folder does not exist... creating\"; mkdir -p files/trees; fi"); 
@@ -254,7 +255,8 @@ void selection::MakeSelection(){
 
         std::cout << "Ending Selection over MC" << std::endl;
 
-        // Get the total number of in cryostat nues
+        // Get the total number of in cryostat nues, I think this number is wrong for now until we have the unweighted numbers back...
+        // This is because we shouldnt ppfx weight any cyo nues when the flux is for the active volume 
         tot_true_cryo_nues = counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_qe)  + 
                              counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_res) + 
                              counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_dis) + 
@@ -586,9 +588,12 @@ void selection::SavetoFile(){
 } // End save to file
 // -----------------------------------------------------------------------------
 void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, int cut_index, std::vector<std::vector<double>> &counter_v){
-
-    // Fill Histograms -- also returns the cv weight for tabulating 
+    
+    // Get the CV weight
     double weight = 1.0;
+    weight = GetCVWeight(type, SC);
+    
+    // Fill Histograms
     if (!slim) _hhelper.at(type).FillHists(type, classification.second, interaction, cut_index, SC, weight);
 
     // Set counters for the cut
@@ -609,6 +614,63 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
         }
 
     }
+
+}
+// -----------------------------------------------------------------------------
+double selection::GetCVWeight(int type, SliceContainer SC){
+    
+    double weight = 1.0;
+    bool weight_tune{true}, weight_ppfx{true};
+
+    // Set the weight settings
+    if (_weight_cfg == 0){
+        weight_tune = false;
+        weight_ppfx = false;
+    }
+    else if (_weight_cfg == 1){
+        weight_tune = true;
+        weight_ppfx = true;
+    }
+    else if (_weight_cfg == 2){
+        weight_tune = true;
+        weight_ppfx = false;
+    }
+    else if (_weight_cfg == 3){
+        weight_tune = false;
+        weight_ppfx = true;
+    }
+    else {
+        std::cout << "Unknown weight setting specified, using defaults" << std::endl;
+    }
+
+
+    // Get the tune weight
+    if (type == _util.k_mc || type == _util.k_dirt){
+        
+        weight = SC.weightTune; // Here define the weight
+        
+        // Catch infinate/nan/unreasonably large tune weights
+        if (std::isinf(weight))      weight = 1.0; 
+        if (std::isnan(weight) == 1) weight = 1.0;
+        if (weight > 100)            weight = 1.0;
+
+        // If tune weight turned off, just set weight to 1.0
+        if (!weight_tune) weight = 1.0;
+
+    } 
+    else weight = 1.0;
+    
+
+    // Get the PPFX CV flux correction weight
+    if (type == _util.k_mc){
+        double weight_flux = SC.GetPPFXCVWeight();
+        
+        // If we want ppfx weight then add this into the weight
+        if (weight_ppfx) weight = weight * weight_flux;
+
+    }
+
+    return weight;
 
 }
 // -----------------------------------------------------------------------------

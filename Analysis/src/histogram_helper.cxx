@@ -359,17 +359,13 @@ void histogram_helper::InitHistograms(){
     // Interaction Histograms
     TH1D_interaction_hists.resize(_util.k_interactions_MAX);
     for (unsigned int p =0 ; p < TH1D_interaction_hists.size(); p++ ){
-        TH1D_interaction_hists.at(p) = new TH1D( Form("h_true_nue_E_%s", _util.interaction_types.at(p).c_str() ), "; True #nu_{e} Energy; Entries", 25, 0, 5 );
+        TH1D_interaction_hists.at(p) = new TH1D( Form("h_true_nue_E_%s", _util.interaction_types.at(p).c_str() ), "; True #nu_{e} Energy; Entries", 15, 0, 5 );
     }
 
 
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::FillHists(int type, int classification_index, std::string interaction, int cut_index, SliceContainer SC, double &_weight){
-
-    // Get the CV weight
-    double weight = GetCVWeight(type, SC);
-    _weight = weight;
+void histogram_helper::FillHists(int type, int classification_index, std::string interaction, int cut_index, SliceContainer SC, double weight){
 
     // Calculate some variables
     double reco_shr_p = std::sqrt(SC.shr_px*SC.shr_px + SC.shr_py*SC.shr_py + SC.shr_pz*SC.shr_pz);
@@ -714,39 +710,5 @@ void histogram_helper::WriteInteractions(){
     }
     
     
-}
-// -----------------------------------------------------------------------------
-double histogram_helper::GetCVWeight(int type, SliceContainer SC){
-    
-    double weight = 1.0;
-
-    // Get the tune weight
-    if (type == _util.k_mc || type == _util.k_dirt){
-        
-        weight = SC.weightTune; // Here define the weight
-        
-        // Catch infinate/nan/unreasonably large tune weights
-        if (std::isinf(weight))      weight = 1.0; 
-        if (std::isnan(weight) == 1) weight = 1.0;
-        if (weight > 100)            weight = 1.0;
-
-        // If tune weight turned off, just set weight to 1.0
-        if (!weight_tune) weight = 1.0;
-
-    } 
-    else weight = 1.0;
-    
-
-    // Get the PPFX CV flux correction weight
-    if (type == _util.k_mc){
-        double weight_flux = SC.GetPPFXCVWeight();
-        
-        // If we want ppfx weight then add this into the weight
-        if (weight_ppfx) weight = weight * weight_flux;
-
-    }
-
-    return weight;
-
 }
 // -----------------------------------------------------------------------------

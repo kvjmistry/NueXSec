@@ -32,6 +32,8 @@ namespace xsecSelection {
 
             int max_events{-1};
 
+            int _weight_cfg{1};
+
             // Scale factors (everything is scaled to data)
             double mc_scale_factor     = 1.0;
             double intime_scale_factor = 1.0;
@@ -135,6 +137,9 @@ namespace xsecSelection {
             // -----------------------------------------------------------------
             // Function to implement counters and fillings of histograms for each cut
             void SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, int cut_index, std::vector<std::vector<double>> &counter_v);
+            // -----------------------------------------------------------------
+            // Get the CV weights for histograms
+            double GetCVWeight(int type, SliceContainer SC);
             // -----------------------------------------------------------------
 
     }; // END Class

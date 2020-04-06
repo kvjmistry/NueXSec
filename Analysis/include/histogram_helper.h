@@ -39,7 +39,7 @@ class histogram_helper{
     void MakeDirectory();
     // -------------------------------------------------------------------------
     // Function to fill the reco variables
-    void FillHists(int type, int classification_index, std::string interaction, int cut_index, SliceContainer SC, double &_weight);
+    void FillHists(int type, int classification_index, std::string interaction, int cut_index, SliceContainer SC, double weight);
     // -------------------------------------------------------------------------
     // Function to write the histograms to a file
     void WriteReco(int type);
@@ -58,9 +58,6 @@ class histogram_helper{
     // -------------------------------------------------------------------------
     // Function to write the interaction histograms
     void WriteInteractions();
-    // -------------------------------------------------------------------------
-    // Get the CV weights for histograms
-    double GetCVWeight(int type, SliceContainer SC);
     // -------------------------------------------------------------------------
 
     private:
