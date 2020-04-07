@@ -562,18 +562,23 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
         _hhelper.at(_util.k_mc).WriteFlash();
         _hhelper.at(_util.k_mc).WriteInteractions();
+        _hhelper.at(_util.k_mc).Write_2DSigBkgHists();
+
         _thelper.at(_util.k_mc).WriteTree(_util.k_mc);
 
     }
     if (bool_use_data) {
         _hhelper.at(_util.k_data).WriteReco(_util.k_data);
         _hhelper.at(_util.k_data).WriteFlash();
+
         _thelper.at(_util.k_data).WriteTree(_util.k_data);
 
     }
     if (bool_use_ext) {
         _hhelper.at(_util.k_ext).WriteReco(_util.k_ext);
         _hhelper.at(_util.k_ext).WriteFlash();
+        _hhelper.at(_util.k_ext).Write_2DSigBkgHists();
+
         _thelper.at(_util.k_ext).WriteTree(_util.k_ext);
 
     }
@@ -581,6 +586,8 @@ void selection::SavetoFile(){
         // _hhelper.at(_util.k_dirt).WriteTrue(); // Only turn this on to inspect. It wont merge since the file names are not uniique yet!!
         _hhelper.at(_util.k_dirt).WriteReco(_util.k_dirt);
         _hhelper.at(_util.k_dirt).WriteFlash();
+        _hhelper.at(_util.k_dirt).Write_2DSigBkgHists();
+
         _thelper.at(_util.k_dirt).WriteTree(_util.k_dirt);
 
     }

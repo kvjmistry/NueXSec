@@ -59,6 +59,10 @@ class histogram_helper{
     // Function to write the interaction histograms
     void WriteInteractions();
     // -------------------------------------------------------------------------
+    // Function to write the 2D signal vs Background Histograms
+    void Write_2DSigBkgHists();
+    // -------------------------------------------------------------------------
+
 
     private:
 
@@ -80,6 +84,9 @@ class histogram_helper{
     // Interaction Histograms
     std::vector<TH1D*> TH1D_interaction_hists;
 
+    // 2D histograms for Signal and Background Rejection
+    std::vector<std::vector<TH2D*>> TH2D_hists;
+    
     // enum for histogram vars
     enum TH1D_hist_vars {
         k_reco_vtx_x,                                                           // Reco Vertex X
@@ -167,6 +174,12 @@ class histogram_helper{
         k_true_nue_vtx_z_y,
         k_true_nue_vtx_z_y_sce,
         k_TH2D_true_MAX
+    };
+
+    // 2D Histograms for separating signal and background
+    enum TH2D_reco_hist_vars {
+        k_reco_shr_dEdx_shr_dist,
+        k_TH2D_reco_MAX
     };
 
     

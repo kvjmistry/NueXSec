@@ -365,6 +365,29 @@ void histogram_helper::InitHistograms(){
         TH1D_interaction_hists.at(p) = new TH1D( Form("h_true_nue_E_%s", _util.interaction_types.at(p).c_str() ), "; True #nu_{e} Energy; Entries", 15, 0, 5 );
     }
 
+    // 2D signal and background separation plots
+    
+    // Resizing the histograms
+    TH2D_hists.resize(k_TH2D_reco_MAX);
+    
+    // Loop over the histograms to resize
+    for (unsigned int i = 0; i < TH2D_hists.size(); i++){
+        TH2D_hists.at(i).resize(_util.k_sig_bkg_MAX);
+    }
+
+    // Loop over the histograms
+    for (unsigned int i = 0; i < TH2D_hists.size(); i++){
+       
+        // Loop over the types 
+        for (unsigned int k =0 ; k< TH2D_hists.at(i).size(); k++){
+            // dEdx vs shower vertex distance 
+            TH2D_hists.at(i).at(k)     = new TH2D( Form("h_reco_shr_dEdx_shr_dist_%s", _util.sig_bkg_prefix.at(k).c_str()),";Collection Plane dEdx (calibrated) [MeV/cm];Shower to Vertex Distance [cm]", 40, 0, 10, 20, 0, 20);
+        }
+        
+    }
+
+
+
 
 }
 // -----------------------------------------------------------------------------
@@ -592,6 +615,26 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
         }
         
     }
+
+    // Fill 2D histograms for signal background rejection -- only for MC, dirt and EXT
+    if (_type != _util.k_data){ 
+        
+        // For the dEdx vs shower distance we make the histogram just before the cut is applied
+        if (cut_index == _util.k_shr_hits_y_plane){
+            
+            // This is the signal
+            if (classification_index == _util.k_nue_cc){
+                TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(_util.k_signal)->Fill(SC.shr_dedx_Y_cali, SC.shr_distance, weight);
+            }
+            // This is the background
+            else {
+                TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(_util.k_background)->Fill(SC.shr_dedx_Y_cali, SC.shr_distance, weight);
+            }
+
+        }
+        
+
+    }
     
 
 }
@@ -714,6 +757,26 @@ void histogram_helper::WriteInteractions(){
         TH1D_interaction_hists.at(p)->Write("",TObject::kOverwrite);
     }
     
+    
+}
+// -----------------------------------------------------------------------------
+void histogram_helper::Write_2DSigBkgHists(){
+    
+    TDirectory *dir;
+    bool bool_dir = _util.GetDirectory(f_nuexsec, dir ,"2D");
+    if (bool_dir) dir->cd();
+    
+    // TH2D
+    for (unsigned int p = 0; p < TH2D_hists.size(); p++){
+        
+        TH2D_hists.at(p).at(_util.k_signal)->SetOption("box");
+        TH2D_hists.at(p).at(_util.k_signal)->SetFillColor(30);
+        TH2D_hists.at(p).at(_util.k_signal)->Write("",TObject::kOverwrite);
+
+        TH2D_hists.at(p).at(_util.k_background)->SetOption("box");
+        TH2D_hists.at(p).at(_util.k_background)->SetFillColor(46);
+        TH2D_hists.at(p).at(_util.k_background)->Write("",TObject::kOverwrite);
+    }
     
 }
 // -----------------------------------------------------------------------------

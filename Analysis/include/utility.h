@@ -86,6 +86,8 @@ public:
     // For creating histogram names
     std::vector<std::string> type_prefix = {"MC", "Data", "EXT", "Dirt"};
 
+    std::vector<std::string> sig_bkg_prefix = {"Signal", "Background"};
+
     // Cut directory names
     std::vector<std::string> cut_dirs = {
             "Unselected",    // Unselected
@@ -113,6 +115,7 @@ public:
                 "True",
                 "Flash",
                 "Interaction",
+                "2D",
                 "Stack"
                 };
 
@@ -282,6 +285,13 @@ public:
         k_count_ext,
         k_count_dirt,
         k_COUNTER_MAX
+    };
+
+    // Enums for singal and background separation plots
+    enum enum_sig_bkg {
+        k_signal,
+        k_background,
+        k_sig_bkg_MAX
     };
 
 }; // End Class Utility
