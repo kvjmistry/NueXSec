@@ -327,7 +327,9 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights){
     
     tree->SetBranchAddress("nu_completeness_from_pfp", &nu_completeness_from_pfp);
     tree->SetBranchAddress("nu_purity_from_pfp", &nu_purity_from_pfp);
-    // tree->SetBranchAddress("n_tracks_pandora", &n_tracks_pandora);
+    tree->SetBranchAddress("n_tracks_pandora", &n_tracks_pandora);
+    
+    tree->SetBranchAddress("_closestNuCosmicDist",&_closestNuCosmicDist);
     
     // tree->SetBranchAddress("vtx_fit_pandora_x", &vtx_fit_pandora_x);
     // tree->SetBranchAddress("vtx_fit_pandora_y", &vtx_fit_pandora_y);
