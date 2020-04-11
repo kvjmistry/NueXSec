@@ -48,7 +48,8 @@ int main(int argc, char *argv[]){
     "\033[0;33m[--slim]\033[0m                                               \033[0;32mWhen this extension is added, the histogram helper class is not initalised and no histograms will be filled or saved. This is to speed up the selection code if you just want to run the selection.\033[0m\n\n"
     "\033[0;33m[--verbose <verbose level>]\033[0m                            \033[0;32m0 does not print the selection cut results, 1 (default) currently prints everything\033[0m\n\n"
     "\n\nTo make the histograms after running selection, run: \n\n"
-    "\033[0;31m./nuexsec --run <run period num> --hist <input merged nuexsec file>\033[0m \n\n"
+    "\033[0;31m./nuexsec --run <run period num> --hist <input merged nuexsec file> [options (see below)]\033[0m \n\n"
+    "\033[0;33m[--weight <weight setting>]\033[0m                            \033[0;32mChange the Weight level to dislay on the plots. Should be used in conjunction with the setting used in the selection stage. level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only \033[0m\n\n"
     "The <input merged nuexsec file> corresponds to hadd merged file of the mc, data, ext and dirt. See the bash script merge_run1_files.sh for more details\n\n";
 
     // -------------------------------------------------------------------------    
@@ -160,7 +161,7 @@ int main(int argc, char *argv[]){
 
     // Add catches for default input
     if ((run_period == "empty") ){
-        std::cout << "Error, must provide a run period as input!" << std::endl;
+        std::cout << "\nError, must provide a run period as input!\n" << std::endl;
         std::cout << "USAGE:" << usage << std::endl; 
         exit(1);
     }

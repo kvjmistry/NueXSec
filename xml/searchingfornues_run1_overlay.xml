@@ -7,7 +7,7 @@
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
 <!ENTITY name "searchingfornues_run1_overlay">
-<!ENTITY version "v2">
+<!ENTITY version "v3">
 ]>
 
 <job>
@@ -44,11 +44,11 @@
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <maxfilesperjob>5</maxfilesperjob>
-    <numjobs>500</numjobs>
+    <numjobs>3000</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <schema>root</schema>
-    <inputdef>prodgenie_numi_uboone_overlay_fhc_mcc9_run1_v28_v2_sample0</inputdef>
+    <inputdef>prodgenie_numi_uboone_overlay_fhc_mcc9_run1_v28_all_snapshot</inputdef>
     <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
     <jobsub_start>  --expected-lifetime=short</jobsub_start>
     <blacklist>Lancaster</blacklist>

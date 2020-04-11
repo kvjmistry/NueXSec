@@ -13,7 +13,8 @@ DEBUGFLAGS= -O0 -g -D _DEBUG
 MAIN = nuexsec
 
 # List the object files here
-OBJ_FILES = bin/main.o bin/utility.o bin/selection.o bin/selection_cuts.o bin/Passed_Container.o bin/histogram_helper.o bin/histogram_plotter.o bin/SliceContainer.o bin/TreeHelper.o
+# OBJ_FILES = bin/main.o bin/utility.o bin/selection.o bin/selection_cuts.o bin/Passed_Container.o bin/histogram_helper.o bin/histogram_plotter.o bin/SliceContainer.o bin/TreeHelper.o
+OBJ_FILES = bin/*.o
 
 # Main Target
 all: $(MAIN)

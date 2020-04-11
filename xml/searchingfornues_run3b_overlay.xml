@@ -38,13 +38,13 @@
     <fcl>run_EventRates.fcl</fcl>
     <fcl>run_flashvalidation_mc.fcl</fcl>
     <fcl>standard_overlay_notpc_numi_uboone_updated.fcl</fcl>
-    <fcl>run_neutrinoselectionfilter_run1_overlay_cc0pinp_numi.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run3_overlay_cc0pinp_numi.fcl</fcl>
     <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</outdir>
     <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</logdir>
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <maxfilesperjob>5</maxfilesperjob>
-    <numjobs>800</numjobs>
+    <numjobs>2000</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <schema>root</schema>

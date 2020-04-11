@@ -96,6 +96,8 @@ class histogram_helper{
         k_reco_vtx_y_sce,                                                       // Reco Vertex Y Space Charge Corrected
         k_reco_vtx_z_sce,                                                       // Reco Vertex Z Space Charge Corrected
         k_reco_dEdx_y_plane,                                                    // dEdx on Collection Plane (uncalibrated)
+        k_reco_dEdx_cali_u_plane,                                               // dEdx Cali on U Plane
+        k_reco_dEdx_cali_v_plane,                                               // dEdx Cali on V Plane
         k_reco_dEdx_cali_y_plane,                                               // dEdx Cali on Collection Plane
         k_reco_leading_mom,                                                     // Leading Shower Momentum
         k_reco_shower_to_vtx_dist,                                              // 2D distance shower vertex to reco nu vertex
@@ -103,9 +105,9 @@ class histogram_helper{
         k_reco_leading_shower_hits_all_planes,                                  // Leading Shower hits in all planes
         k_reco_leading_shower_hits_collection_plane,                            // Leading Shower hits in collection
         k_reco_leading_shower_open_angle,                                       // Leading Shower opening angle
-        k_reco_secondary_shower_to_vtx_dist,                                    // Secondary shower to vertex distance (for events with more than 1 shower)
-        k_reco_leading_shower_hits_per_length,                                  // Leading Shower hits per length
-        k_reco_longest_track_leading_shower_length,                             // Longest track to leading shower length
+        // k_reco_secondary_shower_to_vtx_dist,                                 // Secondary shower to vertex distance (for events with more than 1 shower)
+        // k_reco_leading_shower_hits_per_length,                               // Leading Shower hits per length
+        // k_reco_longest_track_leading_shower_length,                          // Longest track to leading shower length
         k_reco_n_track_contained,                                               // Number of Tracks Contained
         k_reco_n_shower_contained,                                              // Number of Showers Contained
         k_reco_leading_shower_phi,                                              // Leading shower phi
@@ -122,11 +124,14 @@ class histogram_helper{
         k_reco_shower_energy_tot_cali,                                          // Calibrated energy of all the showers
         k_reco_shower_hits,                                                     // Total number of hits for the leading shower
         k_reco_shower_hits_y_plane,                                             // Total number of hits for the leading shower in the collection plane
-        k_reco_shr_trkfit_2cm_dEdx,                                             // dE/dx of the leading shower on the Y plane with the track fitting, use first 2 cm
+        k_reco_shr_trkfit_2cm_dEdx_u,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use first 2 cm u plane
+        k_reco_shr_trkfit_2cm_dEdx_v,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use first 2 cm v plane
         k_reco_shr_trkfit_2cm_dEdx_y,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use first 2 cm y plane
-        k_reco_shr_trkfit_gap05_dEdx,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use 1x4 cm box, skip first 10mm
+        k_reco_shr_trkfit_gap05_dEdx_u,                                         // dE/dx of the leading shower on the Y plane with the track fitting, use 1x4 cm box, skip first 10mm u plane
+        k_reco_shr_trkfit_gap05_dEdx_v,                                         // dE/dx of the leading shower on the Y plane with the track fitting, use 1x4 cm box, skip first 10mm v plane
         k_reco_shr_trkfit_gap05_dEdx_y,                                         // dE/dx of the leading shower on the Y plane with the track fitting, use 1x4 cm box, skip first 5mm y plane
-        k_reco_shr_trkfit_gap10_dEdx,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use 1x4 cm box, skip first 5mm
+        k_reco_shr_trkfit_gap10_dEdx_u,                                         // dE/dx of the leading shower on the Y plane with the track fitting, use 1x4 cm box, skip first 5mm u plane
+        k_reco_shr_trkfit_gap10_dEdx_v,                                         // dE/dx of the leading shower on the Y plane with the track fitting, use 1x4 cm box, skip first 5mm v plane
         k_reco_shr_trkfit_gap10_dEdx_y,                                         // dE/dx of the leading shower on the Y plane with the track fitting, use 1x4 cm box, skip first 10mm y plane
         k_reco_opfilter_beam,                                                   // Common optical filter beam
         k_reco_opfilter_veto,                                                   // Common Optical filter michel veto
@@ -134,7 +139,11 @@ class histogram_helper{
         k_reco_nslice,                                                          // Pandora Slice ID
         k_reco_slclustfrac,                                                     // Reco Fraction of hits in the slice that are fully reconstructed to 3D particles.
         k_reco_cosmicIP,                                                        // Reco Closest distance between shower start and space points associated to tracks flagged as cosmics.
-        k_reco_shr_tkfit_dedx_Y,                                                // The dEdx using the trackfit variable
+        k_reco_shr_tkfit_dedx_u,                                                // The dEdx using the trackfit variable u plane
+        k_reco_shr_tkfit_dedx_v,                                                // The dEdx using the trackfit variable v plane
+        k_reco_shr_tkfit_dedx_y,                                                // The dEdx using the trackfit variable collection
+        k_reco_flash_time,                                                      // The Flash time
+        k_reco_flash_pe,                                                        // The Flash PE
         k_TH1D_MAX
     };
 

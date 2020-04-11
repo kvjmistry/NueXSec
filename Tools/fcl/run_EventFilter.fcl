@@ -51,5 +51,6 @@ physics:
 }
 
 physics.filters.filter.EventList: "run1_run_subrun_list_data.txt"
+physics.filters.filter.EventList: "test.list"
 physics.filters.filter.Selection: 1
 

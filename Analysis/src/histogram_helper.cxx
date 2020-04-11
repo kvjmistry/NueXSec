@@ -196,7 +196,10 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_vtx_z_sce).at(i).at(j) = new TH1D ( Form("h_reco_vtx_z_sce_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, -10, 1050);
 
             // dEdx
+            TH1D_hists.at(k_reco_dEdx_cali_u_plane).at(i).at(j) = new TH1D ( Form("h_reco_dEdx_cali_u_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_dEdx_cali_v_plane).at(i).at(j) = new TH1D ( Form("h_reco_dEdx_cali_v_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_dEdx_cali_y_plane).at(i).at(j) = new TH1D ( Form("h_reco_dEdx_cali_y_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            
             TH1D_hists.at(k_reco_dEdx_y_plane).at(i).at(j) = new TH1D ( Form("h_reco_dEdx_y_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
 
             // Leading Shower Momentum
@@ -218,13 +221,13 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_leading_shower_open_angle).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_open_angle_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 50);
 
             // Secondary shower to vertex distance (for events with more than 1 shower)
-            TH1D_hists.at(k_reco_secondary_shower_to_vtx_dist).at(i).at(j) = new TH1D ( Form("h_reco_secondary_shower_to_vtx_dist_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 80);
+            // TH1D_hists.at(k_reco_secondary_shower_to_vtx_dist).at(i).at(j) = new TH1D ( Form("h_reco_secondary_shower_to_vtx_dist_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 80);
 
             // Leading Shower hits per length
-            TH1D_hists.at(k_reco_leading_shower_hits_per_length).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_hits_per_length_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 20);
+            // TH1D_hists.at(k_reco_leading_shower_hits_per_length).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_hits_per_length_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 20);
 
             // Longest track to leading shower length
-            TH1D_hists.at(k_reco_longest_track_leading_shower_length).at(i).at(j) = new TH1D ( Form("h_reco_longest_track_leading_shower_length_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 3);
+            // TH1D_hists.at(k_reco_longest_track_leading_shower_length).at(i).at(j) = new TH1D ( Form("h_reco_longest_track_leading_shower_length_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 3);
 
             // Number of Tracks Contained
             TH1D_hists.at(k_reco_n_track_contained).at(i).at(j) = new TH1D ( Form("h_reco_n_track_contained_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 5, 0, 5);
@@ -275,12 +278,17 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_shower_hits_y_plane).at(i).at(j) = new TH1D (Form("h_reco_shower_hits_y_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 800);
 
             // Shower Track fit dEdx variables
-            TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx).at(i).at(j)     = new TH1D ( Form("h_reco_shr_trkfit_2cm_dEdx_%s_%s",_util.cut_dirs.at(i).c_str(),     _util.classification_dirs.at(j).c_str()) ,"", 60, 0, 20);
-            TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_y).at(i).at(j)   = new TH1D ( Form("h_reco_shr_trkfit_2cm_dEdx_y_%s_%s",_util.cut_dirs.at(i).c_str(),   _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
-            TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx).at(i).at(j)    = new TH1D ( Form("h_reco_shr_trkfit_gap05_dEdx_%s_%s",_util.cut_dirs.at(i).c_str(),    _util.classification_dirs.at(j).c_str()) ,"", 60, 0, 20);
+            TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_u).at(i).at(j)   = new TH1D ( Form("h_reco_shr_trkfit_2cm_dEdx_u_%s_%s",_util.cut_dirs.at(i).c_str(),     _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_v).at(i).at(j)   = new TH1D ( Form("h_reco_shr_trkfit_2cm_dEdx_v_%s_%s",_util.cut_dirs.at(i).c_str(),     _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_y).at(i).at(j)   = new TH1D ( Form("h_reco_shr_trkfit_2cm_dEdx_y_%s_%s",_util.cut_dirs.at(i).c_str(),     _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            
+            TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx_u).at(i).at(j)  = new TH1D ( Form("h_reco_shr_trkfit_gap05_dEdx_u_%s_%s",_util.cut_dirs.at(i).c_str(),  _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx_v).at(i).at(j)  = new TH1D ( Form("h_reco_shr_trkfit_gap05_dEdx_v_%s_%s",_util.cut_dirs.at(i).c_str(),  _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx_y).at(i).at(j)  = new TH1D ( Form("h_reco_shr_trkfit_gap05_dEdx_y_%s_%s",_util.cut_dirs.at(i).c_str(),  _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
-            TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx).at(i).at(j)   = new TH1D ( Form("h_reco_shr_trkfit_gap10_dEdx_%s_%s",_util.cut_dirs.at(i).c_str(),   _util.classification_dirs.at(j).c_str()) ,"", 60, 0, 20);
-            TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx_y).at(i).at(j) = new TH1D ( Form("h_reco_shr_trkfit_gap10_dEdx_y_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            
+            TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx_u).at(i).at(j) = new TH1D ( Form("h_reco_shr_trkfit_gap10_dEdx_u_%s_%s",_util.cut_dirs.at(i).c_str(),   _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx_v).at(i).at(j) = new TH1D ( Form("h_reco_shr_trkfit_gap10_dEdx_v_%s_%s",_util.cut_dirs.at(i).c_str(),   _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx_y).at(i).at(j) = new TH1D ( Form("h_reco_shr_trkfit_gap10_dEdx_y_%s_%s",_util.cut_dirs.at(i).c_str(),   _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
 
             // Op Filter
             TH1D_hists.at(k_reco_opfilter_beam).at(i).at(j) = new TH1D ( Form("h_reco_opfilter_beam_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 500);
@@ -299,7 +307,15 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_cosmicIP).at(i).at(j) = new TH1D ( Form("h_reco_cosmicIP_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 100, 0, 500);
 
             // dEdx with the trackfit variable
-            TH1D_hists.at(k_reco_shr_tkfit_dedx_Y).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_Y_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_shr_tkfit_dedx_u).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_u_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_shr_tkfit_dedx_v).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_v_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_shr_tkfit_dedx_y).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_y_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+
+            // Flash time
+            TH1D_hists.at(k_reco_flash_time).at(i).at(j) = new TH1D ( Form("h_reco_flash_time_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 25 );
+
+            // Flash PE
+            TH1D_hists.at(k_reco_flash_pe).at(i).at(j) = new TH1D ( Form("h_reco_flash_pe_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 100, 0, 5000 );
 
         }
         
@@ -405,6 +421,8 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     TH1D_hists.at(k_reco_vtx_y_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_y, weight);
     TH1D_hists.at(k_reco_vtx_z_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_z, weight);
 
+    TH1D_hists.at(k_reco_dEdx_cali_u_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_U_cali, weight); // Just the collection plane!
+    TH1D_hists.at(k_reco_dEdx_cali_v_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_V_cali, weight); // Just the collection plane!
     TH1D_hists.at(k_reco_dEdx_cali_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y_cali, weight); // Just the collection plane!
 
     TH1D_hists.at(k_reco_dEdx_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y, weight); // Just the collection plane!
@@ -459,11 +477,16 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
 
     TH1D_hists.at(k_reco_shower_hits_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot, weight);
 
-    TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_2cm_dedx_Y + SC.shr_tkfit_2cm_dedx_V + SC.shr_tkfit_2cm_dedx_U, weight);
+    TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_u).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_2cm_dedx_U, weight);
+    TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_2cm_dedx_V, weight);
     TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_2cm_dedx_Y, weight);
-    TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap05_dedx_Y + SC.shr_tkfit_gap05_dedx_V + SC.shr_tkfit_gap05_dedx_U, weight);
+    
+    TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx_u).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap05_dedx_U, weight);
+    TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap05_dedx_V, weight);
     TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap05_dedx_Y, weight);
-    TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap10_dedx_Y + SC.shr_tkfit_gap10_dedx_V + SC.shr_tkfit_gap10_dedx_U, weight);
+    
+    TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx_u).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap10_dedx_U, weight);
+    TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap10_dedx_V, weight);
     TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap10_dedx_Y, weight);
 
 
@@ -478,7 +501,23 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
 
     TH1D_hists.at(k_reco_cosmicIP).at(cut_index).at(classification_index)->Fill(SC.CosmicIP, weight);
 
-    TH1D_hists.at(k_reco_shr_tkfit_dedx_Y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
+    TH1D_hists.at(k_reco_shr_tkfit_dedx_u).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_U, weight);
+    TH1D_hists.at(k_reco_shr_tkfit_dedx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_V, weight);
+    TH1D_hists.at(k_reco_shr_tkfit_dedx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
+
+
+    // Flash histograms
+    if (type == _util.k_mc || type == _util.k_dirt){
+        TH1D_hists.at(k_reco_flash_time).at(cut_index).at(classification_index)->Fill(SC.flash_time + 0.055 -0.359, weight);
+    }
+    if (type == _util.k_ext){
+        TH1D_hists.at(k_reco_flash_time).at(cut_index).at(classification_index)->Fill(SC.flash_time -0.359, weight);
+    }
+    if (type == _util.k_data){
+        TH1D_hists.at(k_reco_flash_time).at(cut_index).at(classification_index)->Fill(SC.flash_time, weight);
+    }
+    
+    TH1D_hists.at(k_reco_flash_pe).at(cut_index).at(classification_index)->Fill(SC.flash_pe, weight);
 
     // -------------------------------------------------------------------------
     // Fill truth histograms

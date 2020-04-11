@@ -405,6 +405,12 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     std::string interaction                    = SC.SliceInteractionType(type); // Genie interaction type
     std::string category                       = SC.SliceCategory();            // The pandora group slice category
 
+    // Test code to isolate the low E nues in truth
+    // if (type == _util.k_mc && SC.nu_e > 0.5) return false;
+    // if (type == _util.k_mc && SC.shr_dedx_Y_cali > 7 && classification.second == _util.k_nue_cc){
+    //     std::cout << SC.run << " " << SC.sub<<" " << SC.evt<<  std::endl;
+    // }
+
     // *************************************************************************
     // Unselected---------------------------------------------------------------
     // *************************************************************************

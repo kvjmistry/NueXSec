@@ -59,7 +59,7 @@ public:
     float shr_py;                // Shower: Y component of the reconstructed momentum of the leading shower (in GeV/c)
     float shr_pz;                // Shower: Z component of the reconstructed momentum of the leading shower (in GeV/c)
     
-    float shr_openangle;         // Shower: Opening angle of the shower
+    float shr_openangle;         // Shower: Opening angle of the shower -- variable does not work...
     
     float shr_tkfit_start_x;     // Shower: Start x coordinate of the leading shower obtained with the track fitting
     float shr_tkfit_start_y;     // Shower: Start y coordinate of the leading shower obtained with the track fitting
@@ -219,8 +219,8 @@ public:
     int   elecclusters_V_N;
     int   elecclusters_Y_N;
     
-    int   n_tracks_contained;    // Reco Number of tracks fully contained in the fiducial volume
-    int   n_showers_contained;   // Reco Number of showers with a starting point within the fiducial volume.
+    unsigned int   n_tracks_contained;    // Reco Number of tracks fully contained in the fiducial volume
+    unsigned int   n_showers_contained;   // Reco Number of showers with a starting point within the fiducial volume.
     float matched_E;             // Total kinetic energy of the MCParticles matched to PFParticles
     float hits_ratio;            // Reco Ratio between hits from showers and total number of hits in the slice.
     float contained_fraction;    // Reco Hits in PFParticles contained in the fiducial volume over the total number of clustered hits in the slice.
