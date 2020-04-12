@@ -3,4 +3,4 @@
 
 source merge/merge_run3_files.sh 
 
-./nuexsec --run 3 --hist files/nuexsec_run3_merged.root --weight 0
+./nuexsec --run 3 --hist files/nuexsec_run3_merged.root --weight 0 --area

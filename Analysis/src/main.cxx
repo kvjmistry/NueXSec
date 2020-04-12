@@ -7,6 +7,7 @@ int main(int argc, char *argv[]){
     bool using_slim_version        = false;
     bool make_histos               = false;
     bool run_selection             = true;
+    bool area_norm                 = false;
 
     // inputs 
     char * mc_file_name          = (char *)"empty";
@@ -50,6 +51,7 @@ int main(int argc, char *argv[]){
     "\n\nTo make the histograms after running selection, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --hist <input merged nuexsec file> [options (see below)]\033[0m \n\n"
     "\033[0;33m[--weight <weight setting>]\033[0m                            \033[0;32mChange the Weight level to dislay on the plots. Should be used in conjunction with the setting used in the selection stage. level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only \033[0m\n\n"
+    "\033[0;33m[--area]\033[0m                                               \033[0;32mArea normalise all the histograms\033[0m\n\n"
     "The <input merged nuexsec file> corresponds to hadd merged file of the mc, data, ext and dirt. See the bash script merge_run1_files.sh for more details\n\n";
 
     // -------------------------------------------------------------------------    
@@ -65,6 +67,7 @@ int main(int argc, char *argv[]){
             std::cout << " *** \t Running with Slimmed Selection (no histograms will be made)\t *** " << std::endl;
         }
 
+        // Histogram Mode
         if (strcmp(arg, "--hist") == 0) {
             std::cout << "Making Histograms, file to make histograms with: "<< argv[i+1] << std::endl;
             make_histos = true;
@@ -156,6 +159,12 @@ int main(int argc, char *argv[]){
             std::cout << usage << std::endl; 
             exit(1);
         }
+
+        // Area Normalise the histograms
+        if (strcmp(arg, "--area") == 0) {
+            std::cout << "Area Normalising the histograms"<< std::endl;
+            area_norm = true;
+        }
         
     }
 
@@ -192,7 +201,7 @@ int main(int argc, char *argv[]){
                                                                                 verbose, weight );
     
     // Run the make histogram function
-    if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, config, weight);
+    if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, config, weight, area_norm);
 
     // -------------------------------------------------------------------------
     // Finished!

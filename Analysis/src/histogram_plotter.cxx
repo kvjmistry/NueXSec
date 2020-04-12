@@ -7,11 +7,13 @@ histogram_plotter::~histogram_plotter(){
     // f_nuexsec->Close();
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config, int weight_cfg){
+void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config, int weight_cfg, bool _area_norm){
 
     std::cout << "Creating histograms and making plots" << std::endl;
     
     double Data_POT;
+
+    area_norm = _area_norm;
 
     // Set the scale factors
     if (strcmp(run_period, "1") == 0){
@@ -335,7 +337,7 @@ void histogram_plotter::SetTPadOptions(TPad * topPad, TPad * bottomPad ){
 
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, double y_scale_factor, const char* x_axis_name,
+void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, bool _area_norm, bool logy, double y_scale_factor, const char* x_axis_name,
                                      const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, double Data_POT, const char* print_name, bool override_data_mc_comparison ){
 
     std::vector<TH1D*>  hist(_util.k_classifications_MAX);                      // The vector of histograms from the file for the plot
@@ -497,7 +499,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     }
     
     // Normalisation by area
-    if (area_norm && found_data) {
+    if (_area_norm && found_data) {
         
         if (integral_mc_ext != 0) {
             
@@ -551,7 +553,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     }
 
     // Set the y axis of the stack
-    if(!area_norm) h_stack->GetYaxis()->SetTitle("Entries");
+    if(!_area_norm) h_stack->GetYaxis()->SetTitle("Entries");
     else           h_stack->GetYaxis()->SetTitle("Entries [A.U.]");
     
     // Customise the stacked histogram
@@ -607,7 +609,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     // Calculate the chi2 
     if (found_data) {
         TH1D * h_last = (TH1D*) h_stack->GetStack()->Last();
-        chi2  = Chi2Calc(h_last, hist.at(_util.k_leg_data), area_norm, hist_integrals.at(_util.k_data));
+        chi2  = Chi2Calc(h_last, hist.at(_util.k_leg_data), _area_norm, hist_integrals.at(_util.k_data));
     }
     
     // Now create the ratio of data to MC ----------------------------------
@@ -676,7 +678,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         
         Draw_Data_POT(c, Data_POT);
         
-        if (area_norm) Draw_Area_Norm(c);
+        if (_area_norm) Draw_Area_Norm(c);
         
         // Add the weight labels
         Draw_WeightLabels(c);
@@ -691,8 +693,6 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
     // MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, const char* x_axis_name, double y_scale_factor, 
     //                             const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, const char* print_name, bool override_data_mc_comparison )
-
-    bool area_norm = false;
 
     // Reco X
     MakeStack("h_reco_vtx_x",_util.cut_dirs.at(cut_index).c_str(),

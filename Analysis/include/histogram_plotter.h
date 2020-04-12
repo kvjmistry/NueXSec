@@ -25,10 +25,11 @@ class histogram_plotter{
     
     bool weight_tune = true; // Apply genie tune weight
     bool weight_ppfx = true; // Apply ppfx cv weight
+    bool area_norm   = false;  // Decide if to area normalse the histograms
 
     // -------------------------------------------------------------------------
     // Main function call to control this class
-    void MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config, int weight_cfg);
+    void MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config, int weight_cfg, bool _area_norm);
     // -------------------------------------------------------------------------
     // Initalise the file input
     void Initalise(const char *hist_file_name, const char* _run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor, int weight_cfg);

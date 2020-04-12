@@ -105,6 +105,9 @@ bool selection_cuts::shr_hits_y_plane(SliceContainer &SC){
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::shr_distance(SliceContainer &SC){
+    
+    if (SC.n_tracks == 0) return true; // Dont apply this cut if there is no tracks
+    
     if (SC.shr_distance < 10 ) return true; // pass 
     else return false;                      // fail
 }
