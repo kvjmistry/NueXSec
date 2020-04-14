@@ -1019,6 +1019,25 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
                         area_norm,  false, 1.0, "Shower Moliere RMS [deg]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_shrmoliererms.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
+    // Fraction of spacepoints in 1cm cylinder (2nd half of shr)
+    MakeStack("h_reco_CylFrac2h_1cm",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Fraction of spacepoints in 1cm cylinder (2nd half of shr)", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_CylFrac2h_1cm.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+
+    // Median Spread of SpacePoints (second half of shower)
+    MakeStack("h_reco_DeltaRMS2h",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Median Spread of SpacePoints (second half of shower)", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_DeltaRMS2h.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+
+    // Median of 1st component of shr PCA (5cm window)
+    MakeStack("h_reco_shrPCA1CMed_5cm",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Median of 1st component of shr PCA (5cm window)", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shrPCA1CMed_5cm.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+
+    // Median of 1st component of shr PCA (5cm window)
+    MakeStack("h_reco_shrMCSMom",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Leading Shower MCS Momentum [MeV/c]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shrMCSMom.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
 }
 // -----------------------------------------------------------------------------

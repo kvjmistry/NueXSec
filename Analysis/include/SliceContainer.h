@@ -138,23 +138,23 @@ public:
     float shr_llrpid_dedx_Y; // to set branch
     float shr_llrpid_dedx;   // to set branch
 
-    float CylFrac1h_1cm;  // to set branch
-    float CylFrac1h_2cm;  // to set branch
-    float CylFrac1h_3cm;  // to set branch
-    float CylFrac1h_4cm;  // to set branch
-    float CylFrac1h_5cm;  // to set branch
+    float CylFrac1h_1cm;  // Frac of spacepoints of the leading shower within 1cm of the shower axis. Only in the first half of the shower
+    float CylFrac1h_2cm;  // Frac of spacepoints of the leading shower within 2cm of the shower axis. Only in the first half of the shower
+    float CylFrac1h_3cm;  // Frac of spacepoints of the leading shower within 3cm of the shower axis. Only in the first half of the shower
+    float CylFrac1h_4cm;  // Frac of spacepoints of the leading shower within 4cm of the shower axis. Only in the first half of the shower
+    float CylFrac1h_5cm;  // Frac of spacepoints of the leading shower within 5cm of the shower axis. Only in the first half of the shower
 
-    float CylFrac2h_1cm;  // to set branch
-    float CylFrac2h_2cm;  // to set branch
-    float CylFrac2h_3cm;  // to set branch
-    float CylFrac2h_4cm;  // to set branch
-    float CylFrac2h_5cm;  // to set branch
+    float CylFrac2h_1cm;  // Frac of spacepoints of the leading shower within 1cm of the shower axis. Only in the second half of the shower
+    float CylFrac2h_2cm;  // Frac of spacepoints of the leading shower within 2cm of the shower axis. Only in the second half of the shower
+    float CylFrac2h_3cm;  // Frac of spacepoints of the leading shower within 3cm of the shower axis. Only in the second half of the shower
+    float CylFrac2h_4cm;  // Frac of spacepoints of the leading shower within 4cm of the shower axis. Only in the second half of the shower
+    float CylFrac2h_5cm;  // Frac of spacepoints of the leading shower within 5cm of the shower axis. Only in the second half of the shower
 
-    float CylFrac_1cm;  // to set branch
-    float CylFrac_2cm;  // to set branch
-    float CylFrac_3cm;  // to set branch
-    float CylFrac_4cm;  // to set branch
-    float CylFrac_5cm;  // to set branch
+    float CylFrac_1cm;  // Frac of spacepoints of the leading shower within 1cm of the shower axis.
+    float CylFrac_2cm;  // Frac of spacepoints of the leading shower within 2cm of the shower axis.
+    float CylFrac_3cm;  // Frac of spacepoints of the leading shower within 3cm of the shower axis.
+    float CylFrac_4cm;  // Frac of spacepoints of the leading shower within 4cm of the shower axis.
+    float CylFrac_5cm;  // Frac of spacepoints of the leading shower within 5cm of the shower axis.
 
     float DeltaMed;   // to set branch
     float DeltaMed1h; // to set branch
@@ -162,11 +162,11 @@ public:
 
     float DeltaRMS;   // to set branch
     float DeltaRMS1h; // to set branch
-    float DeltaRMS2h; // to set branch
+    float DeltaRMS2h; // 0 to 20
 
-    float shr_PCA1CMed_5cm; // to set branch
+    float shrPCA1CMed_5cm; // 0 to 1
 
-    float shrMCSMom; // to set branch
+    float shrMCSMom; // 0 to 200
 
 
     float shr_chipr;            // Shower: Chi2 proton score for the leading shower (with the shower reconstructed as track)

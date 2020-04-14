@@ -24,7 +24,7 @@ double _Run1_Dirt_POT  = 6.43292e+20;       // Run 1 dirt POT
 double _Run1_Data_POT  =  3.932e+19 ;          // Run 1 Data POT (tortgt) beam good and bad file
 double _Run1_Data_trig = 1052383.0;            // Run 1 data HW Triggers (EA9CNT)  beam good and bad file
 
-double _Run1_EXT_trig  = 2987202.860000;    // Run 1 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
+double _Run1_EXT_trig  = 3378479.250000;    // Run 1 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
 
 // POT and Trigger 
 double _Run3_MC_POT    = 1.14486e+21;      // Run 3 MC POT v33

@@ -152,6 +152,10 @@ class histogram_helper{
         k_reco_shrsubclusters,                                                  // Number of subclusters the shower can be broken into, Sum all three planes
         k_reco_shrmoliereavg,                                                   // Average angle between the shower’s direction and its 3D spacepoints.
         k_reco_shrmoliererms,                                                   // RMS of the moliere angle
+        k_reco_CylFrac2h_1cm,                                                   // Frac of spacepoints of the leading shower within 1cm of the shower axis. Only in the second half of the shower
+        k_reco_DeltaRMS2h,                                                      // RMS of spacepoint distance from shower center in the second half of the shower.
+        k_reco_shrPCA1CMed_5cm,                                                 // Median PCA component calculated in 5 cm blocks.
+        k_reco_shrMCSMom,                                                       // Multiple Coulomb scattering shower momentum
         k_TH1D_MAX
     };
 

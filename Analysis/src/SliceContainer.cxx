@@ -79,6 +79,43 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights){
     tree->SetBranchAddress("shr_tkfit_gap10_nhits_Y", &shr_tkfit_gap10_nhits_Y );
     tree->SetBranchAddress("shr_tkfit_gap10_nhits_V", &shr_tkfit_gap10_nhits_V );
     tree->SetBranchAddress("shr_tkfit_gap10_nhits_U", &shr_tkfit_gap10_nhits_U );
+
+
+    tree->SetBranchAddress("shr_llrpid_dedx_U", &shr_llrpid_dedx_U );
+    tree->SetBranchAddress("shr_llrpid_dedx_V", &shr_llrpid_dedx_V );
+    tree->SetBranchAddress("shr_llrpid_dedx_Y", &shr_llrpid_dedx_Y );
+    tree->SetBranchAddress("shr_llrpid_dedx",   &shr_llrpid_dedx );
+
+    tree->SetBranchAddress("CylFrac1h_1cm", &CylFrac1h_1cm );
+    tree->SetBranchAddress("CylFrac1h_2cm", &CylFrac1h_2cm );
+    tree->SetBranchAddress("CylFrac1h_3cm", &CylFrac1h_3cm );
+    tree->SetBranchAddress("CylFrac1h_4cm", &CylFrac1h_4cm );
+    tree->SetBranchAddress("CylFrac1h_5cm", &CylFrac1h_5cm );
+
+    tree->SetBranchAddress("CylFrac2h_1cm", &CylFrac2h_1cm );
+    tree->SetBranchAddress("CylFrac2h_2cm", &CylFrac2h_2cm );
+    tree->SetBranchAddress("CylFrac2h_3cm", &CylFrac2h_3cm );
+    tree->SetBranchAddress("CylFrac2h_4cm", &CylFrac2h_4cm );
+    tree->SetBranchAddress("CylFrac2h_5cm", &CylFrac2h_5cm );
+
+    tree->SetBranchAddress("CylFrac_1cm", &CylFrac_1cm );
+    tree->SetBranchAddress("CylFrac_2cm", &CylFrac_2cm );
+    tree->SetBranchAddress("CylFrac_3cm", &CylFrac_3cm );
+    tree->SetBranchAddress("CylFrac_4cm", &CylFrac_4cm );
+    tree->SetBranchAddress("CylFrac_5cm", &CylFrac_5cm );
+
+    tree->SetBranchAddress("DeltaMed",   &DeltaMed );
+    tree->SetBranchAddress("DeltaMed1h", &DeltaMed1h );
+    tree->SetBranchAddress("DeltaMed2h", &DeltaMed2h );
+
+    tree->SetBranchAddress("DeltaRMS",   &DeltaRMS );
+    tree->SetBranchAddress("DeltaRMS1h", &DeltaRMS1h );
+    tree->SetBranchAddress("DeltaRMS2h", &DeltaRMS2h );
+
+    tree->SetBranchAddress("shrPCA1CMed_5cm", &shrPCA1CMed_5cm );
+
+    tree->SetBranchAddress("shrMCSMom", &shrMCSMom );
+
     tree->SetBranchAddress("shr_chipr",      &shr_chipr);
     tree->SetBranchAddress("shr_chimu",      &shr_chimu);
     tree->SetBranchAddress("shr_bragg_p",    &shr_bragg_p);

@@ -328,7 +328,24 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_shrmoliereavg).at(i).at(j) = new TH1D ( Form("h_reco_shrmoliereavg_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 30);
 
             // Shower Moliere RMS
-            TH1D_hists.at(k_reco_shrmoliererms).at(i).at(j) = new TH1D ( Form("h_reco_shrmoliererms_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 30 );
+            TH1D_hists.at(k_reco_shrmoliererms).at(i).at(j) = new TH1D ( Form("h_reco_shrmoliererms_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 30000 );
+
+            // Shower Cylindrical Fraction 1cm in the Second half
+            TH1D_hists.at(k_reco_CylFrac2h_1cm).at(i).at(j) = new TH1D ( Form("h_reco_CylFrac2h_1cm_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 1 );
+
+            // Shower RMS of spacepoint to the shower center at the second half of the Shower
+            TH1D_hists.at(k_reco_DeltaRMS2h).at(i).at(j) = new TH1D ( Form("h_reco_DeltaRMS2h_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 20 );
+
+            // Shower Median PCA Calculated in 5cm blocks
+            TH1D_hists.at(k_reco_shrPCA1CMed_5cm).at(i).at(j) = new TH1D ( Form("h_reco_shrPCA1CMed_5cm_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 1 );
+
+            // Shower Momentum from MCS
+            TH1D_hists.at(k_reco_shrMCSMom).at(i).at(j) = new TH1D ( Form("h_reco_shrMCSMom_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 300 );
+
+            
+            
+            
+            
 
 
         }
@@ -529,6 +546,14 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
 
     TH1D_hists.at(k_reco_shrmoliereavg).at(cut_index).at(classification_index)->Fill(SC.shrmoliereavg, weight);
     TH1D_hists.at(k_reco_shrmoliererms).at(cut_index).at(classification_index)->Fill(SC.shrmoliererms, weight);
+
+    TH1D_hists.at(k_reco_CylFrac2h_1cm).at(cut_index).at(classification_index)->Fill(SC.CylFrac2h_1cm, weight);
+    
+    TH1D_hists.at(k_reco_DeltaRMS2h).at(cut_index).at(classification_index)->Fill(SC.DeltaRMS2h, weight);
+    
+    TH1D_hists.at(k_reco_shrPCA1CMed_5cm).at(cut_index).at(classification_index)->Fill(SC.shrPCA1CMed_5cm, weight);
+    
+    TH1D_hists.at(k_reco_shrMCSMom).at(cut_index).at(classification_index)->Fill(SC.shrMCSMom, weight);
 
 
 

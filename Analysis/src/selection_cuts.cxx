@@ -128,7 +128,7 @@ bool selection_cuts::shr_contained(SliceContainer &SC){
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::shr_moliere_avg(SliceContainer &SC){
-    if (SC.shrmoliereavg < 15 ) return true;    // pass 
+    if (SC.shrmoliereavg < 10 ) return true;    // pass 
     else return false;                     // fail
 }
 // -----------------------------------------------------------------------------
