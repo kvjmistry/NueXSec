@@ -133,6 +133,42 @@ public:
     unsigned int   shr_tkfit_gap10_nhits_V;
     unsigned int   shr_tkfit_gap10_nhits_U;
     
+    float shr_llrpid_dedx_U; // to set branch
+    float shr_llrpid_dedx_V; // to set branch
+    float shr_llrpid_dedx_Y; // to set branch
+    float shr_llrpid_dedx;   // to set branch
+
+    float CylFrac1h_1cm;  // to set branch
+    float CylFrac1h_2cm;  // to set branch
+    float CylFrac1h_3cm;  // to set branch
+    float CylFrac1h_4cm;  // to set branch
+    float CylFrac1h_5cm;  // to set branch
+
+    float CylFrac2h_1cm;  // to set branch
+    float CylFrac2h_2cm;  // to set branch
+    float CylFrac2h_3cm;  // to set branch
+    float CylFrac2h_4cm;  // to set branch
+    float CylFrac2h_5cm;  // to set branch
+
+    float CylFrac_1cm;  // to set branch
+    float CylFrac_2cm;  // to set branch
+    float CylFrac_3cm;  // to set branch
+    float CylFrac_4cm;  // to set branch
+    float CylFrac_5cm;  // to set branch
+
+    float DeltaMed;   // to set branch
+    float DeltaMed1h; // to set branch
+    float DeltaMed2h; // to set branch
+
+    float DeltaRMS;   // to set branch
+    float DeltaRMS1h; // to set branch
+    float DeltaRMS2h; // to set branch
+
+    float shr_PCA1CMed_5cm; // to set branch
+
+    float shrMCSMom; // to set branch
+
+
     float shr_chipr;            // Shower: Chi2 proton score for the leading shower (with the shower reconstructed as track)
     float shr_chimu;            // Shower: Chi2 muon score for the leading shower (with the shower reconstructed as track)
     float shr_bragg_p;          // Shower: Proton Bragg likelihood score for the leading shower (with the shower reconstructed as track)
@@ -146,6 +182,7 @@ public:
 
     float shr_distance;         // Shower: Distance between leading shower vertex and reconstructed neutrino vertex. Labelled as shower_vtx_dist in technote
     float shr_score;            // Shower: Pandora track score for the leading shower
+    
     int   shr_bkt_pdg;          // Shower: PDG code of the MCParticle matched to the leading shower
     float shr_bkt_purity;       // Shower: Purity of the leading shower
     float shr_bkt_completeness; // Shower: Completeness of the leading shower
@@ -190,9 +227,9 @@ public:
     float extra_energy_y;       // Total energy of the unclustered hits on the Y plane
     float trk_energy_hits_tot;  // Track: Sum of the energy of the tracks obtained with the deposited charge
     
-    int   shrsubclusters0;      // Shower: in how many sub-clusters can the shower be broken based on proximity clustering?
-    int   shrsubclusters1;      // Shower: what fraction of the total charge does the dominant shower sub-cluster carry?
-    int   shrsubclusters2;
+    unsigned int   shrsubclusters0;      // Shower: in how many sub-clusters can the shower be broken based on proximity clustering?
+    unsigned int   shrsubclusters1;      // Plane 1
+    unsigned int   shrsubclusters2;      // Plane 2
     
     float shrclusfrac0;         // what fraction of the total charge does the dominant shower sub-cluster carry?
     float shrclusfrac1;

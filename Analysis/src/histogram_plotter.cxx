@@ -950,8 +950,18 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
     // Cosmic Inpact Parameter
     MakeStack("h_reco_cosmicIP",_util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Pandora Cosmic Inpact Parameter [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Pandora Cosmic Impact Parameter [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_cosmicIP.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+
+    // Cosmic Inpact Parameter in 3D
+    MakeStack("h_reco_CosmicIPAll3D",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Pandora Cosmic Impact Parameter 3D [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_CosmicIPAll3D.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+
+    // 3D direction between closest pfp not in the neutrino slice
+    MakeStack("h_reco_CosmicDirAll3D",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "3D Pandora Cosmic Impact Direction", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_CosmicDirAll3D.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
     // Shower dEdx with the track fitter u plane
     MakeStack("h_reco_shr_tkfit_dedx_u",_util.cut_dirs.at(cut_index).c_str(),
@@ -978,6 +988,36 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
     MakeStack("h_reco_flash_pe",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Flash PE [PE]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_flash_pe.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+
+    // Shower Subcluster Plane 0
+    MakeStack("h_reco_shrsubclusters0",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Shower Sub Cluster Plane 0", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shrsubclusters0.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+
+    // Shower Subcluster Plane 1
+    MakeStack("h_reco_shrsubclusters1",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Shower Sub Cluster Plane 1", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shrsubclusters1.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+
+    // Shower Subcluster Plane 2
+    MakeStack("h_reco_shrsubclusters2",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Shower Sub Cluster Plane 2", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shrsubclusters2.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+
+    // Shower Subcluster All Planes
+    MakeStack("h_reco_shrsubclusters",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Shower Sub Cluster All Planes", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shrsubclusters.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+
+    // Shower Moliere Average
+    MakeStack("h_reco_shrmoliereavg",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Shower Moliere Average [deg]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shrmoliereavg.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+    
+    // Shower Moliere RMS
+    MakeStack("h_reco_shrmoliererms",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Shower Moliere RMS [deg]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shrmoliererms.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
 
 }
@@ -1412,7 +1452,7 @@ void histogram_plotter::MakeEfficiencyPlotByCut(const char* print_name, const ch
         h_true_nue->Scale(scale);
         h_true_nue->Draw("hist,same");
 
-        TGaxis *axis = new TGaxis(gPad->GetUxmax()+3,gPad->GetUymin(),gPad->GetUxmax()+3, gPad->GetUymax(),0,rightmax,510,"+L");
+        TGaxis *axis = new TGaxis(gPad->GetUxmax()+4,gPad->GetUymin(),gPad->GetUxmax()+4, gPad->GetUymax(),0,rightmax,510,"+L");
         axis->SetTitle("True #nu_{e} Events in FV");
         axis->SetLineColor(kAzure-6);
         axis->SetLabelColor(kAzure-6);

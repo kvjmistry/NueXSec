@@ -139,11 +139,19 @@ class histogram_helper{
         k_reco_nslice,                                                          // Pandora Slice ID
         k_reco_slclustfrac,                                                     // Reco Fraction of hits in the slice that are fully reconstructed to 3D particles.
         k_reco_cosmicIP,                                                        // Reco Closest distance between shower start and space points associated to tracks flagged as cosmics.
+        k_reco_CosmicIPAll3D,                                                   // Reco 3D distance of shower start from closest spacepoint of any pfp not in the neutrino slice
+        k_reco_CosmicDirAll3D,                                                  // cosine of 3D direction difference between shower and closest pfp not in the neutrino slice
         k_reco_shr_tkfit_dedx_u,                                                // The dEdx using the trackfit variable u plane
         k_reco_shr_tkfit_dedx_v,                                                // The dEdx using the trackfit variable v plane
         k_reco_shr_tkfit_dedx_y,                                                // The dEdx using the trackfit variable collection
         k_reco_flash_time,                                                      // The Flash time
         k_reco_flash_pe,                                                        // The Flash PE
+        k_reco_shrsubclusters0,                                                 // Number of subclusters the shower can be broken into, Plane 0
+        k_reco_shrsubclusters1,                                                 // Number of subclusters the shower can be broken into, Plane 1
+        k_reco_shrsubclusters2,                                                 // Number of subclusters the shower can be broken into, Plane 2
+        k_reco_shrsubclusters,                                                  // Number of subclusters the shower can be broken into, Sum all three planes
+        k_reco_shrmoliereavg,                                                   // Average angle between the shower’s direction and its 3D spacepoints.
+        k_reco_shrmoliererms,                                                   // RMS of the moliere angle
         k_TH1D_MAX
     };
 

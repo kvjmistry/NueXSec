@@ -39,7 +39,7 @@ bool selection_cuts::slice_id(SliceContainer &SC){
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::e_candidate(SliceContainer &SC){
-    if (SC.n_showers > 0) return true; // pass 
+    if (SC.n_showers >= 1) return true; // pass 
     else return false;                 // fail
 }
 // -----------------------------------------------------------------------------
@@ -51,9 +51,9 @@ bool selection_cuts::topo_score(SliceContainer &SC){
 bool selection_cuts::in_fv(SliceContainer &SC){
     
     // These are looser cuts (whats done in the cc inclusive)
-    if ( SC.reco_nu_vtx_sce_x >= 10 && SC.reco_nu_vtx_sce_x <= 246.35 &&
+    if ( SC.reco_nu_vtx_sce_x >= 10 && SC.reco_nu_vtx_sce_x <= 243 &&
         SC.reco_nu_vtx_sce_y >= -106.5 && SC.reco_nu_vtx_sce_y <= 106.5 &&
-        ( (SC.reco_nu_vtx_sce_z >= 20 && SC.reco_nu_vtx_sce_z <= 986.8))
+        ( (SC.reco_nu_vtx_sce_z >= 20 && SC.reco_nu_vtx_sce_z <= 986))
         ){
         return true;   // pass
     }  
@@ -116,5 +116,22 @@ bool selection_cuts::shr_hitratio(SliceContainer &SC){
     if (SC.hits_ratio > 0.7 ) return true; // pass 
     else return false;                     // fail
 }
+// -----------------------------------------------------------------------------
+bool selection_cuts::shr_cosmic_IP(SliceContainer &SC){
+    if (SC.CosmicIP > 20 ) return true;    // pass 
+    else return false;                     // fail
+}
+// -----------------------------------------------------------------------------
+bool selection_cuts::shr_contained(SliceContainer &SC){
+    if (SC.n_showers_contained >= 1 ) return true;    // pass 
+    else return false;                     // fail
+}
+// -----------------------------------------------------------------------------
+bool selection_cuts::shr_moliere_avg(SliceContainer &SC){
+    if (SC.shrmoliereavg < 15 ) return true;    // pass 
+    else return false;                     // fail
+}
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

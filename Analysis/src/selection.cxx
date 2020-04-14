@@ -460,6 +460,15 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, classification, interaction, _util.k_e_candidate, counter_v );
+
+    // *************************************************************************
+    // In FV -------------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.in_fv(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_in_fv) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    SelectionFill(type, SC, classification, interaction, _util.k_in_fv, counter_v );
     
     // *************************************************************************
     // Topological Score -------------------------------------------------------
@@ -471,13 +480,13 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SelectionFill(type, SC, classification, interaction, _util.k_topo_score, counter_v );
 
     // *************************************************************************
-    // In FV -------------------------------------------------------------------
+    // Cosmic Impact Parameter -------------------------------------------------
     // *************************************************************************
-    pass = _scuts.in_fv(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_in_fv) = pass;
+    pass = _scuts.shr_cosmic_IP(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_cosmic_ip) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_in_fv, counter_v );
+    SelectionFill(type, SC, classification, interaction, _util.k_cosmic_ip, counter_v );
 
     // *************************************************************************
     // Cluster Fraction --------------------------------------------------------
@@ -498,6 +507,15 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SelectionFill(type, SC, classification, interaction, _util.k_shower_score, counter_v );
 
     // *************************************************************************
+    // Shower Contained --------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.shr_contained(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_shower_contained) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    SelectionFill(type, SC, classification, interaction, _util.k_shower_contained, counter_v );
+
+    // *************************************************************************
     // Michel Rejection --------------------------------------------------------
     // *************************************************************************
     pass = _scuts.michel_rej(SC);
@@ -516,13 +534,22 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SelectionFill(type, SC, classification, interaction, _util.k_shr_hits, counter_v );
 
     // *************************************************************************
-    // Shower Hits Collection Plane --------------------------------------------
+    // Shower Hit Ratio  -------------------------------------------------------
     // *************************************************************************
-    pass = _scuts.shr_hits_y_plane(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_shr_hits_y_plane) = pass;
+    pass = _scuts.shr_hitratio(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_hit_ratio) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_shr_hits_y_plane, counter_v );
+    SelectionFill(type, SC, classification, interaction, _util.k_hit_ratio, counter_v );
+
+    // *************************************************************************
+    // Shower Moliere Average ----- --------------------------------------------
+    // *************************************************************************
+    pass = _scuts.shr_moliere_avg(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_shr_moliere_avg) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    SelectionFill(type, SC, classification, interaction, _util.k_shr_moliere_avg, counter_v );
 
     // *************************************************************************
     // Shower to Vertex Distance --------------------------------------------
@@ -532,16 +559,6 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, classification, interaction, _util.k_shr_distance, counter_v );
-
-    // *************************************************************************
-    // Shower Hit Ratio  -------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.shr_hitratio(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_hit_ratio) = pass;
-    if(!pass) return false; // Failed the cut!
-    
-    SelectionFill(type, SC, classification, interaction, _util.k_hit_ratio, counter_v );
-
 
     // *************************************************************************
     // dEdx --------------------------------------------------------------------

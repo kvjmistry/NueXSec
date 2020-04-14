@@ -96,15 +96,17 @@ public:
             "Op_Filter_Veto",// Common Optical Filter Michel Veto
             "Slice_ID",      // Slice ID
             "e_candidate",   // Electron Candidate
-            "Topo_Score",    // Topological Score
             "In_FV",         // In FV
+            "Topo_Score",    // Topological Score
+            "Cosmic_IP",     // Cosmic Inpact Parameter
             "Cluster_Frac",  // Cluster Fraction 
             "Shower_Score",  // Track Score
+            "Shower_Contained", // Shower Containment
             "Michel_Rej",    // Michel Rejection
             "ShrHits",       // Shower Hits
-            "ShrHitsYplane", // Shower hits in the y plane
-            "ShrVtxDistance",// Shower to vertex distance
             "HitRatio",      // Ratio of shr hits and slice hits
+            "Moliere_Avg",   // Shower Moliere Average
+            "ShrVtxDistance",// Shower to vertex distance
             "dEdx"           // dEdx
             };
 
@@ -156,15 +158,17 @@ public:
                 k_opfilt_veto,  // Common Optical Filter Michel Veto
                 k_slice_id,     // Slice ID
                 k_e_candidate,  // Electron Candidate
-                k_topo_score,   // Topo Score
                 k_in_fv,        // Reco Nu Vtx (SC Corr) In the FV 
+                k_topo_score,   // Topo Score
+                k_cosmic_ip,    // Cosmic IP
                 k_cluster_frac, // Cluster Fraction
                 k_shower_score, // Shower Score
+                k_shower_contained, // Shower containment
                 k_michel_rej,   // Michel Rejection
                 k_shr_hits,     // Shower Hits
-                k_shr_hits_y_plane, // Shower Hits in the y plane
-                k_shr_distance,    // Shower to reco nu vertex distance
                 k_hit_ratio,       // Ratio of shr hits and slice hits
+                k_shr_moliere_avg, // Shower Moliere Average
+                k_shr_distance,    // Shower to reco nu vertex distance
                 k_dEdx,            // dEdx
                 k_cuts_MAX
                 }; 

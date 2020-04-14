@@ -131,9 +131,9 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights){
     // tree->SetBranchAddress("total_hits_y", &total_hits_y);
     tree->SetBranchAddress("extra_energy_y", &extra_energy_y);
     tree->SetBranchAddress("trk_energy_hits_tot", &trk_energy_hits_tot);
-    // tree->SetBranchAddress("shrsubclusters0", &shrsubclusters0);
-    // tree->SetBranchAddress("shrsubclusters1", &shrsubclusters1);
-    // tree->SetBranchAddress("shrsubclusters2", &shrsubclusters2);
+    tree->SetBranchAddress("shrsubclusters0", &shrsubclusters0);
+    tree->SetBranchAddress("shrsubclusters1", &shrsubclusters1);
+    tree->SetBranchAddress("shrsubclusters2", &shrsubclusters2);
     
     tree->SetBranchAddress("shrclusfrac0", &shrclusfrac0);
     tree->SetBranchAddress("shrclusfrac1", &shrclusfrac1);
