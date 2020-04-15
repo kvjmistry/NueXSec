@@ -441,7 +441,7 @@ public:
     float nu_purity_from_pfp;       // Neutrino Purity from PFP (how many out of all the hits are the neutrino) (needs to be higher than 50% otherwise tag as a mixed)
     int   n_tracks_pandora;         // Number of Tracks Returned by Pandora
     
-    double _closestNuCosmicDist; // Distance between the neutrino vertex and (closest?) cosmic trajectory
+    double _closestNuCosmicDist; // Distance between the neutrino vertex and (closest?) cosmic trajectory tagged from CRT
 
     float vtx_fit_pandora_x;
     float vtx_fit_pandora_y;

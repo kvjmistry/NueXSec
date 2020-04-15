@@ -748,7 +748,7 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
     // Leading Shower Momentum
     MakeStack("h_reco_leading_mom", _util.cut_dirs.at(cut_index).c_str(),
-                        area_norm, false, 1.0, "Leading Shower Momentum [MeV/c]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm, false, 1.0, "Leading Shower Momentum [GeV/c]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_leading_mom.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
     // 2D distance largest flash to reco nu vertex
@@ -926,12 +926,12 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
     // Optical Filter Beam
     MakeStack("h_reco_opfilter_beam",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  true, 1.0, "Common Optical Filter PE [PE]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_opfilter_beam.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), true);
+                        Form("plots/run%s/cuts/%s/reco_opfilter_beam.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
     // Optical Filter Veto
     MakeStack("h_reco_opfilter_veto",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  true, 1.0, "Common Optical Filter Michel Veto [PE]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_opfilter_veto.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), true);
+                        Form("plots/run%s/cuts/%s/reco_opfilter_veto.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
     // Software trigger
     MakeStack("h_reco_softwaretrig",_util.cut_dirs.at(cut_index).c_str(),
@@ -1038,6 +1038,11 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
     MakeStack("h_reco_shrMCSMom",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Leading Shower MCS Momentum [MeV/c]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_shrMCSMom.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+
+    // Distance from closest CRT tagged cosmic to neutrino vertex
+    MakeStack("h_reco_closestNuCosmicDist",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Closest CRT Tagged Cosmic to #nu Vertex Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_closestNuCosmicDist.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
 }
 // -----------------------------------------------------------------------------

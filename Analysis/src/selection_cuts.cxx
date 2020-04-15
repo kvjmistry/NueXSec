@@ -13,12 +13,8 @@ bool selection_cuts::swtrig(SliceContainer &SC, int type){
 // -----------------------------------------------------------------------------
 bool selection_cuts::opfilt_pe(SliceContainer &SC, int type){
     
-    // Common optical is already applied to data
-    if (type == _util.k_mc || type == _util.k_dirt){
-        if (SC.opfilter_pe_beam > 0) return true; // pass 
-        else return false;               // fail
-    }
-    else return true;
+    if (SC.opfilter_pe_beam > 0) return true; // pass 
+    else return false;               // fail
     
 }
 // -----------------------------------------------------------------------------
@@ -44,7 +40,7 @@ bool selection_cuts::e_candidate(SliceContainer &SC){
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::topo_score(SliceContainer &SC){
-    if (SC.topological_score > 0.15) return true; // pass 
+    if (SC.topological_score > 0.1) return true; // pass 
     else return false;                            // fail
 }
 // -----------------------------------------------------------------------------
@@ -132,6 +128,10 @@ bool selection_cuts::shr_moliere_avg(SliceContainer &SC){
     else return false;                     // fail
 }
 // -----------------------------------------------------------------------------
+bool selection_cuts::shr_cyl_frac_1cm(SliceContainer &SC){
+    if (SC.CylFrac2h_1cm > 0.01 ) return true;    // pass 
+    else return false;                     // fail
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

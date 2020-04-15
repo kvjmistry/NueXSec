@@ -156,6 +156,7 @@ class histogram_helper{
         k_reco_DeltaRMS2h,                                                      // RMS of spacepoint distance from shower center in the second half of the shower.
         k_reco_shrPCA1CMed_5cm,                                                 // Median PCA component calculated in 5 cm blocks.
         k_reco_shrMCSMom,                                                       // Multiple Coulomb scattering shower momentum
+        k_reco_closestNuCosmicDist,                                             // Distance between the neutrino vertex and (closest?) cosmic trajectory tagged from CRT
         k_TH1D_MAX
     };
 

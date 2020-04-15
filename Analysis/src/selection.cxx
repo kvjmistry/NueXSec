@@ -426,7 +426,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SelectionFill(type, SC, classification, interaction, _util.k_swtrig, counter_v );
 
     // *************************************************************************
-    // Op Filt PE -- MC Only ---------------------------------------------------
+    // Op Filt PE --------------------------------------------------------------
     // *************************************************************************
     pass = _scuts.opfilt_pe(SC, type);
     passed_v.at(ievent).cut_v.at(_util.k_opfilt_pe) = pass;
@@ -437,11 +437,11 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     // Op Filt Michel Veto -- MC Only ------------------------------------------
     // *************************************************************************
-    pass = _scuts.opfilt_veto(SC, type);
-    passed_v.at(ievent).cut_v.at(_util.k_opfilt_veto) = pass;
-    if(!pass) return false; // Failed the cut!
+    // pass = _scuts.opfilt_veto(SC, type);
+    // passed_v.at(ievent).cut_v.at(_util.k_opfilt_veto) = pass;
+    // if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_opfilt_veto, counter_v );
+    // SelectionFill(type, SC, classification, interaction, _util.k_opfilt_veto, counter_v );
 
     // *************************************************************************
     // Slice ID ----------------------------------------------------------------
@@ -543,13 +543,22 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SelectionFill(type, SC, classification, interaction, _util.k_hit_ratio, counter_v );
 
     // *************************************************************************
-    // Shower Moliere Average ----- --------------------------------------------
+    // Shower Moliere Average --------------------------------------------------
     // *************************************************************************
     pass = _scuts.shr_moliere_avg(SC);
     passed_v.at(ievent).cut_v.at(_util.k_shr_moliere_avg) = pass;
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, classification, interaction, _util.k_shr_moliere_avg, counter_v );
+
+    // *************************************************************************
+    // Shower Cylinrical Fraction 2nd half shower 1cm --------------------------
+    // *************************************************************************
+    pass = _scuts.shr_cyl_frac_1cm(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_shr_CylFrac2h_1cm) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    SelectionFill(type, SC, classification, interaction, _util.k_shr_CylFrac2h_1cm, counter_v );
 
     // *************************************************************************
     // Shower to Vertex Distance --------------------------------------------

@@ -331,7 +331,7 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_shrmoliererms).at(i).at(j) = new TH1D ( Form("h_reco_shrmoliererms_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 30000 );
 
             // Shower Cylindrical Fraction 1cm in the Second half
-            TH1D_hists.at(k_reco_CylFrac2h_1cm).at(i).at(j) = new TH1D ( Form("h_reco_CylFrac2h_1cm_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 1 );
+            TH1D_hists.at(k_reco_CylFrac2h_1cm).at(i).at(j) = new TH1D ( Form("h_reco_CylFrac2h_1cm_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 0.5 );
 
             // Shower RMS of spacepoint to the shower center at the second half of the Shower
             TH1D_hists.at(k_reco_DeltaRMS2h).at(i).at(j) = new TH1D ( Form("h_reco_DeltaRMS2h_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 20 );
@@ -342,11 +342,9 @@ void histogram_helper::InitHistograms(){
             // Shower Momentum from MCS
             TH1D_hists.at(k_reco_shrMCSMom).at(i).at(j) = new TH1D ( Form("h_reco_shrMCSMom_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 300 );
 
+            // Distance between the neutrino vertex and (closest?) cosmic trajectory tagged from CRT
+            TH1D_hists.at(k_reco_closestNuCosmicDist).at(i).at(j) = new TH1D ( Form("h_reco_closestNuCosmicDist_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 400);
             
-            
-            
-            
-
 
         }
         
@@ -554,6 +552,8 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     TH1D_hists.at(k_reco_shrPCA1CMed_5cm).at(cut_index).at(classification_index)->Fill(SC.shrPCA1CMed_5cm, weight);
     
     TH1D_hists.at(k_reco_shrMCSMom).at(cut_index).at(classification_index)->Fill(SC.shrMCSMom, weight);
+
+    TH1D_hists.at(k_reco_closestNuCosmicDist).at(cut_index).at(classification_index)->Fill(SC._closestNuCosmicDist, weight);
 
 
 

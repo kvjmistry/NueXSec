@@ -72,6 +72,8 @@ class selection_cuts{
     // Shower Moliere Average
     bool shr_moliere_avg(SliceContainer &SC);
     // -------------------------------------------------------------------------
+    // Fraction of spacepoints around 1cm of the leading shower
+    bool shr_cyl_frac_1cm(SliceContainer &SC);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
