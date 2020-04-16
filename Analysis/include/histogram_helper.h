@@ -95,19 +95,13 @@ class histogram_helper{
         k_reco_vtx_x_sce,                                                       // Reco Vertex X Space Charge Corrected
         k_reco_vtx_y_sce,                                                       // Reco Vertex Y Space Charge Corrected
         k_reco_vtx_z_sce,                                                       // Reco Vertex Z Space Charge Corrected
-        k_reco_dEdx_y_plane,                                                    // dEdx on Collection Plane (uncalibrated)
         k_reco_dEdx_cali_u_plane,                                               // dEdx Cali on U Plane
         k_reco_dEdx_cali_v_plane,                                               // dEdx Cali on V Plane
         k_reco_dEdx_cali_y_plane,                                               // dEdx Cali on Collection Plane
         k_reco_leading_mom,                                                     // Leading Shower Momentum
         k_reco_shower_to_vtx_dist,                                              // 2D distance shower vertex to reco nu vertex
         k_reco_track_to_vtx_dist,                                               // 2D distance track vertex to reco nu vertex
-        k_reco_leading_shower_hits_all_planes,                                  // Leading Shower hits in all planes
-        k_reco_leading_shower_hits_collection_plane,                            // Leading Shower hits in collection
-        k_reco_leading_shower_open_angle,                                       // Leading Shower opening angle
-        // k_reco_secondary_shower_to_vtx_dist,                                 // Secondary shower to vertex distance (for events with more than 1 shower)
-        // k_reco_leading_shower_hits_per_length,                               // Leading Shower hits per length
-        // k_reco_longest_track_leading_shower_length,                          // Longest track to leading shower length
+        k_reco_shr_hits_max,                                                    // Leading Shower hits in all planes
         k_reco_n_track_contained,                                               // Number of Tracks Contained
         k_reco_n_shower_contained,                                              // Number of Showers Contained
         k_reco_leading_shower_phi,                                              // Leading shower phi
@@ -122,8 +116,8 @@ class histogram_helper{
         k_reco_shower_score,                                                    // Shower score
         k_reco_track_score,                                                     // Track score
         k_reco_shower_energy_tot_cali,                                          // Calibrated energy of all the showers
-        k_reco_shower_hits,                                                     // Total number of hits for the leading shower
-        k_reco_shower_hits_y_plane,                                             // Total number of hits for the leading shower in the collection plane
+        k_reco_shr_hits_tot,                                                    // Total number of hits for all showers
+        k_reco_shr_hits_y_tot,                                                  // Total number of hits for all showers in the collection plane
         k_reco_shr_trkfit_2cm_dEdx_u,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use first 2 cm u plane
         k_reco_shr_trkfit_2cm_dEdx_v,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use first 2 cm v plane
         k_reco_shr_trkfit_2cm_dEdx_y,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use first 2 cm y plane
@@ -146,9 +140,6 @@ class histogram_helper{
         k_reco_shr_tkfit_dedx_y,                                                // The dEdx using the trackfit variable collection
         k_reco_flash_time,                                                      // The Flash time
         k_reco_flash_pe,                                                        // The Flash PE
-        k_reco_shrsubclusters0,                                                 // Number of subclusters the shower can be broken into, Plane 0
-        k_reco_shrsubclusters1,                                                 // Number of subclusters the shower can be broken into, Plane 1
-        k_reco_shrsubclusters2,                                                 // Number of subclusters the shower can be broken into, Plane 2
         k_reco_shrsubclusters,                                                  // Number of subclusters the shower can be broken into, Sum all three planes
         k_reco_shrmoliereavg,                                                   // Average angle between the shower’s direction and its 3D spacepoints.
         k_reco_shrmoliererms,                                                   // RMS of the moliere angle
@@ -157,6 +148,7 @@ class histogram_helper{
         k_reco_shrPCA1CMed_5cm,                                                 // Median PCA component calculated in 5 cm blocks.
         k_reco_shrMCSMom,                                                       // Multiple Coulomb scattering shower momentum
         k_reco_closestNuCosmicDist,                                             // Distance between the neutrino vertex and (closest?) cosmic trajectory tagged from CRT
+        k_reco_trk_len,                                                         // Length of the longest track
         k_TH1D_MAX
     };
 

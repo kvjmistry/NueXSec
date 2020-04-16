@@ -266,6 +266,30 @@ void selection::MakeSelection(){
         std::cout << "-------------------------------" << std::endl;
         std::cout << "Total Nue's in the Cryostat: " << tot_true_cryo_nues << std::endl;
         std::cout << "-------------------------------" << std::endl;
+
+
+        // Loop again to look at background events that still pass
+        // Event loop
+        // for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
+            
+        //     if (mc_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true ){
+            
+        //         mc_tree->GetEntry(ievent); 
+
+        //         std::pair<std::string, int> classification = mc_SC.SliceClassifier(_util.k_mc);
+
+        //         // Background events
+        //         if (classification.second != _util.k_nue_cc){
+        //             if (mc_SC.shr_tkfit_gap10_dedx_Y < 3.2 && mc_SC.shr_tkfit_gap10_dedx_Y > 0){
+        //                 std::cout <<  mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt << " " << mc_SC.shr_tkfit_gap10_dedx_Y <<  std::endl;
+        //             }
+
+        //         }
+        //     }
+
+        // } // End Event loop
+
+
     }
     // Data --------------------------------------------------------------------
     if (bool_use_data){

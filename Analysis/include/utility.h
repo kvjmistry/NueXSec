@@ -119,6 +119,7 @@ public:
                 "Flash",
                 "Interaction",
                 "2D",
+                "ParticleStack",
                 "Stack"
                 };
 
@@ -147,6 +148,22 @@ public:
                 "CC_MEC",
                 "NC"
                 };
+    
+     // Names of the Particle types
+    std::vector<std::string> particle_types = {
+                "electron",
+                "muon",
+                "proton",
+                "photon",
+                "kaon",
+                "pion",
+                "cosmic",
+                "neutron",
+                "data",
+                "ext",
+                "dirt",
+                "unmatched"
+                };
 
     // enum to switch file type 
     enum type {k_mc, k_data, k_ext, k_dirt, k_type_MAX}; 
@@ -174,12 +191,6 @@ public:
                 k_dEdx,              // dEdx
                 k_cuts_MAX
                 }; 
-
-                // to add
-                // shr tkfit 2cm dedx Ys
-                // shr tkfit 2cm dedx ALL
-                // shr tkfit gap10 dedx Y
-                // secondshower Y vtxdist
 
     // Config enums
     enum enum_config {
@@ -298,6 +309,23 @@ public:
         k_signal,
         k_background,
         k_sig_bkg_MAX
+    };
+
+    // Enum for labelling the particles by type
+    enum enum_particle_type {
+        k_electron,
+        k_muon,
+        k_proton,
+        k_photon,
+        k_kaon,
+        k_pion,
+        k_part_cosmic,
+        k_neutron,
+        k_part_data,
+        k_part_ext,
+        k_part_dirt,
+        k_part_unmatched,
+        k_particles_MAX
     };
 
 }; // End Class Utility

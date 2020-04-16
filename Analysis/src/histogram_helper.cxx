@@ -23,6 +23,8 @@ void histogram_helper::MakeDirectory(){
 
     // Create a new subdirectory for each classification
     TDirectory *dir_classification[_util.classification_dirs.size()];
+
+    TDirectory *dir_particle[_util.particle_types.size()];
     
     // Loop over the plot types ------------------------------------------------
     for (unsigned int k = 0; k < _util.plot_types.size(); k++) {
@@ -57,6 +59,37 @@ void histogram_helper::MakeDirectory(){
                     // Make the directory
                     if (!bool_dir) dir_classification[j] = dir_cut[i]->mkdir(_util.classification_dirs.at(j).c_str());
                     dir_classification[j]->cd();
+                    f_nuexsec->cd();    // change current directory to top
+
+                } // End loop over the classifications -------------------------
+                
+                f_nuexsec->cd();    // change current directory to top
+                
+            } // End loop over the cuts ----------------------------------------
+       
+        }
+        // We also want stacked histograms by particle type
+        else if (_util.plot_types.at(k) == "ParticleStack"){
+            
+            // Loop over the cuts ----------------------------------------------
+            for (int i = 0; i < ncuts; i++) {
+               
+                // Get the directory 
+                bool_dir = _util.GetDirectory(f_nuexsec, dir_cut[i] ,Form("%s/%s", _util.plot_types.at(k).c_str(), _util.cut_dirs.at(i).c_str()));
+
+                // Make the directory
+                if (!bool_dir) dir_cut[i] = dir_plot_types[k]->mkdir(_util.cut_dirs.at(i).c_str());
+                dir_cut[i]->cd();
+                
+                // Loop over the particle types -------------------------------
+                for (unsigned int j = 0; j < _util.particle_types.size(); j++){
+                
+                    // Get the directory 
+                    bool_dir = _util.GetDirectory(f_nuexsec, dir_particle[j] ,Form("%s/%s/%s", _util.plot_types.at(k).c_str(), _util.cut_dirs.at(i).c_str(), _util.particle_types.at(j).c_str()));
+
+                    // Make the directory
+                    if (!bool_dir) dir_particle[j] = dir_cut[i]->mkdir(_util.particle_types.at(j).c_str());
+                    dir_particle[j]->cd();
                     f_nuexsec->cd();    // change current directory to top
 
                 } // End loop over the classifications -------------------------
@@ -200,8 +233,6 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_dEdx_cali_v_plane).at(i).at(j) = new TH1D ( Form("h_reco_dEdx_cali_v_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_dEdx_cali_y_plane).at(i).at(j) = new TH1D ( Form("h_reco_dEdx_cali_y_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             
-            TH1D_hists.at(k_reco_dEdx_y_plane).at(i).at(j) = new TH1D ( Form("h_reco_dEdx_y_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
-
             // Leading Shower Momentum
             TH1D_hists.at(k_reco_leading_mom).at(i).at(j) = new TH1D ( Form("h_reco_leading_mom_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 2);
 
@@ -212,22 +243,7 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_track_to_vtx_dist).at(i).at(j) = new TH1D ( Form("h_reco_track_to_vtx_dist_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 20);
 
             // Leading Shower hits in all planes
-            TH1D_hists.at(k_reco_leading_shower_hits_all_planes).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_hits_all_planes_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 2000);
-
-            // Leading Shower hits in collection
-            TH1D_hists.at(k_reco_leading_shower_hits_collection_plane).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_hits_collection_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 800);
-
-            // Leading Shower opening angle
-            TH1D_hists.at(k_reco_leading_shower_open_angle).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_open_angle_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 50);
-
-            // Secondary shower to vertex distance (for events with more than 1 shower)
-            // TH1D_hists.at(k_reco_secondary_shower_to_vtx_dist).at(i).at(j) = new TH1D ( Form("h_reco_secondary_shower_to_vtx_dist_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 80);
-
-            // Leading Shower hits per length
-            // TH1D_hists.at(k_reco_leading_shower_hits_per_length).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_hits_per_length_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 20);
-
-            // Longest track to leading shower length
-            // TH1D_hists.at(k_reco_longest_track_leading_shower_length).at(i).at(j) = new TH1D ( Form("h_reco_longest_track_leading_shower_length_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 3);
+            TH1D_hists.at(k_reco_shr_hits_max).at(i).at(j) = new TH1D ( Form("h_reco_shr_hits_max_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 2000);
 
             // Number of Tracks Contained
             TH1D_hists.at(k_reco_n_track_contained).at(i).at(j) = new TH1D ( Form("h_reco_n_track_contained_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 5, 0, 5);
@@ -272,10 +288,10 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_shower_energy_tot_cali).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_tot_cali_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 3);
             
             // Total number of hits for the leading shower
-            TH1D_hists.at(k_reco_shower_hits).at(i).at(j) = new TH1D (Form("h_reco_shower_hits_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 800);
+            TH1D_hists.at(k_reco_shr_hits_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 800);
             
             // Total number of hits for the leading shower in the collection plane
-            TH1D_hists.at(k_reco_shower_hits_y_plane).at(i).at(j) = new TH1D (Form("h_reco_shower_hits_y_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 800);
+            TH1D_hists.at(k_reco_shr_hits_y_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_y_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 800);
 
             // Shower Track fit dEdx variables
             TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_u).at(i).at(j)   = new TH1D ( Form("h_reco_shr_trkfit_2cm_dEdx_u_%s_%s",_util.cut_dirs.at(i).c_str(),     _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
@@ -319,9 +335,6 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_flash_pe).at(i).at(j) = new TH1D ( Form("h_reco_flash_pe_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 100, 0, 5000 );
 
             // Shower Subcluster in each plane
-            TH1D_hists.at(k_reco_shrsubclusters0).at(i).at(j) = new TH1D ( Form("h_reco_shrsubclusters0_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 20);
-            TH1D_hists.at(k_reco_shrsubclusters1).at(i).at(j) = new TH1D ( Form("h_reco_shrsubclusters1_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 20);
-            TH1D_hists.at(k_reco_shrsubclusters2).at(i).at(j) = new TH1D ( Form("h_reco_shrsubclusters2_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 20);
             TH1D_hists.at(k_reco_shrsubclusters).at(i).at(j)  = new TH1D ( Form("h_reco_shrsubclusters_%s_%s", _util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 20);
 
             // Shower Moliers Average
@@ -345,6 +358,8 @@ void histogram_helper::InitHistograms(){
             // Distance between the neutrino vertex and (closest?) cosmic trajectory tagged from CRT
             TH1D_hists.at(k_reco_closestNuCosmicDist).at(i).at(j) = new TH1D ( Form("h_reco_closestNuCosmicDist_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 400);
             
+            // Longest Track Length if there is one
+            TH1D_hists.at(k_reco_trk_len).at(i).at(j) = new TH1D ( Form("h_reco_trk_len_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 400);
 
         }
         
@@ -426,7 +441,7 @@ void histogram_helper::InitHistograms(){
         // Loop over the types 
         for (unsigned int k =0 ; k< TH2D_hists.at(i).size(); k++){
             // dEdx vs shower vertex distance 
-            TH2D_hists.at(i).at(k)     = new TH2D( Form("h_reco_shr_dEdx_shr_dist_%s", _util.sig_bkg_prefix.at(k).c_str()),";Collection Plane dEdx (calibrated) [MeV/cm];Shower to Vertex Distance [cm]", 40, 0, 10, 20, 0, 20);
+            TH2D_hists.at(i).at(k)     = new TH2D( Form("h_reco_shr_dEdx_shr_dist_%s", _util.sig_bkg_prefix.at(k).c_str()),";Collection Plane dEdx (calibrated) [MeV/cm];Shower to Vertex Distance [cm]", 40, 0, 10, 15, 0, 20);
         }
         
     }
@@ -453,8 +468,6 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     TH1D_hists.at(k_reco_dEdx_cali_u_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_U_cali, weight); // Just the collection plane!
     TH1D_hists.at(k_reco_dEdx_cali_v_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_V_cali, weight); // Just the collection plane!
     TH1D_hists.at(k_reco_dEdx_cali_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y_cali, weight); // Just the collection plane!
-
-    TH1D_hists.at(k_reco_dEdx_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y, weight); // Just the collection plane!
     
     TH1D_hists.at(k_reco_leading_mom).at(cut_index).at(classification_index)->Fill(reco_shr_p, weight);
     
@@ -462,17 +475,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
 
     TH1D_hists.at(k_reco_track_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.trk_distance, weight);
     
-    TH1D_hists.at(k_reco_leading_shower_hits_all_planes).at(cut_index).at(classification_index)->Fill(SC.shr_hits_tot, weight);
-    
-    TH1D_hists.at(k_reco_leading_shower_hits_collection_plane).at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot, weight);
-
-    // TH1D_hists.at(k_reco_secondary_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill();
-    
-    TH1D_hists.at(k_reco_leading_shower_open_angle).at(cut_index).at(classification_index)->Fill(SC.shr_openangle, weight);
-    
-    // TH1D_hists.at(k_reco_leading_shower_hits_per_length).at(cut_index).at(classification_index)->Fill();
-    
-    // TH1D_hists.at(k_reco_longest_track_leading_shower_length).at(cut_index).at(classification_index)->Fill();
+    TH1D_hists.at(k_reco_shr_hits_max).at(cut_index).at(classification_index)->Fill(SC.shr_hits_max, weight);
     
     TH1D_hists.at(k_reco_n_track_contained).at(cut_index).at(classification_index)->Fill(SC.n_tracks_contained, weight);
     
@@ -502,17 +505,18 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
 
     TH1D_hists.at(k_reco_shower_energy_tot_cali).at(cut_index).at(classification_index)->Fill(SC.shr_energy_tot_cali, weight);
 
-    TH1D_hists.at(k_reco_shower_hits).at(cut_index).at(classification_index)->Fill(SC.shr_hits_max, weight);
+    TH1D_hists.at(k_reco_shr_hits_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_tot, weight);
 
-    TH1D_hists.at(k_reco_shower_hits_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot, weight);
+    TH1D_hists.at(k_reco_shr_hits_y_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot, weight);
 
     TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_u).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_2cm_dedx_U, weight);
-    TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_2cm_dedx_V, weight);
+    TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_2cm_dedx_V, weight);    
     TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_2cm_dedx_Y, weight);
     
     TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx_u).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap05_dedx_U, weight);
     TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap05_dedx_V, weight);
     TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap05_dedx_Y, weight);
+    
     
     TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx_u).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap10_dedx_U, weight);
     TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap10_dedx_V, weight);
@@ -532,14 +536,10 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     TH1D_hists.at(k_reco_CosmicIPAll3D).at(cut_index).at(classification_index)->Fill(SC.CosmicIPAll3D, weight);
     TH1D_hists.at(k_reco_CosmicDirAll3D).at(cut_index).at(classification_index)->Fill(SC.CosmicDirAll3D, weight);
 
-
     TH1D_hists.at(k_reco_shr_tkfit_dedx_u).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_U, weight);
     TH1D_hists.at(k_reco_shr_tkfit_dedx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_V, weight);
     TH1D_hists.at(k_reco_shr_tkfit_dedx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
 
-    TH1D_hists.at(k_reco_shrsubclusters0).at(cut_index).at(classification_index)->Fill(SC.shrsubclusters0, weight);
-    TH1D_hists.at(k_reco_shrsubclusters1).at(cut_index).at(classification_index)->Fill(SC.shrsubclusters1, weight);
-    TH1D_hists.at(k_reco_shrsubclusters2).at(cut_index).at(classification_index)->Fill(SC.shrsubclusters2, weight);
     TH1D_hists.at(k_reco_shrsubclusters).at(cut_index).at(classification_index)->Fill(SC.shrsubclusters0 + SC.shrsubclusters1 + SC.shrsubclusters2, weight);
 
     TH1D_hists.at(k_reco_shrmoliereavg).at(cut_index).at(classification_index)->Fill(SC.shrmoliereavg, weight);
@@ -554,6 +554,8 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     TH1D_hists.at(k_reco_shrMCSMom).at(cut_index).at(classification_index)->Fill(SC.shrMCSMom, weight);
 
     TH1D_hists.at(k_reco_closestNuCosmicDist).at(cut_index).at(classification_index)->Fill(SC._closestNuCosmicDist, weight);
+
+    if (SC.n_tracks > 0) TH1D_hists.at(k_reco_trk_len).at(cut_index).at(classification_index)->Fill(SC.trk_len, weight);
 
 
 
@@ -710,7 +712,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     if (_type != _util.k_data){ 
         
         // For the dEdx vs shower distance we make the histogram just before the cut is applied
-        if (cut_index == _util.k_dEdx - 1 ){
+        if (cut_index == _util.k_shr_distance - 1 ){
             
             // This is the signal
             if (classification_index == _util.k_nue_cc){

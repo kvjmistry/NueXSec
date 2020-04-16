@@ -54,15 +54,6 @@ bool selection_cuts::in_fv(SliceContainer &SC){
         return true;   // pass
     }  
     else return false; // fail
-    
-    // These are tighter cuts
-    // if ( SC.reco_nu_vtx_sce_x >= 22 && SC.reco_nu_vtx_sce_x <= 234.35 &&
-    //     SC.reco_nu_vtx_sce_y >= -75.1 && SC.reco_nu_vtx_sce_y <= 75.1 &&
-    //     ( (SC.reco_nu_vtx_sce_z >= 35 && SC.reco_nu_vtx_sce_z <= 665) || (SC.reco_nu_vtx_sce_z >= 785 && SC.reco_nu_vtx_sce_z <= 941.8))
-    //     ){
-    //     return true; // pass
-    // }  
-    // else return false; // fail
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::cluster_frac(SliceContainer &SC){
@@ -91,7 +82,7 @@ bool selection_cuts::selected(SliceContainer &SC){
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::shr_hits(SliceContainer &SC){
-    if (SC.shr_hits_tot > 220 ) return true; // pass 
+    if (SC.shr_hits_max > 220 ) return true; // pass 
     else return false;                  // fail
 }
 // -----------------------------------------------------------------------------

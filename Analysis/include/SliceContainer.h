@@ -31,6 +31,9 @@ public:
     // Function to return the genie interaction mode, e.g. ccqe, ccmec etc.
     std::string SliceInteractionType(int type);
     // -------------------------------------------------------------------------
+    // Function to classify the event by particle type
+    std::pair<std::string, int> ParticleClassifier(int type);
+    // -------------------------------------------------------------------------
     // Function to Get the PPFX CV correction weight
     double GetPPFXCVWeight();
     // -------------------------------------------------------------------------
@@ -88,7 +91,7 @@ public:
     int   shr_tkfit_nhits_V;     // Shower: Number of hits in the 1x4 cm box on the V plane with the track fitting
     int   shr_tkfit_nhits_U;     // Shower: Number of hits in the 1x4 cm box on the U plane with the track fitting
     
-    float shr_tkfit_dedx_Y_alt;  // Shower: dE/dx of the leading shower on the Y plane with the track fitting  [calculated using XYZ instead of RR]
+    float shr_tkfit_dedx_Y_alt;  // Shower: dE/dx of the leading shower on the Y plane with the track fitting  [calculated using XYZ instead of Residual Range]
     float shr_tkfit_dedx_V_alt;  // Shower: dE/dx of the leading shower on the V plane with the track fitting  [calculated using XYZ instead of RR]
     float shr_tkfit_dedx_U_alt;  // Shower: dE/dx of the leading shower on the U plane with the track fitting  [calculated using XYZ instead of RR]
     
@@ -133,11 +136,6 @@ public:
     unsigned int   shr_tkfit_gap10_nhits_V;
     unsigned int   shr_tkfit_gap10_nhits_U;
     
-    float shr_llrpid_dedx_U; // to set branch
-    float shr_llrpid_dedx_V; // to set branch
-    float shr_llrpid_dedx_Y; // to set branch
-    float shr_llrpid_dedx;   // to set branch
-
     float CylFrac1h_1cm;  // Frac of spacepoints of the leading shower within 1cm of the shower axis. Only in the first half of the shower
     float CylFrac1h_2cm;  // Frac of spacepoints of the leading shower within 2cm of the shower axis. Only in the first half of the shower
     float CylFrac1h_3cm;  // Frac of spacepoints of the leading shower within 3cm of the shower axis. Only in the first half of the shower
@@ -217,7 +215,7 @@ public:
     float trk_bragg_pion;       // Track Bragg Likelihood Pion
     
     unsigned int   trk_hits_max;         // Track:  Number of hits of the leading track
-    unsigned int   shr_hits_max;         // Shower: Number of hits of the leading shower
+    unsigned int   shr_hits_max;         // Shower: Number of hits of the leading shower 
     
     float trkshrhitdist0;       // distance between hits of shower and track in 2D on each palne based on hit-hit distances
     float trkshrhitdist1;      
@@ -239,7 +237,7 @@ public:
     float shrclusdir1; 
     float shrclusdir2;
     
-    unsigned int   shr_hits_tot;         // Shower: Total number of shower hits
+    unsigned int   shr_hits_tot;         // Shower: Total number of shower hits (all showers)
     unsigned int   shr_hits_y_tot;       // Shower: Total number of shower hits on the Y Plane 2
     unsigned int   shr_hits_u_tot;       // Shower: Total number of shower hits on the U Plane 1 
     unsigned int   shr_hits_v_tot;       // Shower: Total number of shower hits on the V Plane 0

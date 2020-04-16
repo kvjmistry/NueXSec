@@ -80,12 +80,6 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights){
     tree->SetBranchAddress("shr_tkfit_gap10_nhits_V", &shr_tkfit_gap10_nhits_V );
     tree->SetBranchAddress("shr_tkfit_gap10_nhits_U", &shr_tkfit_gap10_nhits_U );
 
-
-    tree->SetBranchAddress("shr_llrpid_dedx_U", &shr_llrpid_dedx_U );
-    tree->SetBranchAddress("shr_llrpid_dedx_V", &shr_llrpid_dedx_V );
-    tree->SetBranchAddress("shr_llrpid_dedx_Y", &shr_llrpid_dedx_Y );
-    tree->SetBranchAddress("shr_llrpid_dedx",   &shr_llrpid_dedx );
-
     tree->SetBranchAddress("CylFrac1h_1cm", &CylFrac1h_1cm );
     tree->SetBranchAddress("CylFrac1h_2cm", &CylFrac1h_2cm );
     tree->SetBranchAddress("CylFrac1h_3cm", &CylFrac1h_3cm );
@@ -675,6 +669,64 @@ std::string SliceContainer::SliceCategory(){
         std::cout << "Unknown Category type"<< std::endl;
         return "unknown";
     }
+}
+// -----------------------------------------------------------------------------
+std::pair<std::string, int> SliceContainer::ParticleClassifier(int type){
+    
+    // MC Specific classsifications
+    if (type == _util.k_mc){
+
+        // Electron
+        if (shr_bkt_pdg == 11 || shr_bkt_pdg == -11){
+            return std::make_pair("e",_util.k_electron);
+        }
+        // Muon
+        else if (shr_bkt_pdg == 13 || shr_bkt_pdg == -13){
+            return std::make_pair("muon",_util.k_muon);
+        }
+        // Pion
+        else if (shr_bkt_pdg == 211 || shr_bkt_pdg == -211){
+            return std::make_pair("e",_util.k_pion);
+        }
+        // Photon 
+        else if (shr_bkt_pdg == 22 ){
+            return std::make_pair("photon",_util.k_photon);
+        }
+        // Proton
+        else if (shr_bkt_pdg == 2212){
+            return std::make_pair("p",_util.k_proton);
+        }
+        // Neutron
+        else if (shr_bkt_pdg == 2112){
+            return std::make_pair("n",_util.k_neutron);
+        }
+        // Kaon
+        else if (shr_bkt_pdg == 321 || shr_bkt_pdg == -321 ){
+            return std::make_pair("K",_util.k_kaon);
+        }
+        // Other stuff is assumed cosmic
+        else {
+            return std::make_pair("cosmic",_util.k_part_cosmic);
+        }
+
+
+    }
+    // Data
+    else if (type == _util.k_data){
+        return std::make_pair("data",_util.k_part_data);
+    }
+    // EXT
+    else if (type == _util.k_ext){
+        return std::make_pair("ext",_util.k_part_ext);
+        
+    }
+    // Dirt
+    else if (type == _util.k_dirt){
+        return std::make_pair("dirt",_util.k_part_dirt);
+    }
+    // What is this type?
+    else return std::make_pair("unmatched",_util.k_part_unmatched);
+    
 }
 // -----------------------------------------------------------------------------
 std::string SliceContainer::SliceInteractionType(int type){

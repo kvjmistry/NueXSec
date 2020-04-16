@@ -724,18 +724,12 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
                         area_norm,  false, 1.0, "Reco Vertex Z (Space Charge Corr) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_vtx_z_sce.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
-
-    // dEdx
-    MakeStack("h_reco_dEdx_y_plane",_util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Collection Plane dEdx (uncalibrated) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_dEdx_y_plane.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
-
-     // dEdx cali U Plane
+    // dEdx cali U Plane
     MakeStack("h_reco_dEdx_cali_u_plane",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "U Plane dEdx (calibrated) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_dEdx_cali_u_plane.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
-     // dEdx cali V Plane
+    // dEdx cali V Plane
     MakeStack("h_reco_dEdx_cali_v_plane",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "V Plane dEdx (calibrated) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_dEdx_cali_v_plane.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
@@ -766,35 +760,10 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
                         area_norm,  false, 1.0, "Track to Vertex Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_trac_util.k_to_vtx_dist.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
-    // Leading Shower hits in all planes
-    MakeStack("h_reco_leading_shower_hits_all_planes", _util.cut_dirs.at(cut_index).c_str(),
+    // Leading Shower hits in all planes -- need to redefine
+    MakeStack("h_reco_shr_hits_max", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Leading Shower Hits All Planes", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_leading_shower_hits_all_planes.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
-
-    // Leading Shower hits in collection
-    MakeStack("h_reco_leading_shower_hits_collection_plane", _util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Leading Shower Hits Collection Plane", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_leading_shower_hits_collection_plane.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
-
-    // Leading Shower opening angle
-    MakeStack("h_reco_leading_shower_open_angle", _util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Leading Shower Open Angle [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_leading_shower_open_angle.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
-
-    // Secondary shower to vertex distance (for events with more than 1 shower)
-    // MakeStack("h_reco_secondary_shower_to_vtx_dist", _util.cut_dirs.at(cut_index).c_str(),
-    //                     area_norm,  false, 1.0, "Secondary Shower to Vertex Distance (>1 shower) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-    //                     Form("plots/run%s/cuts/%s/reco_secondary_shower_to_vtx_dist.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
-
-    // Leading Shower hits per length
-    // MakeStack("h_reco_leading_shower_hits_per_length", _util.cut_dirs.at(cut_index).c_str(),
-    //                     area_norm,  false, 1.0, "Leading Shower Hits / Length [cm^{-1}]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-    //                     Form("plots/run%s/cuts/%s/reco_leading_shower_hits_per_length.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
-
-    // Longest track to leading shower length
-    // MakeStack("h_reco_longest_trac_util.k_leading_shower_length", _util.cut_dirs.at(cut_index).c_str(),
-    //                     area_norm,  false, 1.0, "Longest Track Length / Leading Shower Length", 0.8, 0.98, 0.87, 0.32, Data_POT,
-    //                     Form("plots/run%s/cuts/%s/reco_longest_track_leading_shower_length.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+                        Form("plots/run%s/cuts/%s/reco_shr_hits_max.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
     // Number of Tracks Contained
     MakeStack("h_reco_n_track_contained", _util.cut_dirs.at(cut_index).c_str(),
@@ -863,19 +832,19 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
     // Calibrated energy of all the showers
     MakeStack("h_reco_shower_energy_tot_cali", _util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  true, 1.0, "Total Calibrated Energy of all Showers [GeV]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Total Calibrated Energy of all Showers [GeV]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_shower_energy_tot_cali.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
-    // Total number of hits for the leading showe
-    MakeStack("h_reco_shower_hits", _util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Total Num of hits for the leading Shower", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shower_hits.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+    // Total number of hits for all showers
+    MakeStack("h_reco_shr_hits_tot", _util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Total Num of hits for all Showers", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shr_hits_tot.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
     
-    // Total number of hits for the leading shower in the collection plane
-    MakeStack("h_reco_shower_hits_y_plane", _util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Total Num of hits for the leading Shower in Collection Plane", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shower_hits_y_plane.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+    // Total number of hits for the all showers in the collection plane
+    MakeStack("h_reco_shr_hits_y_tot", _util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Total Num of hits for all Showers in Collection Plane", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shr_hits_y_tot.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
     // dEdx Trackfit first 2cm U plane
     MakeStack("h_reco_shr_trkfit_2cm_dEdx_u",_util.cut_dirs.at(cut_index).c_str(),
@@ -989,21 +958,6 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
                         area_norm,  false, 1.0, "Flash PE [PE]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_flash_pe.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
 
-    // Shower Subcluster Plane 0
-    MakeStack("h_reco_shrsubclusters0",_util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Shower Sub Cluster Plane 0", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shrsubclusters0.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
-
-    // Shower Subcluster Plane 1
-    MakeStack("h_reco_shrsubclusters1",_util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Shower Sub Cluster Plane 1", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shrsubclusters1.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
-
-    // Shower Subcluster Plane 2
-    MakeStack("h_reco_shrsubclusters2",_util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Shower Sub Cluster Plane 2", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shrsubclusters2.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
-
     // Shower Subcluster All Planes
     MakeStack("h_reco_shrsubclusters",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Shower Sub Cluster All Planes", 0.8, 0.98, 0.87, 0.32, Data_POT,
@@ -1043,6 +997,12 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
     MakeStack("h_reco_closestNuCosmicDist",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Closest CRT Tagged Cosmic to #nu Vertex Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_closestNuCosmicDist.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+
+    // Longest Track Length
+    MakeStack("h_reco_trk_len",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Longest Track Length [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_trk_len.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false);
+
 
 }
 // -----------------------------------------------------------------------------
