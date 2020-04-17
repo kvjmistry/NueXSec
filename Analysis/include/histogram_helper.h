@@ -39,10 +39,13 @@ class histogram_helper{
     void MakeDirectory();
     // -------------------------------------------------------------------------
     // Function to fill the reco variables
-    void FillHists(int type, int classification_index, std::string interaction, int cut_index, SliceContainer SC, double weight);
+    void FillHists(int type, int classification_index, std::string interaction, int _par_type, int cut_index, SliceContainer SC, double weight);
     // -------------------------------------------------------------------------
     // Function to write the histograms to a file
     void WriteReco(int type);
+    // -------------------------------------------------------------------------
+    // As above, but for histograms by particle type
+    void WriteRecoPar(int type);
     // -------------------------------------------------------------------------
     // Function to fill the true neutrino in FV graphs
     void FillTEfficiency(int cut_index, std::string classification, SliceContainer SC, double weight);
@@ -70,6 +73,9 @@ class histogram_helper{
    
     // vector of histograms to make, indexed by enums
     std::vector<std::vector<std::vector<TH1D*>>> TH1D_hists; 
+
+    // vector of histograms to make, indexed by enums -- for particle type
+    std::vector<std::vector<std::vector<TH1D*>>> TH1D_hists_particle; 
 
     // Histograms for the efficiency plot
     std::vector<TH1D*> TEfficiency_hists;
@@ -150,6 +156,13 @@ class histogram_helper{
         k_reco_closestNuCosmicDist,                                             // Distance between the neutrino vertex and (closest?) cosmic trajectory tagged from CRT
         k_reco_trk_len,                                                         // Length of the longest track
         k_TH1D_MAX
+    };
+
+    // enum for histogram vars
+    enum TH1D_par_hist_vars {
+        k_reco_dEdx_cali_y_plane_par,                                           // cali dEdx in the collection plane
+        k_reco_shr_tkfit_dedx_y_par,                                                // dEdx in the collection plane with trackfit 1x4 cm box
+        k_TH1D_par_MAX
     };
 
     enum TH1D_true_hist_vars {

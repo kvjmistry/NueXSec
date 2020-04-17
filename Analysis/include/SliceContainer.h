@@ -31,7 +31,7 @@ public:
     // Function to return the genie interaction mode, e.g. ccqe, ccmec etc.
     std::string SliceInteractionType(int type);
     // -------------------------------------------------------------------------
-    // Function to classify the event by particle type
+    // Function to classify the event by particle type of the leading shower
     std::pair<std::string, int> ParticleClassifier(int type);
     // -------------------------------------------------------------------------
     // Function to Get the PPFX CV correction weight

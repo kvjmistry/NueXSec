@@ -136,7 +136,7 @@ namespace xsecSelection {
             void SavetoFile();
             // -----------------------------------------------------------------
             // Function to implement counters and fillings of histograms for each cut
-            void SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, int cut_index, std::vector<std::vector<double>> &counter_v);
+            void SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, std::pair<std::string, int> par_type, int cut_index, std::vector<std::vector<double>> &counter_v);
             // -----------------------------------------------------------------
             // Get the CV weights for histograms
             double GetCVWeight(int type, SliceContainer SC);

@@ -428,6 +428,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     std::pair<std::string, int> classification = SC.SliceClassifier(type);      // Classification of the event
     std::string interaction                    = SC.SliceInteractionType(type); // Genie interaction type
     std::string category                       = SC.SliceCategory();            // The pandora group slice category
+    std::pair<std::string, int> particle_type  = SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
 
     // Test code to isolate the low E nues in truth
     // if (type == _util.k_mc && SC.nu_e > 0.5) return false;
@@ -438,7 +439,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
     // *************************************************************************
-    SelectionFill(type, SC, classification, interaction, _util.k_unselected, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_unselected, counter_v );
     
     // *************************************************************************
     // Software Trigger -- MC Only  --------------------------------------------
@@ -447,7 +448,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_swtrig) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_swtrig, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_swtrig, counter_v );
 
     // *************************************************************************
     // Op Filt PE --------------------------------------------------------------
@@ -456,7 +457,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_opfilt_pe) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_opfilt_pe, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_opfilt_pe, counter_v );
 
     // *************************************************************************
     // Op Filt Michel Veto -- MC Only ------------------------------------------
@@ -465,7 +466,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // passed_v.at(ievent).cut_v.at(_util.k_opfilt_veto) = pass;
     // if(!pass) return false; // Failed the cut!
     
-    // SelectionFill(type, SC, classification, interaction, _util.k_opfilt_veto, counter_v );
+    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_opfilt_veto, counter_v );
 
     // *************************************************************************
     // Slice ID ----------------------------------------------------------------
@@ -474,7 +475,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_slice_id) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_slice_id, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_slice_id, counter_v );
     
     // *************************************************************************
     // Electron Candidate ------------------------------------------------------
@@ -483,7 +484,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_e_candidate) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_e_candidate, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_e_candidate, counter_v );
 
     // *************************************************************************
     // In FV -------------------------------------------------------------------
@@ -492,7 +493,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_in_fv) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_in_fv, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_in_fv, counter_v );
     
     // *************************************************************************
     // Topological Score -------------------------------------------------------
@@ -501,7 +502,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_topo_score) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_topo_score, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_topo_score, counter_v );
 
     // *************************************************************************
     // Cosmic Impact Parameter -------------------------------------------------
@@ -510,7 +511,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_cosmic_ip) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_cosmic_ip, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_cosmic_ip, counter_v );
 
     // *************************************************************************
     // Cluster Fraction --------------------------------------------------------
@@ -519,7 +520,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_cluster_frac) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_cluster_frac, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_cluster_frac, counter_v );
 
     // *************************************************************************
     // Shower Score ------------------------------------------------------------
@@ -528,7 +529,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_shower_score) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_shower_score, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shower_score, counter_v );
 
     // *************************************************************************
     // Shower Contained --------------------------------------------------------
@@ -537,7 +538,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_shower_contained) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_shower_contained, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shower_contained, counter_v );
 
     // *************************************************************************
     // Michel Rejection --------------------------------------------------------
@@ -546,7 +547,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_michel_rej) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_michel_rej, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_michel_rej, counter_v );
 
     // *************************************************************************
     // Shower Hits -------------------------------------------------------------
@@ -555,7 +556,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_shr_hits) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_shr_hits, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_hits, counter_v );
 
     // *************************************************************************
     // Shower Hit Ratio  -------------------------------------------------------
@@ -564,7 +565,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_hit_ratio) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_hit_ratio, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_hit_ratio, counter_v );
 
     // *************************************************************************
     // Shower Moliere Average --------------------------------------------------
@@ -573,7 +574,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_shr_moliere_avg) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_shr_moliere_avg, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_moliere_avg, counter_v );
 
     // *************************************************************************
     // Shower Cylinrical Fraction 2nd half shower 1cm --------------------------
@@ -582,7 +583,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_shr_CylFrac2h_1cm) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_shr_CylFrac2h_1cm, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_CylFrac2h_1cm, counter_v );
 
     // *************************************************************************
     // Shower to Vertex Distance --------------------------------------------
@@ -591,7 +592,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_shr_distance) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_shr_distance, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_distance, counter_v );
 
     // *************************************************************************
     // dEdx --------------------------------------------------------------------
@@ -600,7 +601,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_dEdx) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, _util.k_dEdx, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx, counter_v );
     
     // *************************************************************************
     return true;
@@ -616,6 +617,7 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_mc).WriteTrue();
         _hhelper.at(_util.k_mc).WriteTEfficiency();
         _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
+        _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_mc);
         _hhelper.at(_util.k_mc).WriteFlash();
         _hhelper.at(_util.k_mc).WriteInteractions();
         _hhelper.at(_util.k_mc).Write_2DSigBkgHists();
@@ -625,6 +627,7 @@ void selection::SavetoFile(){
     }
     if (bool_use_data) {
         _hhelper.at(_util.k_data).WriteReco(_util.k_data);
+        _hhelper.at(_util.k_data).WriteRecoPar(_util.k_data);
         _hhelper.at(_util.k_data).WriteFlash();
 
         _thelper.at(_util.k_data).WriteTree(_util.k_data);
@@ -632,6 +635,7 @@ void selection::SavetoFile(){
     }
     if (bool_use_ext) {
         _hhelper.at(_util.k_ext).WriteReco(_util.k_ext);
+        _hhelper.at(_util.k_ext).WriteRecoPar(_util.k_ext);
         _hhelper.at(_util.k_ext).WriteFlash();
         _hhelper.at(_util.k_ext).Write_2DSigBkgHists();
 
@@ -641,6 +645,7 @@ void selection::SavetoFile(){
     if (bool_use_dirt) {
         // _hhelper.at(_util.k_dirt).WriteTrue(); // Only turn this on to inspect. It wont merge since the file names are not uniique yet!!
         _hhelper.at(_util.k_dirt).WriteReco(_util.k_dirt);
+        _hhelper.at(_util.k_dirt).WriteRecoPar(_util.k_dirt);
         _hhelper.at(_util.k_dirt).WriteFlash();
         _hhelper.at(_util.k_dirt).Write_2DSigBkgHists();
 
@@ -650,14 +655,14 @@ void selection::SavetoFile(){
 
 } // End save to file
 // -----------------------------------------------------------------------------
-void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, int cut_index, std::vector<std::vector<double>> &counter_v){
+void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, std::pair<std::string, int> par_type, int cut_index, std::vector<std::vector<double>> &counter_v){
     
     // Get the CV weight
     double weight = 1.0;
     weight = GetCVWeight(type, SC);
     
     // Fill Histograms
-    if (!slim) _hhelper.at(type).FillHists(type, classification.second, interaction, cut_index, SC, weight);
+    if (!slim) _hhelper.at(type).FillHists(type, classification.second, interaction, par_type.second, cut_index, SC, weight);
 
     // Set counters for the cut
     _util.Tabulate(interaction, classification.first, type, counter_v.at(cut_index), weight );

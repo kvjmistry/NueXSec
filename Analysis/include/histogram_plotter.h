@@ -36,7 +36,7 @@ class histogram_plotter{
     // -------------------------------------------------------------------------
     // Function to make a stacked histogram and save as a pdf
     void MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, double y_scale_factor, const char* x_axis_name,
-                                     const double leg_x1, const double leg_x2, const double leg_y1, double Data_POT, const double leg_y2, const char* print_name, bool override_data_mc_comparison );
+                                     const double leg_x1, const double leg_x2, const double leg_y1, double Data_POT, const double leg_y2, const char* print_name, bool override_data_mc_comparison, std::string plotmode );
     // -------------------------------------------------------------------------
     // Calculates the chi2
     // Returns reduced chi2, num mc+ext scaled to data POT, num data, num degrees of freedom, p value in vector respectively
@@ -59,6 +59,15 @@ class histogram_plotter{
     // -------------------------------------------------------------------------
     // Set the TPad Options
     void SetTPadOptions(TPad * topPad, TPad * bottomPad );
+    // -------------------------------------------------------------------------
+    // Function to get all the histograms from the file
+    bool GetHistograms(std::vector<TH1D*> &hist, std::string hist_name, std::string cut_name, std::string plotmode, bool &found_data, bool &found_ext, bool &found_dirt);
+    // -------------------------------------------------------------------------
+    // Function to set the colours of the stacked histogram
+    void SetFillColours(std::vector<TH1D*> &hist, std::string plotmode, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt);
+    // -------------------------------------------------------------------------
+    // Function to set the legend of the stacked histograms
+    void SetLegend(std::vector<TH1D*> hist, TLegend *leg_stack, std::vector<double> hist_integrals, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt, std::string plotmode );
     // -------------------------------------------------------------------------
     // Call make stacked histograms
     void CallMakeStack(const char *run_period, int cut_index, double Data_POT);

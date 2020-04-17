@@ -365,6 +365,35 @@ void histogram_helper::InitHistograms(){
         
     }
     // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
+    // Stacked histograms by particle type
+
+    // Resize the histogram vector. plot var, cuts, classifications
+    TH1D_hists_particle.resize(k_TH1D_par_MAX);
+
+    for (unsigned int u = 0; u < k_TH1D_par_MAX; u++){
+        TH1D_hists_particle.at(u).resize(_util.k_cuts_MAX);
+
+        for (unsigned int i=0; i < _util.cut_dirs.size();i++){
+            TH1D_hists_particle.at(u).at(i).resize(_util.k_particles_MAX);
+        }
+    }
+
+    // loop over and create the histograms
+    for (unsigned int i=0; i < _util.cut_dirs.size();i++){
+    
+        for (unsigned int j=0; j < _util.particle_types.size();j++){
+        
+            // dEdx
+            TH1D_hists_particle.at(k_reco_dEdx_cali_y_plane_par).at(i).at(j) = new TH1D ( Form("h_reco_dEdx_cali_y_plane_par_%s_%s",_util.cut_dirs.at(i).c_str(), _util.particle_types.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists_particle.at(k_reco_shr_tkfit_dedx_y_par).at(i).at(j)  = new TH1D ( Form("h_reco_shr_tkfit_dedx_y_par_%s_%s", _util.cut_dirs.at(i).c_str(), _util.particle_types.at(j).c_str()) ,"", 40, 0, 10);
+
+        }
+    }
+
+
+    // -------------------------------------------------------------------------
 
     // Intialising true histograms in here
     if (_type == _util.k_mc || _type == _util.k_dirt){
@@ -451,7 +480,7 @@ void histogram_helper::InitHistograms(){
 
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::FillHists(int type, int classification_index, std::string interaction, int cut_index, SliceContainer SC, double weight){
+void histogram_helper::FillHists(int type, int classification_index, std::string interaction, int _par_type, int cut_index, SliceContainer SC, double weight){
 
     // Calculate some variables
     double reco_shr_p = std::sqrt(SC.shr_px*SC.shr_px + SC.shr_py*SC.shr_py + SC.shr_pz*SC.shr_pz);
@@ -556,8 +585,16 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     TH1D_hists.at(k_reco_closestNuCosmicDist).at(cut_index).at(classification_index)->Fill(SC._closestNuCosmicDist, weight);
 
     if (SC.n_tracks > 0) TH1D_hists.at(k_reco_trk_len).at(cut_index).at(classification_index)->Fill(SC.trk_len, weight);
+    
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
+    // Partice Type Hists
+    TH1D_hists_particle.at(k_reco_dEdx_cali_y_plane_par).at(cut_index).at(_par_type)->Fill(SC.shr_dedx_Y_cali, weight);
+    TH1D_hists_particle.at(k_reco_shr_tkfit_dedx_y_par).at(cut_index).at(_par_type)->Fill(SC.shr_tkfit_dedx_Y, weight);
 
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     // Flash histograms
     if (type == _util.k_mc || type == _util.k_dirt){
@@ -773,6 +810,56 @@ void histogram_helper::WriteReco(int type){
                 // Now write the histograms
                 TH1D_hists.at(u).at(i).at(j)->SetOption("hist,E");
                 TH1D_hists.at(u).at(i).at(j)->Write("",TObject::kOverwrite);
+
+                if (break_early) break;
+            }
+
+        }
+    }
+}
+// -----------------------------------------------------------------------------
+void histogram_helper::WriteRecoPar(int type){
+
+    f_nuexsec->cd();
+
+    bool bool_dir;
+    TDirectory *truth_dir; // e.g MC/Truth, Data/Truth, EXT/Truth
+    bool break_early{false};
+
+    // Loop over the histogram variables
+    for (unsigned int u = 0 ; u < TH1D_hists_particle.size(); u++){
+        
+        // loop over the cut directories
+        for (unsigned int i = 0; i < _util.cut_dirs.size(); i++){
+
+            // loop over the particle type directories
+            for (unsigned int j = 0; j < _util.particle_types.size(); j++){
+
+                // Choose which folder to fill in based on the type (a re-mapping of enums)
+                if (type == _util.k_mc && ( j == _util.k_part_data || j == _util.k_part_ext || j == _util.k_part_dirt)){ 
+                    break;
+                }
+                if (type == _util.k_data){ 
+                    j = _util.k_part_data;
+                    break_early = true;
+                }
+                if (type == _util.k_ext){ 
+                    j = _util.k_part_ext;
+                    break_early = true;
+                }
+                if (type == _util.k_dirt){ 
+                    j= _util.k_part_dirt;
+                    break_early = true;
+                }
+
+                // Get the classification directory and cd
+                bool_dir = _util.GetDirectory(f_nuexsec, truth_dir ,Form("%s/%s/%s", "ParticleStack", _util.cut_dirs.at(i).c_str(), _util.particle_types.at(j).c_str() ) );
+                
+                if (bool_dir) truth_dir->cd();
+
+                // Now write the histograms
+                TH1D_hists_particle.at(u).at(i).at(j)->SetOption("hist,E");
+                TH1D_hists_particle.at(u).at(i).at(j)->Write("",TObject::kOverwrite);
 
                 if (break_early) break;
             }

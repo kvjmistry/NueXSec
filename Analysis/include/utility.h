@@ -159,10 +159,10 @@ public:
                 "pion",
                 "cosmic",
                 "neutron",
-                "data",
+                "unmatched",
                 "ext",
-                "dirt",
-                "unmatched"
+                "data",
+                "dirt"
                 };
 
     // enum to switch file type 
@@ -321,10 +321,10 @@ public:
         k_pion,
         k_part_cosmic,
         k_neutron,
-        k_part_data,
-        k_part_ext,
-        k_part_dirt,
         k_part_unmatched,
+        k_part_ext,
+        k_part_data,
+        k_part_dirt,
         k_particles_MAX
     };
 
