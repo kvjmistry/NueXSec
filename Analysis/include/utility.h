@@ -68,6 +68,7 @@ public:
     // -------------------------------------------------------------------------
     // Get a histogram from a file
     bool GetHist(TFile* f, TH1D* &h, TString string);
+    bool GetHist(TFile* f, TH2D* &h, TString string);
     // -------------------------------------------------------------------------
     // Function to tabulate all the nuetrino types and flavours
     void Tabulate(std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight);
@@ -106,9 +107,11 @@ public:
             "ShrHits",       // Shower Hits
             "HitRatio",      // Ratio of shr hits and slice hits
             "Moliere_Avg",   // Shower Moliere Average
-            "Cylindrical_Frac_2h_1cm", // Fraction of spacepoints in 1cm cylinder (second half)
+            // "Cylindrical_Frac_2h_1cm", // Fraction of spacepoints in 1cm cylinder (second half)
             "ShrVtxDistance",// Shower to vertex distance
-            "dEdx"           // dEdx
+            "dEdx_y",          // dEdx y plane
+            // "dEdx_v",          // dEdx y plane
+            // "dEdx_u"           // dEdx y plane
             };
 
 
@@ -186,9 +189,11 @@ public:
                 k_shr_hits,          // Shower Hits
                 k_hit_ratio,         // Ratio of shr hits and slice hits
                 k_shr_moliere_avg,   // Shower Moliere Average
-                k_shr_CylFrac2h_1cm, // Fraction of spacepoints in 1cm cylinder (second half)
+                // k_shr_CylFrac2h_1cm, // Fraction of spacepoints in 1cm cylinder (second half)
                 k_shr_distance,      // Shower to reco nu vertex distance
-                k_dEdx,              // dEdx
+                k_dEdx_y,            // dEdx y plane
+                // k_dEdx_v,            // dEdx v plane
+                // k_dEdx_u,            // dEdx u plane
                 k_cuts_MAX
                 }; 
 

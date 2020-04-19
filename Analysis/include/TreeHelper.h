@@ -39,6 +39,20 @@ class TreeHelper{
 
     TTree * tree;     // Main tree with the selected events
     TTree * eff_tree; // Efficiency and Purity tree
+    TTree * dedx_tree;  // Tree for optimising the dedx cut
+
+
+    // vars for dedx
+    float shr_dedx_Y_cali{0.0},        shr_dedx_V_cali{0.0},        shr_dedx_U_cali{0.0};
+    float shr_tkfit_dedx_Y{0.0},       shr_tkfit_dedx_V{0.0},       shr_tkfit_dedx_U{0.0};
+    float shr_tkfit_dedx_Y_alt{0.0},   shr_tkfit_dedx_V_alt{0.0},   shr_tkfit_dedx_U_alt{0.0};
+    float shr_tkfit_2cm_dedx_Y{0.0},   shr_tkfit_2cm_dedx_V{0.0},   shr_tkfit_2cm_dedx_U{0.0};
+    float shr_tkfit_gap05_dedx_Y{0.0}, shr_tkfit_gap05_dedx_V{0.0}, shr_tkfit_gap05_dedx_U{0.0};
+    float shr_tkfit_gap10_dedx_Y{0.0}, shr_tkfit_gap10_dedx_V{0.0}, shr_tkfit_gap10_dedx_U{0.0};
+    float shr_distance{0.0};
+    float shr_theta{0.0};
+
+    std::string cut;
 
     // -------------------------------------------------------------------------
     // Initialiser function
@@ -47,12 +61,14 @@ class TreeHelper{
     // Function to fill the tree vars
     void FillVars(SliceContainer &SC, std::pair<std::string, int> _classification, bool _gen, double _weight);
     // -------------------------------------------------------------------------
+    // Fill the variables in the dedx tree
+    void Fill_dedxVars(SliceContainer &SC, std::pair<std::string, int> _classification, std::string _cut, double _weight);
+    // -------------------------------------------------------------------------
     // Fills the Efficiency and Purity
     void FillEff(double _efficiency, double _purity);
     // -------------------------------------------------------------------------
     // Writes the tree to file
     void WriteTree(int type);
-    // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

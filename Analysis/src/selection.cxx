@@ -579,11 +579,11 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     // Shower Cylinrical Fraction 2nd half shower 1cm --------------------------
     // *************************************************************************
-    pass = _scuts.shr_cyl_frac_1cm(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_shr_CylFrac2h_1cm) = pass;
-    if(!pass) return false; // Failed the cut!
+    // pass = _scuts.shr_cyl_frac_1cm(SC);
+    // passed_v.at(ievent).cut_v.at(_util.k_shr_CylFrac2h_1cm) = pass;
+    // if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_CylFrac2h_1cm, counter_v );
+    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_CylFrac2h_1cm, counter_v );
 
     // *************************************************************************
     // Shower to Vertex Distance --------------------------------------------
@@ -595,13 +595,31 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_distance, counter_v );
 
     // *************************************************************************
-    // dEdx --------------------------------------------------------------------
+    // dEdx in y plane ---------------------------------------------------------
     // *************************************************************************
-    pass = _scuts.dEdx(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_dEdx) = pass;
+    pass = _scuts.dEdx_y(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_dEdx_y) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_y, counter_v );
+
+    // *************************************************************************
+    // dEdx in v plane ---------------------------------------------------------
+    // *************************************************************************
+    // pass = _scuts.dEdx_v(SC);
+    // passed_v.at(ievent).cut_v.at(_util.k_dEdx_v) = pass;
+    // if(!pass) return false; // Failed the cut!
+    
+    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_v, counter_v );
+
+    // *************************************************************************
+    // dEdx in u plane ---------------------------------------------------------
+    // *************************************************************************
+    // pass = _scuts.dEdx_u(SC);
+    // passed_v.at(ievent).cut_v.at(_util.k_dEdx_u) = pass;
+    // if(!pass) return false; // Failed the cut!
+    
+    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_u, counter_v );
     
     // *************************************************************************
     return true;
@@ -681,6 +699,11 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
             _thelper.at(type).FillVars(SC, classification, false, weight);
         }
 
+    }
+
+    // Fill the dedx ttree before shr dist cut and after cut dedx
+    if (cut_index == _util.k_shr_distance - 1 || cut_index == _util.k_shr_distance || cut_index == _util.k_dEdx_y ){
+        _thelper.at(type).Fill_dedxVars(SC, classification, _util.cut_dirs.at(cut_index), weight);
     }
 
 }

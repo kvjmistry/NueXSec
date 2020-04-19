@@ -71,9 +71,49 @@ bool selection_cuts::michel_rej(SliceContainer &SC){
     else return false;                               // fail
 }
 // -----------------------------------------------------------------------------
-bool selection_cuts::dEdx(SliceContainer &SC){
-    if (SC.shr_dedx_Y_cali > 1.7 && SC.shr_dedx_Y_cali < 3.2) return true; // pass 
-    else return false;                                                     // fail
+bool selection_cuts::dEdx_y(SliceContainer &SC){
+    // if (SC.shr_dedx_Y_cali > 1.7 && SC.shr_dedx_Y_cali < 3.2) return true; // pass 
+    // else return false;                                                     // fail
+
+    // Kill the background region
+    if ( (SC.shr_tkfit_dedx_Y >= 2.6 && SC.shr_tkfit_dedx_Y < 6.8) || (SC.shr_tkfit_dedx_Y < 0.5) ){
+        return false;
+    }
+    // Try and recover the events in the other planes
+    else {
+        return true;
+    }
+
+}
+// -----------------------------------------------------------------------------
+bool selection_cuts::dEdx_v(SliceContainer &SC){
+
+    // We only want to run this cut if the dedx calculation failed in the collection plane
+    if (SC.shr_tkfit_dedx_Y > 0 ) return true;
+
+
+    // Kill the background region
+    if (  (SC.shr_tkfit_dedx_V > 2.7 && SC.shr_tkfit_dedx_V < 6 ) || (SC.shr_tkfit_dedx_V > 0 && SC.shr_tkfit_dedx_V < 1.5) ){
+        return false;
+    }
+    // Try and recover the events in the other planes
+    else {
+        return true;
+    }
+
+}
+// -----------------------------------------------------------------------------
+bool selection_cuts::dEdx_u(SliceContainer &SC){
+
+    // Signal region
+    if (SC.shr_tkfit_dedx_U >= 1.7 && SC.shr_tkfit_dedx_U < 3.2){
+        return true;
+    }
+    // failed the cut
+    else {
+        return false;
+    }
+
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::selected(SliceContainer &SC){
@@ -95,7 +135,8 @@ bool selection_cuts::shr_distance(SliceContainer &SC){
     
     if (SC.n_tracks == 0) return true; // Dont apply this cut if there is no tracks
     
-    if (SC.shr_distance < 10 ) return true; // pass 
+    // if (SC.shr_distance < 10 ) return true; // pass 
+    if (SC.shr_distance < 4) return true; // pass 
     else return false;                      // fail
 }
 // -----------------------------------------------------------------------------
@@ -115,7 +156,7 @@ bool selection_cuts::shr_contained(SliceContainer &SC){
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::shr_moliere_avg(SliceContainer &SC){
-    if (SC.shrmoliereavg < 10 ) return true;    // pass 
+    if (SC.shrmoliereavg < 8 ) return true;    // pass 
     else return false;                     // fail
 }
 // -----------------------------------------------------------------------------

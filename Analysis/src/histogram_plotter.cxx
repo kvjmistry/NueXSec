@@ -63,13 +63,7 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
 
     // Create a set of strings for creating a dynamic directory
     // Directory structure that is created will take the form plots/<cut>/
-    std::string a = "if [ ! -d \"plots/";
-    std::string b = "run" + std::string(run_period) + "/" + "Flash";
-    std::string c = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
-    std::string d = "run" + std::string(run_period) + "/" + "Flash";
-    std::string e = "; fi";
-    std::string command = a + b + c + d + e ;
-    system(command.c_str()); 
+    CreateDirectory("Flash", run_period);
 
     // Flash time plots
     MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time.pdf", run_period), "h_flash_time");
@@ -93,29 +87,25 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
     MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_pe_OMO_sid1.pdf", run_period), "h_flash_pe_sid1"); // Slice ID 1
     MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_pe_OMO_sid0.pdf", run_period), "h_flash_pe_sid0"); // Slice ID 0
 
-    a = "if [ ! -d \"plots/";
-    b = "run" + std::string(run_period) + "/" + "Efficiency";
-    c = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
-    d = "run" + std::string(run_period) + "/" + "Efficiency";
-    e = "; fi";
-    command = a + b + c + d + e ;
-    system(command.c_str()); 
 
+    // Create the Efficiency Folder
+    CreateDirectory("Efficiency", run_period);
 
     MakeEfficiencyPlot(Form("plots/run%s/Efficiency/Integrated_Efficiency_Purity.pdf", run_period), run_period);
 
     MakeEfficiencyPlotByCut(Form("plots/run%s/Efficiency/TEff.pdf", run_period), run_period);
 
-    a = "if [ ! -d \"plots/";
-    b = "run" + std::string(run_period) + "/" + "Interaction";
-    c = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
-    d = "run" + std::string(run_period) + "/" + "Interaction";
-    e = "; fi";
-    command = a + b + c + d + e ;
-    system(command.c_str());
+    // Create the interaction folder
+    CreateDirectory("Interaction", run_period);
 
     // Interaction Plot
     MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction.pdf", run_period), run_period);
+
+    // Create the 2D folder
+    CreateDirectory("2D", run_period);
+
+    Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_shr_dist.pdf", run_period), "h_reco_shr_dEdx_shr_dist", run_period);
+
 
 }
 // -----------------------------------------------------------------------------
@@ -1662,7 +1652,51 @@ void histogram_plotter::MakeInteractionPlot(const char* print_name, const char *
 
 }
 // -----------------------------------------------------------------------------
+void histogram_plotter::Plot2D_Signal_Background(const char* print_name, const char* histname, const char *run_period){
+
+    std::vector<TH2D*>  hist(_util.sig_bkg_prefix.size());
+    
+    TCanvas * c       = new TCanvas();
+
+    for (unsigned int k = 0; k < hist.size(); k++){
+        _util.GetHist(f_nuexsec, hist.at(k), Form("2D/%s_%s", histname ,_util.sig_bkg_prefix.at(k).c_str() ));
+        if (hist.at(k) == NULL){
+            std::cout << "Couldn't get all the interaction histograms so exiting function..."<< std::endl;
+            return;
+        }
+        hist.at(k)->SetStats(kFALSE);
+    }
+
+    TLegend *leg_stack = new TLegend(0.75, 0.89, 0.87, 0.75);
+    leg_stack->SetBorderSize(0);
+    leg_stack->SetFillStyle(0);
+
+    leg_stack->AddEntry(hist.at(_util.k_signal),     "Signal",     "f");
+    leg_stack->AddEntry(hist.at(_util.k_background), "Background", "f");
+
+    hist.at(_util.k_background)->Draw("box");
+    hist.at(_util.k_signal)->Draw("box, same");
+
+    leg_stack->Draw();
+
+    // Draw the run period on the plot
+    Draw_Run_Period(c);
+
+    c->Print(print_name);
+
+}
 // -----------------------------------------------------------------------------
+void histogram_plotter::CreateDirectory(std::string folder, const char *run_period){
+
+    std::string a = "if [ ! -d \"plots/";
+    std::string b = "run" + std::string(run_period) + "/" + folder;
+    std::string c = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
+    std::string d = "run" + std::string(run_period) + "/" + folder;
+    std::string e = "; fi";
+    std::string command = a + b + c + d + e ;
+    system(command.c_str()); 
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

@@ -86,7 +86,11 @@ class histogram_plotter{
     // True Neutino energy for nues broken down by genie interaction type
     void MakeInteractionPlot(const char* print_name, const char *run_period);
     // -------------------------------------------------------------------------
+    // Plot the 2D signal vs Background Plots
+    void Plot2D_Signal_Background(const char* print_name, const char* histname, const char *run_period);
     // -------------------------------------------------------------------------
+    // Create another directory in the plots folder
+    void CreateDirectory(std::string folder, const char *run_period);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

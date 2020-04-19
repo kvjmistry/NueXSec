@@ -21,8 +21,9 @@ void TreeHelper::Initialise(int type, const char* run_period, std::string file_o
         }
 
         // Create the TTree
-        tree     = new TTree("mc_tree",    "mc_tree");
-        eff_tree = new TTree("mc_eff_tree","mc_eff_tree");
+        tree      = new TTree("mc_tree",         "mc_tree");
+        eff_tree  = new TTree("mc_eff_tree",     "mc_eff_tree");
+        dedx_tree = new TTree("mc_dedx_tree",    "mc_dedx_tree");
     }
     else if (type == _util.k_data){
         
@@ -36,7 +37,8 @@ void TreeHelper::Initialise(int type, const char* run_period, std::string file_o
         }
 
         // Create the TTree
-        tree = new TTree("data_tree","data_tree");
+        tree      = new TTree("data_tree",     "data_tree");
+        dedx_tree = new TTree("data_dedx_tree","data_dedx_tree");
 
     }
     else if (type == _util.k_ext){
@@ -51,7 +53,8 @@ void TreeHelper::Initialise(int type, const char* run_period, std::string file_o
         }
 
         // Create the TTree
-        tree = new TTree("ext_tree","ext_tree");
+        tree      = new TTree("ext_tree",     "ext_tree");
+        dedx_tree = new TTree("ext_dedx_tree","ext_dedx_tree");
 
     }
     else if (type == _util.k_dirt){
@@ -66,7 +69,8 @@ void TreeHelper::Initialise(int type, const char* run_period, std::string file_o
         }
 
         // Create the TTree
-        tree = new TTree("dirt_tree","dirt_tree");
+        tree      = new TTree("dirt_tree",     "dirt_tree");
+        dedx_tree = new TTree("dirt_dedx_tree","dirt_dedx_tree");
 
     }
     else {
@@ -111,6 +115,38 @@ void TreeHelper::Initialise(int type, const char* run_period, std::string file_o
         eff_tree->Branch("purity", &purity, "purity/D");
     }
 
+    dedx_tree->Branch("shr_dedx_Y_cali", &shr_dedx_Y_cali, "shr_dedx_Y_cali/F");
+    dedx_tree->Branch("shr_dedx_V_cali", &shr_dedx_V_cali, "shr_dedx_V_cali/F");
+    dedx_tree->Branch("shr_dedx_U_cali", &shr_dedx_U_cali, "shr_dedx_U_cali/F");
+    
+    dedx_tree->Branch("shr_tkfit_dedx_Y", &shr_tkfit_dedx_Y, "shr_tkfit_dedx_Y/F");
+    dedx_tree->Branch("shr_tkfit_dedx_V", &shr_tkfit_dedx_V, "shr_tkfit_dedx_V/F");
+    dedx_tree->Branch("shr_tkfit_dedx_U", &shr_tkfit_dedx_U, "shr_tkfit_dedx_U/F");
+    
+    dedx_tree->Branch("shr_tkfit_dedx_Y_alt", &shr_tkfit_dedx_Y_alt, "shr_tkfit_dedx_Y_alt/F");
+    dedx_tree->Branch("shr_tkfit_dedx_V_alt", &shr_tkfit_dedx_V_alt, "shr_tkfit_dedx_V_alt/F");
+    dedx_tree->Branch("shr_tkfit_dedx_U_alt", &shr_tkfit_dedx_U_alt, "shr_tkfit_dedx_U_alt/F");
+    
+    dedx_tree->Branch("shr_tkfit_2cm_dedx_Y", &shr_tkfit_2cm_dedx_Y, "shr_tkfit_2cm_dedx_Y/F");
+    dedx_tree->Branch("shr_tkfit_2cm_dedx_V", &shr_tkfit_2cm_dedx_V, "shr_tkfit_2cm_dedx_V/F");
+    dedx_tree->Branch("shr_tkfit_2cm_dedx_U", &shr_tkfit_2cm_dedx_U, "shr_tkfit_2cm_dedx_U/F");
+    
+    dedx_tree->Branch("shr_tkfit_gap05_dedx_Y", &shr_tkfit_gap05_dedx_Y, "shr_tkfit_gap05_dedx_Y/F");
+    dedx_tree->Branch("shr_tkfit_gap05_dedx_V", &shr_tkfit_gap05_dedx_V, "shr_tkfit_gap05_dedx_V/F");
+    dedx_tree->Branch("shr_tkfit_gap05_dedx_U", &shr_tkfit_gap05_dedx_U, "shr_tkfit_gap05_dedx_U/F");
+    
+    dedx_tree->Branch("shr_tkfit_gap10_dedx_Y", &shr_tkfit_gap10_dedx_Y, "shr_tkfit_gap10_dedx_Y/F");
+    dedx_tree->Branch("shr_tkfit_gap10_dedx_V", &shr_tkfit_gap10_dedx_V, "shr_tkfit_gap10_dedx_V/F");
+    dedx_tree->Branch("shr_tkfit_gap10_dedx_U", &shr_tkfit_gap10_dedx_U, "shr_tkfit_gap10_dedx_U/F");
+
+    dedx_tree->Branch("weight",          &weight,       "weight/D");
+    dedx_tree->Branch("classifcation",   &classifcation);
+    dedx_tree->Branch("shr_distance",    &shr_distance, "shr_distance/F");
+    dedx_tree->Branch("shr_theta",       &shr_theta,    "shr_theta/F");
+    dedx_tree->Branch("cut", &cut);
+
+    std::cout << "Finished Initalising the Tree Helper..."<< std::endl;
+
 }
 // -----------------------------------------------------------------------------
 void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _classification, bool _gen, double _weight){
@@ -137,6 +173,40 @@ void TreeHelper::FillEff(double _efficiency, double _purity){
 
 }
 // -----------------------------------------------------------------------------
+void TreeHelper::Fill_dedxVars(SliceContainer &SC, std::pair<std::string, int> _classification, std::string _cut, double _weight){
+
+    f_nuexsec->cd();
+
+    classifcation = _classification.first;
+    weight = _weight;
+    cut    = _cut;
+
+
+    shr_dedx_Y_cali        = SC.shr_dedx_Y_cali;
+    shr_dedx_V_cali        = SC.shr_dedx_V_cali;
+    shr_dedx_U_cali        = SC.shr_dedx_U_cali;
+    shr_tkfit_dedx_Y       = SC.shr_tkfit_dedx_Y;
+    shr_tkfit_dedx_V       = SC.shr_tkfit_dedx_V;
+    shr_tkfit_dedx_U       = SC.shr_tkfit_dedx_U;
+    shr_tkfit_dedx_Y_alt   = SC.shr_tkfit_dedx_Y_alt;
+    shr_tkfit_dedx_V_alt   = SC.shr_tkfit_dedx_V_alt;
+    shr_tkfit_dedx_U_alt   = SC.shr_tkfit_dedx_U_alt;
+    shr_tkfit_2cm_dedx_Y   = SC.shr_tkfit_2cm_dedx_Y;
+    shr_tkfit_2cm_dedx_V   = SC.shr_tkfit_2cm_dedx_V;
+    shr_tkfit_2cm_dedx_U   = SC.shr_tkfit_2cm_dedx_U;
+    shr_tkfit_gap05_dedx_Y = SC.shr_tkfit_gap05_dedx_Y;
+    shr_tkfit_gap05_dedx_V = SC.shr_tkfit_gap05_dedx_V;
+    shr_tkfit_gap05_dedx_U = SC.shr_tkfit_gap05_dedx_U;
+    shr_tkfit_gap10_dedx_Y = SC.shr_tkfit_gap10_dedx_Y;
+    shr_tkfit_gap10_dedx_V = SC.shr_tkfit_gap10_dedx_V;
+    shr_tkfit_gap10_dedx_U = SC.shr_tkfit_gap10_dedx_U;
+    shr_distance           = SC.shr_distance;
+    shr_theta              = SC.shr_theta;
+
+    dedx_tree->Fill();
+
+}
+// -----------------------------------------------------------------------------
 void TreeHelper::WriteTree(int type){
 
     f_nuexsec->cd();
@@ -145,6 +215,8 @@ void TreeHelper::WriteTree(int type){
 
     // Write the efficiency tree only if its MC
     if (type == _util.k_mc) eff_tree->Write("",TObject::kOverwrite);
+
+    dedx_tree->Write("",TObject::kOverwrite);
 
 }
 // -----------------------------------------------------------------------------
