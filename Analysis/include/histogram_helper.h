@@ -144,6 +144,10 @@ class histogram_helper{
         k_reco_shr_tkfit_dedx_u,                                                // The dEdx using the trackfit variable u plane
         k_reco_shr_tkfit_dedx_v,                                                // The dEdx using the trackfit variable v plane
         k_reco_shr_tkfit_dedx_y,                                                // The dEdx using the trackfit variable collection
+        k_reco_shr_tkfit_dedx_y_good_theta,                                     // The dEdx using the trackfit variable collection for angles not close to parallel to the y plane
+        k_reco_shr_tkfit_dedx_y_bad_theta,                                      // The dEdx using the trackfit variable collection for angles close to parallel to the y plane
+        k_reco_shr_tkfit_dedx_v_bad_theta,                                      // The dEdx using the trackfit variable v plane for angles close to parallel to the y plane
+        k_reco_shr_tkfit_dedx_u_bad_theta,                                      // The dEdx using the trackfit variable v plane for angles close to parallel to the y plane
         k_reco_flash_time,                                                      // The Flash time
         k_reco_flash_pe,                                                        // The Flash PE
         k_reco_shrsubclusters,                                                  // Number of subclusters the shower can be broken into, Sum all three planes

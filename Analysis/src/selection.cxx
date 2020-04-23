@@ -102,7 +102,7 @@ void selection::Initialise( const char * mc_file,
     // Get MC variables --------------------------------------------------------
     if (bool_use_mc){
         std::cout << "\nInitialising MC" << std::endl;
-         _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
+        _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the mc slice container
         mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights);
@@ -279,9 +279,9 @@ void selection::MakeSelection(){
         //         std::pair<std::string, int> classification = mc_SC.SliceClassifier(_util.k_mc);
 
         //         // Background events
-        //         if (classification.second != _util.k_nue_cc){
-        //             if (mc_SC.shr_tkfit_gap10_dedx_Y < 3.2 && mc_SC.shr_tkfit_gap10_dedx_Y > 0){
-        //                 std::cout <<  mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt << " " << mc_SC.shr_tkfit_gap10_dedx_Y <<  std::endl;
+        //         if (classification.second == _util.k_nue_cc){
+        //             if (mc_SC.shr_tkfit_dedx_Y > 6.8){
+        //                 std::cout <<  mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt <<  std::endl;
         //             }
 
         //         }

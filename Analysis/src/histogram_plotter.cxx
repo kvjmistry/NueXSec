@@ -57,7 +57,7 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
         system(command.c_str()); 
 
         // Call the Make stack function for all the plots we want
-        CallMakeStack(run_period, i, Data_POT);
+        // CallMakeStack(run_period, i, Data_POT);
         
     }
 
@@ -1065,6 +1065,27 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
                         area_norm,  false, 1.0, "Collection Plane dEdx (track fitter) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_shr_tkfit_dedx_y.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
 
+    // Shower dEdx with the track fitter y plane good theta
+    MakeStack("h_reco_shr_tkfit_dedx_y_good_theta",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Collection Plane dEdx (track fitter), Good Theta [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shr_tkfit_dedx_y_good_theta.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+
+    // Shower dEdx with the track fitter y plane bad theta
+    MakeStack("h_reco_shr_tkfit_dedx_y_bad_theta",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Collection Plane dEdx (track fitter), Bad Theta [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shr_tkfit_dedx_y_bad_theta.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+
+    // Shower dEdx with the track fitter v plane bad theta
+    MakeStack("h_reco_shr_tkfit_dedx_v_bad_theta",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "V Plane dEdx (track fitter), Bad Theta [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shr_tkfit_dedx_v_bad_theta.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+
+    // Shower dEdx with the track fitter u plane bad theta
+    MakeStack("h_reco_shr_tkfit_dedx_u_bad_theta",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "U Plane dEdx (track fitter), Bad Theta [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_shr_tkfit_dedx_u_bad_theta.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+
+
     // Shower Flash Time
     MakeStack("h_reco_flash_time",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Flash Time [#mus]", 0.8, 0.98, 0.87, 0.32, Data_POT,
@@ -1560,6 +1581,8 @@ void histogram_plotter::MakeEfficiencyPlotByCut(const char* print_name, const ch
 
         TH1D* h_true_nue = (TH1D*)hist.at(_util.k_unselected)->Clone("h_clone_true_nue");
 
+        gPad->SetRightMargin(0.17 );
+
         Float_t rightmax = 1.1*h_true_nue->GetMaximum();
         Float_t scale = gPad->GetUymax()/rightmax;
         h_true_nue ->SetLineColor(kAzure-6);
@@ -1569,6 +1592,7 @@ void histogram_plotter::MakeEfficiencyPlotByCut(const char* print_name, const ch
 
         TGaxis *axis = new TGaxis(gPad->GetUxmax()+4,gPad->GetUymin(),gPad->GetUxmax()+4, gPad->GetUymax(),0,rightmax,510,"+L");
         axis->SetTitle("True #nu_{e} Events in FV");
+        axis->SetTitleOffset(1.4);
         axis->SetLineColor(kAzure-6);
         axis->SetLabelColor(kAzure-6);
         axis->SetTitleColor(kAzure-6);

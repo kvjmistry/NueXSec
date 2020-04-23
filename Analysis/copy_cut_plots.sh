@@ -10,42 +10,44 @@ cuts=(
   Unselected
   SoftwareTrig
   Op_Filter_PE
-  Op_Filter_Veto
   Slice_ID
   e_candidate
-  Topo_Score
-  Topo_Score
-  Topo_Score
+  e_candidate
+  e_candidate
   In_FV
+  Topo_Score
+  Cosmic_IP
   Cluster_Frac
   Shower_Score
+  Shower_Contained
   Michel_Rej
   ShrHits
-  ShrHitsYplane
-  ShrVtxDistance
   HitRatio
+  Moliere_Avg
+  ShrVtxDistance
+  dEdx_y
 )
 
 # the list of plots to copy
 cuts2=(
 reco_softwaretrig.pdf
 reco_opfilter_beam.pdf
-reco_opfilter_veto.pdf
 reco_nslice.pdf
 reco_shower_multiplicity.pdf
-reco_topological_score.pdf
 reco_vtx_x_sce.pdf
 reco_vtx_y_sce.pdf
 reco_vtx_z_sce.pdf
+reco_topological_score.pdf
+reco_cosmicIP.pdf 
 reco_slclustfrac.pdf
 reco_shower_score.pdf
+reco_n_shower_contained.pdf
 reco_shower_energy_tot_cali.pdf
-reco_leading_shower_hits_all_planes.pdf
-reco_leading_shower_hits_collection_plane.pdf
-reco_shower_to_vtx_dist.pdf
+reco_shr_hits_max.pdf
 reco_hits_ratio.pdf
-reco_dEdx_cali_y_plane.pdf
-
+reco_shrmoliereavg.pdf
+reco_shower_to_vtx_dist.pdf
+reco_shr_tkfit_dedx_y.pdf
 )
 
 cut_path=/uboone/app/users/kmistry/MCC9_uboonecode_v08_00_00_33/srcs/ubana/ubana/NueXSec/Analysis/plots/run1/cuts/

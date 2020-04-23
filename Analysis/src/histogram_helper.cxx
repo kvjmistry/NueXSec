@@ -328,6 +328,13 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_shr_tkfit_dedx_u).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_u_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_shr_tkfit_dedx_v).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_v_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_shr_tkfit_dedx_y).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_y_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            
+            TH1D_hists.at(k_reco_shr_tkfit_dedx_y_good_theta).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_y_good_theta_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_shr_tkfit_dedx_y_bad_theta).at(i).at(j)  = new TH1D ( Form("h_reco_shr_tkfit_dedx_y_bad_theta_%s_%s",_util.cut_dirs.at(i).c_str(),  _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_shr_tkfit_dedx_v_bad_theta).at(i).at(j)  = new TH1D ( Form("h_reco_shr_tkfit_dedx_v_bad_theta_%s_%s",_util.cut_dirs.at(i).c_str(),  _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_shr_tkfit_dedx_u_bad_theta).at(i).at(j)  = new TH1D ( Form("h_reco_shr_tkfit_dedx_u_bad_theta_%s_%s",_util.cut_dirs.at(i).c_str(),  _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            
+            
             // Flash time
             TH1D_hists.at(k_reco_flash_time).at(i).at(j) = new TH1D ( Form("h_reco_flash_time_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 25 );
 
@@ -514,7 +521,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     
     TH1D_hists.at(k_reco_leading_shower_theta).at(cut_index).at(classification_index)->Fill(SC.shr_theta * 180/3.14159, weight);
     
-    TH1D_hists.at(k_reco_leading_shower_cos_theta).at(cut_index).at(classification_index)->Fill(std::cos(SC.shr_theta * 180/3.14159), weight);
+    TH1D_hists.at(k_reco_leading_shower_cos_theta).at(cut_index).at(classification_index)->Fill(std::cos(SC.shr_theta), weight);
     
     TH1D_hists.at(k_reco_shower_multiplicity).at(cut_index).at(classification_index)->Fill(SC.n_showers, weight);
     
@@ -526,7 +533,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
 
     if (SC.n_tracks > 0) TH1D_hists.at(k_reco_track_shower_angle).at(cut_index).at(classification_index)->Fill(SC.tksh_angle*180/3.14159, weight);
 
-    if (SC.n_tracks > 0) TH1D_hists.at(k_reco_hits_ratio).at(cut_index).at(classification_index)->Fill(SC.hits_ratio, weight);
+    TH1D_hists.at(k_reco_hits_ratio).at(cut_index).at(classification_index)->Fill(SC.hits_ratio, weight);
 
     TH1D_hists.at(k_reco_shower_score).at(cut_index).at(classification_index)->Fill(SC.shr_score, weight);
 
@@ -568,6 +575,17 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     TH1D_hists.at(k_reco_shr_tkfit_dedx_u).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_U, weight);
     TH1D_hists.at(k_reco_shr_tkfit_dedx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_V, weight);
     TH1D_hists.at(k_reco_shr_tkfit_dedx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
+
+    // Split the dedx into good and bad angles
+    if (SC.shr_theta * 180/3.14159 < 80 || SC.shr_theta * 180/3.14159 > 100) {
+        TH1D_hists.at(k_reco_shr_tkfit_dedx_y_good_theta).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
+    }
+    else {
+        TH1D_hists.at(k_reco_shr_tkfit_dedx_y_bad_theta).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
+        TH1D_hists.at(k_reco_shr_tkfit_dedx_v_bad_theta).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_V, weight);
+        TH1D_hists.at(k_reco_shr_tkfit_dedx_u_bad_theta).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_U, weight);
+    }
+     
 
     TH1D_hists.at(k_reco_shrsubclusters).at(cut_index).at(classification_index)->Fill(SC.shrsubclusters0 + SC.shrsubclusters1 + SC.shrsubclusters2, weight);
 
