@@ -333,6 +333,12 @@ void selection::MakeSelection(){
                     subrun = data_SC.sub;
                     event  = data_SC.evt;
 
+                    double INTERCEPT = 0.0;
+                    double SLOPE = 0.83;
+                    double reco_nu_e = (data_SC.shr_energy_tot_cali + INTERCEPT) / SLOPE + data_SC.trk_energy_tot;
+
+                    // std::cout << run << " " << subrun << " " << event << " " << reco_nu_e <<  '\n';
+
                     run_subrun_file << run << " " << subrun << " " << event << '\n';
 
                 }
@@ -406,7 +412,7 @@ void selection::MakeSelection(){
                              efficiency, purity);
             
             // Fill the efficiency and purity for the output mc tree file
-            _thelper.at(_util.k_mc).FillEff(efficiency, purity);
+            if (bool_use_mc) _thelper.at(_util.k_mc).FillEff(efficiency, purity);
 
         }
     

@@ -57,7 +57,7 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
         system(command.c_str()); 
 
         // Call the Make stack function for all the plots we want
-        // CallMakeStack(run_period, i, Data_POT);
+        CallMakeStack(run_period, i, Data_POT);
         
     }
 
@@ -1140,6 +1140,11 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
     MakeStack("h_reco_trk_len",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Longest Track Length [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_trk_len.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+
+    // Reco Neutrino Energy
+    MakeStack("h_reco_nu_e",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Reconstructed Neutrino Energy [GeV]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_nu_e.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
 
 
 

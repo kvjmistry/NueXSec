@@ -368,6 +368,9 @@ void histogram_helper::InitHistograms(){
             // Longest Track Length if there is one
             TH1D_hists.at(k_reco_trk_len).at(i).at(j) = new TH1D ( Form("h_reco_trk_len_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 400);
 
+            // Reconstructed Neutrino Energy
+            TH1D_hists.at(k_reco_nu_e).at(i).at(j) = new TH1D ( Form("h_reco_nu_e_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 3);
+
         }
         
     }
@@ -492,6 +495,11 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     // Calculate some variables
     double reco_shr_p = std::sqrt(SC.shr_px*SC.shr_px + SC.shr_py*SC.shr_py + SC.shr_pz*SC.shr_pz);
 
+    // Reconstructed Energy of neutrino
+    double INTERCEPT = 0.0;
+    double SLOPE = 0.83;
+    double reco_nu_e = (SC.shr_energy_tot_cali + INTERCEPT) / SLOPE + SC.trk_energy_tot;
+
     // Now fill the histograms!
     TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x, weight);
     TH1D_hists.at(k_reco_vtx_y).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_y, weight);
@@ -603,6 +611,8 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     TH1D_hists.at(k_reco_closestNuCosmicDist).at(cut_index).at(classification_index)->Fill(SC._closestNuCosmicDist, weight);
 
     if (SC.n_tracks > 0) TH1D_hists.at(k_reco_trk_len).at(cut_index).at(classification_index)->Fill(SC.trk_len, weight);
+
+    TH1D_hists.at(k_reco_nu_e).at(cut_index).at(classification_index)->Fill(reco_nu_e, weight);
     
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
