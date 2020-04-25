@@ -108,6 +108,8 @@ void TreeHelper::Initialise(int type, const char* run_period, std::string file_o
     tree->Branch("event",  &event,  "event/I");
     tree->Branch("gen",    &gen,    "gen/O");
     tree->Branch("weight", &weight, "weight/D");
+    tree->Branch("true_energy", &true_energy, "true_energy/D");
+    tree->Branch("reco_energy", &reco_energy, "reco_energy/D");
     tree->Branch("classifcation",   &classifcation);
 
     if (type == _util.k_mc){
@@ -149,7 +151,7 @@ void TreeHelper::Initialise(int type, const char* run_period, std::string file_o
 
 }
 // -----------------------------------------------------------------------------
-void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _classification, bool _gen, double _weight){
+void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _classification, bool _gen, double _weight, double _true_energy, double _reco_energy){
 
     f_nuexsec->cd();
 
@@ -159,6 +161,8 @@ void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _class
     gen    = _gen;
     classifcation = _classification.first;
     weight = _weight;
+    true_energy = _true_energy;
+    reco_energy = _reco_energy;
 
     tree->Fill();
 

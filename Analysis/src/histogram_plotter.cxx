@@ -669,7 +669,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         if (hist.at(0)->GetMinimum() != 0.0) hist.at(k_plot_data)->SetMinimum(hist.at(0)->GetMinimum() / 2.);  // hist.at(0) is just checking the bounds of the first histogram
         
 
-        h_stack->SetMinimum(0.1);
+        h_stack->SetMinimum(2.5);
         if (hist.at(0)->GetMinimum() == 0.0) hist.at(k_plot_data)->SetMinimum(hist.at(0)->GetMinimum() + 0.0001 / 2.); 
         
         hist.at(_util.k_leg_data)->SetMaximum(y_maximum * (y_scale_factor * 500));
@@ -679,7 +679,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
 
     }
     else if(logy && !found_data) {
-        h_stack->SetMinimum(0.1);
+        h_stack->SetMinimum(2.5);
         c->SetLogy();
         h_stack->Draw("hist");
     }

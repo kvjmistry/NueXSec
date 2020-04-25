@@ -685,6 +685,11 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     double weight = 1.0;
     weight = GetCVWeight(type, SC);
     
+    // This is in many places, need to have a way for setting this number by default
+    double INTERCEPT = 0.0;
+    double SLOPE = 0.83;
+    double reco_nu_e = (SC.shr_energy_tot_cali + INTERCEPT) / SLOPE + SC.trk_energy_tot;
+
     // Fill Histograms
     if (!slim) _hhelper.at(type).FillHists(type, classification.second, interaction, par_type.second, cut_index, SC, weight);
 
@@ -699,10 +704,10 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
 
         // This is a generated event, but unselected
         if (cut_index == _util.k_unselected && classification.second == _util.k_nue_cc){
-            _thelper.at(type).FillVars(SC, classification, true, weight);
+            _thelper.at(type).FillVars(SC, classification, true, weight, SC.nu_e, reco_nu_e);
         }
         else {
-            _thelper.at(type).FillVars(SC, classification, false, weight);
+            _thelper.at(type).FillVars(SC, classification, false, weight, SC.nu_e, reco_nu_e);
         }
 
     }

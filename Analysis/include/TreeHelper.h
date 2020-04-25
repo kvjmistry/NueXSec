@@ -35,6 +35,8 @@ class TreeHelper{
     
     double weight{0.0};        // This is not going to be integer if we already weight the CV
 
+    double true_energy{0.0}, reco_energy{0.0};
+
     double efficiency{0.0}, purity{0.0};
 
     TTree * tree;     // Main tree with the selected events
@@ -59,7 +61,7 @@ class TreeHelper{
     void Initialise(int type, const char *run_period, std::string file_out, int weight_cfg );
     // -------------------------------------------------------------------------
     // Function to fill the tree vars
-    void FillVars(SliceContainer &SC, std::pair<std::string, int> _classification, bool _gen, double _weight);
+    void FillVars(SliceContainer &SC, std::pair<std::string, int> _classification, bool _gen, double _weight, double _true_energy, double _reco_energy);
     // -------------------------------------------------------------------------
     // Fill the variables in the dedx tree
     void Fill_dedxVars(SliceContainer &SC, std::pair<std::string, int> _classification, std::string _cut, double _weight);
