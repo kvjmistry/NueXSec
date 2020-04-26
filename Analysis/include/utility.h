@@ -107,7 +107,6 @@ public:
             "ShrHits",       // Shower Hits
             "HitRatio",      // Ratio of shr hits and slice hits
             "Moliere_Avg",   // Shower Moliere Average
-            // "Cylindrical_Frac_2h_1cm", // Fraction of spacepoints in 1cm cylinder (second half)
             "ShrVtxDistance",// Shower to vertex distance
             "dEdx_y",          // dEdx y plane
             // "dEdx_v",          // dEdx y plane
@@ -189,7 +188,6 @@ public:
                 k_shr_hits,          // Shower Hits
                 k_hit_ratio,         // Ratio of shr hits and slice hits
                 k_shr_moliere_avg,   // Shower Moliere Average
-                // k_shr_CylFrac2h_1cm, // Fraction of spacepoints in 1cm cylinder (second half)
                 k_shr_distance,      // Shower to reco nu vertex distance
                 k_dEdx_y,            // dEdx y plane
                 // k_dEdx_v,            // dEdx v plane

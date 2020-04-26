@@ -54,14 +54,8 @@ class selection_cuts{
     // Cut on the dEdx y plane
     bool dEdx_u(SliceContainer &SC);
     // -------------------------------------------------------------------------
-    // Selected variable in PeLEE tree
-    bool selected(SliceContainer &SC);
-    // -------------------------------------------------------------------------
     // Cut on the total hits for the leading shower
     bool shr_hits(SliceContainer &SC);
-    // -------------------------------------------------------------------------
-    // Cut on the total hits for the leading shower on the y plane
-    bool shr_hits_y_plane(SliceContainer &SC);
     // -------------------------------------------------------------------------
     // Cut on the shower to nu vertex distance
     bool shr_distance(SliceContainer &SC);
@@ -77,9 +71,6 @@ class selection_cuts{
     // -------------------------------------------------------------------------
     // Shower Moliere Average
     bool shr_moliere_avg(SliceContainer &SC);
-    // -------------------------------------------------------------------------
-    // Fraction of spacepoints around 1cm of the leading shower
-    bool shr_cyl_frac_1cm(SliceContainer &SC);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

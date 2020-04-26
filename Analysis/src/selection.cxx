@@ -583,15 +583,6 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_moliere_avg, counter_v );
 
     // *************************************************************************
-    // Shower Cylinrical Fraction 2nd half shower 1cm --------------------------
-    // *************************************************************************
-    // pass = _scuts.shr_cyl_frac_1cm(SC);
-    // passed_v.at(ievent).cut_v.at(_util.k_shr_CylFrac2h_1cm) = pass;
-    // if(!pass) return false; // Failed the cut!
-    
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_CylFrac2h_1cm, counter_v );
-
-    // *************************************************************************
     // Shower to Vertex Distance --------------------------------------------
     // *************************************************************************
     pass = _scuts.shr_distance(SC);
@@ -704,10 +695,10 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
 
         // This is a generated event, but unselected
         if (cut_index == _util.k_unselected && classification.second == _util.k_nue_cc){
-            _thelper.at(type).FillVars(SC, classification, true, weight, SC.nu_e, reco_nu_e);
+            _thelper.at(type).FillVars(SC, classification, true, weight, reco_nu_e);
         }
         else {
-            _thelper.at(type).FillVars(SC, classification, false, weight, SC.nu_e, reco_nu_e);
+            _thelper.at(type).FillVars(SC, classification, false, weight, reco_nu_e);
         }
 
     }

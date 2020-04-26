@@ -111,6 +111,15 @@ void TreeHelper::Initialise(int type, const char* run_period, std::string file_o
     tree->Branch("true_energy", &true_energy, "true_energy/D");
     tree->Branch("reco_energy", &reco_energy, "reco_energy/D");
     tree->Branch("classifcation",   &classifcation);
+    tree->Branch("shr_tkfit_dedx_Y", &shr_tkfit_dedx_Y, "shr_tkfit_dedx_Y/F");
+    tree->Branch("n_showers", &n_showers, "n_showers/F");
+    tree->Branch("n_tracks",  &n_tracks,  "n_tracks/F");
+    tree->Branch("shr_theta", &shr_theta, "shr_theta/F");
+    tree->Branch("shr_phi",   &shr_phi,   "shr_phi/F");
+    tree->Branch("shr_energy_tot_cali", &shr_energy_tot_cali, "shr_energy_tot_cali/F");
+    tree->Branch("shrmoliereavg", &shrmoliereavg, "shrmoliereavg/F");
+    tree->Branch("shr_hits_max",  &shr_hits_max,  "shr_hits_max/F");
+
 
     if (type == _util.k_mc){
         eff_tree->Branch("efficiency", &efficiency, "efficiency/D");
@@ -151,7 +160,7 @@ void TreeHelper::Initialise(int type, const char* run_period, std::string file_o
 
 }
 // -----------------------------------------------------------------------------
-void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _classification, bool _gen, double _weight, double _true_energy, double _reco_energy){
+void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _classification, bool _gen, double _weight, double _reco_energy){
 
     f_nuexsec->cd();
 
@@ -161,8 +170,16 @@ void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _class
     gen    = _gen;
     classifcation = _classification.first;
     weight = _weight;
-    true_energy = _true_energy;
+    true_energy = SC.nu_e;
     reco_energy = _reco_energy;
+    shr_tkfit_dedx_Y = SC.shr_tkfit_dedx_Y;
+    n_showers = SC.n_showers;
+    n_tracks = SC.n_tracks;
+    shr_theta = SC.shr_theta;
+    shr_phi = SC.shr_phi;
+    shr_energy_tot_cali = SC.shr_energy_tot_cali;
+    shrmoliereavg = SC.shrmoliereavg;
+    shr_hits_max = SC.shr_hits_max;
 
     tree->Fill();
 

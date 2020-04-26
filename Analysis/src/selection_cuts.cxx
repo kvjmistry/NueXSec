@@ -116,18 +116,8 @@ bool selection_cuts::dEdx_u(SliceContainer &SC){
 
 }
 // -----------------------------------------------------------------------------
-bool selection_cuts::selected(SliceContainer &SC){
-    if (SC.selected == 1 ) return true; // pass 
-    else return false;                  // fail
-}
-// -----------------------------------------------------------------------------
 bool selection_cuts::shr_hits(SliceContainer &SC){
     if (SC.shr_hits_max > 220 ) return true; // pass 
-    else return false;                  // fail
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::shr_hits_y_plane(SliceContainer &SC){
-    if (SC.shr_hits_y_tot > 200 ) return true; // pass 
     else return false;                  // fail
 }
 // -----------------------------------------------------------------------------
@@ -160,10 +150,6 @@ bool selection_cuts::shr_moliere_avg(SliceContainer &SC){
     else return false;                     // fail
 }
 // -----------------------------------------------------------------------------
-bool selection_cuts::shr_cyl_frac_1cm(SliceContainer &SC){
-    if (SC.CylFrac2h_1cm > 0.01 ) return true;    // pass 
-    else return false;                     // fail
-}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
