@@ -809,7 +809,7 @@ double SliceContainer::GetPPFXCVWeight(){
         ybin = h_2D_CV_UW_PPFX_ratio_nue->GetYaxis()->FindBin(nu_theta);
         weight = h_2D_CV_UW_PPFX_ratio_nue->GetBinContent(xbin, ybin);
     }
-    if (nu_pdg == 12) {
+    if (nu_pdg == -12) {
         xbin = h_2D_CV_UW_PPFX_ratio_nuebar->GetXaxis()->FindBin(nu_e);
         ybin = h_2D_CV_UW_PPFX_ratio_nuebar->GetYaxis()->FindBin(nu_theta);
         weight = h_2D_CV_UW_PPFX_ratio_nuebar->GetBinContent(xbin, ybin);

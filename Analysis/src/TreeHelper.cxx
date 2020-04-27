@@ -174,12 +174,12 @@ void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _class
     reco_energy = _reco_energy;
     shr_tkfit_dedx_Y = SC.shr_tkfit_dedx_Y;
     n_showers = SC.n_showers;
-    n_tracks = SC.n_tracks;
+    n_tracks  = SC.n_tracks;
     shr_theta = SC.shr_theta;
-    shr_phi = SC.shr_phi;
+    shr_phi   = SC.shr_phi;
     shr_energy_tot_cali = SC.shr_energy_tot_cali;
     shrmoliereavg = SC.shrmoliereavg;
-    shr_hits_max = SC.shr_hits_max;
+    shr_hits_max  = SC.shr_hits_max;
 
     tree->Fill();
 
