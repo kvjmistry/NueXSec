@@ -217,17 +217,96 @@ void make_xsec_plot(){
     TLegend *leg = new TLegend(0.17, 0.5, 0.48, 0.9);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
-
     leg->AddEntry(h_nue,             "NuMI #nu_{e} Flux",                       "l");
     leg->AddEntry(h_nuebar,          "NuMI #bar{#nu_{e}} Flux",                 "l");
     leg->AddEntry(h_spline_nue,      "GENIE #nu_{e} CC Cross Section",          "l");
     leg->AddEntry(h_spline_nuebar,   "GENIE #bar{#nu_{e}} CC Cross Section",    "l");
-
     leg->AddEntry(gr, "Data #sigma_{#nu_{e}+#bar{#nu_{e}}} (stat+sys)",   "lep");
-
     leg->Draw();
 
 
     c->Print("../../Analysis/plots/integrated_cross_sec.pdf");
+
+
+
+    // Now create the other flux integrated cross sec plot
+    TCanvas *c2  = new TCanvas();
+    double x1[]  = {0, 1};
+    double y1[]  = {4.67e-39, 4.67e-39};
+    double ex1[] = {0.0, 0.0};
+    double ey1[] = {0.1907e-38, 0.1907e-38};
+    double ey2[] = {0.101e-38, 0.101e-38};
+    
+    // Stats band
+    auto g_xsec_sys = new TGraphErrors(2, x1, y1, ex1, ey1);
+    g_xsec_sys->SetFillColor(kGray);
+    g_xsec_sys->SetFillColorAlpha(12, 0.15);
+    g_xsec_sys->SetTitle(";;#nu_{e}/#bar{#nu_{e}} CC Cross Section [cm^{2}]");
+    g_xsec_sys->GetXaxis()->SetRangeUser(0,1);
+    g_xsec_sys->GetYaxis()->SetRangeUser(0,1.0e-38);
+    g_xsec_sys->GetXaxis()->SetLabelOffset(10);
+    gStyle->SetTickLength(0.00,"x"); 
+    g_xsec_sys->GetXaxis()->SetLabelOffset(999);
+    g_xsec_sys->GetXaxis()->SetLabelSize(0);
+    g_xsec_sys->GetXaxis()->SetTickLength(0);
+    g_xsec_sys->GetYaxis()->CenterTitle();
+    g_xsec_sys->GetYaxis()->SetLabelSize(0.04);
+    g_xsec_sys->GetYaxis()->SetTitleSize(0.04);
+    g_xsec_sys->Draw("a3");
+
+    // Systematic band
+    auto g_xsec_stat = new TGraphErrors(2, x1, y1, ex1, ey2);
+    g_xsec_stat->SetFillColorAlpha(46, 0.15);
+    g_xsec_stat->SetTitle(";;#nu_{e}/#bar{#nu_{e}} CC Cross Section [10^{-38} cm^{2}]");
+    g_xsec_stat->GetXaxis()->SetRangeUser(0,1);
+    g_xsec_stat->GetYaxis()->SetRangeUser(0,1.0e-38);
+    g_xsec_stat->Draw("3, same");
+
+    // data xsec
+    double y_xsec[]  = {4.67e-39, 4.67e-39};
+    auto g_xsec = new TGraphErrors(2, x1, y_xsec);
+    g_xsec->SetLineColor(kBlack);
+    g_xsec->SetLineWidth(2);
+    g_xsec->Draw("same");
+
+    // Genie nue
+    double y_nue[]  = {6.34569e-39, 6.34569e-39};
+    auto g_xsec_nue = new TGraphErrors(2, x1, y_nue);
+    g_xsec_nue->SetLineColor(kBlue+2);
+    g_xsec_nue->SetLineWidth(2);
+    g_xsec_nue->SetLineStyle(3);
+    g_xsec_nue->Draw("same");
+
+    // Genie nuebar
+    double y_nuebar[]  = {2.24685e-39, 2.24685e-39};
+    auto g_xsec_nuebar = new TGraphErrors(2, x1, y_nuebar);
+    g_xsec_nuebar->SetLineColor(kGreen+2);
+    g_xsec_nuebar->SetLineWidth(2);
+    g_xsec_nuebar->SetLineStyle(3);
+    g_xsec_nuebar->Draw("same");
+
+    // Genie nue + nuebar
+    double y_nue_nuebar[]  = {4.83e-39, 4.83e-39};
+    auto g_xsec_nue_nuebar = new TGraphErrors(2, x1, y_nue_nuebar);
+    g_xsec_nue_nuebar->SetLineColor(kAzure-3);
+    g_xsec_nue_nuebar->SetLineWidth(2);
+    g_xsec_nue_nuebar->SetLineStyle(3);
+    g_xsec_nue_nuebar->Draw("same");
+
+    // Draw the Legend
+    TLegend *leg2 = new TLegend(0.57, 0.65, 0.88, 0.9);
+    leg2->SetBorderSize(0);
+    leg2->SetFillStyle(0);
+    leg2->AddEntry(g_xsec, "Data #nu_{e} + #bar{#nu_{e}} CC Cross Section",      "l");
+    leg2->AddEntry(g_xsec_sys,      "Stat + Sys Uncertainty",                  "f");
+    leg2->AddEntry(g_xsec_stat,     "Stat Uncertainty",                        "f");
+    leg2->AddEntry(g_xsec_nue,      "GENIE #nu_{e} CC Cross Section",          "l");
+    leg2->AddEntry(g_xsec_nuebar,   "GENIE #bar{#nu_{e}} CC Cross Section",    "l");
+    leg2->AddEntry(g_xsec_nue_nuebar,   "GENIE #nu_{e} + #bar{#nu_{e}} CC Cross Section",    "l");
+    
+    leg2->Draw();
+    
+
+    c2->Print("../../Analysis/plots/integrated_cross_sec2.pdf");
 
 }
