@@ -59,7 +59,17 @@ void make_xsec_plot(){
     TCanvas *c = new TCanvas();
     
     // Nue flux
-    h_nue->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu_{e}} / cm^{2} / 6e20 POT");
+    h_nue->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu_{e}} / cm^{2} / 6 #times 10^{20} POT");
+    h_nue->GetXaxis()->CenterTitle();
+    h_nue->GetYaxis()->CenterTitle();
+
+    h_nue->GetXaxis()->SetLabelFont(42);
+    h_nue->GetXaxis()->SetLabelSize(0.04);
+    h_nue->GetXaxis()->SetTitleSize(0.04);
+    h_nue->GetYaxis()->SetLabelFont(42);
+    h_nue->GetYaxis()->SetLabelSize(0.04);
+    h_nue->GetYaxis()->SetTitleSize(0.04);
+
     h_nue->GetXaxis()->SetRangeUser(0,3);
     h_nue->GetYaxis()->SetRangeUser(0,150.0e6);
     h_nue->SetLineColor(kBlue+2);
@@ -82,7 +92,7 @@ void make_xsec_plot(){
     // nue spline
     h_spline_nue->SetLineWidth(2);
     h_spline_nue->SetLineColor(kBlue+2);
-    h_spline_nue->SetLineStyle(2);
+    h_spline_nue->SetLineStyle(3);
     h_spline_nue->Scale(scale);
     h_spline_nue->Draw("hist,L,P,same");
 
@@ -95,12 +105,15 @@ void make_xsec_plot(){
 
     // The second axis
     TGaxis *axis = new TGaxis(3.0, 0, 3.0, 150.0e6, 0, rightmax, 510, "+L");
-    axis->SetTitle("#nu_{e}/#bar{#nu_{e}} CC Cross Section [1e-38 cm^{2}]");
-    axis->SetTitleOffset(1.2);
+    axis->SetTitle("#nu_{e}/#bar{#nu_{e}} CC Cross Section [10^{-38} cm^{2}]");
+    axis->SetTitleOffset(1.1);
     axis->SetLineColor(kBlack);
     axis->SetLabelColor(kBlack);
     axis->SetTitleColor(kBlack);
-    
+    axis->SetTextFont(42);
+    axis->SetLabelFont(42);
+    axis->CenterTitle();
+
     axis->Draw();
 
     // Get the energy values
@@ -197,10 +210,11 @@ void make_xsec_plot(){
     
     gr->SetMarkerColor(kBlack);
     gr->SetMarkerStyle(kFullCircle);
+    gr->SetLineWidth(2);
     gr->Draw("L,P,same");
 
     // Draw the Legend
-    TLegend *leg = new TLegend(0.2, 0.6, 0.4, 0.8);
+    TLegend *leg = new TLegend(0.17, 0.5, 0.48, 0.9);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
 
@@ -213,5 +227,7 @@ void make_xsec_plot(){
 
     leg->Draw();
 
+
+    c->Print("../../Analysis/plots/integrated_cross_sec.pdf");
 
 }
