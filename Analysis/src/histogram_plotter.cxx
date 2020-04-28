@@ -57,7 +57,7 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
         system(command.c_str()); 
 
         // Call the Make stack function for all the plots we want
-        CallMakeStack(run_period, i, Data_POT);
+        // CallMakeStack(run_period, i, Data_POT);
         
     }
 
@@ -105,6 +105,38 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
     CreateDirectory("2D", run_period);
 
     Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_shr_dist.pdf", run_period), "h_reco_shr_dEdx_shr_dist", run_period);
+
+    // Create the Truth folder
+    CreateDirectory("Truth", run_period);
+    
+    // Make 1D Histtograms
+    // Save1DHists(Form("plots/run%s/Truth/true_nue_theta.pdf", run_period), "h_true_nue_theta", run_period);
+    Save1DHists(Form("plots/run%s/Truth/true_nue_phi.pdf",   run_period), "h_true_nue_phi",   run_period);
+    Save1DHists(Form("plots/run%s/Truth/true_nue_angle.pdf", run_period), "h_true_nue_angle", run_period);
+    Save1DHists(Form("plots/run%s/Truth/true_nue_px.pdf",    run_period), "h_true_nue_px",    run_period);
+    Save1DHists(Form("plots/run%s/Truth/true_nue_py.pdf",    run_period), "h_true_nue_py",    run_period);
+    Save1DHists(Form("plots/run%s/Truth/true_nue_pz.pdf",    run_period), "h_true_nue_pz",    run_period);
+    Save1DHists(Form("plots/run%s/Truth/true_nue_e.pdf",     run_period), "h_true_nue_e",     run_period);
+    Save1DHists(Form("plots/run%s/Truth/true_nue_p.pdf",     run_period), "h_true_nue_p",     run_period);
+    Save1DHists(Form("plots/run%s/Truth/true_vtx_x.pdf",     run_period), "h_true_vtx_x",     run_period);
+    Save1DHists(Form("plots/run%s/Truth/true_vtx_y.pdf",     run_period), "h_true_vtx_y",     run_period);
+    Save1DHists(Form("plots/run%s/Truth/true_vtx_z.pdf",     run_period), "h_true_vtx_z",     run_period);
+    Save1DHists(Form("plots/run%s/Truth/true_vtx_x_sce.pdf", run_period), "h_true_vtx_x_sce", run_period);
+    Save1DHists(Form("plots/run%s/Truth/true_vtx_y_sce.pdf", run_period), "h_true_vtx_y_sce", run_period);
+    Save1DHists(Form("plots/run%s/Truth/true_vtx_z_sce.pdf", run_period), "h_true_vtx_z_sce", run_period);
+    
+
+    // Make the 2D histograms
+    Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta.pdf",          run_period), "h_true_nue_phi_theta",          run_period);
+    Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_theta.pdf",       run_period), "h_true_nue_energy_theta",       run_period);
+    Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_phi.pdf",         run_period), "h_true_nue_energy_phi",         run_period);
+    Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_angle.pdf",       run_period), "h_true_nue_energy_angle",       run_period);
+    Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y.pdf",            run_period), "h_true_nue_vtx_z_y",            run_period);
+    Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_sce.pdf",        run_period), "h_true_nue_vtx_z_y_sce",        run_period);
+    Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E.pdf",     run_period), "h_true_elec_E_reco_elec_E",     run_period);
+    Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_x_reco_nu_vtx_x.pdf", run_period), "h_true_nu_vtx_x_reco_nu_vtx_x", run_period);
+    Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_y_reco_nu_vtx_y.pdf", run_period), "h_true_nu_vtx_y_reco_nu_vtx_y", run_period);
+    Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_z_reco_nu_vtx_z.pdf", run_period), "h_true_nu_vtx_z_reco_nu_vtx_z", run_period);
 
 
 }
@@ -325,6 +357,31 @@ void histogram_plotter::SetTPadOptions(TPad * topPad, TPad * bottomPad ){
     bottomPad->Draw();
     topPad   ->cd();
 
+}
+// -----------------------------------------------------------------------------
+void histogram_plotter::IncreaseLabelSize(TH1D* h){
+
+    h->GetXaxis()->SetLabelSize(0.05);
+    h->GetXaxis()->SetTitleSize(0.05);
+    h->GetYaxis()->SetLabelSize(0.05);
+    h->GetYaxis()->SetTitleSize(0.05);
+    gPad->SetLeftMargin(0.15);
+    gPad->SetBottomMargin(0.12);
+}
+// -----------------------------------------------------------------------------
+void histogram_plotter::IncreaseLabelSize(TH2D* h){
+
+    h->GetXaxis()->SetLabelSize(0.05);
+    h->GetXaxis()->SetTitleSize(0.05);
+    h->GetYaxis()->SetLabelSize(0.05);
+    h->GetYaxis()->SetTitleSize(0.05);
+    h->GetZaxis()->SetLabelSize(0.05);
+    h->GetZaxis()->SetTitleSize(0.05);
+    gPad->SetLeftMargin(0.15);
+    gPad->SetRightMargin(0.2);
+    gPad->SetBottomMargin(0.13);
+    h->SetMarkerSize(1.8);
+    // gPad->SetGridx(); 
 }
 // -----------------------------------------------------------------------------
 bool histogram_plotter::GetHistograms(std::vector<TH1D*> &hist, std::string hist_name, std::string cut_name, std::string plotmode, bool &found_data, bool &found_ext, bool &found_dirt){
@@ -1727,6 +1784,49 @@ void histogram_plotter::CreateDirectory(std::string folder, const char *run_peri
 
 }
 // -----------------------------------------------------------------------------
+void histogram_plotter::Save1DHists(const char* print_name, const char* histname, const char *run_period){
+
+    TH1D* hist;
+    _util.GetHist(f_nuexsec, hist, Form("True/%s_MC", histname ));
+    
+    if (hist == NULL) std::cout << "couldn't get the hist!" << std::endl;
+    
+    TCanvas * c       = new TCanvas();
+
+    hist->SetStats(kFALSE);
+
+    IncreaseLabelSize(hist);
+
+    hist->SetLineColor(kAzure-6);
+    hist->SetLineWidth(2);
+    hist->Draw("hist_E");
+
+    // Draw the run period on the plot
+    Draw_Run_Period(c);
+
+    c->Print(print_name);
+}
+// -----------------------------------------------------------------------------
+void histogram_plotter::Save2DHists(const char* print_name, const char* histname, const char *run_period){
+
+    TH2D* hist;
+    _util.GetHist(f_nuexsec, hist, Form("True/%s_MC", histname ));
+    
+    if (hist == NULL) std::cout << "couldn't get the hist!" << std::endl;
+    
+    TCanvas * c       = new TCanvas();
+
+    hist->SetStats(kFALSE);
+
+    IncreaseLabelSize(hist);
+
+    hist->Draw("colz");
+
+    // Draw the run period on the plot
+    Draw_Run_Period(c);
+
+    c->Print(print_name);
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

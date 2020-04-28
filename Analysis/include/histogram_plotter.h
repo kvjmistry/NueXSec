@@ -60,6 +60,12 @@ class histogram_plotter{
     // Set the TPad Options
     void SetTPadOptions(TPad * topPad, TPad * bottomPad );
     // -------------------------------------------------------------------------
+    // Increase the label size of the 1D histogram
+    void IncreaseLabelSize(TH1D* h);
+    // -------------------------------------------------------------------------
+    // Increase the label size of the 2D histogram
+    void IncreaseLabelSize(TH2D* h);
+    // -------------------------------------------------------------------------
     // Function to get all the histograms from the file
     bool GetHistograms(std::vector<TH1D*> &hist, std::string hist_name, std::string cut_name, std::string plotmode, bool &found_data, bool &found_ext, bool &found_dirt);
     // -------------------------------------------------------------------------
@@ -92,6 +98,11 @@ class histogram_plotter{
     // Create another directory in the plots folder
     void CreateDirectory(std::string folder, const char *run_period);
     // -------------------------------------------------------------------------
+    // Script to get the 1D histograms and save them as a PDF
+    void Save1DHists(const char* print_name, const char* histname, const char *run_period);
+    // -------------------------------------------------------------------------
+    // Script to get the 2D histograms and save them as a PDF
+    void Save2DHists(const char* print_name, const char* histname, const char *run_period);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

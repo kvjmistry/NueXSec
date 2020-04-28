@@ -137,7 +137,7 @@ int main(int argc, char *argv[]){
         }
 
         // Whats the verbose?
-        if (strcmp(arg, "-v") == 0 || strcmp(arg, "--verbose") == 0){
+        if (strcmp(arg, "-v") == 0 || strcmp(arg, "--verbose") == 0 || strcmp(arg, "--v") == 0){
             std::cout << "Setting Verbose Level to : " << argv[i+1] << std::endl;
             verbose = atoi(argv[i+1]);
         }

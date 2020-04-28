@@ -347,7 +347,7 @@ double utility::GetTheta(double px, double py, double pz){
     // input detector coordinates to translate
     detxyz = {px, py, pz};     
 
-    // From detector to beam coords
+    // From beam to detector rotation matrix
     rotmatrix = {
         0.92103853804025681562, 0.022713504803924120662, 0.38880857519374290021,
         4.6254001262154668408e-05, 0.99829162468141474651, -0.058427989452906302359,
@@ -359,13 +359,11 @@ double utility::GetTheta(double px, double py, double pz){
     newY = TVector3(rotmatrix[3], rotmatrix[4], rotmatrix[5]);
     newZ = TVector3(rotmatrix[6], rotmatrix[7], rotmatrix[8]);
 
-    RotDet2Beam.RotateAxes(newX, newY, newZ); // Return the TRotation now beam to det
-    // RotDet2Beam.Invert(); // Invert back to the det to beam rot matrix
-
-    TVector3 Trans_Targ2Det_beam = { 5502, 7259, 67270}; //cm -- in beam coords
+    RotDet2Beam.RotateAxes(newX, newY, newZ); // Return the TRotation now det to beam
+    // RotDet2Beam.Invert(); // Invert back to the beam to det
 
     // Rotate to beam coords
-    BeamCoords = RotDet2Beam * detxyz + Trans_Targ2Det_beam;
+    BeamCoords = RotDet2Beam * detxyz;
 
     TVector3 beam_dir = {0 , 0 , 1};
     double theta = BeamCoords.Angle(beam_dir) * 180 / 3.1415926;

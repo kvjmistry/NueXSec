@@ -199,12 +199,16 @@ class histogram_helper{
     };
 
     enum TH2D_true_hist_vars {
-        k_true_nue_theta_phi, 
+        k_true_nue_phi_theta, 
         k_true_nue_energy_theta,
         k_true_nue_energy_phi,
         k_true_nue_energy_angle,
         k_true_nue_vtx_z_y,
         k_true_nue_vtx_z_y_sce,
+        k_true_elec_E_reco_elec_E,
+        k_true_nu_vtx_x_reco_nu_vtx_x,
+        k_true_nu_vtx_y_reco_nu_vtx_y,
+        k_true_nu_vtx_z_reco_nu_vtx_z,
         k_TH2D_true_MAX
     };
 

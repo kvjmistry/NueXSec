@@ -48,7 +48,7 @@ public:
     // Shower Properties 
     float shr_energy_tot;        // Shower: the energy of the showers (in GeV)
     float shr_energy;            // Shower: Energy of the shower with the largest number of hits (in GeV)
-    float shr_energy_tot_cali;   // Shower: Sum of the energy of the calibrated showers (in GeV). Used only at pre-selection as a “Michel veto”.
+    float shr_energy_tot_cali;   // Shower: Sum of the energy of the calibrated showers (in GeV). Used only at pre-selection as a “Michel veto”.  does not take into account pi0. Only accounts for the fact the shower could be broken up.
     float shr_energy_cali;       // Shower: Energy of the calibrated shower with the largest number of hits (in GeV)
     
     float shr_theta;             // Shower: Reconstructed theta angle for the leading shower
