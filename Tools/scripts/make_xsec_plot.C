@@ -115,19 +115,29 @@ void make_xsec_plot(){
 
     leg->Draw();
 
-   Double_t x[n]   = {-0.22, 0.05, 0.25, 0.35, 0.5, 0.61,0.7,0.85,0.89,0.95};
-   Double_t y[n]   = {1,2.9,5.6,7.4,9,9.6,8.7,6.3,4.5,1};
-   Double_t exl[n] = {.05,.1,.07,.07,.04,.05,.06,.07,.08,.05};
-   Double_t eyl[n] = {.8,.7,.6,.5,.4,.4,.5,.6,.7,.8};
-   Double_t exh[n] = {.02,.08,.05,.05,.03,.03,.04,.05,.06,.03};
-   Double_t eyh[n] = {.6,.5,.4,.3,.2,.2,.3,.4,.5,.6};
-   auto gr = new TGraphAsymmErrors(n,x,y,exl,exh,eyl,eyh);
-   gr->SetTitle("TGraphAsymmErrors Example");
-   gr->SetMarkerColor(4);
-   gr->SetMarkerStyle(21);
-   gr->Draw("ALP");
-}
+
+    // Now draw the data cross section
+    double data_xsec = 0.467 * scale; // Scale is to take it to the flux axes
+
+    double data_stat_err_plus = 0.101 * scale;
+    double data_stat_err_minus = 0.101 * scale;
+
+    double data_stat_plus_sys_err_plus = 0.1907 * scale;
+    double data_stat__plus_sys_err_minus = 0.1907 * scale;
+
+    const Int_t n = 2;
+    Double_t x[n]   = {0.56,0.56};
+    Double_t y[n]   = {data_xsec,data_xsec};
+    Double_t exl[n] = {0.25, 0.25};
+    Double_t eyl[n] = {data_stat_err_minus, data_stat__plus_sys_err_minus};
+    Double_t exh[n] = {1.0, 1.0};
+    Double_t eyh[n] = {data_stat_err_plus, data_stat_plus_sys_err_plus};
     
+    auto gr = new TGraphAsymmErrors(n,x,y,exl,exh,eyl,eyh);
+    
+    gr->SetMarkerColor(kBlack);
+    gr->SetMarkerStyle(kFullCircle);
+    gr->Draw("L,P,same");
 
 
 }
