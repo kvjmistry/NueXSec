@@ -395,7 +395,7 @@ void selection::MakeSelection(){
         
         if (verbose == 1) {
             _util.PrintInfo(counter_v.at(p), intime_scale_factor, mc_scale_factor, dirt_scale_factor,
-                            _util.cut_dirs.at(p), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc_infv) + counter_v.at(_util.k_unselected).at(_util.k_count_nuebar_cc_infv),
+                            _util.cut_dirs.at(p), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc),
                              efficiency, purity);
             
             // Fill the efficiency and purity for the output mc tree file

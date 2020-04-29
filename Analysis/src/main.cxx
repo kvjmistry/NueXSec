@@ -8,6 +8,7 @@ int main(int argc, char *argv[]){
     bool make_histos               = false;
     bool run_selection             = true;
     bool area_norm                 = false;
+    bool calc_cross_sec            = false;
 
     // inputs 
     char * mc_file_name          = (char *)"empty";
@@ -21,6 +22,7 @@ int main(int argc, char *argv[]){
     char * variation             = (char *)"empty";
     char * variation_file_name   = (char *)"empty";
     char * hist_file_name        = (char *)"empty";
+    char * tree_file_name        = (char *)"empty";
     char * run_period            = (char *)"empty";
     int num_events{-1};
     int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
@@ -33,6 +35,7 @@ int main(int argc, char *argv[]){
     xsecSelection::selection  _selection_instance;
     utility _utility;
     histogram_plotter _hplot;
+    CrossSectionHelper _xsec;
 
     std::string usage = "\nFirst run the selection with the options: \n\n\033[0;31m./nuexsec --run <run period num> [options (see below)]\033[0m \n\n"
     "\033[0;34m[--mc <mc file>]\033[0m                                       \033[0;32mThe input overlay root file\033[0m\n\n"
@@ -48,11 +51,16 @@ int main(int argc, char *argv[]){
     "\033[0;33m[--weight <weight setting>]\033[0m                            \033[0;32mChange the Weight level. level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only \033[0m\n\n"
     "\033[0;33m[--slim]\033[0m                                               \033[0;32mWhen this extension is added, the histogram helper class is not initalised and no histograms will be filled or saved. This is to speed up the selection code if you just want to run the selection.\033[0m\n\n"
     "\033[0;33m[--verbose <verbose level>]\033[0m                            \033[0;32m0 does not print the selection cut results, 1 (default) currently prints everything\033[0m\n\n"
+    "-------------------------------------------------------"
     "\n\nTo make the histograms after running selection, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --hist <input merged nuexsec file> [options (see below)]\033[0m \n\n"
     "\033[0;33m[--weight <weight setting>]\033[0m                            \033[0;32mChange the Weight level to dislay on the plots. Should be used in conjunction with the setting used in the selection stage. level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only \033[0m\n\n"
     "\033[0;33m[--area]\033[0m                                               \033[0;32mArea normalise all the histograms\033[0m\n\n"
-    "The <input merged nuexsec file> corresponds to hadd merged file of the mc, data, ext and dirt. See the bash script merge_run1_files.sh for more details\n\n";
+    "The <input merged nuexsec file> corresponds to hadd merged file of the mc, data, ext and dirt. See the bash script merge_run1_files.sh for more details\n\n"
+    "-------------------------------------------------------"
+    "\n\nTo run the cross section calculation code, run: \n\n"
+    "\033[0;31m./nuexsec --run <run period num> --xsec <input merged nuexsec tree file> [options (see below)]\033[0m \n\n"
+    "The <input merged nuexsec ttree file> corresponds to merged ttree file of the mc, data, ext and dirt. See the bash script merge_uneaventrees.C for more details\n\n";
 
     // -------------------------------------------------------------------------    
     // Loop over input arguments
@@ -73,6 +81,14 @@ int main(int argc, char *argv[]){
             make_histos = true;
             run_selection = false; // switch this bool out
             hist_file_name = argv[i+1];
+        }
+
+        // XSec mode
+        if (strcmp(arg, "--xsec") == 0) {
+            std::cout << "Calculating the Cross Section with input file name: " << argv[i+1] << std::endl;
+            calc_cross_sec = true;
+            run_selection = false; // switch this bool out
+            tree_file_name = argv[i+1];
         }
         
         // MC file
@@ -202,6 +218,9 @@ int main(int argc, char *argv[]){
     
     // Run the make histogram function
     if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, config, weight, area_norm);
+
+    // Run the calculate cross section function
+    if (calc_cross_sec) _xsec.Initialise(run_period, tree_file_name);
 
     // -------------------------------------------------------------------------
     // Finished!

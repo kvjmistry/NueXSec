@@ -88,6 +88,7 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
                 run = _run;
                 subrun = _subrun;
                 event = _event;
+                gen = _gen;
                 classifcation = *_classifcation;
                 weight = _weight;
                 true_energy = _true_energy;

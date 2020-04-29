@@ -3,6 +3,7 @@
 
 #include "utility.h"
 #include "selection.h"
+#include "CrossSectionHelper.h"
 
 /*
 
