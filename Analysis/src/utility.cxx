@@ -103,145 +103,71 @@ bool utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     }
 }
 // -----------------------------------------------------------------------------
-void utility::Tabulate(std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight) {
+void utility::Tabulate(bool inFV, std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight) {
 
     if (type == k_mc){
         
-        // Define the counters
+        // Require in FV condition
+        if (inFV){
+            if (interaction == "nue_cc_qe")  counter_v.at(k_count_nue_cc_qe)  += weight; 
+            if (interaction == "nue_cc_res") counter_v.at(k_count_nue_cc_res) += weight;
+            if (interaction == "nue_cc_coh") counter_v.at(k_count_nue_cc_dis) += weight;
+            if (interaction == "nue_cc_dis") counter_v.at(k_count_nue_cc_coh) += weight;
+            if (interaction == "nue_cc_mec") counter_v.at(k_count_nue_cc_mec) += weight;
 
-        // nue interaction types
-        int nue_cc_qe     = 0;
-        int nue_cc_res    = 0;
-        int nue_cc_dis    = 0;
-        int nue_cc_coh    = 0;
-        int nue_cc_mec    = 0;
+            if (interaction == "nue_bar_cc_qe")  counter_v.at(k_count_nuebar_cc_qe)  += weight; 
+            if (interaction == "nue_bar_cc_res") counter_v.at(k_count_nuebar_cc_res) += weight;
+            if (interaction == "nue_bar_cc_coh") counter_v.at(k_count_nuebar_cc_dis) += weight;
+            if (interaction == "nue_bar_cc_dis") counter_v.at(k_count_nuebar_cc_coh) += weight;
+            if (interaction == "nue_bar_cc_mec") counter_v.at(k_count_nuebar_cc_mec) += weight;
 
-        // nue bar interaction types
-        int nue_bar_cc_qe     = 0;
-        int nue_bar_cc_res    = 0;
-        int nue_bar_cc_dis    = 0;
-        int nue_bar_cc_coh    = 0;
-        int nue_bar_cc_mec    = 0;
+            if (interaction == "numu_cc_qe"  )  counter_v.at(k_count_numu_cc_qe)  += weight;
+            if (interaction == "numu_cc_res" )  counter_v.at(k_count_numu_cc_res) += weight;
+            if (interaction == "numu_cc_coh" )  counter_v.at(k_count_numu_cc_dis) += weight;
+            if (interaction == "numu_cc_dis" )  counter_v.at(k_count_numu_cc_coh) += weight;
+            if (interaction == "numu_cc_mec" )  counter_v.at(k_count_numu_cc_mec) += weight;
 
-        // total nue + nuebar interaction types
-        int total_nue_cc_qe     = 0;
-        int total_nue_cc_res    = 0;
-        int total_nue_cc_dis    = 0;
-        int total_nue_cc_coh    = 0;
-        int total_nue_cc_mec    = 0;
+            if (interaction == "numu_bar_cc_qe")  counter_v.at(k_count_numubar_cc_qe)  += weight;
+            if (interaction == "numu_bar_cc_res") counter_v.at(k_count_numubar_cc_res) += weight;
+            if (interaction == "numu_bar_cc_coh") counter_v.at(k_count_numubar_cc_dis) += weight;
+            if (interaction == "numu_bar_cc_dis") counter_v.at(k_count_numubar_cc_coh) += weight;
+            if (interaction == "numu_bar_cc_mec") counter_v.at(k_count_numubar_cc_mec) += weight;
 
-        // total numu + numubar interaction types
-        int numu_cc_qe    = 0;
-        int numu_cc_res   = 0;
-        int numu_cc_dis   = 0;
-        int numu_cc_coh   = 0;
-        int numu_cc_mec   = 0;
-
-        int tot_nue_numu_nc = 0;
-        
-        // Selection Categories
-        double nue_cc        = 0.0;
-        double nue_cc_mixed  = 0.0;
-        double cosmic        = 0.0;
-        double numu_cc       = 0.0;
-        double numu_cc_pi0   = 0.0;
-        double nu_out_fv     = 0.0;
-        double nc            = 0.0;
-        double nc_pi0        = 0.0;
-        double unmatched     = 0.0;
-        double total         = 0.0;
-
-        // Total nue or nuebar interaction types
-        int only_nue_cc     = 0;
-        int only_nue_bar_cc = 0;
-
-        if (interaction == "nue_cc_qe")  nue_cc_qe  += weight; 
-        if (interaction == "nue_cc_res") nue_cc_res += weight;
-        if (interaction == "nue_cc_coh") nue_cc_coh += weight;
-        if (interaction == "nue_cc_dis") nue_cc_dis += weight;
-        if (interaction == "nue_cc_mec") nue_cc_mec += weight;
-
-        if (interaction == "nue_bar_cc_qe")  nue_bar_cc_qe  += weight; 
-        if (interaction == "nue_bar_cc_res") nue_bar_cc_res += weight;
-        if (interaction == "nue_bar_cc_coh") nue_bar_cc_coh += weight;
-        if (interaction == "nue_bar_cc_dis") nue_bar_cc_dis += weight;
-        if (interaction == "nue_bar_cc_mec") nue_bar_cc_mec += weight;
-
-        if (interaction == "numu_cc_qe"  || interaction == "numu_bar_cc_qe")  numu_cc_qe  += weight;
-        if (interaction == "numu_cc_res" || interaction == "numu_bar_cc_res") numu_cc_res += weight;
-        if (interaction == "numu_cc_coh" || interaction == "numu_bar_cc_coh") numu_cc_coh += weight;
-        if (interaction == "numu_cc_dis" || interaction == "numu_bar_cc_dis") numu_cc_dis += weight;
-        if (interaction == "numu_cc_mec" || interaction == "numu_bar_cc_mec") numu_cc_mec += weight;
-        
-        // Check if string contains "NC"
-        if (interaction.find("nc") != std::string::npos) {
-            tot_nue_numu_nc += weight;
+            // These are all the nus, but now in the fv
+            if (interaction == "nue_cc_qe" || interaction == "nue_cc_res" || interaction == "nue_cc_coh" || interaction == "nue_cc_dis" || interaction == "nue_cc_mec") counter_v.at(k_count_nue_cc_infv) += weight;
+            if (interaction == "nue_bar_cc_qe" || interaction == "nue_bar_cc_res" || interaction == "nue_bar_cc_coh" || interaction == "nue_bar_cc_dis" || interaction == "nue_bar_cc_mec") counter_v.at(k_count_nuebar_cc_infv) += weight;
+            
+            if (interaction == "numu_cc_qe" || interaction == "numu_cc_res" || interaction == "numu_cc_coh" || interaction == "numu_cc_dis" || interaction == "numu_cc_mec") counter_v.at(k_count_numu_cc_infv) += weight;
+            if (interaction == "numu_bar_cc_qe" || interaction == "numu_bar_cc_res" || interaction == "numu_bar_cc_coh" || interaction == "numu_bar_cc_dis" || interaction == "numu_bar_cc_mec") counter_v.at(k_count_numubar_cc_infv) += weight;
         }
 
-        if (classification == "nue_cc")       nue_cc       += weight;
-        if (classification == "nue_cc_mixed") nue_cc_mixed += weight;
-        if (classification == "nu_out_fv")    nu_out_fv    += weight;
-        if (classification == "nc")           nc           += weight;
-        if (classification == "nc_pi0")       nc_pi0       += weight;
-        if (classification == "numu_cc")      numu_cc      += weight;
-        if (classification == "numu_cc_pi0")  numu_cc_pi0  += weight;
-        if (classification == "cosmic")       cosmic       += weight;
-        if (classification == "unmatched")    unmatched    += weight;
-
-        only_nue_cc     = nue_cc_qe     + nue_cc_res     + nue_cc_dis     + nue_cc_coh     + nue_cc_mec;
-        only_nue_bar_cc = nue_bar_cc_qe + nue_bar_cc_res + nue_bar_cc_dis + nue_bar_cc_coh + nue_bar_cc_mec;
-
-        total_nue_cc_qe  = nue_cc_qe  + nue_bar_cc_qe;
-        total_nue_cc_res = nue_cc_res + nue_bar_cc_res;
-        total_nue_cc_dis = nue_cc_dis + nue_bar_cc_dis;
-        total_nue_cc_coh = nue_cc_coh + nue_bar_cc_coh;
-        total_nue_cc_mec = nue_cc_mec + nue_bar_cc_mec;
-
-        // Total nue + nuebar
-        // nue_cc = only_nue_cc + only_nue_bar_cc;
-
-        // Total numu's
-        // numu_cc = numu_cc_qe + numu_cc_res + numu_cc_dis + numu_cc_coh + numu_cc_mec;
+        // These are all the nus, but now in the cryostat volume
+        if (interaction == "nue_cc_qe" || interaction == "nue_cc_res" || interaction == "nue_cc_coh" || interaction == "nue_cc_dis" || interaction == "nue_cc_mec") counter_v.at(k_count_nue_cc_incryo) += weight;
+        if (interaction == "nue_bar_cc_qe" || interaction == "nue_bar_cc_res" || interaction == "nue_bar_cc_coh" || interaction == "nue_bar_cc_dis" || interaction == "nue_bar_cc_mec") counter_v.at(k_count_nuebar_cc_incryo) += weight;
         
-        // Add up all the MC events selected including the backgrounds
-        total = nue_cc + nue_cc_mixed + nu_out_fv + cosmic + numu_cc + numu_cc_pi0 + nc + nc_pi0 + unmatched;
+        if (interaction == "numu_cc_qe" || interaction == "numu_cc_res" || interaction == "numu_cc_coh" || interaction == "numu_cc_dis" || interaction == "numu_cc_mec") counter_v.at(k_count_numu_cc_incryo) += weight;
+        if (interaction == "numu_bar_cc_qe" || interaction == "numu_bar_cc_res" || interaction == "numu_bar_cc_coh" || interaction == "numu_bar_cc_dis" || interaction == "numu_bar_cc_mec") counter_v.at(k_count_numubar_cc_incryo) += weight;
         
-        // Now add counters to the vector
-        counter_v.at(k_count_total_nue_cc_qe)  += total_nue_cc_qe ;
-        counter_v.at(k_count_total_nue_cc_res) += total_nue_cc_res;
-        counter_v.at(k_count_total_nue_cc_dis) += total_nue_cc_dis;
-        counter_v.at(k_count_total_nue_cc_coh) += total_nue_cc_coh;
-        counter_v.at(k_count_total_nue_cc_mec) += total_nue_cc_mec;
+        // Classification
+        if (classification == "nue_cc")       counter_v.at(k_count_nue_cc)       += weight;
+        if (classification == "nue_cc_mixed") counter_v.at(k_count_nue_cc_mixed) += weight;
+        if (classification == "nu_out_fv")    counter_v.at(k_count_nu_out_fv)    += weight;
+        if (classification == "nc")           counter_v.at(k_count_nc)           += weight;
+        if (classification == "nc_pi0")       counter_v.at(k_count_nc_pi0)       += weight;
+        if (classification == "numu_cc")      counter_v.at(k_count_numu_cc)      += weight;
+        if (classification == "numu_cc_pi0")  counter_v.at(k_count_numu_cc_pi0)  += weight;
+        if (classification == "cosmic")       counter_v.at(k_count_cosmic)       += weight;
+        if (classification == "unmatched")    counter_v.at(k_count_unmatched)    += weight;
 
-        counter_v.at(k_count_only_nue_cc)      += only_nue_cc    ;
-        counter_v.at(k_count_only_nue_bar_cc)  += only_nue_bar_cc;
-
-        counter_v.at(k_count_numu_cc_qe)       += numu_cc_qe ;
-        counter_v.at(k_count_numu_cc_res)      += numu_cc_res;
-        counter_v.at(k_count_numu_cc_dis)      += numu_cc_dis;
-        counter_v.at(k_count_numu_cc_coh)      += numu_cc_coh;
-        counter_v.at(k_count_numu_cc_mec)      += numu_cc_mec;
-
-        counter_v.at(k_count_tot_nue_numu_nc)  += tot_nue_numu_nc;
-        
-        counter_v.at(k_count_nue_cc)           += nue_cc      ;
-        counter_v.at(k_count_nue_cc_mixed)     += nue_cc_mixed;
-        counter_v.at(k_count_nu_out_fv)        += nu_out_fv   ;
-        counter_v.at(k_count_cosmic)           += cosmic      ;
-        counter_v.at(k_count_numu_cc)          += numu_cc     ;
-        counter_v.at(k_count_numu_cc_pi0)      += numu_cc_pi0 ;
-        counter_v.at(k_count_nc)               += nc          ;
-        counter_v.at(k_count_nc_pi0)           += nc_pi0      ;
-        counter_v.at(k_count_unmatched)        += unmatched   ;
-        
-        counter_v.at(k_count_total)            += total;
+        // Total selected MC events
+        counter_v.at(k_count_total_mc) += weight;
     
     }
     else if (type == k_data) {
-        counter_v.at(k_count_data) += 1;
+        counter_v.at(k_count_data) += weight; // The weight **should** always be 1 for these
     }
     else if (type == k_ext){
-        counter_v.at(k_count_ext)  += 1;
+        counter_v.at(k_count_ext)  += weight; // The weight **should** always be 1 for these -- maybe not this if we decide to use the BNB stream
     }
     else if (type == k_dirt){
         counter_v.at(k_count_dirt) += weight;
@@ -253,87 +179,61 @@ void utility::Tabulate(std::string interaction, std::string classification, int 
     
 }
 // -----------------------------------------------------------------------------
-void utility::PrintInfo(std::vector<double> counter_v, double intime_scale_factor, double mc_scale_factor, double dirt_scale_factor, std::string cut_name, double tot_true_infv_nues, double &efficiency, double &purity) {
+void utility::PrintInfo(std::vector<double> c_v, double intime_scale_factor, double mc_scale_factor, double dirt_scale_factor, std::string cut_name, double tot_true_infv_nues, double &efficiency, double &purity) {
 
-    double counter_nue_cc_qe      = counter_v.at(k_count_total_nue_cc_qe);
-    double counter_nue_cc_res     = counter_v.at(k_count_total_nue_cc_res);
-    double counter_nue_cc_dis     = counter_v.at(k_count_total_nue_cc_dis);
-    double counter_nue_cc_coh     = counter_v.at(k_count_total_nue_cc_coh);
-    double counter_nue_cc_mec     = counter_v.at(k_count_total_nue_cc_mec);
-    
-    double counter_numu_cc_qe     = counter_v.at(k_count_numu_cc_qe);
-    double counter_numu_cc_res    = counter_v.at(k_count_numu_cc_res);
-    double counter_numu_cc_dis    = counter_v.at(k_count_numu_cc_dis);
-    double counter_numu_cc_coh    = counter_v.at(k_count_numu_cc_coh);
-    double counter_numu_cc_mec    = counter_v.at(k_count_numu_cc_mec);
+    // c_v is short for counter vec here!
 
-    double counter_tot_nue_numu_nc = counter_v.at(k_count_tot_nue_numu_nc);
-
-    double counter_nue_cc         = counter_v.at(k_count_nue_cc);
-    double counter_nue_cc_mixed   = counter_v.at(k_count_nue_cc_mixed);
-    double counter_nu_out_fv      = counter_v.at(k_count_nu_out_fv);
-    double counter_cosmic         = counter_v.at(k_count_cosmic);
-    double counter_numu_cc        = counter_v.at(k_count_numu_cc);
-    double counter_numu_cc_pi0    = counter_v.at(k_count_numu_cc_pi0);
-    double counter_nc             = counter_v.at(k_count_nc);
-    double counter_nc_pi0         = counter_v.at(k_count_nc_pi0);
-    double counter_unmatched      = counter_v.at(k_count_unmatched);
-    double counter                = counter_v.at(k_count_total);
-    
-    double counter_data           = counter_v.at(k_count_data);
-    double counter_ext            = counter_v.at(k_count_ext);
-    double counter_dirt           = counter_v.at(k_count_dirt);
-
-    counter = counter + (counter_ext * (intime_scale_factor / mc_scale_factor)) + (counter_dirt * (dirt_scale_factor / mc_scale_factor)); // Add in the EXT and dirt counters with the scalings to MC POT
+    // Sum of selected mc, dirt and ext. The dirt and ext are scaled to the MC POT
+    double sum_mc_dirt_ext = c_v.at(k_count_total_mc)+ (c_v.at(k_count_ext) * (intime_scale_factor / mc_scale_factor)) + (c_v.at(k_count_dirt) * (dirt_scale_factor / mc_scale_factor));
 
     std::cout << "\n------------------------------------------------" << std::endl;
     std::cout << "------------------------------------------------" << std::endl;
     std::cout << "\n\033[0;33m <" << cut_name << "> \033[0m" << std::endl;
     std::cout << "                    Scaled to MC POT | Scaled to Data POT | Unscaled" << std::endl;
-    std::cout << " Total Candidate Nue     : " << counter                << "\t " << double(counter                   * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Nue CC        : " << counter_nue_cc         << "\t \t " << double(counter_nue_cc         * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Nue CC Mixed  : " << counter_nue_cc_mixed   << "\t \t " << double(counter_nue_cc_mixed   * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Nu out FV     : " << counter_nu_out_fv      << "\t \t " << double(counter_nu_out_fv      * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Cosmic        : " << counter_cosmic         << "\t \t " << double(counter_cosmic         * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Numu CC       : " << counter_numu_cc        << "\t \t " << double(counter_numu_cc        * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Numu CC Pi0   : " << counter_numu_cc_pi0    << "\t \t " << double(counter_numu_cc_pi0    * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of NC            : " << counter_nc             << "\t \t " << double(counter_nc             * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of NC Pi0        : " << counter_nc_pi0         << "\t \t " << double(counter_nc_pi0         * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Unmatched     : " << counter_unmatched      << "\t \t " << double(counter_unmatched      * mc_scale_factor  ) << std::endl;
+    std::cout << " Total Candidate Nue     : " << sum_mc_dirt_ext                 << "\t "    << double(sum_mc_dirt_ext                * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Nue CC        : " << c_v.at(k_count_nue_cc)          << "\t \t " << double(c_v.at(k_count_nue_cc)         * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Nue CC Mixed  : " << c_v.at(k_count_nue_cc_mixed)    << "\t \t " << double(c_v.at(k_count_nue_cc_mixed)   * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Nu out FV     : " << c_v.at(k_count_nu_out_fv)       << "\t \t " << double(c_v.at(k_count_nu_out_fv)      * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Cosmic        : " << c_v.at(k_count_cosmic)          << "\t \t " << double(c_v.at(k_count_cosmic)         * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Numu CC       : " << c_v.at(k_count_numu_cc)         << "\t \t " << double(c_v.at(k_count_numu_cc)        * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Numu CC Pi0   : " << c_v.at(k_count_numu_cc_pi0)     << "\t \t " << double(c_v.at(k_count_numu_cc_pi0)    * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of NC            : " << c_v.at(k_count_nc)              << "\t \t " << double(c_v.at(k_count_nc)             * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of NC Pi0        : " << c_v.at(k_count_nc_pi0)          << "\t \t " << double(c_v.at(k_count_nc_pi0)         * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Unmatched     : " << c_v.at(k_count_unmatched)       << "\t \t " << double(c_v.at(k_count_unmatched)      * mc_scale_factor  ) << std::endl;
     
-    std::cout << " Number of InTime Cosmics: " << double(counter_ext * (intime_scale_factor / mc_scale_factor))
-              << "\t " << double(counter_ext * intime_scale_factor) << "\t " << counter_ext << std::endl;
+    std::cout << " Number of InTime Cosmics: " << double(c_v.at(k_count_ext) * (intime_scale_factor / mc_scale_factor))
+              << "\t " << double(c_v.at(k_count_ext) * intime_scale_factor) << "\t " << c_v.at(k_count_ext) << std::endl;
     
-    std::cout << " Number of Dirt          : " << double(counter_dirt * dirt_scale_factor / mc_scale_factor)
-              << "\t "                         << double(counter_dirt * dirt_scale_factor) << "\t " << counter_dirt << std::endl;
+    std::cout << " Number of Dirt          : " << double(c_v.at(k_count_dirt) * dirt_scale_factor / mc_scale_factor)
+              << "\t "                         << double(c_v.at(k_count_dirt) * dirt_scale_factor) << "\t " << c_v.at(k_count_dirt) << std::endl;
 
-    std::cout << "--------- Neutrinos Selected in Truth ----------" << std::endl;
-    std::cout << " Nue CC QE               : " << counter_nue_cc_qe   << std::endl;
-    std::cout << " Nue CC Res              : " << counter_nue_cc_res  << std::endl;
-    std::cout << " Nue CC DIS              : " << counter_nue_cc_dis  << std::endl;
-    std::cout << " Nue CC COH              : " << counter_nue_cc_coh  << std::endl;
-    std::cout << " Nue CC MEC              : " << counter_nue_cc_mec  << std::endl;
-    std::cout << " Numu CC QE              : " << counter_numu_cc_qe  << std::endl;
-    std::cout << " Numu CC Res             : " << counter_numu_cc_res << std::endl;
-    std::cout << " Numu CC DIS             : " << counter_numu_cc_dis << std::endl;
-    std::cout << " Numu CC COH             : " << counter_numu_cc_coh << std::endl;
-    std::cout << " Numu CC MEC             : " << counter_numu_cc_mec << std::endl;
+    std::cout << "----------- Neutrinos in FV Truth -------------" << std::endl;
+    std::cout << " Nue CC QE    : " << c_v.at(k_count_nue_cc_qe)   <<  "   Nuebar CC QE    : " << c_v.at(k_count_nuebar_cc_qe)  << std::endl;
+    std::cout << " Nue CC Res   : " << c_v.at(k_count_nue_cc_res)  <<  "   Nuebar CC Res   : " << c_v.at(k_count_nuebar_cc_res) << std::endl;
+    std::cout << " Nue CC DIS   : " << c_v.at(k_count_nue_cc_dis)  <<  "   Nuebar CC DIS   : " << c_v.at(k_count_nuebar_cc_dis) << std::endl;
+    std::cout << " Nue CC COH   : " << c_v.at(k_count_nue_cc_coh)  <<  "   Nuebar CC COH   : " << c_v.at(k_count_nuebar_cc_coh) << std::endl;
+    std::cout << " Nue CC MEC   : " << c_v.at(k_count_nue_cc_mec)  <<  "   Nuebar CC MEC   : " << c_v.at(k_count_nuebar_cc_mec) << std::endl;
+    std::cout << std::endl;
+    std::cout << " Numu CC QE   : " << c_v.at(k_count_numu_cc_qe)  <<  "   Numubar CC QE   : " << c_v.at(k_count_numubar_cc_qe) << std::endl;
+    std::cout << " Numu CC Res  : " << c_v.at(k_count_numu_cc_res) <<  "   Numubar CC Res  : " << c_v.at(k_count_numubar_cc_res)<< std::endl;
+    std::cout << " Numu CC DIS  : " << c_v.at(k_count_numu_cc_dis) <<  "   Numubar CC DIS  : " << c_v.at(k_count_numubar_cc_dis)<< std::endl;
+    std::cout << " Numu CC COH  : " << c_v.at(k_count_numu_cc_coh) <<  "   Numubar CC COH  : " << c_v.at(k_count_numubar_cc_coh)<< std::endl;
+    std::cout << " Numu CC MEC  : " << c_v.at(k_count_numu_cc_mec) <<  "   Numubar CC MEC  : " << c_v.at(k_count_numubar_cc_mec)<< std::endl;
     std::cout << "------------------------------------------------" << std::endl;
-    std::cout << " Tot Nue                 : " << counter_nue_cc_qe    + counter_nue_cc_res   + counter_nue_cc_dis   +  counter_nue_cc_coh   + counter_nue_cc_mec  << std::endl;
-    std::cout << " Tot NuMu                : " << counter_numu_cc_qe   + counter_numu_cc_res  + counter_numu_cc_dis  +  counter_numu_cc_coh  + counter_numu_cc_mec << std::endl;
-    std::cout << " Tot NC                  : " << counter_tot_nue_numu_nc << std::endl;
-    std::cout << " Sum Neutrinos           : " <<   counter_nue_cc_qe   + counter_nue_cc_res  + counter_nue_cc_dis  +
-                                                  + counter_nue_cc_coh  + counter_nue_cc_mec  + counter_numu_cc_qe  + counter_numu_cc_res +
-                                                  + counter_numu_cc_dis + counter_numu_cc_coh + counter_numu_cc_mec + 
-                                                  counter_tot_nue_numu_nc << std::endl;
+    std::cout << " Tot Nue in FV                 : " << c_v.at(k_count_nue_cc_infv)     << "   Tot Nue in Cryo                 : " << c_v.at(k_count_nue_cc_incryo)     << std::endl;
+    std::cout << " Tot Nuebar in FV              : " << c_v.at(k_count_nuebar_cc_infv)  << "   Tot Nuebar in Cryo              : " << c_v.at(k_count_nuebar_cc_incryo) << std::endl;
+    std::cout << " Tot NuMu in FV                : " << c_v.at(k_count_numu_cc_infv)    << "   Tot NuMu in Cryo                : " << c_v.at(k_count_numu_cc_incryo)<< std::endl;
+    std::cout << " Tot NuMubar in FV             : " << c_v.at(k_count_numubar_cc_infv) << "   Tot NuMubar in Cryo             : " << c_v.at(k_count_numubar_cc_incryo)<< std::endl;
+    // std::cout << " Tot NC                  : " << counter_tot_nue_numu_nc << std::endl;
+    // std::cout << " Sum Neutrinos           : " <<  << std::endl;
 
     std::cout << "------------------------------------------------" << std::endl;
-    efficiency = double(counter_nue_cc) / double(tot_true_infv_nues);
-    purity     = double(counter_nue_cc) / double(counter);
-    std::cout << " Efficiency       : " << "( " << counter_nue_cc << " / " << tot_true_infv_nues << " ) = " << efficiency << std::endl;
-    std::cout << " Purity           : " << "( " << counter_nue_cc << " / " << counter           << " ) = " << purity << std::endl;
+    efficiency = double(c_v.at(k_count_nue_cc)) / double(tot_true_infv_nues);
+    purity     = double(c_v.at(k_count_nue_cc)) / double(sum_mc_dirt_ext);
+    std::cout << " Efficiency       : " << "( " << c_v.at(k_count_nue_cc) << " / " << tot_true_infv_nues << " ) = " << efficiency << std::endl;
+    std::cout << " Purity           : " << "( " << c_v.at(k_count_nue_cc) << " / " << sum_mc_dirt_ext           << " ) = " << purity << std::endl;
     std::cout << "------------------------------------------------" << std::endl;
-    std::cout << " Total Nue Candidates in data : " << counter_data << std::endl;
+    std::cout << " Total Nue Candidates in data : " << c_v.at(k_count_data) << std::endl;
     std::cout << "------------------------------------------------" << std::endl;
 }
 // -----------------------------------------------------------------------------

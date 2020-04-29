@@ -1625,7 +1625,7 @@ void histogram_plotter::MakeEfficiencyPlotByCut(const char* print_name, const ch
 
     
     
-    for (int p = 1; p < _util.k_cuts_MAX; p++){
+    for (int p = 0; p < _util.k_cuts_MAX; p++){
 
         c = new TCanvas();
 

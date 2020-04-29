@@ -221,7 +221,7 @@ void make_xsec_plot(){
     leg->AddEntry(h_nuebar,          "NuMI #bar{#nu_{e}} Flux",                 "l");
     leg->AddEntry(h_spline_nue,      "GENIE #nu_{e} CC Cross Section",          "l");
     leg->AddEntry(h_spline_nuebar,   "GENIE #bar{#nu_{e}} CC Cross Section",    "l");
-    leg->AddEntry(gr, "Data #sigma_{#nu_{e}+#bar{#nu_{e}}} (stat+sys)",   "lep");
+    leg->AddEntry(gr, "Data #sigma_{#nu_{e} + #bar{#nu_{e}}} (stat+sys)",   "lep");
     leg->Draw();
 
 
@@ -288,7 +288,7 @@ void make_xsec_plot(){
     // Genie nue + nuebar
     double y_nue_nuebar[]  = {4.83e-39, 4.83e-39};
     auto g_xsec_nue_nuebar = new TGraphErrors(2, x1, y_nue_nuebar);
-    g_xsec_nue_nuebar->SetLineColor(kAzure-3);
+    g_xsec_nue_nuebar->SetLineColor(kViolet-5);
     g_xsec_nue_nuebar->SetLineWidth(2);
     g_xsec_nue_nuebar->SetLineStyle(3);
     g_xsec_nue_nuebar->Draw("same");

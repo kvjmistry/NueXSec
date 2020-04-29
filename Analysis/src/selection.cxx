@@ -255,19 +255,6 @@ void selection::MakeSelection(){
 
         std::cout << "Ending Selection over MC" << std::endl;
 
-        // Get the total number of in cryostat nues, I think this number is wrong for now until we have the unweighted numbers back...
-        // This is because we shouldnt ppfx weight any cyo nues when the flux is for the active volume 
-        tot_true_cryo_nues = counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_qe)  + 
-                             counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_res) + 
-                             counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_dis) + 
-                             counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_coh) + 
-                             counter_v.at(_util.k_unselected).at(_util.k_count_total_nue_cc_mec);
-
-        std::cout << "-------------------------------" << std::endl;
-        std::cout << "Total Nue's in the Cryostat: " << tot_true_cryo_nues << std::endl;
-        std::cout << "-------------------------------" << std::endl;
-
-
         // Loop again to look at background events that still pass
         // Event loop
         // for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
@@ -408,7 +395,7 @@ void selection::MakeSelection(){
         
         if (verbose == 1) {
             _util.PrintInfo(counter_v.at(p), intime_scale_factor, mc_scale_factor, dirt_scale_factor,
-                            _util.cut_dirs.at(p), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc),
+                            _util.cut_dirs.at(p), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc_infv) + counter_v.at(_util.k_unselected).at(_util.k_count_nuebar_cc_infv),
                              efficiency, purity);
             
             // Fill the efficiency and purity for the output mc tree file
@@ -685,7 +672,7 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     if (!slim) _hhelper.at(type).FillHists(type, classification.second, interaction, par_type.second, cut_index, SC, weight);
 
     // Set counters for the cut
-    _util.Tabulate(interaction, classification.first, type, counter_v.at(cut_index), weight );
+    _util.Tabulate(SC.isVtxInFiducial, interaction, classification.first, type, counter_v.at(cut_index), weight );
 
     // Fill Plots for Efficiency
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC, weight);

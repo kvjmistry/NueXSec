@@ -71,7 +71,7 @@ public:
     bool GetHist(TFile* f, TH2D* &h, TString string);
     // -------------------------------------------------------------------------
     // Function to tabulate all the nuetrino types and flavours
-    void Tabulate(std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight);
+    void Tabulate(bool inFV, std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight);
     // -------------------------------------------------------------------------
     // Function to print the tabulated events
     void PrintInfo(std::vector<double> counter_v, double intime_scale_factor, double mc_scale_factor, double dirt_scale_factor, std::string cut_name, double tot_true_infv_nues, double &efficiency, double &purity);
@@ -277,19 +277,39 @@ public:
 
     // enum for counter vector
     enum enum_counters {
-        k_count_total_nue_cc_qe,
-        k_count_total_nue_cc_res,
-        k_count_total_nue_cc_dis,
-        k_count_total_nue_cc_coh,
-        k_count_total_nue_cc_mec,
-        k_count_only_nue_cc,
-        k_count_only_nue_bar_cc,
+        k_count_nue_cc_qe,
+        k_count_nue_cc_res,
+        k_count_nue_cc_dis,
+        k_count_nue_cc_coh,
+        k_count_nue_cc_mec,
+        
+        k_count_nuebar_cc_qe,
+        k_count_nuebar_cc_res,
+        k_count_nuebar_cc_dis,
+        k_count_nuebar_cc_coh,
+        k_count_nuebar_cc_mec,
+        
+        k_count_nue_cc_infv,
+        k_count_nuebar_cc_infv,
+        k_count_nue_cc_incryo,
+        k_count_nuebar_cc_incryo,
+        
         k_count_numu_cc_qe,
         k_count_numu_cc_res,
         k_count_numu_cc_dis,
         k_count_numu_cc_coh,
         k_count_numu_cc_mec,
-        k_count_tot_nue_numu_nc,
+        
+        k_count_numubar_cc_qe,
+        k_count_numubar_cc_res,
+        k_count_numubar_cc_dis,
+        k_count_numubar_cc_coh,
+        k_count_numubar_cc_mec,
+        
+        k_count_numu_cc_infv,
+        k_count_numubar_cc_infv,
+        k_count_numu_cc_incryo,
+        k_count_numubar_cc_incryo,
         
         k_count_nue_cc,
         k_count_nue_cc_mixed,
@@ -300,7 +320,8 @@ public:
         k_count_nc,
         k_count_nc_pi0,
         k_count_unmatched,
-        k_count_total,
+        k_count_total_mc,
+        
         k_count_data,
         k_count_ext,
         k_count_dirt,
