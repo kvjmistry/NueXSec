@@ -16,6 +16,11 @@ class CrossSectionHelper{
     // Class instances
     utility _util;
 
+     // Scale factors (everything is scaled to data)
+    double mc_scale_factor     = 1.0;
+    double intime_scale_factor = 1.0;
+    double dirt_scale_factor   = 1.0;
+
     // Variables
     int run{0}, subrun{0}, event{0};
     std::string *classifcation = NULL; // The classification of the event
@@ -45,17 +50,25 @@ class CrossSectionHelper{
 
     // Fluxes need to be defined by reading in the flux file and integrating
     double integrated_flux{0.0};
+    double flux_scale_factor{1.0e-4}; // m2 to cm2
+    double mc_flux_scale_factor{1.0};
+    double data_flux_scale_factor{1.0};
 
     // -------------------------------------------------------------------------
     // Initialiser function
     void Initialise(const char *run_period, const char * xsec_file_in, utility _utility);
     // -------------------------------------------------------------------------
+    // Function to loop over events and calculate the cross section
+    void LoopEvents(); 
+    // -------------------------------------------------------------------------
     // Function to calculate the cross section
-    void CalcCrossSec(); 
+    double CalcCrossSec(double sel, double gen, double sig, double bkg, double flux, double ext, double dirt, double targ);
     // -------------------------------------------------------------------------
     // Function to get the integrated flux
     double GetIntegratedFlux();
     // -------------------------------------------------------------------------
+    // Function to get the POT from the flux file
+    double GetPOT(TFile* f, bool disp);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

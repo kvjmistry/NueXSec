@@ -9,6 +9,36 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
     // Set the run period
     run_period = _run_period;
 
+    // Set the scale factors
+    if (strcmp(_run_period, "1") == 0){
+        mc_scale_factor     = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_MC_POT);
+        dirt_scale_factor   = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_Dirt_POT);
+        intime_scale_factor = _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
+        mc_flux_scale_factor   = flux_scale_factor * _util.config_v.at(_util.k_Run1_MC_POT);
+        data_flux_scale_factor = flux_scale_factor * _util.config_v.at(_util.k_Run1_Data_POT);
+    }
+    else if (strcmp(_run_period, "3") == 0){
+        mc_scale_factor     = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_MC_POT);
+        dirt_scale_factor   = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_Dirt_POT);
+        intime_scale_factor = _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
+        mc_flux_scale_factor   = flux_scale_factor * _util.config_v.at(_util.k_Run3_MC_POT);
+        data_flux_scale_factor = flux_scale_factor * _util.config_v.at(_util.k_Run3_Data_POT);
+    }
+    else {
+        std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;
+        exit(1);
+    }
+    
+    std::cout << "\033[0;32m-------------------------------" << std::endl;
+    std::cout << "Scale Factors:\n" <<
+    "MC Scale factor:        " << mc_scale_factor          << "\n" <<
+    "Dirt Scale factor:      " << dirt_scale_factor        << "\n" <<
+    "EXT Scale factor:       " << intime_scale_factor      << "\n" <<
+    "MC Flux Scale factor:   " << mc_flux_scale_factor     << "\n" <<
+    "Data Flux Scale factor: " << data_flux_scale_factor
+    << std::endl;
+    std::cout << "-------------------------------\033[0m" << std::endl;
+
     // File not already open, open the file
     if (!gROOT->GetListOfFiles()->FindObject( xsec_file_in ) ) {
         f_nuexsec = new TFile( xsec_file_in, "READ");
@@ -35,12 +65,12 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
     N_target_Data = (lar_density_data * volume * NA * N_nuc) / m_mol;
     std::cout << "Number of Target Nucleons in Data: " << N_target_Data << std::endl;
 
-    // Now calculate the cross section
-    CalcCrossSec();
+    // Now loop over events and caluclate the cross section
+    LoopEvents();
 
 }
 // -----------------------------------------------------------------------------
-void CrossSectionHelper::CalcCrossSec(){
+void CrossSectionHelper::LoopEvents(){
 
     double n_data{0.0}, n_dirt{0.0}, n_ext{0.0}, n_selected{0.0}, n_gen{0.0}, n_bkg{0.0}, n_sig{0.0}, n_sel{0.0};
 
@@ -85,17 +115,63 @@ void CrossSectionHelper::CalcCrossSec(){
 
     }
 
-    std::cout << 
-    "Selected:   " << n_sel << "\n" << 
-    "Signal:     " << n_sig << "\n" << 
-    "Background: " << n_bkg << "\n" << 
-    "Generated:  " << n_gen << "\n" << 
-    "EXT:        " << n_ext << "\n" << 
-    "Dirt:       " << n_dirt << "\n" << 
-    "Data:       " << n_data << "\n" 
+    // MC 
+    double n_dirt_mc   = n_dirt * (dirt_scale_factor / mc_scale_factor);
+    double n_ext_mc    = n_ext  * (intime_scale_factor / mc_scale_factor);
+    
+    double n_sig_data = n_sig * mc_scale_factor;
+    double n_bkg_data = n_bkg * mc_scale_factor;
+    double n_gen_data = n_gen * mc_scale_factor;
+    double n_dirt_data = n_dirt * dirt_scale_factor;
+    double n_ext_data  = n_ext  * intime_scale_factor;
+
+    std::cout << "\n" <<
+    "Selected MC:     " << n_sel << "\n" << 
+    "Signal MC:       " << n_sig << "\n" << 
+    "Background MC:   " << n_bkg << "\n" << 
+    "Generated MC:    " << n_gen << "\n" << 
+    "EXT MC:          " << n_ext_mc << "\n" << 
+    "Dirt MC:         " << n_dirt_mc << "\n\n" << 
+    
+    "Selected Data:   " << n_data << "\n" << 
+    "Signal Data:     " << n_sig_data << "\n" << 
+    "Background Data: " << n_bkg_data << "\n" << 
+    "Generated Data:  " << n_gen_data << "\n" << 
+    "EXT Data:        " << n_ext_data  << "\n" << 
+    "Dirt Data:       " << n_dirt_data << "\n"
     << std::endl;
 
-    
+    // MC Cross section
+    double mc_xsec   = CalcCrossSec(n_sel, n_gen, n_sig, n_bkg, integrated_flux * mc_flux_scale_factor , n_ext_mc, n_dirt_mc, N_target_MC);
+
+    double data_xsec = CalcCrossSec(n_data, n_gen_data, n_sig_data, n_bkg_data, integrated_flux * data_flux_scale_factor , n_ext_data, n_dirt_data, N_target_Data);
+
+    std::cout << 
+    "MC XSEC: "   << mc_xsec << "\n" << 
+    "Data XSEC: " << data_xsec
+    << std::endl;
+
+}
+// -----------------------------------------------------------------------------
+double CrossSectionHelper::CalcCrossSec(double sel, double gen, double sig, double bkg, double flux, double ext, double dirt, double targ){
+
+    bool DEBUG{true};
+
+    if (DEBUG) {
+        std::cout << 
+        "DEBUG:       " << "\n" << 
+        "Sel:         " << sel  << "\n" << 
+        "Bkg:         " << bkg  << "\n" << 
+        "Flux:        " << flux << "\n" << 
+        "Targets:     " << targ << "\n" << 
+        "EXT:         " << ext  << "\n" << 
+        "Dirt:        " << dirt << "\n" << 
+        "efficiency:\t" << (sig / gen ) << std::endl;
+    }
+
+    // (S - B) / (eff * targ * flux)
+    return (sel - ( bkg + ext + dirt) ) / ( (sig / gen ) * targ * flux );
+
 }
 // -----------------------------------------------------------------------------
 double CrossSectionHelper::GetIntegratedFlux(){
@@ -125,7 +201,25 @@ double CrossSectionHelper::GetIntegratedFlux(){
 
     std::cout << "Integral Nuebar Flux: " << integral_nuebar << std::endl;
 
-    return integral_nue + integral_nuebar;
 
+    double POT_flux{0.0}; // The POT of the flux file (i.e the POT used in the flux histogram)
+    POT_flux = GetPOT(f_flux, true);
+
+    return (integral_nue + integral_nuebar) / POT_flux;
+
+}
+// -----------------------------------------------------------------------------
+double CrossSectionHelper::GetPOT(TFile* f, bool disp){
+    TTree* TPOT = (TTree*) f->Get("POT");
+    if (TPOT == NULL) std::cout << "Error cant get POT info" << std::endl;
+
+    double fPOT{0};
+    TPOT->SetBranchAddress("POT", &fPOT); // Get the POT
+    TPOT->GetEntry(0);
+    double total_entries = TPOT->GetEntries(); // if using hadd, this will not be 1 equal to 1 anymore
+    fPOT*=total_entries;
+    std::cout << "TOTAL POT READ IN:\t" << fPOT << std::endl;
+
+    return fPOT;
 }
 // -----------------------------------------------------------------------------
