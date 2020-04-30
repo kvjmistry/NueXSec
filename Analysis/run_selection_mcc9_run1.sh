@@ -13,3 +13,6 @@ source merge/merge_run1_files.sh
 
 # Merge the ttrees to one file
 root -l -b -q 'merge/merge_uneaventrees.C("1","files/trees/nuexsec_selected_tree_mc_run1.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root")'
+
+# Now run the cross section calculator
+./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root 

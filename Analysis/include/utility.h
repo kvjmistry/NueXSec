@@ -37,25 +37,8 @@ class utility{
 
 public:
     // -------------------------------------------------------------------------
-    // Function to configure the cut values from main.h
-    std::vector<double> configure( 
-                                   double _Run1_MC_POT,
-                                   double _Run1_Dirt_POT,
-                                   double _Run1_Data_POT,
-                                   double _Run1_Data_trig,
-                                   double _Run1_EXT_trig,
-                                   double _Run3_MC_POT,
-                                   double _Run3_Dirt_POT,
-                                   double _Run3_Data_POT,
-                                   double _Run3_Data_trig,
-                                   double _Run3_EXT_trig,
-                                   double _x1,
-                                   double _x2,
-                                   double _y1,
-                                   double _y2,
-                                   double _z1,
-                                   double _z2
-                                  );
+    // Initalise variables
+    void Initalise();
     // -------------------------------------------------------------------------
     // Get a TFile from a file
     bool GetFile(TFile* &f, TString string);
@@ -79,6 +62,46 @@ public:
     // Function calculate theta
     double GetTheta(double px, double py, double pz);
     // -------------------------------------------------------------------------
+
+    // Variables
+    
+    // POT 
+    std::vector<double> config_v;
+
+    std::vector<std::string> confignames = {
+        "Run1_MC_POT",
+        "Run1_Dirt_POT",
+        "Run1_Data_POT",
+        "Run1_Data_trig",
+        "Run1_EXT_trig",
+        "Run3_MC_POT",
+        "Run3_Dirt_POT",
+        "Run3_Data_POT",
+        "Run3_Data_trig",
+        "Run3_EXT_trig",
+        "x1", "x2", "y1", "y2", "z1", "z2"
+    };
+
+    // enums for config variables
+    enum enum_config {
+                k_Run1_MC_POT,
+                k_Run1_Dirt_POT,
+                k_Run1_Data_POT,
+                k_Run1_Data_trig,
+                k_Run1_EXT_trig,
+                k_Run3_MC_POT,
+                k_Run3_Dirt_POT,
+                k_Run3_Data_POT,
+                k_Run3_Data_trig,
+                k_Run3_EXT_trig,
+                k_config_x1,
+                k_config_x2,
+                k_config_y1,
+                k_config_y2,
+                k_config_z1,
+                k_config_z2,
+                k_config_MAX
+                };
 
 
     // Other definitions for code
@@ -194,28 +217,6 @@ public:
                 // k_dEdx_u,            // dEdx u plane
                 k_cuts_MAX
                 }; 
-
-    // Config enums
-    enum enum_config {
-        k_config_Run1_MC_POT,
-        k_config_Run1_Dirt_POT,
-        k_config_Run1_Data_POT,
-        k_config_Run1_Data_trig,
-        k_config_Run1_EXT_trig,
-        k_config_Run3_MC_POT,
-        k_config_Run3_Dirt_POT,
-        k_config_Run3_Data_POT,
-        k_config_Run3_Data_trig,
-        k_config_Run3_EXT_trig,
-        k_config_x1,
-        k_config_x2,
-        k_config_y1,
-        k_config_y2,
-        k_config_z1,
-        k_config_z2,
-        k_config_MAX
-    };
-
 
     // Genie interaction enums
     enum enum_interactions {

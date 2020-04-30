@@ -11,7 +11,7 @@ void selection::Initialise( const char * mc_file,
                             const char * data_file_out,
                             const char * dirt_file_out,
                             const char * variation_file,
-                            const std::vector<double> _config,
+                            utility _utility,
                             bool _slim,
                             int num_events,
                             const char * run_period,
@@ -19,6 +19,9 @@ void selection::Initialise( const char * mc_file,
                             int weight_cfg){
     
     std::cout << "\nInitialising..." << std::endl;
+
+    _util = _utility;
+
     if (_slim){
         std::cout << "\033[0;32m-------------------------------" << std::endl;
         std::cout << "     Running in Slim Mode!" << std::endl;
@@ -38,15 +41,15 @@ void selection::Initialise( const char * mc_file,
 
     // Set the scale factors
     if (strcmp(run_period, "1") == 0){
-        mc_scale_factor     = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_MC_POT);
-        dirt_scale_factor   = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_Dirt_POT);
-        intime_scale_factor = _config.at(_util.k_config_Run1_Data_trig) / _config.at(_util.k_config_Run1_EXT_trig);
+        mc_scale_factor     = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_MC_POT);
+        dirt_scale_factor   = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_Dirt_POT);
+        intime_scale_factor = _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
         _run_period = 1;
     }
     else if (strcmp(run_period, "3") == 0){
-        mc_scale_factor     = _config.at(_util.k_config_Run3_Data_POT)  / _config.at(_util.k_config_Run3_MC_POT);
-        dirt_scale_factor   = _config.at(_util.k_config_Run3_Data_POT)  / _config.at(_util.k_config_Run3_Dirt_POT);
-        intime_scale_factor = _config.at(_util.k_config_Run3_Data_trig) / _config.at(_util.k_config_Run3_EXT_trig);
+        mc_scale_factor     = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_MC_POT);
+        dirt_scale_factor   = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_Dirt_POT);
+        intime_scale_factor = _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
         _run_period = 3;
     }
     else {

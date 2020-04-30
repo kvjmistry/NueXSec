@@ -7,26 +7,28 @@ histogram_plotter::~histogram_plotter(){
     // f_nuexsec->Close();
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config, int weight_cfg, bool _area_norm){
+void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config, int weight_cfg, bool _area_norm, utility _utility){
 
     std::cout << "Creating histograms and making plots" << std::endl;
     
+    _util = _utility;
+
     double Data_POT;
 
     area_norm = _area_norm;
 
     // Set the scale factors
     if (strcmp(run_period, "1") == 0){
-        mc_scale_factor     = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_MC_POT) ;
-        dirt_scale_factor   = _config.at(_util.k_config_Run1_Data_POT)  / _config.at(_util.k_config_Run1_Dirt_POT);
-        intime_scale_factor = _config.at(_util.k_config_Run1_Data_trig) / _config.at(_util.k_config_Run1_EXT_trig);
-        Data_POT = _config.at(_util.k_config_Run1_Data_POT); // Define this variable here for easier reading
+        mc_scale_factor     = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_MC_POT);
+        dirt_scale_factor   = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_Dirt_POT);
+        intime_scale_factor = _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
+        Data_POT = _util.config_v.at(_util.k_Run1_Data_POT); // Define this variable here for easier reading
     }
     else if (strcmp(run_period, "3") == 0){
-        mc_scale_factor     = _config.at(_util.k_config_Run3_Data_POT)  / _config.at(_util.k_config_Run3_MC_POT);
-        dirt_scale_factor   = _config.at(_util.k_config_Run3_Data_POT)  / _config.at(_util.k_config_Run3_Dirt_POT);
-        intime_scale_factor = _config.at(_util.k_config_Run3_Data_trig) / _config.at(_util.k_config_Run3_EXT_trig);
-        Data_POT = _config.at(_util.k_config_Run3_Data_POT); // Define this variable here for easier reading
+        mc_scale_factor     = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_MC_POT);
+        dirt_scale_factor   = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_Dirt_POT);
+        intime_scale_factor = _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
+        Data_POT = _util.config_v.at(_util.k_Run3_Data_POT); // Define this variable here for easier reading
     }
     else {
         std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;

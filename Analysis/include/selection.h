@@ -118,7 +118,7 @@ namespace xsecSelection {
                              const char * data_file_out,
                              const char * dirt_file_out,
                              const char * variation_file,
-                             const std::vector<double> _config,
+                             utility _utility,
                              bool _slim,
                              int num_events,
                              const char * run_period,

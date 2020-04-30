@@ -1,9 +1,10 @@
 #include "../include/CrossSectionHelper.h"
 
 // -----------------------------------------------------------------------------
-void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_file_in){
+void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_file_in, utility _utility){
 
     std::cout << "Initalising Cross Section Helper..." << std::endl;
+    _util = _utility;
 
     // Set the run period
     run_period = _run_period;

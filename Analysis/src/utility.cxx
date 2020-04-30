@@ -1,51 +1,45 @@
 #include "../include/utility.h"
 
-
 // -----------------------------------------------------------------------------
-std::vector<double> utility::configure(
-        double _Run1_MC_POT,
-        double _Run1_Dirt_POT,
-        double _Run1_Data_POT,
-        double _Run1_Data_trig,
-        double _Run1_EXT_trig,
-        double _Run3_MC_POT,
-        double _Run3_Dirt_POT,
-        double _Run3_Data_POT,
-        double _Run3_Data_trig,
-        double _Run3_EXT_trig,
-        double _x1,
-        double _x2,
-        double _y1,
-        double _y2,
-        double _z1,
-        double _z2
-        ) {
-    std::vector<double> config;
-    config.resize(k_config_MAX, 0);
+void utility::Initalise(){
 
-    config.at(k_config_Run1_MC_POT)     = _Run1_MC_POT;
-    config.at(k_config_Run1_Dirt_POT)   = _Run1_Dirt_POT;
-    config.at(k_config_Run1_Data_POT)   = _Run1_Data_POT;
-    config.at(k_config_Run1_Data_trig)  = _Run1_Data_trig;
-    config.at(k_config_Run1_EXT_trig)   = _Run1_EXT_trig;
+    std::cout << "Initialising Utility Class..." << std::endl;
 
-    config.at(k_config_Run3_MC_POT)     = _Run3_MC_POT;
-    config.at(k_config_Run3_Dirt_POT)   = _Run3_Dirt_POT;
-    config.at(k_config_Run3_Data_POT)   = _Run3_Data_POT;
-    config.at(k_config_Run3_Data_trig)  = _Run3_Data_trig;
-    config.at(k_config_Run3_EXT_trig)   = _Run3_EXT_trig;
+    std::string line;
 
-    config.at(k_config_x1)  = _x1;
-    config.at(k_config_x2)  = _x2;
-    config.at(k_config_y1)  = _y1;
-    config.at(k_config_y2)  = _y2;
-    config.at(k_config_z1)  = _z1;
-    config.at(k_config_z2)  = _z2;
+    config_v.resize(k_config_MAX, 1.0);
+
+    std::ifstream myfile ("config.txt");
+
+    std::string varname;
+    std::string value;
     
+    if (myfile.is_open()) {
 
-    return config;
+        // Loop over the config ist
+        for (unsigned int p = 0; p < confignames.size(); p++){
+            
+            // Loop over lines in file
+            while ( getline (myfile,line) ) {
 
-} // End config function
+                std::istringstream ss(line);
+                ss >> varname >> value; 
+
+                // Found the correct variation file 
+                if (varname == confignames.at(p)) {
+                    // std::cout << "Found match for: " << varname << " "<< std::stod(value) <<  std::endl;
+                    config_v.at(p)= std::stod(value);
+                    break;
+                }
+                
+            }
+        }
+
+        myfile.close();
+    }
+    else std::cout << "Unable to open file, bad things are going to happen..." << std::endl; 
+
+}
 // -----------------------------------------------------------------------------
 bool utility::GetFile(TFile* &f, TString string){
     f = TFile::Open(string);

@@ -29,7 +29,7 @@ class histogram_plotter{
 
     // -------------------------------------------------------------------------
     // Main function call to control this class
-    void MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config, int weight_cfg, bool _area_norm);
+    void MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config, int weight_cfg, bool _area_norm, utility _utility);
     // -------------------------------------------------------------------------
     // Initalise the file input
     void Initalise(const char *hist_file_name, const char* _run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor, int weight_cfg);

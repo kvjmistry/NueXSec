@@ -193,34 +193,22 @@ int main(int argc, char *argv[]){
 
     // -------------------------------------------------------------------------
     
-    // Configure the cut values
-    config = _utility.configure(
-        _Run1_MC_POT,
-        _Run1_Dirt_POT,
-        _Run1_Data_POT,
-        _Run1_Data_trig,
-        _Run1_EXT_trig,
-        _Run3_MC_POT,
-        _Run3_Dirt_POT,
-        _Run3_Data_POT,
-        _Run3_Data_trig,
-        _Run3_EXT_trig,
-        _x1, _x2, _y1, _y2, _z1, _z2
-        );
+    // Configure the utility class
+    _utility.Initalise();
 
     // -------------------------------------------------------------------------
 
     // Initialise the selction script
     if (run_selection) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name,
                                                                                 mc_file_name_out, ext_file_name_out, data_file_name_out, dirt_file_name_out,
-                                                                                variation_file_name, config, using_slim_version, num_events, run_period,
+                                                                                variation_file_name, _utility, using_slim_version, num_events, run_period,
                                                                                 verbose, weight );
     
     // Run the make histogram function
-    if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, config, weight, area_norm);
+    if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, config, weight, area_norm, _utility);
 
     // Run the calculate cross section function
-    if (calc_cross_sec) _xsec.Initialise(run_period, tree_file_name);
+    if (calc_cross_sec) _xsec.Initialise(run_period, tree_file_name, _utility);
 
     // -------------------------------------------------------------------------
     // Finished!

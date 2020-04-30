@@ -48,7 +48,7 @@ class CrossSectionHelper{
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(const char *run_period, const char * xsec_file_in );
+    void Initialise(const char *run_period, const char * xsec_file_in, utility _utility);
     // -------------------------------------------------------------------------
     // Function to calculate the cross section
     void CalcCrossSec(); 
