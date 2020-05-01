@@ -44,7 +44,6 @@ namespace xsecSelection {
             bool bool_use_ext{false};
             bool bool_use_data{false};
             bool bool_use_dirt{false};
-            bool bool_use_variation{false};
             bool slim{false};               // Flag to decide whether to make, fill and plot histograms
 
             // Decide whether to make a run subrun event filelist for the selected data events
@@ -55,7 +54,6 @@ namespace xsecSelection {
             TFile * f_data;      // The data file
             TFile * f_ext;       // The ext file
             TFile * f_dirt;      // The dirt file
-            TFile * f_variation; // The variation file
             TFile * f_flux_weights; // The file with the flux weights
 
             // TTrees
@@ -117,7 +115,7 @@ namespace xsecSelection {
                              const char * ext_file_out,
                              const char * data_file_out,
                              const char * dirt_file_out,
-                             const char * variation_file,
+                             const char * mc_tree_file_name_out,
                              utility _utility,
                              bool _slim,
                              int num_events,

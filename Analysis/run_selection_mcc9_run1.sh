@@ -16,3 +16,14 @@ root -l -b -q 'merge/merge_uneaventrees.C("1","files/trees/nuexsec_selected_tree
 
 # Now run the cross section calculator
 ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root 
+
+
+
+
+# Running detector variation samples
+
+# CV
+# ./nuexsec --run 1 --var /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_detvar/run1/neutrinoselection_filt_run1_overlay_CV.root CV 2> /dev/null | tee log/run1_CV.log
+
+# BNB_Diffusion
+# ./nuexsec --run 1 --var /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_detvar/run1/neutrinoselection_filt_run1_overlay_diffusion.root BNB_Diffusion 2> /dev/null | tee log/run1_BNB_Diffusion.log

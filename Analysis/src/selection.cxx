@@ -10,7 +10,7 @@ void selection::Initialise( const char * mc_file,
                             const char * ext_file_out,
                             const char * data_file_out,
                             const char * dirt_file_out,
-                            const char * variation_file,
+                            const char * mc_tree_file_name_out,
                             utility _utility,
                             bool _slim,
                             int num_events,
@@ -81,7 +81,6 @@ void selection::Initialise( const char * mc_file,
     "Ext  File Path:      " << ext_file       <<"\n" <<
     "Data File Path:      " << data_file      <<"\n" <<
     "Dirt File Path:      " << dirt_file      <<"\n" <<
-    "Variation File Path: " << variation_file <<"\n" <<
     std::endl;
 
     // Now get the files, if file isnt specified then set bool to skip
@@ -89,7 +88,6 @@ void selection::Initialise( const char * mc_file,
     bool_use_ext       = _util.GetFile(f_ext,       ext_file);
     bool_use_data      = _util.GetFile(f_data,      data_file);
     bool_use_dirt      = _util.GetFile(f_dirt,      dirt_file);
-    bool_use_variation = _util.GetFile(f_variation, variation_file);
 
     // Load in the flux weights file
     std::cout << "Getting the CV flux file..."<< std::endl;
@@ -110,13 +108,13 @@ void selection::Initialise( const char * mc_file,
         // Initialise all the mc slice container
         mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights);
 
+        // Initialise the Tree Helper
+        _thelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_tree_file_name_out, weight_cfg);
+
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_file_out, weight_cfg);
         if (!_slim) _hhelper.at(_util.k_mc).InitHistograms();
 
-        // Initialise the Tree Helper
-        _thelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, "empty", weight_cfg);
-        
         mc_tree_total_entries = mc_tree->GetEntries();
         std::cout << "Total MC Events:         " << mc_tree_total_entries << std::endl;
 

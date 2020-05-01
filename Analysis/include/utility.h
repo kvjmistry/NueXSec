@@ -38,7 +38,7 @@ class utility{
 public:
     // -------------------------------------------------------------------------
     // Initalise variables
-    void Initalise();
+    void Initalise(const char* variation, bool overwritePOT, const char* run_period);
     // -------------------------------------------------------------------------
     // Get a TFile from a file
     bool GetFile(TFile* &f, TString string);

@@ -205,6 +205,7 @@ double CrossSectionHelper::GetIntegratedFlux(){
     double POT_flux{0.0}; // The POT of the flux file (i.e the POT used in the flux histogram)
     POT_flux = GetPOT(f_flux, true);
 
+    // Return the flux per POT
     return (integral_nue + integral_nuebar) / POT_flux;
 
 }

@@ -9,6 +9,7 @@ int main(int argc, char *argv[]){
     bool run_selection             = true;
     bool area_norm                 = false;
     bool calc_cross_sec            = false;
+    bool overwritePOT              = false; 
 
     // inputs 
     char * mc_file_name          = (char *)"empty";
@@ -21,6 +22,7 @@ int main(int argc, char *argv[]){
     char * dirt_file_name_out    = (char *)"empty";
     char * variation             = (char *)"empty";
     char * variation_file_name   = (char *)"empty";
+    char * mc_tree_file_name_out = (char *)"empty";
     char * hist_file_name        = (char *)"empty";
     char * tree_file_name        = (char *)"empty";
     char * run_period            = (char *)"empty";
@@ -46,7 +48,7 @@ int main(int argc, char *argv[]){
     "\033[0;33m[--data_out <data file output name>]\033[0m                   \033[0;32mThe output on beam root file name (will put in the ./files/ folder)\033[0m\n\n"
     "\033[0;33m[--ext_out <ext file output name>]\033[0m                     \033[0;32mThe output off beam root file name (will put in the ./files/ folder)\033[0m\n\n"
     "\033[0;33m[--dirt_out <dirt file output name>]\033[0m                   \033[0;32mThe output dirt overlay root file name (will put in the ./files/ folder)\033[0m\n\n"
-    "\033[0;33m[--var <variation file>]\033[0m                               \033[0;31mNot yet supported\033[0m\n\n"
+    "\033[0;33m[--var <variation file> <variation name>]\033[0m              \033[0;31mPath to variation file name, the variation name\033[0m\n\n"
     "\033[0;33m[-n <num events>]\033[0m                                      \033[0;32mThe number of events to run over. This is good for checking if the code doesn't segfault. All the POT scalings will not work.\033[0m\n\n"
     "\033[0;33m[--weight <weight setting>]\033[0m                            \033[0;32mChange the Weight level. level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only \033[0m\n\n"
     "\033[0;33m[--slim]\033[0m                                               \033[0;32mWhen this extension is added, the histogram helper class is not initalised and no histograms will be filled or saved. This is to speed up the selection code if you just want to run the selection.\033[0m\n\n"
@@ -139,14 +141,7 @@ int main(int argc, char *argv[]){
             dirt_file_name_out = argv[i+1];
         }
 
-        // Variation file
-        if (strcmp(arg, "--var") == 0){
-            std::cout << "Using Variation: " << argv[i+1] << std::endl;
-            variation = argv[i+1];
-            variation_file_name = argv[i+2];
-        }
-
-        // Variation file
+        // Weight Settings
         if (strcmp(arg, "--weight") == 0){
             std::cout << "Running with weight configuration setting of: " << argv[i+1] << std::endl;
             weight = atoi(argv[i+1]);
@@ -171,6 +166,7 @@ int main(int argc, char *argv[]){
             run_period = argv[i+1];
         }
 
+        // Help!
         if (strcmp(arg, "--h") == 0 || strcmp(arg, "-h") == 0|| strcmp(arg, "--help") == 0 || strcmp(arg, "--usage") == 0){
             std::cout << usage << std::endl; 
             exit(1);
@@ -180,6 +176,22 @@ int main(int argc, char *argv[]){
         if (strcmp(arg, "--area") == 0) {
             std::cout << "Area Normalising the histograms"<< std::endl;
             area_norm = true;
+        }
+
+        // Variation file
+        if (strcmp(arg, "--var") == 0){
+            std::cout << "Using Variation: " << argv[i+2] << std::endl;
+            
+            variation = argv[i+2];
+            mc_file_name = argv[i+1];
+            
+            mc_file_name_out      = Form("nuexsec_mc_run%s_%s.root", run_period, variation);
+            mc_tree_file_name_out = Form("nuexsec_selected_tree_mc_run%s_%s.root", run_period, variation);
+            
+            std::cout  << "Output filename will be overwritten with name: "      << mc_file_name_out << std::endl;
+            std::cout << "Output tree filename will be overwritten with name: " << mc_tree_file_name_out << std::endl;
+            
+            overwritePOT = true;
         }
         
     }
@@ -194,15 +206,14 @@ int main(int argc, char *argv[]){
     // -------------------------------------------------------------------------
     
     // Configure the utility class
-    _utility.Initalise();
+    _utility.Initalise(variation, overwritePOT, run_period);
 
     // -------------------------------------------------------------------------
 
     // Initialise the selction script
-    if (run_selection) _selection_instance.xsecSelection::selection::Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name,
-                                                                                mc_file_name_out, ext_file_name_out, data_file_name_out, dirt_file_name_out,
-                                                                                variation_file_name, _utility, using_slim_version, num_events, run_period,
-                                                                                verbose, weight );
+    if (run_selection) _selection_instance.Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name,
+                                                      mc_file_name_out, ext_file_name_out, data_file_name_out, dirt_file_name_out,
+                                                      mc_tree_file_name_out, _utility, using_slim_version, num_events, run_period, verbose, weight );
     
     // Run the make histogram function
     if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, config, weight, area_norm, _utility);

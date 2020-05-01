@@ -1,29 +1,52 @@
 #include "../include/utility.h"
 
 // -----------------------------------------------------------------------------
-void utility::Initalise(){
+void utility::Initalise(const char* variation, bool overwritePOT, const char* run_period){
 
     std::cout << "Initialising Utility Class..." << std::endl;
 
+    std::string variation_str = variation;
+
+    // Check the variaition mode setting and see if we want to overwrite the POT
+    if (overwritePOT){
+
+        // Loop over the POT config names and overwrite the name of the CV MC POT
+        for (unsigned int p = 0; p < confignames.size(); p++){
+            
+            // std::string match_name = Form("Run%s_MC_POT", run_period);
+            std::string match_name = "Run1_MC_POT";
+            
+            // If matched then overwrite the POT config for the MC to the variation
+            if (confignames.at(p) == match_name){
+                confignames[p] = match_name + "_" + variation_str;
+                std::cout << "New MC POT config to search for is: " << confignames.at(p) << std::endl;
+            }
+
+        }
+    }
+
+    // Get the congigureation parameters
     std::string line;
 
     config_v.resize(k_config_MAX, 1.0);
 
-    std::ifstream myfile ("config.txt");
-
     std::string varname;
     std::string value;
     
-    if (myfile.is_open()) {
+    // Loop over the config ist
+    for (unsigned int p = 0; p < confignames.size(); p++){
 
-        // Loop over the config ist
-        for (unsigned int p = 0; p < confignames.size(); p++){
+        std::ifstream myfile ("config.txt");
+
+        if (myfile.is_open()) {
             
+            // std::cout << confignames.at(p) <<  std::endl;
+
             // Loop over lines in file
             while ( getline (myfile,line) ) {
 
                 std::istringstream ss(line);
-                ss >> varname >> value; 
+                ss >> varname >> value;
 
                 // Found the correct variation file 
                 if (varname == confignames.at(p)) {
@@ -33,11 +56,13 @@ void utility::Initalise(){
                 }
                 
             }
+           
+       
         }
+        else std::cout << "Unable to open file, bad things are going to happen..." << std::endl; 
 
         myfile.close();
     }
-    else std::cout << "Unable to open file, bad things are going to happen..." << std::endl; 
 
 }
 // -----------------------------------------------------------------------------

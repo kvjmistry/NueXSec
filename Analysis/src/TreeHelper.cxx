@@ -1,7 +1,7 @@
 #include "../include/TreeHelper.h"
 
 // -----------------------------------------------------------------------------
-void TreeHelper::Initialise(int type, const char* run_period, std::string file_out, int weight_cfg ){
+void TreeHelper::Initialise(int type, const char* run_period, const char * file_out, int weight_cfg ){
 
     std::cout << "Initalising Tree Helper..." << std::endl;
 
