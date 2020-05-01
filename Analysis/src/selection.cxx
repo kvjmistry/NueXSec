@@ -707,6 +707,7 @@ double selection::GetCVWeight(int type, SliceContainer SC){
     if (_weight_cfg == 0){
         weight_tune = false;
         weight_ppfx = false;
+        return weight;
     }
     else if (_weight_cfg == 1){
         weight_tune = true;

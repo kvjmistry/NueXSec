@@ -48,7 +48,7 @@ int main(int argc, char *argv[]){
     "\033[0;33m[--data_out <data file output name>]\033[0m                   \033[0;32mThe output on beam root file name (will put in the ./files/ folder)\033[0m\n\n"
     "\033[0;33m[--ext_out <ext file output name>]\033[0m                     \033[0;32mThe output off beam root file name (will put in the ./files/ folder)\033[0m\n\n"
     "\033[0;33m[--dirt_out <dirt file output name>]\033[0m                   \033[0;32mThe output dirt overlay root file name (will put in the ./files/ folder)\033[0m\n\n"
-    "\033[0;33m[--var <variation file> <variation name>]\033[0m              \033[0;31mPath to variation file name, the variation name\033[0m\n\n"
+    "\033[0;33m[--var <variation file> <variation name>]\033[0m              \033[0;32m(first arg) Path to variation file name, (second arg) the variation name -- overwrites the default MC option\033[0m\n\n"
     "\033[0;33m[-n <num events>]\033[0m                                      \033[0;32mThe number of events to run over. This is good for checking if the code doesn't segfault. All the POT scalings will not work.\033[0m\n\n"
     "\033[0;33m[--weight <weight setting>]\033[0m                            \033[0;32mChange the Weight level. level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only \033[0m\n\n"
     "\033[0;33m[--slim]\033[0m                                               \033[0;32mWhen this extension is added, the histogram helper class is not initalised and no histograms will be filled or saved. This is to speed up the selection code if you just want to run the selection.\033[0m\n\n"
