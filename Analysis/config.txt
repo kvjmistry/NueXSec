@@ -1,5 +1,9 @@
+// Config file for the selction code. Configure your cuts and other variable parameters here
+// Make sure there is no whitespace in new lines, add any character
+// Confugure the value in the utility class in config names. You can retireve them by
+// setting the enum in the list below the config names
 // Format is:
-varname POT
+varname value
 -
 // ---------------- Run 1 ----------------------
 // Run1 MC POT v33
@@ -9,27 +13,23 @@ Run1_MC_POT 1.66215e+21
 Run1_Dirt_POT 3.82938e+20
 -
 // Run 1 Data POT (tortgt) beam good and bad file
-Run1_Data_POT 3.932e+19
+// Run1_Data_POT 3.932e+19
+Run1_Data_POT 3.935e+19 // v3 bad runs subtracted
 -
 // Run 1 data HW Triggers (EA9CNT) beam good and bad file
-Run1_Data_trig 1052383.0
+// Run1_Data_trig 1052383.0
+Run1_Data_trig 1039282.0 // v3 bad runs subtracted
 -
 // Run 1 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
 Run1_EXT_trig 3378479.250000
 -
-// Additional POT Definitions
+// ------- Additional Run 1 POT Definitions -----
 -
 // Run 1 Det var CV
 Run1_MC_POT_CV 4.44874e+20
 -
 // Run 1 Det Var BNB diffusion
 Run1_MC_POT_BNB_Diffusion 4.19732e+20
--
-// Run 1 Data POT (tortgt_wcut)
-// Run1_Data_POT 4.822e+19
--
-// Run 1 data HW Triggers (EA9CNT_wcut)
-// Run1_Data_trig 1278305.0
 -
 // ---------------- Run 3 ----------------------
 // Run 3 MC POT v33
@@ -51,8 +51,8 @@ Run3_EXT_trig 1558577.475000
 // -------------- Selection Cuts ---------------
 // Fiducial Volume
 x1 10
-x2 246.35
+x2 243
 y1 -106.5
 y2 106.5
 z1 20
-z2 986.8
+z2 986

@@ -44,7 +44,7 @@ public:
     bool GetFile(TFile* &f, TString string);
     // -------------------------------------------------------------------------
     // Get a TTrees from a file
-    void GetTree(TFile* f, TTree* &T, TString string);
+    bool GetTree(TFile* f, TTree* &T, TString string);
     // -------------------------------------------------------------------------
     // Get a TDirectory from a file
     bool GetDirectory(TFile* f, TDirectory* &d, TString string);

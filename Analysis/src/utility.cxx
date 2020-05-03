@@ -78,14 +78,15 @@ bool utility::GetFile(TFile* &f, TString string){
     }
 }
 // -----------------------------------------------------------------------------
-void utility::GetTree(TFile* f, TTree* &T, TString string){
+bool utility::GetTree(TFile* f, TTree* &T, TString string){
     T = (TTree*) f->Get(string);
     if (T == NULL) {
-        std::cout << "\nfailed to get:\t" << string << "\tThis tree might not exist in the file, exiting...\n" << std::endl;
-        exit(1);
+        std::cout << "\nfailed to get:\t" << string << "\tThis tree might not exist in the file\n" << std::endl;
+        // exit(1);
+        return true;
     }
     else {
-        return;
+        return false;
     }
 }
 // -----------------------------------------------------------------------------

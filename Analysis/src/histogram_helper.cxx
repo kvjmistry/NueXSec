@@ -852,6 +852,9 @@ void histogram_helper::WriteReco(int type){
                 TH1D_hists.at(u).at(i).at(j)->SetOption("hist,E");
                 TH1D_hists.at(u).at(i).at(j)->Write("",TObject::kOverwrite);
 
+                // Try to clear some memory
+                // delete TH1D_hists.at(u).at(i).at(j);
+
                 if (break_early) break;
             }
 

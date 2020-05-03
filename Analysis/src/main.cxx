@@ -230,5 +230,6 @@ int main(int argc, char *argv[]){
     std::cout << "Time taken by function: " << duration_sec.count() << " seconds" << std::endl; 
     std::cout << "Time taken by function: " << duration_min.count() << " minutes" << std::endl; 
     
+    exit(0);
     return 0;
 }

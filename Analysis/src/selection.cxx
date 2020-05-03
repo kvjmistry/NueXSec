@@ -22,6 +22,10 @@ void selection::Initialise( const char * mc_file,
 
     _util = _utility;
 
+    // Initialise the selection cuts class
+    _scuts.Initalise(_utility);
+
+    // Display slimmed selection
     if (_slim){
         std::cout << "\033[0;32m-------------------------------" << std::endl;
         std::cout << "     Running in Slim Mode!" << std::endl;

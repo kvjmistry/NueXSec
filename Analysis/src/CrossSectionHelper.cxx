@@ -46,6 +46,7 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
 
     // Get the Input TTree
     _util.GetTree(f_nuexsec, tree, "tree");
+    if (tree == NULL)  _util.GetTree(f_nuexsec, tree, "mc_tree");
 
     // Set the tree branches
     tree->SetBranchAddress("run",    &run);
@@ -58,6 +59,8 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
 
     // Get the integrated flux
     integrated_flux = GetIntegratedFlux();
+
+    std::cout << "Volume used in cuts: " << volume << std::endl;
 
     N_target_MC   = (lar_density_mc   * volume * NA * N_nuc) / m_mol;
     std::cout << "Number of Target Nucleons in MC: " << N_target_MC << std::endl;

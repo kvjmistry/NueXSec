@@ -1,5 +1,12 @@
 #include "../include/selection_cuts.h"
 // -----------------------------------------------------------------------------
+void selection_cuts::Initalise(utility _utility){
+
+    std::cout << "Initalising Selection Cuts Class " << std::endl;
+    _util = _utility;
+
+}
+// -----------------------------------------------------------------------------
 bool selection_cuts::swtrig(SliceContainer &SC, int type){
     
     // Common optical is already applied to data
@@ -47,9 +54,9 @@ bool selection_cuts::topo_score(SliceContainer &SC){
 bool selection_cuts::in_fv(SliceContainer &SC){
     
     // These are looser cuts (whats done in the cc inclusive)
-    if ( SC.reco_nu_vtx_sce_x >= 10 && SC.reco_nu_vtx_sce_x <= 243 &&
-        SC.reco_nu_vtx_sce_y >= -106.5 && SC.reco_nu_vtx_sce_y <= 106.5 &&
-        ( (SC.reco_nu_vtx_sce_z >= 20 && SC.reco_nu_vtx_sce_z <= 986))
+    if ( SC.reco_nu_vtx_sce_x   >= _util.config_v.at(_util.k_config_x1) && SC.reco_nu_vtx_sce_x <= _util.config_v.at(_util.k_config_x2) &&
+        SC.reco_nu_vtx_sce_y    >= _util.config_v.at(_util.k_config_y1) && SC.reco_nu_vtx_sce_y <= _util.config_v.at(_util.k_config_y2) &&
+        ( (SC.reco_nu_vtx_sce_z >= _util.config_v.at(_util.k_config_z1) && SC.reco_nu_vtx_sce_z <= _util.config_v.at(_util.k_config_z2)))
         ){
         return true;   // pass
     }  
