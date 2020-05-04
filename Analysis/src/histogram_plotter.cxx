@@ -539,14 +539,14 @@ void histogram_plotter::SetLegend(std::vector<TH1D*> hist, TLegend *leg_stack, s
     if (found_ext)  leg_stack->AddEntry(hist.at(k_plot_ext),  Form("InTime (EXT) (%2.1f)",        hist_integrals.at(_util.k_leg_ext)),      "f");
 
     if (plotmode == "classifications"){
-        leg_stack->AddEntry(hist.at(_util.k_unmatched),       Form("Unmatched (%2.1f)",           hist_integrals.at(_util.k_unmatched)),    "f");
+        // leg_stack->AddEntry(hist.at(_util.k_unmatched),       Form("Unmatched (%2.1f)",           hist_integrals.at(_util.k_unmatched)),    "f"); // This should be zero, so dont plot
         leg_stack->AddEntry(hist.at(_util.k_nc_pi0),          Form("NC #pi^{0} (%2.1f)",          hist_integrals.at(_util.k_nc_pi0)),       "f");
         leg_stack->AddEntry(hist.at(_util.k_nc),              Form("NC (%2.1f)",                  hist_integrals.at(_util.k_nc)),           "f");
         leg_stack->AddEntry(hist.at(_util.k_numu_cc_pi0),     Form("#nu_{#mu} CC #pi^{0} (%2.1f)",hist_integrals.at(_util.k_numu_cc_pi0)),  "f");
         leg_stack->AddEntry(hist.at(_util.k_numu_cc),         Form("#nu_{#mu} CC (%2.1f)",        hist_integrals.at(_util.k_numu_cc)),      "f");
         leg_stack->AddEntry(hist.at(_util.k_cosmic),          Form("Cosmic (%2.1f)",              hist_integrals.at(_util.k_cosmic)),       "f");
         leg_stack->AddEntry(hist.at(_util.k_nu_out_fv),       Form("#nu OutFV (%2.1f)",           hist_integrals.at(_util.k_nu_out_fv)),    "f");
-        // leg_stack->AddEntry(hist.at(_util.k_nue_cc_mixed), Form("#nu_{e} CC Mixed (%2.1f)",    hist_integrals.at(_util.k_nue_cc_mixed)), "f"); // This isnt filled anymore
+        leg_stack->AddEntry(hist.at(_util.k_nue_cc_mixed),    Form("#nu_{e} CC Mixed (%2.1f)",    hist_integrals.at(_util.k_nue_cc_mixed)), "f");
         leg_stack->AddEntry(hist.at(_util.k_nue_cc),          Form("#nu_{e} CC (%2.1f)",          hist_integrals.at(_util.k_nue_cc)),       "f");
     }
 
@@ -559,7 +559,7 @@ void histogram_plotter::SetLegend(std::vector<TH1D*> hist, TLegend *leg_stack, s
         leg_stack->AddEntry(hist.at(_util.k_photon),         Form("#gamma (%2.1f)",    hist_integrals.at(_util.k_photon)),        "f");
         leg_stack->AddEntry(hist.at(_util.k_pion),           Form("#pi (%2.1f)",       hist_integrals.at(_util.k_pion)),          "f");
         leg_stack->AddEntry(hist.at(_util.k_neutron),        Form("n (%2.1f)",         hist_integrals.at(_util.k_neutron)),       "f");
-        leg_stack->AddEntry(hist.at(_util.k_electron),       Form("e (%2.1f)",          hist_integrals.at(_util.k_electron)),      "f");
+        leg_stack->AddEntry(hist.at(_util.k_electron),       Form("e (%2.1f)",         hist_integrals.at(_util.k_electron)),      "f");
 
     }
     
@@ -603,6 +603,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     TPaveText * pt_bottom;
 
     TH1D * h_ratio;
+    TH1D * h_ratio_error;
     TH1D * h_mc_ext_sum;
 
 
@@ -777,7 +778,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     
     h_error_hist->SetFillColorAlpha(12, 0.15);
     h_error_hist->SetLineWidth(0);
-    h_error_hist->Draw("e2 hist same");
+    h_error_hist->Draw("e2, same");
 
     // Set the legend ----------------------------------------------------------
     TLegend *leg_stack = new TLegend(leg_x1,leg_y1,leg_x2,leg_y2);
@@ -810,8 +811,9 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
             h_mc_ext_sum->Add(hist.at(i), 1);
         }
 
-        h_ratio->Add(h_mc_ext_sum, -1);
+        // h_ratio->Add(h_mc_ext_sum, -1); // Turn off for data / MC + ext
         h_ratio->Divide(h_mc_ext_sum);
+
     
         h_ratio->GetXaxis()->SetLabelSize(12);
         h_ratio->GetXaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
@@ -822,14 +824,26 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         h_ratio->GetXaxis()->SetTitleFont(46);
         h_ratio->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
 
-        h_ratio->GetYaxis()->SetRangeUser(-0.5,0.5);
+        // For percent difference
+        // h_ratio->GetYaxis()->SetTitle("(Data - MC) / MC ");
+        // h_ratio->GetYaxis()->SetRangeUser(-0.5,0.5);
+        
+        // For ratio
+        h_ratio->GetYaxis()->SetRangeUser(0.5, 1.5);
+        h_ratio->GetYaxis()->SetTitle("Data / (MC + EXT) ");
+
         h_ratio->GetXaxis()->SetTitle(x_axis_name);
-        h_ratio->GetYaxis()->SetTitle("(Data - MC) / MC ");
         h_ratio->GetYaxis()->SetTitleSize(13);
         h_ratio->GetYaxis()->SetTitleFont(44);
+        h_ratio->GetYaxis()->CenterTitle();
         h_ratio->GetYaxis()->SetTitleOffset(1.5);
         h_ratio->SetTitle(" ");
-        h_ratio->Draw("E");
+        h_ratio->Draw("E,same");
+
+        // Draw the error hist 
+        h_ratio_error = (TH1D*) h_error_hist->Clone("h_ratio_error");
+        h_ratio_error->Divide(h_ratio_error);
+        h_ratio_error->Draw("e2, same");
 
         // Now doing this stuff on the bottom pad
         //x_min, y_min, x_max, y_max
@@ -998,7 +1012,7 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
     
     // Shower score
     MakeStack("h_reco_shower_score", _util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  true, 1.0, "Shower Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Shower Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("plots/run%s/cuts/%s/reco_shower_score.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
 
     // Track score
@@ -1206,6 +1220,11 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
                         Form("plots/run%s/cuts/%s/reco_nu_e.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
 
 
+    // Contained Fraction
+    MakeStack("h_reco_contained_fraction",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Contained Fraction (PFP hits in FV / hits in slice)", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("plots/run%s/cuts/%s/reco_contained_fraction.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+
 
     // Stacked Histograms by particle type
     
@@ -1229,6 +1248,7 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name, s
     double integral_mc_ext = 0.0;
     
     TH1D * h_ratio;
+    TH1D * h_ratio_error;
     TH1D * h_mc_ext_sum;
 
     TPad * topPad;
@@ -1315,7 +1335,7 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name, s
     }
     
     h_error_hist->SetFillColorAlpha(12, 0.15);
-    h_error_hist->Draw("e2 hist same");    
+    h_error_hist->Draw("e2, same");    
 
     TLegend *leg_stack = new TLegend(0.8, 0.91, 0.95, 0.32);
     leg_stack->SetBorderSize(0);
@@ -1341,7 +1361,7 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name, s
         h_mc_ext_sum->Add(hist.at(i), 1);
     }
 
-    h_ratio->Add(h_mc_ext_sum, -1);
+    // h_ratio->Add(h_mc_ext_sum, -1);
     h_ratio->Divide(h_mc_ext_sum);
 
     h_ratio->GetXaxis()->SetLabelSize(12);
@@ -1353,13 +1373,24 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name, s
     h_ratio->GetXaxis()->SetTitleFont(46);
     h_ratio->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
 
-    h_ratio->GetYaxis()->SetRangeUser(-0.5,0.5);
-    h_ratio->GetYaxis()->SetTitle("(Data - MC) / MC ");
+    // For percent difference
+    // h_ratio->GetYaxis()->SetTitle("(Data - MC) / MC ");
+    // h_ratio->GetYaxis()->SetRangeUser(-0.5,0.5);
+    
+    // For ratio
+    h_ratio->GetYaxis()->SetRangeUser(0.5, 1.5);
+    h_ratio->GetYaxis()->SetTitle("Data / (MC + EXT) ");
+
     h_ratio->GetYaxis()->SetTitleSize(13);
     h_ratio->GetYaxis()->SetTitleFont(44);
     h_ratio->GetYaxis()->SetTitleOffset(1.5);
     h_ratio->SetTitle(" ");
     h_ratio->Draw("E");
+
+     // Draw the error hist 
+    h_ratio_error = (TH1D*) h_error_hist->Clone("h_ratio_error");
+    h_ratio_error->Divide(h_ratio_error);
+    h_ratio_error->Draw("e2, same");
 
     // Draw the run period on the plot
     Draw_Run_Period(c);

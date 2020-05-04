@@ -114,24 +114,24 @@ public:
 
     // Cut directory names
     std::vector<std::string> cut_dirs = {
-            "Unselected",    // Unselected
-            "SoftwareTrig",  // Software Trigger
-            "Op_Filter_PE",  // Common Optical Filter PE
+            "Unselected",     // Unselected
+            "SoftwareTrig",   // Software Trigger
+            "Op_Filter_PE",   // Common Optical Filter PE
             // "Op_Filter_Veto",// Common Optical Filter Michel Veto
-            "Slice_ID",      // Slice ID
-            "e_candidate",   // Electron Candidate
-            "In_FV",         // In FV
-            "Topo_Score",    // Topological Score
-            "Cosmic_IP",     // Cosmic Inpact Parameter
-            "Cluster_Frac",  // Cluster Fraction 
-            "Shower_Score",  // Track Score
-            "Shower_Contained", // Shower Containment
-            "Michel_Rej",    // Michel Rejection
-            "ShrHits",       // Shower Hits
-            "HitRatio",      // Ratio of shr hits and slice hits
-            "Moliere_Avg",   // Shower Moliere Average
-            "ShrVtxDistance",// Shower to vertex distance
-            "dEdx_y",          // dEdx y plane
+            "Slice_ID",       // Slice ID
+            "e_candidate",    // Electron Candidate
+            "In_FV",          // In FV
+            "Topo_Score",     // Topological Score
+            "Cosmic_IP",      // Cosmic Inpact Parameter
+            "Cluster_Frac",   // Cluster Fraction 
+            "Contained_Frac", // Slice Contained Fraction
+            "Shower_Score",   // Track Score
+            "Michel_Rej",     // Michel Rejection
+            "ShrHits",        // Shower Hits
+            "HitRatio",       // Ratio of shr hits and slice hits
+            "Moliere_Avg",    // Shower Moliere Average
+            "ShrVtxDistance", // Shower to vertex distance
+            "dEdx_y",         // dEdx y plane
             // "dEdx_v",          // dEdx y plane
             // "dEdx_u"           // dEdx y plane
             };
@@ -205,8 +205,8 @@ public:
                 k_topo_score,        // Topo Score
                 k_cosmic_ip,         // Cosmic IP
                 k_cluster_frac,      // Cluster Fraction
+                k_contained_frac,    // Slice Contained Fraction
                 k_shower_score,      // Shower Score
-                k_shower_contained,  // Shower containment
                 k_michel_rej,        // Michel Rejection
                 k_shr_hits,          // Shower Hits
                 k_hit_ratio,         // Ratio of shr hits and slice hits

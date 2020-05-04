@@ -218,7 +218,7 @@ void histogram_helper::InitHistograms(){
             // Reco Vtx X, Y, Z
             TH1D_hists.at(k_reco_vtx_x).at(i).at(j) = new TH1D ( Form("h_reco_vtx_x_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, -10, 270);
 
-            TH1D_hists.at(k_reco_vtx_y).at(i).at(j) = new TH1D ( Form("h_reco_vtx_y_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, -10, 120);
+            TH1D_hists.at(k_reco_vtx_y).at(i).at(j) = new TH1D ( Form("h_reco_vtx_y_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, -120, 120);
             
             TH1D_hists.at(k_reco_vtx_z).at(i).at(j) = new TH1D ( Form("h_reco_vtx_z_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, -10, 1050);
 
@@ -276,7 +276,7 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_track_shower_angle).at(i).at(j) = new TH1D (Form("h_reco_track_shower_angle_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, -180, 180);
             
             // Ratio hits from showers to slice
-            TH1D_hists.at(k_reco_hits_ratio).at(i).at(j) = new TH1D (Form("h_reco_hits_ratio_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 1);
+            TH1D_hists.at(k_reco_hits_ratio).at(i).at(j) = new TH1D (Form("h_reco_hits_ratio_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 21, 0, 1.05);
             
             // Shower score
             TH1D_hists.at(k_reco_shower_score).at(i).at(j) = new TH1D (Form("h_reco_shower_score_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 0.5);
@@ -288,10 +288,10 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_shower_energy_tot_cali).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_tot_cali_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 3);
             
             // Total number of hits for the leading shower
-            TH1D_hists.at(k_reco_shr_hits_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 800);
+            TH1D_hists.at(k_reco_shr_hits_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 1600);
             
             // Total number of hits for the leading shower in the collection plane
-            TH1D_hists.at(k_reco_shr_hits_y_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_y_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 800);
+            TH1D_hists.at(k_reco_shr_hits_y_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_y_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 1600);
 
             // Shower Track fit dEdx variables
             TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_u).at(i).at(j)   = new TH1D ( Form("h_reco_shr_trkfit_2cm_dEdx_u_%s_%s",_util.cut_dirs.at(i).c_str(),     _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
@@ -371,6 +371,8 @@ void histogram_helper::InitHistograms(){
             // Reconstructed Neutrino Energy
             TH1D_hists.at(k_reco_nu_e).at(i).at(j) = new TH1D ( Form("h_reco_nu_e_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 3);
 
+            // Contained Fraction
+            TH1D_hists.at(k_reco_contained_fraction).at(i).at(j) = new TH1D ( Form("h_reco_contained_fraction_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 21, 0, 1.05);
         }
         
     }
@@ -618,6 +620,8 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     if (SC.n_tracks > 0) TH1D_hists.at(k_reco_trk_len).at(cut_index).at(classification_index)->Fill(SC.trk_len, weight);
 
     TH1D_hists.at(k_reco_nu_e).at(cut_index).at(classification_index)->Fill(reco_nu_e, weight);
+
+    TH1D_hists.at(k_reco_contained_fraction).at(cut_index).at(classification_index)->Fill(SC.contained_fraction, weight);
     
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
@@ -659,7 +663,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
         // True nue angle from numi beamline 
         double nu_angle = _util.GetTheta(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz); 
 
-        if (classification_index == _util.k_nue_cc){
+        if (classification_index == _util.k_nue_cc || classification_index == _util.k_nue_cc_mixed){
             TH1D_true_hists.at(k_true_nue_theta)->Fill(nu_theta, weight);
             TH1D_true_hists.at(k_true_nue_phi)  ->Fill(nu_phi, weight);
             TH1D_true_hists.at(k_true_nue_angle)->Fill(nu_angle, weight);
@@ -793,7 +797,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
         if (cut_index == _util.k_shr_distance - 1 ){
             
             // This is the signal
-            if (classification_index == _util.k_nue_cc){
+            if (classification_index == _util.k_nue_cc || classification_index == _util.k_nue_cc_mixed){
                 TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(_util.k_signal)->Fill(SC.shr_dedx_Y_cali, SC.shr_distance, weight);
             }
             // This is the background
@@ -915,7 +919,7 @@ void histogram_helper::WriteRecoPar(int type){
 void histogram_helper::FillTEfficiency(int cut_index, std::string classification, SliceContainer SC, double weight){
 
     // Fill the histogram at the specified cut
-    if (classification == "nue_cc") TEfficiency_hists.at(cut_index)->Fill(SC.nu_e, weight);
+    if (classification == "nue_cc" || classification == "nue_cc_mixed") TEfficiency_hists.at(cut_index)->Fill(SC.nu_e, weight);
 }
 // -----------------------------------------------------------------------------
 void histogram_helper::WriteTEfficiency(){

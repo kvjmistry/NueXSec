@@ -208,18 +208,19 @@ void utility::PrintInfo(std::vector<double> c_v, double intime_scale_factor, dou
 
     std::cout << "\n------------------------------------------------" << std::endl;
     std::cout << "------------------------------------------------" << std::endl;
+    std::cout.precision(6);
     std::cout << "\n\033[0;33m <" << cut_name << "> \033[0m" << std::endl;
     std::cout << "                    Scaled to MC POT | Scaled to Data POT | Unscaled" << std::endl;
-    std::cout << " Total Candidate Nue     : " << sum_mc_dirt_ext                 << "\t "    << double(sum_mc_dirt_ext                * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Nue CC        : " << c_v.at(k_count_nue_cc)          << "\t \t " << double(c_v.at(k_count_nue_cc)         * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Nue CC Mixed  : " << c_v.at(k_count_nue_cc_mixed)    << "\t \t " << double(c_v.at(k_count_nue_cc_mixed)   * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Nu out FV     : " << c_v.at(k_count_nu_out_fv)       << "\t \t " << double(c_v.at(k_count_nu_out_fv)      * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Cosmic        : " << c_v.at(k_count_cosmic)          << "\t \t " << double(c_v.at(k_count_cosmic)         * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Numu CC       : " << c_v.at(k_count_numu_cc)         << "\t \t " << double(c_v.at(k_count_numu_cc)        * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Numu CC Pi0   : " << c_v.at(k_count_numu_cc_pi0)     << "\t \t " << double(c_v.at(k_count_numu_cc_pi0)    * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of NC            : " << c_v.at(k_count_nc)              << "\t \t " << double(c_v.at(k_count_nc)             * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of NC Pi0        : " << c_v.at(k_count_nc_pi0)          << "\t \t " << double(c_v.at(k_count_nc_pi0)         * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Unmatched     : " << c_v.at(k_count_unmatched)       << "\t \t " << double(c_v.at(k_count_unmatched)      * mc_scale_factor  ) << std::endl;
+    std::cout << " Total Candidate Nue     : " << sum_mc_dirt_ext                 << "    " << double(sum_mc_dirt_ext                * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Nue CC        : " << c_v.at(k_count_nue_cc)          << "    " << double(c_v.at(k_count_nue_cc)         * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Nue CC Mixed  : " << c_v.at(k_count_nue_cc_mixed)    << "    " << double(c_v.at(k_count_nue_cc_mixed)   * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Nu out FV     : " << c_v.at(k_count_nu_out_fv)       << "    " << double(c_v.at(k_count_nu_out_fv)      * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Cosmic        : " << c_v.at(k_count_cosmic)          << "    " << double(c_v.at(k_count_cosmic)         * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Numu CC       : " << c_v.at(k_count_numu_cc)         << "    " << double(c_v.at(k_count_numu_cc)        * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Numu CC Pi0   : " << c_v.at(k_count_numu_cc_pi0)     << "    " << double(c_v.at(k_count_numu_cc_pi0)    * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of NC            : " << c_v.at(k_count_nc)              << "    " << double(c_v.at(k_count_nc)             * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of NC Pi0        : " << c_v.at(k_count_nc_pi0)          << "    " << double(c_v.at(k_count_nc_pi0)         * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Unmatched     : " << c_v.at(k_count_unmatched)       << "    " << double(c_v.at(k_count_unmatched)      * mc_scale_factor  ) << std::endl;
     
     std::cout << " Number of InTime Cosmics: " << double(c_v.at(k_count_ext) * (intime_scale_factor / mc_scale_factor))
               << "\t " << double(c_v.at(k_count_ext) * intime_scale_factor) << "\t " << c_v.at(k_count_ext) << std::endl;
@@ -248,10 +249,10 @@ void utility::PrintInfo(std::vector<double> c_v, double intime_scale_factor, dou
     // std::cout << " Sum Neutrinos           : " <<  << std::endl;
 
     std::cout << "------------------------------------------------" << std::endl;
-    efficiency = double(c_v.at(k_count_nue_cc)) / double(tot_true_infv_nues);
-    purity     = double(c_v.at(k_count_nue_cc)) / double(sum_mc_dirt_ext);
-    std::cout << " Efficiency       : " << "( " << c_v.at(k_count_nue_cc) << " / " << tot_true_infv_nues << " ) = " << efficiency << std::endl;
-    std::cout << " Purity           : " << "( " << c_v.at(k_count_nue_cc) << " / " << sum_mc_dirt_ext           << " ) = " << purity << std::endl;
+    efficiency = double(c_v.at(k_count_nue_cc) + c_v.at(k_count_nue_cc_mixed)) / double(tot_true_infv_nues);
+    purity     = double(c_v.at(k_count_nue_cc) + c_v.at(k_count_nue_cc_mixed)) / double(sum_mc_dirt_ext);
+    std::cout << " Efficiency       : " << "( " << c_v.at(k_count_nue_cc) + c_v.at(k_count_nue_cc_mixed) << " / " << tot_true_infv_nues << " ) = " << efficiency << std::endl;
+    std::cout << " Purity           : " << "( " << c_v.at(k_count_nue_cc) + c_v.at(k_count_nue_cc_mixed) << " / " << sum_mc_dirt_ext           << " ) = " << purity << std::endl;
     std::cout << "------------------------------------------------" << std::endl;
     std::cout << " Total Nue Candidates in data : " << c_v.at(k_count_data) << std::endl;
     std::cout << "------------------------------------------------" << std::endl;

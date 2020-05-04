@@ -160,6 +160,7 @@ class histogram_helper{
         k_reco_closestNuCosmicDist,                                             // Distance between the neutrino vertex and (closest?) cosmic trajectory tagged from CRT
         k_reco_trk_len,                                                         // Length of the longest track
         k_reco_nu_e,                                                            // Reconstructed Neutrino Energy
+        k_reco_contained_fraction,                                              // Ratio of PFP hits in FV to the slice
         k_TH1D_MAX
     };
 

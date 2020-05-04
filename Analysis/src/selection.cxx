@@ -400,7 +400,7 @@ void selection::MakeSelection(){
         
         if (verbose == 1) {
             _util.PrintInfo(counter_v.at(p), intime_scale_factor, mc_scale_factor, dirt_scale_factor,
-                            _util.cut_dirs.at(p), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc),
+                            _util.cut_dirs.at(p), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc) + counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc_mixed),
                              efficiency, purity);
             
             // Fill the efficiency and purity for the output mc tree file
@@ -521,6 +521,15 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_cluster_frac, counter_v );
 
     // *************************************************************************
+    // Slice Contained Fraction ------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.contained_frac(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_contained_frac) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_contained_frac, counter_v );
+
+    // *************************************************************************
     // Shower Score ------------------------------------------------------------
     // *************************************************************************
     pass = _scuts.shower_score(SC);
@@ -528,15 +537,6 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shower_score, counter_v );
-
-    // *************************************************************************
-    // Shower Contained --------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.shr_contained(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_shower_contained) = pass;
-    if(!pass) return false; // Failed the cut!
-    
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shower_contained, counter_v );
 
     // *************************************************************************
     // Michel Rejection --------------------------------------------------------
@@ -609,8 +609,8 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // if(!pass) return false; // Failed the cut!
     
     // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_u, counter_v );
-    
-    // *************************************************************************
+
+    // ************************************************************************n*
     return true;
 
 }
@@ -683,10 +683,10 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC, weight);
 
     // For the last cut we fill the tree  or the first cut and nue_cc (generated and unselected)
-    if ( (cut_index == _util.k_cuts_MAX - 1) || (cut_index == _util.k_unselected && classification.second == _util.k_nue_cc) ){
+    if ( (cut_index == _util.k_cuts_MAX - 1) || (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nue_cc_mixed) ) ){
 
         // This is a generated event, but unselected
-        if (cut_index == _util.k_unselected && classification.second == _util.k_nue_cc){
+        if (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nue_cc_mixed )){
             _thelper.at(type).FillVars(SC, classification, true, weight, reco_nu_e);
         }
         else {

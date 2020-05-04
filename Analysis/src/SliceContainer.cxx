@@ -581,11 +581,10 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
             // Nue CC
             else if (nu_pdg == 12 || nu_pdg == -12){
 
-                // Check if the neutrino has a purity > 50%
-                if (nu_purity_from_pfp > 0.5) return std::make_pair("nue_cc",_util.k_nue_cc);
-               
-                // Classify as a cosmic
-                else return std::make_pair("cosmic",_util.k_cosmic);
+                
+                if (nu_purity_from_pfp >= 0.6) return std::make_pair("nue_cc",_util.k_nue_cc); // purity > 60% so pure nue
+                else if (nu_purity_from_pfp < 0.6 && nu_purity_from_pfp > 0.2) return std::make_pair("nue_cc_mixed",_util.k_nue_cc_mixed); // purity from 20 to 60% so mixed
+                else return std::make_pair("cosmic",_util.k_cosmic); // Classify as a cosmic with very low purity
 
             }
             // Unknown Neutrino Type

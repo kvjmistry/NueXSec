@@ -68,8 +68,8 @@ class selection_cuts{
     // Impact parameter of object thats not a pfp to the slice
     bool shr_cosmic_IP(SliceContainer &SC);
     // -------------------------------------------------------------------------
-    // Is the leading shower contained
-    bool shr_contained(SliceContainer &SC);
+    // Slice Contained Fraction
+    bool contained_frac(SliceContainer &SC);
     // -------------------------------------------------------------------------
     // Shower Moliere Average
     bool shr_moliere_avg(SliceContainer &SC);

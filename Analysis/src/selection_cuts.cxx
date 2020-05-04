@@ -147,8 +147,8 @@ bool selection_cuts::shr_cosmic_IP(SliceContainer &SC){
     else return false;                     // fail
 }
 // -----------------------------------------------------------------------------
-bool selection_cuts::shr_contained(SliceContainer &SC){
-    if (SC.n_showers_contained >= 1 ) return true;    // pass 
+bool selection_cuts::contained_frac(SliceContainer &SC){
+    if (SC.contained_fraction >= 0.6 ) return true;    // pass 
     else return false;                     // fail
 }
 // -----------------------------------------------------------------------------

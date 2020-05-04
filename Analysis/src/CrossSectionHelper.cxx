@@ -83,13 +83,13 @@ void CrossSectionHelper::LoopEvents(){
         tree->GetEntry(ievent); 
 
         // Signal event
-        if (*classifcation == "nue_cc" && gen == false) {
+        if ((*classifcation == "nue_cc" || *classifcation == "nue_cc_mixed") && gen == false) {
             n_sel+=weight;
             n_sig+=weight;
         }
 
         // Background event
-        if (*classifcation == "nue_cc_mixed" || *classifcation == "nu_out_fv"  || *classifcation == "cosmic" ||
+        if ( *classifcation == "nu_out_fv"  || *classifcation == "cosmic" ||
            *classifcation == "numu_cc" || *classifcation == "numu_cc_pi0" || *classifcation == "nc" || 
            *classifcation == "nc_pi0" || *classifcation == "unmatched"){
             n_bkg+=weight;
@@ -97,7 +97,7 @@ void CrossSectionHelper::LoopEvents(){
         }
         
         // Generated event
-        if (*classifcation == "nue_cc" && gen == true) {
+        if ( (*classifcation == "nue_cc"|| *classifcation == "nue_cc_mixed" ) && gen == true) {
             n_gen+=weight;
         }
 
