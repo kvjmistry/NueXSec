@@ -29,9 +29,6 @@ int main(int argc, char *argv[]){
     int num_events{-1};
     int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
     int weight{1};  // level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only
-
-    // Configurations from main.h will be stored in here and passed to the selection
-    std::vector<double> config;
     
     // Class instances
     xsecSelection::selection  _selection_instance;
@@ -216,7 +213,7 @@ int main(int argc, char *argv[]){
                                                       mc_tree_file_name_out, _utility, using_slim_version, num_events, run_period, verbose, weight );
     
     // Run the make histogram function
-    if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, config, weight, area_norm, _utility);
+    if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, weight, area_norm, _utility, variation);
 
     // Run the calculate cross section function
     if (calc_cross_sec) _xsec.Initialise(run_period, tree_file_name, _utility);

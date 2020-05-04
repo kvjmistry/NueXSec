@@ -7,7 +7,7 @@ histogram_plotter::~histogram_plotter(){
     // f_nuexsec->Close();
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config, int weight_cfg, bool _area_norm, utility _utility){
+void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *run_period, int weight_cfg, bool _area_norm, utility _utility, const char * variation){
 
     std::cout << "Creating histograms and making plots" << std::endl;
     
@@ -34,7 +34,9 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
         std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;
         exit(1);
     }
-    
+
+    // Set the variation mode
+    if (std::string(variation) != "empty") std::cout << "Using varmode for detector variation:\t " << variation << std::endl;
 
     std::cout << "\033[0;32m-------------------------------" << std::endl;
     std::cout << "Scale Factors:\n" <<
@@ -48,97 +50,98 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
     // Loop over the cuts and plot histograms by plot type
     for (unsigned int i = 0 ; i < _util.k_cuts_MAX; i++){
         
-        // Create a set of strings for creating a dynamic directory
-        // Directory structure that is created will take the form plots/<cut>/
-        std::string a = "if [ ! -d \"plots/";
-        std::string b = "run" + std::string(run_period) + "/cuts/" + _util.cut_dirs.at(i);
-        std::string c = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
-        std::string d = "run" + std::string(run_period) + "/cuts/" + _util.cut_dirs.at(i);
-        std::string e = "; fi";
-        std::string command = a + b + c + d + e ;
-        system(command.c_str()); 
-
+        // Create the directories
+        if (std::string(variation) == "empty") CreateDirectory("/cuts/" + _util.cut_dirs.at(i), run_period);
+        else CreateDirectory("/detvar/" + std::string(variation) + "/cuts/" + _util.cut_dirs.at(i), run_period);
+        
         // Call the Make stack function for all the plots we want
-        CallMakeStack(run_period, i, Data_POT);
+        CallMakeStack(run_period, i, Data_POT, variation);
         
     }
 
-    // Create a set of strings for creating a dynamic directory
-    // Directory structure that is created will take the form plots/<cut>/
-    CreateDirectory("Flash", run_period);
+    // Only do this stuff for the CV -- unless we really want these plots for each detvar, then we need to change the file paths!!
+    if (std::string(variation) == "empty"){
 
-    // Flash time plots
-    MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time.pdf", run_period), "h_flash_time");
-    MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time_sid1.pdf", run_period), "h_flash_time_sid1"); // Slice ID 1
-    MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time_sid0.pdf", run_period), "h_flash_time_sid0"); // Slice ID 0
+        // Create a set of strings for creating a dynamic directory
+        // Directory structure that is created will take the form plots/<cut>/
+        CreateDirectory("Flash", run_period);
 
-    // Flash PE plots
-    MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_pe.pdf", run_period), "h_flash_pe");
-    MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_pe_sid1.pdf", run_period), "h_flash_pe_sid1"); // Slice ID 1
-    MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_pe_sid0.pdf", run_period), "h_flash_pe_sid0"); // Slice ID 0
+        // Flash time plots
+        MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time.pdf", run_period), "h_flash_time");
+        MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time_sid1.pdf", run_period), "h_flash_time_sid1"); // Slice ID 1
+        MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time_sid0.pdf", run_period), "h_flash_time_sid0"); // Slice ID 0
 
-    // On beam minus off beam plots
+        // Flash PE plots
+        MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_pe.pdf", run_period), "h_flash_pe");
+        MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_pe_sid1.pdf", run_period), "h_flash_pe_sid1"); // Slice ID 1
+        MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_pe_sid0.pdf", run_period), "h_flash_pe_sid0"); // Slice ID 0
 
-    // Flash time
-    MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_time_OMO.pdf", run_period), "h_flash_time");
-    MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_time_OMO_sid1.pdf", run_period), "h_flash_time_sid1"); // Slice ID 1
-    MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_time_OMO_sid0.pdf", run_period), "h_flash_time_sid0"); // Slice ID 0
+        // On beam minus off beam plots
 
-    // Flash PE plots
-    MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_pe_OMO.pdf", run_period), "h_flash_pe");
-    MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_pe_OMO_sid1.pdf", run_period), "h_flash_pe_sid1"); // Slice ID 1
-    MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_pe_OMO_sid0.pdf", run_period), "h_flash_pe_sid0"); // Slice ID 0
+        // Flash time
+        MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_time_OMO.pdf", run_period), "h_flash_time");
+        MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_time_OMO_sid1.pdf", run_period), "h_flash_time_sid1"); // Slice ID 1
+        MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_time_OMO_sid0.pdf", run_period), "h_flash_time_sid0"); // Slice ID 0
+
+        // Flash PE plots
+        MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_pe_OMO.pdf", run_period), "h_flash_pe");
+        MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_pe_OMO_sid1.pdf", run_period), "h_flash_pe_sid1"); // Slice ID 1
+        MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_pe_OMO_sid0.pdf", run_period), "h_flash_pe_sid0"); // Slice ID 0
 
 
-    // Create the Efficiency Folder
-    CreateDirectory("Efficiency", run_period);
+        // Create the Efficiency Folder
+        CreateDirectory("Efficiency", run_period);
 
-    MakeEfficiencyPlot(Form("plots/run%s/Efficiency/Integrated_Efficiency_Purity.pdf", run_period), run_period);
+        MakeEfficiencyPlot(Form("plots/run%s/Efficiency/Integrated_Efficiency_Purity.pdf", run_period), run_period);
 
-    MakeEfficiencyPlotByCut(Form("plots/run%s/Efficiency/TEff.pdf", run_period), run_period);
+        MakeEfficiencyPlotByCut(Form("plots/run%s/Efficiency/TEff.pdf", run_period), run_period);
 
-    // Create the interaction folder
-    CreateDirectory("Interaction", run_period);
+        // Create the interaction folder
+        CreateDirectory("Interaction", run_period);
 
-    // Interaction Plot
-    MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction.pdf", run_period), run_period);
+        // Interaction Plot
+        MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction.pdf", run_period), run_period);
 
-    // Create the 2D folder
-    CreateDirectory("2D", run_period);
+        // Create the 2D folder
+        CreateDirectory("2D", run_period);
 
-    Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_shr_dist.pdf", run_period), "h_reco_shr_dEdx_shr_dist", run_period);
+        Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_shr_dist.pdf", run_period), "h_reco_shr_dEdx_shr_dist", run_period);
 
-    // Create the Truth folder
-    CreateDirectory("Truth", run_period);
+        // Create the Truth folder
+        CreateDirectory("Truth", run_period);
+        
+        // Make 1D Histtograms
+        // Save1DHists(Form("plots/run%s/Truth/true_nue_theta.pdf", run_period), "h_true_nue_theta", run_period);
+        Save1DHists(Form("plots/run%s/Truth/true_nue_phi.pdf",   run_period), "h_true_nue_phi",   run_period);
+        Save1DHists(Form("plots/run%s/Truth/true_nue_angle.pdf", run_period), "h_true_nue_angle", run_period);
+        Save1DHists(Form("plots/run%s/Truth/true_nue_px.pdf",    run_period), "h_true_nue_px",    run_period);
+        Save1DHists(Form("plots/run%s/Truth/true_nue_py.pdf",    run_period), "h_true_nue_py",    run_period);
+        Save1DHists(Form("plots/run%s/Truth/true_nue_pz.pdf",    run_period), "h_true_nue_pz",    run_period);
+        Save1DHists(Form("plots/run%s/Truth/true_nue_e.pdf",     run_period), "h_true_nue_e",     run_period);
+        Save1DHists(Form("plots/run%s/Truth/true_nue_p.pdf",     run_period), "h_true_nue_p",     run_period);
+        Save1DHists(Form("plots/run%s/Truth/true_vtx_x.pdf",     run_period), "h_true_vtx_x",     run_period);
+        Save1DHists(Form("plots/run%s/Truth/true_vtx_y.pdf",     run_period), "h_true_vtx_y",     run_period);
+        Save1DHists(Form("plots/run%s/Truth/true_vtx_z.pdf",     run_period), "h_true_vtx_z",     run_period);
+        Save1DHists(Form("plots/run%s/Truth/true_vtx_x_sce.pdf", run_period), "h_true_vtx_x_sce", run_period);
+        Save1DHists(Form("plots/run%s/Truth/true_vtx_y_sce.pdf", run_period), "h_true_vtx_y_sce", run_period);
+        Save1DHists(Form("plots/run%s/Truth/true_vtx_z_sce.pdf", run_period), "h_true_vtx_z_sce", run_period);
+        
+
+        // Make the 2D histograms
+        Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta.pdf",          run_period), "h_true_nue_phi_theta",          run_period);
+        Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_theta.pdf",       run_period), "h_true_nue_energy_theta",       run_period);
+        Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_phi.pdf",         run_period), "h_true_nue_energy_phi",         run_period);
+        Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_angle.pdf",       run_period), "h_true_nue_energy_angle",       run_period);
+        Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y.pdf",            run_period), "h_true_nue_vtx_z_y",            run_period);
+        Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_sce.pdf",        run_period), "h_true_nue_vtx_z_y_sce",        run_period);
+        Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E.pdf",     run_period), "h_true_elec_E_reco_elec_E",     run_period);
+        Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_x_reco_nu_vtx_x.pdf", run_period), "h_true_nu_vtx_x_reco_nu_vtx_x", run_period);
+        Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_y_reco_nu_vtx_y.pdf", run_period), "h_true_nu_vtx_y_reco_nu_vtx_y", run_period);
+        Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_z_reco_nu_vtx_z.pdf", run_period), "h_true_nu_vtx_z_reco_nu_vtx_z", run_period);
+
+    }
+
     
-    // Make 1D Histtograms
-    // Save1DHists(Form("plots/run%s/Truth/true_nue_theta.pdf", run_period), "h_true_nue_theta", run_period);
-    Save1DHists(Form("plots/run%s/Truth/true_nue_phi.pdf",   run_period), "h_true_nue_phi",   run_period);
-    Save1DHists(Form("plots/run%s/Truth/true_nue_angle.pdf", run_period), "h_true_nue_angle", run_period);
-    Save1DHists(Form("plots/run%s/Truth/true_nue_px.pdf",    run_period), "h_true_nue_px",    run_period);
-    Save1DHists(Form("plots/run%s/Truth/true_nue_py.pdf",    run_period), "h_true_nue_py",    run_period);
-    Save1DHists(Form("plots/run%s/Truth/true_nue_pz.pdf",    run_period), "h_true_nue_pz",    run_period);
-    Save1DHists(Form("plots/run%s/Truth/true_nue_e.pdf",     run_period), "h_true_nue_e",     run_period);
-    Save1DHists(Form("plots/run%s/Truth/true_nue_p.pdf",     run_period), "h_true_nue_p",     run_period);
-    Save1DHists(Form("plots/run%s/Truth/true_vtx_x.pdf",     run_period), "h_true_vtx_x",     run_period);
-    Save1DHists(Form("plots/run%s/Truth/true_vtx_y.pdf",     run_period), "h_true_vtx_y",     run_period);
-    Save1DHists(Form("plots/run%s/Truth/true_vtx_z.pdf",     run_period), "h_true_vtx_z",     run_period);
-    Save1DHists(Form("plots/run%s/Truth/true_vtx_x_sce.pdf", run_period), "h_true_vtx_x_sce", run_period);
-    Save1DHists(Form("plots/run%s/Truth/true_vtx_y_sce.pdf", run_period), "h_true_vtx_y_sce", run_period);
-    Save1DHists(Form("plots/run%s/Truth/true_vtx_z_sce.pdf", run_period), "h_true_vtx_z_sce", run_period);
-    
-
-    // Make the 2D histograms
-    Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta.pdf",          run_period), "h_true_nue_phi_theta",          run_period);
-    Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_theta.pdf",       run_period), "h_true_nue_energy_theta",       run_period);
-    Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_phi.pdf",         run_period), "h_true_nue_energy_phi",         run_period);
-    Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_angle.pdf",       run_period), "h_true_nue_energy_angle",       run_period);
-    Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y.pdf",            run_period), "h_true_nue_vtx_z_y",            run_period);
-    Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_sce.pdf",        run_period), "h_true_nue_vtx_z_y_sce",        run_period);
-    Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E.pdf",     run_period), "h_true_elec_E_reco_elec_E",     run_period);
-    Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_x_reco_nu_vtx_x.pdf", run_period), "h_true_nu_vtx_x_reco_nu_vtx_x", run_period);
-    Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_y_reco_nu_vtx_y.pdf", run_period), "h_true_nu_vtx_y_reco_nu_vtx_y", run_period);
-    Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_z_reco_nu_vtx_z.pdf", run_period), "h_true_nu_vtx_z_reco_nu_vtx_z", run_period);
 
 
 }
@@ -567,9 +570,11 @@ void histogram_plotter::SetLegend(std::vector<TH1D*> hist, TLegend *leg_stack, s
 }
 // -----------------------------------------------------------------------------
 void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, bool _area_norm, bool logy, double y_scale_factor, const char* x_axis_name,
-                                     const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, double Data_POT, const char* print_name, bool override_data_mc_comparison, std::string plotmode ){
+                                     const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, double Data_POT,
+                                    const char* print_name, bool override_data_mc_comparison, std::string plotmode, bool plotvar, const char * variation, const char *run_period ){
 
-    
+    // Check if we want this plot for variations
+    if (!plotvar && std::string(variation) != "empty" ) return;
     
     std::vector<TH1D*>  hist;                      // The vector of histograms from the file for the plot
     std::vector<double> hist_integrals;            // The integrals of all the histograms
@@ -838,7 +843,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         h_ratio->GetYaxis()->CenterTitle();
         h_ratio->GetYaxis()->SetTitleOffset(1.5);
         h_ratio->SetTitle(" ");
-        h_ratio->Draw("E,same");
+        h_ratio->Draw("E0,same");
 
         // Draw the error hist 
         h_ratio_error = (TH1D*) h_error_hist->Clone("h_ratio_error");
@@ -883,12 +888,13 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         Draw_WeightLabels(c);
     }
     
-    c->Print(print_name);
+    if (std::string(variation) == "empty") c->Print( Form("plots/run%s/%s", run_period, print_name) );
+    else c->Print( Form("plots/run%s/detvar/%s/%s", run_period, variation, print_name));
 
 
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, double Data_POT){
+void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, double Data_POT, const char* variation){
 
     // MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, const char* x_axis_name, double y_scale_factor, 
     //                             const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, const char* print_name, bool override_data_mc_comparison )
@@ -896,334 +902,334 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
     // Reco X
     MakeStack("h_reco_vtx_x",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Reco Vertex X [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_vtx_x.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_vtx_x.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
     
     // Reco Y
     MakeStack("h_reco_vtx_y",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Reco Vertex Y [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_vtx_y.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_vtx_y.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Reco Z
     MakeStack("h_reco_vtx_z",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Reco Vertex Z [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_vtx_z.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_vtx_z.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Reco X SCE
     MakeStack("h_reco_vtx_x_sce",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Reco Vertex X (Space Charge Corr) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_vtx_x_sce.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_vtx_x_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period);
     
     // Reco Y SCE
     MakeStack("h_reco_vtx_y_sce",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Reco Vertex Y (Space Charge Corr) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_vtx_y_sce.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_vtx_y_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period);
 
     // Reco Z SCE
     MakeStack("h_reco_vtx_z_sce",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Reco Vertex Z (Space Charge Corr) [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_vtx_z_sce.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_vtx_z_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period);
 
     // dEdx cali U Plane
     MakeStack("h_reco_dEdx_cali_u_plane",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "U Plane dEdx (calibrated) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_dEdx_cali_u_plane.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_dEdx_cali_u_plane.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // dEdx cali V Plane
     MakeStack("h_reco_dEdx_cali_v_plane",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "V Plane dEdx (calibrated) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_dEdx_cali_v_plane.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_dEdx_cali_v_plane.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
 
     // dEdx cali Y Plane
     MakeStack("h_reco_dEdx_cali_y_plane",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Collection Plane dEdx (calibrated) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_dEdx_cali_y_plane.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_dEdx_cali_y_plane.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Leading Shower Momentum
     MakeStack("h_reco_leading_mom", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm, false, 1.0, "Leading Shower Momentum [GeV/c]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_leading_mom.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_leading_mom.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period);
 
     // 2D distance shower vertex to reco nu vertex
     MakeStack("h_reco_shower_to_vtx_dist", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Shower to Vertex Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shower_to_vtx_dist.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shower_to_vtx_dist.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
 
     // Leading Shower hits in all planes -- need to redefine
     MakeStack("h_reco_shr_hits_max", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Leading Shower Hits All Planes", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_hits_max.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_hits_max.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Number of Tracks Contained
     MakeStack("h_reco_n_track_contained", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Number of Tracks Contained", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_n_track_contained.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_n_track_contained.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Number of Showers Contained
     MakeStack("h_reco_n_shower_contained", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Number of Showers Contained", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_n_shower_contained.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_n_shower_contained.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Leading shower phi
     MakeStack("h_reco_leading_shower_phi", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Leading Shower Phi [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_leading_shower_phi.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_leading_shower_phi.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period);
 
     // Leading shower theta
     MakeStack("h_reco_leading_shower_theta", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Leading Shower Theta [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_leading_shower_theta.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_leading_shower_theta.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period);
 
     // Leading shower cos theta
     MakeStack("h_reco_leading_shower_cos_theta", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Leading Shower Cos(#theta)", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_leading_shower_cos_theta.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_leading_shower_cos_theta.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period);
 
     // Leading shower multiplicity
     MakeStack("h_reco_shower_multiplicity", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  true, 1.0, "Shower Multiplicty", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shower_multiplicity.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shower_multiplicity.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period);
 
     // Leading track multiplicity
     MakeStack("h_reco_track_multiplicity", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Track Multiplicty", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_track_multiplicity.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_track_multiplicity.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period);
 
     // Topological Score
     MakeStack("h_reco_topological_score", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  true, 1.0, "Topological Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_topological_score.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_topological_score.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period);
 
     // Track shower dist
     MakeStack("h_reco_track_shower_dist", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Longest Track Leading Shower Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_track_shower_dist.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_track_shower_dist.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
     
     // Track shower angle
     MakeStack("h_reco_track_shower_angle", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  true, 1.0, "Longest Track Leading Shower Angle [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_track_shower_angle.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_track_shower_angle.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Ratio hits from showers to slice
     MakeStack("h_reco_hits_ratio", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Hit Ratio of all Showers and the Slice", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_hits_ratio.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_hits_ratio.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
     
     // Shower score
     MakeStack("h_reco_shower_score", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Shower Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shower_score.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shower_score.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Track score
     MakeStack("h_reco_track_score", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Track Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_track_score.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_track_score.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Calibrated energy of all the showers
     MakeStack("h_reco_shower_energy_tot_cali", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Total Calibrated Energy of all Showers [GeV]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shower_energy_tot_cali.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shower_energy_tot_cali.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Total number of hits for all showers
     MakeStack("h_reco_shr_hits_tot", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Total Num of hits for all Showers", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_hits_tot.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_hits_tot.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     
     // Total number of hits for the all showers in the collection plane
     MakeStack("h_reco_shr_hits_y_tot", _util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Total Num of hits for all Showers in Collection Plane", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_hits_y_tot.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_hits_y_tot.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // dEdx Trackfit first 2cm U plane
     MakeStack("h_reco_shr_trkfit_2cm_dEdx_u",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Shower dEdx First 2cm Fit U Plane [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_trkfit_2cm_dEdx_u.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_trkfit_2cm_dEdx_u.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // dEdx Trackfit first 2cm V plane
     MakeStack("h_reco_shr_trkfit_2cm_dEdx_v",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Shower dEdx First 2cm Fit V Plane [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_trkfit_2cm_dEdx_v.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_trkfit_2cm_dEdx_v.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // dEdx Trackfit first 2cm y Plane
     MakeStack("h_reco_shr_trkfit_2cm_dEdx_y",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Shower dEdx First 2cm Fit Collection Plane [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_trkfit_2cm_dEdx_y.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_trkfit_2cm_dEdx_y.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
 
     // dEdx Fit 1x4cm box skip 5mm U Plane
     MakeStack("h_reco_shr_trkfit_gap05_dEdx_u",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Shower dEdx 1x4cm Box Fit U Plane (skip first 5mm) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_trkfit_gap05_dEdx_u.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_trkfit_gap05_dEdx_u.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // dEdx Fit 1x4cm box skip 5mm V Plane
     MakeStack("h_reco_shr_trkfit_gap05_dEdx_v",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Shower dEdx 1x4cm Box Fit V Plane (skip first 5mm) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_trkfit_gap05_dEdx_v.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_trkfit_gap05_dEdx_v.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // dEdx Fit 1x4cm box skip 5mm y Plane
     MakeStack("h_reco_shr_trkfit_gap05_dEdx_y",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Shower dEdx 1x4cm Box Fit Coll. Plane (skip first 5mm) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_trkfit_gap05_dEdx_y.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_trkfit_gap05_dEdx_y.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // dEdx Fit 1x4cm box skip 10mm U Plane
     MakeStack("h_reco_shr_trkfit_gap10_dEdx_u",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Shower dEdx 1x4cm Box Fit U Plane (skip first 10mm) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_trkfit_gap10_dEdx_u.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_trkfit_gap10_dEdx_u.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // dEdx Fit 1x4cm box skip 10mm V Plane
     MakeStack("h_reco_shr_trkfit_gap10_dEdx_v",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Shower dEdx 1x4cm Box Fit V Plane (skip first 10mm) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_trkfit_gap10_dEdx_v.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_trkfit_gap10_dEdx_v.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // dEdx Fit 1x4cm box skip 5mm y Plane
     MakeStack("h_reco_shr_trkfit_gap10_dEdx_y",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Shower dEdx 1x4cm Box Fit Coll. Plane (skip first 10mm) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_trkfit_gap10_dEdx_y.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_trkfit_gap10_dEdx_y.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Optical Filter Beam
     MakeStack("h_reco_opfilter_beam",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  true, 1.0, "Common Optical Filter PE [PE]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_opfilter_beam.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_opfilter_beam.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Optical Filter Veto
     MakeStack("h_reco_opfilter_veto",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  true, 1.0, "Common Optical Filter Michel Veto [PE]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_opfilter_veto.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_opfilter_veto.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Software trigger
     MakeStack("h_reco_softwaretrig",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  true, 1.0, "Software Trigger", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_softwaretrig.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), true, "classifications" );
+                        Form("cuts/%s/reco_softwaretrig.pdf", _util.cut_dirs.at(cut_index).c_str()), true, "classifications", false, variation, run_period);
 
     // Slice ID
     MakeStack("h_reco_nslice",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  true, 1.0, "Pandora Slice ID", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_nslice.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_nslice.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Slice Cluster Fraction
     MakeStack("h_reco_slclustfrac",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Slice Cluster Fraction", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_slclustfrac.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_slclustfrac.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Cosmic Inpact Parameter
     MakeStack("h_reco_cosmicIP",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Pandora Cosmic Impact Parameter [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_cosmicIP.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_cosmicIP.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Cosmic Inpact Parameter in 3D
     MakeStack("h_reco_CosmicIPAll3D",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Pandora Cosmic Impact Parameter 3D [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_CosmicIPAll3D.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_CosmicIPAll3D.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // 3D direction between closest pfp not in the neutrino slice
     MakeStack("h_reco_CosmicDirAll3D",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "3D Pandora Cosmic Impact Direction", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_CosmicDirAll3D.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_CosmicDirAll3D.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Shower dEdx with the track fitter u plane
     MakeStack("h_reco_shr_tkfit_dedx_u",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "U Plane dEdx (track fitter) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_tkfit_dedx_u.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_tkfit_dedx_u.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Shower dEdx with the track fitter v plane
     MakeStack("h_reco_shr_tkfit_dedx_v",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "V Plane dEdx (track fitter) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_tkfit_dedx_v.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_tkfit_dedx_v.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
 
     // Shower dEdx with the track fitter y plane
     MakeStack("h_reco_shr_tkfit_dedx_y",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Collection Plane dEdx (track fitter) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_tkfit_dedx_y.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_tkfit_dedx_y.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period);
 
     // Shower dEdx with the track fitter y plane good theta
     MakeStack("h_reco_shr_tkfit_dedx_y_good_theta",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Collection Plane dEdx (track fitter), Good Theta [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_tkfit_dedx_y_good_theta.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_tkfit_dedx_y_good_theta.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Shower dEdx with the track fitter y plane bad theta
     MakeStack("h_reco_shr_tkfit_dedx_y_bad_theta",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Collection Plane dEdx (track fitter), Bad Theta [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_tkfit_dedx_y_bad_theta.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_tkfit_dedx_y_bad_theta.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Shower dEdx with the track fitter v plane bad theta
     MakeStack("h_reco_shr_tkfit_dedx_v_bad_theta",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "V Plane dEdx (track fitter), Bad Theta [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_tkfit_dedx_v_bad_theta.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_tkfit_dedx_v_bad_theta.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Shower dEdx with the track fitter u plane bad theta
     MakeStack("h_reco_shr_tkfit_dedx_u_bad_theta",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "U Plane dEdx (track fitter), Bad Theta [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_tkfit_dedx_u_bad_theta.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shr_tkfit_dedx_u_bad_theta.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
 
     // Shower Flash Time
     MakeStack("h_reco_flash_time",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Flash Time [#mus]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_flash_time.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_flash_time.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period);
 
     // Shower Flash PE
     MakeStack("h_reco_flash_pe",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Flash PE [PE]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_flash_pe.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_flash_pe.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Shower Subcluster All Planes
     MakeStack("h_reco_shrsubclusters",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Shower Sub Cluster All Planes", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shrsubclusters.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shrsubclusters.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Shower Moliere Average
     MakeStack("h_reco_shrmoliereavg",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Shower Moliere Average [deg]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shrmoliereavg.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shrmoliereavg.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
     
     // Shower Moliere RMS
     MakeStack("h_reco_shrmoliererms",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Shower Moliere RMS [deg]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shrmoliererms.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shrmoliererms.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Fraction of spacepoints in 1cm cylinder (2nd half of shr)
     MakeStack("h_reco_CylFrac2h_1cm",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Fraction of spacepoints in 1cm cylinder (2nd half of shr)", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_CylFrac2h_1cm.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_CylFrac2h_1cm.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Median Spread of SpacePoints (second half of shower)
     MakeStack("h_reco_DeltaRMS2h",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Median Spread of SpacePoints (second half of shower)", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_DeltaRMS2h.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_DeltaRMS2h.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Median of 1st component of shr PCA (5cm window)
     MakeStack("h_reco_shrPCA1CMed_5cm",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Median of 1st component of shr PCA (5cm window)", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shrPCA1CMed_5cm.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shrPCA1CMed_5cm.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Median of 1st component of shr PCA (5cm window)
     MakeStack("h_reco_shrMCSMom",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Leading Shower MCS Momentum [MeV/c]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shrMCSMom.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_shrMCSMom.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Distance from closest CRT tagged cosmic to neutrino vertex
     MakeStack("h_reco_closestNuCosmicDist",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Closest CRT Tagged Cosmic to #nu Vertex Distance [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_closestNuCosmicDist.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_closestNuCosmicDist.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Longest Track Length
     MakeStack("h_reco_trk_len",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Longest Track Length [cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_trk_len.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_trk_len.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
     // Reco Neutrino Energy
     MakeStack("h_reco_nu_e",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Reconstructed Neutrino Energy [GeV]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_nu_e.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_nu_e.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period);
 
 
     // Contained Fraction
     MakeStack("h_reco_contained_fraction",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Contained Fraction (PFP hits in FV / hits in slice)", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_contained_fraction.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "classifications" );
+                        Form("cuts/%s/reco_contained_fraction.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period);
 
 
     // Stacked Histograms by particle type
@@ -1231,12 +1237,12 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
     // dEdx cali Y Plane
     MakeStack("h_reco_dEdx_cali_y_plane_par",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Collection Plane dEdx (calibrated) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_dEdx_cali_y_plane_par.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "particle" );
+                        Form("cuts/%s/reco_dEdx_cali_y_plane_par.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "particle", false, variation, run_period );
 
     // dEdx cali Y Plane using trackfits
     MakeStack("h_reco_shr_tkfit_dedx_y_par",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Collection Plane dEdx (track fitter) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("plots/run%s/cuts/%s/reco_shr_tkfit_dedx_y_par.pdf", run_period, _util.cut_dirs.at(cut_index).c_str()), false, "particle" );
+                        Form("cuts/%s/reco_shr_tkfit_dedx_y_par.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "particle", true, variation, run_period );
 
 
 }

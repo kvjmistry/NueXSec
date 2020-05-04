@@ -27,16 +27,18 @@ class histogram_plotter{
     bool weight_ppfx = true; // Apply ppfx cv weight
     bool area_norm   = false;  // Decide if to area normalse the histograms
 
+
     // -------------------------------------------------------------------------
     // Main function call to control this class
-    void MakeHistograms(const char * hist_file_name, const char *run_period, const std::vector<double> _config, int weight_cfg, bool _area_norm, utility _utility);
+    void MakeHistograms(const char * hist_file_name, const char *run_period, int weight_cfg, bool _area_norm, utility _utility, const char* variation);
     // -------------------------------------------------------------------------
     // Initalise the file input
     void Initalise(const char *hist_file_name, const char* _run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor, int weight_cfg);
     // -------------------------------------------------------------------------
     // Function to make a stacked histogram and save as a pdf
     void MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, double y_scale_factor, const char* x_axis_name,
-                                     const double leg_x1, const double leg_x2, const double leg_y1, double Data_POT, const double leg_y2, const char* print_name, bool override_data_mc_comparison, std::string plotmode );
+                                     const double leg_x1, const double leg_x2, const double leg_y1, double Data_POT, const double leg_y2,
+                                     const char* print_name, bool override_data_mc_comparison, std::string plotmode, bool plotvar, const char * variation, const char *run_period );
     // -------------------------------------------------------------------------
     // Calculates the chi2
     // Returns reduced chi2, num mc+ext scaled to data POT, num data, num degrees of freedom, p value in vector respectively
@@ -76,7 +78,7 @@ class histogram_plotter{
     void SetLegend(std::vector<TH1D*> hist, TLegend *leg_stack, std::vector<double> hist_integrals, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt, std::string plotmode );
     // -------------------------------------------------------------------------
     // Call make stacked histograms
-    void CallMakeStack(const char *run_period, int cut_index, double Data_POT);
+    void CallMakeStack(const char *run_period, int cut_index, double Data_POT, const char *variation);
     // -------------------------------------------------------------------------
     void MakeFlashPlot(double Data_POT, const char* print_name, std::string histname);
     // -------------------------------------------------------------------------
