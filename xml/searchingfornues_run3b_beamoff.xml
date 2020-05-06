@@ -8,7 +8,10 @@
 <!ENTITY user "kmistry">
 <!ENTITY name "searchingfornues_run3b_beamoff_offset1_mcc9_v33">
 <!ENTITY indef "numi_uboone_run3b_beamoff_offset1_mcc9_reco2_v08_00_00_28_sample0_all_v2">
-<!ENTITY version "v1">
+<!ENTITY version "v2">
+
+<!-- v2 includes common optical filter-->
+
 ]>
 
 <job>
@@ -33,6 +36,7 @@
 
   <!-- Project stages -->
   <stage name="ntuple">
+    <fcl>reco_uboone_mcc9_8_driver_data_ext_numi_optical_updated.fcl</fcl>
     <fcl>run_neutrinoselectionfilter_run3_dataOFF_cc0pinp.fcl</fcl>
     <datafiletypes>root,pndr</datafiletypes>
     <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</outdir>
@@ -41,11 +45,11 @@
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <inputdef>&indef;</inputdef>
     <maxfilesperjob>10</maxfilesperjob>
-    <numjobs>378</numjobs>
+    <numjobs>172</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <disk>25GB</disk>
-    <schema>root</schema>
+    <schema>gsiftp</schema>
     <jobsub>--expected-lifetime=12h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
     <jobsub_start> --expected-lifetime=short</jobsub_start>
     <blacklist>Lancaster</blacklist>

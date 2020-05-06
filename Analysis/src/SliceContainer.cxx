@@ -573,6 +573,9 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
 
             // NuMu CC
             if (nu_pdg == 14 || nu_pdg == -14){
+
+                // Purity is low so return cosmic
+                if (nu_purity_from_pfp < 0.6) return std::make_pair("cosmic",_util.k_cosmic);
                 
                 if (npi0 > 0) return std::make_pair("numu_cc_pi0", _util.k_numu_cc_pi0); // has a pi0
                 else return std::make_pair("numu_cc",_util.k_numu_cc);
@@ -596,6 +599,10 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
         }
         // Neutral Current
         else {
+
+            // Purity is low so return cosmic
+            if (nu_purity_from_pfp < 0.6) return std::make_pair("cosmic",_util.k_cosmic);
+
             if (npi0 > 0) return std::make_pair("nc_pi0",_util.k_nc_pi0);
             else return std::make_pair("nc",_util.k_nc);
         }

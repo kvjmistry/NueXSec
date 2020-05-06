@@ -88,6 +88,9 @@ int GetPOT(const char *_file1, std::string type){
         run_subrun_file.close();
 
         //gSystem->Exec("/uboone/app/users/zarko/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt"); 
+	// Use Pawels updated version --slip for slipstacking info
+	gSystem->Exec("/uboone/app/users/guzowski/slip_stacking/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt"); 
+	
 
         //gSystem->Exec("rm run_subrun_list_data.txt");
 

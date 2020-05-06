@@ -1,6 +1,6 @@
 // Script to merge the mc, data, ext and dirt ttrees to one file
 
-void merge_uneaventrees(std::string run_type, std::string mc, std::string data, std::string ext, std::string dirt) {
+void merge_uneaventrees(std::string run_type, std::string mc, std::string data, std::string ext, std::string dirt, std::string detvar) {
 
     enum types {
         k_mc,
@@ -30,9 +30,15 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
     float shrmoliereavg{0.0}, _shrmoliereavg{0.0};
     float shr_hits_max{0.0},  _shr_hits_max{0.0};
 
+
+
     std::vector<std::string> treenames{"mc_tree", "data_tree", "ext_tree", "dirt_tree"};
 
-    TFile *outfile = new TFile(Form("./files/trees/nuexsec_tree_merged_run%s.root", run_type.c_str()), "UPDATE");
+    TFile *outfile;
+    
+    if (detvar == "") outfile = new TFile(Form("./files/trees/nuexsec_tree_merged_run%s.root", run_type.c_str()), "UPDATE");
+    else outfile = new TFile(Form("./files/trees/nuexsec_tree_merged_run%s_%s.root", run_type.c_str(), detvar.c_str()), "UPDATE");
+    
     TTree* outtree = new TTree("tree", "UPDATE");
 
     outtree->Branch("run",    &run,    "run/I");

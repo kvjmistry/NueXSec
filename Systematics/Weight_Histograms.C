@@ -4,7 +4,7 @@ Macro to Make the weight histograms for the Central value weighting
 
 This can and should be extended for making the systematic variations
 
-USAGE: root -l -b -q Weight_Histograms.C
+USAGE: root -l -b -q 'Weight_Histograms.C("fhc/rhc")'
 
 */
 // ------------------------------------------------------------------------------------------------------------
@@ -102,7 +102,7 @@ void CalcRatio(TFile *fin, TFile *fout,int flav, const char* mode){
 
 }
 // -----------------------------------------------------------------------------
-void Weight_Histograms(){
+void Weight_Histograms(std::string horn){
 
     enum flavours {
         knue,
@@ -121,9 +121,21 @@ void Weight_Histograms(){
     // File with CV
     TFile *fin;
 
-    bool boolfile  = GetFile(fin , "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold/output_uboone_run0.root"); if (boolfile == false) gSystem->Exit(0); // Most up to date version of CV
+    bool boolfile;
+    
+    if (horn == "fhc" )boolfile = GetFile(fin , "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold/output_uboone_run0.root");
+    else if (horn == "rhc") boolfile = GetFile(fin , "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold/RHC/output_uboone_run0.root"); 
+    else {
+        std::cout << "You misepelt the horn config...."<< std::endl;
+        gSystem->Exit(0);
+    }
+    
+    if (boolfile == false) gSystem->Exit(0); // Most up to date version of CV
 
-    TFile *fout = new TFile("f_flux_CV_weights.root", "RECREATE");
+    TFile *fout;
+    
+    if      (horn == "fhc") fout = new TFile("f_flux_CV_weights_fhc.root", "RECREATE");
+    else if (horn == "rhc") fout = new TFile("f_flux_CV_weights_rhc.root", "RECREATE");
 
     for (unsigned int k =0 ; k < k_flav_MAX; k++){
         CalcRatio(fin, fout,  k, modes.at(k));

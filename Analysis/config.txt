@@ -14,11 +14,13 @@ Run1_Dirt_POT 3.82938e+20
 -
 // Run 1 Data POT (tortgt) beam good and bad file
 // Run1_Data_POT 3.932e+19
-Run1_Data_POT 3.935e+19 // v3 bad runs subtracted
+// Run1_Data_POT 3.935e+19 // v3 bad runs subtracted
+Run1_Data_POT 8.953e+19 // v3 bad runs subtracted more stats
 -
 // Run 1 data HW Triggers (EA9CNT) beam good and bad file
 // Run1_Data_trig 1052383.0
-Run1_Data_trig 1039282.0 // v3 bad runs subtracted
+// Run1_Data_trig 1039282.0 // v3 bad runs subtracted
+Run1_Data_trig 2365837.0 // v3 bad runs subtracted more stats
 -
 // Run 1 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
 Run1_EXT_trig 3378479.250000
@@ -38,14 +40,14 @@ Run3_MC_POT 1.14486e+21
 // Run 3 dirt POT
 Run3_Dirt_POT 4.32295e+20
 -
-// Run 3 Data POT (tortgt) beam good and bad file
-Run3_Data_POT 4.049e+19
+// Run 3 Data POT (tortgt) beam good, bad runs removed
+Run3_Data_POT 3.991e+19
 -
-// Run 3 data HW Triggers (EA9CNT)  beam good and bad file
-Run3_Data_trig 827436.0
+// Run 3 data HW Triggers (EA9CNT) beam good, bad runs removed
+Run3_Data_trig  815631.0
 -
 // Run 3 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
-Run3_EXT_trig 1558577.475000
+Run3_EXT_trig 1550231.025000
 -
 // ---------------------------------------------
 // -------------- Selection Cuts ---------------

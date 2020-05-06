@@ -834,7 +834,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         // h_ratio->GetYaxis()->SetRangeUser(-0.5,0.5);
         
         // For ratio
-        h_ratio->GetYaxis()->SetRangeUser(0.5, 1.5);
+        h_ratio->GetYaxis()->SetRangeUser(0, 2);
         h_ratio->GetYaxis()->SetTitle("Data / (MC + EXT) ");
 
         h_ratio->GetXaxis()->SetTitle(x_axis_name);

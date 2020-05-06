@@ -7,7 +7,7 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
     _util = _utility;
 
     // Set the run period
-    run_period = _run_period;
+    run_period = std::string(_run_period);
 
     // Set the scale factors
     if (strcmp(_run_period, "1") == 0){
@@ -46,7 +46,10 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
 
     // Get the Input TTree
     _util.GetTree(f_nuexsec, tree, "tree");
-    if (tree == NULL)  _util.GetTree(f_nuexsec, tree, "mc_tree");
+    if (tree == NULL) {
+        std::cout << "Error failed to get the standard tree, maybe this is a MC only file, so trying to get the mc_tree"<< std::endl;
+        _util.GetTree(f_nuexsec, tree, "mc_tree");
+    }
 
     // Set the tree branches
     tree->SetBranchAddress("run",    &run);
@@ -186,7 +189,21 @@ double CrossSectionHelper::GetIntegratedFlux(){
     double energy_threshold = 0.05; // Set threshold to integrate the flux from [GeV]
 
     // Hardcoded for run 1 right now.. urgh krish you lazy
-    bool boolfile  = _util.GetFile(f_flux , "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold/output_uboone_run0.root"); if (boolfile == false) gSystem->Exit(0); // Most up to date version of CV
+    bool boolfile;
+    
+    std::string flux_file_name;
+
+    if (run_period == "1"){
+        flux_file_name = "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold/output_uboone_run0.root";
+        boolfile = _util.GetFile(f_flux, flux_file_name);
+    }
+    else {
+        flux_file_name = "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold/RHC/output_uboone_run0.root";
+        boolfile = _util.GetFile(f_flux, flux_file_name );
+    }
+    std::cout << "Using Flux file name: \033[0;31m" << flux_file_name << "\033[0m" <<  std::endl;
+
+    if (boolfile == false) gSystem->Exit(0); // Most up to date version of CV
 
     bool boolhist = _util.GetHist(f_flux, h_nue, "nue/Detsmear/nue_CV_AV_TPC_5MeV_bin");     if (boolhist == false) gSystem->Exit(0); // Get the PPFX weighted CV for nue
     boolhist      = _util.GetHist(f_flux, h_nuebar, "nuebar/Detsmear/nuebar_CV_AV_TPC_5MeV_bin"); if (boolhist == false) gSystem->Exit(0); // Get the PPFX weighted CV for nuebar
