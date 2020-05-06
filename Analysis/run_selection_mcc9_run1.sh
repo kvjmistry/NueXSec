@@ -25,7 +25,7 @@ fi
 # Running detector variation samples
 
 # CV
-if [ $1 == "CV" ]; then
+if [ "$1" == "CV" ]; then
   ./nuexsec --run 1 --var /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_detvar/run1/neutrinoselection_filt_run1_overlay_CV.root CV 2> /dev/null | tee log/run1_CV.log
 
   source merge/merge_run1_files.sh files/nuexsec_mc_run1_CV.root files/nuexsec_run1_CV_merged.root
@@ -42,7 +42,7 @@ fi
 
 
 # BNB_Diffusion
-if [ $1 == "BNB_Diffusion" ]; then
+if [ "$1" == "BNB_Diffusion" ]; then
   ./nuexsec --run 1 --var /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_detvar/run1/neutrinoselection_filt_run1_overlay_diffusion.root BNB_Diffusion 2> /dev/null | tee log/run1_BNB_Diffusion.log
 
   source merge/merge_run1_files.sh files/nuexsec_mc_run1_BNB_Diffusion.root files/nuexsec_run1_BNB_Diffusion_merged.root

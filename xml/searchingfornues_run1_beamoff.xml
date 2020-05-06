@@ -7,8 +7,10 @@
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
 <!ENTITY name "searchingfornues_run1_beamoff">
-<!ENTITY version "v1">
+<!ENTITY version "v2">
 ]>
+
+<!--v2 includes fix to common optical filter michel veto times -->
 
 <job>
 
@@ -35,18 +37,19 @@
   
   <!-- Project stages -->
   <stage name="ntuple">
+    <fcl>reco_uboone_mcc9_8_driver_data_ext_numi_optical_updated.fcl</fcl>
     <fcl>run_neutrinoselectionfilter_run1_data_cc0pinp.fcl</fcl>
     <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</outdir>
     <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</logdir>
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <maxfilesperjob>10</maxfilesperjob>
-    <numjobs>1100</numjobs>
+    <numjobs>1134</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
-    <schema>root</schema>
+    <schema>gsiftp</schema>
     <inputdef>numi_uboone_run1_beamoff_offset1_mcc9_reco2_v08_00_00_28_all_snapshot</inputdef>
-    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub>--expected-lifetime=12h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
     <jobsub_start>  --expected-lifetime=short</jobsub_start>
     <blacklist>Lancaster</blacklist>
   </stage>

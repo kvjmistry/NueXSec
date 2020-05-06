@@ -10,12 +10,12 @@
 <!ENTITY user "kmistry">
 <!ENTITY name "searchingfornues_ntuple_run1_beamon_offset1_mcc9_v33">
 <!ENTITY indef "numi_uboone_run1_beamon_offset1_mcc9_reco2_v08_00_00_28_beam_good_snapshot">
-<!ENTITY version "v3">
+<!ENTITY version "v4">
 ]>
 
 <!--v2 is sample 0 run 1 beam good beam bad -->
 <!--v3 is all run 1 beam good -->
-
+<!-- v4 is with fix to common optical filter michel veto times-->
 
 <job>
 
@@ -39,6 +39,7 @@
 
   <!-- Project stages -->
   <stage name="ntuple">
+    <fcl>reco_uboone_mcc9_8_driver_data_numi_optical_updated.fcl</fcl>
     <fcl>run_neutrinoselectionfilter_run1_data_cc0pinp.fcl</fcl>
     <datafiletypes>root,pndr</datafiletypes>
     <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</outdir>
@@ -47,7 +48,7 @@
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <inputdef>&indef;</inputdef>
     <maxfilesperjob>10</maxfilesperjob>
-    <numjobs>235</numjobs>
+    <numjobs>1127</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <disk>25GB</disk>
