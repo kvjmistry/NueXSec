@@ -10,6 +10,7 @@ int main(int argc, char *argv[]){
     bool area_norm                 = false;
     bool calc_cross_sec            = false;
     bool overwritePOT              = false; 
+    bool run_sys                   = false;
 
     // inputs 
     char * mc_file_name          = (char *)"empty";
@@ -35,6 +36,7 @@ int main(int argc, char *argv[]){
     utility _utility;
     histogram_plotter _hplot;
     CrossSectionHelper _xsec;
+    // SystematicsHelper _systematics;
 
     std::string usage = "\nFirst run the selection with the options: \n\n\033[0;31m./nuexsec --run <run period num> [options (see below)]\033[0m \n\n"
     "\033[0;34m[--mc <mc file>]\033[0m                                       \033[0;32mThe input overlay root file\033[0m\n\n"
@@ -61,6 +63,11 @@ int main(int argc, char *argv[]){
     "\n\nTo run the cross section calculation code, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --xsec <input merged nuexsec tree file> [options (see below)]\033[0m \n\n"
     "The <input merged nuexsec ttree file> corresponds to merged ttree file of the mc, data, ext and dirt. See the bash script merge_uneaventrees.C for more details\n\n";
+
+    std::string usage2 = "\n\nTo run the detector systematics code, run: \n\n"
+    "\033[0;31m./nuexsec --run <run period num> --sys\033[0m \n\n"
+    "This will run the detector systematics plotting code\n\n";
+
 
     // -------------------------------------------------------------------------    
     // Loop over input arguments
@@ -190,6 +197,14 @@ int main(int argc, char *argv[]){
             std::cout << "Output tree filename will be overwritten with name: " << mc_tree_file_name_out << std::endl;
             
             overwritePOT = true;
+        }
+
+        // Systematics
+        if (strcmp(arg, "--sys") == 0){
+            // std::cout << "Using Systematics plotting code" << std::endl;
+            
+            run_sys = true;
+            run_selection = false;
         }
         
     }

@@ -11,7 +11,7 @@ class SystematicsHelper{
     SystematicsHelper(){};
     
     // The output file
-    TFile* f_nuexsec;
+    std::vector<TFile*> f_vars;
 
     // Class instances
     utility _util;
@@ -23,23 +23,37 @@ class SystematicsHelper{
 
     std::string run_period;
 
+    std::vector<double> POT_v; // vector of POT for each variation 
+
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(const char *run_period, const char * xsec_file_in, utility _utility);
+    void Initialise(const char *run_period, utility _utility);
     // -------------------------------------------------------------------------
     // Function to loop over events and calculate the cross section
-    void LoopEvents(); 
+    void MakeHistograms(); 
     // -------------------------------------------------------------------------
+    void GetPOT(const char* run_period);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 
-    private:
+    enum enum_variations {
+        k_CV,
+        k_bnb_diffusion,
+        k_vars_MAX
+    };
 
-    // Here we create the trees 
+    std::string var_string = {
+        "CV",
+        "BNB_Diffusion"
+    };
 
+    std::string var_string_pretty = {
+        "CV",
+        "BNB Diffusion"
+    };
 
 
 }; // End Class SystematicsHelper

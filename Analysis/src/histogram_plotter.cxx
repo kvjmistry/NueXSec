@@ -852,6 +852,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         
         // For ratio
         h_ratio->GetYaxis()->SetRangeUser(0, 2);
+        h_ratio->GetYaxis()->SetRangeUser(0.5,1.5);
         h_ratio->GetYaxis()->SetTitle("Data / (MC + EXT) ");
 
         h_ratio->GetXaxis()->SetTitle(x_axis_name);
@@ -869,10 +870,8 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         h_ratio_error->Draw("e2, same");
 
         // Choose whether to center the xaxis labels. Only makes sense for counting type of plots
-        TAxis* xaxis; 
         if (centerxaxis) {
-            xaxis = h_ratio->GetXaxis();
-            xaxis->CenterLabels(kTRUE);
+            h_ratio->GetXaxis()->CenterLabels(kTRUE);
         }
 
         // Now doing this stuff on the bottom pad

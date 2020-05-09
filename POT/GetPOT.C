@@ -8,7 +8,7 @@
 /*
 Script to get the POT from a pandora ntuple file
 
-Usage: root -l -q -b 'GetPOT.C("/path/to/file","mc/data")'
+Usage: root -l -q -b 'GetPOT.C("/path/to/file","mc/data/ext")'
 
 if MC is given, then it will look for the pot branch in the file, if data is given,
 then Zarko's POT counting script will be called after generating a run subrun file list
@@ -87,12 +87,12 @@ int GetPOT(const char *_file1, std::string type){
         
         run_subrun_file.close();
 
-        //gSystem->Exec("/uboone/app/users/zarko/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt"); 
-	// Use Pawels updated version --slip for slipstacking info
-	gSystem->Exec("/uboone/app/users/guzowski/slip_stacking/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt"); 
+        if (type == "ext") gSystem->Exec("/uboone/app/users/zarko/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt"); 
 	
-
-        //gSystem->Exec("rm run_subrun_list_data.txt");
+	// Use Pawels updated version for on beam, use  --slip for slipstacking info
+	else gSystem->Exec("/uboone/app/users/guzowski/slip_stacking/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt"); 
+		
+        gSystem->Exec("rm run_subrun_list_data.txt");
 
         return 0;
 

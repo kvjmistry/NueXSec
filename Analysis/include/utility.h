@@ -117,7 +117,7 @@ public:
             "Unselected",     // Unselected
             "SoftwareTrig",   // Software Trigger
             "Op_Filter_PE",   // Common Optical Filter PE
-            // "Op_Filter_Veto",// Common Optical Filter Michel Veto
+            "Op_Filter_Veto",// Common Optical Filter Michel Veto
             "Slice_ID",       // Slice ID
             "e_candidate",    // Electron Candidate
             "In_FV",          // In FV
@@ -198,7 +198,7 @@ public:
                 k_unselected,        // Unselected 
                 k_swtrig,            // Software Trigger
                 k_opfilt_pe,         // Common Optical Filter PE
-                // k_opfilt_veto,    // Common Optical Filter Michel Veto
+                k_opfilt_veto,    // Common Optical Filter Michel Veto
                 k_slice_id,          // Slice ID
                 k_e_candidate,       // Electron Candidate
                 k_in_fv,             // Reco Nu Vtx (SC Corr) In the FV 

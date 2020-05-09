@@ -253,6 +253,11 @@ void selection::MakeSelection(){
             // Get the entry in the tree
             mc_tree->GetEntry(ievent); 
 
+            // Skip the RHC events contaminated in the FHC files
+            if (_run_period == 1 && mc_SC.run > 10000 ){
+                continue;
+            }
+
             // Apply the selection cuts 
             bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
             if (!pass) continue;
@@ -459,13 +464,13 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_opfilt_pe, counter_v );
 
     // *************************************************************************
-    // Op Filt Michel Veto -- MC Only ------------------------------------------
+    // Op Filt Michel Veto -----------------------------------------------------
     // *************************************************************************
-    // pass = _scuts.opfilt_veto(SC, type);
-    // passed_v.at(ievent).cut_v.at(_util.k_opfilt_veto) = pass;
-    // if(!pass) return false; // Failed the cut!
+    pass = _scuts.opfilt_veto(SC, type);
+    passed_v.at(ievent).cut_v.at(_util.k_opfilt_veto) = pass;
+    if(!pass) return false; // Failed the cut!
     
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_opfilt_veto, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_opfilt_veto, counter_v );
 
     // *************************************************************************
     // Slice ID ----------------------------------------------------------------

@@ -35,7 +35,7 @@
   
   <!-- Project stages -->
   <stage name="ntuple">
-    <fcl>run_flashvalidation_mc.fcl</fcl>
+    <fcl>run_redk2nu_rhc.fcl</fcl>
     <fcl>standard_overlay_notpc_numi_uboone_updated.fcl</fcl>
     <fcl>run_neutrinoselectionfilter_run3_overlay_cc0pinp_numi_dirt.fcl</fcl>
     <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</outdir>
@@ -49,7 +49,7 @@
     <disk>25GB</disk>
     <schema>gsiftp</schema>
     <inputdef>prodgenie_numi_uboone_overlay_dirt_rhc_mcc9_run3b_v28_all_snapshot</inputdef>
-    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/RHC/flux_cached_entries.root</jobsub>
     <jobsub_start>  --expected-lifetime=short</jobsub_start>
     <blacklist>Lancaster</blacklist>
   </stage>

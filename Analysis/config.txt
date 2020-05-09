@@ -7,23 +7,22 @@ varname value
 -
 // ---------------- Run 1 ----------------------
 // Run1 MC POT v33
-Run1_MC_POT 1.66215e+21
+Run1_MC_POT 1.64468e+21
 -
 // Run 1 dirt POT
 Run1_Dirt_POT 3.82938e+20
 -
 // Run 1 Data POT (tortgt) beam good and bad file
-// Run1_Data_POT 3.932e+19
-// Run1_Data_POT 3.935e+19 // v3 bad runs subtracted
-Run1_Data_POT 8.953e+19 // v3 bad runs subtracted more stats
+// Run1_Data_POT 8.953e+19    // v2 bad runs subtracted more stats
+Run1_Data_POT 8.885e+19       // v3 with michel veto updated
 -
-// Run 1 data HW Triggers (EA9CNT) beam good and bad file
-// Run1_Data_trig 1052383.0
-// Run1_Data_trig 1039282.0 // v3 bad runs subtracted
-Run1_Data_trig 2365837.0 // v3 bad runs subtracted more stats
+// Run 1 data HW Triggers (EA9CNT) 
+// Run1_Data_trig 2365837.0    // v2 bad runs subtracted more stats
+Run1_Data_trig 2347745.0       // v3 with michel veto updated
 -
 // Run 1 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
-Run1_EXT_trig 3378479.250000
+// Run1_EXT_trig 3378479.250000
+Run1_EXT_trig 4015961.990000 // v3 with michel veto updated
 -
 // ------- Additional Run 1 POT Definitions -----
 -
