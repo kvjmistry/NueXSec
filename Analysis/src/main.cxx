@@ -11,6 +11,11 @@ int main(int argc, char *argv[]){
     bool calc_cross_sec            = false;
     bool overwritePOT              = false; 
     bool run_sys                   = false;
+    bool print                     = false;
+    bool _print_mc                 = false;
+    bool _print_data               = false;
+    bool _print_ext                = false;
+    bool _print_dirt               = false;
 
     // inputs 
     char * mc_file_name          = (char *)"empty";
@@ -36,6 +41,7 @@ int main(int argc, char *argv[]){
     utility _utility;
     histogram_plotter _hplot;
     CrossSectionHelper _xsec;
+    PrintHelper _phelper;
     // SystematicsHelper _systematics;
 
     std::string usage = "\nFirst run the selection with the options: \n\n\033[0;31m./nuexsec --run <run period num> [options (see below)]\033[0m \n\n"
@@ -206,7 +212,46 @@ int main(int argc, char *argv[]){
             run_sys = true;
             run_selection = false;
         }
+
+        // Only run the print function
+        if (strcmp(arg, "--printonly") == 0) {
+            run_selection = false;
+            print = true;
+        }
+
+        // Print all
+        if (strcmp(arg, "--printall") == 0) {
+            print = true;
+            _print_mc                 = true;
+            _print_data               = true;
+            _print_ext                = true;
+            _print_dirt               = true;
+        }
         
+        // Print MC
+        if (strcmp(arg, "--printmc") == 0) {
+            print = true;
+            _print_mc = true;
+        }
+        
+        // Print Data
+        if (strcmp(arg, "--printdata") == 0) {
+            print = true;
+            _print_data = true;
+        }
+
+        // Print ext
+        if (strcmp(arg, "--printext") == 0) {
+            print = true;
+            _print_ext = true;
+        }
+
+        // Print Dirt
+        if (strcmp(arg, "--printdirt") == 0) {
+            print = true;
+            _print_dirt = true;
+        }
+   
     }
 
     // Add catches for default input
@@ -227,7 +272,11 @@ int main(int argc, char *argv[]){
     if (run_selection) _selection_instance.Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name,
                                                       mc_file_name_out, ext_file_name_out, data_file_name_out, dirt_file_name_out,
                                                       mc_tree_file_name_out, _utility, using_slim_version, num_events, run_period, verbose, weight );
+
     
+    // Print the selection results
+    if (print) _phelper.Initialise(run_period, "empty", weight, _print_mc, _print_data, _print_ext, _print_dirt, _utility );
+
     // Run the make histogram function
     if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, weight, area_norm, _utility, variation);
 

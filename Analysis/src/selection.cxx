@@ -402,17 +402,12 @@ void selection::MakeSelection(){
     // Print information from the selection, loop over the cuts
     for (unsigned int p=0; p < counter_v.size();p++){
 
-        double efficiency{0.0}, purity{0.0};
+        // Fill the counter trees
+        if (bool_use_mc)   _thelper.at(_util.k_mc)  .Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
+        if (bool_use_data) _thelper.at(_util.k_data).Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
+        if (bool_use_ext)  _thelper.at(_util.k_ext) .Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
+        if (bool_use_dirt) _thelper.at(_util.k_dirt).Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
         
-        if (verbose == 1) {
-            _util.PrintInfo(counter_v.at(p), intime_scale_factor, mc_scale_factor, dirt_scale_factor,
-                            _util.cut_dirs.at(p), counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc) + counter_v.at(_util.k_unselected).at(_util.k_count_nue_cc_mixed),
-                             efficiency, purity);
-            
-            // Fill the efficiency and purity for the output mc tree file
-            if (bool_use_mc) _thelper.at(_util.k_mc).FillEff(efficiency, purity);
-
-        }
     
     }
     

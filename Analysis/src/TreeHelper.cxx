@@ -22,8 +22,8 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
 
         // Create the TTree
         tree      = new TTree("mc_tree",         "mc_tree");
-        eff_tree  = new TTree("mc_eff_tree",     "mc_eff_tree");
         dedx_tree = new TTree("mc_dedx_tree",    "mc_dedx_tree");
+        counter_tree = new TTree("mc_counter_tree",    "mc_counter_tree");
     }
     else if (type == _util.k_data){
         
@@ -39,6 +39,7 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
         // Create the TTree
         tree      = new TTree("data_tree",     "data_tree");
         dedx_tree = new TTree("data_dedx_tree","data_dedx_tree");
+        counter_tree = new TTree("data_counter_tree",    "data_counter_tree");
 
     }
     else if (type == _util.k_ext){
@@ -55,6 +56,7 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
         // Create the TTree
         tree      = new TTree("ext_tree",     "ext_tree");
         dedx_tree = new TTree("ext_dedx_tree","ext_dedx_tree");
+        counter_tree = new TTree("ext_counter_tree",    "ext_counter_tree");
 
     }
     else if (type == _util.k_dirt){
@@ -71,6 +73,7 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
         // Create the TTree
         tree      = new TTree("dirt_tree",     "dirt_tree");
         dedx_tree = new TTree("dirt_dedx_tree","dirt_dedx_tree");
+        counter_tree = new TTree("dirt_counter_tree",    "dirt_counter_tree");
 
     }
     else {
@@ -81,27 +84,6 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     // Set the type
     _type = type;
     
-    // Set the weight settings
-    if (weight_cfg == 0){
-        weight_tune = false;
-        weight_ppfx = false;
-    }
-    else if (weight_cfg == 1){
-        weight_tune = true;
-        weight_ppfx = true;
-    }
-    else if (weight_cfg == 2){
-        weight_tune = true;
-        weight_ppfx = false;
-    }
-    else if (weight_cfg == 3){
-        weight_tune = false;
-        weight_ppfx = true;
-    }
-    else {
-        std::cout << "Unknown weight setting specified, using defaults" << std::endl;
-    }
-
     // Set the tree branches
     tree->Branch("run",    &run,    "run/I");
     tree->Branch("subrun", &subrun, "subrun/I");
@@ -119,12 +101,6 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     tree->Branch("shr_energy_tot_cali", &shr_energy_tot_cali, "shr_energy_tot_cali/F");
     tree->Branch("shrmoliereavg", &shrmoliereavg, "shrmoliereavg/F");
     tree->Branch("shr_hits_max",  &shr_hits_max,  "shr_hits_max/F");
-
-
-    if (type == _util.k_mc){
-        eff_tree->Branch("efficiency", &efficiency, "efficiency/D");
-        eff_tree->Branch("purity", &purity, "purity/D");
-    }
 
     dedx_tree->Branch("shr_dedx_Y_cali", &shr_dedx_Y_cali, "shr_dedx_Y_cali/F");
     dedx_tree->Branch("shr_dedx_V_cali", &shr_dedx_V_cali, "shr_dedx_V_cali/F");
@@ -156,6 +132,56 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     dedx_tree->Branch("shr_theta",       &shr_theta,    "shr_theta/F");
     dedx_tree->Branch("cut", &cut);
 
+
+    // Counter Tree
+    counter_tree->Branch("count_nue_cc_qe",  &count_nue_cc_qe);
+    counter_tree->Branch("count_nue_cc_res", &count_nue_cc_res);
+    counter_tree->Branch("count_nue_cc_dis", &count_nue_cc_dis);
+    counter_tree->Branch("count_nue_cc_coh", &count_nue_cc_coh);
+    counter_tree->Branch("count_nue_cc_mec", &count_nue_cc_mec);
+    
+    counter_tree->Branch("count_nuebar_cc_qe",  &count_nuebar_cc_qe);
+    counter_tree->Branch("count_nuebar_cc_res", &count_nuebar_cc_res);
+    counter_tree->Branch("count_nuebar_cc_dis", &count_nuebar_cc_dis);
+    counter_tree->Branch("count_nuebar_cc_coh", &count_nuebar_cc_coh);
+    counter_tree->Branch("count_nuebar_cc_mec", &count_nuebar_cc_mec);
+    
+    counter_tree->Branch("count_nue_cc_infv",      &count_nue_cc_infv);
+    counter_tree->Branch("count_nuebar_cc_infv",   &count_nuebar_cc_infv);
+    counter_tree->Branch("count_nue_cc_incryo",    &count_nue_cc_incryo);
+    counter_tree->Branch("count_nuebar_cc_incryo", &count_nuebar_cc_incryo);
+    
+    counter_tree->Branch("count_numu_cc_qe",  &count_numu_cc_qe);
+    counter_tree->Branch("count_numu_cc_res", &count_numu_cc_res);
+    counter_tree->Branch("count_numu_cc_dis", &count_numu_cc_dis);
+    counter_tree->Branch("count_numu_cc_coh", &count_numu_cc_coh);
+    counter_tree->Branch("count_numu_cc_mec", &count_numu_cc_mec);
+    
+    counter_tree->Branch("count_numubar_cc_qe",  &count_numubar_cc_qe);
+    counter_tree->Branch("count_numubar_cc_res", &count_numubar_cc_res);
+    counter_tree->Branch("count_numubar_cc_dis", &count_numubar_cc_dis);
+    counter_tree->Branch("count_numubar_cc_coh", &count_numubar_cc_coh);
+    counter_tree->Branch("count_numubar_cc_mec", &count_numubar_cc_mec);
+    
+    counter_tree->Branch("count_numu_cc_infv",      &count_numu_cc_infv);
+    counter_tree->Branch("count_numubar_cc_infv",   &count_numubar_cc_infv);
+    counter_tree->Branch("count_numu_cc_incryo",    &count_numu_cc_incryo);
+    counter_tree->Branch("count_numubar_cc_incryo", &count_numubar_cc_incryo);
+    
+    counter_tree->Branch("count_nue_cc",       &count_nue_cc);
+    counter_tree->Branch("count_nue_cc_mixed", &count_nue_cc_mixed);
+    counter_tree->Branch("count_nu_out_fv",    &count_nu_out_fv);
+    counter_tree->Branch("count_cosmic",       &count_cosmic);
+    counter_tree->Branch("count_numu_cc",      &count_numu_cc);
+    counter_tree->Branch("count_numu_cc_pi0",  &count_numu_cc_pi0);
+    counter_tree->Branch("count_nc",           &count_nc);
+    counter_tree->Branch("count_nc_pi0",       &count_nc_pi0);
+    counter_tree->Branch("count_unmatched",    &count_unmatched);
+    counter_tree->Branch("count_total_mc",     &count_total_mc);
+    counter_tree->Branch("count_data",         &count_data);
+    counter_tree->Branch("count_ext",          &count_ext);
+    counter_tree->Branch("count_dirt",         &count_dirt);
+
     std::cout << "Finished Initalising the Tree Helper..."<< std::endl;
 
 }
@@ -182,15 +208,6 @@ void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _class
     shr_hits_max  = SC.shr_hits_max;
 
     tree->Fill();
-
-}
-// -----------------------------------------------------------------------------
-void TreeHelper::FillEff(double _efficiency, double _purity){
-
-    efficiency = _efficiency;
-    purity     = _purity;
-
-    eff_tree->Fill();
 
 }
 // -----------------------------------------------------------------------------
@@ -234,10 +251,69 @@ void TreeHelper::WriteTree(int type){
 
     tree->Write("",TObject::kOverwrite);
 
-    // Write the efficiency tree only if its MC
-    if (type == _util.k_mc) eff_tree->Write("",TObject::kOverwrite);
-
     dedx_tree->Write("",TObject::kOverwrite);
+
+    counter_tree->Write("",TObject::kOverwrite);
 
 }
 // -----------------------------------------------------------------------------
+void TreeHelper::Fill_counters(std::vector<double> counter_v, std::string cut_name, bool bool_use_mc, bool bool_use_ext, bool bool_use_data, bool bool_use_dirt){
+
+    f_nuexsec->cd();
+
+    if (bool_use_mc){
+        count_nue_cc_qe  = counter_v.at(_util.k_count_nue_cc_qe);
+        count_nue_cc_res = counter_v.at(_util.k_count_nue_cc_res);
+        count_nue_cc_dis = counter_v.at(_util.k_count_nue_cc_dis);
+        count_nue_cc_coh = counter_v.at(_util.k_count_nue_cc_coh);
+        count_nue_cc_mec = counter_v.at(_util.k_count_nue_cc_mec);
+        
+        count_nuebar_cc_qe  = counter_v.at(_util.k_count_nuebar_cc_qe);
+        count_nuebar_cc_res = counter_v.at(_util.k_count_nuebar_cc_res);
+        count_nuebar_cc_dis = counter_v.at(_util.k_count_nuebar_cc_dis);
+        count_nuebar_cc_coh = counter_v.at(_util.k_count_nuebar_cc_coh);
+        count_nuebar_cc_mec = counter_v.at(_util.k_count_nuebar_cc_mec);
+        
+        count_nue_cc_infv      = counter_v.at(_util.k_count_nue_cc_infv);
+        count_nuebar_cc_infv   = counter_v.at(_util.k_count_nuebar_cc_infv);
+        count_nue_cc_incryo    = counter_v.at(_util.k_count_nue_cc_incryo);
+        count_nuebar_cc_incryo = counter_v.at(_util.k_count_nuebar_cc_incryo);
+        
+        count_numu_cc_qe  = counter_v.at(_util.k_count_numu_cc_qe);
+        count_numu_cc_res = counter_v.at(_util.k_count_numu_cc_res);
+        count_numu_cc_dis = counter_v.at(_util.k_count_numu_cc_dis);
+        count_numu_cc_coh = counter_v.at(_util.k_count_numu_cc_coh);
+        count_numu_cc_mec = counter_v.at(_util.k_count_numu_cc_mec);
+        
+        count_numubar_cc_qe  = counter_v.at(_util.k_count_numubar_cc_qe);
+        count_numubar_cc_res = counter_v.at(_util.k_count_numubar_cc_res);
+        count_numubar_cc_dis = counter_v.at(_util.k_count_numubar_cc_dis);
+        count_numubar_cc_coh = counter_v.at(_util.k_count_numubar_cc_coh);
+        count_numubar_cc_mec = counter_v.at(_util.k_count_numubar_cc_mec);
+        
+        count_numu_cc_infv      = counter_v.at(_util.k_count_numu_cc_infv);
+        count_numubar_cc_infv   = counter_v.at(_util.k_count_numubar_cc_infv);
+        count_numu_cc_incryo    = counter_v.at(_util.k_count_numu_cc_incryo);
+        count_numubar_cc_incryo = counter_v.at(_util.k_count_numubar_cc_incryo);
+        
+        count_nue_cc       = counter_v.at(_util.k_count_nue_cc);
+        count_nue_cc_mixed = counter_v.at(_util.k_count_nue_cc_mixed);
+        count_nu_out_fv    = counter_v.at(_util.k_count_nu_out_fv);
+        count_cosmic       = counter_v.at(_util.k_count_cosmic);
+        count_numu_cc      = counter_v.at(_util.k_count_numu_cc);
+        count_numu_cc_pi0  = counter_v.at(_util.k_count_numu_cc_pi0);
+        count_nc           = counter_v.at(_util.k_count_nc);
+        count_nc_pi0       = counter_v.at(_util.k_count_nc_pi0);
+        count_unmatched    = counter_v.at(_util.k_count_unmatched);
+        count_total_mc     = counter_v.at(_util.k_count_total_mc);
+    }
+
+    if (bool_use_data)  count_data         = counter_v.at(_util.k_count_data);
+    
+    if (bool_use_ext)   count_ext          = counter_v.at(_util.k_count_ext);
+    
+    if (bool_use_dirt)  count_dirt         = counter_v.at(_util.k_count_dirt);
+
+    counter_tree->Fill();
+
+}
