@@ -278,6 +278,7 @@ public:
     
     float leeweight;
     float weightTune;
+    float ppfx_cv;    // Weight from PPFX CV
     
     float true_pt;         // Total Pt of all MC particles
     float true_pt_visible; // Total Visible Pt of all MC particles

@@ -10,7 +10,7 @@ varname value
 Run1_MC_POT 1.64468e+21
 -
 // Run 1 dirt POT
-Run1_Dirt_POT 3.82938e+20
+Run1_Dirt_POT 4.76579e+20 // v3 includes ppfx cv correction
 -
 // Run 1 Data POT (tortgt) beam good and bad file
 // Run1_Data_POT 8.953e+19    // v2 bad runs subtracted more stats
