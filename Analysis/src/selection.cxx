@@ -407,8 +407,7 @@ void selection::MakeSelection(){
         if (bool_use_data) _thelper.at(_util.k_data).Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
         if (bool_use_ext)  _thelper.at(_util.k_ext) .Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
         if (bool_use_dirt) _thelper.at(_util.k_dirt).Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
-        
-    
+
     }
     
     // Now save all the outputs to file

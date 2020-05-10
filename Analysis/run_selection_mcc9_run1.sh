@@ -5,7 +5,20 @@
 
 if [ -z "$1" ]; then
   # Run the selection
-  ./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v2/neutrinoselection_filt_run1_overlay.root  --dirt /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v3/neutrinoselection_filt_run1_dirt_overlay.root --data /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v3/neutrinoselection_filt_run1_beamon_beamgood.root --ext /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v3/neutrinoselection_filt_run1_beamoff.root --printall  2> /dev/null | tee log/run1.log
+  # ./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v2/neutrinoselection_filt_run1_overlay.root  --dirt /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v3/neutrinoselection_filt_run1_dirt_overlay.root --data /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v3/neutrinoselection_filt_run1_beamon_beamgood.root --ext /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v3/neutrinoselection_filt_run1_beamoff.root --printall  2> /dev/null | tee log/run1.log
+
+  # Parallel processing version
+  mc="./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v2/neutrinoselection_filt_run1_overlay.root"
+  data="./nuexsec --run 1 --data /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v3/neutrinoselection_filt_run1_beamon_beamgood.root"
+  ext="./nuexsec --run 1 --ext /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v3/neutrinoselection_filt_run1_beamoff.root"
+  dirt="./nuexsec --run 1 --dirt /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v3/neutrinoselection_filt_run1_dirt_overlay.root"
+
+  eval $mc | tee log/run1_mc.log | sed -e 's/^/[MC] /' &
+  eval $data | tee log/run1_data.log | sed -e 's/^/[Data] /' &
+  eval $ext | tee log/run1_ext.log | sed -e 's/^/[EXT] /' &
+  eval $dirt | tee log/run1_dirt.log | sed -e 's/^/[Dirt] /' &
+  wait
+  ./nuexsec --run 1 --printonly --printall
 
   # Merge the files
   source merge/merge_run1_files.sh files/nuexsec_mc_run1.root files/nuexsec_run1_merged.root
