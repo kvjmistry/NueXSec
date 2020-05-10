@@ -57,8 +57,15 @@ int main(int argc, char *argv[]){
     "\033[0;33m[-n <num events>]\033[0m                                      \033[0;32mThe number of events to run over. This is good for checking if the code doesn't segfault. All the POT scalings will not work.\033[0m\n\n"
     "\033[0;33m[--weight <weight setting>]\033[0m                            \033[0;32mChange the Weight level. level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only \033[0m\n\n"
     "\033[0;33m[--slim]\033[0m                                               \033[0;32mWhen this extension is added, the histogram helper class is not initalised and no histograms will be filled or saved. This is to speed up the selection code if you just want to run the selection.\033[0m\n\n"
-    "\033[0;33m[--verbose <verbose level>]\033[0m                            \033[0;32m0 does not print the selection cut results, 1 (default) currently prints everything\033[0m\n\n"
-    "-------------------------------------------------------"
+    // "\033[0;33m[--verbose <verbose level>]\033[0m                            \033[0;32mDoes not print the selection cut results, 1 (default) currently prints everything\033[0m\n\n"
+    "\033[0;33m[--printmc]\033[0m                                            \033[0;32mPrints the selection results if MC ran \033[0m\n\n"
+    "\033[0;33m[--printdata]\033[0m                                          \033[0;32mPrints the selection results if Data ran \033[0m\n\n"
+    "\033[0;33m[--printext]\033[0m                                           \033[0;32mPrints the selection results if EXT ran \033[0m\n\n"
+    "\033[0;33m[--printdirt]\033[0m                                          \033[0;32mPrints the selection results if Dirt ran \033[0m\n\n"
+    "\033[0;33m[--printall]\033[0m                                           \033[0;32mPrints the selection results if mc, data, ext, dirt ran \033[0m\n\n"
+    "\033[0;33m[--printonly]\033[0m                                          \033[0;32mTurns off running of the selection, turns on print function. Good for checking selection results and not having to run the selection again \033[0m\n\n";
+    
+    std::string usage2 = "-------------------------------------------------------"
     "\n\nTo make the histograms after running selection, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --hist <input merged nuexsec file> [options (see below)]\033[0m \n\n"
     "\033[0;33m[--weight <weight setting>]\033[0m                            \033[0;32mChange the Weight level to dislay on the plots. Should be used in conjunction with the setting used in the selection stage. level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only \033[0m\n\n"
@@ -70,7 +77,7 @@ int main(int argc, char *argv[]){
     "\033[0;31m./nuexsec --run <run period num> --xsec <input merged nuexsec tree file> [options (see below)]\033[0m \n\n"
     "The <input merged nuexsec ttree file> corresponds to merged ttree file of the mc, data, ext and dirt. See the bash script merge_uneaventrees.C for more details\n\n";
 
-    std::string usage2 = "\n\nTo run the detector systematics code, run: \n\n"
+    std::string usage3 = "\n\nTo run the detector systematics code, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --sys\033[0m \n\n"
     "This will run the detector systematics plotting code\n\n";
 
@@ -179,7 +186,7 @@ int main(int argc, char *argv[]){
 
         // Help!
         if (strcmp(arg, "--h") == 0 || strcmp(arg, "-h") == 0|| strcmp(arg, "--help") == 0 || strcmp(arg, "--usage") == 0){
-            std::cout << usage << std::endl; 
+            std::cout << usage <<  usage2 << usage3 << std::endl; 
             exit(1);
         }
 
@@ -257,7 +264,7 @@ int main(int argc, char *argv[]){
     // Add catches for default input
     if ((run_period == "empty") ){
         std::cout << "\nError, must provide a run period as input!\n" << std::endl;
-        std::cout << "USAGE:" << usage << std::endl; 
+        std::cout << "USAGE:" << usage << usage2 << usage3 << std::endl; 
         exit(1);
     }
 
