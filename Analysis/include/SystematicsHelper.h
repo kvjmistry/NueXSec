@@ -35,8 +35,14 @@ class SystematicsHelper{
     // -------------------------------------------------------------------------
     void GetPOT(const char* run_period);
     // -------------------------------------------------------------------------
+    // Plots the variation comparisons
+    void PlotVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name);
     // -------------------------------------------------------------------------
+    void SetVariationProperties(TH1D* h, int index);
     // -------------------------------------------------------------------------
+    void SetTPadOptions(TPad * topPad, TPad * bottomPad );
+    // -------------------------------------------------------------------------
+    void CreateDirectory(std::string folder, std::string run_period);
     // -------------------------------------------------------------------------
 
     enum enum_variations {

@@ -28,6 +28,7 @@
 #include "TSystem.h"
 #include "TEfficiency.h"
 #include "TGaxis.h"
+#include "TStyle.h"
 
 // Class at the top level of the selection, so most classes will be including
 // from this class. Mainly provided useful functions.

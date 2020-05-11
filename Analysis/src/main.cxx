@@ -42,7 +42,7 @@ int main(int argc, char *argv[]){
     histogram_plotter _hplot;
     CrossSectionHelper _xsec;
     PrintHelper _phelper;
-    SystematicsHelper _systematics;
+    SystematicsHelper _syshelper;
 
     std::string usage = "\nFirst run the selection with the options: \n\n\033[0;31m./nuexsec --run <run period num> [options (see below)]\033[0m \n\n"
     "\033[0;34m[--mc <mc file>]\033[0m                                       \033[0;32mThe input overlay root file\033[0m\n\n"
@@ -214,8 +214,7 @@ int main(int argc, char *argv[]){
 
         // Systematics
         if (strcmp(arg, "--sys") == 0){
-            // std::cout << "Using Systematics plotting code" << std::endl;
-            
+            std::cout << "Using Systematics plotting code" << std::endl;
             run_sys = true;
             run_selection = false;
         }
@@ -289,6 +288,9 @@ int main(int argc, char *argv[]){
 
     // Run the calculate cross section function
     if (calc_cross_sec) _xsec.Initialise(run_period, tree_file_name, _utility);
+
+    // Run the systematics helper code
+    if (run_sys) _syshelper.Initialise(run_period, _utility);
 
     // -------------------------------------------------------------------------
     // Finished!
