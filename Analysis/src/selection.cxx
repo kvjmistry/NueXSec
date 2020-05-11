@@ -739,6 +739,7 @@ double selection::GetCVWeight(int type, SliceContainer SC){
         if (std::isinf(weight))      weight = 1.0; 
         if (std::isnan(weight) == 1) weight = 1.0;
         if (weight > 100)            weight = 1.0;
+        if (weight < 0)              weight = 1.0;
 
         // If tune weight turned off, just set weight to 1.0
         if (!weight_tune) weight = 1.0;
@@ -757,12 +758,13 @@ double selection::GetCVWeight(int type, SliceContainer SC){
     }
 
     // Default overlay does not yet contain ppfx correction in ntuple -- just dirt for now
-    if (type == _util.k_dirt){
+    if (type == _util.k_dirt && _run_period == 1){
         double weight_flux = SC.ppfx_cv;
 
         if (std::isinf(weight_flux))      weight_flux = 1.0; 
         if (std::isnan(weight_flux) == 1) weight_flux = 1.0;
         if (weight_flux > 100)            weight_flux = 1.0;
+        if (weight_flux < 0)              weight_flux = 1.0;
 
         if (weight_ppfx) weight = weight * weight_flux;
 

@@ -17,20 +17,32 @@ if [ -z "$1" ]; then
   eval $data | tee log/run1_data.log | sed -e 's/^/[Data] /' &
   eval $ext | tee log/run1_ext.log | sed -e 's/^/[EXT] /' &
   eval $dirt | tee log/run1_dirt.log | sed -e 's/^/[Dirt] /' &
+  
+  # wait for the background processes to finish
   wait
-  ./nuexsec --run 1 --printonly --printall
+
+  # put the outputs into 1 log file
+  declare -a arr=("log/run1_mc.log" "log/run1_data.log" "log/run1_ext.log" "log/run1_dirt.log")
+  echo " " > log/run1.log
+  for i in "${arr[@]}"; do
+    cat "$i" >> log/run1.log 
+  done
+  
+  # Print the selection
+  ./nuexsec --run 1 --printonly --printall | tee -a log/run1.log 
 
   # Merge the files
   source merge/merge_run1_files.sh files/nuexsec_mc_run1.root files/nuexsec_run1_merged.root
 
   # Run the histogram plotter
-  ./nuexsec --run 1 --hist files/nuexsec_run1_merged.root
+  ./nuexsec --run 1 --hist files/nuexsec_run1_merged.root &
+  wait
 
   # Merge the ttrees to one file
   root -l -b -q 'merge/merge_uneaventrees.C("1","files/trees/nuexsec_selected_tree_mc_run1.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "")'
 
   # Now run the cross section calculator
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root | tee -a log/run1.log 
 fi
 # ---------------------
 

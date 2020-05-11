@@ -14,7 +14,7 @@ void SystematicsHelper::Initialise(const char *_run_period, utility _utility){
 
     // Get the variation files
     for (unsigned int l =0; l < var_string.size(); l++){
-        f_vars.at(l) = new TFile( Form("files/nuexsec_run%s_%s_merged", _run_period, var_string.c_str() ), "READ");
+        f_vars.at(l) = new TFile( Form("files/nuexsec_run%s_%s_merged", _run_period, var_string.at(l).c_str() ), "READ");
 
         // Maybe add something here to pickup non processed variation
     }
@@ -25,12 +25,7 @@ void SystematicsHelper::Initialise(const char *_run_period, utility _utility){
 }
 // -----------------------------------------------------------------------------
 void SystematicsHelper::MakeHistograms(){
-
-
-
-
-
-
+    // help
 }
 // -----------------------------------------------------------------------------
 void SystematicsHelper::GetPOT(const char* run_period){

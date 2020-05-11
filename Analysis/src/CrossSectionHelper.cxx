@@ -63,6 +63,11 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
     // Get the integrated flux
     integrated_flux = GetIntegratedFlux();
 
+    // Calculate the volume as used in the cuts
+    volume = (_util.config_v.at(_util.k_config_x2) - _util.config_v.at(_util.k_config_x1)) * 
+             (_util.config_v.at(_util.k_config_y2) - _util.config_v.at(_util.k_config_y1)) * 
+             (_util.config_v.at(_util.k_config_z2) - _util.config_v.at(_util.k_config_z1));
+
     std::cout << "Volume used in cuts: " << volume << std::endl;
 
     N_target_MC   = (lar_density_mc   * volume * NA * N_nuc) / m_mol;

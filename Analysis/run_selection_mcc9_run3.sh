@@ -13,19 +13,30 @@ if [ -z "$1" ]; then
   eval $data | tee log/run3_data.log | sed -e 's/^/[Data] /' &
   eval $ext | tee log/run3_ext.log | sed -e 's/^/[EXT] /' &
   eval $dirt | tee log/run3_dirt.log | sed -e 's/^/[Dirt] /' &
+  
+  # wait for the background processes to finish
   wait
-  ./nuexsec --run 3 --printonly --printall
+  
+  # put the outputs into 1 log file
+  declare -a arr=("log/run3_mc.log" "log/run3_data.log" "log/run3_ext.log" "log/run3_dirt.log")
+  echo " " > log/run3.log
+  for i in "${arr[@]}"; do
+    cat "$i" >> log/run3.log 
+  done
+  
+  ./nuexsec --run 3 --printonly --printall | tee -a log/run3.log 
 
 
   source merge/merge_run3_files.sh files/nuexsec_mc_run3.root files/nuexsec_run3_merged.root
 
-  ./nuexsec --run 3 --hist files/nuexsec_run3_merged.root
+  ./nuexsec --run 3 --hist files/nuexsec_run3_merged.root &
+  wait
 
   # Merge the ttrees to one file
   root -l -b -q 'merge/merge_uneaventrees.C("3","files/trees/nuexsec_selected_tree_mc_run3.root", "files/trees/nuexsec_selected_tree_data_run3.root", "files/trees/nuexsec_selected_tree_ext_run3.root","files/trees/nuexsec_selected_tree_dirt_run3.root", "")'
 
   # Now run the cross section calculator
-  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root 
+  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root | tee -a log/run3.log 
 
 fi
 

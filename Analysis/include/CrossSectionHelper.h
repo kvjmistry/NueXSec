@@ -41,7 +41,7 @@ class CrossSectionHelper{
     double lar_density_mc   = 1.3954;   // Density of Argon in the simulation g/cm3
     double lar_density_data = 1.3836;   // Density of Argon in the simulation g/cm3
     double volume           = 4.1622e7; // Fiducial volume cm3
-    double NA               = 6.022e23; // Advogadro's number molecule/mol
+    double NA               = 6.022140857e23; // Advogadro's number molecule/mol
     double N_nuc            = 40.0;     // Number of argon nuclons
     double m_mol            = 39.95;    // Molar Mass of Argon g/mol
 

@@ -42,7 +42,7 @@ int main(int argc, char *argv[]){
     histogram_plotter _hplot;
     CrossSectionHelper _xsec;
     PrintHelper _phelper;
-    // SystematicsHelper _systematics;
+    SystematicsHelper _systematics;
 
     std::string usage = "\nFirst run the selection with the options: \n\n\033[0;31m./nuexsec --run <run period num> [options (see below)]\033[0m \n\n"
     "\033[0;34m[--mc <mc file>]\033[0m                                       \033[0;32mThe input overlay root file\033[0m\n\n"

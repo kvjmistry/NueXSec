@@ -45,12 +45,12 @@ class SystematicsHelper{
         k_vars_MAX
     };
 
-    std::string var_string = {
+    std::vector<std::string> var_string = {
         "CV",
         "BNB_Diffusion"
     };
 
-    std::string var_string_pretty = {
+    std::vector<std::string> var_string_pretty = {
         "CV",
         "BNB Diffusion"
     };
