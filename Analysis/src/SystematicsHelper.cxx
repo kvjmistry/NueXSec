@@ -171,21 +171,11 @@ void SystematicsHelper::MakeHistograms(){
         PlotVariations("h_reco_nu_e", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_nu_e.pdf", run_period.c_str(), _util.cut_dirs.at(i).c_str()),
                         _util.cut_dirs.at(i), "Reconstructed Neutrino Energy [GeV]");
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        // Leading Shower Energy
+        PlotVariations("h_reco_shower_energy_tot_cali", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_shower_energy_tot_cali.pdf", run_period.c_str(), _util.cut_dirs.at(i).c_str()),
+                        _util.cut_dirs.at(i), "Reconstructed Leading Shower Energy [GeV]");
+
+
     }
 
 
@@ -240,6 +230,9 @@ void SystematicsHelper::PlotVariations(std::string hist_name, const char* print_
             h_error_hist->SetFillColorAlpha(12, 0.15);
             h_error_hist->SetLineWidth(2);
             h_error_hist->SetLineColor(kBlack);
+            h_error_hist->GetYaxis()->SetTitle("Entries");
+            h_error_hist->GetYaxis()->SetTitleFont(46);
+            h_error_hist->GetYaxis()->SetTitleSize(13);
             h_error_hist->Draw("E2");
         }
 
