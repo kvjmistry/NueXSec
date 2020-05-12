@@ -10,15 +10,17 @@ varname value
 Run1_MC_POT 1.64468e+21
 -
 // Run 1 dirt POT
-Run1_Dirt_POT 4.76579e+20 // v3 includes ppfx cv correction
+Run1_Dirt_POT 5.08152e+20 // v3 includes ppfx cv correction
 -
 // Run 1 Data POT (tortgt) beam good and bad file
 // Run1_Data_POT 8.953e+19    // v2 bad runs subtracted more stats
-Run1_Data_POT 8.885e+19       // v3 with michel veto updated
+Run1_Data_POT 8.885e+19       // v3 with michel veto updated pawels tool
+// Run1_Data_POT 8.907e+19       // v3 with michel veto updated zarkos tool
 -
 // Run 1 data HW Triggers (EA9CNT) 
 // Run1_Data_trig 2365837.0    // v2 bad runs subtracted more stats
-Run1_Data_trig 2347745.0       // v3 with michel veto updated
+Run1_Data_trig 2347745.0       // v3 with michel veto updated pawels tool
+// Run1_Data_trig 2353838.0      // v3 with michel veto updated zarkos tool
 -
 // Run 1 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
 // Run1_EXT_trig 3378479.250000

@@ -16,7 +16,7 @@ then Zarko's POT counting script will be called after generating a run subrun fi
 */
 
 
-int GetPOT(const char *_file1, std::string type){
+void GetPOT(const char *_file1, std::string type){
 
     bool debug = false;
 
@@ -47,7 +47,6 @@ int GetPOT(const char *_file1, std::string type){
         }
 
         std::cout << "Total POT: " << pot_sum  << std::endl;
-        return 0;
 
     }
     // Data file so do zarko's POT counting script
@@ -69,7 +68,7 @@ int GetPOT(const char *_file1, std::string type){
 
         // Get the tree
         TTree * mytree = (TTree*)f->Get("nuselection/SubRun");
-	if (mytree == NULL) mytree = (TTree*)f->Get("FlashValidate/pottree");
+    if (mytree == NULL) mytree = (TTree*)f->Get("FlashValidate/pottree");
 
         if (mytree == NULL){
             std::cout << "help can't get the branch so exiting..." << std::endl;
@@ -87,14 +86,15 @@ int GetPOT(const char *_file1, std::string type){
         
         run_subrun_file.close();
 
-        if (type == "ext") gSystem->Exec("/uboone/app/users/zarko/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt"); 
-	
-	// Use Pawels updated version for on beam, use  --slip for slipstacking info
-	else gSystem->Exec("/uboone/app/users/guzowski/slip_stacking/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt"); 
-		
-        gSystem->Exec("rm run_subrun_list_data.txt");
-
-        return 0;
+        if (type == "ext") {
+        std::cout << "/uboone/app/users/zarko/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt" << std::endl;
+        //gSystem->Exec("/uboone/app/users/zarko/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt"); 
+    }
+    
+    // Use Pawels updated version for on beam, use  --slip for slipstacking info
+    else gSystem->Exec("/uboone/app/users/guzowski/slip_stacking/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt"); 
+        
+        //gSystem->Exec("rm run_subrun_list_data.txt");
 
     }
     

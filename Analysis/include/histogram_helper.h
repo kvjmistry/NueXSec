@@ -161,6 +161,7 @@ class histogram_helper{
         k_reco_trk_len,                                                         // Length of the longest track
         k_reco_nu_e,                                                            // Reconstructed Neutrino Energy
         k_reco_contained_fraction,                                              // Ratio of PFP hits in FV to the slice
+        k_reco_run_number,                                                      // Wont be used for stack, but for run normalisation plot
         k_TH1D_MAX
     };
 
@@ -218,9 +219,6 @@ class histogram_helper{
         k_reco_shr_dEdx_shr_dist,
         k_TH2D_reco_MAX
     };
-
-    
-
 
 }; // End Class Histogram Helper 
 
