@@ -52,7 +52,7 @@
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <disk>25GB</disk>
-    <schema>gsiftp</schema>
+    <schema>root</schema>
     <jobsub>--expected-lifetime=12h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
     <jobsub_start> --expected-lifetime=short</jobsub_start>
     <blacklist>Lancaster</blacklist>

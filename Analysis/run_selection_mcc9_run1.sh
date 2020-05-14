@@ -7,6 +7,12 @@ if [ -z "$1" ]; then
   # Run the selection
   # ./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v2/neutrinoselection_filt_run1_overlay.root  --dirt /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v3/neutrinoselection_filt_run1_dirt_overlay.root --data /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v3/neutrinoselection_filt_run1_beamon_beamgood.root --ext /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v3/neutrinoselection_filt_run1_beamoff.root --printall  2> /dev/null | tee log/run1.log
 
+  # use the BNB ntuples as a cross check for the analysis
+  # mc="./nuexsec --run 1 --mc /uboone/data/users/davidc/searchingfornues/v08_00_00_33/cc0pinp/0304/run1/prodgenie_bnb_nu_uboone_overlay_mcc9.1_v08_00_00_26_filter_run1_reco2_reco2.root --weight 2"
+  # data="./nuexsec --run 1 --data /uboone/data/users/davidc/searchingfornues/v08_00_00_33/cc0pinp/0304/run1/data_bnb_mcc9.1_v08_00_00_25_reco2_C1_beam_good_reco2_5e19.root"
+  # ext="./nuexsec --run 1 --ext /uboone/data/users/davidc/searchingfornues/v08_00_00_33/cc0pinp/0304/run1/data_extbnb_mcc9.1_v08_00_00_25_reco2_C1_all_reco2.root"
+  # dirt="./nuexsec --run 1 --dirt /uboone/data/users/davidc/searchingfornues/v08_00_00_33/cc0pinp/0304/run1/prodgenie_bnb_dirt_overlay_mcc9.1_v08_00_00_26_run1_reco2_reco2.root --weight 2"
+
   # Parallel processing version
   mc="./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v2/neutrinoselection_filt_run1_overlay.root --weight 3"
   data="./nuexsec --run 1 --data /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v3/neutrinoselection_filt_run1_beamon_beamgood.root"
@@ -27,15 +33,16 @@ if [ -z "$1" ]; then
   for i in "${arr[@]}"; do
     cat "$i" >> log/run1.log 
   done
-  
+
   # Print the selection
   ./nuexsec --run 1 --printonly --printall | tee -a log/run1.log 
-
+  
   # Merge the files
   source merge/merge_run1_files.sh files/nuexsec_mc_run1.root files/nuexsec_run1_merged.root
 
   # Run the histogram plotter
-  ./nuexsec --run 1 --hist files/nuexsec_run1_merged.root --weight 3 &
+  plotter="./nuexsec --run 1 --hist files/nuexsec_run1_merged.root --weight 3"
+  eval $plotter &
   wait
 
   # Merge the ttrees to one file

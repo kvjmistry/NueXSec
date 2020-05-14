@@ -252,10 +252,10 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_n_shower_contained).at(i).at(j) = new TH1D ( Form("h_reco_n_shower_contained_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 5, 0, 5);
 
             // Leading shower phi
-            TH1D_hists.at(k_reco_leading_shower_phi).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_phi_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 12, -180, 180);
+            TH1D_hists.at(k_reco_leading_shower_phi).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_phi_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 14, -190, 190);
 
             // Leading shower theta
-            TH1D_hists.at(k_reco_leading_shower_theta).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_theta_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 12, 0, 180);
+            TH1D_hists.at(k_reco_leading_shower_theta).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_theta_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 13, 0, 190);
 
             // Leading shower cos theta
             TH1D_hists.at(k_reco_leading_shower_cos_theta).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_cos_theta_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 16, -1, 1);
@@ -638,6 +638,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
 
     // Flash histograms
     if (type == _util.k_mc || type == _util.k_dirt){
+        // We also want to apply the software trigger to the MC, just to be fair
         TH1D_hists.at(k_reco_flash_time).at(cut_index).at(classification_index)->Fill(SC.flash_time + 0.055 -0.359, weight);
     }
     if (type == _util.k_ext){
@@ -647,7 +648,13 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
         TH1D_hists.at(k_reco_flash_time).at(cut_index).at(classification_index)->Fill(SC.flash_time, weight);
     }
     
-    TH1D_hists.at(k_reco_flash_pe).at(cut_index).at(classification_index)->Fill(SC.flash_pe, weight);
+    // Also apply the SW Trig
+    
+    if (type == _util.k_mc || type == _util.k_dirt){
+        TH1D_hists.at(k_reco_flash_pe).at(cut_index).at(classification_index)->Fill(SC.flash_pe, weight);
+    
+    }
+    else TH1D_hists.at(k_reco_flash_pe).at(cut_index).at(classification_index)->Fill(SC.flash_pe, weight);
 
     // -------------------------------------------------------------------------
     // Fill truth histograms
@@ -732,32 +739,32 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
 
         // Flash histograms
         if (type == _util.k_mc){
-            TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
-            TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight); // See numi documentation page to see what these numbers mean
+            if (SC.swtrig > 0) TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
+            if (SC.swtrig > 0) TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight); // See numi documentation page to see what these numbers mean
            
             if (SC.nslice == 1){
-                TH1D_flash_hists.at(k_flash_time_sid1)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
-                TH1D_flash_hists.at(k_flash_pe_sid1)->Fill(SC.flash_pe, weight); // See numi documentation page to see what these numbers mean
+                if (SC.swtrig > 0) TH1D_flash_hists.at(k_flash_time_sid1)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
+                if (SC.swtrig > 0) TH1D_flash_hists.at(k_flash_pe_sid1)->Fill(SC.flash_pe, weight); // See numi documentation page to see what these numbers mean
 
             }
             if (SC.nslice == 0){
-                TH1D_flash_hists.at(k_flash_time_sid0)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
-                TH1D_flash_hists.at(k_flash_pe_sid0)->Fill(SC.flash_pe, weight); // See numi documentation page to see what these numbers mean
+                if (SC.swtrig > 0) TH1D_flash_hists.at(k_flash_time_sid0)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
+                if (SC.swtrig > 0) TH1D_flash_hists.at(k_flash_pe_sid0)->Fill(SC.flash_pe, weight); // See numi documentation page to see what these numbers mean
 
             }
         }
         if (type == _util.k_dirt){
-            TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + 0.055 -0.359, weight);
-            TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
+            if (SC.swtrig > 0) TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + 0.055 -0.359, weight);
+            if (SC.swtrig > 0) TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
            
             if (SC.nslice == 1){
-                TH1D_flash_hists.at(k_flash_time_sid1)->Fill(SC.flash_time + 0.055 -0.359, weight);
-                TH1D_flash_hists.at(k_flash_pe_sid1)->Fill(SC.flash_pe, weight);
+                if (SC.swtrig > 0) TH1D_flash_hists.at(k_flash_time_sid1)->Fill(SC.flash_time + 0.055 -0.359, weight);
+                if (SC.swtrig > 0) TH1D_flash_hists.at(k_flash_pe_sid1)->Fill(SC.flash_pe, weight);
 
             }
             if (SC.nslice == 0){
-                TH1D_flash_hists.at(k_flash_time_sid0)->Fill(SC.flash_time + 0.055 -0.359, weight);
-                TH1D_flash_hists.at(k_flash_pe_sid0)->Fill(SC.flash_pe, weight);
+                if (SC.swtrig > 0) TH1D_flash_hists.at(k_flash_time_sid0)->Fill(SC.flash_time + 0.055 -0.359, weight);
+                if (SC.swtrig > 0) TH1D_flash_hists.at(k_flash_pe_sid0)->Fill(SC.flash_pe, weight);
                 
             }
         }

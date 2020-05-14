@@ -27,7 +27,7 @@ bool selection_cuts::opfilt_pe(SliceContainer &SC, int type){
 // -----------------------------------------------------------------------------
 bool selection_cuts::opfilt_veto(SliceContainer &SC, int type){
 
-    if (SC.opfilter_pe_veto < 40) return true; // pass 
+    if (SC.opfilter_pe_veto < 20) return true; // pass 
     else return false;               // fail
 }
 // -----------------------------------------------------------------------------

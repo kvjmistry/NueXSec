@@ -306,6 +306,11 @@ void selection::MakeSelection(){
             // Get the entry in the tree
             data_tree->GetEntry(ievent);
 
+            // Skip the RHC events contaminated in the FHC files
+            if (_run_period == 3 && data_SC.run < 16880 ){
+                continue;
+            }
+
             bool pass = ApplyCuts(_util.k_data, ievent, counter_v, data_passed_v, data_SC);
             if (!pass) continue;
         }

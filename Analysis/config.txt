@@ -7,22 +7,27 @@ varname value
 -
 // ---------------- Run 1 ----------------------
 // Run1 MC POT v33
+// Run1_MC_POT 1.30691e+21 // *BNB* overlay POT
 Run1_MC_POT 1.64468e+21
 -
 // Run 1 dirt POT
+// Run1_Dirt_POT 3.22483e+20 // **BNB** dirt POT
 Run1_Dirt_POT 5.08152e+20 // v3 includes ppfx cv correction
 -
 // Run 1 Data POT (tortgt) beam good and bad file
+// Run1_Data_POT 4.072e+19       // **BNB** run 1 POT
 // Run1_Data_POT 8.953e+19    // v2 bad runs subtracted more stats
 Run1_Data_POT 8.885e+19       // v3 with michel veto updated pawels tool
 // Run1_Data_POT 8.907e+19       // v3 with michel veto updated zarkos tool
 -
 // Run 1 data HW Triggers (EA9CNT) 
+// Run1_Data_trig 9028010.0     // **BNB** run 1 Triggers
 // Run1_Data_trig 2365837.0    // v2 bad runs subtracted more stats
 Run1_Data_trig 2347745.0       // v3 with michel veto updated pawels tool
 // Run1_Data_trig 2353838.0      // v3 with michel veto updated zarkos tool
 -
 // Run 1 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
+// Run1_EXT_trig 33580525.000000 // **BNB** sample triggers
 // Run1_EXT_trig 3378479.250000
 Run1_EXT_trig 4015961.990000 // v3 with michel veto updated
 -
@@ -42,10 +47,12 @@ Run3_MC_POT 1.14486e+21
 Run3_Dirt_POT 4.32295e+20
 -
 // Run 3 Data POT (tortgt) beam good, bad runs removed
-Run3_Data_POT 3.991e+19
+// Run3_Data_POT 3.991e+19
+Run3_Data_POT 2.996e+19 // with runs < 16880 removed
 -
 // Run 3 data HW Triggers (EA9CNT) beam good, bad runs removed
-Run3_Data_trig  815631.0
+// Run3_Data_trig  815631.0
+Run3_Data_trig  611581.0
 -
 // Run 3 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
 Run3_EXT_trig 1550231.025000

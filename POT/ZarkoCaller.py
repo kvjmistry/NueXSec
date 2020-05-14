@@ -9,7 +9,7 @@ import sys
 
 
 # create the output files:
-file = open("run_subrun_list_data_bad_removed.txt", "r")
+file = open("run_subrun_list_data.txt", "r")
 
 # loop over the run subrun filelist
 for line in file:

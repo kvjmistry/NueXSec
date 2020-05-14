@@ -179,6 +179,9 @@ void RunPeriod_Norm(const char *_file1){
 
     c3->Print("plots/data_events_per_pot.pdf");
 
+    TCanvas *c4 = new TCanvas();
+    h_run_data_pot->Draw();
+
 
 
 

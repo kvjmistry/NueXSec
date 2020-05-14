@@ -853,6 +853,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         // For ratio
         h_ratio->GetYaxis()->SetRangeUser(0, 2);
         h_ratio->GetYaxis()->SetRangeUser(0.5,1.5);
+        h_ratio->GetYaxis()->SetRangeUser(0.85, 1.15);
         h_ratio->GetYaxis()->SetTitle("Data / (MC + EXT) ");
 
         h_ratio->GetXaxis()->SetTitle(x_axis_name);
@@ -1025,7 +1026,7 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
     // Topological Score
     MakeStack("h_reco_topological_score", _util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  true, 1.0, "Topological Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Topological Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("cuts/%s/reco_topological_score.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false);
 
     // Track shower dist
