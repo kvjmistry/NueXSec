@@ -38,6 +38,9 @@ class SystematicsHelper{
     // Plots the variation comparisons
     void PlotVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name);
     // -------------------------------------------------------------------------
+    // Plots the variation comparisons
+    void PlotVariationsEXT(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name);
+    // -------------------------------------------------------------------------
     void SetVariationProperties(TH1D* h, int index);
     // -------------------------------------------------------------------------
     void SetTPadOptions(TPad * topPad, TPad * bottomPad );
@@ -45,10 +48,19 @@ class SystematicsHelper{
     void CreateDirectory(std::string folder, std::string run_period);
     // -------------------------------------------------------------------------
 
+    std::string mode{"default"}; // what mode to run this class in
+
+
     enum enum_variations {
         k_CV,
         k_bnb_diffusion,
         k_vars_MAX
+    };
+
+    enum enum_ext {
+        k_BNB,
+        k_NuMI,
+        k_ext_MAX
     };
 
     std::vector<std::string> var_string = {

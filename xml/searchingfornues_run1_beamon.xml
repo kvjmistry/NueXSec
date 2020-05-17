@@ -8,7 +8,7 @@
 <!ENTITY file_type "mc">
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
-<!ENTITY name "searchingfornues_ntuple_run1_beamon_offset1_mcc9_v33">
+<!ENTITY name "searchingfornues_run1_beamon">
 <!ENTITY indef "numi_uboone_run1_beamon_offset1_mcc9_reco2_v08_00_00_28_beam_good_snapshot">
 <!ENTITY version "v4">
 ]>

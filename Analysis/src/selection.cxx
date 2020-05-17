@@ -709,6 +709,10 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
 // -----------------------------------------------------------------------------
 double selection::GetCVWeight(int type, SliceContainer SC){
     
+
+    // Always give weights of 1 to the off beam and data
+    if (type == _util.k_data || _util.k_ext) return 1.0;
+
     double weight = 1.0;
     bool weight_tune{true}, weight_ppfx{true};
 
@@ -754,16 +758,15 @@ double selection::GetCVWeight(int type, SliceContainer SC){
     
 
     // Get the PPFX CV flux correction weight
-    if (type == _util.k_mc){
+    if (_run_period == 3){
         double weight_flux = SC.GetPPFXCVWeight();
         
         // If we want ppfx weight then add this into the weight
         if (weight_ppfx) weight = weight * weight_flux;
 
     }
-
-    // Default overlay does not yet contain ppfx correction in ntuple -- just dirt for now
-    if (type == _util.k_dirt && _run_period == 1){
+   
+    if (_run_period == 1){
         double weight_flux = SC.ppfx_cv;
 
         if (std::isinf(weight_flux))      weight_flux = 1.0; 

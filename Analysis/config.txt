@@ -8,7 +8,7 @@ varname value
 // ---------------- Run 1 ----------------------
 // Run1 MC POT v33
 // Run1_MC_POT 1.30691e+21 // *BNB* overlay POT
-Run1_MC_POT 1.64468e+21
+Run1_MC_POT 1.12613e+21
 -
 // Run 1 dirt POT
 // Run1_Dirt_POT 3.22483e+20 // **BNB** dirt POT
@@ -38,6 +38,12 @@ Run1_MC_POT_CV 4.44874e+20
 -
 // Run 1 Det Var BNB diffusion
 Run1_MC_POT_BNB_Diffusion 4.19732e+20
+-
+// Run 1 EXT NuMI sample number of triggers
+Run1_EXT_trig_NuMI 4015961.990000
+-
+// Run 1 EXT BNB sample number of triggers
+Run1_EXT_trig_BNB 33580525.000000
 -
 // ---------------- Run 3 ----------------------
 // Run 3 MC POT v33
