@@ -47,7 +47,7 @@ Run1_EXT_trig_BNB 33580525.000000
 -
 // ---------------- Run 3 ----------------------
 // Run 3 MC POT v33
-Run3_MC_POT 1.14486e+21
+Run3_MC_POT 1.18225e+21
 -
 // Run 3 dirt POT
 Run3_Dirt_POT 4.32295e+20

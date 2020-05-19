@@ -11,7 +11,7 @@ void SystematicsHelper::Initialise(const char *_run_period, utility _utility){
 
     // Off beam mode to compare bnb and numi off beam samples
     if (_mode == "ext"){
-        var_string = { "BNB", "NuMI" };
+        var_string = { "NuMI", "BNB" };
         mode = _mode;
     }
 
@@ -126,6 +126,49 @@ void SystematicsHelper::SetVariationProperties(TH1D* h, int index){
 
 }
 // -----------------------------------------------------------------------------
+void SystematicsHelper::Draw_Area_Norm(TCanvas* c){
+    c->cd();
+
+    TPaveText *pt;
+
+    pt = new TPaveText(0.4, 0.916, 0.4, 0.916,"NDC");
+    pt->AddText("Area Normalised");
+    pt->SetTextColor(kGreen+2);
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.03);
+    pt->Draw();
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::Draw_Run_Period(TCanvas* c){
+    c->cd();
+
+    TPaveText *pt;
+
+    if (run_period == "1"){
+        pt = new TPaveText(0.66, 0.89, 0.86, 0.96,"NDC");
+        pt->AddText("Run1");
+        pt->SetTextColor(kRed+2);
+    }
+    else if (run_period == "3"){
+        pt = new TPaveText(0.66, 0.89, 0.86, 0.96,"NDC");
+        pt->AddText("Run3b");
+        pt->SetTextColor(kBlue+2);
+    }
+    else {
+        pt = new TPaveText(0.66, 0.89, 0.86, 0.96,"NDC");
+        pt->AddText("RunXXX");
+        pt->SetTextColor(kGreen+2);
+    }
+    
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.04);
+    pt->Draw();
+}
+// -----------------------------------------------------------------------------
 void SystematicsHelper::SetTPadOptions(TPad * topPad, TPad * bottomPad ){
 
     topPad   ->SetBottomMargin(0.05);
@@ -160,7 +203,7 @@ void SystematicsHelper::MakeHistograms(){
     for (unsigned int i = 0 ; i < _util.k_cuts_MAX; i++){
         
         // Default detector systematics mode
-        if (mode == "defaut"){
+        if (mode == "default"){
             // Create the directory
             CreateDirectory("/detvar/comparisons/cuts/" + _util.cut_dirs.at(i), run_period);
 
@@ -226,6 +269,54 @@ void SystematicsHelper::MakeHistograms(){
             // Space Charge Corrected X position comparision plot
             PlotVariationsEXT("h_reco_vtx_x_sce", Form("plots/run%s/ext/comparisons/cuts/%s/reco_vtx_x_sce.pdf", run_period.c_str(), _util.cut_dirs.at(i).c_str()),
                             _util.cut_dirs.at(i), "Reco Vertex X [cm]");
+
+            // Space Charge Corrected Y position comparision plot
+            PlotVariationsEXT("h_reco_vtx_y_sce", Form("plots/run%s/ext/comparisons/cuts/%s/reco_vtx_y_sce.pdf", run_period.c_str(), _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Reco Vertex Y [cm]");
+
+
+            // Space Charge Corrected X position comparision plot
+            PlotVariationsEXT("h_reco_vtx_z_sce", Form("plots/run%s/ext/comparisons/cuts/%s/reco_vtx_z_sce.pdf", run_period.c_str(), _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Reco Vertex Z [cm]");
+        
+            // Leading Shower Phi
+            PlotVariationsEXT("h_reco_leading_shower_phi", Form("plots/run%s/ext/comparisons/cuts/%s/reco_leading_shower_phi.pdf", run_period.c_str(), _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Leading Shower Phi [degrees]");
+
+            // Leading Shower Theta
+            PlotVariationsEXT("h_reco_leading_shower_theta", Form("plots/run%s/ext/comparisons/cuts/%s/reco_leading_shower_theta.pdf", run_period.c_str(), _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Leading Shower Theta [degrees]");
+
+
+            // Shower Multiplicty
+            PlotVariationsEXT("h_reco_shower_multiplicity", Form("plots/run%s/ext/comparisons/cuts/%s/reco_shower_multiplicity.pdf", run_period.c_str(), _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Shower Multiplicty");
+
+            // Track Multiplicty
+            PlotVariationsEXT("h_reco_track_multiplicity", Form("plots/run%s/ext/comparisons/cuts/%s/reco_track_multiplicity.pdf", run_period.c_str(), _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Track Multiplicity");
+
+            
+            // Topological Score
+            PlotVariationsEXT("h_reco_topological_score", Form("plots/run%s/ext/comparisons/cuts/%s/reco_topological_score.pdf", run_period.c_str(), _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Topological Score");
+
+            
+            // Shower Track Fitter dedx Y plane
+            PlotVariationsEXT("h_reco_shr_tkfit_dedx_y", Form("plots/run%s/ext/comparisons/cuts/%s/reco_shr_tkfit_dedx_y.pdf", run_period.c_str(), _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Collection Plane dEdx (track fitter) [MeV/cm]");
+
+            // Reco Electron Neutrino E
+            PlotVariationsEXT("h_reco_nu_e", Form("plots/run%s/ext/comparisons/cuts/%s/reco_nu_e.pdf", run_period.c_str(), _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Reconstructed Neutrino Energy [GeV]");
+
+            // Leading Shower Energy
+            PlotVariationsEXT("h_reco_shower_energy_tot_cali", Form("plots/run%s/ext/comparisons/cuts/%s/reco_shower_energy_tot_cali.pdf", run_period.c_str(), _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Reconstructed Leading Shower Energy [GeV]");
+
+            // Flash PE
+            PlotVariationsEXT("h_reco_flash_pe", Form("plots/run%s/ext/comparisons/cuts/%s/reco_flash_pe.pdf", run_period.c_str(), _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Flash PE [PE]");
 
         }
         // dont know what your trying to configure tbh ;)
@@ -398,12 +489,13 @@ void SystematicsHelper::PlotVariationsEXT(std::string hist_name, const char* pri
     // Now scale the histograms to POT
     for (unsigned int y=0; y < hist.size(); y++ ){
         double scale_fact = POT_v.at(k_NuMI) / POT_v.at(y);
-        std::cout << "scale factor: " << scale_fact << std::endl;
+        // std::cout << "scale factor: " << scale_fact << std::endl;
         hist.at(y)->Scale(scale_fact);
 
         // Do area norm
+        std::cout << "BNB to NuMI scale Factor: " << hist.at(k_NuMI)->Integral() / hist.at(y)->Integral() << std::endl;
         hist.at(y)->Scale(hist.at(k_NuMI)->Integral() / hist.at(y)->Integral() );
-
+        
         if (y == k_NuMI){
             // Clone a histogram to plot the CV error as a grey band
             h_error_hist = (TH1D*) hist.at(k_NuMI)->Clone("h_error_hist");
@@ -456,7 +548,7 @@ void SystematicsHelper::PlotVariationsEXT(std::string hist_name, const char* pri
         hist_ratio.at(k)->GetXaxis()->SetTitleFont(46);
         hist_ratio.at(k)->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
         hist_ratio.at(k)->GetYaxis()->SetRangeUser(0., 2.0);
-        hist_ratio.at(k)->GetYaxis()->SetTitle("Variation / CV");
+        hist_ratio.at(k)->GetYaxis()->SetTitle("NuMI / BNB");
         hist_ratio.at(k)->GetYaxis()->SetTitleSize(13);
         hist_ratio.at(k)->GetYaxis()->SetTitleFont(44);
         hist_ratio.at(k)->GetYaxis()->SetTitleOffset(1.5);
@@ -474,10 +566,10 @@ void SystematicsHelper::PlotVariationsEXT(std::string hist_name, const char* pri
 
 
     // Draw the run period on the plot
-    // Draw_Run_Period(c);
+    Draw_Run_Period(c);
 
-    // Add the weight labels
-    // Draw_WeightLabels(c);
+    // Draw area normalisation
+    Draw_Area_Norm(c);
     
     c->Print(print_name);
 

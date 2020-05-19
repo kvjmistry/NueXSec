@@ -47,6 +47,12 @@ class SystematicsHelper{
     // -------------------------------------------------------------------------
     void CreateDirectory(std::string folder, std::string run_period);
     // -------------------------------------------------------------------------
+    // Draw area norm label
+    void Draw_Area_Norm(TCanvas* c);
+    // -------------------------------------------------------------------------
+    // Draw run period label
+    void Draw_Run_Period(TCanvas* c);
+    // -------------------------------------------------------------------------
 
     std::string mode{"default"}; // what mode to run this class in
 
@@ -58,8 +64,8 @@ class SystematicsHelper{
     };
 
     enum enum_ext {
-        k_BNB,
         k_NuMI,
+        k_BNB,
         k_ext_MAX
     };
 
