@@ -32,6 +32,7 @@ int main(int argc, char *argv[]){
     char * hist_file_name        = (char *)"empty";
     char * tree_file_name        = (char *)"empty";
     char * run_period            = (char *)"empty";
+    char * sysmode               = (char *)"default";
     int num_events{-1};
     int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
     int weight{1};  // level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only
@@ -70,7 +71,7 @@ int main(int argc, char *argv[]){
     "\033[0;31m./nuexsec --run <run period num> --hist <input merged nuexsec file> [options (see below)]\033[0m \n\n"
     "\033[0;33m[--weight <weight setting>]\033[0m                            \033[0;32mChange the Weight level to dislay on the plots. Should be used in conjunction with the setting used in the selection stage. level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only \033[0m\n\n"
     "\033[0;33m[--area]\033[0m                                               \033[0;32mArea normalise all the histograms\033[0m\n\n"
-    "\033[0;33m[--var dummy <variation name>]\033[0m              \033[0;32m(first arg) this argument is already input from the hist option, use something like -dummy- as a placeholder, (second arg) the variation name\033[0m\n\n"
+    "\033[0;33m[--var dummy <variation name>]\033[0m                         \033[0;32m(first arg) this argument is already input from the hist option, use something like -dummy- as a placeholder, (second arg) the variation name\033[0m\n\n"
     "The <input merged nuexsec file> corresponds to hadd merged file of the mc, data, ext and dirt. See the bash script merge_run1_files.sh for more details\n\n"
     "-------------------------------------------------------"
     "\n\nTo run the cross section calculation code, run: \n\n"
@@ -78,7 +79,8 @@ int main(int argc, char *argv[]){
     "The <input merged nuexsec ttree file> corresponds to merged ttree file of the mc, data, ext and dirt. See the bash script merge_uneaventrees.C for more details\n\n";
 
     std::string usage3 = "\n\nTo run the detector systematics code, run: \n\n"
-    "\033[0;31m./nuexsec --run <run period num> --sys\033[0m \n\n"
+    "\033[0;31m./nuexsec --run <run period num> --sys <systematics mode>\033[0m \n\n"
+    "\033[0;34m[--sys <systematics mode>]\033[0m                             \033[0;32mThe input mode of systematics to run. Options are default or ext \033[0m\n\n"
     "This will run the detector systematics plotting code\n\n";
 
 
@@ -214,9 +216,10 @@ int main(int argc, char *argv[]){
 
         // Systematics
         if (strcmp(arg, "--sys") == 0){
-            std::cout << "Using Systematics plotting code" << std::endl;
+            std::cout << "Using Systematics plotting code with mode: " << argv[i+1] << std::endl;
             run_sys = true;
             run_selection = false;
+            sysmode = argv[i+1];
         }
 
         // Only run the print function
@@ -290,7 +293,7 @@ int main(int argc, char *argv[]){
     if (calc_cross_sec) _xsec.Initialise(run_period, tree_file_name, _utility);
 
     // Run the systematics helper code
-    if (run_sys) _syshelper.Initialise(run_period, _utility);
+    if (run_sys) _syshelper.Initialise(run_period, _utility, sysmode);
 
     // -------------------------------------------------------------------------
     // Finished!

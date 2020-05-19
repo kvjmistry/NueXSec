@@ -28,7 +28,7 @@ class SystematicsHelper{
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(const char *run_period, utility _utility);
+    void Initialise(const char *run_period, utility _utility, const char* _mode);
     // -------------------------------------------------------------------------
     // Function to loop over events and calculate the cross section
     void MakeHistograms(); 

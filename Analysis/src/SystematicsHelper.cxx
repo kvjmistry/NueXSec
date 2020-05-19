@@ -1,18 +1,15 @@
 #include "../include/SystematicsHelper.h"
 
 // -----------------------------------------------------------------------------
-void SystematicsHelper::Initialise(const char *_run_period, utility _utility){
+void SystematicsHelper::Initialise(const char *_run_period, utility _utility, const char* _mode){
 
     std::cout << "Initalising Systematics Helper..." << std::endl;
     _util = _utility;
 
-    // To be added in as a configurable parameter
-    std::string _mode = "ext";
-
     // Off beam mode to compare bnb and numi off beam samples
-    if (_mode == "ext"){
+    if (std::string(_mode) == "ext"){
         var_string = { "NuMI", "BNB" };
-        mode = _mode;
+        mode = std::string(_mode);
     }
 
     // Get the POT of the variations from the file
