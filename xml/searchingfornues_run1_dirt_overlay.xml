@@ -7,10 +7,11 @@
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
 <!ENTITY name "searchingfornues_run1_dirt_overlay">
-<!ENTITY version "v4">
+<!ENTITY version "v5">
 ]>
 
 <!-- v4 includes ppfx weights added to the ntuples... for DIRT!-->
+<!-- v5 includes adding in all the software trigger modes -->
 
 <job>
 

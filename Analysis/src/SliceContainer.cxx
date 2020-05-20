@@ -414,7 +414,7 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights){
         tree->SetBranchAddress("weightsFlux",     &weightsFlux_v);
         tree->SetBranchAddress("weightsGenie",    &weightsGenie_v);
         tree->SetBranchAddress("weightsReint",    &weightsReint_v);
-        tree->SetBranchAddress("weightTune",      &weightTune);
+        tree->SetBranchAddress("weightSplineTimesTune",      &weightSplineTimesTune);
         tree->SetBranchAddress("ppfx_cv",         &ppfx_cv);
     }
     

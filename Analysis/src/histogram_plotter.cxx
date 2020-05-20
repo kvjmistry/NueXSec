@@ -853,7 +853,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         // For ratio
         h_ratio->GetYaxis()->SetRangeUser(0, 2);
         h_ratio->GetYaxis()->SetRangeUser(0.5,1.5);
-        h_ratio->GetYaxis()->SetRangeUser(0.85, 1.15);
+        h_ratio->GetYaxis()->SetRangeUser(0.8, 1.2);
         h_ratio->GetYaxis()->SetTitle("Data / (MC + EXT) ");
 
         h_ratio->GetXaxis()->SetTitle(x_axis_name);
@@ -1529,7 +1529,7 @@ void histogram_plotter::MakeFlashPlotOMO(double Data_POT, const char* print_name
     
     
     h_error_hist->SetFillColorAlpha(12, 0.15);
-    h_error_hist->Draw("e2 hist same");    
+    h_error_hist->Draw("e2, same");    
 
     TLegend *leg_stack = new TLegend(0.8, 0.91, 0.95, 0.32);
     leg_stack->SetBorderSize(0);

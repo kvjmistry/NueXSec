@@ -7,9 +7,10 @@
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
 <!ENTITY name "searchingfornues_run1_overlay">
-<!ENTITY version "v4">
+<!ENTITY version "v5">
 
 <!-- v4 includes ppfx_cv weight in the ntuple tree  -->
+<!-- v5 includes all the swtrigger modes in the ntuple tree  -->
 
 ]>
 

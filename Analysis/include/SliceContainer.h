@@ -277,7 +277,7 @@ public:
     float CosmicDirAll2DOvlp;    // cosine of 2D direction difference between shower cluster and cluster whose endpoints for the closest line 
     
     float leeweight;
-    float weightTune;
+    float weightSplineTimesTune;
     float ppfx_cv;    // Weight from PPFX CV
     
     float true_pt;         // Total Pt of all MC particles

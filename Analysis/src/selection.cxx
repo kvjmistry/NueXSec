@@ -711,7 +711,7 @@ double selection::GetCVWeight(int type, SliceContainer SC){
     
 
     // Always give weights of 1 to the off beam and data
-    if (type == _util.k_data || _util.k_ext) return 1.0;
+    if (type == _util.k_data || type == _util.k_ext) return 1.0;
 
     double weight = 1.0;
     bool weight_tune{true}, weight_ppfx{true};
@@ -742,7 +742,7 @@ double selection::GetCVWeight(int type, SliceContainer SC){
     // Get the tune weight
     if (type == _util.k_mc || type == _util.k_dirt){
         
-        weight = SC.weightTune; // Here define the weight
+        weight = SC.weightSplineTimesTune; // Here define the weight
         
         // Catch infinate/nan/unreasonably large tune weights
         if (std::isinf(weight))      weight = 1.0; 
@@ -755,18 +755,16 @@ double selection::GetCVWeight(int type, SliceContainer SC){
 
     } 
     else weight = 1.0;
-    
 
-    // Get the PPFX CV flux correction weight
-    if (_run_period == 3){
+    // Get the PPFX CV flux correction weight -- only dont have ppfx corrections for dirt
+    if (_run_period == 3 && type == _util.k_dirt){
         double weight_flux = SC.GetPPFXCVWeight();
         
         // If we want ppfx weight then add this into the weight
         if (weight_ppfx) weight = weight * weight_flux;
 
     }
-   
-    if (_run_period == 1){
+    else {
         double weight_flux = SC.ppfx_cv;
 
         if (std::isinf(weight_flux))      weight_flux = 1.0; 
