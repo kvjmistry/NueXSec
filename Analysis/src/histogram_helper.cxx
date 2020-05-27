@@ -375,7 +375,7 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_contained_fraction).at(i).at(j) = new TH1D ( Form("h_reco_contained_fraction_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 21, 0, 1.05);
 
             // Run Number
-            TH1D_hists.at(k_reco_run_number).at(i).at(j) = new TH1D ( Form("h_reco_run_number_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"; Run Number; Entries", 70, 4500, 8000);
+            TH1D_hists.at(k_reco_run_number).at(i).at(j) = new TH1D ( Form("h_reco_run_number_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"; Run Number; Entries", 270, 4500, 18000);
         
         }
         
