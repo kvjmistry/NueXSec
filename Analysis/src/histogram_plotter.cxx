@@ -1355,6 +1355,21 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name, s
 
     }
 
+    // Normalisation by area
+    if (area_norm) {
+        
+        if (integral_mc_ext != 0) {
+            
+            for (unsigned int i=0; i < hist.size(); i++){
+                if (i == _util.k_data) continue; // Dont scale the data 
+                // if (i == 0) std::cout << "area norm scale factor: "  << hist_integrals.at(k_plot_data) / integral_mc_ext << std::endl;
+                hist.at(i)->Scale( hist_integrals.at(_util.k_data) / integral_mc_ext );
+            }
+
+        }
+
+    }
+
     // Add the histograms to the stack
     h_stack->Add(hist.at(_util.k_ext));
     h_stack->Add(hist.at(_util.k_mc));
@@ -1363,7 +1378,8 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name, s
     h_stack->Draw("hist");
     hist.at(_util.k_data)->Draw("same PE");
 
-    h_stack->GetYaxis()->SetTitle("Entries");
+    if (area_norm) h_stack->GetYaxis()->SetTitle("Entries A.U. ");
+    else h_stack->GetYaxis()->SetTitle("Entries");
 
     // MC error histogram ------------------------------------------------------
     TH1D * h_error_hist = (TH1D*) hist.at(_util.k_mc)->Clone("h_error_hist");
@@ -1444,6 +1460,8 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name, s
 
     // Add the weight labels
     Draw_WeightLabels(c);
+
+    if (area_norm) Draw_Area_Norm(c);
     
     c->Print(print_name);
 
