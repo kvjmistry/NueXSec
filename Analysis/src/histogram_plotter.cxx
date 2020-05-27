@@ -724,6 +724,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
             
             for (unsigned int i=0; i < hist.size(); i++){
                 if (i == k_plot_data) continue; // Dont scale the data 
+                // if (i == 0) std::cout << "area norm scale factor: "  << hist_integrals.at(k_plot_data) / integral_mc_ext << std::endl;
                 hist.at(i)->Scale( hist_integrals.at(k_plot_data) / integral_mc_ext );
             }
 
@@ -849,6 +850,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         // For percent difference
         // h_ratio->GetYaxis()->SetTitle("(Data - MC) / MC ");
         // h_ratio->GetYaxis()->SetRangeUser(-0.5,0.5);
+        // h_ratio->GetYaxis()->SetRangeUser(-0.2, 0.2);
         
         // For ratio
         h_ratio->GetYaxis()->SetRangeUser(0, 2);
@@ -1259,6 +1261,11 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
                         area_norm,  false, 1.0, "Contained Fraction (PFP hits in FV / hits in slice)", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("cuts/%s/reco_contained_fraction.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false);
 
+    // Contained Fraction
+    MakeStack("h_reco_run_number",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Run Number", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("cuts/%s/reco_run_number.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false);
+
 
     // Stacked Histograms by particle type
     
@@ -1412,7 +1419,7 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name, s
     // h_ratio->GetYaxis()->SetRangeUser(-0.5,0.5);
     
     // For ratio
-    h_ratio->GetYaxis()->SetRangeUser(0.5, 1.5);
+    h_ratio->GetYaxis()->SetRangeUser(0.80, 1.20);
     h_ratio->GetYaxis()->SetTitle("Data / (MC + EXT) ");
 
     h_ratio->GetYaxis()->SetTitleSize(13);
