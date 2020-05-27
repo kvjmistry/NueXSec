@@ -11,8 +11,18 @@ bool selection_cuts::swtrig(SliceContainer &SC, int type){
     
     // Common optical is already applied to data
     if (type == _util.k_mc || type == _util.k_dirt){
-        if (SC.swtrig > 0) return true;  // pass 
-        else return false;               // fail
+        
+        // Run 1 uses a different software trigger
+        if (SC.run_period == "1"){
+            if (SC.swtrig_pre == 1) return true;  // pass 
+            else return false;                    // fail
+        }
+        // Keep using standard software trigger for run 3 for now...
+        else {
+            if (SC.swtrig == 1) return true;  // pass 
+            else return false;               // fail
+        }
+       
     }
     else return true;
     
@@ -20,6 +30,7 @@ bool selection_cuts::swtrig(SliceContainer &SC, int type){
 // -----------------------------------------------------------------------------
 bool selection_cuts::opfilt_pe(SliceContainer &SC, int type){
     
+    // This should be turned on if BNB
     // if (type == _util.k_data || type == _util.k_ext) return true;
 
     if (SC.opfilter_pe_beam > 0) return true; // pass 
@@ -29,6 +40,7 @@ bool selection_cuts::opfilt_pe(SliceContainer &SC, int type){
 // -----------------------------------------------------------------------------
 bool selection_cuts::opfilt_veto(SliceContainer &SC, int type){
 
+    // This should be turned on if BNB
     // if (type == _util.k_data || type == _util.k_ext) return true;
 
     if (SC.opfilter_pe_veto < 20) return true; // pass 

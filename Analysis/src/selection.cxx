@@ -757,7 +757,7 @@ double selection::GetCVWeight(int type, SliceContainer SC){
     if (weight_ppfx) weight = weight * weight_flux;
 
 
-    std::cout << SC.weightSplineTimesTune << "   "<< SC.ppfx_cv << std::endl;
+    // std::cout << SC.weightSplineTimesTune << "   "<< SC.ppfx_cv << std::endl;
 
     return weight;
 
