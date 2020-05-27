@@ -111,7 +111,7 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the mc slice container
-        mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights);
+        mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights, run_period);
 
         // Initialise the Tree Helper
         _thelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_tree_file_name_out, weight_cfg);
@@ -139,7 +139,7 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_data, data_tree, "nuselection/NeutrinoSelectionFilter");
         
         // Initialise all the data slice container
-        data_SC.Initialise(data_tree, _util.k_data, f_flux_weights);
+        data_SC.Initialise(data_tree, _util.k_data, f_flux_weights, run_period);
 
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, run_period, data_file_out, weight_cfg);
@@ -169,7 +169,7 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_ext, ext_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
-        ext_SC.Initialise(ext_tree, _util.k_ext, f_flux_weights);
+        ext_SC.Initialise(ext_tree, _util.k_ext, f_flux_weights, run_period);
 
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, ext_file_out, weight_cfg);
@@ -199,7 +199,7 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_dirt, dirt_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
-        dirt_SC.Initialise(dirt_tree, _util.k_dirt, f_flux_weights);
+        dirt_SC.Initialise(dirt_tree, _util.k_dirt, f_flux_weights, run_period);
 
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, dirt_file_out, weight_cfg);
@@ -252,11 +252,6 @@ void selection::MakeSelection(){
             // std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
             // Get the entry in the tree
             mc_tree->GetEntry(ievent); 
-
-            // Skip the RHC events contaminated in the FHC files
-            if (_run_period == 1 && mc_SC.run > 10000 ){
-                continue;
-            }
 
             // Apply the selection cuts 
             bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
@@ -740,41 +735,29 @@ double selection::GetCVWeight(int type, SliceContainer SC){
 
 
     // Get the tune weight
-    if (type == _util.k_mc || type == _util.k_dirt){
-        
-        weight = SC.weightSplineTimesTune; // Here define the weight
-        
-        // Catch infinate/nan/unreasonably large tune weights
-        if (std::isinf(weight))      weight = 1.0; 
-        if (std::isnan(weight) == 1) weight = 1.0;
-        if (weight > 100)            weight = 1.0;
-        if (weight < 0)              weight = 1.0;
+    weight = SC.weightSplineTimesTune; // Here define the weight
+    
+    // Catch infinate/nan/unreasonably large tune weights
+    if (std::isinf(weight))      weight = 1.0; 
+    if (std::isnan(weight) == 1) weight = 1.0;
+    if (weight > 100)            weight = 1.0;
+    if (weight < 0)              weight = 1.0;
 
-        // If tune weight turned off, just set weight to 1.0
-        if (!weight_tune) weight = 1.0;
+    // If tune weight turned off, just set weight to 1.0
+    if (!weight_tune) weight = 1.0;
 
-    } 
-    else weight = 1.0;
+    // Get the PPFX CV flux correction weight
+    double weight_flux = SC.ppfx_cv;
 
-    // Get the PPFX CV flux correction weight -- only dont have ppfx corrections for dirt
-    if (_run_period == 3 && type == _util.k_dirt){
-        double weight_flux = SC.GetPPFXCVWeight();
-        
-        // If we want ppfx weight then add this into the weight
-        if (weight_ppfx) weight = weight * weight_flux;
+    if (std::isinf(weight_flux))      weight_flux = 1.0; 
+    if (std::isnan(weight_flux) == 1) weight_flux = 1.0;
+    if (weight_flux > 100)            weight_flux = 1.0;
+    if (weight_flux < 0)              weight_flux = 1.0;
 
-    }
-    else {
-        double weight_flux = SC.ppfx_cv;
+    if (weight_ppfx) weight = weight * weight_flux;
 
-        if (std::isinf(weight_flux))      weight_flux = 1.0; 
-        if (std::isnan(weight_flux) == 1) weight_flux = 1.0;
-        if (weight_flux > 100)            weight_flux = 1.0;
-        if (weight_flux < 0)              weight_flux = 1.0;
 
-        if (weight_ppfx) weight = weight * weight_flux;
-
-    }
+    std::cout << SC.weightSplineTimesTune << "   "<< SC.ppfx_cv << std::endl;
 
     return weight;
 
