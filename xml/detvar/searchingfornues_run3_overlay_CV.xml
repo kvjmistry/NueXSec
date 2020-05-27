@@ -37,19 +37,19 @@
   
   <!-- Project stages -->
   <stage name="ntuple">
-    <fcl>standard_overlay_optical_numi_uboone_updated.fcl</fcl>
-    <fcl>run_neutrinoselectionfilter_run1_overlay_cc0pinp_numi_dirt.fcl</fcl>
+    <fcl>standard_overlay_notpc_numi_uboone_updated.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run3_overlay_cc0pinp_numi_dirt.fcl</fcl>
     <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</outdir>
     <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</logdir>
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <maxfilesperjob>5</maxfilesperjob>
-    <numjobs>125</numjobs>
+    <numjobs>759</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <disk>25GB</disk>
-    <schema>gsiftp</schema>
-    <inputdef>prodgenie_numi_uboone_overlay_fhc_mcc9_run1_v28_sample3</inputdef>
+    <schema>root</schema>
+    <inputdef>prodgenie_numi_uboone_overlay_rhc_mcc9_run3b_v28_sample2_v3</inputdef>
     <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
     <jobsub_start>  --expected-lifetime=short</jobsub_start>
     <blacklist>Lancaster</blacklist>
