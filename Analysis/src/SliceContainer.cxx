@@ -1,7 +1,7 @@
 #include "../include/SliceContainer.h"
 
 // -----------------------------------------------------------------------------
-void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights){
+void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, const char * _run_period){
 
     std::cout << "Initalising Slice Container" << std::endl;
 
@@ -281,7 +281,11 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights){
     tree->SetBranchAddress("category", &category);
     tree->SetBranchAddress("lep_e", &lep_e);
     tree->SetBranchAddress("pass", &pass);
+    
     tree->SetBranchAddress("swtrig", &swtrig);
+    tree->SetBranchAddress("swtrig_pre", &swtrig_pre);
+    tree->SetBranchAddress("swtrig_post", &swtrig_post);
+    
     tree->SetBranchAddress("evnhits", &evnhits);
     tree->SetBranchAddress("slpdg", &slpdg);
     tree->SetBranchAddress("slnhits", &slnhits);
@@ -410,10 +414,10 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights){
     
     // MC specific branches
     if (type == _util.k_mc || type == _util.k_dirt){
-        tree->SetBranchAddress("weights",         &weights_v);
-        tree->SetBranchAddress("weightsFlux",     &weightsFlux_v);
-        tree->SetBranchAddress("weightsGenie",    &weightsGenie_v);
-        tree->SetBranchAddress("weightsReint",    &weightsReint_v);
+        // tree->SetBranchAddress("weights",         &weights_v);
+        // tree->SetBranchAddress("weightsFlux",     &weightsFlux_v);
+        // tree->SetBranchAddress("weightsGenie",    &weightsGenie_v);
+        // tree->SetBranchAddress("weightsReint",    &weightsReint_v);
         tree->SetBranchAddress("weightSplineTimesTune",      &weightSplineTimesTune);
         tree->SetBranchAddress("ppfx_cv",         &ppfx_cv);
     }
@@ -558,6 +562,8 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights){
         boolhist = _util.GetHist(f_flux_weights, h_2D_CV_UW_PPFX_ratio_numubar, "h_2D_CV_UW_PPFX_ratio_numubar"); if (boolhist == false) exit(2);
     }
 
+    run_period = std::string(_run_period);
+
 
 }
 // -----------------------------------------------------------------------------
@@ -567,7 +573,11 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
     if (type == _util.k_mc){
 
         // Out of Fiducial Volume Event
-        if (!isVtxInFiducial) return std::make_pair("nu_out_fv",_util.k_nu_out_fv);
+        if (!isVtxInFiducial) {
+            // std::cout << "Purity of out of FV event: "<< nu_purity_from_pfp << std::endl;
+            if (nu_purity_from_pfp < 0.6) return std::make_pair("cosmic",_util.k_cosmic);
+            else return std::make_pair("nu_out_fv",_util.k_nu_out_fv);
+        }
 
         // Charged Current 
         if (ccnc == _util.k_CC){
@@ -586,9 +596,9 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
             else if (nu_pdg == 12 || nu_pdg == -12){
 
                 
-                if (nu_purity_from_pfp >= 0.6) return std::make_pair("nue_cc",_util.k_nue_cc); // purity > 60% so pure nue
-                else if (nu_purity_from_pfp < 0.6 && nu_purity_from_pfp > 0.2) return std::make_pair("nue_cc_mixed",_util.k_nue_cc_mixed); // purity from 20 to 60% so mixed
-                else return std::make_pair("cosmic",_util.k_cosmic); // Classify as a cosmic with very low purity
+                if (nu_purity_from_pfp >= 0.6)     return std::make_pair("nue_cc",_util.k_nue_cc); // purity > 60% so pure nue
+                else                               return std::make_pair("nue_cc_mixed",_util.k_nue_cc_mixed); // purity from 0 to 60% mixed event. (includes pure cosmic)
+                // else return std::make_pair("cosmic",_util.k_cosmic); // Classify as a cosmic with very low purity
 
             }
             // Unknown Neutrino Type

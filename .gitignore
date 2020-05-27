@@ -77,3 +77,5 @@ Tools/bin
 POT/filelists/
 Analysis/lists
 plots/bnb_run1/
+POT/filelists/*
+POT/*.txt

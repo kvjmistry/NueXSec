@@ -19,7 +19,7 @@ public:
 
     // -------------------------------------------------------------------------
     // Initialise the class
-    void Initialise(TTree* tree, int type, TFile *f_flux_weights);
+    void Initialise(TTree* tree, int type, TFile *f_flux_weights, const char * _run_period);
     // -------------------------------------------------------------------------
     // Function to classify the slice
     std::pair<std::string, int>  SliceClassifier(int type);
@@ -44,6 +44,7 @@ public:
     int   run;                   // Run
     int   sub;                   // Subrun
     int   evt;                   // Event
+    std::string run_period;      // Run period 
     
     // Shower Properties 
     float shr_energy_tot;        // Shower: the energy of the showers (in GeV)
@@ -361,6 +362,8 @@ public:
     float lep_e;
     int   pass;
     int   swtrig;     // Software Trigger
+    int   swtrig_pre;     // Software Trigger before change
+    int   swtrig_post;     // Software Trigger after change
     int   evnhits;    // Reco Number of hits in the event
     int   slpdg;      // Reco Slice PDG of primary PFP
     int   slnhits;    // Reco Slice Number of Hits within it
