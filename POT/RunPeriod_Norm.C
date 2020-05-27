@@ -35,6 +35,8 @@ std::vector<std::string> cut_dirs = {
 // -----------------------------------------------------------------------------
 void RunPeriod_Norm(const char *_file1){
 
+    std::string run_period = "run1";
+
     gStyle->SetOptStat(0);
 
     std::cout << "File: " << _file1 << std::endl;
@@ -65,12 +67,12 @@ void RunPeriod_Norm(const char *_file1){
     double pot, EA9CNT, ext_trig;
     std::string line;
 
-    TH1D* h_run_ext_trig  = new TH1D("h_run_ext_trig",  "; Run Number; EXT Triggers",              70, 4500, 8000);
-    TH1D* h_run_data_trig = new TH1D("h_run_data_EA9CNT_trig", "; Run Number; EA9CNT (Data HW Triggers)", 70, 4500, 8000);
-    TH1D* h_run_data_pot  = new TH1D("h_run_data_EA9CNT_pot",  "; Run Number; tortgt_wcut (Data POT)",    70, 4500, 8000);
+    TH1D* h_run_ext_trig  = new TH1D("h_run_ext_trig",  "; Run Number; EXT Triggers",                     270, 4500, 18000);
+    TH1D* h_run_data_trig = new TH1D("h_run_data_EA9CNT_trig", "; Run Number; EA9CNT (Data HW Triggers)", 270, 4500, 18000);
+    TH1D* h_run_data_pot  = new TH1D("h_run_data_EA9CNT_pot",  "; Run Number; tortgt_wcut (Data POT)",    270, 4500, 18000);
 
     // EXT Triggers
-    std::ifstream myfile ("filelists/run1_beamoff_trig.txt");
+    std::ifstream myfile ("filelists/beamoff_trig.txt");
     if (myfile.is_open()) {
         
         // Loop over lines in file
@@ -88,7 +90,7 @@ void RunPeriod_Norm(const char *_file1){
     myfile.close();
 
     // Data POT and triggers
-    std::ifstream myfile2 ("filelists/run1_beamon_pot_trig.txt");
+    std::ifstream myfile2 ("filelists/beamon_pot_trig.txt");
     if (myfile2.is_open()) {
         
         // Loop over lines in file
@@ -117,6 +119,10 @@ void RunPeriod_Norm(const char *_file1){
 
     // Make the EXT plot
     TCanvas *c = new TCanvas();
+
+    if (run_period == "run1") h_run_ext.at(0)->GetXaxis()->SetRangeUser(4500, 8000);
+    else h_run_ext.at(0)->GetXaxis()->SetRangeUser(16880, 18000);
+
     h_run_ext.at(0)->SetLineWidth(2);
     h_run_ext.at(0)->GetYaxis()->SetTitle("Events / EXT Triggers");
     h_run_ext.at(0)->SetLineColor(kBlack);
@@ -144,6 +150,10 @@ void RunPeriod_Norm(const char *_file1){
 
     // Make the EA9CNT plot
     TCanvas *c2 = new TCanvas();
+
+    if (run_period == "run1") h_run_data_EA9CNT.at(0)->GetXaxis()->SetRangeUser(4500, 8000);
+    else h_run_data_EA9CNT.at(0)->GetXaxis()->SetRangeUser(16880, 18000);
+
     h_run_data_EA9CNT.at(0)->SetLineWidth(2);
     h_run_data_EA9CNT.at(0)->GetYaxis()->SetTitle("Events / EA9CNT (Data Triggers)");
     h_run_data_EA9CNT.at(0)->SetLineColor(kBlack);
@@ -162,6 +172,10 @@ void RunPeriod_Norm(const char *_file1){
     c2->Print("plots/data_events_per_trig.pdf");
 
     TCanvas *c3 = new TCanvas();
+
+    if (run_period == "run1") h_run_data_pot_v.at(0)->GetXaxis()->SetRangeUser(4500, 8000);
+    else h_run_data_pot_v.at(0)->GetXaxis()->SetRangeUser(16880, 18000);
+
     h_run_data_pot_v.at(0)->SetLineWidth(2);
     h_run_data_pot_v.at(0)->GetYaxis()->SetTitle("Events / tortgt_wcut (Data POT)");
     h_run_data_pot_v.at(0)->SetLineColor(kBlack);

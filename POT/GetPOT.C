@@ -68,7 +68,7 @@ void GetPOT(const char *_file1, std::string type){
 
         // Get the tree
         TTree * mytree = (TTree*)f->Get("nuselection/SubRun");
-    if (mytree == NULL) mytree = (TTree*)f->Get("FlashValidate/pottree");
+        if (mytree == NULL) mytree = (TTree*)f->Get("FlashValidate/pottree");
 
         if (mytree == NULL){
             std::cout << "help can't get the branch so exiting..." << std::endl;
@@ -82,7 +82,7 @@ void GetPOT(const char *_file1, std::string type){
         for (int i = 0; i < mytree->GetEntries(); i++){
             mytree->GetEntry(i);
 
-            // if (run < 16880) continue;
+            //if (run < 16880) continue;
 
             run_subrun_file << run << " " << subrun << '\n';
         }
@@ -90,13 +90,17 @@ void GetPOT(const char *_file1, std::string type){
         run_subrun_file.close();
 
         if (type == "ext") {
-        std::cout << "/uboone/app/users/zarko/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt" << std::endl;
-        gSystem->Exec("/uboone/app/users/zarko/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt"); 
-    }
+            std::cout << "/uboone/app/users/zarko/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt" << std::endl;
+            gSystem->Exec("/uboone/app/users/zarko/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt"); 
+        }
+        // Use Pawels updated version for on beam, use  --slip for slipstacking info
+        else {
+            std::cout << "/uboone/app/users/guzowski/slip_stacking/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt" << std::endl;
+            //gSystem->Exec("/uboone/app/users/guzowski/slip_stacking/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt"); 
+
+        } 
     
-    // Use Pawels updated version for on beam, use  --slip for slipstacking info
-    else gSystem->Exec("/uboone/app/users/guzowski/slip_stacking/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt"); 
-        
+    
         // gSystem->Exec("rm run_subrun_list_data.txt");
 
     }
