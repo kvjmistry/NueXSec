@@ -724,7 +724,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
             
             for (unsigned int i=0; i < hist.size(); i++){
                 if (i == k_plot_data) continue; // Dont scale the data 
-                // if (i == 0) std::cout << "area norm scale factor: "  << hist_integrals.at(k_plot_data) / integral_mc_ext << std::endl;
+                if (i == 0) std::cout << "area norm scale factor: "  << hist_integrals.at(k_plot_data) / integral_mc_ext << std::endl;
                 hist.at(i)->Scale( hist_integrals.at(k_plot_data) / integral_mc_ext );
             }
 
@@ -1202,7 +1202,7 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
     // Shower Flash PE
     MakeStack("h_reco_flash_pe",_util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Flash PE [PE]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Largest Flash Intensity [PE]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("cuts/%s/reco_flash_pe.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false);
 
     // Shower Subcluster All Planes

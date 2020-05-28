@@ -1,0 +1,90 @@
+
+
+// Script to make the efficiency plot in MCC8. Uses hard coded values unfortunantely
+
+void make_efficiency_plot(){
+
+
+    TFile *f_mc;
+
+    std::vector<double> efficiency_v = {1, 0.5489, 0.38, 0.315, 0.261, 0.132, 0.0903}; // efficiency vector
+    std::vector<double> purity_v = {0, 0.00736, 0.03569, 0.0418, 0.1514, 0.2928, 0.3973}    ; // purity vector
+    std::vector<double> purity_nu_v = {0, 0.1225, 0.1612, 0.1943, 0.3253, 0.5142, 0.6978}    ; // purity nu Only vector
+    std::vector<std::string> names = {"No Cuts (0)","Simple Pre-Cuts (1)", "Flash-Matching (2)", "Reco. Vertex Quality (3)", "Shower Hit Threshold (4)", "Electron-like Shower (5)", "Finalisation Cuts (6)"};
+
+    double efficiency, purity;
+
+    TCanvas *c = new TCanvas();
+    TH1D* h_eff = new TH1D("h_efficiency", "", efficiency_v.size(), 0, efficiency_v.size());
+    TH1D* h_pur = new TH1D("h_purity", "", efficiency_v.size(), 0, efficiency_v.size());
+    TH1D* h_pur_nu = new TH1D("h_purity_nu", "", efficiency_v.size(), 0, efficiency_v.size());
+
+    // c->SetGrid();
+    c->SetGridy();
+
+    TLegend *leg_stack = new TLegend(0.55, 0.91, 0.85, 0.72);
+    leg_stack->SetBorderSize(0);
+    leg_stack->SetFillStyle(0);
+
+
+    for (unsigned int k=0; k < efficiency_v.size();k++){
+        h_eff ->Fill(names.at(k).c_str(), efficiency_v.at(k));
+        h_pur ->Fill(names.at(k).c_str(), purity_v.at(k));
+        h_pur_nu ->Fill(names.at(k).c_str(), purity_nu_v.at(k));
+        h_eff->SetBinError(k+1, 0);
+        h_pur->SetBinError(k+1, 0);
+        h_pur_nu->SetBinError(k+1, 0);
+    }
+    
+    leg_stack->AddEntry(h_eff, "Efficiency","lp");
+    leg_stack->AddEntry(h_pur, "Purity",    "lp");
+    leg_stack->AddEntry(h_pur_nu, "Purity (Beam Only)",    "lp");
+
+    h_eff->GetYaxis()->SetRangeUser(0,1.1);
+    h_eff->GetXaxis()->SetLabelSize(0.05);
+    h_eff->GetXaxis()->SetLabelOffset(0.01);
+    h_eff->SetStats(kFALSE);
+    h_eff->SetMarkerStyle(20);
+    h_eff->SetMarkerSize(0.5);
+    h_eff->SetLineWidth(2);
+
+    h_eff->Draw("LP");
+
+    h_pur->SetLineColor(kRed+2);
+    h_pur->SetStats(kFALSE);
+    h_pur->SetMarkerStyle(20);
+    h_pur->SetMarkerSize(0.5);
+    h_pur->SetLineWidth(2);
+    h_pur->Draw("LP,same");
+
+    h_pur_nu->SetLineColor(kGreen+2);
+    h_pur_nu->SetStats(kFALSE);
+    h_pur_nu->SetMarkerStyle(20);
+    h_pur_nu->SetMarkerSize(0.5);
+    h_pur_nu->SetLineWidth(2);
+    h_pur_nu->Draw("LP,same");
+
+    leg_stack->Draw();
+
+    c->SetBottomMargin(0.15);
+    c->SetRightMargin(0.15);
+
+    // Draw vertical lines to help the eye
+    TLine *line;
+    for (unsigned int l=1; l < efficiency_v.size()+1; l++){
+        line  = new TLine( h_eff->GetBinCenter(l) ,   0 , h_eff->GetBinCenter(l)  ,  1.1);
+        line->SetLineColor(12);
+        line->SetLineStyle(kDotted);
+        line->Draw();
+    }
+
+    h_eff->GetXaxis()->SetTickLength(0.00);
+    h_pur->GetXaxis()->SetTickLength(0.00);
+
+
+    c->Print("efficiency_plot_mcc8.pdf");
+
+
+
+
+}

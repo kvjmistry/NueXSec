@@ -59,7 +59,7 @@ void make_xsec_plot(){
     TCanvas *c = new TCanvas();
     
     // Nue flux
-    h_nue->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu_{e}} / cm^{2} / 6 #times 10^{20} POT");
+    h_nue->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu}_{e} / cm^{2} / 6 #times 10^{20} POT");
     h_nue->GetXaxis()->CenterTitle();
     h_nue->GetYaxis()->CenterTitle();
 
@@ -105,7 +105,7 @@ void make_xsec_plot(){
 
     // The second axis
     TGaxis *axis = new TGaxis(3.0, 0, 3.0, 150.0e6, 0, rightmax, 510, "+L");
-    axis->SetTitle("#nu_{e}/#bar{#nu_{e}} CC Cross Section [10^{-38} cm^{2}]");
+    axis->SetTitle("#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-38} cm^{2}]");
     axis->SetTitleOffset(1.1);
     axis->SetLineColor(kBlack);
     axis->SetLabelColor(kBlack);
@@ -218,10 +218,10 @@ void make_xsec_plot(){
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(h_nue,             "NuMI #nu_{e} Flux",                       "l");
-    leg->AddEntry(h_nuebar,          "NuMI #bar{#nu_{e}} Flux",                 "l");
+    leg->AddEntry(h_nuebar,          "NuMI #bar{#nu}_{e} Flux",                 "l");
     leg->AddEntry(h_spline_nue,      "GENIE #nu_{e} CC Cross Section",          "l");
-    leg->AddEntry(h_spline_nuebar,   "GENIE #bar{#nu_{e}} CC Cross Section",    "l");
-    leg->AddEntry(gr, "Data #sigma_{#nu_{e} + #bar{#nu_{e}}} (stat+sys)",   "lep");
+    leg->AddEntry(h_spline_nuebar,   "GENIE #bar{#nu}_{e} CC Cross Section",    "l");
+    leg->AddEntry(gr, "Data #sigma_{#nu_{e} + #bar{#nu}_{e}} (stat+sys)",   "lep");
     leg->Draw();
 
 
@@ -241,7 +241,7 @@ void make_xsec_plot(){
     auto g_xsec_sys = new TGraphErrors(2, x1, y1, ex1, ey1);
     g_xsec_sys->SetFillColor(kGray);
     g_xsec_sys->SetFillColorAlpha(12, 0.15);
-    g_xsec_sys->SetTitle(";;#nu_{e}/#bar{#nu_{e}} CC Cross Section [cm^{2}]");
+    g_xsec_sys->SetTitle(";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [cm^{2}]");
     g_xsec_sys->GetXaxis()->SetRangeUser(0,1);
     g_xsec_sys->GetYaxis()->SetRangeUser(0,1.0e-38);
     g_xsec_sys->GetXaxis()->SetLabelOffset(10);
@@ -257,7 +257,7 @@ void make_xsec_plot(){
     // Systematic band
     auto g_xsec_stat = new TGraphErrors(2, x1, y1, ex1, ey2);
     g_xsec_stat->SetFillColorAlpha(46, 0.15);
-    g_xsec_stat->SetTitle(";;#nu_{e}/#bar{#nu_{e}} CC Cross Section [10^{-38} cm^{2}]");
+    g_xsec_stat->SetTitle(";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-38} cm^{2}]");
     g_xsec_stat->GetXaxis()->SetRangeUser(0,1);
     g_xsec_stat->GetYaxis()->SetRangeUser(0,1.0e-38);
     g_xsec_stat->Draw("3, same");
@@ -297,12 +297,12 @@ void make_xsec_plot(){
     TLegend *leg2 = new TLegend(0.57, 0.65, 0.88, 0.9);
     leg2->SetBorderSize(0);
     leg2->SetFillStyle(0);
-    leg2->AddEntry(g_xsec, "Data #nu_{e} + #bar{#nu_{e}} CC Cross Section",      "l");
+    leg2->AddEntry(g_xsec, "Data #nu_{e} + #bar{#nu}_{e} CC Cross Section",      "l");
     leg2->AddEntry(g_xsec_sys,      "Stat + Sys Uncertainty",                  "f");
     leg2->AddEntry(g_xsec_stat,     "Stat Uncertainty",                        "f");
     leg2->AddEntry(g_xsec_nue,      "GENIE #nu_{e} CC Cross Section",          "l");
-    leg2->AddEntry(g_xsec_nuebar,   "GENIE #bar{#nu_{e}} CC Cross Section",    "l");
-    leg2->AddEntry(g_xsec_nue_nuebar,   "GENIE #nu_{e} + #bar{#nu_{e}} CC Cross Section",    "l");
+    leg2->AddEntry(g_xsec_nuebar,   "GENIE #bar{#nu}_{e} CC Cross Section",    "l");
+    leg2->AddEntry(g_xsec_nue_nuebar,   "GENIE #nu_{e} + #bar{#nu}_{e} CC Cross Section",    "l");
     
     leg2->Draw();
     
