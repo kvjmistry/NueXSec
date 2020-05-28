@@ -1,174 +1,174 @@
 #include "../include/selection_cuts.h"
-// -----------------------------------------------------------------------------
+// // -----------------------------------------------------------------------------
 void selection_cuts::Initalise(utility _utility){
 
     std::cout << "Initalising Selection Cuts Class " << std::endl;
     _util = _utility;
 
 }
-// -----------------------------------------------------------------------------
-bool selection_cuts::swtrig(SliceContainer &SC, int type){
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::swtrig(SliceContainer &SC, int type){
     
-    // Common optical is already applied to data
-    if (type == _util.k_mc || type == _util.k_dirt){
+//     // Common optical is already applied to data
+//     if (type == _util.k_mc || type == _util.k_dirt){
         
-        // Run 1 uses a different software trigger
-        if (SC.run_period == "1"){
-            if (SC.swtrig_pre == 1) return true;  // pass 
-            else return false;                    // fail
-        }
-        // Keep using standard software trigger for run 3 for now...
-        else {
-            if (SC.swtrig == 1) return true;  // pass 
-            else return false;               // fail
-        }
+//         // Run 1 uses a different software trigger
+//         if (SC.run_period == "1"){
+//             if (SC.swtrig_pre == 1) return true;  // pass 
+//             else return false;                    // fail
+//         }
+//         // Keep using standard software trigger for run 3 for now...
+//         else {
+//             if (SC.swtrig == 1) return true;  // pass 
+//             else return false;               // fail
+//         }
        
-    }
-    else return true;
+//     }
+//     else return true;
     
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::opfilt_pe(SliceContainer &SC, int type){
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::opfilt_pe(SliceContainer &SC, int type){
     
-    // This should be turned on if BNB
-    // if (type == _util.k_data || type == _util.k_ext) return true;
+//     // This should be turned on if BNB
+//     // if (type == _util.k_data || type == _util.k_ext) return true;
 
-    if (SC.opfilter_pe_beam > 0) return true; // pass 
-    else return false;               // fail
+//     if (SC.opfilter_pe_beam > 0) return true; // pass 
+//     else return false;               // fail
     
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::opfilt_veto(SliceContainer &SC, int type){
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::opfilt_veto(SliceContainer &SC, int type){
 
-    // This should be turned on if BNB
-    // if (type == _util.k_data || type == _util.k_ext) return true;
+//     // This should be turned on if BNB
+//     // if (type == _util.k_data || type == _util.k_ext) return true;
 
-    if (SC.opfilter_pe_veto < 20) return true; // pass 
-    else return false;               // fail
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::slice_id(SliceContainer &SC){
+//     if (SC.opfilter_pe_veto < 20) return true; // pass 
+//     else return false;               // fail
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::slice_id(SliceContainer &SC){
 
-    if (SC.nslice == 1) return true; // pass 
-    else return false;               // fail
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::e_candidate(SliceContainer &SC){
-    if (SC.n_showers >= 1) return true; // pass 
-    else return false;                 // fail
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::topo_score(SliceContainer &SC){
-    if (SC.topological_score > 0.1) return true; // pass 
-    else return false;                            // fail
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::in_fv(SliceContainer &SC){
+//     if (SC.nslice == 1) return true; // pass 
+//     else return false;               // fail
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::e_candidate(SliceContainer &SC){
+//     if (SC.n_showers >= 1) return true; // pass 
+//     else return false;                 // fail
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::topo_score(SliceContainer &SC){
+//     if (SC.topological_score > 0.1) return true; // pass 
+//     else return false;                            // fail
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::in_fv(SliceContainer &SC){
     
-    // These are looser cuts (whats done in the cc inclusive)
-    if ( SC.reco_nu_vtx_sce_x   >= _util.config_v.at(_util.k_config_x1) && SC.reco_nu_vtx_sce_x <= _util.config_v.at(_util.k_config_x2) &&
-        SC.reco_nu_vtx_sce_y    >= _util.config_v.at(_util.k_config_y1) && SC.reco_nu_vtx_sce_y <= _util.config_v.at(_util.k_config_y2) &&
-        ( (SC.reco_nu_vtx_sce_z >= _util.config_v.at(_util.k_config_z1) && SC.reco_nu_vtx_sce_z <= _util.config_v.at(_util.k_config_z2)))
-        ){
-        return true;   // pass
-    }  
-    else return false; // fail
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::cluster_frac(SliceContainer &SC){
-    if (SC.slclustfrac > 0.4) return true; // pass 
-    else return false;                     // fail
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::shower_score(SliceContainer &SC){
-    if (SC.shr_score < 0.3) return true; // pass 
-    else return false;                   // fail
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::michel_rej(SliceContainer &SC){
-    if (SC.shr_energy_tot_cali > 0.075) return true; // pass 
-    else return false;                               // fail
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::dEdx_y(SliceContainer &SC){
-    // if (SC.shr_dedx_Y_cali > 1.7 && SC.shr_dedx_Y_cali < 3.2) return true; // pass 
-    // else return false;                                                     // fail
+//     // These are looser cuts (whats done in the cc inclusive)
+//     if ( SC.reco_nu_vtx_sce_x   >= _util.config_v.at(_util.k_config_x1) && SC.reco_nu_vtx_sce_x <= _util.config_v.at(_util.k_config_x2) &&
+//         SC.reco_nu_vtx_sce_y    >= _util.config_v.at(_util.k_config_y1) && SC.reco_nu_vtx_sce_y <= _util.config_v.at(_util.k_config_y2) &&
+//         ( (SC.reco_nu_vtx_sce_z >= _util.config_v.at(_util.k_config_z1) && SC.reco_nu_vtx_sce_z <= _util.config_v.at(_util.k_config_z2)))
+//         ){
+//         return true;   // pass
+//     }  
+//     else return false; // fail
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::cluster_frac(SliceContainer &SC){
+//     if (SC.slclustfrac > 0.4) return true; // pass 
+//     else return false;                     // fail
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::shower_score(SliceContainer &SC){
+//     if (SC.shr_score < 0.3) return true; // pass 
+//     else return false;                   // fail
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::michel_rej(SliceContainer &SC){
+//     if (SC.shr_energy_tot_cali > 0.075) return true; // pass 
+//     else return false;                               // fail
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::dEdx_y(SliceContainer &SC){
+//     // if (SC.shr_dedx_Y_cali > 1.7 && SC.shr_dedx_Y_cali < 3.2) return true; // pass 
+//     // else return false;                                                     // fail
 
-    // Kill the background region
-    if ( (SC.shr_tkfit_dedx_Y >= 2.6 && SC.shr_tkfit_dedx_Y < 6.8) || (SC.shr_tkfit_dedx_Y < 0.5) ){
-        return false;
-    }
-    // Try and recover the events in the other planes
-    else {
-        return true;
-    }
+//     // Kill the background region
+//     if ( (SC.shr_tkfit_dedx_Y >= 2.6 && SC.shr_tkfit_dedx_Y < 6.8) || (SC.shr_tkfit_dedx_Y < 0.5) ){
+//         return false;
+//     }
+//     // Try and recover the events in the other planes
+//     else {
+//         return true;
+//     }
 
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::dEdx_v(SliceContainer &SC){
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::dEdx_v(SliceContainer &SC){
 
-    // We only want to run this cut if the dedx calculation failed in the collection plane
-    if (SC.shr_tkfit_dedx_Y > 0 ) return true;
+//     // We only want to run this cut if the dedx calculation failed in the collection plane
+//     if (SC.shr_tkfit_dedx_Y > 0 ) return true;
 
 
-    // Kill the background region
-    if (  (SC.shr_tkfit_dedx_V > 2.7 && SC.shr_tkfit_dedx_V < 6 ) || (SC.shr_tkfit_dedx_V > 0 && SC.shr_tkfit_dedx_V < 1.5) ){
-        return false;
-    }
-    // Try and recover the events in the other planes
-    else {
-        return true;
-    }
+//     // Kill the background region
+//     if (  (SC.shr_tkfit_dedx_V > 2.7 && SC.shr_tkfit_dedx_V < 6 ) || (SC.shr_tkfit_dedx_V > 0 && SC.shr_tkfit_dedx_V < 1.5) ){
+//         return false;
+//     }
+//     // Try and recover the events in the other planes
+//     else {
+//         return true;
+//     }
 
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::dEdx_u(SliceContainer &SC){
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::dEdx_u(SliceContainer &SC){
 
-    // Signal region
-    if (SC.shr_tkfit_dedx_U >= 1.7 && SC.shr_tkfit_dedx_U < 3.2){
-        return true;
-    }
-    // failed the cut
-    else {
-        return false;
-    }
+//     // Signal region
+//     if (SC.shr_tkfit_dedx_U >= 1.7 && SC.shr_tkfit_dedx_U < 3.2){
+//         return true;
+//     }
+//     // failed the cut
+//     else {
+//         return false;
+//     }
 
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::shr_hits(SliceContainer &SC){
-    if (SC.shr_hits_max > 220 ) return true; // pass 
-    else return false;                  // fail
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::shr_distance(SliceContainer &SC){
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::shr_hits(SliceContainer &SC){
+//     if (SC.shr_hits_max > 220 ) return true; // pass 
+//     else return false;                  // fail
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::shr_distance(SliceContainer &SC){
     
-    if (SC.n_tracks == 0) return true; // Dont apply this cut if there is no tracks
+//     if (SC.n_tracks == 0) return true; // Dont apply this cut if there is no tracks
     
-    // if (SC.shr_distance < 10 ) return true; // pass 
-    if (SC.shr_distance < 4) return true; // pass 
-    else return false;                      // fail
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::shr_hitratio(SliceContainer &SC){
-    if (SC.hits_ratio > 0.7 ) return true; // pass 
-    else return false;                     // fail
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::shr_cosmic_IP(SliceContainer &SC){
-    if (SC.CosmicIP > 20 ) return true;    // pass 
-    else return false;                     // fail
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::contained_frac(SliceContainer &SC){
-    if (SC.contained_fraction >= 0.6 ) return true;    // pass 
-    else return false;                     // fail
-}
-// -----------------------------------------------------------------------------
-bool selection_cuts::shr_moliere_avg(SliceContainer &SC){
-    if (SC.shrmoliereavg < 8 ) return true;    // pass 
-    else return false;                     // fail
-}
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
+//     // if (SC.shr_distance < 10 ) return true; // pass 
+//     if (SC.shr_distance < 4) return true; // pass 
+//     else return false;                      // fail
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::shr_hitratio(SliceContainer &SC){
+//     if (SC.hits_ratio > 0.7 ) return true; // pass 
+//     else return false;                     // fail
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::shr_cosmic_IP(SliceContainer &SC){
+//     if (SC.CosmicIP > 20 ) return true;    // pass 
+//     else return false;                     // fail
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::contained_frac(SliceContainer &SC){
+//     if (SC.contained_fraction >= 0.6 ) return true;    // pass 
+//     else return false;                     // fail
+// }
+// // -----------------------------------------------------------------------------
+// bool selection_cuts::shr_moliere_avg(SliceContainer &SC){
+//     if (SC.shrmoliereavg < 8 ) return true;    // pass 
+//     else return false;                     // fail
+// }
+// // -----------------------------------------------------------------------------
+// // -----------------------------------------------------------------------------
+// // -----------------------------------------------------------------------------
+// // -----------------------------------------------------------------------------

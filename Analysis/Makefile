@@ -6,7 +6,7 @@ CPPFLAGS = -I$(LIBDIR) -Wall -Wextra
 CXXFLAGS=$(shell root-config --cflags)
 
 # Libraries to inlcude e.g. ROOT
-LIBS=$(shell root-config --libs) -L$(LIBDIR)
+LIBS=$(shell root-config --libs) -L$(LIBDIR) -lNueXSec
 
 # Debug Flags
 DEBUGFLAGS= -O0 -g -D _DEBUG

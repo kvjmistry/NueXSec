@@ -513,8 +513,7 @@ void histogram_plotter::SetFillColours(std::vector<TH1D*> &hist, std::string plo
         hist.at(_util.k_nc_pi0)       ->SetFillColor(36);
         hist.at(_util.k_cosmic)       ->SetFillColor(1);
         hist.at(_util.k_nc)           ->SetFillColor(46);
-        hist.at(_util.k_nu_out_fv)    ->SetFillColor(kViolet-7);
-        hist.at(_util.k_numu_cc_pi0)  ->SetFillColor(42);
+        hist.at(_util.k_nue_cc_out_fv)    ->SetFillColor(kViolet-7);
         hist.at(_util.k_unmatched)    ->SetFillColor(12);
         
     }
@@ -561,10 +560,9 @@ void histogram_plotter::SetLegend(std::vector<TH1D*> hist, TLegend *leg_stack, s
         // leg_stack->AddEntry(hist.at(_util.k_unmatched),       Form("Unmatched (%2.1f)",           hist_integrals.at(_util.k_unmatched)),    "f"); // This should be zero, so dont plot
         leg_stack->AddEntry(hist.at(_util.k_nc_pi0),          Form("NC #pi^{0} (%2.1f)",          hist_integrals.at(_util.k_nc_pi0)),       "f");
         leg_stack->AddEntry(hist.at(_util.k_nc),              Form("NC (%2.1f)",                  hist_integrals.at(_util.k_nc)),           "f");
-        leg_stack->AddEntry(hist.at(_util.k_numu_cc_pi0),     Form("#nu_{#mu} CC #pi^{0} (%2.1f)",hist_integrals.at(_util.k_numu_cc_pi0)),  "f");
         leg_stack->AddEntry(hist.at(_util.k_numu_cc),         Form("#nu_{#mu} CC (%2.1f)",        hist_integrals.at(_util.k_numu_cc)),      "f");
         leg_stack->AddEntry(hist.at(_util.k_cosmic),          Form("Cosmic (%2.1f)",              hist_integrals.at(_util.k_cosmic)),       "f");
-        leg_stack->AddEntry(hist.at(_util.k_nu_out_fv),       Form("#nu OutFV (%2.1f)",           hist_integrals.at(_util.k_nu_out_fv)),    "f");
+        leg_stack->AddEntry(hist.at(_util.k_nue_cc_out_fv),   Form("#nue OutFV (%2.1f)",          hist_integrals.at(_util.k_nue_cc_out_fv)),    "f");
         leg_stack->AddEntry(hist.at(_util.k_nue_cc_mixed),    Form("#nu_{e} CC Mixed (%2.1f)",    hist_integrals.at(_util.k_nue_cc_mixed)), "f");
         leg_stack->AddEntry(hist.at(_util.k_nue_cc),          Form("#nu_{e} CC (%2.1f)",          hist_integrals.at(_util.k_nue_cc)),       "f");
     }

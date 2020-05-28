@@ -58,6 +58,7 @@ namespace xsecSelection {
 
             // TTrees
             TTree * mc_tree;      // MC   Tree
+            TTree * mc_truth_tree; // MC Truth Tree
             TTree * data_tree;    // Data Tree
             TTree * ext_tree;     // EXT  Tree
             TTree * dirt_tree;    // Dirt Tree
@@ -135,9 +136,6 @@ namespace xsecSelection {
             // -----------------------------------------------------------------
             // Function to implement counters and fillings of histograms for each cut
             void SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, std::pair<std::string, int> par_type, int cut_index, std::vector<std::vector<double>> &counter_v);
-            // -----------------------------------------------------------------
-            // Get the CV weights for histograms
-            double GetCVWeight(int type, SliceContainer SC);
             // -----------------------------------------------------------------
 
     }; // END Class

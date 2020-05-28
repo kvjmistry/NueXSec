@@ -29,6 +29,8 @@
 #include "TEfficiency.h"
 #include "TGaxis.h"
 #include "TStyle.h"
+#include "../../lib/TpcObjectContainer.h"
+#include "../../lib/ParticleContainer.h"
 
 // Class at the top level of the selection, so most classes will be including
 // from this class. Mainly provided useful functions.
@@ -116,25 +118,6 @@ public:
     // Cut directory names
     std::vector<std::string> cut_dirs = {
             "Unselected",     // Unselected
-            "SoftwareTrig",   // Software Trigger
-            "Op_Filter_PE",   // Common Optical Filter PE
-            "Op_Filter_Veto",// Common Optical Filter Michel Veto
-            "Slice_ID",       // Slice ID
-            "e_candidate",    // Electron Candidate
-            "In_FV",          // In FV
-            "Topo_Score",     // Topological Score
-            "Cosmic_IP",      // Cosmic Inpact Parameter
-            "Cluster_Frac",   // Cluster Fraction 
-            "Contained_Frac", // Slice Contained Fraction
-            "Shower_Score",   // Track Score
-            "Michel_Rej",     // Michel Rejection
-            "ShrHits",        // Shower Hits
-            "HitRatio",       // Ratio of shr hits and slice hits
-            "Moliere_Avg",    // Shower Moliere Average
-            "ShrVtxDistance", // Shower to vertex distance
-            "dEdx_y",         // dEdx y plane
-            // "dEdx_v",          // dEdx y plane
-            // "dEdx_u"           // dEdx y plane
             };
 
 
@@ -153,12 +136,12 @@ public:
     std::vector<std::string> classification_dirs = {
                 "nue_cc",
                 "nue_cc_mixed",
-                "nu_out_fv",
+                "nue_cc_out_fv",
                 "cosmic",
                 "numu_cc",
-                "numu_cc_pi0",
                 "nc",
                 "nc_pi0",
+                "nc_mixed",
                 "unmatched",
                 "ext",
                 "data",
@@ -197,25 +180,6 @@ public:
     // enums for cut dirs
     enum enum_cut_dirs {
                 k_unselected,        // Unselected 
-                k_swtrig,            // Software Trigger
-                k_opfilt_pe,         // Common Optical Filter PE
-                k_opfilt_veto,    // Common Optical Filter Michel Veto
-                k_slice_id,          // Slice ID
-                k_e_candidate,       // Electron Candidate
-                k_in_fv,             // Reco Nu Vtx (SC Corr) In the FV 
-                k_topo_score,        // Topo Score
-                k_cosmic_ip,         // Cosmic IP
-                k_cluster_frac,      // Cluster Fraction
-                k_contained_frac,    // Slice Contained Fraction
-                k_shower_score,      // Shower Score
-                k_michel_rej,        // Michel Rejection
-                k_shr_hits,          // Shower Hits
-                k_hit_ratio,         // Ratio of shr hits and slice hits
-                k_shr_moliere_avg,   // Shower Moliere Average
-                k_shr_distance,      // Shower to reco nu vertex distance
-                k_dEdx_y,            // dEdx y plane
-                // k_dEdx_v,            // dEdx v plane
-                // k_dEdx_u,            // dEdx u plane
                 k_cuts_MAX
                 }; 
 
@@ -243,12 +207,12 @@ public:
     enum enum_classification {
                 k_nue_cc,
                 k_nue_cc_mixed,
-                k_nu_out_fv,
+                k_nue_cc_out_fv,
                 k_cosmic,
                 k_numu_cc,
-                k_numu_cc_pi0,
                 k_nc,
                 k_nc_pi0,
+                k_nc_mixed,
                 k_unmatched,
                 k_leg_ext,
                 k_leg_data,
@@ -256,21 +220,7 @@ public:
                 k_classifications_MAX
                 };
     
-    // The PeLEE teams classifciation of events
-    enum enum_pandora_classification {
-        k_pandora_nu_e_other   = 1,
-        k_pandora_nu_e_cc0pi0p = 10,
-        k_pandora_nu_e_cc0pinp = 11,
-        k_pandora_nu_mu_other  = 2,
-        k_pandora_nu_mu_pi0    = 21,
-        k_pandora_nc           = 3,
-        k_pandora_nc_pi0       = 31,
-        k_pandora_cosmic       = 4,
-        k_pandora_outfv        = 5,
-        k_pandora_other        = 6,
-        k_pandora_data         = 0
-    };
-
+    
     // enums for checking if CC or NC interaction
     enum enum_CCNC {
         k_CC,
