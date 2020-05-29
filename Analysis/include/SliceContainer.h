@@ -40,7 +40,7 @@ public:
     bool InFV();
     // -------------------------------------------------------------------------
     // Set the TPC object particle tree
-    void SetTPCObj(xsecAna::TPCObjectContainer * tpc_obj, int type);
+    void SetTPCObj(xsecAna::TPCObjectContainer tpc_obj, int type);
     // -------------------------------------------------------------------------
 
 

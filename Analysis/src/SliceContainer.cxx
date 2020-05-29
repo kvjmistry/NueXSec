@@ -38,24 +38,24 @@ void SliceContainer::Initialise(TTree *tree, TTree *mc_truth_tree, int type, TFi
 
 }
 // -----------------------------------------------------------------------------
-void SliceContainer::SetTPCObj(xsecAna::TPCObjectContainer * tpc_obj, int type){
+void SliceContainer::SetTPCObj(xsecAna::TPCObjectContainer tpc_obj, int type){
 
     // Number of pfp
-    n_pfp          = tpc_obj->NumPFParticles();
-    n_pfp_tracks   = tpc_obj->NPfpTracks();
-    n_pfp_showers  = tpc_obj->NPfpShowers();
-    tpc_obj_origin = tpc_obj->Origin();
+    n_pfp          = tpc_obj.NumPFParticles();
+    n_pfp_tracks   = tpc_obj.NPfpTracks();
+    n_pfp_showers  = tpc_obj.NPfpShowers();
+    tpc_obj_origin = tpc_obj.Origin();
 
-    tpco_vtx_x = tpc_obj->pfpVtxX();
-    tpco_vtx_y = tpc_obj->pfpVtxY();
-    tpco_vtx_z = tpc_obj->pfpVtxZ();
+    tpco_vtx_x = tpc_obj.pfpVtxX();
+    tpco_vtx_y = tpc_obj.pfpVtxY();
+    tpco_vtx_z = tpc_obj.pfpVtxZ();
 
-    tpco_hits = tpc_obj->NumPFPHits();
+    tpco_hits = tpc_obj.NumPFPHits();
 
 
-    run    = tpc_obj->RunNumber();
-    subrun = tpc_obj->SubRunNumber();
-    event  = tpc_obj->EventNumber();
+    run    = tpc_obj.RunNumber();
+    subrun = tpc_obj.SubRunNumber();
+    event  = tpc_obj.EventNumber();
 
     // Get the leading shower index
     GetLeadingShowerIndex();
@@ -66,7 +66,7 @@ void SliceContainer::SetTPCObj(xsecAna::TPCObjectContainer * tpc_obj, int type){
     // Get the Particle vector
     for (int j = 0; j < n_pfp ; j++){
 
-        auto const pfp_obj = tpc_obj->GetParticle(j);
+        auto const pfp_obj = tpc_obj.GetParticle(j);
 
         // PFP vars
         mc_origin    .push_back(pfp_obj.Origin());

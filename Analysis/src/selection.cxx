@@ -250,13 +250,27 @@ void selection::MakeSelection(){
             // Alert the user
             if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
 
-            // std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
             // Get the entry in the tree
             mc_tree->GetEntry(ievent); 
 
-            // Apply the selection cuts 
-            // bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
-            // if (!pass) continue;
+            int n_tpc_obj = mc_SC.tpc_object_container_v->size();
+            
+            // Loop over the TPC Objects in the event
+            for (int i = 0; i < n_tpc_obj; i++){
+
+                // Reset and go again
+                mc_SC.Reset();
+                
+                // Set the TPC Object properties
+                mc_SC.SetTPCObj(mc_SC.tpc_object_container_v->at(i), _util.k_mc);
+
+                // Apply the selection cuts 
+                // bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
+                // if (!pass) continue;
+
+            }
+
+           
 
         } // End Event loop
 
@@ -379,10 +393,10 @@ void selection::MakeSelection(){
     for (unsigned int p=0; p < counter_v.size();p++){
 
         // Fill the counter trees
-        if (bool_use_mc)   _thelper.at(_util.k_mc)  .Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
-        if (bool_use_data) _thelper.at(_util.k_data).Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
-        if (bool_use_ext)  _thelper.at(_util.k_ext) .Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
-        if (bool_use_dirt) _thelper.at(_util.k_dirt).Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
+        // if (bool_use_mc)   _thelper.at(_util.k_mc)  .Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
+        // if (bool_use_data) _thelper.at(_util.k_data).Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
+        // if (bool_use_ext)  _thelper.at(_util.k_ext) .Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
+        // if (bool_use_dirt) _thelper.at(_util.k_dirt).Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
 
     }
     

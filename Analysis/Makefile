@@ -1,8 +1,8 @@
-LIBDIR = ../lib
+LIBDIR = ../lib/
 
 # Compilation Flags
 CXX = g++
-CPPFLAGS = -I$(LIBDIR) -Wall -Wextra
+CPPFLAGS = -I$(LIBDIR) 
 CXXFLAGS=$(shell root-config --cflags)
 
 # Libraries to inlcude e.g. ROOT
