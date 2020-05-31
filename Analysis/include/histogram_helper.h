@@ -95,6 +95,7 @@ class histogram_helper{
     
     // enum for histogram vars
     enum TH1D_hist_vars {
+        k_reco_vtx_x,
         k_TH1D_MAX
     };
 

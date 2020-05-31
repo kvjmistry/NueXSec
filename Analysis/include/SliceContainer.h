@@ -1,11 +1,6 @@
 #ifndef SLICECONTAINER_H
 #define SLICECONTAINER_H
 
-#include <vector>
-#include <string>
-#include <TTree.h>
-#include <iostream>
-
 #include "utility.h"
 
 /* 
@@ -40,7 +35,7 @@ public:
     bool InFV();
     // -------------------------------------------------------------------------
     // Set the TPC object particle tree
-    void SetTPCObj(xsecAna::TPCObjectContainer tpc_obj, int type);
+    void SetTPCObj(xsecAna::TPCObjectContainer &tpc_obj, int type);
     // -------------------------------------------------------------------------
 
 
@@ -57,6 +52,7 @@ public:
     int subleading_shower_index;
     int n_pfp_tracks;
     int n_pfp_showers;
+    int tpc_obj_mode;
 
     double tpco_vtx_x;
     double tpco_vtx_y;
@@ -114,8 +110,7 @@ public:
     int mc_numu_nc_counter_bar = 0;
     double mc_nu_energy = 0;
     double mc_nu_momentum = 0;
-    int mc_nu_id = -1;
-    int mc_nu_id_var = -1;
+    int mc_nu_id;
 
     int mc_nu_num_particles = 0;
     int mc_nu_num_charged_particles = 0;

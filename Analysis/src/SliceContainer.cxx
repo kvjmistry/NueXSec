@@ -38,13 +38,14 @@ void SliceContainer::Initialise(TTree *tree, TTree *mc_truth_tree, int type, TFi
 
 }
 // -----------------------------------------------------------------------------
-void SliceContainer::SetTPCObj(xsecAna::TPCObjectContainer tpc_obj, int type){
+void SliceContainer::SetTPCObj(xsecAna::TPCObjectContainer &tpc_obj, int type){
 
     // Number of pfp
     n_pfp          = tpc_obj.NumPFParticles();
     n_pfp_tracks   = tpc_obj.NPfpTracks();
     n_pfp_showers  = tpc_obj.NPfpShowers();
     tpc_obj_origin = tpc_obj.Origin();
+    tpc_obj_mode   = tpc_obj.Mode();
 
     tpco_vtx_x = tpc_obj.pfpVtxX();
     tpco_vtx_y = tpc_obj.pfpVtxY();
@@ -57,16 +58,13 @@ void SliceContainer::SetTPCObj(xsecAna::TPCObjectContainer tpc_obj, int type){
     subrun = tpc_obj.SubRunNumber();
     event  = tpc_obj.EventNumber();
 
-    // Get the leading shower index
-    GetLeadingShowerIndex();
-
     // Check if vertex is in the FV
     if (type == _util.k_mc) infv = InFV();
 
     // Get the Particle vector
     for (int j = 0; j < n_pfp ; j++){
 
-        auto const pfp_obj = tpc_obj.GetParticle(j);
+        xsecAna::ParticleContainer pfp_obj = tpc_obj.GetParticle(j);
 
         // PFP vars
         mc_origin    .push_back(pfp_obj.Origin());
@@ -102,6 +100,9 @@ void SliceContainer::SetTPCObj(xsecAna::TPCObjectContainer tpc_obj, int type){
 
     }
 
+    // Get the leading shower index
+    GetLeadingShowerIndex();
+
 }
 // -----------------------------------------------------------------------------
 void SliceContainer::Reset(){
@@ -112,6 +113,7 @@ void SliceContainer::Reset(){
     subleading_shower_index = -1;
     n_pfp_tracks = -1;
     n_pfp_showers = -1;
+    tpc_obj_mode = -1;
 
     tpco_vtx_x = -1;
     tpco_vtx_y = -1;
@@ -158,6 +160,38 @@ void SliceContainer::Reset(){
     CCNC.clear();
 
 
+    mc_nue_cc_counter = 0;
+    mc_nue_nc_counter = 0;
+    mc_numu_cc_counter = 0;
+    mc_numu_nc_counter = 0;
+    mc_nue_cc_counter_bar = 0;
+    mc_numu_cc_counter_bar = 0;
+    mc_nue_nc_counter_bar = 0;
+    mc_numu_nc_counter_bar = 0;
+    mc_nu_energy = 0;
+    mc_nu_momentum = 0;
+    mc_nu_id = -1;
+
+    mc_nu_num_particles = 0;
+    mc_nu_num_charged_particles = 0;
+    
+    mc_nu_vtx_x = -999;
+    mc_nu_vtx_y = -999;
+    mc_nu_vtx_z = -999;
+    mc_nu_dir_x = -999;
+    mc_nu_dir_y = -999;
+    mc_nu_dir_z = -999;
+    
+    mc_ele_dir_x = -999;
+    mc_ele_dir_y = -999;
+    mc_ele_dir_z = -999;
+    
+    mc_ele_energy = 0;
+    mc_ele_momentum = 0;
+    has_pi0 = false;
+    mc_nu_time = -1;
+
+
 }
 // -----------------------------------------------------------------------------
 void SliceContainer::GetLeadingShowerIndex(){
@@ -201,7 +235,7 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
 
         
 
-        bool part_neutrino, part_cosmic, part_unmatched, part_numu, part_nue, part_cc;
+        bool part_neutrino{false}, part_cosmic{false}, part_unmatched{false}, part_numu{false}, part_nue{false}, part_cc{false}, part_nc{false};
 
 
         // loop over the origin vector and see whats in it
@@ -213,11 +247,10 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
             if (mc_parent_pdg.at(k) == 12 || mc_parent_pdg.at(k) == -12) part_nue = true;
             if (mc_parent_pdg.at(k) == 14 || mc_parent_pdg.at(k) == -14) part_numu = true;
 
-            if (CCNC.at(k) == _util.k_CC) part_cc = true;
-            else part_cc = false;
-        }
+            if (CCNC.at(k) == 0) part_cc = true;
+            if (CCNC.at(k) == 1) part_nc = true;
 
-        if (part_unmatched) return std::make_pair("unmatched", _util.k_unmatched);
+        }
 
         // CC Interactions
         if (part_cc){
@@ -230,22 +263,36 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
             }
 
             // Nue CC
-            if (part_nue) return std::make_pair("nue_cc", _util.k_cosmic );
+            if (part_nue) {
+                
+                if (infv) return std::make_pair("nue_cc", _util.k_nue_cc );
+                else return std::make_pair("nue_cc_out_fv", _util.k_nue_cc_out_fv );
+
+            }
             else return std::make_pair("numu_cc",_util.k_numu_cc  );
+
+            if (part_unmatched) return std::make_pair("unmatched", _util.k_unmatched);
         
         }
         // NC events
-        else {
+        else if (part_nc) {
 
             // Mixed NC event
             if( part_cosmic ) {
                 return std::make_pair("nc_mixed", _util.k_nc_mixed );
             }
-            else {
+            if (part_nue || part_numu) {
                 if (has_pi0) return std::make_pair("nc_pi0", _util.k_nc_pi0);
                 else return std::make_pair("nc",_util.k_nc);
             }
+
+            if (part_unmatched) return std::make_pair("unmatched", _util.k_unmatched);
         }
+        else {
+            return std::make_pair("unmatched", _util.k_unmatched);
+        }
+
+        
         
     }
     // Data
@@ -269,114 +316,122 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
 std::pair<std::string, int> SliceContainer::ParticleClassifier(int type){
     
     // MC Specific classsifications
-    // if (type == _util.k_mc){
+    if (type == _util.k_mc){
 
-    //     // Electron
-    //     if (shr_bkt_pdg == 11 || shr_bkt_pdg == -11){
-    //         return std::make_pair("e",_util.k_electron);
-    //     }
-    //     // Muon
-    //     else if (shr_bkt_pdg == 13 || shr_bkt_pdg == -13){
-    //         return std::make_pair("muon",_util.k_muon);
-    //     }
-    //     // Pion
-    //     else if (shr_bkt_pdg == 211 || shr_bkt_pdg == -211){
-    //         return std::make_pair("e",_util.k_pion);
-    //     }
-    //     // Photon 
-    //     else if (shr_bkt_pdg == 22 ){
-    //         return std::make_pair("photon",_util.k_photon);
-    //     }
-    //     // Proton
-    //     else if (shr_bkt_pdg == 2212){
-    //         return std::make_pair("p",_util.k_proton);
-    //     }
-    //     // Neutron
-    //     else if (shr_bkt_pdg == 2112){
-    //         return std::make_pair("n",_util.k_neutron);
-    //     }
-    //     // Kaon
-    //     else if (shr_bkt_pdg == 321 || shr_bkt_pdg == -321 ){
-    //         return std::make_pair("K",_util.k_kaon);
-    //     }
-    //     // Other stuff is assumed cosmic
-    //     else {
-    //         return std::make_pair("cosmic",_util.k_part_cosmic);
-    //     }
+        if (leading_shower_index < 0 || mc_pdg.size() < 0 || leading_shower_index > 1000) return std::make_pair("part_unmatched",_util.k_part_unmatched);
+
+        // Electron
+        if (mc_pdg.at(leading_shower_index) == 11 || mc_pdg.at(leading_shower_index) == -11){
+            return std::make_pair("e",_util.k_electron);
+        }
+        // Muon
+        else if (mc_pdg.at(leading_shower_index) == 13 || mc_pdg.at(leading_shower_index) == -13){
+            return std::make_pair("muon",_util.k_muon);
+        }
+        // Pion
+        else if (mc_pdg.at(leading_shower_index) == 211 || mc_pdg.at(leading_shower_index) == -211){
+            return std::make_pair("e",_util.k_pion);
+        }
+        // Photon 
+        else if (mc_pdg.at(leading_shower_index) == 22 ){
+            return std::make_pair("photon",_util.k_photon);
+        }
+        // Proton
+        else if (mc_pdg.at(leading_shower_index) == 2212){
+            return std::make_pair("p",_util.k_proton);
+        }
+        // Neutron
+        else if (mc_pdg.at(leading_shower_index) == 2112){
+            return std::make_pair("n",_util.k_neutron);
+        }
+        // Kaon
+        else if (mc_pdg.at(leading_shower_index) == 321 || mc_pdg.at(leading_shower_index) == -321 ){
+            return std::make_pair("K",_util.k_kaon);
+        }
+        // Other stuff is assumed cosmic
+        else {
+            return std::make_pair("cosmic",_util.k_part_cosmic);
+        }
 
 
-    // }
-    // // Data
-    // else if (type == _util.k_data){
-    //     return std::make_pair("data",_util.k_part_data);
-    // }
-    // // EXT
-    // else if (type == _util.k_ext){
-    //     return std::make_pair("ext",_util.k_part_ext);
+    }
+    // Data
+    else if (type == _util.k_data){
+        return std::make_pair("data",_util.k_part_data);
+    }
+    // EXT
+    else if (type == _util.k_ext){
+        return std::make_pair("ext",_util.k_part_ext);
         
-    // }
-    // // Dirt
-    // else if (type == _util.k_dirt){
-    //     return std::make_pair("dirt",_util.k_part_dirt);
-    // }
-    // // What is this type?
-    // else return std::make_pair("unmatched",_util.k_part_unmatched);
+    }
+    // Dirt
+    else if (type == _util.k_dirt){
+        return std::make_pair("dirt",_util.k_part_dirt);
+    }
+    // What is this type?
+    else return std::make_pair("unmatched",_util.k_part_unmatched);
     
 }
 // -----------------------------------------------------------------------------
 std::string SliceContainer::SliceInteractionType(int type){
 
-    // // Only do this for mc, otherwise return data type
-    // if (type == _util.k_mc || type == _util.k_dirt){
-    //     std::string nu;
-    //     std::string CCNC;
+    
+    // Only do this for mc, otherwise return data type
+    if (type == _util.k_mc || type == _util.k_dirt){
+        std::string nu = "unmatched";
 
-    //     // Get the nu flavour
-    //     if (nu_pdg == 14 ){
-    //         nu = "numu_";
-    //     }
-    //     else if (nu_pdg == -14){
-    //         nu = "numu_bar_";
-    //     }
-    //     else if (nu_pdg == 12){
-    //         nu = "nue_";
-    //     }
-    //     else if (nu_pdg == -12){
-    //         nu = "nue_bar_";
-    //     }
-    //     else {
-    //         nu = "unknown_";
-    //     }
+        // Get the nu flavour
+        if (mc_nu_id == 2 ){
+            nu = "numu_cc_";
+        }
+        else if (mc_nu_id == 6){
+            nu = "numu_bar_cc_";
+        }
+        else if (mc_nu_id == 1){
+            nu = "nue_cc_";
+        }
+        else if (mc_nu_id == 5){
+            nu = "nue_bar_cc_";
+        }
+        else if (mc_nu_id == 4){
+            nu = "numu_nc_";
+        }
+        else if (mc_nu_id == 8){
+            nu = "numu_bar_nc_";
+        }
+        else if (mc_nu_id == 3){
+            nu = "nue_nc_";
+        }
+        else if (mc_nu_id == 7){
+            nu = "nue_bar_nc_";
+        }
+        else {
+            nu = "unknown_";
+        }
 
-    //     // The interaction type
-    //     if (ccnc == _util.k_CC){
-    //         CCNC = "cc_";
-    //     }
-    //     else CCNC = "nc_";
+        if (tpc_obj_mode == 0) {
+            return nu + "qe";
 
+        }
+        else if (tpc_obj_mode == 1 ) {
+            return nu + "res";
 
-    //     if (interaction == _util.k_qe) {
-    //         return nu + CCNC + "qe";
+        }
+        else if (tpc_obj_mode == 2 ) {
+            return nu + "dis";
 
-    //     }
-    //     else if (interaction == _util.k_res ) {
-    //         return nu + CCNC + "res";
+        }
+        else if (tpc_obj_mode == 3) {
+            return nu + "coh";
 
-    //     }
-    //     else if (interaction == _util.k_dis ) {
-    //         return nu + CCNC + "dis";
+        }
+        else if (tpc_obj_mode == 10) {
+            return nu + "mec";
 
-    //     }
-    //     else if (interaction == _util.k_coh) {
-    //         return nu + CCNC + "coh";
-
-    //     }
-    //     else if (interaction == _util.k_mec) {
-    //         return nu + CCNC + "mec";
-
-    //     }
-    // }
-    // else return "data";
+        }
+        else return "unmatched";
+    }
+    else return "data";
 
 
 }

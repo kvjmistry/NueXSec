@@ -23,6 +23,8 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
         // Create the TTree
         tree      = new TTree("mc_tree",         "mc_tree");
         counter_tree = new TTree("mc_counter_tree",    "mc_counter_tree");
+        tree->SetDirectory(0);
+        counter_tree->SetDirectory(0);
     }
     else if (type == _util.k_data){
         
@@ -126,10 +128,10 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     
     counter_tree->Branch("count_nue_cc",       &count_nue_cc);
     counter_tree->Branch("count_nue_cc_mixed", &count_nue_cc_mixed);
-    counter_tree->Branch("count_nu_out_fv",    &count_nu_out_fv);
+    counter_tree->Branch("count_nue_cc_out_fv",&count_nue_cc_out_fv);
     counter_tree->Branch("count_cosmic",       &count_cosmic);
     counter_tree->Branch("count_numu_cc",      &count_numu_cc);
-    counter_tree->Branch("count_numu_cc_pi0",  &count_numu_cc_pi0);
+    counter_tree->Branch("count_nc_mixed",     &count_nc_mixed);
     counter_tree->Branch("count_nc",           &count_nc);
     counter_tree->Branch("count_nc_pi0",       &count_nc_pi0);
     counter_tree->Branch("count_unmatched",    &count_unmatched);
@@ -163,6 +165,7 @@ void TreeHelper::WriteTree(int type){
     tree->Write("",TObject::kOverwrite);
 
     counter_tree->Write("",TObject::kOverwrite);
+    
 
 }
 // -----------------------------------------------------------------------------
@@ -207,10 +210,10 @@ void TreeHelper::Fill_counters(std::vector<double> counter_v, std::string cut_na
         
         count_nue_cc       = counter_v.at(_util.k_count_nue_cc);
         count_nue_cc_mixed = counter_v.at(_util.k_count_nue_cc_mixed);
-        count_nu_out_fv    = counter_v.at(_util.k_count_nu_out_fv);
+        count_nue_cc_out_fv = counter_v.at(_util.k_count_nue_cc_out_fv);
         count_cosmic       = counter_v.at(_util.k_count_cosmic);
         count_numu_cc      = counter_v.at(_util.k_count_numu_cc);
-        count_numu_cc_pi0  = counter_v.at(_util.k_count_numu_cc_pi0);
+        count_nc_mixed     = counter_v.at(_util.k_count_nc_mixed);
         count_nc           = counter_v.at(_util.k_count_nc);
         count_nc_pi0       = counter_v.at(_util.k_count_nc_pi0);
         count_unmatched    = counter_v.at(_util.k_count_unmatched);

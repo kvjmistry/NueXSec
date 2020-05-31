@@ -109,7 +109,7 @@ void selection::Initialise( const char * mc_file,
     if (bool_use_mc){
         std::cout << "\nInitialising MC" << std::endl;
         _util.GetTree(f_mc, mc_tree, "AnalyzeTPCO/tree");
-        _util.GetTree(f_mc, mc_tree, "AnalyzeTPCO/mctruth_counter_tree");
+        _util.GetTree(f_mc, mc_truth_tree, "AnalyzeTPCO/mctruth_counter_tree");
 
         // Initialise all the mc slice container
         mc_SC.Initialise(mc_tree, mc_truth_tree, _util.k_mc, f_flux_weights, run_period);
@@ -122,14 +122,10 @@ void selection::Initialise( const char * mc_file,
         if (!_slim) _hhelper.at(_util.k_mc).InitHistograms();
 
         mc_tree_total_entries = mc_tree->GetEntries();
-        std::cout << "Total MC Events:         " << mc_tree_total_entries << std::endl;
+        std::cout << "Total MC Events:         " << mc_tree_total_entries << "   Total MC truth entries: " << mc_truth_tree->GetEntries() << std::endl;
 
         // Resize the Passed vector
-        mc_passed_v.resize(mc_tree_total_entries);
-
-        for (unsigned int y = 0; y < mc_passed_v.size(); y++ ){
-            mc_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
-        }
+        mc_passed_v_v.resize(mc_tree_total_entries);
 
         std::cout << "Initialisation of MC Complete!" << std::endl;
     } // End getting MC variables
@@ -153,11 +149,11 @@ void selection::Initialise( const char * mc_file,
         std::cout << "Total Data Events:         " << data_tree_total_entries << std::endl;
 
         // Resize the Passed vector
-        data_passed_v.resize(data_tree_total_entries);
+        data_passed_v_v.resize(data_tree_total_entries);
         
-        for (unsigned int y = 0; y < data_passed_v.size(); y++ ){
-            data_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
-        }
+        // for (unsigned int y = 0; y < data_passed_v.size(); y++ ){
+        //     data_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
+        // }
 
         std::cout << "Initialisation of Data Complete!" << std::endl;
 
@@ -183,11 +179,11 @@ void selection::Initialise( const char * mc_file,
         std::cout << "Total EXT Events:        " << ext_tree_total_entries << std::endl;
 
         // Resize the Passed vector
-        ext_passed_v.resize(ext_tree_total_entries);
+        ext_passed_v_v.resize(ext_tree_total_entries);
 
-        for (unsigned int y = 0; y < ext_passed_v.size(); y++ ){
-            ext_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
-        }
+        // for (unsigned int y = 0; y < ext_passed_v.size(); y++ ){
+        //     ext_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
+        // }
 
         std::cout << "Initialisation of EXT Complete!" << std::endl;
 
@@ -213,11 +209,11 @@ void selection::Initialise( const char * mc_file,
         std::cout << "Total Dirt Events:         " << dirt_tree_total_entries << std::endl;
 
         // Resize the Passed vector
-        dirt_passed_v.resize(dirt_tree_total_entries);
+        dirt_passed_v_v.resize(dirt_tree_total_entries);
         
-        for (unsigned int y = 0; y < dirt_passed_v.size(); y++ ){
-            dirt_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
-        }
+        // for (unsigned int y = 0; y < dirt_passed_v.size(); y++ ){
+        //     dirt_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
+        // }
 
         std::cout << "Initialisation of Dirt Complete!" << std::endl;
 
@@ -251,23 +247,32 @@ void selection::MakeSelection(){
             if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
 
             // Get the entry in the tree
-            mc_tree->GetEntry(ievent); 
+            mc_tree      ->GetEntry(ievent); 
+            mc_truth_tree->GetEntry(ievent);
 
             int n_tpc_obj = mc_SC.tpc_object_container_v->size();
+
+            // resize the passed vector to number of tpc objects
+            mc_passed_v_v.at(ievent).resize(n_tpc_obj);
+
+            // Resize each entry of the passed vector
+            for (unsigned int y = 0; y < mc_passed_v_v.at(ievent).size(); y++ ){
+                mc_passed_v_v.at(ievent).at(y).cut_v.resize(_util.k_cuts_MAX, false);
+            }
             
             // Loop over the TPC Objects in the event
             for (int i = 0; i < n_tpc_obj; i++){
 
-                // Reset and go again
-                mc_SC.Reset();
+                // xsecAna::ParticleContainer pfp_obj = mc_SC.tpc_object_container_v->at(i).GetParticle(0);
                 
                 // Set the TPC Object properties
                 mc_SC.SetTPCObj(mc_SC.tpc_object_container_v->at(i), _util.k_mc);
 
                 // Apply the selection cuts 
-                // bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
-                // if (!pass) continue;
+                bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v_v.at(ievent), mc_SC);
 
+                // Reset and go again
+                mc_SC.Reset(); 
             }
 
            
@@ -300,7 +305,7 @@ void selection::MakeSelection(){
                 continue;
             }
 
-            bool pass = ApplyCuts(_util.k_data, ievent, counter_v, data_passed_v, data_SC);
+            bool pass = ApplyCuts(_util.k_data, ievent, counter_v, data_passed_v_v.at(ievent), data_SC);
             if (!pass) continue;
         }
 
@@ -316,20 +321,20 @@ void selection::MakeSelection(){
             // Loop over the data events and make a run_subrun_event filelist
             for (int ievent = 0; ievent < data_tree_total_entries; ievent++){
             
-                if (data_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true ){
+                // if (data_passed_v_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true ){
                     
-                    // Get the entry in the tree
-                    data_tree->GetEntry(ievent);
+                //     // Get the entry in the tree
+                //     data_tree->GetEntry(ievent);
 
-                    run    = data_SC.run;
-                    subrun = data_SC.subrun;
-                    event  = data_SC.event;
+                //     run    = data_SC.run;
+                //     subrun = data_SC.subrun;
+                //     event  = data_SC.event;
 
-                    // std::cout << run << " " << subrun << " " << event << " " << reco_nu_e <<  '\n';
+                //     // std::cout << run << " " << subrun << " " << event << " " << reco_nu_e <<  '\n';
 
-                    run_subrun_file << run << " " << subrun << " " << event << '\n';
+                //     run_subrun_file << run << " " << subrun << " " << event << '\n';
 
-                }
+                // }
                 
             }
 
@@ -355,7 +360,7 @@ void selection::MakeSelection(){
             // Get the entry in the tree
             ext_tree->GetEntry(ievent); // TPC Objects
 
-            bool pass = ApplyCuts(_util.k_ext, ievent, counter_v, ext_passed_v, ext_SC);
+            bool pass = ApplyCuts(_util.k_ext, ievent, counter_v, ext_passed_v_v.at(ievent), ext_SC);
             if (!pass) continue;
         }
          
@@ -379,7 +384,7 @@ void selection::MakeSelection(){
             // Get the entry in the tree
             dirt_tree->GetEntry(ievent);
 
-            bool pass = ApplyCuts(_util.k_dirt, ievent, counter_v, dirt_passed_v, dirt_SC);
+            bool pass = ApplyCuts(_util.k_dirt, ievent, counter_v, dirt_passed_v_v.at(ievent), dirt_SC);
             if (!pass) continue;
         }
          
@@ -393,12 +398,17 @@ void selection::MakeSelection(){
     for (unsigned int p=0; p < counter_v.size();p++){
 
         // Fill the counter trees
-        // if (bool_use_mc)   _thelper.at(_util.k_mc)  .Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
+        if (bool_use_mc)   _thelper.at(_util.k_mc)  .Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
         // if (bool_use_data) _thelper.at(_util.k_data).Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
         // if (bool_use_ext)  _thelper.at(_util.k_ext) .Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
         // if (bool_use_dirt) _thelper.at(_util.k_dirt).Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
 
     }
+
+    double e = 1.0, p = 1.0;
+
+
+    // _util.PrintInfo(counter_v.at(0),  1.0, 1.0, 1.0,"unselected", 10, e, p);
     
     // Now save all the outputs to file
     if (!slim) SavetoFile();
@@ -417,11 +427,8 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     std::string interaction                    = SC.SliceInteractionType(type); // Genie interaction type
     std::pair<std::string, int> particle_type  = SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
 
-    // Test code to isolate the low E nues in truth
-    // if (type == _util.k_mc && SC.nu_e > 0.5) return false;
-    // if (type == _util.k_mc && SC.shr_dedx_Y_cali > 7 && classification.second == _util.k_nue_cc){
-    //     std::cout << SC.run << " " << SC.sub<<" " << SC.evt<<  std::endl;
-    // }
+    // std::cout << classification.first << "  " <<  interaction << "   " << particle_type.first << std::endl;
+
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
@@ -448,12 +455,12 @@ void selection::SavetoFile(){
     std::cout << "Now Saving Histograms to file" << std::endl;
     if (bool_use_mc) {
 
-        _hhelper.at(_util.k_mc).WriteTrue();
+        // _hhelper.at(_util.k_mc).WriteTrue();
         _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
-        _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_mc);
-        _hhelper.at(_util.k_mc).WriteFlash();
-        _hhelper.at(_util.k_mc).WriteInteractions();
-        _hhelper.at(_util.k_mc).Write_2DSigBkgHists();
+        // _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_mc);
+        // _hhelper.at(_util.k_mc).WriteFlash();
+        // _hhelper.at(_util.k_mc).WriteInteractions();
+        // _hhelper.at(_util.k_mc).Write_2DSigBkgHists();
 
         _thelper.at(_util.k_mc).WriteTree(_util.k_mc);
 

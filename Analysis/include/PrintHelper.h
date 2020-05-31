@@ -95,10 +95,10 @@ class PrintHelper{
     
     double count_nue_cc{0.0};
     double count_nue_cc_mixed{0.0};
-    double count_nu_out_fv{0.0};
+    double count_nue_cc_out_fv{0.0};
     double count_cosmic{0.0};
     double count_numu_cc{0.0};
-    double count_numu_cc_pi0{0.0};
+    double count_nc_mixed{0.0};
     double count_nc{0.0};
     double count_nc_pi0{0.0};
     double count_unmatched{0.0};

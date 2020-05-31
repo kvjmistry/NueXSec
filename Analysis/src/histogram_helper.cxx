@@ -216,7 +216,7 @@ void histogram_helper::InitHistograms(){
         for (unsigned int j=0; j < _util.classification_dirs.size();j++){
         
             // Reco Vtx X, Y, Z
-            // TH1D_hists.at(k_reco_vtx_x).at(i).at(j) = new TH1D ( Form("h_reco_vtx_x_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, -10, 270);
+            TH1D_hists.at(k_reco_vtx_x).at(i).at(j) = new TH1D ( Form("h_reco_vtx_x_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, -10, 270);
 
         
         }
@@ -224,48 +224,14 @@ void histogram_helper::InitHistograms(){
     }
     // -------------------------------------------------------------------------
 
-    // Flash histograms
-    TH1D_flash_hists.resize(k_TH1D_flash_MAX);
-    TH1D_flash_hists.at(k_flash_time) = new TH1D( Form("h_flash_time_%s", _util.type_prefix.at(_type).c_str()), "; Flash Time [us]; Entries", 100, 0, 25 );
-    TH1D_flash_hists.at(k_flash_pe)   = new TH1D( Form("h_flash_pe_%s", _util.type_prefix.at(_type).c_str()),   "; Largest Flash Intensity [PE]; Entries", 40, 0, 10000 );
-    
 }
 // -----------------------------------------------------------------------------
 void histogram_helper::FillHists(int type, int classification_index, std::string interaction, int _par_type, int cut_index, SliceContainer SC, double weight){
 
    
     // Now fill the histograms!
-    // TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x, weight);
+    TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.tpco_vtx_x, weight);
     
-    // -----------------------------------------------------------------------------
-
-    // Only do this for after the software trigger
-    if (cut_index == _util.k_unselected){
-
-        // // Flash histograms
-        // if (type == _util.k_mc){
-        //     TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
-        //     TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight); // See numi documentation page to see what these numbers mean
-           
-        // }
-        // if (type == _util.k_dirt){
-        //     TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + 0.055 -0.359, weight);
-        //     TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
-           
-        // }
-        // if (type == _util.k_ext){
-        //     TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + -0.359, weight);
-        //     TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
-           
-        // }
-        // if (type == _util.k_data){
-        //     TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time, weight);
-        //     TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
-            
-        // }
-        
-    }
-
 }
 // -----------------------------------------------------------------------------
 void histogram_helper::WriteReco(int type){
@@ -309,7 +275,7 @@ void histogram_helper::WriteReco(int type){
 
                 // Now write the histograms
                 TH1D_hists.at(u).at(i).at(j)->SetOption("hist,E");
-                TH1D_hists.at(u).at(i).at(j)->Write("",TObject::kOverwrite);
+                // TH1D_hists.at(u).at(i).at(j)->Write("",TObject::kOverwrite);
 
                 // Try to clear some memory
                 // delete TH1D_hists.at(u).at(i).at(j);

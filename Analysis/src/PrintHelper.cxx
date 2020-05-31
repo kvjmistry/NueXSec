@@ -78,7 +78,7 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, in
 
     // MC -----------------------
     if (print_mc){
-        if (file_out_str == "empty") file_name = Form("files/trees/nuexsec_selected_tree_mc_run%s.root", run_period);
+        if (file_out_str == "empty") file_name = Form("files/trees/mcc8_nuexsec_selected_tree_mc_run%s.root", run_period);
         else file_name = "files/trees/" + file_out_str;
         
         // File not already open, open the file
@@ -132,10 +132,10 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, in
         
         mc_counter_tree->SetBranchAddress("count_nue_cc",       &count_nue_cc);
         mc_counter_tree->SetBranchAddress("count_nue_cc_mixed", &count_nue_cc_mixed);
-        mc_counter_tree->SetBranchAddress("count_nu_out_fv",    &count_nu_out_fv);
+        mc_counter_tree->SetBranchAddress("count_nue_cc_out_fv",&count_nue_cc_out_fv);
         mc_counter_tree->SetBranchAddress("count_cosmic",       &count_cosmic);
         mc_counter_tree->SetBranchAddress("count_numu_cc",      &count_numu_cc);
-        mc_counter_tree->SetBranchAddress("count_numu_cc_pi0",  &count_numu_cc_pi0);
+        mc_counter_tree->SetBranchAddress("count_nc_mixed",     &count_nc_mixed);
         mc_counter_tree->SetBranchAddress("count_nc",           &count_nc);
         mc_counter_tree->SetBranchAddress("count_nc_pi0",       &count_nc_pi0);
         mc_counter_tree->SetBranchAddress("count_unmatched",    &count_unmatched);
@@ -191,10 +191,10 @@ void PrintHelper::PrintResults(){
             std::cout << " Total Candidate Nue     : " << sum_mc_dirt_ext                 << "    " << double(sum_mc_dirt_ext                * mc_scale_factor  ) << std::endl;
             std::cout << " Number of Nue CC        : " << count_nue_cc          << "    " << double(count_nue_cc         * mc_scale_factor  ) << std::endl;
             std::cout << " Number of Nue CC Mixed  : " << count_nue_cc_mixed    << "    " << double(count_nue_cc_mixed   * mc_scale_factor  ) << std::endl;
-            std::cout << " Number of Nu out FV     : " << count_nu_out_fv       << "    " << double(count_nu_out_fv      * mc_scale_factor  ) << std::endl;
+            std::cout << " Number of Nue CC out FV : " << count_nue_cc_out_fv   << "    " << double(count_nue_cc_out_fv  * mc_scale_factor  ) << std::endl;
             std::cout << " Number of Cosmic        : " << count_cosmic          << "    " << double(count_cosmic         * mc_scale_factor  ) << std::endl;
             std::cout << " Number of Numu CC       : " << count_numu_cc         << "    " << double(count_numu_cc        * mc_scale_factor  ) << std::endl;
-            std::cout << " Number of Numu CC Pi0   : " << count_numu_cc_pi0     << "    " << double(count_numu_cc_pi0    * mc_scale_factor  ) << std::endl;
+            std::cout << " Number of NC Mixed      : " << count_nc_mixed        << "    " << double(count_nc_mixed       * mc_scale_factor  ) << std::endl;
             std::cout << " Number of NC            : " << count_nc              << "    " << double(count_nc             * mc_scale_factor  ) << std::endl;
             std::cout << " Number of NC Pi0        : " << count_nc_pi0          << "    " << double(count_nc_pi0         * mc_scale_factor  ) << std::endl;
             std::cout << " Number of Unmatched     : " << count_unmatched       << "    " << double(count_unmatched      * mc_scale_factor  ) << std::endl;

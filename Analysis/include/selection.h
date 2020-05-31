@@ -83,10 +83,10 @@ namespace xsecSelection {
             bool   detector_variations;
 
             // Passed Containers
-            std::vector<Passed_Container> mc_passed_v;   // MC Passed Container
-            std::vector<Passed_Container> data_passed_v; // Data Passed Container
-            std::vector<Passed_Container> ext_passed_v;  // EXT Passed Container
-            std::vector<Passed_Container> dirt_passed_v; // Dirt Passed Container
+            std::vector<std::vector<Passed_Container>> mc_passed_v_v;   // MC Passed Container
+            std::vector<std::vector<Passed_Container>> data_passed_v_v; // Data Passed Container
+            std::vector<std::vector<Passed_Container>> ext_passed_v_v;  // EXT Passed Container
+            std::vector<std::vector<Passed_Container>> dirt_passed_v_v; // Dirt Passed Container
             
             // Counter Container
             std::vector<std::vector<double>> counter_v;

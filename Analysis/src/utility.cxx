@@ -171,11 +171,11 @@ void utility::Tabulate(bool inFV, std::string interaction, std::string classific
         // Classification
         if (classification == "nue_cc")       counter_v.at(k_count_nue_cc)       += weight;
         if (classification == "nue_cc_mixed") counter_v.at(k_count_nue_cc_mixed) += weight;
-        if (classification == "nu_out_fv")    counter_v.at(k_count_nu_out_fv)    += weight;
+        if (classification == "nue_cc_out_fv")counter_v.at(k_count_nue_cc_out_fv)+= weight;
         if (classification == "nc")           counter_v.at(k_count_nc)           += weight;
         if (classification == "nc_pi0")       counter_v.at(k_count_nc_pi0)       += weight;
         if (classification == "numu_cc")      counter_v.at(k_count_numu_cc)      += weight;
-        if (classification == "numu_cc_pi0")  counter_v.at(k_count_numu_cc_pi0)  += weight;
+        if (classification == "nc_mixed")     counter_v.at(k_count_nc_mixed)     += weight;
         if (classification == "cosmic")       counter_v.at(k_count_cosmic)       += weight;
         if (classification == "unmatched")    counter_v.at(k_count_unmatched)    += weight;
 
@@ -214,10 +214,10 @@ void utility::PrintInfo(std::vector<double> c_v, double intime_scale_factor, dou
     std::cout << " Total Candidate Nue     : " << sum_mc_dirt_ext                 << "    " << double(sum_mc_dirt_ext                * mc_scale_factor  ) << std::endl;
     std::cout << " Number of Nue CC        : " << c_v.at(k_count_nue_cc)          << "    " << double(c_v.at(k_count_nue_cc)         * mc_scale_factor  ) << std::endl;
     std::cout << " Number of Nue CC Mixed  : " << c_v.at(k_count_nue_cc_mixed)    << "    " << double(c_v.at(k_count_nue_cc_mixed)   * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Nu out FV     : " << c_v.at(k_count_nu_out_fv)       << "    " << double(c_v.at(k_count_nu_out_fv)      * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Nue CC out FV : " << c_v.at(k_count_nue_cc_out_fv)   << "    " << double(c_v.at(k_count_nue_cc_out_fv)  * mc_scale_factor  ) << std::endl;
     std::cout << " Number of Cosmic        : " << c_v.at(k_count_cosmic)          << "    " << double(c_v.at(k_count_cosmic)         * mc_scale_factor  ) << std::endl;
     std::cout << " Number of Numu CC       : " << c_v.at(k_count_numu_cc)         << "    " << double(c_v.at(k_count_numu_cc)        * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Numu CC Pi0   : " << c_v.at(k_count_numu_cc_pi0)     << "    " << double(c_v.at(k_count_numu_cc_pi0)    * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of NC Mixed      : " << c_v.at(k_count_nc_mixed)        << "    " << double(c_v.at(k_count_nc_mixed)    * mc_scale_factor  ) << std::endl;
     std::cout << " Number of NC            : " << c_v.at(k_count_nc)              << "    " << double(c_v.at(k_count_nc)             * mc_scale_factor  ) << std::endl;
     std::cout << " Number of NC Pi0        : " << c_v.at(k_count_nc_pi0)          << "    " << double(c_v.at(k_count_nc_pi0)         * mc_scale_factor  ) << std::endl;
     std::cout << " Number of Unmatched     : " << c_v.at(k_count_unmatched)       << "    " << double(c_v.at(k_count_unmatched)      * mc_scale_factor  ) << std::endl;
