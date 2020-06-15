@@ -111,7 +111,7 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the mc slice container
-        mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights, run_period);
+        mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights, run_period, _util);
 
         // Initialise the Tree Helper
         _thelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_tree_file_name_out, weight_cfg);
@@ -139,7 +139,7 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_data, data_tree, "nuselection/NeutrinoSelectionFilter");
         
         // Initialise all the data slice container
-        data_SC.Initialise(data_tree, _util.k_data, f_flux_weights, run_period);
+        data_SC.Initialise(data_tree, _util.k_data, f_flux_weights, run_period, _util);
 
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, run_period, data_file_out, weight_cfg);
@@ -169,7 +169,7 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_ext, ext_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
-        ext_SC.Initialise(ext_tree, _util.k_ext, f_flux_weights, run_period);
+        ext_SC.Initialise(ext_tree, _util.k_ext, f_flux_weights, run_period, _util);
 
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, ext_file_out, weight_cfg);
@@ -199,7 +199,7 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_dirt, dirt_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
-        dirt_SC.Initialise(dirt_tree, _util.k_dirt, f_flux_weights, run_period);
+        dirt_SC.Initialise(dirt_tree, _util.k_dirt, f_flux_weights, run_period, _util);
 
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, dirt_file_out, weight_cfg);
@@ -431,7 +431,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Test code to isolate the low E nues in truth
     // if (type == _util.k_mc && SC.nu_e > 0.5) return false;
     // if (type == _util.k_mc && SC.shr_dedx_Y_cali > 7 && classification.second == _util.k_nue_cc){
-    //     std::cout << SC.run << " " << SC.sub<<" " << SC.evt<<  std::endl;
+        // std::cout << SC.run << " " << SC.sub<<" " << SC.evt<<  std::endl;
     // }
 
     // *************************************************************************

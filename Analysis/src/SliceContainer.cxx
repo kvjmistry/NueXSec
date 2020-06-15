@@ -1,9 +1,10 @@
 #include "../include/SliceContainer.h"
 
 // -----------------------------------------------------------------------------
-void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, const char * _run_period){
+void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, const char * _run_period, utility util){
 
     std::cout << "Initalising Slice Container" << std::endl;
+    _util = util;
 
     tree->SetBranchAddress("selected", &selected);
     tree->SetBranchAddress("run", &run);
@@ -572,8 +573,11 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
     // MC Specific classsifications
     if (type == _util.k_mc){
 
+        
+        bool is_in_fv = _util.in_fv(reco_nu_vtx_sce_x, reco_nu_vtx_sce_y, reco_nu_vtx_sce_x);
+
         // Out of Fiducial Volume Event
-        if (!isVtxInFiducial) {
+        if (!is_in_fv) {
             // std::cout << "Purity of out of FV event: "<< nu_purity_from_pfp << std::endl;
             if (nu_purity_from_pfp < 0.6) return std::make_pair("cosmic",_util.k_cosmic);
             else return std::make_pair("nu_out_fv",_util.k_nu_out_fv);
@@ -594,11 +598,10 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
             }
             // Nue CC
             else if (nu_pdg == 12 || nu_pdg == -12){
-
                 
-                if (nu_purity_from_pfp >= 0.6)     return std::make_pair("nue_cc",_util.k_nue_cc); // purity > 60% so pure nue
-                else                               return std::make_pair("nue_cc_mixed",_util.k_nue_cc_mixed); // purity from 0 to 60% mixed event. (includes pure cosmic)
-                // else return std::make_pair("cosmic",_util.k_cosmic); // Classify as a cosmic with very low purity
+                if (nu_purity_from_pfp >= 0.6)                                  return std::make_pair("nue_cc",_util.k_nue_cc); // purity > 60% so pure nue
+                else if (nu_purity_from_pfp < 0.6 && nu_purity_from_pfp > 0.0)  return std::make_pair("nue_cc_mixed",_util.k_nue_cc_mixed); // purity from >0 to 60% mixed event.
+                else return std::make_pair("cosmic",_util.k_cosmic); // Classify as a cosmic with very low purity
 
             }
             // Unknown Neutrino Type

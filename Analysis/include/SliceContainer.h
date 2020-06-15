@@ -19,7 +19,7 @@ public:
 
     // -------------------------------------------------------------------------
     // Initialise the class
-    void Initialise(TTree* tree, int type, TFile *f_flux_weights, const char * _run_period);
+    void Initialise(TTree* tree, int type, TFile *f_flux_weights, const char * _run_period, utility util);
     // -------------------------------------------------------------------------
     // Function to classify the slice
     std::pair<std::string, int>  SliceClassifier(int type);

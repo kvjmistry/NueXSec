@@ -65,14 +65,10 @@ bool selection_cuts::topo_score(SliceContainer &SC){
 // -----------------------------------------------------------------------------
 bool selection_cuts::in_fv(SliceContainer &SC){
     
-    // These are looser cuts (whats done in the cc inclusive)
-    if ( SC.reco_nu_vtx_sce_x   >= _util.config_v.at(_util.k_config_x1) && SC.reco_nu_vtx_sce_x <= _util.config_v.at(_util.k_config_x2) &&
-        SC.reco_nu_vtx_sce_y    >= _util.config_v.at(_util.k_config_y1) && SC.reco_nu_vtx_sce_y <= _util.config_v.at(_util.k_config_y2) &&
-        ( (SC.reco_nu_vtx_sce_z >= _util.config_v.at(_util.k_config_z1) && SC.reco_nu_vtx_sce_z <= _util.config_v.at(_util.k_config_z2)))
-        ){
-        return true;   // pass
-    }  
-    else return false; // fail
+    // Check if the reco vertex is in the FV
+    bool is_in_fv = _util.in_fv(SC.reco_nu_vtx_sce_x, SC.reco_nu_vtx_sce_y, SC.reco_nu_vtx_sce_x);
+    return is_in_fv;
+
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::cluster_frac(SliceContainer &SC){

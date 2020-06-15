@@ -289,8 +289,26 @@ double utility::GetTheta(double px, double py, double pz){
     TVector3 beam_dir = {0 , 0 , 1};
     double theta = BeamCoords.Angle(beam_dir) * 180 / 3.1415926;
 
+
+    // Create vectors to get the angle in the yz and xz planes
+    TVector3 BeamCoords_yz = { 0, BeamCoords.Y(), BeamCoords.Z() }; // Angle upwards
+    TVector3 BeamCoords_xz = { BeamCoords.X(), 0, BeamCoords.Z() }; // Angle across
+
+    // if (theta > 50 ) std::cout <<"Theta: " << theta << "   UP: " << BeamCoords_yz.Angle(beam_dir) * 180 / 3.1415926 << "  Across: " << BeamCoords_xz.Angle(beam_dir) * 180 / 3.1415926 << std::endl;
+
     // std::cout << theta << std::endl;
 
     return theta;
+}
+// -----------------------------------------------------------------------------
+bool utility::in_fv(double x, double y, double z){
+    
+    // These are looser cuts (whats done in the cc inclusive)
+    if ( x   >= config_v.at(k_config_x1) && x <= config_v.at(k_config_x2)  &&
+         y   >= config_v.at(k_config_y1) && y <= config_v.at(k_config_y2)  &&
+         z   >= config_v.at(k_config_z1) && z <= config_v.at(k_config_z2)  ){
+        return true;   // pass
+    }  
+    else return false; // fail
 }
 // -----------------------------------------------------------------------------

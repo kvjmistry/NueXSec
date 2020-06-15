@@ -192,6 +192,7 @@ double CrossSectionHelper::GetIntegratedFlux(){
     TH1D* h_nue, *h_nuebar;
 
     double energy_threshold = 0.05; // Set threshold to integrate the flux from [GeV]
+    std::cout << "Using a flux energy threshold of :" << energy_threshold * 1000 << " MeV"<< std::endl;
 
     // Hardcoded for run 1 right now.. urgh krish you lazy
     bool boolfile;

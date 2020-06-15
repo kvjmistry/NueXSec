@@ -63,6 +63,9 @@ public:
     // Function calculate theta
     double GetTheta(double px, double py, double pz);
     // -------------------------------------------------------------------------
+    // Check if vertex is in the FV
+    bool in_fv(double x, double y, double z);
+    // -------------------------------------------------------------------------
 
     // Variables
     

@@ -7,10 +7,13 @@ void make_efficiency_plot(){
 
     TFile *f_mc;
 
-    std::vector<double> efficiency_v = {1, 0.5489, 0.38, 0.315, 0.261, 0.132, 0.0903}; // efficiency vector
-    std::vector<double> purity_v = {0, 0.00736, 0.03569, 0.0418, 0.1514, 0.2928, 0.3973}    ; // purity vector
-    std::vector<double> purity_nu_v = {0, 0.1225, 0.1612, 0.1943, 0.3253, 0.5142, 0.6978}    ; // purity nu Only vector
-    std::vector<std::string> names = {"No Cuts (0)","Simple Pre-Cuts (1)", "Flash-Matching (2)", "Reco. Vertex Quality (3)", "Shower Hit Threshold (4)", "Electron-like Shower (5)", "Finalisation Cuts (6)"};
+    //std::vector<double> efficiency_v = {1, 0.5489, 0.38, 0.315, 0.261, 0.132, 0.0903}; // efficiency vector -- with mixed as bkg
+    //std::vector<double> purity_v = {0, 0.00736, 0.03569, 0.0418, 0.1514, 0.2928, 0.3973}    ; // purity vector -- with mixec as bkg
+    //std::vector<double> purity_nu_v = {0, 0.1225, 0.1612, 0.1943, 0.3253, 0.5142, 0.6978}    ; // purity nu Only vector -- with mixed as bkg
+    std::vector<double> efficiency_v = {1, 0.6939, 0.4568, 0.365, 0.3, 0.1511, 0.0907}; // efficiency vector -- with mixed as sig
+    std::vector<double> purity_v = {0, 0.0093, 0.0429, 0.0480, 0.1739, 0.3348, 0.3861}    ; // purity vector -- with mixec as sig
+    std::vector<double> purity_nu_v = {0, 0.04, 0.132, 0.148, 0.319, 0.536, 0.62}    ; // purity nu Only vector -- with mixed as sig
+    std::vector<std::string> names = {"No Cuts (0)","Pre-selection (1)", "Flash Matching (2)", "Vertex Reco. Quality (3)", "Shower Hit Threshold (4)", "Electron-like Shower (5)", "Final Tuning (6)"};
 
     double efficiency, purity;
 
