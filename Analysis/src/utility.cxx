@@ -304,9 +304,7 @@ double utility::GetTheta(double px, double py, double pz){
 bool utility::in_fv(double x, double y, double z){
     
     // These are looser cuts (whats done in the cc inclusive)
-    if ( x   >= config_v.at(k_config_x1) && x <= config_v.at(k_config_x2)  &&
-         y   >= config_v.at(k_config_y1) && y <= config_v.at(k_config_y2)  &&
-         z   >= config_v.at(k_config_z1) && z <= config_v.at(k_config_z2)  ){
+    if ( x   >= config_v.at(k_config_x1) && x <= config_v.at(k_config_x2)  && y   >= config_v.at(k_config_y1) && y <= config_v.at(k_config_y2)  && z   >= config_v.at(k_config_z1) && z <= config_v.at(k_config_z2)  ){
         return true;   // pass
     }  
     else return false; // fail

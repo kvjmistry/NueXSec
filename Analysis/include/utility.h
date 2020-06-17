@@ -120,14 +120,14 @@ public:
     std::vector<std::string> cut_dirs = {
             "Unselected",     // Unselected
             "SoftwareTrig",   // Software Trigger
-            "Op_Filter_PE",   // Common Optical Filter PE
-            "Op_Filter_Veto",// Common Optical Filter Michel Veto
+            // "Op_Filter_PE",   // Common Optical Filter PE
+            // "Op_Filter_Veto",// Common Optical Filter Michel Veto
             "Slice_ID",       // Slice ID
             "e_candidate",    // Electron Candidate
             "In_FV",          // In FV
             "Topo_Score",     // Topological Score
-            "Cosmic_IP",      // Cosmic Inpact Parameter
-            "Cluster_Frac",   // Cluster Fraction 
+            // "Cosmic_IP",      // Cosmic Inpact Parameter
+            // "Cluster_Frac",   // Cluster Fraction 
             "Contained_Frac", // Slice Contained Fraction
             "Shower_Score",   // Track Score
             "Michel_Rej",     // Michel Rejection
@@ -201,14 +201,14 @@ public:
     enum enum_cut_dirs {
                 k_unselected,        // Unselected 
                 k_swtrig,            // Software Trigger
-                k_opfilt_pe,         // Common Optical Filter PE
-                k_opfilt_veto,    // Common Optical Filter Michel Veto
+                // k_opfilt_pe,         // Common Optical Filter PE
+                // k_opfilt_veto,    // Common Optical Filter Michel Veto
                 k_slice_id,          // Slice ID
                 k_e_candidate,       // Electron Candidate
                 k_in_fv,             // Reco Nu Vtx (SC Corr) In the FV 
                 k_topo_score,        // Topo Score
-                k_cosmic_ip,         // Cosmic IP
-                k_cluster_frac,      // Cluster Fraction
+                // k_cosmic_ip,         // Cosmic IP
+                // k_cluster_frac,      // Cluster Fraction
                 k_contained_frac,    // Slice Contained Fraction
                 k_shower_score,      // Shower Score
                 k_michel_rej,        // Michel Rejection

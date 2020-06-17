@@ -117,7 +117,7 @@ void selection::Initialise( const char * mc_file,
         _thelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_tree_file_name_out, weight_cfg);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_file_out, weight_cfg);
+        if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_file_out, weight_cfg, _util);
         if (!_slim) _hhelper.at(_util.k_mc).InitHistograms();
 
         mc_tree_total_entries = mc_tree->GetEntries();
@@ -142,7 +142,7 @@ void selection::Initialise( const char * mc_file,
         data_SC.Initialise(data_tree, _util.k_data, f_flux_weights, run_period, _util);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, run_period, data_file_out, weight_cfg);
+        if (!_slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, run_period, data_file_out, weight_cfg, _util);
         if (!_slim) _hhelper.at(_util.k_data).InitHistograms();
         
         // Initialise the Tree Helper
@@ -172,7 +172,7 @@ void selection::Initialise( const char * mc_file,
         ext_SC.Initialise(ext_tree, _util.k_ext, f_flux_weights, run_period, _util);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, ext_file_out, weight_cfg);
+        if (!_slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, ext_file_out, weight_cfg, _util);
         if (!_slim) _hhelper.at(_util.k_ext).InitHistograms();
         
         // Initialise the Tree Helper
@@ -202,7 +202,7 @@ void selection::Initialise( const char * mc_file,
         dirt_SC.Initialise(dirt_tree, _util.k_dirt, f_flux_weights, run_period, _util);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, dirt_file_out, weight_cfg);
+        if (!_slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, dirt_file_out, weight_cfg, _util);
         if (!_slim) _hhelper.at(_util.k_dirt).InitHistograms();
         
         // Initialise the Tree Helper
@@ -451,20 +451,20 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     // Op Filt PE --------------------------------------------------------------
     // *************************************************************************
-    pass = _scuts.opfilt_pe(SC, type);
-    passed_v.at(ievent).cut_v.at(_util.k_opfilt_pe) = pass;
-    if(!pass) return false; // Failed the cut!
+    // pass = _scuts.opfilt_pe(SC, type);
+    // passed_v.at(ievent).cut_v.at(_util.k_opfilt_pe) = pass;
+    // if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_opfilt_pe, counter_v );
+    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_opfilt_pe, counter_v );
 
     // *************************************************************************
     // Op Filt Michel Veto -----------------------------------------------------
     // *************************************************************************
-    pass = _scuts.opfilt_veto(SC, type);
-    passed_v.at(ievent).cut_v.at(_util.k_opfilt_veto) = pass;
-    if(!pass) return false; // Failed the cut!
+    // pass = _scuts.opfilt_veto(SC, type);
+    // passed_v.at(ievent).cut_v.at(_util.k_opfilt_veto) = pass;
+    // if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_opfilt_veto, counter_v );
+    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_opfilt_veto, counter_v );
 
     // *************************************************************************
     // Slice ID ----------------------------------------------------------------
@@ -505,20 +505,20 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     // Cosmic Impact Parameter -------------------------------------------------
     // *************************************************************************
-    pass = _scuts.shr_cosmic_IP(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_cosmic_ip) = pass;
-    if(!pass) return false; // Failed the cut!
+    // pass = _scuts.shr_cosmic_IP(SC);
+    // passed_v.at(ievent).cut_v.at(_util.k_cosmic_ip) = pass;
+    // if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_cosmic_ip, counter_v );
+    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_cosmic_ip, counter_v );
 
     // *************************************************************************
     // Cluster Fraction --------------------------------------------------------
     // *************************************************************************
-    pass = _scuts.cluster_frac(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_cluster_frac) = pass;
-    if(!pass) return false; // Failed the cut!
+    // pass = _scuts.cluster_frac(SC);
+    // passed_v.at(ievent).cut_v.at(_util.k_cluster_frac) = pass;
+    // if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_cluster_frac, counter_v );
+    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_cluster_frac, counter_v );
 
     // *************************************************************************
     // Slice Contained Fraction ------------------------------------------------

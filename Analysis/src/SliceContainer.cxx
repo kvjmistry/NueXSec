@@ -574,12 +574,12 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
     if (type == _util.k_mc){
 
         
-        bool is_in_fv = _util.in_fv(reco_nu_vtx_sce_x, reco_nu_vtx_sce_y, reco_nu_vtx_sce_x);
+        bool is_in_fv = _util.in_fv(true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z);
 
         // Out of Fiducial Volume Event
         if (!is_in_fv) {
             // std::cout << "Purity of out of FV event: "<< nu_purity_from_pfp << std::endl;
-            if (nu_purity_from_pfp < 0.6) return std::make_pair("cosmic",_util.k_cosmic);
+            if (nu_purity_from_pfp == 0) return std::make_pair("cosmic",_util.k_cosmic);
             else return std::make_pair("nu_out_fv",_util.k_nu_out_fv);
         }
 
@@ -590,7 +590,7 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
             if (nu_pdg == 14 || nu_pdg == -14){
 
                 // Purity is low so return cosmic
-                if (nu_purity_from_pfp < 0.6) return std::make_pair("cosmic",_util.k_cosmic);
+                if (nu_purity_from_pfp == 0) return std::make_pair("cosmic",_util.k_cosmic);
                 
                 if (npi0 > 0) return std::make_pair("numu_cc_pi0", _util.k_numu_cc_pi0); // has a pi0
                 else return std::make_pair("numu_cc",_util.k_numu_cc);
@@ -615,7 +615,7 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
         else {
 
             // Purity is low so return cosmic
-            if (nu_purity_from_pfp < 0.6) return std::make_pair("cosmic",_util.k_cosmic);
+            if (nu_purity_from_pfp == 0) return std::make_pair("cosmic",_util.k_cosmic);
 
             if (npi0 > 0) return std::make_pair("nc_pi0",_util.k_nc_pi0);
             else return std::make_pair("nc",_util.k_nc);

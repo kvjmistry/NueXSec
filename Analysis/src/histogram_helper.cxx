@@ -108,9 +108,11 @@ void histogram_helper::MakeDirectory(){
    
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::Initialise(int type, const char* run_period, const char * file_out, int weight_cfg ){
+void histogram_helper::Initialise(int type, const char* run_period, const char * file_out, int weight_cfg, utility util ){
 
     std::cout << "Initalising Histogram Helper, creating TFile and directories..." << std::endl;
+
+    _util = util;
 
     std::string file_out_str = file_out;
 
@@ -216,17 +218,17 @@ void histogram_helper::InitHistograms(){
         for (unsigned int j=0; j < _util.classification_dirs.size();j++){
         
             // Reco Vtx X, Y, Z
-            TH1D_hists.at(k_reco_vtx_x).at(i).at(j) = new TH1D ( Form("h_reco_vtx_x_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, -10, 270);
+            TH1D_hists.at(k_reco_vtx_x).at(i).at(j) = new TH1D ( Form("h_reco_vtx_x_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 15, -10, 270);
 
-            TH1D_hists.at(k_reco_vtx_y).at(i).at(j) = new TH1D ( Form("h_reco_vtx_y_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, -120, 120);
+            TH1D_hists.at(k_reco_vtx_y).at(i).at(j) = new TH1D ( Form("h_reco_vtx_y_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, -120, 120);
             
-            TH1D_hists.at(k_reco_vtx_z).at(i).at(j) = new TH1D ( Form("h_reco_vtx_z_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, -10, 1050);
+            TH1D_hists.at(k_reco_vtx_z).at(i).at(j) = new TH1D ( Form("h_reco_vtx_z_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, -10, 1050);
 
-            TH1D_hists.at(k_reco_vtx_x_sce).at(i).at(j) = new TH1D ( Form("h_reco_vtx_x_sce_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, -10, 270);
+            TH1D_hists.at(k_reco_vtx_x_sce).at(i).at(j) = new TH1D ( Form("h_reco_vtx_x_sce_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 15, -10, 270);
 
-            TH1D_hists.at(k_reco_vtx_y_sce).at(i).at(j) = new TH1D ( Form("h_reco_vtx_y_sce_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, -120, 120);
+            TH1D_hists.at(k_reco_vtx_y_sce).at(i).at(j) = new TH1D ( Form("h_reco_vtx_y_sce_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, -120, 120);
             
-            TH1D_hists.at(k_reco_vtx_z_sce).at(i).at(j) = new TH1D ( Form("h_reco_vtx_z_sce_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, -10, 1050);
+            TH1D_hists.at(k_reco_vtx_z_sce).at(i).at(j) = new TH1D ( Form("h_reco_vtx_z_sce_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, -10, 1050);
 
             // dEdx
             TH1D_hists.at(k_reco_dEdx_cali_u_plane).at(i).at(j) = new TH1D ( Form("h_reco_dEdx_cali_u_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
@@ -320,9 +322,9 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_slclustfrac).at(i).at(j) = new TH1D ( Form("h_reco_slclustfrac_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 15, 0, 1);
         
             // Cosmic Inpact Parameter
-            TH1D_hists.at(k_reco_cosmicIP).at(i).at(j)       = new TH1D ( Form("h_reco_cosmicIP_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 75, 0, 250);
-            TH1D_hists.at(k_reco_CosmicIPAll3D).at(i).at(j)  = new TH1D ( Form("h_reco_CosmicIPAll3D_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 75, 0, 250);
-            TH1D_hists.at(k_reco_CosmicDirAll3D).at(i).at(j) = new TH1D ( Form("h_reco_CosmicDirAll3D_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, -1, 1);
+            TH1D_hists.at(k_reco_cosmicIP).at(i).at(j)       = new TH1D ( Form("h_reco_cosmicIP_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 250);
+            TH1D_hists.at(k_reco_CosmicIPAll3D).at(i).at(j)  = new TH1D ( Form("h_reco_CosmicIPAll3D_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 250);
+            TH1D_hists.at(k_reco_CosmicDirAll3D).at(i).at(j) = new TH1D ( Form("h_reco_CosmicDirAll3D_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, -1, 1);
 
             // dEdx with the trackfit variable
             TH1D_hists.at(k_reco_shr_tkfit_dedx_u).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_u_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
@@ -509,6 +511,9 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     double SLOPE = 0.83;
     double reco_nu_e = (SC.shr_energy_tot_cali + INTERCEPT) / SLOPE + SC.trk_energy_tot;
 
+
+    bool true_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z);
+
     // Now fill the histograms!
     TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x, weight);
     TH1D_hists.at(k_reco_vtx_y).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_y, weight);
@@ -594,13 +599,14 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     TH1D_hists.at(k_reco_shr_tkfit_dedx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
 
     // Split the dedx into good and bad angles
-    if (SC.shr_theta * 180/3.14159 < 80 || SC.shr_theta * 180/3.14159 > 100) {
-        TH1D_hists.at(k_reco_shr_tkfit_dedx_y_good_theta).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
-    }
-    else {
+    
+    if (SC.shr_theta * 180/3.14159 > 80 && SC.shr_theta * 180/3.14159 < 100) {
         TH1D_hists.at(k_reco_shr_tkfit_dedx_y_bad_theta).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
         TH1D_hists.at(k_reco_shr_tkfit_dedx_v_bad_theta).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_V, weight);
         TH1D_hists.at(k_reco_shr_tkfit_dedx_u_bad_theta).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_U, weight);
+    }
+    else {
+        TH1D_hists.at(k_reco_shr_tkfit_dedx_y_good_theta).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
     }
      
 
@@ -674,7 +680,8 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
         // True nue angle from numi beamline 
         double nu_angle = _util.GetTheta(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz); 
 
-        if (classification_index == _util.k_nue_cc || classification_index == _util.k_nue_cc_mixed){
+        // Also require in FV
+        if ( (classification_index == _util.k_nue_cc || classification_index == _util.k_nue_cc_mixed) && true_in_fv ){
             TH1D_true_hists.at(k_true_nue_theta)->Fill(nu_theta, weight);
             TH1D_true_hists.at(k_true_nue_phi)  ->Fill(nu_phi, weight);
             TH1D_true_hists.at(k_true_nue_angle)->Fill(nu_angle, weight);
@@ -704,8 +711,6 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
                 TH2D_true_hists.at(k_true_nu_vtx_x_reco_nu_vtx_x)->Fill(SC.true_nu_vtx_sce_x,  SC.reco_nu_vtx_sce_x, weight);
                 TH2D_true_hists.at(k_true_nu_vtx_y_reco_nu_vtx_y)->Fill(SC.true_nu_vtx_sce_y,  SC.reco_nu_vtx_sce_y, weight);
                 TH2D_true_hists.at(k_true_nu_vtx_z_reco_nu_vtx_z)->Fill(SC.true_nu_vtx_sce_z,  SC.reco_nu_vtx_sce_z, weight);
-
-
             
                 // True nue interaction histograms
                 if (interaction == "nue_cc_qe" || interaction == "nue_bar_cc_qe"){

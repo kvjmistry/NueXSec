@@ -59,7 +59,7 @@ bool selection_cuts::e_candidate(SliceContainer &SC){
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::topo_score(SliceContainer &SC){
-    if (SC.topological_score > 0.1) return true; // pass 
+    if (SC.topological_score > 0.2) return true; // pass 
     else return false;                            // fail
 }
 // -----------------------------------------------------------------------------
@@ -77,7 +77,7 @@ bool selection_cuts::cluster_frac(SliceContainer &SC){
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::shower_score(SliceContainer &SC){
-    if (SC.shr_score < 0.3) return true; // pass 
+    if (SC.shr_score < 0.15) return true; // pass 
     else return false;                   // fail
 }
 // -----------------------------------------------------------------------------
@@ -91,7 +91,7 @@ bool selection_cuts::dEdx_y(SliceContainer &SC){
     // else return false;                                                     // fail
 
     // Kill the background region
-    if ( (SC.shr_tkfit_dedx_Y >= 2.6 && SC.shr_tkfit_dedx_Y < 6.8) || (SC.shr_tkfit_dedx_Y < 0.5) ){
+    if ( (SC.shr_tkfit_dedx_Y >= 3.1 && SC.shr_tkfit_dedx_Y < 5.5) || (SC.shr_tkfit_dedx_Y < 0.5) ){
         return false;
     }
     // Try and recover the events in the other planes
@@ -156,12 +156,12 @@ bool selection_cuts::shr_cosmic_IP(SliceContainer &SC){
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::contained_frac(SliceContainer &SC){
-    if (SC.contained_fraction >= 0.6 ) return true;    // pass 
+    if (SC.contained_fraction >= 0.75 ) return true;    // pass 
     else return false;                     // fail
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::shr_moliere_avg(SliceContainer &SC){
-    if (SC.shrmoliereavg < 8 ) return true;    // pass 
+    if (SC.shrmoliereavg < 7 ) return true;    // pass 
     else return false;                     // fail
 }
 // -----------------------------------------------------------------------------

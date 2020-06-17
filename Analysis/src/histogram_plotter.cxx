@@ -553,9 +553,9 @@ void histogram_plotter::SetFillColours(std::vector<TH1D*> &hist, std::string plo
 // -----------------------------------------------------------------------------
 void histogram_plotter::SetLegend(std::vector<TH1D*> hist, TLegend *leg_stack, std::vector<double> hist_integrals, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt, std::string plotmode ){
     
-    if (found_data) leg_stack->AddEntry(hist.at(k_plot_data), Form("Data (%2.1f)",                hist_integrals.at(_util.k_leg_data)),     "lep");
+    if (found_data) leg_stack->AddEntry(hist.at(k_plot_data), Form("On-Beam Data (%2.1f)",                hist_integrals.at(_util.k_leg_data)),     "lep");
     if (found_dirt) leg_stack->AddEntry(hist.at(k_plot_dirt), Form("Dirt (%2.1f)",                hist_integrals.at(_util.k_leg_dirt)),     "f");
-    if (found_ext)  leg_stack->AddEntry(hist.at(k_plot_ext),  Form("InTime (EXT) (%2.1f)",        hist_integrals.at(_util.k_leg_ext)),      "f");
+    if (found_ext)  leg_stack->AddEntry(hist.at(k_plot_ext),  Form("Off-Beam Data (%2.1f)",        hist_integrals.at(_util.k_leg_ext)),      "f");
 
     if (plotmode == "classifications"){
         // leg_stack->AddEntry(hist.at(_util.k_unmatched),       Form("Unmatched (%2.1f)",           hist_integrals.at(_util.k_unmatched)),    "f"); // This should be zero, so dont plot
@@ -777,10 +777,21 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     else            h_stack->GetYaxis()->SetTitle("Entries [A.U.]");
     
     // Customise the stacked histogram
-    h_stack->GetYaxis()->SetTitleFont(45);
-    h_stack->GetYaxis()->SetTitleSize(18);
-    h_stack->GetYaxis()->SetTitleOffset(1.30);
-    
+    h_stack->GetYaxis()->SetTitleSize(17);
+    h_stack->GetYaxis()->SetTitleFont(46);
+    if (!found_data) h_stack->GetXaxis()->SetLabelSize(0);
+
+    // Customise bin labels for pass and fail type of histograms (ones with 2 bins)
+    if (h_stack->GetXaxis()->GetNbins() == 2){
+        h_stack->GetXaxis()->SetNdivisions(2, 0, 0, kFALSE);
+        h_stack->GetXaxis()->CenterLabels(kTRUE);
+        h_stack->GetXaxis()->SetBinLabel(1,"Fail");
+        h_stack->GetXaxis()->SetBinLabel(2,"Pass");
+    } 
+
+    // Set Poisson Errors for data
+    // hist.at(_util.k_leg_data)->SetBinErrorOption(TH1::kPoisson);
+
     if (found_data && found_ext) h_stack->GetXaxis()->SetLabelOffset(10);
     else h_stack->GetXaxis()->SetTitle(x_axis_name);
     
@@ -845,6 +856,16 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         h_ratio->GetXaxis()->SetTitleOffset(3.0);
         h_ratio->GetXaxis()->SetTitleSize(17);
         h_ratio->GetXaxis()->SetTitleFont(46);
+        
+        // Customise bin labels for pass and fail type of histograms (ones with 2 bins)
+        if (h_ratio->GetXaxis()->GetNbins() == 2){
+            h_ratio->GetXaxis()->SetNdivisions(2, 0, 0, kFALSE);
+            h_ratio->GetXaxis()->CenterLabels(kTRUE);
+            h_ratio->GetXaxis()->SetBinLabel(1,"Fail");
+            h_ratio->GetXaxis()->SetBinLabel(2,"Pass");
+        } 
+
+
         h_ratio->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
 
         // For percent difference
@@ -853,17 +874,18 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         // h_ratio->GetYaxis()->SetRangeUser(-0.2, 0.2);
         
         // For ratio
-        h_ratio->GetYaxis()->SetRangeUser(0, 2);
-        h_ratio->GetYaxis()->SetRangeUser(0.5,1.5);
-        h_ratio->GetYaxis()->SetRangeUser(0.8, 1.2);
-        h_ratio->GetYaxis()->SetTitle("Data / (MC + EXT) ");
+        if (cut_name == "dEdx_y" || cut_name == "ShrVtxDistance" || cut_name == "Moliere_Avg" )h_ratio->GetYaxis()->SetRangeUser(0, 2);
+        else h_ratio->GetYaxis()->SetRangeUser(0.8, 1.2);
+        
+        h_ratio->GetYaxis()->SetTitle("#frac{On-Beam}{(Overlay + Off-Beam)}");
 
         h_ratio->GetXaxis()->SetTitle(x_axis_name);
-        h_ratio->GetYaxis()->SetTitleSize(13);
+        h_ratio->GetYaxis()->SetTitleSize(10);
         h_ratio->GetYaxis()->SetTitleFont(44);
         h_ratio->GetYaxis()->CenterTitle();
         h_ratio->GetYaxis()->SetTitleOffset(1.5);
         h_ratio->SetTitle(" ");
+        // h_ratio->SetBinErrorOption(TH1::kPoisson);
 
         h_ratio->Draw("E0,same");
 
@@ -1013,7 +1035,7 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
     // Leading shower cos theta
     MakeStack("h_reco_leading_shower_cos_theta", _util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Leading Shower Cos(#theta)", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.5, "Leading Shower Cos(#theta)", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("cuts/%s/reco_leading_shower_cos_theta.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false);
 
     // Leading shower multiplicity
@@ -1038,7 +1060,7 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
     
     // Track shower angle
     MakeStack("h_reco_track_shower_angle", _util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  true, 1.0, "Longest Track Leading Shower Angle [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Longest Track Leading Shower Angle [degrees]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("cuts/%s/reco_track_shower_angle.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false);
 
     // Ratio hits from showers to slice
@@ -1171,7 +1193,7 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
     // Shower dEdx with the track fitter y plane
     MakeStack("h_reco_shr_tkfit_dedx_y",_util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Collection Plane dEdx (track fitter) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Leading Shower dEdx (Collection Plane) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("cuts/%s/reco_shr_tkfit_dedx_y.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false);
 
     // Shower dEdx with the track fitter y plane good theta
@@ -1207,17 +1229,17 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
     // Shower Subcluster All Planes
     MakeStack("h_reco_shrsubclusters",_util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Shower Sub Cluster All Planes", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Leading Shower Sub Cluster All Planes", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("cuts/%s/reco_shrsubclusters.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false);
 
     // Shower Moliere Average
     MakeStack("h_reco_shrmoliereavg",_util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Shower Moliere Average [deg]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Leading Shower Moliere Average [deg]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("cuts/%s/reco_shrmoliereavg.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false);
     
     // Shower Moliere RMS
     MakeStack("h_reco_shrmoliererms",_util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Shower Moliere RMS [deg]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Leading Shower Moliere RMS [deg]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("cuts/%s/reco_shrmoliererms.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false);
 
     // Fraction of spacepoints in 1cm cylinder (2nd half of shr)
@@ -1258,7 +1280,7 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
     // Contained Fraction
     MakeStack("h_reco_contained_fraction",_util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Contained Fraction (PFP hits in FV / hits in slice)", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 0.1, "Contained Fraction (PFP hits in FV / hits in slice)", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("cuts/%s/reco_contained_fraction.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false);
 
     // Contained Fraction
@@ -1269,14 +1291,9 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
     // Stacked Histograms by particle type
     
-    // dEdx cali Y Plane
-    MakeStack("h_reco_dEdx_cali_y_plane_par",_util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Collection Plane dEdx (calibrated) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
-                        Form("cuts/%s/reco_dEdx_cali_y_plane_par.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "particle", false, variation, run_period, false);
-
     // dEdx cali Y Plane using trackfits
     MakeStack("h_reco_shr_tkfit_dedx_y_par",_util.cut_dirs.at(cut_index).c_str(),
-                        area_norm,  false, 1.0, "Collection Plane dEdx (track fitter) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        area_norm,  false, 1.0, "Leading Shower dEdx (Collection Plane) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("cuts/%s/reco_shr_tkfit_dedx_y_par.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "particle", true, variation, run_period, false);
 
 
@@ -1381,6 +1398,10 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name, s
     if (area_norm) h_stack->GetYaxis()->SetTitle("Entries A.U. ");
     else h_stack->GetYaxis()->SetTitle("Entries");
 
+    h_stack->GetYaxis()->SetTitleSize(17);
+    h_stack->GetYaxis()->SetTitleFont(46);
+    h_stack->GetXaxis()->SetLabelSize(0);
+
     // MC error histogram ------------------------------------------------------
     TH1D * h_error_hist = (TH1D*) hist.at(_util.k_mc)->Clone("h_error_hist");
 
@@ -1398,10 +1419,10 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name, s
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
 
-    leg_stack->AddEntry(hist.at(_util.k_data), "Data",   "lep");
+    leg_stack->AddEntry(hist.at(_util.k_data), "On-Beam Data",   "lep");
     leg_stack->AddEntry(hist.at(_util.k_dirt), "Dirt",   "f");
     leg_stack->AddEntry(hist.at(_util.k_mc),   "Overlay","f");
-    leg_stack->AddEntry(hist.at(_util.k_ext),  "InTime", "f");
+    leg_stack->AddEntry(hist.at(_util.k_ext),  "Off-Beam Data", "f");
 
 
     leg_stack->Draw();
@@ -1423,8 +1444,6 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name, s
 
     h_ratio->GetXaxis()->SetLabelSize(12);
     h_ratio->GetXaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
-    h_ratio->GetYaxis()->SetLabelSize(11);
-    h_ratio->GetYaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
     h_ratio->GetXaxis()->SetTitleOffset(3.0);
     h_ratio->GetXaxis()->SetTitleSize(17);
     h_ratio->GetXaxis()->SetTitleFont(46);
@@ -1435,13 +1454,17 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char* print_name, s
     // h_ratio->GetYaxis()->SetRangeUser(-0.5,0.5);
     
     // For ratio
+    
     h_ratio->GetYaxis()->SetRangeUser(0.80, 1.20);
-    h_ratio->GetYaxis()->SetTitle("Data / (MC + EXT) ");
+    h_ratio->GetYaxis()->SetTitle("#frac{On-Beam}{(Overlay + Off-Beam)}");
 
-    h_ratio->GetYaxis()->SetTitleSize(13);
+    h_ratio->GetYaxis()->SetLabelSize(11);
+    h_ratio->GetYaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+    h_ratio->GetYaxis()->SetTitleSize(10);
     h_ratio->GetYaxis()->SetTitleFont(44);
     h_ratio->GetYaxis()->SetTitleOffset(1.5);
     h_ratio->SetTitle(" ");
+    h_ratio->GetYaxis()->CenterTitle();
     h_ratio->Draw("E");
 
      // Draw the error hist 
@@ -1560,7 +1583,7 @@ void histogram_plotter::MakeFlashPlotOMO(double Data_POT, const char* print_name
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
 
-    leg_stack->AddEntry(hist.at(_util.k_data), "Data - EXT",   "lep");
+    leg_stack->AddEntry(hist.at(_util.k_data), "On-Beam - Off-Beam Data",   "lep");
     leg_stack->AddEntry(hist.at(_util.k_dirt), "Dirt",   "f");
     leg_stack->AddEntry(hist.at(_util.k_mc),   "Overlay","f");
 
