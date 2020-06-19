@@ -10,8 +10,8 @@ class CrossSectionHelper{
     // Default constructor
     CrossSectionHelper(){};
     
-    // The output file
-    TFile* f_nuexsec;
+    // The input and output files
+    TFile* f_nuexsec, *fnuexsec_out;
 
     // Class instances
     utility _util;
@@ -54,6 +54,30 @@ class CrossSectionHelper{
     double mc_flux_scale_factor{1.0};
     double data_flux_scale_factor{1.0};
 
+    // Energy Bins
+    const int nbins = 5;
+    double edges[6] = {0.0, 0.05, 0.25, 1.0, 2.0, 6.0};
+    
+    // Define histograms for the cross section calculation
+    std::vector<TH1D*> h_cross_sec;
+
+    // enum for histogram vars
+    enum TH1D_xsec_hist_vars {
+        k_xsec_sel,     // Selected event histogram binned in energy
+        k_xsec_bkg,     // Bkg event histogram binned in energy
+        k_xsec_gen,     // Gen event histogram binned in energy
+        k_xsec_sig,     // Sig event histogram binned in energy
+        k_xsec_ext,     // EXT event histogram binned in energy
+        k_xsec_dirt,    // Dirt event histogram binned in energy
+        k_xsec_data,    // Data event histogram binned in energy
+        k_xsec_mcxsec,  // MC Cross Section
+        k_xsec_dataxsec,// Data Cross Section
+        k_TH1D_xsec_MAX
+    };
+
+    // Names for cross section histograms
+    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "sig", "ext", "dirt", "data", "mc_xsec", "data_xsec"};
+
     // -------------------------------------------------------------------------
     // Initialiser function
     void Initialise(const char *run_period, const char * xsec_file_in, utility _utility);
@@ -70,7 +94,9 @@ class CrossSectionHelper{
     // Function to get the POT from the flux file
     double GetPOT(TFile* f, bool disp);
     // -------------------------------------------------------------------------
+    int GetBinIndex(double reco_energy);
     // -------------------------------------------------------------------------
+    void WriteHists();
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 
