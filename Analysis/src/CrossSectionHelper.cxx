@@ -76,6 +76,14 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
     N_target_Data = (lar_density_data * volume * NA * N_nuc) / m_mol;
     std::cout << "Number of Target Nucleons in Data: " << N_target_Data << std::endl;
 
+    // Histogram stuff -- may want to put this in another function
+    // Resize the histogram vector. plot var, cuts, classifications
+    h_cross_sec.resize(k_TH1D_xsec_MAX);
+
+    // loop over and create the histograms
+    for (unsigned int i=0; i < xsec_types.size();i++){    
+        h_cross_sec.at(i) = new TH1D ( Form("h_run%s_%s",_run_period, xsec_types.at(i).c_str()) ,"", nbins, edges);
+    }
     // Now loop over events and caluclate the cross section
     LoopEvents();
 
@@ -90,10 +98,14 @@ void CrossSectionHelper::LoopEvents(){
 
         tree->GetEntry(ievent); 
 
+        if (reco_energy > 6.0 && *classifcation == "data" ) std::cout << "reco energy was:  " << reco_energy << "  Consider updating the bins" <<std::endl;
+
         // Signal event
         if ((*classifcation == "nue_cc" || *classifcation == "nue_cc_mixed") && gen == false) {
             n_sel+=weight;
             n_sig+=weight;
+            h_cross_sec.at(k_xsec_sel)->Fill(reco_energy, weight);
+            h_cross_sec.at(k_xsec_sig)->Fill(reco_energy, weight);
         }
 
         // Background event
@@ -102,26 +114,32 @@ void CrossSectionHelper::LoopEvents(){
            *classifcation == "nc_pi0" || *classifcation == "unmatched"){
             n_bkg+=weight;
             n_sel+=weight;
+            h_cross_sec.at(k_xsec_bkg)->Fill(reco_energy, weight);
+            h_cross_sec.at(k_xsec_sel)->Fill(reco_energy, weight);
         }
         
         // Generated event
         if ( (*classifcation == "nue_cc"|| *classifcation == "nue_cc_mixed" ) && gen == true) {
             n_gen+=weight;
+            h_cross_sec.at(k_xsec_gen)->Fill(reco_energy, weight);
         }
 
         // Data event
         if (*classifcation == "data"){
             n_data+=weight;
+            h_cross_sec.at(k_xsec_data)->Fill(reco_energy, weight);
         }
 
         // Off beam event
         if (*classifcation == "ext"){
             n_ext+=weight;
+            h_cross_sec.at(k_xsec_ext)->Fill(reco_energy, weight);
         }
 
         // Dirt event
         if (*classifcation == "dirt"){
             n_dirt+=weight;
+            h_cross_sec.at(k_xsec_dirt)->Fill(reco_energy, weight);
         }
 
     }
@@ -162,11 +180,48 @@ void CrossSectionHelper::LoopEvents(){
     "Data XSEC: " << data_xsec
     << std::endl;
 
+
+    // Now loop over the bins in the histogram and calculate the cross section
+    for (int k =1; k < h_cross_sec.at(0)->GetNbinsX()+1; k++){
+
+        double temp_xsec_mc = CalcCrossSec(h_cross_sec.at(k_xsec_sel)->GetBinContent(k),
+                                           h_cross_sec.at(k_xsec_gen)->GetBinContent(k),
+                                           h_cross_sec.at(k_xsec_sig)->GetBinContent(k),
+                                           h_cross_sec.at(k_xsec_bkg)->GetBinContent(k), 
+                                           integrated_flux * mc_flux_scale_factor,
+                                           h_cross_sec.at(k_xsec_ext)->GetBinContent(k) * (intime_scale_factor / mc_scale_factor),
+                                           h_cross_sec.at(k_xsec_dirt)->GetBinContent(k)* (dirt_scale_factor / mc_scale_factor),
+                                           N_target_MC);
+
+
+        double temp_xsec_data = CalcCrossSec(h_cross_sec.at(k_xsec_data)->GetBinContent(k),
+                                             h_cross_sec.at(k_xsec_gen)->GetBinContent(k)* mc_scale_factor,
+                                             h_cross_sec.at(k_xsec_sig)->GetBinContent(k)* mc_scale_factor,
+                                             h_cross_sec.at(k_xsec_bkg)->GetBinContent(k)* mc_scale_factor, 
+                                             integrated_flux * data_flux_scale_factor,
+                                             h_cross_sec.at(k_xsec_ext)->GetBinContent(k) * intime_scale_factor,
+                                             h_cross_sec.at(k_xsec_dirt)->GetBinContent(k)* dirt_scale_factor*0.45,
+                                             N_target_Data);
+
+        if (std::isnan(temp_xsec_mc) == 1) temp_xsec_mc = 0.0;
+        if (std::isnan(temp_xsec_data) == 1) temp_xsec_data = 0.0;
+
+        h_cross_sec.at(k_xsec_mcxsec)->SetBinContent(k, temp_xsec_mc);
+        h_cross_sec.at(k_xsec_dataxsec)->SetBinContent(k, temp_xsec_data);
+
+        std::cout << "Bin: " << k << "  MC XSec: " << temp_xsec_mc << std::endl;
+        std::cout << "Bin: " << k << "  Data XSec: " << temp_xsec_data << std::endl;
+    }
+
+    // Write the histograms to file for inspection
+    WriteHists();
+
+
 }
 // -----------------------------------------------------------------------------
 double CrossSectionHelper::CalcCrossSec(double sel, double gen, double sig, double bkg, double flux, double ext, double dirt, double targ){
 
-    bool DEBUG{true};
+    bool DEBUG{false};
 
     if (DEBUG) {
         std::cout << 
@@ -231,6 +286,8 @@ double CrossSectionHelper::GetIntegratedFlux(){
     double POT_flux{0.0}; // The POT of the flux file (i.e the POT used in the flux histogram)
     POT_flux = GetPOT(f_flux, true);
 
+    f_flux->Close();
+
     // Return the flux per POT
     return (integral_nue + integral_nuebar) / POT_flux;
 
@@ -248,5 +305,27 @@ double CrossSectionHelper::GetPOT(TFile* f, bool disp){
     std::cout << "TOTAL POT READ IN:\t" << fPOT << std::endl;
 
     return fPOT;
+}
+// -----------------------------------------------------------------------------
+void CrossSectionHelper::WriteHists(){
+
+    // Now open the output file
+    // File not already open, open the file
+    if (!gROOT->GetListOfFiles()->FindObject( Form("files/crosssec_run%s.root", run_period.c_str()) ) ) {
+        fnuexsec_out = new TFile( Form("files/crosssec_run%s.root", run_period.c_str()) , "UPDATE");
+    }
+
+    fnuexsec_out->cd();
+
+    TDirectory *dir;
+    bool bool_dir = _util.GetDirectory(fnuexsec_out, dir ,"xsec");
+    if (bool_dir) dir->cd();
+    
+    for (unsigned int p = 0; p < h_cross_sec.size(); p++){
+        h_cross_sec.at(p)->Write("",TObject::kOverwrite);
+    }
+
+    fnuexsec_out->Close();
+    
 }
 // -----------------------------------------------------------------------------
