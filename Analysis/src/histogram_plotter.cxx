@@ -94,50 +94,50 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
 
         MakeEfficiencyPlot(Form("plots/run%s/Efficiency/Integrated_Efficiency_Purity.pdf", run_period), run_period);
 
-        MakeEfficiencyPlotByCut(Form("plots/run%s/Efficiency/TEff.pdf", run_period), run_period);
+        MakeEfficiencyPlotByCut(run_period);
 
         // Create the interaction folder
         CreateDirectory("Interaction", run_period);
 
         // Interaction Plot
-        MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction.pdf", run_period), run_period);
+        MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction.pdf", run_period));
 
         // Create the 2D folder
         CreateDirectory("2D", run_period);
 
-        Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_shr_dist.pdf", run_period), "h_reco_shr_dEdx_shr_dist", run_period);
+        Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_shr_dist.pdf", run_period), "h_reco_shr_dEdx_shr_dist");
 
         // Create the Truth folder
         CreateDirectory("Truth", run_period);
         
         // Make 1D Histtograms
         // Save1DHists(Form("plots/run%s/Truth/true_nue_theta.pdf", run_period), "h_true_nue_theta", run_period);
-        Save1DHists(Form("plots/run%s/Truth/true_nue_phi.pdf",   run_period), "h_true_nue_phi",   run_period);
-        Save1DHists(Form("plots/run%s/Truth/true_nue_angle.pdf", run_period), "h_true_nue_angle", run_period);
-        Save1DHists(Form("plots/run%s/Truth/true_nue_px.pdf",    run_period), "h_true_nue_px",    run_period);
-        Save1DHists(Form("plots/run%s/Truth/true_nue_py.pdf",    run_period), "h_true_nue_py",    run_period);
-        Save1DHists(Form("plots/run%s/Truth/true_nue_pz.pdf",    run_period), "h_true_nue_pz",    run_period);
-        Save1DHists(Form("plots/run%s/Truth/true_nue_e.pdf",     run_period), "h_true_nue_e",     run_period);
-        Save1DHists(Form("plots/run%s/Truth/true_nue_p.pdf",     run_period), "h_true_nue_p",     run_period);
-        Save1DHists(Form("plots/run%s/Truth/true_vtx_x.pdf",     run_period), "h_true_vtx_x",     run_period);
-        Save1DHists(Form("plots/run%s/Truth/true_vtx_y.pdf",     run_period), "h_true_vtx_y",     run_period);
-        Save1DHists(Form("plots/run%s/Truth/true_vtx_z.pdf",     run_period), "h_true_vtx_z",     run_period);
-        Save1DHists(Form("plots/run%s/Truth/true_vtx_x_sce.pdf", run_period), "h_true_vtx_x_sce", run_period);
-        Save1DHists(Form("plots/run%s/Truth/true_vtx_y_sce.pdf", run_period), "h_true_vtx_y_sce", run_period);
-        Save1DHists(Form("plots/run%s/Truth/true_vtx_z_sce.pdf", run_period), "h_true_vtx_z_sce", run_period);
+        Save1DHists(Form("plots/run%s/Truth/true_nue_phi.pdf",   run_period), "h_true_nue_phi"  );
+        Save1DHists(Form("plots/run%s/Truth/true_nue_angle.pdf", run_period), "h_true_nue_angle");
+        Save1DHists(Form("plots/run%s/Truth/true_nue_px.pdf",    run_period), "h_true_nue_px"   );
+        Save1DHists(Form("plots/run%s/Truth/true_nue_py.pdf",    run_period), "h_true_nue_py"   );
+        Save1DHists(Form("plots/run%s/Truth/true_nue_pz.pdf",    run_period), "h_true_nue_pz"   );
+        Save1DHists(Form("plots/run%s/Truth/true_nue_e.pdf",     run_period), "h_true_nue_e"    );
+        Save1DHists(Form("plots/run%s/Truth/true_nue_p.pdf",     run_period), "h_true_nue_p"    );
+        Save1DHists(Form("plots/run%s/Truth/true_vtx_x.pdf",     run_period), "h_true_vtx_x"    );
+        Save1DHists(Form("plots/run%s/Truth/true_vtx_y.pdf",     run_period), "h_true_vtx_y"    );
+        Save1DHists(Form("plots/run%s/Truth/true_vtx_z.pdf",     run_period), "h_true_vtx_z"    );
+        Save1DHists(Form("plots/run%s/Truth/true_vtx_x_sce.pdf", run_period), "h_true_vtx_x_sce");
+        Save1DHists(Form("plots/run%s/Truth/true_vtx_y_sce.pdf", run_period), "h_true_vtx_y_sce");
+        Save1DHists(Form("plots/run%s/Truth/true_vtx_z_sce.pdf", run_period), "h_true_vtx_z_sce");
         
 
         // Make the 2D histograms
-        Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta.pdf",          run_period), "h_true_nue_phi_theta",          run_period);
-        Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_theta.pdf",       run_period), "h_true_nue_energy_theta",       run_period);
-        Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_phi.pdf",         run_period), "h_true_nue_energy_phi",         run_period);
-        Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_angle.pdf",       run_period), "h_true_nue_energy_angle",       run_period);
-        Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y.pdf",            run_period), "h_true_nue_vtx_z_y",            run_period);
-        Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_sce.pdf",        run_period), "h_true_nue_vtx_z_y_sce",        run_period);
-        Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E.pdf",     run_period), "h_true_elec_E_reco_elec_E",     run_period);
-        Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_x_reco_nu_vtx_x.pdf", run_period), "h_true_nu_vtx_x_reco_nu_vtx_x", run_period);
-        Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_y_reco_nu_vtx_y.pdf", run_period), "h_true_nu_vtx_y_reco_nu_vtx_y", run_period);
-        Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_z_reco_nu_vtx_z.pdf", run_period), "h_true_nu_vtx_z_reco_nu_vtx_z", run_period);
+        Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta.pdf",          run_period), "h_true_nue_phi_theta"         );
+        Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_theta.pdf",       run_period), "h_true_nue_energy_theta"      );
+        Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_phi.pdf",         run_period), "h_true_nue_energy_phi"        );
+        Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_angle.pdf",       run_period), "h_true_nue_energy_angle"      );
+        Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y.pdf",            run_period), "h_true_nue_vtx_z_y"           );
+        Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_sce.pdf",        run_period), "h_true_nue_vtx_z_y_sce"       );
+        Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E.pdf",     run_period), "h_true_elec_E_reco_elec_E"    );
+        Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_x_reco_nu_vtx_x.pdf", run_period), "h_true_nu_vtx_x_reco_nu_vtx_x");
+        Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_y_reco_nu_vtx_y.pdf", run_period), "h_true_nu_vtx_y_reco_nu_vtx_y");
+        Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_z_reco_nu_vtx_z.pdf", run_period), "h_true_nu_vtx_z_reco_nu_vtx_z");
 
     }
 
@@ -1721,7 +1721,7 @@ void histogram_plotter::MakeEfficiencyPlot(const char* print_name, const char *r
 
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeEfficiencyPlotByCut(const char* print_name, const char *run_period ){
+void histogram_plotter::MakeEfficiencyPlotByCut(const char *run_period ){
 
     std::vector<TH1D*>  hist(_util.k_cuts_MAX); // The vector of histograms from the file for the plot
     std::vector<TEfficiency*> TEff_v(_util.k_cuts_MAX);
@@ -1787,7 +1787,7 @@ void histogram_plotter::MakeEfficiencyPlotByCut(const char* print_name, const ch
 
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeInteractionPlot(const char* print_name, const char *run_period){
+void histogram_plotter::MakeInteractionPlot(const char* print_name){
 
     std::vector<TH1D*>  hist(_util.interaction_types.size());
     
@@ -1853,7 +1853,7 @@ void histogram_plotter::MakeInteractionPlot(const char* print_name, const char *
 
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Plot2D_Signal_Background(const char* print_name, const char* histname, const char *run_period){
+void histogram_plotter::Plot2D_Signal_Background(const char* print_name, const char* histname){
 
     std::vector<TH2D*>  hist(_util.sig_bkg_prefix.size());
     
@@ -1899,7 +1899,7 @@ void histogram_plotter::CreateDirectory(std::string folder, const char *run_peri
 
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Save1DHists(const char* print_name, const char* histname, const char *run_period){
+void histogram_plotter::Save1DHists(const char* print_name, const char* histname){
 
     TH1D* hist;
     _util.GetHist(f_nuexsec, hist, Form("True/%s_MC", histname ));
@@ -1922,7 +1922,7 @@ void histogram_plotter::Save1DHists(const char* print_name, const char* histname
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Save2DHists(const char* print_name, const char* histname, const char *run_period){
+void histogram_plotter::Save2DHists(const char* print_name, const char* histname){
 
     TH2D* hist;
     _util.GetHist(f_nuexsec, hist, Form("True/%s_MC", histname ));

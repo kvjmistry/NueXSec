@@ -264,7 +264,7 @@ int main(int argc, char *argv[]){
     }
 
     // Add catches for default input
-    if ((run_period == "empty") ){
+    if (std::string(run_period) == "empty" ){
         std::cout << "\nError, must provide a run period as input!\n" << std::endl;
         std::cout << "USAGE:" << usage << usage2 << usage3 << std::endl; 
         exit(1);
@@ -284,7 +284,7 @@ int main(int argc, char *argv[]){
 
     
     // Print the selection results
-    if (print) _phelper.Initialise(run_period, "empty", weight, _print_mc, _print_data, _print_ext, _print_dirt, _utility );
+    if (print) _phelper.Initialise(run_period, "empty", _print_mc, _print_data, _print_ext, _print_dirt, _utility );
 
     // Run the make histogram function
     if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, weight, area_norm, _utility, variation);

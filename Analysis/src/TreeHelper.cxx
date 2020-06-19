@@ -1,7 +1,7 @@
 #include "../include/TreeHelper.h"
 
 // -----------------------------------------------------------------------------
-void TreeHelper::Initialise(int type, const char* run_period, const char * file_out, int weight_cfg ){
+void TreeHelper::Initialise(int type, const char* run_period, const char * file_out ){
 
     std::cout << "Initalising Tree Helper..." << std::endl;
 
@@ -245,7 +245,7 @@ void TreeHelper::Fill_dedxVars(SliceContainer &SC, std::pair<std::string, int> _
 
 }
 // -----------------------------------------------------------------------------
-void TreeHelper::WriteTree(int type){
+void TreeHelper::WriteTree(){
 
     f_nuexsec->cd();
 
@@ -257,7 +257,7 @@ void TreeHelper::WriteTree(int type){
 
 }
 // -----------------------------------------------------------------------------
-void TreeHelper::Fill_counters(std::vector<double> counter_v, std::string cut_name, bool bool_use_mc, bool bool_use_ext, bool bool_use_data, bool bool_use_dirt){
+void TreeHelper::Fill_counters(std::vector<double> counter_v, bool bool_use_mc, bool bool_use_ext, bool bool_use_data, bool bool_use_dirt){
 
     f_nuexsec->cd();
 

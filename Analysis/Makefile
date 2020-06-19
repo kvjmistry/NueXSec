@@ -21,9 +21,9 @@ all: $(MAIN)
 
 $(MAIN): $(OBJ_FILES)
 	@echo
-	@echo -e  "\033[0;32mBuilding $(MAIN)\033[0;36m"
+	@echo "\033[0;32mBuilding $(MAIN)\033[0;36m"
 	$(CXX) $(LIBS) -o $@ $^
-	@echo -e "\033[0;31mDone!"
+	@echo "\033[0;31mDone!"
 	@echo
 
 # Build the Object files
@@ -34,6 +34,6 @@ bin/%.o: src/%.cxx
 
 # Clean compilation
 clean:
-	@echo -e "\033[0;31m"
+	@echo "\033[0;31m"
 	rm nuexsec bin/*
 	@echo

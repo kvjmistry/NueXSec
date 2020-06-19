@@ -2,6 +2,8 @@
 #./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files/neutrinoselection_filt_run1_overlay.root
 #./nuexsec --run 1 --mc /uboone/data/users/elenag/PeLEENtupleNuMI/neutrinoselection_filt_run1_NuMI_overlay.root
 
+if [ ! -d \"log\" ]; then echo \"\n Log folder doesnt exist... creating\"; mkdir -p log; fi
+
 
 if [ -z "$1" ]; then
   # Run the selection
@@ -58,7 +60,7 @@ fi
 
 # CV
 if [ "$1" == "CV" ]; then
-  ./nuexsec --run 1 --var /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_detvar/run1/neutrinoselection_filt_run1_overlay_CV.root CV 2> /dev/null | tee log/run1_CV.log
+  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_CV.root CV 2> /dev/null | tee log/run1_CV.log
 
   source merge/merge_run1_files.sh files/nuexsec_mc_run1_CV.root files/nuexsec_run1_CV_merged.root
 
@@ -75,7 +77,7 @@ fi
 
 # BNB_Diffusion
 if [ "$1" == "BNB_Diffusion" ]; then
-  ./nuexsec --run 1 --var /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_detvar/run1/neutrinoselection_filt_run1_overlay_diffusion.root BNB_Diffusion 2> /dev/null | tee log/run1_BNB_Diffusion.log
+  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_diffusion.root BNB_Diffusion 2> /dev/null | tee log/run1_BNB_Diffusion.log
 
   source merge/merge_run1_files.sh files/nuexsec_mc_run1_BNB_Diffusion.root files/nuexsec_run1_BNB_Diffusion_merged.root
 

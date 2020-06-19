@@ -814,11 +814,11 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
             
             // This is the signal
             if (classification_index == _util.k_nue_cc || classification_index == _util.k_nue_cc_mixed){
-                TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(_util.k_signal)->Fill(SC.shr_dedx_Y_cali, SC.shr_distance, weight);
+                TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(_util.k_signal)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
             }
             // This is the background
             else {
-                TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(_util.k_background)->Fill(SC.shr_dedx_Y_cali, SC.shr_distance, weight);
+                TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(_util.k_background)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
             }
 
         }

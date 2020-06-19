@@ -114,7 +114,7 @@ void selection::Initialise( const char * mc_file,
         mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights, run_period, _util);
 
         // Initialise the Tree Helper
-        _thelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_tree_file_name_out, weight_cfg);
+        _thelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_tree_file_name_out);
 
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_file_out, weight_cfg, _util);
@@ -146,7 +146,7 @@ void selection::Initialise( const char * mc_file,
         if (!_slim) _hhelper.at(_util.k_data).InitHistograms();
         
         // Initialise the Tree Helper
-        _thelper.at(_util.k_data).Initialise(_util.k_data, run_period, "empty", weight_cfg);
+        _thelper.at(_util.k_data).Initialise(_util.k_data, run_period, "empty");
 
         data_tree_total_entries = data_tree->GetEntries();
         std::cout << "Total Data Events:         " << data_tree_total_entries << std::endl;
@@ -176,7 +176,7 @@ void selection::Initialise( const char * mc_file,
         if (!_slim) _hhelper.at(_util.k_ext).InitHistograms();
         
         // Initialise the Tree Helper
-        _thelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, "empty", weight_cfg);
+        _thelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, "empty");
 
         ext_tree_total_entries = ext_tree->GetEntries();
         std::cout << "Total EXT Events:        " << ext_tree_total_entries << std::endl;
@@ -206,7 +206,7 @@ void selection::Initialise( const char * mc_file,
         if (!_slim) _hhelper.at(_util.k_dirt).InitHistograms();
         
         // Initialise the Tree Helper
-        _thelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, "empty", weight_cfg);
+        _thelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, "empty");
 
         dirt_tree_total_entries = dirt_tree->GetEntries();
         std::cout << "Total Dirt Events:         " << dirt_tree_total_entries << std::endl;
@@ -404,10 +404,10 @@ void selection::MakeSelection(){
     for (unsigned int p=0; p < counter_v.size();p++){
 
         // Fill the counter trees
-        if (bool_use_mc)   _thelper.at(_util.k_mc)  .Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
-        if (bool_use_data) _thelper.at(_util.k_data).Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
-        if (bool_use_ext)  _thelper.at(_util.k_ext) .Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
-        if (bool_use_dirt) _thelper.at(_util.k_dirt).Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
+        if (bool_use_mc)   _thelper.at(_util.k_mc)  .Fill_counters(counter_v.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
+        if (bool_use_data) _thelper.at(_util.k_data).Fill_counters(counter_v.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
+        if (bool_use_ext)  _thelper.at(_util.k_ext) .Fill_counters(counter_v.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
+        if (bool_use_dirt) _thelper.at(_util.k_dirt).Fill_counters(counter_v.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
 
     }
     
@@ -634,7 +634,7 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_mc).WriteInteractions();
         _hhelper.at(_util.k_mc).Write_2DSigBkgHists();
 
-        _thelper.at(_util.k_mc).WriteTree(_util.k_mc);
+        _thelper.at(_util.k_mc).WriteTree();
 
     }
     if (bool_use_data) {
@@ -642,7 +642,7 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_data).WriteRecoPar(_util.k_data);
         _hhelper.at(_util.k_data).WriteFlash();
 
-        _thelper.at(_util.k_data).WriteTree(_util.k_data);
+        _thelper.at(_util.k_data).WriteTree();
 
     }
     if (bool_use_ext) {
@@ -651,7 +651,7 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_ext).WriteFlash();
         _hhelper.at(_util.k_ext).Write_2DSigBkgHists();
 
-        _thelper.at(_util.k_ext).WriteTree(_util.k_ext);
+        _thelper.at(_util.k_ext).WriteTree();
 
     }
     if (bool_use_dirt) {
@@ -661,7 +661,7 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_dirt).WriteFlash();
         _hhelper.at(_util.k_dirt).Write_2DSigBkgHists();
 
-        _thelper.at(_util.k_dirt).WriteTree(_util.k_dirt);
+        _thelper.at(_util.k_dirt).WriteTree();
 
     }
 

@@ -1,7 +1,7 @@
 #include "../include/PrintHelper.h"
 
 // -----------------------------------------------------------------------------
-void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, int weight_cfg, bool _print_mc, bool _print_data, bool _print_ext, bool _print_dirt, utility _utility ){
+void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bool _print_mc, bool _print_data, bool _print_ext, bool _print_dirt, utility _utility ){
 
     std::cout << "Initalising Print Helper..." << std::endl;
 

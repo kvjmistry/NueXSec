@@ -13,8 +13,8 @@ void utility::Initalise(const char* variation, bool overwritePOT, const char* ru
         // Loop over the POT config names and overwrite the name of the CV MC POT
         for (unsigned int p = 0; p < confignames.size(); p++){
             
-            // std::string match_name = Form("Run%s_MC_POT", run_period);
-            std::string match_name = "Run1_MC_POT";
+            std::string match_name = Form("Run%s_MC_POT", run_period);
+            // std::string match_name = "Run1_MC_POT";
             
             // If matched then overwrite the POT config for the MC to the variation
             if (confignames.at(p) == match_name){

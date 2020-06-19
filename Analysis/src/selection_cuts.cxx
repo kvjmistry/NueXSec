@@ -31,7 +31,12 @@ bool selection_cuts::swtrig(SliceContainer &SC, int type){
 bool selection_cuts::opfilt_pe(SliceContainer &SC, int type){
     
     // This should be turned on if BNB
-    // if (type == _util.k_data || type == _util.k_ext) return true;
+    if (type == _util.k_data || type == _util.k_ext) {
+        // Placeholder to remove a compilation warning
+        // return true;
+    }
+
+    
 
     if (SC.opfilter_pe_beam > 0) return true; // pass 
     else return false;               // fail
@@ -41,7 +46,10 @@ bool selection_cuts::opfilt_pe(SliceContainer &SC, int type){
 bool selection_cuts::opfilt_veto(SliceContainer &SC, int type){
 
     // This should be turned on if BNB
-    // if (type == _util.k_data || type == _util.k_ext) return true;
+    if (type == _util.k_data || type == _util.k_ext){
+        // Placeholder to remove a compilation warning
+        // return true;
+    }
 
     if (SC.opfilter_pe_veto < 20) return true; // pass 
     else return false;               // fail

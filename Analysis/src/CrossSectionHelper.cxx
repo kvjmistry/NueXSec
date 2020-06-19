@@ -284,7 +284,7 @@ double CrossSectionHelper::GetIntegratedFlux(){
 
 
     double POT_flux{0.0}; // The POT of the flux file (i.e the POT used in the flux histogram)
-    POT_flux = GetPOT(f_flux, true);
+    POT_flux = GetPOT(f_flux);
 
     f_flux->Close();
 
@@ -293,7 +293,7 @@ double CrossSectionHelper::GetIntegratedFlux(){
 
 }
 // -----------------------------------------------------------------------------
-double CrossSectionHelper::GetPOT(TFile* f, bool disp){
+double CrossSectionHelper::GetPOT(TFile* f){
     TTree* TPOT = (TTree*) f->Get("POT");
     if (TPOT == NULL) std::cout << "Error cant get POT info" << std::endl;
 

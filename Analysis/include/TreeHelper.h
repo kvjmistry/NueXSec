@@ -13,7 +13,7 @@ class TreeHelper{
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(int type, const char *run_period, const char * file_out, int weight_cfg );
+    void Initialise(int type, const char *run_period, const char * file_out );
     // -------------------------------------------------------------------------
     // Function to fill the tree vars
     void FillVars(SliceContainer &SC, std::pair<std::string, int> _classification, bool _gen, double _weight, double _reco_energy);
@@ -22,10 +22,10 @@ class TreeHelper{
     void Fill_dedxVars(SliceContainer &SC, std::pair<std::string, int> _classification, std::string _cut, double _weight);
     // -------------------------------------------------------------------------
     // Writes the tree to file
-    void WriteTree(int type);
+    void WriteTree();
     // -------------------------------------------------------------------------
     // Fill the counter tree
-    void Fill_counters(std::vector<double> counter_v, std::string cut_name, bool bool_use_mc, bool bool_use_ext, bool bool_use_data, bool bool_use_dirt);
+    void Fill_counters(std::vector<double> counter_v, bool bool_use_mc, bool bool_use_ext, bool bool_use_data, bool bool_use_dirt);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

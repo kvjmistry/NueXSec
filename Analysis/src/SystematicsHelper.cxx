@@ -408,7 +408,7 @@ void SystematicsHelper::PlotVariations(std::string hist_name, const char* print_
     for (unsigned int k =0; k < hist_ratio.size(); k++){
 
         SetVariationProperties(hist_ratio.at(k), k);
-        hist_ratio.at(k)->SetLineWidth(1.5);
+        hist_ratio.at(k)->SetLineWidth(1);
 
 
         hist_ratio.at(k)->GetXaxis()->SetLabelSize(12);
@@ -533,7 +533,7 @@ void SystematicsHelper::PlotVariationsEXT(std::string hist_name, const char* pri
     for (unsigned int k =0; k < hist_ratio.size(); k++){
 
         SetVariationProperties(hist_ratio.at(k), k);
-        hist_ratio.at(k)->SetLineWidth(1.5);
+        hist_ratio.at(k)->SetLineWidth(1);
 
 
         hist_ratio.at(k)->GetXaxis()->SetLabelSize(12);
