@@ -200,11 +200,11 @@ double CrossSectionHelper::GetIntegratedFlux(){
     std::string flux_file_name;
 
     if (run_period == "1"){
-        flux_file_name = "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold/output_uboone_run0.root";
+        flux_file_name = "../Systematics/output_fhc_uboone_run0.root";
         boolfile = _util.GetFile(f_flux, flux_file_name);
     }
     else {
-        flux_file_name = "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold/RHC/output_uboone_run0.root";
+        flux_file_name = "../Systematics/output_rhc_uboone_run0.root";
         boolfile = _util.GetFile(f_flux, flux_file_name );
     }
     std::cout << "Using Flux file name: \033[0;31m" << flux_file_name << "\033[0m" <<  std::endl;

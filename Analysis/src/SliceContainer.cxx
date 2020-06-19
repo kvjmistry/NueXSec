@@ -800,6 +800,9 @@ std::string SliceContainer::SliceInteractionType(int type){
             return nu + CCNC + "mec";
 
         }
+        else {
+            return nu + CCNC + "unknown";
+        }
     }
     else return "data";
 

@@ -249,10 +249,11 @@ void selection::MakeSelection(){
             // Alert the user
             if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
 
-            // std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
             // Get the entry in the tree
             mc_tree->GetEntry(ievent); 
 
+            //std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
+            
             // Apply the selection cuts 
             bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
             if (!pass) continue;
@@ -422,11 +423,15 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Here we apply the selection cuts ----------------------------------------
     bool pass; // A flag to see if an event passes an event
 
+    
     // Classify the event
     std::pair<std::string, int> classification = SC.SliceClassifier(type);      // Classification of the event
     std::string interaction                    = SC.SliceInteractionType(type); // Genie interaction type
+    //std::string interaction = "nue_cc_qe";
     std::string category                       = SC.SliceCategory();            // The pandora group slice category
     std::pair<std::string, int> particle_type  = SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
+
+
 
     // Test code to isolate the low E nues in truth
     // if (type == _util.k_mc && SC.nu_e > 0.5) return false;

@@ -8,6 +8,7 @@
 #include <vector>
 #include <cstring>
 #include <cstdlib>
+#include <sstream>
 
 // Root Includes
 #include "TDirectory.h"

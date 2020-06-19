@@ -9,7 +9,6 @@
 #include "Passed_Container.h"
 #include "TreeHelper.h"
 
-#include <omp.h>
 #include "TThread.h"
 
 /* 
