@@ -756,6 +756,10 @@ double selection::GetCVWeight(int type, SliceContainer SC){
 
     if (weight_ppfx) weight = weight * weight_flux;
 
+    // Try energy dependent scaling for pi0
+    if (SC.npi0 > 0) {
+        weight = weight * (1 - 0.4 * SC.pi0_e);
+    }
 
     // std::cout << SC.weightSplineTimesTune << "   "<< SC.ppfx_cv << std::endl;
 
