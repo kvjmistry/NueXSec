@@ -183,11 +183,19 @@ void PrintHelper::PrintResults(){
             init_count_unmatched    = count_unmatched;
             if (print_ext) init_count_ext = count_ext;
             if (print_dirt) init_count_dirt = count_dirt;
+
         }
 
         
-        // // Sum of selected mc, dirt and ext. The dirt and ext are scaled to the MC POT
+        // Sum of selected mc, dirt and ext. The dirt and ext are scaled to the MC POT
         double sum_mc_dirt_ext = count_total_mc+ (count_ext * (intime_scale_factor / mc_scale_factor)) + (count_dirt * (dirt_scale_factor / mc_scale_factor));
+
+        // Set the efficiency and purity for case zero
+        if (p == 0){
+            efficiency_last = double(count_nue_cc + count_nue_cc_mixed) / double(tot_true_infv_nues);
+            purity_last     = double(count_nue_cc + count_nue_cc_mixed) / double(sum_mc_dirt_ext);
+        }
+
 
         if (print_mc && print_data && print_ext && print_dirt){
             std::cout << "\n------------------------------------------------" << std::endl;
@@ -254,8 +262,13 @@ void PrintHelper::PrintResults(){
             purity     = double(count_nue_cc + count_nue_cc_mixed) / double(sum_mc_dirt_ext);
             printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Efficiency", count_nue_cc + count_nue_cc_mixed, tot_true_infv_nues, 100 * efficiency);
             printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Purity", count_nue_cc + count_nue_cc_mixed, sum_mc_dirt_ext, 100 * purity);
-            // std::cout << " Efficiency       : " << "( " << count_nue_cc + count_nue_cc_mixed << " / " << tot_true_infv_nues << " ) = " << efficiency << std::endl;
-            // std::cout << " Purity           : " << "( " << count_nue_cc + count_nue_cc_mixed << " / " << sum_mc_dirt_ext           << " ) = " << purity << std::endl;
+            
+            std::cout << std::endl;
+            std::cout << " Efficiency Change : "  << 100 * (efficiency -efficiency_last) << " \%" << std::endl;
+            std::cout << " Purity Change     : " <<  100 * (purity - purity_last) << " \%" << std::endl;
+
+            efficiency_last = efficiency;
+            purity_last     = purity;
         }
 
         if (print_data){

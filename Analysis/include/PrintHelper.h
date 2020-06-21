@@ -120,6 +120,9 @@ class PrintHelper{
     double init_count_ext{0.0};
     double init_count_dirt{0.0};
 
+    // The efficiency and purity from the previous cut
+    double efficiency_last{0.0};
+    double purity_last{0.0};
     
 
     private:
