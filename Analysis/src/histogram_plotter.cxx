@@ -106,6 +106,8 @@ void histogram_plotter::MakeHistograms(const char * hist_file_name, const char *
         CreateDirectory("2D", run_period);
 
         Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_shr_dist.pdf", run_period), "h_reco_shr_dEdx_shr_dist");
+        Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_shr_dist_post.pdf", run_period), "h_reco_shr_dEdx_shr_dist_post");
+        Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_shr_dist_large_dedx.pdf", run_period), "h_reco_shr_dEdx_shr_dist_large_dedx");
 
         // Create the Truth folder
         CreateDirectory("Truth", run_period);
@@ -1196,6 +1198,11 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
                         area_norm,  false, 1.0, "Leading Shower dEdx (Collection Plane) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                         Form("cuts/%s/reco_shr_tkfit_dedx_y.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false);
 
+    // Shower dEdx with the track fitter y plane when there is no tracks
+    MakeStack("h_reco_shr_tkfit_dedx_y_no_tracks",_util.cut_dirs.at(cut_index).c_str(),
+                        area_norm,  false, 1.0, "Leading Shower dEdx (Collection Plane) (0 tracks) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                        Form("cuts/%s/reco_shr_tkfit_dedx_y_no_tracks.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false);
+
     // Shower dEdx with the track fitter y plane good theta
     MakeStack("h_reco_shr_tkfit_dedx_y_good_theta",_util.cut_dirs.at(cut_index).c_str(),
                         area_norm,  false, 1.0, "Collection Plane dEdx (track fitter), Good Theta [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
@@ -1877,6 +1884,36 @@ void histogram_plotter::Plot2D_Signal_Background(const char* print_name, const c
 
     hist.at(_util.k_background)->Draw("box");
     hist.at(_util.k_signal)->Draw("box, same");
+    // hist.at(_util.k_background) ->SetFillStyle(3244);
+    hist.at(_util.k_background) ->SetFillColorAlpha(kRed+2, 0.2);
+    hist.at(_util.k_background)->Draw("box,same");
+
+    // Draw cut lines to help the eye
+    std::vector<TLine*> line_v;
+    line_v.resize(10);
+    line_v.at(0) = new TLine( 0.5,  0 , 0.5, 4);
+    line_v.at(1) = new TLine( 0.5,  4 , 1.75, 4);
+    
+    line_v.at(2) = new TLine( 1.75, 4 , 1.75, 8);
+    line_v.at(3) = new TLine( 1.75, 8 , 2.3,  8);
+    
+    line_v.at(4) = new TLine( 2.3,  3 , 2.3,  8);
+    line_v.at(5) = new TLine( 2.3,  3 , 3.5,  3);
+    
+    line_v.at(6) = new TLine( 3.5,  0 , 3.5,  3);
+    line_v.at(7) = new TLine( 3.5,  0 , 4.7, 0);
+    
+    line_v.at(8) = new TLine( 4.7, 0 , 4.7, 3);
+    line_v.at(9) = new TLine( 4.7, 3,  10.0, 3);
+
+
+    for (unsigned int l=0; l < line_v.size(); l++){
+        line_v.at(l)->SetLineColor(kBlack);
+        // line_v.at(l)->SetLineStyle(kDotted);
+        line_v.at(l)->Draw();
+    }
+
+
 
     leg_stack->Draw();
 

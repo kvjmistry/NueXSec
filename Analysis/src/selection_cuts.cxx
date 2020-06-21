@@ -95,11 +95,23 @@ bool selection_cuts::michel_rej(SliceContainer &SC){
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::dEdx_y(SliceContainer &SC){
-    // if (SC.shr_dedx_Y_cali > 1.7 && SC.shr_dedx_Y_cali < 3.2) return true; // pass 
-    // else return false;                                                     // fail
-
     // Kill the background region
     if ( (SC.shr_tkfit_dedx_Y >= 3.1 && SC.shr_tkfit_dedx_Y < 5.5) || (SC.shr_tkfit_dedx_Y < 0.5) ){
+        return false;
+    }
+    // Try and recover the events in the other planes
+    else {
+        return true;
+    }
+
+}
+// -----------------------------------------------------------------------------
+bool selection_cuts::dEdx_y_no_tracks(SliceContainer &SC){
+
+    if (SC.n_tracks > 0) return true; // Dont apply this cut if there is no tracks
+    
+    // Kill the background region
+    if ( (SC.shr_tkfit_dedx_Y >= 2.7 && SC.shr_tkfit_dedx_Y < 5.5) || (SC.shr_tkfit_dedx_Y < 1.7) ){
         return false;
     }
     // Try and recover the events in the other planes
@@ -148,9 +160,49 @@ bool selection_cuts::shr_distance(SliceContainer &SC){
     
     if (SC.n_tracks == 0) return true; // Dont apply this cut if there is no tracks
     
-    // if (SC.shr_distance < 10 ) return true; // pass 
     if (SC.shr_distance < 6) return true; // pass 
     else return false;                      // fail
+}
+// -----------------------------------------------------------------------------
+bool selection_cuts::shr_dist_dEdx_y(SliceContainer &SC){
+
+    if (SC.n_tracks == 0) return true; // Dont apply this cut if there is no tracks
+
+    if (SC.shr_tkfit_dedx_Y < 0) return false;
+    
+    else if (SC.shr_tkfit_dedx_Y >= 0 && SC.shr_tkfit_dedx_Y < 0.5){
+        return false;
+    }
+    
+    else if (SC.shr_tkfit_dedx_Y >= 0.5 && SC.shr_tkfit_dedx_Y < 1.75){
+        if (SC.shr_distance > 4 ) return false;
+        else return true;
+    }
+
+    else if (SC.shr_tkfit_dedx_Y >= 1.75 && SC.shr_tkfit_dedx_Y < 2.3){
+        if (SC.shr_distance > 8 ) return false;
+        else return true;
+    }
+
+    else if (SC.shr_tkfit_dedx_Y >= 2.3 && SC.shr_tkfit_dedx_Y < 3.5){
+        if (SC.shr_distance > 3 ) return false;
+        else return true;
+    }
+
+    else if (SC.shr_tkfit_dedx_Y >= 3.5 && SC.shr_tkfit_dedx_Y < 4.7){
+        if (SC.shr_distance > 0 ) return false;
+        else return true;
+    }
+
+    else if (SC.shr_tkfit_dedx_Y >= 4.7){
+        if (SC.shr_distance > 3 ) return false;
+        else return true;
+    }
+    else{
+        std::cout << "Uncaught dEdx values..." << std::endl;
+        return false;
+    }
+
 }
 // -----------------------------------------------------------------------------
 bool selection_cuts::shr_hitratio(SliceContainer &SC){

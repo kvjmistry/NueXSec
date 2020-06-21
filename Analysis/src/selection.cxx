@@ -454,24 +454,6 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_swtrig, counter_v );
 
     // *************************************************************************
-    // Op Filt PE --------------------------------------------------------------
-    // *************************************************************************
-    // pass = _scuts.opfilt_pe(SC, type);
-    // passed_v.at(ievent).cut_v.at(_util.k_opfilt_pe) = pass;
-    // if(!pass) return false; // Failed the cut!
-    
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_opfilt_pe, counter_v );
-
-    // *************************************************************************
-    // Op Filt Michel Veto -----------------------------------------------------
-    // *************************************************************************
-    // pass = _scuts.opfilt_veto(SC, type);
-    // passed_v.at(ievent).cut_v.at(_util.k_opfilt_veto) = pass;
-    // if(!pass) return false; // Failed the cut!
-    
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_opfilt_veto, counter_v );
-
-    // *************************************************************************
     // Slice ID ----------------------------------------------------------------
     // *************************************************************************
     pass = _scuts.slice_id(SC);
@@ -506,24 +488,6 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_topo_score, counter_v );
-
-    // *************************************************************************
-    // Cosmic Impact Parameter -------------------------------------------------
-    // *************************************************************************
-    // pass = _scuts.shr_cosmic_IP(SC);
-    // passed_v.at(ievent).cut_v.at(_util.k_cosmic_ip) = pass;
-    // if(!pass) return false; // Failed the cut!
-    
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_cosmic_ip, counter_v );
-
-    // *************************************************************************
-    // Cluster Fraction --------------------------------------------------------
-    // *************************************************************************
-    // pass = _scuts.cluster_frac(SC);
-    // passed_v.at(ievent).cut_v.at(_util.k_cluster_frac) = pass;
-    // if(!pass) return false; // Failed the cut!
-    
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_cluster_frac, counter_v );
 
     // *************************************************************************
     // Slice Contained Fraction ------------------------------------------------
@@ -580,40 +544,41 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_moliere_avg, counter_v );
 
     // *************************************************************************
-    // Shower to Vertex Distance --------------------------------------------
+    // 2D cut for Shower to Vertex Distance and dEdx ---------------------------
     // *************************************************************************
-    pass = _scuts.shr_distance(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_shr_distance) = pass;
+    pass = _scuts.shr_dist_dEdx_y(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_vtx_dist_dedx) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_distance, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_vtx_dist_dedx, counter_v );
 
     // *************************************************************************
-    // dEdx in y plane ---------------------------------------------------------
+    // dEdx in y plane for 0 track events --------------------------------------
     // *************************************************************************
-    pass = _scuts.dEdx_y(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_dEdx_y) = pass;
+    pass = _scuts.dEdx_y_no_tracks(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_dEdx_y_no_tracks) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_y, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_y_no_tracks, counter_v );
 
-    // *************************************************************************
-    // dEdx in v plane ---------------------------------------------------------
-    // *************************************************************************
-    // pass = _scuts.dEdx_v(SC);
-    // passed_v.at(ievent).cut_v.at(_util.k_dEdx_v) = pass;
+
+    // // *************************************************************************
+    // // Shower to Vertex Distance --------------------------------------------
+    // // *************************************************************************
+    // pass = _scuts.shr_distance(SC);
+    // passed_v.at(ievent).cut_v.at(_util.k_shr_distance) = pass;
     // if(!pass) return false; // Failed the cut!
     
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_v, counter_v );
+    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_distance, counter_v );
 
-    // *************************************************************************
-    // dEdx in u plane ---------------------------------------------------------
-    // *************************************************************************
-    // pass = _scuts.dEdx_u(SC);
-    // passed_v.at(ievent).cut_v.at(_util.k_dEdx_u) = pass;
-    // if(!pass) return false; // Failed the cut!
+    // // *************************************************************************
+    // // dEdx in y plane ---------------------------------------------------------
+    // // *************************************************************************
+    // pass = _scuts.dEdx_y(SC);
+    // passed_v.at(ievent).cut_v.at(_util.k_dEdx_y) = pass;
+    // // if(!pass) return false; // Failed the cut!
     
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_u, counter_v );
+    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_y, counter_v );
 
     // ************************************************************************n*
     return true;
@@ -701,9 +666,9 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     }
 
     // Fill the dedx ttree before shr dist cut and after cut dedx
-    if (cut_index == _util.k_shr_distance - 1 || cut_index == _util.k_shr_distance || cut_index == _util.k_dEdx_y ){
-        _thelper.at(type).Fill_dedxVars(SC, classification, _util.cut_dirs.at(cut_index), weight);
-    }
+    // if (cut_index == _util.k_shr_distance - 1 || cut_index == _util.k_shr_distance || cut_index == _util.k_dEdx_y ){
+    //     _thelper.at(type).Fill_dedxVars(SC, classification, _util.cut_dirs.at(cut_index), weight);
+    // }
 
 }
 // -----------------------------------------------------------------------------

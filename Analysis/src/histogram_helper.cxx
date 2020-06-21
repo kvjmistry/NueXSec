@@ -330,7 +330,8 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_shr_tkfit_dedx_u).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_u_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_shr_tkfit_dedx_v).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_v_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_shr_tkfit_dedx_y).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_y_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
-            
+            TH1D_hists.at(k_reco_shr_tkfit_dedx_y_no_tracks).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_y_no_tracks_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+
             TH1D_hists.at(k_reco_shr_tkfit_dedx_y_good_theta).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_y_good_theta_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_shr_tkfit_dedx_y_bad_theta).at(i).at(j)  = new TH1D ( Form("h_reco_shr_tkfit_dedx_y_bad_theta_%s_%s",_util.cut_dirs.at(i).c_str(),  _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_shr_tkfit_dedx_v_bad_theta).at(i).at(j)  = new TH1D ( Form("h_reco_shr_tkfit_dedx_v_bad_theta_%s_%s",_util.cut_dirs.at(i).c_str(),  _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
@@ -341,7 +342,7 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_flash_time).at(i).at(j) = new TH1D ( Form("h_reco_flash_time_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 25 );
 
             // Flash PE
-            TH1D_hists.at(k_reco_flash_pe).at(i).at(j) = new TH1D ( Form("h_reco_flash_pe_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 100, 0, 5000 );
+            TH1D_hists.at(k_reco_flash_pe).at(i).at(j) = new TH1D ( Form("h_reco_flash_pe_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 5000 );
 
             // Shower Subcluster in each plane
             TH1D_hists.at(k_reco_shrsubclusters).at(i).at(j)  = new TH1D ( Form("h_reco_shrsubclusters_%s_%s", _util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 20);
@@ -487,17 +488,15 @@ void histogram_helper::InitHistograms(){
         TH2D_hists.at(i).resize(_util.k_sig_bkg_MAX);
     }
 
-    // Loop over the histograms
-    for (unsigned int i = 0; i < TH2D_hists.size(); i++){
-       
-        // Loop over the types 
-        for (unsigned int k =0 ; k< TH2D_hists.at(i).size(); k++){
-            // dEdx vs shower vertex distance 
-            TH2D_hists.at(i).at(k)     = new TH2D( Form("h_reco_shr_dEdx_shr_dist_%s", _util.sig_bkg_prefix.at(k).c_str()),";Collection Plane dEdx (calibrated) [MeV/cm];Shower to Vertex Distance [cm]", 40, 0, 10, 15, 0, 20);
-       
-        }
-        
+    // Loop over the types 
+    for (unsigned int k =0 ; k< TH2D_hists.at(0).size(); k++){
+        // dEdx vs shower vertex distance 
+        TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(k)          = new TH2D( Form("h_reco_shr_dEdx_shr_dist_%s", _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dEdx (Collection Plane) [MeV/cm];Leading Shower to Vertex Distance [cm]", 40, 0, 10, 15, 0, 20);
+        TH2D_hists.at(k_reco_shr_dEdx_shr_dist_post).at(k)     = new TH2D( Form("h_reco_shr_dEdx_shr_dist_post_%s", _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dEdx (Collection Plane) [MeV/cm];Leading Shower to Vertex Distance [cm]", 40, 0, 10, 15, 0, 20);
+        TH2D_hists.at(k_reco_shr_dEdx_shr_dist_large_dedx).at(k) = new TH2D( Form("h_reco_shr_dEdx_shr_dist_large_dedx_%s", _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dEdx (Collection Plane) [MeV/cm];Leading Shower to Vertex Distance [cm]", 80, 10, 30, 15, 0, 20);
     }
+        
+    
 
 }
 // -----------------------------------------------------------------------------
@@ -597,6 +596,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     TH1D_hists.at(k_reco_shr_tkfit_dedx_u).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_U, weight);
     TH1D_hists.at(k_reco_shr_tkfit_dedx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_V, weight);
     TH1D_hists.at(k_reco_shr_tkfit_dedx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
+    if (SC.n_tracks == 0) TH1D_hists.at(k_reco_shr_tkfit_dedx_y_no_tracks).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
 
     // Split the dedx into good and bad angles
     
@@ -810,19 +810,34 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     if (_type != _util.k_data){ 
         
         // For the dEdx vs shower distance we make the histogram just before the cut is applied
-        if (cut_index == _util.k_shr_distance - 1 ){
+        if (cut_index == _util.k_vtx_dist_dedx - 1 ){
             
             // This is the signal
             if (classification_index == _util.k_nue_cc || classification_index == _util.k_nue_cc_mixed){
-                TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(_util.k_signal)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
+                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(_util.k_signal)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
+                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist_large_dedx).at(_util.k_signal)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
             }
             // This is the background
             else {
-                TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(_util.k_background)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
+                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(_util.k_background)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
+                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist_large_dedx).at(_util.k_background)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
             }
 
         }
-        
+
+        // For the dEdx vs shower distance we make the histogram after the cut is applied
+        if (cut_index == _util.k_vtx_dist_dedx ){
+            
+            // This is the signal
+            if (classification_index == _util.k_nue_cc || classification_index == _util.k_nue_cc_mixed){
+                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist_post).at(_util.k_signal)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
+            }
+            // This is the background
+            else {
+                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist_post).at(_util.k_background)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
+            }
+
+        }
 
     }
     

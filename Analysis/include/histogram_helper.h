@@ -144,6 +144,7 @@ class histogram_helper{
         k_reco_shr_tkfit_dedx_u,                                                // The dEdx using the trackfit variable u plane
         k_reco_shr_tkfit_dedx_v,                                                // The dEdx using the trackfit variable v plane
         k_reco_shr_tkfit_dedx_y,                                                // The dEdx using the trackfit variable collection
+        k_reco_shr_tkfit_dedx_y_no_tracks,                                      // The dEdx using the trackfit variable collection in the case there is no tracks
         k_reco_shr_tkfit_dedx_y_good_theta,                                     // The dEdx using the trackfit variable collection for angles not close to parallel to the y plane
         k_reco_shr_tkfit_dedx_y_bad_theta,                                      // The dEdx using the trackfit variable collection for angles close to parallel to the y plane
         k_reco_shr_tkfit_dedx_v_bad_theta,                                      // The dEdx using the trackfit variable v plane for angles close to parallel to the y plane
@@ -217,6 +218,8 @@ class histogram_helper{
     // 2D Histograms for separating signal and background
     enum TH2D_reco_hist_vars {
         k_reco_shr_dEdx_shr_dist,
+        k_reco_shr_dEdx_shr_dist_post, // after the cut
+        k_reco_shr_dEdx_shr_dist_large_dedx, // for dedx values > 10 MeV/cm
         k_TH2D_reco_MAX
     };
 

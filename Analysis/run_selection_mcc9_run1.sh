@@ -2,7 +2,11 @@
 #./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files/neutrinoselection_filt_run1_overlay.root
 #./nuexsec --run 1 --mc /uboone/data/users/elenag/PeLEENtupleNuMI/neutrinoselection_filt_run1_NuMI_overlay.root
 
-if [ ! -d \"log\" ]; then echo \"\n Log folder doesnt exist... creating\"; mkdir -p log; fi
+if [ ! -d "log" ]; then 
+  echo
+  echo "Log folder doesnt exist... creating"
+  mkdir -p log
+fi
 
 
 if [ -z "$1" ]; then
