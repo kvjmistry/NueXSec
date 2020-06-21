@@ -107,6 +107,19 @@ class PrintHelper{
     double count_ext{0.0};
     double count_dirt{0.0};
 
+    // Counters at no cuts applied
+    double init_count_nue_cc{0.0};
+    double init_count_nue_cc_mixed{0.0};
+    double init_count_nu_out_fv{0.0};
+    double init_count_cosmic{0.0};
+    double init_count_numu_cc{0.0};
+    double init_count_numu_cc_pi0{0.0};
+    double init_count_nc{0.0};
+    double init_count_nc_pi0{0.0};
+    double init_count_unmatched{0.0};
+    double init_count_ext{0.0};
+    double init_count_dirt{0.0};
+
     
 
     private:
