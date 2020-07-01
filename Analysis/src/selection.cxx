@@ -238,6 +238,8 @@ void selection::MakeSelection(){
     if (bool_use_mc){
         std::cout << "\nStarting Selection over MC" << std::endl;
 
+        int numu_pi{0}, numubar_pi{0}, nue_pi{0}, nuebar_pi{0}; // Total number of 1pi events
+
         // Event loop
         for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
 
@@ -252,7 +254,27 @@ void selection::MakeSelection(){
             // Get the entry in the tree
             mc_tree->GetEntry(ievent); 
 
-            //std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
+            // Get the 1 pion events for kirsty
+            if (mc_SC.isVtxInFiducial){
+                if (mc_SC.nu_pdg == 14){
+                    if (mc_SC.npion == 1) numu_pi ++;
+                }
+                if (mc_SC.nu_pdg == -14){
+                    if (mc_SC.npion == 1) numubar_pi ++;
+                }
+
+                if (mc_SC.nu_pdg == 12){
+                    if (mc_SC.npion == 1) nue_pi ++;
+                }
+
+                if (mc_SC.nu_pdg == -12){
+                    if (mc_SC.npion == 1) nuebar_pi ++;
+                }
+            }
+            
+
+            // std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
+
             
             // Apply the selection cuts 
             bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
@@ -261,6 +283,10 @@ void selection::MakeSelection(){
         } // End Event loop
 
         std::cout << "Ending Selection over MC" << std::endl;
+        std::cout << "numu_pi: " << numu_pi << std::endl;
+        std::cout << "numubar_pi: " << numubar_pi << std::endl;
+        std::cout << "nue_pi: "  << nue_pi  << std::endl;
+        std::cout << "nuebar_pi: "  << nuebar_pi  << std::endl;
 
         // Loop again to look at background events that still pass
         // Event loop
@@ -653,10 +679,10 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC, weight);
 
     // For the last cut we fill the tree  or the first cut and nue_cc (generated and unselected)
-    if ( (cut_index == _util.k_cuts_MAX - 1) || (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nue_cc_mixed) ) ){
+    if ( (cut_index == _util.k_cuts_MAX - 1) || (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc) ) ){
 
         // This is a generated event, but unselected
-        if (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nue_cc_mixed )){
+        if (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc )){
             _thelper.at(type).FillVars(SC, classification, true, weight, reco_nu_e);
         }
         else {
@@ -734,6 +760,11 @@ double selection::GetCVWeight(int type, SliceContainer SC){
     // std::cout << SC.weightSplineTimesTune << "   "<< SC.ppfx_cv << std::endl;
 
     return weight;
+
+}
+// -----------------------------------------------------------------------------
+void selection::ApplyPiZeroSelection(int type, int ievent, SliceContainer &SC){
+
 
 }
 // -----------------------------------------------------------------------------

@@ -440,7 +440,7 @@ public:
     int   slothnhits;  // Slice Other Number of Hits
     
     float nu_completeness_from_pfp; // Neutrino Completeness from PFP (how many of the hits reconstructed for the neutrino were from the true neutrino? )
-    float nu_purity_from_pfp;       // Neutrino Purity from PFP (how many out of all the hits are the neutrino) (needs to be higher than 50% otherwise tag as a mixed)
+    float nu_purity_from_pfp;       // Neutrino Purity from PFP (how many out of all the hits are the neutrino)
     int   n_tracks_pandora;         // Number of Tracks Returned by Pandora
     
     double _closestNuCosmicDist; // Distance between the neutrino vertex and (closest?) cosmic trajectory tagged from CRT

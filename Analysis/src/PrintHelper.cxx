@@ -131,7 +131,7 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bo
         mc_counter_tree->SetBranchAddress("count_numubar_cc_incryo", &count_numubar_cc_incryo);
         
         mc_counter_tree->SetBranchAddress("count_nue_cc",       &count_nue_cc);
-        mc_counter_tree->SetBranchAddress("count_nue_cc_mixed", &count_nue_cc_mixed);
+        mc_counter_tree->SetBranchAddress("count_nuebar_cc",    &count_nuebar_cc);
         mc_counter_tree->SetBranchAddress("count_nu_out_fv",    &count_nu_out_fv);
         mc_counter_tree->SetBranchAddress("count_cosmic",       &count_cosmic);
         mc_counter_tree->SetBranchAddress("count_numu_cc",      &count_numu_cc);
@@ -170,10 +170,10 @@ void PrintHelper::PrintResults(){
 
         // Set counters at the start
         if (p == 0) {
-            tot_true_infv_nues = count_nue_cc + count_nue_cc_mixed;
+            tot_true_infv_nues = count_nue_cc + count_nuebar_cc;
 
             init_count_nue_cc       = count_nue_cc;
-            init_count_nue_cc_mixed = count_nue_cc_mixed;
+            init_count_nuebar_cc    = count_nuebar_cc;
             init_count_nu_out_fv    = count_nu_out_fv;
             init_count_cosmic       = count_cosmic;
             init_count_numu_cc      = count_numu_cc;
@@ -192,8 +192,8 @@ void PrintHelper::PrintResults(){
 
         // Set the efficiency and purity for case zero
         if (p == 0){
-            efficiency_last = double(count_nue_cc + count_nue_cc_mixed) / double(tot_true_infv_nues);
-            purity_last     = double(count_nue_cc + count_nue_cc_mixed) / double(sum_mc_dirt_ext);
+            efficiency_last = double(count_nue_cc + count_nuebar_cc) / double(tot_true_infv_nues);
+            purity_last     = double(count_nue_cc + count_nuebar_cc) / double(sum_mc_dirt_ext);
         }
 
 
@@ -212,7 +212,7 @@ void PrintHelper::PrintResults(){
 
         if (print_mc){
             printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Nue CC",       count_nue_cc,       double(count_nue_cc       * mc_scale_factor  ), " ", double( 100 * count_nue_cc / init_count_nue_cc));
-            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Nue CC Mixed", count_nue_cc_mixed, double(count_nue_cc_mixed * mc_scale_factor  ), " ", double( 100 * count_nue_cc_mixed / init_count_nue_cc_mixed));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "NueBar CC",    count_nuebar_cc,    double(count_nuebar_cc    * mc_scale_factor  ), " ", double( 100 * count_nuebar_cc / init_count_nuebar_cc));
             printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Nu out FV",    count_nu_out_fv,    double(count_nu_out_fv    * mc_scale_factor  ), " ", double( 100 * count_nu_out_fv / init_count_nu_out_fv));
             printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Cosmic",       count_cosmic,       double(count_cosmic       * mc_scale_factor  ), " ", double( 100 * count_cosmic / init_count_cosmic));
             printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Numu CC",      count_numu_cc,      double(count_numu_cc      * mc_scale_factor  ), " ", double( 100 * count_numu_cc / init_count_numu_cc));
@@ -258,10 +258,10 @@ void PrintHelper::PrintResults(){
         
         if (print_mc){
             std::cout << "------------------------------------------------" << std::endl;
-            efficiency = double(count_nue_cc + count_nue_cc_mixed) / double(tot_true_infv_nues);
-            purity     = double(count_nue_cc + count_nue_cc_mixed) / double(sum_mc_dirt_ext);
-            printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Efficiency", count_nue_cc + count_nue_cc_mixed, tot_true_infv_nues, 100 * efficiency);
-            printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Purity", count_nue_cc + count_nue_cc_mixed, sum_mc_dirt_ext, 100 * purity);
+            efficiency = double(count_nue_cc + count_nuebar_cc) / double(tot_true_infv_nues);
+            purity     = double(count_nue_cc + count_nuebar_cc) / double(sum_mc_dirt_ext);
+            printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Efficiency", count_nue_cc + count_nuebar_cc, tot_true_infv_nues, 100 * efficiency);
+            printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Purity", count_nue_cc + count_nuebar_cc, sum_mc_dirt_ext, 100 * purity);
             
             std::cout << std::endl;
             std::cout << " Efficiency Change : "  << 100 * (efficiency -efficiency_last) << " \%" << std::endl;

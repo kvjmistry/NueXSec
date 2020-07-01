@@ -138,6 +138,9 @@ namespace xsecSelection {
             // Get the CV weights for histograms
             double GetCVWeight(int type, SliceContainer SC);
             // -----------------------------------------------------------------
+            void selection::ApplyPiZeroSelection(int type, int ievent, SliceContainer &SC);
+            // -----------------------------------------------------------------
+
 
     }; // END Class
 

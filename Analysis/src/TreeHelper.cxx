@@ -169,7 +169,7 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     counter_tree->Branch("count_numubar_cc_incryo", &count_numubar_cc_incryo);
     
     counter_tree->Branch("count_nue_cc",       &count_nue_cc);
-    counter_tree->Branch("count_nue_cc_mixed", &count_nue_cc_mixed);
+    counter_tree->Branch("count_nuebar_cc",    &count_nuebar_cc);
     counter_tree->Branch("count_nu_out_fv",    &count_nu_out_fv);
     counter_tree->Branch("count_cosmic",       &count_cosmic);
     counter_tree->Branch("count_numu_cc",      &count_numu_cc);
@@ -297,7 +297,7 @@ void TreeHelper::Fill_counters(std::vector<double> counter_v, bool bool_use_mc, 
         count_numubar_cc_incryo = counter_v.at(_util.k_count_numubar_cc_incryo);
         
         count_nue_cc       = counter_v.at(_util.k_count_nue_cc);
-        count_nue_cc_mixed = counter_v.at(_util.k_count_nue_cc_mixed);
+        count_nuebar_cc    = counter_v.at(_util.k_count_nuebar_cc);
         count_nu_out_fv    = counter_v.at(_util.k_count_nu_out_fv);
         count_cosmic       = counter_v.at(_util.k_count_cosmic);
         count_numu_cc      = counter_v.at(_util.k_count_numu_cc);

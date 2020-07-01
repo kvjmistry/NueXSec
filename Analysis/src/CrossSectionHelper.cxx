@@ -101,7 +101,7 @@ void CrossSectionHelper::LoopEvents(){
         if (reco_energy > 6.0 && *classifcation == "data" ) std::cout << "reco energy was:  " << reco_energy << "  Consider updating the bins" <<std::endl;
 
         // Signal event
-        if ((*classifcation == "nue_cc" || *classifcation == "nue_cc_mixed") && gen == false) {
+        if ((*classifcation == "nue_cc" || *classifcation == "nuebar_cc") && gen == false) {
             n_sel+=weight;
             n_sig+=weight;
             h_cross_sec.at(k_xsec_sel)->Fill(reco_energy, weight);
@@ -119,7 +119,7 @@ void CrossSectionHelper::LoopEvents(){
         }
         
         // Generated event
-        if ( (*classifcation == "nue_cc"|| *classifcation == "nue_cc_mixed" ) && gen == true) {
+        if ( (*classifcation == "nue_cc"|| *classifcation == "nuebar_cc" ) && gen == true) {
             n_gen+=weight;
             h_cross_sec.at(k_xsec_gen)->Fill(reco_energy, weight);
         }

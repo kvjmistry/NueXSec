@@ -379,7 +379,16 @@ void histogram_helper::InitHistograms(){
 
             // Run Number
             TH1D_hists.at(k_reco_run_number).at(i).at(j) = new TH1D ( Form("h_reco_run_number_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"; Run Number; Entries", 270, 4500, 18000);
+
+            // Neutrino Purity
+            TH1D_hists.at(k_reco_nu_purity_from_pfp).at(i).at(j) = new TH1D ( Form("h_reco_nu_purity_from_pfp_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,";", 250, 0, 1.1);
         
+            // CRT veto
+            TH1D_hists.at(k_reco_crtveto).at(i).at(j) = new TH1D ( Form("h_reco_crtveto_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 2, 0, 2);
+
+            // CRT hit PE
+            TH1D_hists.at(k_reco_crthitpe).at(i).at(j) = new TH1D ( Form("h_reco_crthitpe_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 500);
+
         }
         
     }
@@ -494,6 +503,13 @@ void histogram_helper::InitHistograms(){
         TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(k)          = new TH2D( Form("h_reco_shr_dEdx_shr_dist_%s", _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dEdx (Collection Plane) [MeV/cm];Leading Shower to Vertex Distance [cm]", 40, 0, 10, 15, 0, 20);
         TH2D_hists.at(k_reco_shr_dEdx_shr_dist_post).at(k)     = new TH2D( Form("h_reco_shr_dEdx_shr_dist_post_%s", _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dEdx (Collection Plane) [MeV/cm];Leading Shower to Vertex Distance [cm]", 40, 0, 10, 15, 0, 20);
         TH2D_hists.at(k_reco_shr_dEdx_shr_dist_large_dedx).at(k) = new TH2D( Form("h_reco_shr_dEdx_shr_dist_large_dedx_%s", _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dEdx (Collection Plane) [MeV/cm];Leading Shower to Vertex Distance [cm]", 80, 10, 30, 15, 0, 20);
+    
+        // dEdx vs Moliere Average
+        TH2D_hists.at(k_reco_shr_dEdx_moliere).at(k)          = new TH2D( Form("h_reco_shr_dEdx_moliere_%s", _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dEdx (Collection Plane) [MeV/cm];Leading Shower Moliere Avg [deg]", 40, 0, 10, 20, 0, 30);
+    
+
+        // Moliere Average vs Shower vtx distance
+        TH2D_hists.at(k_reco_shr_moliere_shr_dist).at(k)      = new TH2D( Form("h_reco_shr_moliere_shr_dist_%s", _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower Moliere Avg [deg];Leading Shower to Vertex Distance [cm]", 20, 0, 30, 15, 0, 20);
     }
         
     
@@ -632,6 +648,12 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     TH1D_hists.at(k_reco_contained_fraction).at(cut_index).at(classification_index)->Fill(SC.contained_fraction, weight);
 
     TH1D_hists.at(k_reco_run_number).at(cut_index).at(classification_index)->Fill(SC.run, weight);
+
+    TH1D_hists.at(k_reco_nu_purity_from_pfp).at(cut_index).at(classification_index)->Fill(SC.nu_purity_from_pfp, weight);
+
+    TH1D_hists.at(k_reco_crtveto).at(cut_index).at(classification_index)->Fill(SC.crtveto, weight);
+
+    TH1D_hists.at(k_reco_crthitpe).at(cut_index).at(classification_index)->Fill(SC.crthitpe, weight);
     
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
@@ -681,7 +703,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
         double nu_angle = _util.GetTheta(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz); 
 
         // Also require in FV
-        if ( (classification_index == _util.k_nue_cc || classification_index == _util.k_nue_cc_mixed) && true_in_fv ){
+        if ( (classification_index == _util.k_nue_cc || classification_index == _util.k_nuebar_cc) && true_in_fv ){
             TH1D_true_hists.at(k_true_nue_theta)->Fill(nu_theta, weight);
             TH1D_true_hists.at(k_true_nue_phi)  ->Fill(nu_phi, weight);
             TH1D_true_hists.at(k_true_nue_angle)->Fill(nu_angle, weight);
@@ -808,12 +830,28 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
 
     // Fill 2D histograms for signal background rejection -- only for MC, dirt and EXT
     if (_type != _util.k_data){ 
+
+        // For the comparisons of dedx and shr vtx distance with the moliere average we make the histogram just before the cut is applied
+        if (cut_index == _util.k_shr_moliere_avg - 1 ){
+            
+            // This is the signal
+            if (classification_index == _util.k_nue_cc || classification_index == _util.k_nuebar_cc){
+                TH2D_hists.at(k_reco_shr_dEdx_moliere).at(_util.k_signal)->Fill(SC.shr_tkfit_dedx_Y, SC.shrmoliereavg, weight);
+                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_moliere_shr_dist).at(_util.k_signal)->Fill(SC.shrmoliereavg, SC.shr_distance, weight);
+            }
+            // This is the background
+            else {
+                TH2D_hists.at(k_reco_shr_dEdx_moliere).at(_util.k_background)->Fill(SC.shr_tkfit_dedx_Y, SC.shrmoliereavg, weight);
+                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_moliere_shr_dist).at(_util.k_background)->Fill(SC.shrmoliereavg, SC.shr_distance, weight);
+            }
+
+        }
         
         // For the dEdx vs shower distance we make the histogram just before the cut is applied
         if (cut_index == _util.k_vtx_dist_dedx - 1 ){
             
             // This is the signal
-            if (classification_index == _util.k_nue_cc || classification_index == _util.k_nue_cc_mixed){
+            if (classification_index == _util.k_nue_cc || classification_index == _util.k_nuebar_cc){
                 if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(_util.k_signal)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
                 if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist_large_dedx).at(_util.k_signal)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
             }
@@ -829,7 +867,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
         if (cut_index == _util.k_vtx_dist_dedx ){
             
             // This is the signal
-            if (classification_index == _util.k_nue_cc || classification_index == _util.k_nue_cc_mixed){
+            if (classification_index == _util.k_nue_cc || classification_index == _util.k_nuebar_cc){
                 if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist_post).at(_util.k_signal)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
             }
             // This is the background
@@ -950,7 +988,7 @@ void histogram_helper::WriteRecoPar(int type){
 void histogram_helper::FillTEfficiency(int cut_index, std::string classification, SliceContainer SC, double weight){
 
     // Fill the histogram at the specified cut
-    if (classification == "nue_cc" || classification == "nue_cc_mixed") TEfficiency_hists.at(cut_index)->Fill(SC.nu_e, weight);
+    if (classification == "nue_cc" || classification == "nuebar_cc") TEfficiency_hists.at(cut_index)->Fill(SC.nu_e, weight);
 }
 // -----------------------------------------------------------------------------
 void histogram_helper::WriteTEfficiency(){

@@ -143,5 +143,100 @@ void overlay_efficiency(){
     c->Print("../../../Analysis/plots/efficiency_run1_run3_comparison.pdf");
 
 
+    // Now lets plot the difference between the two runs
+
+    TH1D* h_eff_diff = (TH1D*) h_eff_run1->Clone("h_eff_diff");
+    h_eff_diff->Add(h_eff_run3, -1);
+    h_eff_diff->SetStats(kFALSE);
+    h_eff_diff->SetMarkerStyle(20);
+    h_eff_diff->SetMarkerSize(0.5);
+    h_eff_diff->SetLineWidth(2);
+    h_eff_diff->GetYaxis()->SetTitle("Difference \%");
+    h_eff_diff->Scale(100);
+    h_eff_diff->GetYaxis()->SetRangeUser(-8, 8);
+
+    TH1D* h_pur_diff = (TH1D*) h_pur_run1->Clone("h_pur_diff");
+    h_pur_diff->Add(h_pur_run3, -1);
+    h_pur_diff->SetLineColor(kRed+2);
+    h_pur_diff->SetStats(kFALSE);
+    h_pur_diff->SetMarkerStyle(20);
+    h_pur_diff->SetMarkerSize(0.5);
+    h_pur_diff->SetLineWidth(2);
+    h_pur_diff->Scale(100);
+
+    TCanvas *c2 = new TCanvas();
+    c2->SetGridy();
+    h_eff_diff->Draw("LP");
+    h_pur_diff->Draw("LP, same");
+
+    for (unsigned int l=1; l < k_cuts_MAX+1; l++){
+        line  = new TLine( h_eff_run1->GetBinCenter(l) ,   -8 , h_eff_run1->GetBinCenter(l)  ,  8);
+        line->SetLineColor(12);
+        line->SetLineStyle(kDotted);
+        line->Draw();
+    }
+
+    TLegend *leg_stack2 = new TLegend(0.2, 0.9, 0.4, 0.7);
+    leg_stack2->SetBorderSize(0);
+    leg_stack2->SetFillStyle(0);
+    leg_stack2->AddEntry(h_eff_diff, "Efficiency","lp");
+    leg_stack2->AddEntry(h_pur_diff, "Purity","lp");
+    leg_stack2->Draw();
+
+    c2->Print("../../../Analysis/plots/efficiency_run1_run3_comparison_diff.pdf");
+
+
+    // Now lets make a relative differnce plot
+    TH1D* h_eff_diff_rel = new TH1D("h_efficiency_diff_rel", "", k_cuts_MAX, 0, k_cuts_MAX);
+    TH1D* h_pur_diff_rel = new TH1D("h_purity_diff_rel",     "", k_cuts_MAX, 0, k_cuts_MAX);
+
+    for (unsigned int k=0; k < h_eff_run1->GetNbinsX();k++){
+        if ( k == 0 ){
+            h_eff_diff_rel ->Fill(cut_dirs.at(k).c_str(), 0);
+            h_pur_diff_rel ->Fill(cut_dirs.at(k).c_str(), 0);
+        }
+        else {
+            h_eff_diff_rel ->Fill(cut_dirs.at(k).c_str(), h_eff_diff->GetBinContent(k+1) - h_eff_diff->GetBinContent(k));
+            h_pur_diff_rel ->Fill(cut_dirs.at(k).c_str(), h_pur_diff->GetBinContent(k+1) - h_pur_diff->GetBinContent(k));
+        }
+        
+        h_eff_diff_rel->SetBinError(k+1, 0);
+        h_pur_diff_rel->SetBinError(k+1, 0);
+    }
+
+    h_eff_diff_rel->SetStats(kFALSE);
+    h_eff_diff_rel->SetMarkerStyle(20);
+    h_eff_diff_rel->SetMarkerSize(0.5);
+    h_eff_diff_rel->SetLineWidth(2);
+    h_eff_diff_rel->GetYaxis()->SetTitle("Rel. Difference \%");
+    // h_eff_diff_rel->Scale(100);
+    h_eff_diff_rel->GetYaxis()->SetRangeUser(-3, 3);
+
+    h_pur_diff_rel->SetLineColor(kRed+2);
+    h_pur_diff_rel->SetStats(kFALSE);
+    h_pur_diff_rel->SetMarkerStyle(20);
+    h_pur_diff_rel->SetMarkerSize(0.5);
+    h_pur_diff_rel->SetLineWidth(2);
+    // h_pur_diff_rel->Scale(100);
+
+    TCanvas *c3 = new TCanvas();
+    c3->SetGridy();
+    h_eff_diff_rel->Draw("LP");
+    h_pur_diff_rel->Draw("LP, same");
+
+    // Draw vertical lines to help the eye
+    for (unsigned int l=1; l < k_cuts_MAX+1; l++){
+        line  = new TLine( h_eff_run1->GetBinCenter(l) ,   -3 , h_eff_run1->GetBinCenter(l)  ,  3);
+        line->SetLineColor(12);
+        line->SetLineStyle(kDotted);
+        line->Draw();
+    }
+
+    leg_stack2->Draw();
+
+    c3->Print("../../../Analysis/plots/efficiency_run1_run3_comparison_reldiff.pdf");
+
+
+
 
 }

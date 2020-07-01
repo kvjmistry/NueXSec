@@ -116,7 +116,7 @@ class TreeHelper{
     double count_numubar_cc_incryo{0.0};
     
     double count_nue_cc{0.0};
-    double count_nue_cc_mixed{0.0};
+    double count_nuebar_cc{0.0};
     double count_nu_out_fv{0.0};
     double count_cosmic{0.0};
     double count_numu_cc{0.0};

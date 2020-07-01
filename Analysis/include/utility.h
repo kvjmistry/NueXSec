@@ -131,7 +131,7 @@ public:
             "ShrHits",        // Shower Hits
             "HitRatio",       // Ratio of shr hits and slice hits
             "Moliere_Avg",    // Shower Moliere Average
-            "ShrVtxDist_dEdx_y",
+            "ShrVtxDist_dEdx_y", // 2D cut for shower to vertex distance and dedx
             "dEdx_y_no_tracks",  // dEdx y plane no tracks
             // "ShrVtxDistance", // Shower to vertex distance
             // "dEdx_y",         // dEdx y plane
@@ -152,7 +152,7 @@ public:
     // Names of the classifications
     std::vector<std::string> classification_dirs = {
                 "nue_cc",
-                "nue_cc_mixed",
+                "nuebar_cc",
                 "nu_out_fv",
                 "cosmic",
                 "numu_cc",
@@ -238,7 +238,7 @@ public:
     // enums for legend
     enum enum_classification {
                 k_nue_cc,
-                k_nue_cc_mixed,
+                k_nuebar_cc,
                 k_nu_out_fv,
                 k_cosmic,
                 k_numu_cc,
@@ -310,7 +310,7 @@ public:
         k_count_numubar_cc_incryo,
         
         k_count_nue_cc,
-        k_count_nue_cc_mixed,
+        k_count_nuebar_cc,
         k_count_nu_out_fv,
         k_count_cosmic,
         k_count_numu_cc,

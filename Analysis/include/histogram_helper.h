@@ -163,6 +163,9 @@ class histogram_helper{
         k_reco_nu_e,                                                            // Reconstructed Neutrino Energy
         k_reco_contained_fraction,                                              // Ratio of PFP hits in FV to the slice
         k_reco_run_number,                                                      // Wont be used for stack, but for run normalisation plot
+        k_reco_nu_purity_from_pfp,                                              // Purity
+        k_reco_crtveto,                                                         // CRT veto
+        k_reco_crthitpe,                                                        // CRT hit pe
         k_TH1D_MAX
     };
 
@@ -220,6 +223,8 @@ class histogram_helper{
         k_reco_shr_dEdx_shr_dist,
         k_reco_shr_dEdx_shr_dist_post, // after the cut
         k_reco_shr_dEdx_shr_dist_large_dedx, // for dedx values > 10 MeV/cm
+        k_reco_shr_dEdx_moliere, // dedx y and moliere average
+        k_reco_shr_moliere_shr_dist, // moliere average and shr vertex distance
         k_TH2D_reco_MAX
     };
 
