@@ -38,7 +38,7 @@ bool selection_cuts::opfilt_pe(SliceContainer &SC, int type){
 
     
 
-    if (SC.opfilter_pe_beam > 0) return true; // pass 
+    if (SC.opfilter_pe_beam >= 20) return true; // pass 
     else return false;               // fail
     
 }
@@ -225,6 +225,23 @@ bool selection_cuts::shr_moliere_avg(SliceContainer &SC){
     else return false;                     // fail
 }
 // -----------------------------------------------------------------------------
+bool selection_cuts::pi_zero_cuts(SliceContainer &SC){
+    
+    if (SC.pi0_shrscore1 < 0.5  &&
+        SC.pi0_shrscore2 < 0.5  &&
+        SC.pi0_dot1      > 0.8  &&
+        SC.pi0_dot2      > 0.8  &&
+        SC.pi0_radlen1   > 3.0  &&
+        SC.pi0_radlen2   > 3.0  &&
+        SC.pi0_gammadot  < 0.94 &&
+        SC.pi0_energy1_Y > 60   &&
+        SC.pi0_energy2_Y > 40   &&
+        SC.pi0_dedx1_fit_Y > 1.0 ) {
+        return true;
+    }
+    else return false;
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

@@ -65,6 +65,13 @@ class histogram_helper{
     // Function to write the 2D signal vs Background Histograms
     void Write_2DSigBkgHists();
     // -------------------------------------------------------------------------
+    // Pi Zero Stacked Histogram
+    void FillPiZeroHists(int classification_index, SliceContainer SC, double weight, int pizero_mode);
+    // -------------------------------------------------------------------------
+    // Write the PiZero Histograms
+    void WritePiZero(int type);
+    // -------------------------------------------------------------------------
+
 
 
     private:
@@ -76,6 +83,9 @@ class histogram_helper{
 
     // vector of histograms to make, indexed by enums -- for particle type
     std::vector<std::vector<std::vector<TH1D*>>> TH1D_hists_particle; 
+
+    // Histograms for pi0 
+    std::vector<std::vector<TH1D*>> TH1D_pi0_hists;
 
     // Histograms for the efficiency plot
     std::vector<TH1D*> TEfficiency_hists;
@@ -226,6 +236,13 @@ class histogram_helper{
         k_reco_shr_dEdx_moliere, // dedx y and moliere average
         k_reco_shr_moliere_shr_dist, // moliere average and shr vertex distance
         k_TH2D_reco_MAX
+    };
+
+    enum TH1D_pi0_hist_vars {
+        k_pi0_mass,      // The pi0 mass peak no weighting 
+        k_pi0_mass_norm,      // The pi0 mass peak normalisation fix
+        k_pi0_mass_EScale,      // The pi0 mass peak energy dependent scaling
+        k_TH1D_pi0_MAX
     };
 
 }; // End Class Histogram Helper 

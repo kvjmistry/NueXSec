@@ -275,6 +275,8 @@ void selection::MakeSelection(){
 
             // std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
 
+            // Apply Pi0 Selection
+            ApplyPiZeroSelection(_util.k_mc, mc_SC);
             
             // Apply the selection cuts 
             bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
@@ -332,6 +334,9 @@ void selection::MakeSelection(){
             if (_run_period == 3 && data_SC.run < 16880 ){
                 continue;
             }
+
+            // Apply Pi0 Selection
+            ApplyPiZeroSelection(_util.k_data, data_SC);
 
             bool pass = ApplyCuts(_util.k_data, ievent, counter_v, data_passed_v, data_SC);
             if (!pass) continue;
@@ -392,6 +397,9 @@ void selection::MakeSelection(){
             // Get the entry in the tree
             ext_tree->GetEntry(ievent); // TPC Objects
 
+            // Apply Pi0 Selection
+            ApplyPiZeroSelection(_util.k_ext, ext_SC);
+
             bool pass = ApplyCuts(_util.k_ext, ievent, counter_v, ext_passed_v, ext_SC);
             if (!pass) continue;
         }
@@ -415,6 +423,9 @@ void selection::MakeSelection(){
         
             // Get the entry in the tree
             dirt_tree->GetEntry(ievent);
+
+            // Apply Pi0 Selection
+            ApplyPiZeroSelection(_util.k_dirt, dirt_SC);
 
             bool pass = ApplyCuts(_util.k_dirt, ievent, counter_v, dirt_passed_v, dirt_SC);
             if (!pass) continue;
@@ -624,14 +635,17 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_mc).WriteFlash();
         _hhelper.at(_util.k_mc).WriteInteractions();
         _hhelper.at(_util.k_mc).Write_2DSigBkgHists();
+        _hhelper.at(_util.k_mc).WritePiZero(_util.k_mc);
 
         _thelper.at(_util.k_mc).WriteTree();
+
 
     }
     if (bool_use_data) {
         _hhelper.at(_util.k_data).WriteReco(_util.k_data);
         _hhelper.at(_util.k_data).WriteRecoPar(_util.k_data);
         _hhelper.at(_util.k_data).WriteFlash();
+        _hhelper.at(_util.k_data).WritePiZero(_util.k_data);
 
         _thelper.at(_util.k_data).WriteTree();
 
@@ -641,6 +655,7 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_ext).WriteRecoPar(_util.k_ext);
         _hhelper.at(_util.k_ext).WriteFlash();
         _hhelper.at(_util.k_ext).Write_2DSigBkgHists();
+        _hhelper.at(_util.k_ext).WritePiZero(_util.k_ext);
 
         _thelper.at(_util.k_ext).WriteTree();
 
@@ -651,6 +666,7 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_dirt).WriteRecoPar(_util.k_dirt);
         _hhelper.at(_util.k_dirt).WriteFlash();
         _hhelper.at(_util.k_dirt).Write_2DSigBkgHists();
+        _hhelper.at(_util.k_dirt).WritePiZero(_util.k_dirt);
 
         _thelper.at(_util.k_dirt).WriteTree();
 
@@ -663,6 +679,11 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     // Get the CV weight
     double weight = 1.0;
     weight = GetCVWeight(type, SC);
+
+    // Try scaling the pi0
+    // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
+    GetPiZeroWeight(weight, 2, SC);
+
     
     // This is in many places, need to have a way for setting this number by default
     double INTERCEPT = 0.0;
@@ -752,19 +773,99 @@ double selection::GetCVWeight(int type, SliceContainer SC){
 
     if (weight_ppfx) weight = weight * weight_flux;
 
-    // Try energy dependent scaling for pi0
-    if (SC.npi0 > 0) {
-        weight = weight * (1 - 0.4 * SC.pi0_e);
-    }
-
     // std::cout << SC.weightSplineTimesTune << "   "<< SC.ppfx_cv << std::endl;
 
     return weight;
 
 }
 // -----------------------------------------------------------------------------
-void selection::ApplyPiZeroSelection(int type, int ievent, SliceContainer &SC){
+void selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
 
+    bool pass; // A flag to see if an event passes an event
+
+    // Classify the event
+    std::pair<std::string, int> classification = SC.SliceClassifier(type);      // Classification of the event
+    std::string interaction                    = SC.SliceInteractionType(type); // Genie interaction type
+    std::pair<std::string, int> particle_type  = SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
+    
+    // *************************************************************************
+    // Software Trigger -- MC Only  --------------------------------------------
+    // *************************************************************************
+    pass = _scuts.swtrig(SC, type);
+    if(!pass) return; // Failed the cut!
+    
+    // *************************************************************************
+    // Common Optical Filter PE  -----------------------------------------------
+    // *************************************************************************
+    pass = _scuts.opfilt_pe(SC, type);
+    if(!pass) return; // Failed the cut!
+
+    // *************************************************************************
+    // Common Optical Filter Veto  ---------------------------------------------
+    // *************************************************************************
+    pass = _scuts.opfilt_veto(SC, type);
+    if(!pass) return; // Failed the cut!
+
+    // *************************************************************************
+    // Slice ID ----------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.slice_id(SC);
+    if(!pass) return; // Failed the cut!
+    
+    // *************************************************************************
+    // Pi0 Selection Cuts ------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.pi_zero_cuts(SC);
+    if(!pass) return; // Failed the cut!
+
+    // Get the Central Value weight
+    double weight = GetCVWeight(type, SC);
+
+    double weight_norm = weight;
+    double weight_Escale = weight;
+
+    // Try scaling the pi0
+    // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
+    GetPiZeroWeight(weight, 0, SC);
+    GetPiZeroWeight(weight_norm, 1, SC);
+    GetPiZeroWeight(weight_Escale, 2, SC);
+
+    // Now Fill the histograms
+    if (!slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight, 0);
+    if (!slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight_norm, 1);
+    if (!slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight_Escale, 2);
+
+
+}
+// -----------------------------------------------------------------------------
+void selection::GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer &SC){
+
+    // Fix the normalisation
+    if (pizero_mode == 1){
+        
+        if (SC.npi0 > 0) {
+            weight = weight * 0.759;
+        }
+
+    }
+    // Try energy dependent scaling for pi0
+    else if (pizero_mode == 2){
+        
+        if (SC.npi0 > 0) {
+            double pi0emax = 0.6;
+            if (SC.pi0_e > 0.1 && SC.pi0_e < pi0emax){
+                weight = weight * (1 - 0.4 * SC.pi0_e);
+            }
+            else if (SC.pi0_e > 0.1 && SC.pi0_e >= pi0emax){
+                weight = weight * (1 - 0.4 * pi0emax);
+            }
+            
+        }
+    }
+    else {
+        // Dont touch the weight
+    }
+    
 
 }
 // -----------------------------------------------------------------------------

@@ -80,6 +80,8 @@ class selection_cuts{
     // dEdx cut in the case of no tracks
     bool dEdx_y_no_tracks(SliceContainer &SC);
     // -------------------------------------------------------------------------
+    // Pi0 Selection Cuts
+    bool pi_zero_cuts(SliceContainer &SC);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 

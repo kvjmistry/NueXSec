@@ -53,20 +53,6 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
 
     Initalise(hist_file_name, run_period, mc_scale_factor, intime_scale_factor, dirt_scale_factor, weight_cfg);
 
-    // Loop over the cuts and plot histograms by plot type
-    for (unsigned int i = 0; i < _util.k_cuts_MAX; i++)
-    {
-
-        // Create the directories
-        if (std::string(variation) == "empty")
-            CreateDirectory("/cuts/" + _util.cut_dirs.at(i), run_period);
-        else
-            CreateDirectory("/detvar/" + std::string(variation) + "/cuts/" + _util.cut_dirs.at(i), run_period);
-
-        // Call the Make stack function for all the plots we want
-        CallMakeStack(run_period, i, Data_POT, variation);
-    }
-
     // Only do this stuff for the CV -- unless we really want these plots for each detvar, then we need to change the file paths!!
     if (std::string(variation) == "empty")
     {
@@ -150,7 +136,44 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
         Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_x_reco_nu_vtx_x.pdf", run_period), "h_true_nu_vtx_x_reco_nu_vtx_x");
         Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_y_reco_nu_vtx_y.pdf", run_period), "h_true_nu_vtx_y_reco_nu_vtx_y");
         Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_z_reco_nu_vtx_z.pdf", run_period), "h_true_nu_vtx_z_reco_nu_vtx_z");
+
+        // Stacked histograms for pi0
+        // Create the Truth folder
+        CreateDirectory("pi0", run_period);
+
+        // pi0 mass peak unweighted
+        MakeStack("h_pi0_mass", " ",
+                area_norm, false, 1.0, "Mass [MeV]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                Form("plots/run%s/pi0/pi0_mass.pdf", run_period), false, "classifications_pi0", false, variation, run_period, false);
+
+        // pi0 mass normlaisation fixed
+        MakeStack("h_pi0_mass_norm", " ",
+                area_norm, false, 1.0, "Mass [MeV] (Normalisation Fixed)", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                Form("plots/run%s/pi0/pi0_mass_norm.pdf", run_period), false, "classifications_pi0", false, variation, run_period, false);
+
+        // pi0 mass peak unweighted
+        MakeStack("h_pi0_mass_EScale", " ",
+                area_norm, false, 1.0, "Mass [MeV] (E Dependent Scaling)", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                Form("plots/run%s/pi0/pi0_mass_EScale.pdf", run_period), false, "classifications_pi0", false, variation, run_period, false);
+
     }
+
+    // Loop over the cuts and plot histograms by plot type
+    for (unsigned int i = 0; i < _util.k_cuts_MAX; i++)
+    {
+
+        // Create the directories
+        if (std::string(variation) == "empty")
+            CreateDirectory("/cuts/" + _util.cut_dirs.at(i), run_period);
+        else
+            CreateDirectory("/detvar/" + std::string(variation) + "/cuts/" + _util.cut_dirs.at(i), run_period);
+
+        // Call the Make stack function for all the plots we want
+        CallMakeStack(run_period, i, Data_POT, variation);
+    }
+
+    
+
 }
 // -----------------------------------------------------------------------------
 void histogram_plotter::Initalise(const char *hist_file_name, const char *_run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor, int weight_cfg)
@@ -499,7 +522,7 @@ bool histogram_plotter::GetHistograms(std::vector<TH1D *> &hist, std::string his
         }
     }
     // By particles type
-    else
+    else if (plotmode == "particle")
     {
 
         // Loop over the classifications and get the histograms
@@ -553,6 +576,61 @@ bool histogram_plotter::GetHistograms(std::vector<TH1D *> &hist, std::string his
             }
         }
     }
+    // Pi0 type
+    else {
+
+        // Loop over the classifications and get the histograms
+        for (unsigned int i = 0; i < _util.classification_dirs.size(); i++)
+        {
+            // Data
+            if (i == _util.k_leg_data)
+            {
+
+                _util.GetHist(f_nuexsec, hist.at(i), Form("pizero/%s_%s", hist_name.c_str(), _util.classification_dirs.at(i).c_str()));
+                if (hist.at(i) == NULL)
+                {
+                    found_data = false;
+                }
+            }
+            // EXT
+            else if (i == _util.k_leg_ext)
+            {
+
+                _util.GetHist(f_nuexsec, hist.at(i), Form("pizero/%s_%s", hist_name.c_str(), _util.classification_dirs.at(i).c_str()));
+                if (hist.at(i) == NULL)
+                {
+                    found_ext = false;
+                }
+            }
+            // Dirt
+            else if (i == _util.k_leg_dirt)
+            {
+
+                _util.GetHist(f_nuexsec, hist.at(i), Form("pizero/%s_%s", hist_name.c_str(), _util.classification_dirs.at(i).c_str()));
+
+                if (hist.at(i) == NULL)
+                {
+                    found_dirt = false;
+                }
+            }
+            // MC
+            else
+            {
+
+                // MC
+                if (hist.at(i) != NULL && (i == _util.k_leg_data || i == _util.k_leg_ext || i == _util.k_leg_dirt))
+                    continue;
+
+                _util.GetHist(f_nuexsec, hist.at(i), Form("pizero/%s_%s", hist_name.c_str(), _util.classification_dirs.at(i).c_str()));
+
+                // Must have MC for this to work for now...
+                if (hist.at(i) == NULL)
+                    return false;
+            }
+        
+        }
+
+    }
 
     return true;
 }
@@ -560,7 +638,7 @@ bool histogram_plotter::GetHistograms(std::vector<TH1D *> &hist, std::string his
 void histogram_plotter::SetFillColours(std::vector<TH1D *> &hist, std::string plotmode, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt)
 {
 
-    if (plotmode == "classifications")
+    if (plotmode == "classifications" || plotmode == "classifications_pi0")
     {
         hist.at(_util.k_nue_cc)->SetFillColor(30);
         hist.at(_util.k_nuebar_cc)->SetFillColor(32);
@@ -616,7 +694,7 @@ void histogram_plotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, 
     if (found_ext)
         leg_stack->AddEntry(hist.at(k_plot_ext), Form("Off-Beam Data (%2.1f)", hist_integrals.at(_util.k_leg_ext)), "f");
 
-    if (plotmode == "classifications")
+    if (plotmode == "classifications" || plotmode == "classifications_pi0")
     {
         // leg_stack->AddEntry(hist.at(_util.k_unmatched),       Form("Unmatched (%2.1f)",           hist_integrals.at(_util.k_unmatched)),    "f"); // This should be zero, so dont plot
         leg_stack->AddEntry(hist.at(_util.k_nc_pi0), Form("NC #pi^{0} (%2.1f)", hist_integrals.at(_util.k_nc_pi0)), "f");
@@ -658,7 +736,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
 
     unsigned int k_plot_data, k_plot_ext, k_plot_dirt; // Maps to the correct enum value between the classifications and particle type
 
-    if (plotmode == "classifications")
+    if (plotmode == "classifications" || plotmode == "classifications_pi0")
     {
         hist.resize(_util.k_classifications_MAX);
         hist_integrals.resize(_util.k_classifications_MAX, 0.0);
@@ -972,10 +1050,10 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         // h_ratio->GetYaxis()->SetRangeUser(-0.2, 0.2);
 
         // For ratio
-        if (cut_name == "dEdx_y" || cut_name == "ShrVtxDistance" || cut_name == "Moliere_Avg")
-            h_ratio->GetYaxis()->SetRangeUser(0, 2);
-        else
+        if (cut_name == "Unselected" || cut_name == "SoftwareTrig" || cut_name == "Slice_ID" || cut_name == "Topo_Score" || cut_name == "In_FV" || cut_name == "e_candidate")
             h_ratio->GetYaxis()->SetRangeUser(0.8, 1.2);
+        else
+            h_ratio->GetYaxis()->SetRangeUser(0, 2);
 
         h_ratio->GetYaxis()->SetTitle("#frac{On-Beam}{(Overlay + Off-Beam)}");
 
@@ -1041,6 +1119,11 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
 
         // Add the weight labels
         Draw_WeightLabels(c);
+    }
+
+    if (plotmode == "classifications_pi0"){
+        c->Print(print_name);
+        return;
     }
 
     if (std::string(variation) == "empty")
@@ -1411,10 +1494,11 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
     MakeStack("h_reco_shr_tkfit_dedx_y_par", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Leading Shower dEdx (Collection Plane) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_y_par.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "particle", true, variation, run_period, false);
+
+
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeFlashPlot(double Data_POT, const char *print_name, std::string histname)
-{
+void histogram_plotter::MakeFlashPlot(double Data_POT, const char *print_name, std::string histname) {
 
     std::vector<TH1D *> hist(_util.k_type_MAX);
     std::vector<double> hist_integrals(_util.k_type_MAX, 0.0); // The integrals of all the histograms

@@ -428,6 +428,18 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     // tree->SetBranchAddress("peSpectrum",               &peSpectrum_v);
     // tree->SetBranchAddress("peHypothesisNu",           &peHypothesisNu_v);
     // tree->SetBranchAddress("peHypothesisCosmic",       &peHypothesisCosmic_v);
+
+    tree->SetBranchAddress("pi0_shrscore1",  &pi0_shrscore1);
+    tree->SetBranchAddress("pi0_shrscore2",  &pi0_shrscore2);
+    tree->SetBranchAddress("pi0_dot1",       &pi0_dot1);
+    tree->SetBranchAddress("pi0_dot2",       &pi0_dot2);
+    tree->SetBranchAddress("pi0_radlen1",    &pi0_radlen1);
+    tree->SetBranchAddress("pi0_radlen2",    &pi0_radlen2);
+    tree->SetBranchAddress("pi0_gammadot",   &pi0_gammadot);
+    tree->SetBranchAddress("pi0_energy1_Y",  &pi0_energy1_Y);
+    tree->SetBranchAddress("pi0_energy2_Y",  &pi0_energy2_Y);
+    tree->SetBranchAddress("pi0_dedx1_fit_Y",&pi0_dedx1_fit_Y);
+    tree->SetBranchAddress("pi0_mass_Y",     &pi0_mass_Y);
     
     // tree->SetBranchAddress("shr_dedx_u_v",             &shr_dedx_u_v);
     // tree->SetBranchAddress("shr_dedx_v_v",             &shr_dedx_v_v);

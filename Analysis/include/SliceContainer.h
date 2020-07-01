@@ -461,6 +461,17 @@ public:
     float bdt_cosmic;
     float bdt_global;
 
+
+    float pi0_shrscore1, pi0_shrscore2;
+    float pi0_dot1, pi0_dot2;
+    float pi0_radlen1, pi0_radlen2;
+    float pi0_gammadot;
+    float pi0_energy1_Y, pi0_energy2_Y;
+    float pi0_dedx1_fit_Y; 
+    float pi0_mass_Y;
+
+
+
     std::vector<float> *pfp_generation_v          = nullptr; // Vec of PFP generation. 1 is primary
     std::vector<float> *pfp_trk_daughters_v       = nullptr; // Vec PFP Track Daughters
     std::vector<float> *pfp_shr_daughters_v       = nullptr; // Vec PFP Shower Daughters

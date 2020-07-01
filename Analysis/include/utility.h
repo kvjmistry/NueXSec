@@ -145,6 +145,7 @@ public:
                 "Flash",
                 "Interaction",
                 "2D",
+                "pizero",
                 "ParticleStack",
                 "Stack"
                 };

@@ -511,7 +511,23 @@ void histogram_helper::InitHistograms(){
         // Moliere Average vs Shower vtx distance
         TH2D_hists.at(k_reco_shr_moliere_shr_dist).at(k)      = new TH2D( Form("h_reco_shr_moliere_shr_dist_%s", _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower Moliere Avg [deg];Leading Shower to Vertex Distance [cm]", 20, 0, 30, 15, 0, 20);
     }
-        
+    
+
+    // ----------
+    // For pi0 histograms
+    // Resize the histogram vector. plot var, cuts, classifications
+    TH1D_pi0_hists.resize(k_TH1D_pi0_MAX);
+
+    for (unsigned int u = 0; u < k_TH1D_pi0_MAX; u++){
+        TH1D_pi0_hists.at(u).resize(_util.k_classifications_MAX);
+    }
+
+    // loop over and create the histograms
+    for (unsigned int j=0; j < _util.classification_dirs.size();j++){
+        TH1D_pi0_hists.at(k_pi0_mass).at(j) = new TH1D(Form("h_pi0_mass_%s", _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 500);
+        TH1D_pi0_hists.at(k_pi0_mass_norm).at(j) = new TH1D(Form("h_pi0_mass_norm_%s", _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 500);
+        TH1D_pi0_hists.at(k_pi0_mass_EScale).at(j) = new TH1D(Form("h_pi0_mass_EScale_%s", _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 500);
+    }
     
 
 }
@@ -1074,5 +1090,67 @@ void histogram_helper::Write_2DSigBkgHists(){
         TH2D_hists.at(p).at(_util.k_background)->Write("",TObject::kOverwrite);
     }
     
+}
+// -----------------------------------------------------------------------------
+void histogram_helper::FillPiZeroHists(int classification_index, SliceContainer SC, double weight, int pizero_mode){
+
+    if (pizero_mode == 0){
+        TH1D_pi0_hists.at(k_pi0_mass).at(classification_index)->Fill(SC.pi0_mass_Y, weight);
+    }
+    // Norm fix
+    else if (pizero_mode == 1){
+        TH1D_pi0_hists.at(k_pi0_mass_norm).at(classification_index)->Fill(SC.pi0_mass_Y, weight);
+    }
+    // Energy dependent
+    else {
+        TH1D_pi0_hists.at(k_pi0_mass_EScale).at(classification_index)->Fill(SC.pi0_mass_Y, weight);
+    }
+    
+
+
+}
+// -----------------------------------------------------------------------------
+void histogram_helper::WritePiZero(int type){
+    f_nuexsec->cd();
+
+    TDirectory *dir;
+    bool bool_dir = _util.GetDirectory(f_nuexsec, dir ,"pizero");
+    if (bool_dir) dir->cd();
+
+    bool break_early{false};
+    
+    // Loop over the histogram variables
+    for (unsigned int u = 0 ; u < TH1D_pi0_hists.size(); u++){
+        
+        // loop over the classification directories
+        for (unsigned int j = 0; j < _util.classification_dirs.size(); j++){
+
+            // Choose whether to fill MC type classifications or data/ext/dirt (a re-mapping of enums)
+            if (type == _util.k_mc && ( j == _util.k_leg_data || j == _util.k_leg_ext || j == _util.k_leg_dirt)){ 
+                break;
+            }
+            if (type == _util.k_data){ 
+                j = _util.k_leg_data;
+                break_early = true;
+            }
+            if (type == _util.k_ext){ 
+                j = _util.k_leg_ext;
+                break_early = true;
+            }
+            if (type == _util.k_dirt){ 
+                j= _util.k_leg_dirt;
+                break_early = true;
+            }
+
+            // Now write the histograms
+            TH1D_pi0_hists.at(u).at(j)->SetOption("hist,E");
+            TH1D_pi0_hists.at(u).at(j)->Write("",TObject::kOverwrite);
+
+            if (break_early) break;
+        }
+
+        
+    }
+
 }
 // -----------------------------------------------------------------------------
