@@ -83,6 +83,8 @@ class selection_cuts{
     // Pi0 Selection Cuts
     bool pi_zero_cuts(SliceContainer &SC);
     // -------------------------------------------------------------------------
+    // NuMu Selection Cuts
+    bool numu_cuts(SliceContainer &SC);
     // -------------------------------------------------------------------------
 
 

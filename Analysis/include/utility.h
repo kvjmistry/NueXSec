@@ -146,6 +146,7 @@ public:
                 "Interaction",
                 "2D",
                 "pizero",
+                "numu",
                 "ParticleStack",
                 "Stack"
                 };

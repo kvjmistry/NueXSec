@@ -243,5 +243,45 @@ bool selection_cuts::pi_zero_cuts(SliceContainer &SC){
 
 }
 // -----------------------------------------------------------------------------
+bool selection_cuts::numu_cuts(SliceContainer &SC){
+    
+    bool passed = false;
+
+    // Loop over particle vector
+    for (unsigned int l = 0; l < SC.trk_sce_start_x_v->size(); l++ ){
+        
+        // Track start, Track end contained
+        bool trk_start = _util.in_fv(SC.trk_sce_start_x_v->at(l), SC.trk_sce_start_y_v->at(l), SC.trk_sce_start_z_v->at(l));
+        bool trk_end   = _util.in_fv(SC.trk_sce_end_x_v->at(l),   SC.trk_sce_end_y_v->at(l),   SC.trk_sce_end_z_v->at(l));
+    
+        // PID Score
+        bool pid_score = false;
+        if (SC.trk_llr_pid_score_v->at(l) > 0.2) pid_score = true;
+
+        // Track Length
+        bool track_length = false;
+        if (SC.trk_len_v->at(l) > 0.2) track_length = true;
+
+        // Track Score
+        bool track_score = false;
+        if (SC.trk_score_v->at(l) > 0.8) track_score = true;
+
+        // PFP Generation
+        bool pfp_gen = false;
+        if (SC.pfp_generation_v->at(l) > 0.2) pfp_gen = true;
+
+        // Track Distance
+        bool track_dist = false;
+        if (SC.trk_distance_v->at(l) < 4) track_dist = true;
+
+        if (trk_start && trk_end && pid_score && track_length && track_score && pfp_gen && track_dist) {
+            passed = true;
+            break;
+        }
+    }
+    
+    return passed;
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

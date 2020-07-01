@@ -277,6 +277,9 @@ void selection::MakeSelection(){
 
             // Apply Pi0 Selection
             ApplyPiZeroSelection(_util.k_mc, mc_SC);
+
+            // Apply NuMu Selection
+            ApplyNuMuSelection(_util.k_mc, mc_SC);
             
             // Apply the selection cuts 
             bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
@@ -337,6 +340,9 @@ void selection::MakeSelection(){
 
             // Apply Pi0 Selection
             ApplyPiZeroSelection(_util.k_data, data_SC);
+
+            // Apply NuMu Selection
+            ApplyNuMuSelection(_util.k_data, data_SC);
 
             bool pass = ApplyCuts(_util.k_data, ievent, counter_v, data_passed_v, data_SC);
             if (!pass) continue;
@@ -400,6 +406,9 @@ void selection::MakeSelection(){
             // Apply Pi0 Selection
             ApplyPiZeroSelection(_util.k_ext, ext_SC);
 
+            // Apply NuMu Selection
+            ApplyNuMuSelection(_util.k_ext, ext_SC);
+
             bool pass = ApplyCuts(_util.k_ext, ievent, counter_v, ext_passed_v, ext_SC);
             if (!pass) continue;
         }
@@ -426,6 +435,9 @@ void selection::MakeSelection(){
 
             // Apply Pi0 Selection
             ApplyPiZeroSelection(_util.k_dirt, dirt_SC);
+
+            // Apply NuMu Selection
+            ApplyNuMuSelection(_util.k_dirt, dirt_SC);
 
             bool pass = ApplyCuts(_util.k_dirt, ievent, counter_v, dirt_passed_v, dirt_SC);
             if (!pass) continue;
@@ -636,6 +648,7 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_mc).WriteInteractions();
         _hhelper.at(_util.k_mc).Write_2DSigBkgHists();
         _hhelper.at(_util.k_mc).WritePiZero(_util.k_mc);
+        _hhelper.at(_util.k_mc).WriteNuMu(_util.k_mc);
 
         _thelper.at(_util.k_mc).WriteTree();
 
@@ -646,6 +659,7 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_data).WriteRecoPar(_util.k_data);
         _hhelper.at(_util.k_data).WriteFlash();
         _hhelper.at(_util.k_data).WritePiZero(_util.k_data);
+        _hhelper.at(_util.k_data).WriteNuMu(_util.k_data);
 
         _thelper.at(_util.k_data).WriteTree();
 
@@ -656,6 +670,7 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_ext).WriteFlash();
         _hhelper.at(_util.k_ext).Write_2DSigBkgHists();
         _hhelper.at(_util.k_ext).WritePiZero(_util.k_ext);
+        _hhelper.at(_util.k_ext).WriteNuMu(_util.k_ext);
 
         _thelper.at(_util.k_ext).WriteTree();
 
@@ -667,6 +682,7 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_dirt).WriteFlash();
         _hhelper.at(_util.k_dirt).Write_2DSigBkgHists();
         _hhelper.at(_util.k_dirt).WritePiZero(_util.k_dirt);
+        _hhelper.at(_util.k_dirt).WriteNuMu(_util.k_dirt);
 
         _thelper.at(_util.k_dirt).WriteTree();
 
@@ -811,6 +827,12 @@ void selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
     // *************************************************************************
     pass = _scuts.slice_id(SC);
     if(!pass) return; // Failed the cut!
+
+    // *************************************************************************
+    // In FV -------------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.in_fv(SC);
+    if(!pass) return; // Failed the cut!
     
     // *************************************************************************
     // Pi0 Selection Cuts ------------------------------------------------------
@@ -866,6 +888,74 @@ void selection::GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer 
         // Dont touch the weight
     }
     
+
+}
+// -----------------------------------------------------------------------------
+void selection::ApplyNuMuSelection(int type, SliceContainer &SC){
+
+    bool pass; // A flag to see if an event passes an event
+
+    // Classify the event
+    std::pair<std::string, int> classification = SC.SliceClassifier(type);      // Classification of the event
+    std::string interaction                    = SC.SliceInteractionType(type); // Genie interaction type
+    std::pair<std::string, int> particle_type  = SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
+    
+    // *************************************************************************
+    // Software Trigger -- MC Only  --------------------------------------------
+    // *************************************************************************
+    pass = _scuts.swtrig(SC, type);
+    if(!pass) return; // Failed the cut!
+    
+    // *************************************************************************
+    // Common Optical Filter PE  -----------------------------------------------
+    // *************************************************************************
+    pass = _scuts.opfilt_pe(SC, type);
+    if(!pass) return; // Failed the cut!
+
+    // *************************************************************************
+    // Common Optical Filter Veto  ---------------------------------------------
+    // *************************************************************************
+    pass = _scuts.opfilt_veto(SC, type);
+    if(!pass) return; // Failed the cut!
+
+    // *************************************************************************
+    // Slice ID ----------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.slice_id(SC);
+    if(!pass) return; // Failed the cut!
+
+    // *************************************************************************
+    // In FV -------------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.in_fv(SC);
+    if(!pass) return; // Failed the cut!
+        
+    // *************************************************************************
+    // Topological Score -------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.topo_score(SC);
+    if(!pass) return; // Failed the cut!
+    
+    // *************************************************************************
+    // Slice Contained Fraction ------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.contained_frac(SC);
+    if(!pass) return; // Failed the cut!
+    
+
+    // *************************************************************************
+    // NuMu Selection Cuts ------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.numu_cuts(SC);
+    if(!pass) return; // Failed the cut!
+
+    // Get the Central Value weight
+    double weight = GetCVWeight(type, SC);
+    
+    // Also apply the pi0 weight
+    GetPiZeroWeight(weight, 2, SC);
+
+    if (!slim) _hhelper.at(type).FillNuMuHists(classification.second, SC, weight);
 
 }
 // -----------------------------------------------------------------------------

@@ -71,6 +71,12 @@ class histogram_helper{
     // Write the PiZero Histograms
     void WritePiZero(int type);
     // -------------------------------------------------------------------------
+    // Write the NuMi Histograms
+    void WriteNuMu(int type);
+    // -------------------------------------------------------------------------
+    // NuMu Stacked Histogram
+    void FillNuMuHists(int classification_index, SliceContainer SC, double weight);
+    // -------------------------------------------------------------------------
 
 
 
@@ -86,6 +92,9 @@ class histogram_helper{
 
     // Histograms for pi0 
     std::vector<std::vector<TH1D*>> TH1D_pi0_hists;
+
+    // Histograms for NuMu
+    std::vector<std::vector<TH1D*>> TH1D_numu_hists;
 
     // Histograms for the efficiency plot
     std::vector<TH1D*> TEfficiency_hists;
@@ -243,6 +252,13 @@ class histogram_helper{
         k_pi0_mass_norm,      // The pi0 mass peak normalisation fix
         k_pi0_mass_EScale,      // The pi0 mass peak energy dependent scaling
         k_TH1D_pi0_MAX
+    };
+
+    enum TH1D_numu_hist_vars {
+        k_track_theta,      // Longest track theta 
+        k_track_cos_theta,      // Longest track cos theta
+        k_track_phi,      // Longest track phi
+        k_TH1D_numu_MAX
     };
 
 }; // End Class Histogram Helper 

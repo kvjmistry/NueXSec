@@ -536,19 +536,19 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     // tree->SetBranchAddress("trk_start_x_v",            &trk_start_x_v);
     // tree->SetBranchAddress("trk_start_y_v",            &trk_start_y_v);
     // tree->SetBranchAddress("trk_start_z_v",            &trk_start_z_v);
-    // tree->SetBranchAddress("trk_sce_start_x_v",        &trk_sce_start_x_v);
-    // tree->SetBranchAddress("trk_sce_start_y_v",        &trk_sce_start_y_v);
-    // tree->SetBranchAddress("trk_sce_start_z_v",        &trk_sce_start_z_v);
+    tree->SetBranchAddress("trk_sce_start_x_v",        &trk_sce_start_x_v);
+    tree->SetBranchAddress("trk_sce_start_y_v",        &trk_sce_start_y_v);
+    tree->SetBranchAddress("trk_sce_start_z_v",        &trk_sce_start_z_v);
     // tree->SetBranchAddress("trk_end_x_v",              &trk_end_x_v);
     // tree->SetBranchAddress("trk_end_y_v",              &trk_end_y_v);
     // tree->SetBranchAddress("trk_end_z_v",              &trk_end_z_v);
-    // tree->SetBranchAddress("trk_sce_end_x_v",          &trk_sce_end_x_v);
-    // tree->SetBranchAddress("trk_sce_end_y_v",          &trk_sce_end_y_v);
-    // tree->SetBranchAddress("trk_sce_end_z_v",          &trk_sce_end_z_v);
-    // tree->SetBranchAddress("trk_distance_v",           &trk_distance_v);
+    tree->SetBranchAddress("trk_sce_end_x_v",          &trk_sce_end_x_v);
+    tree->SetBranchAddress("trk_sce_end_y_v",          &trk_sce_end_y_v);
+    tree->SetBranchAddress("trk_sce_end_z_v",          &trk_sce_end_z_v);
+    tree->SetBranchAddress("trk_distance_v",           &trk_distance_v);
     // tree->SetBranchAddress("trk_theta_v",              &trk_theta_v);
     // tree->SetBranchAddress("trk_phi_v",                &trk_phi_v);
-    // tree->SetBranchAddress("trk_len_v",                &trk_len_v);
+    tree->SetBranchAddress("trk_len_v",                &trk_len_v);
     // tree->SetBranchAddress("trk_mcs_muon_mom_v",       &trk_mcs_muon_mom_v);
     // tree->SetBranchAddress("trk_range_muon_mom_v",     &trk_range_muon_mom_v);
     // tree->SetBranchAddress("trk_energy_proton_v",      &trk_energy_proton_v);
@@ -561,7 +561,7 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     // tree->SetBranchAddress("trk_llr_pid_v_v",          &trk_llr_pid_v_v);
     // tree->SetBranchAddress("trk_llr_pid_y_v",          &trk_llr_pid_y_v);
     // tree->SetBranchAddress("trk_llr_pid_v",            &trk_llr_pid_v);
-    // tree->SetBranchAddress("trk_llr_pid_score_v",      &trk_llr_pid_score_v);
+    tree->SetBranchAddress("trk_llr_pid_score_v",      &trk_llr_pid_score_v);
 
 
     // weightstree->SetBranchAddress("weights", &_mapWeight);

@@ -528,6 +528,22 @@ void histogram_helper::InitHistograms(){
         TH1D_pi0_hists.at(k_pi0_mass_norm).at(j) = new TH1D(Form("h_pi0_mass_norm_%s", _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 500);
         TH1D_pi0_hists.at(k_pi0_mass_EScale).at(j) = new TH1D(Form("h_pi0_mass_EScale_%s", _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 500);
     }
+
+    // ----------
+    // For numu histograms
+    // Resize the histogram vector. plot var, cuts, classifications
+    TH1D_numu_hists.resize(k_TH1D_numu_MAX);
+
+    for (unsigned int u = 0; u < k_TH1D_numu_MAX; u++){
+        TH1D_numu_hists.at(u).resize(_util.k_classifications_MAX);
+    }
+
+    // loop over and create the histograms
+    for (unsigned int j=0; j < _util.classification_dirs.size();j++){
+        TH1D_numu_hists.at(k_track_theta).at(j)     = new TH1D(Form("h_track_theta_%s", _util.classification_dirs.at(j).c_str()) ,"", 13, 0, 190 );
+        TH1D_numu_hists.at(k_track_cos_theta).at(j) = new TH1D(Form("h_track_cos_theta_%s", _util.classification_dirs.at(j).c_str()) ,"", 16, -1, 1);
+        TH1D_numu_hists.at(k_track_phi).at(j)       = new TH1D(Form("h_track_phi_%s", _util.classification_dirs.at(j).c_str()) ,"", 14, -190, 190);
+    }
     
 
 }
@@ -1110,6 +1126,18 @@ void histogram_helper::FillPiZeroHists(int classification_index, SliceContainer 
 
 }
 // -----------------------------------------------------------------------------
+void histogram_helper::FillNuMuHists(int classification_index, SliceContainer SC, double weight){
+
+    
+    TH1D_numu_hists.at(k_track_theta).at(classification_index)->Fill(SC.trk_theta* 180/3.14159, weight);
+    TH1D_numu_hists.at(k_track_phi).at(classification_index)->Fill(SC.trk_phi* 180/3.14159, weight);
+    TH1D_numu_hists.at(k_track_cos_theta).at(classification_index)->Fill(std::cos(SC.trk_theta), weight);
+    
+    
+
+
+}
+// -----------------------------------------------------------------------------
 void histogram_helper::WritePiZero(int type){
     f_nuexsec->cd();
 
@@ -1154,3 +1182,46 @@ void histogram_helper::WritePiZero(int type){
 
 }
 // -----------------------------------------------------------------------------
+void histogram_helper::WriteNuMu(int type){
+    f_nuexsec->cd();
+
+    TDirectory *dir;
+    bool bool_dir = _util.GetDirectory(f_nuexsec, dir ,"numu");
+    if (bool_dir) dir->cd();
+
+    bool break_early{false};
+    
+    // Loop over the histogram variables
+    for (unsigned int u = 0 ; u < TH1D_numu_hists.size(); u++){
+        
+        // loop over the classification directories
+        for (unsigned int j = 0; j < _util.classification_dirs.size(); j++){
+
+            // Choose whether to fill MC type classifications or data/ext/dirt (a re-mapping of enums)
+            if (type == _util.k_mc && ( j == _util.k_leg_data || j == _util.k_leg_ext || j == _util.k_leg_dirt)){ 
+                break;
+            }
+            if (type == _util.k_data){ 
+                j = _util.k_leg_data;
+                break_early = true;
+            }
+            if (type == _util.k_ext){ 
+                j = _util.k_leg_ext;
+                break_early = true;
+            }
+            if (type == _util.k_dirt){ 
+                j= _util.k_leg_dirt;
+                break_early = true;
+            }
+
+            // Now write the histograms
+            TH1D_numu_hists.at(u).at(j)->SetOption("hist,E");
+            TH1D_numu_hists.at(u).at(j)->Write("",TObject::kOverwrite);
+
+            if (break_early) break;
+        }
+
+        
+    }
+
+}

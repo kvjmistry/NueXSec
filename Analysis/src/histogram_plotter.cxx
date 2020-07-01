@@ -156,6 +156,25 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
                 area_norm, false, 1.0, "Mass [MeV] (E Dependent Scaling)", 0.8, 0.98, 0.87, 0.32, Data_POT,
                 Form("plots/run%s/pi0/pi0_mass_EScale.pdf", run_period), false, "classifications_pi0", false, variation, run_period, false);
 
+        // Stacked histograms for numu
+        // Create the Truth folder
+        CreateDirectory("numu", run_period);
+
+        // pi0 mass peak unweighted
+        MakeStack("h_track_theta", " ",
+                area_norm, false, 1.0, "Leading Track Theta [deg]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                Form("plots/run%s/numu/track_theta.pdf", run_period), false, "classifications_numu", false, variation, run_period, false);
+
+        // pi0 mass normlaisation fixed
+        MakeStack("h_track_phi", " ",
+                area_norm, false, 1.0, "Leading Track Phi [deg]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                Form("plots/run%s/numu/track_phi.pdf", run_period), false, "classifications_numu", false, variation, run_period, false);
+
+        // pi0 mass peak unweighted
+        MakeStack("h_track_cos_theta", " ",
+                area_norm, false, 1.0, "Leading Track Cos(#theta)", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                Form("plots/run%s/numu/track_cos_theta.pdf", run_period), false, "classifications_numu", false, variation, run_period, false);
+
     }
 
     // Loop over the cuts and plot histograms by plot type
@@ -577,7 +596,7 @@ bool histogram_plotter::GetHistograms(std::vector<TH1D *> &hist, std::string his
         }
     }
     // Pi0 type
-    else {
+    else if (plotmode == "classifications_pi0") {
 
         // Loop over the classifications and get the histograms
         for (unsigned int i = 0; i < _util.classification_dirs.size(); i++)
@@ -631,6 +650,61 @@ bool histogram_plotter::GetHistograms(std::vector<TH1D *> &hist, std::string his
         }
 
     }
+    // Pi0 type
+    else {
+
+        // Loop over the classifications and get the histograms
+        for (unsigned int i = 0; i < _util.classification_dirs.size(); i++)
+        {
+            // Data
+            if (i == _util.k_leg_data)
+            {
+
+                _util.GetHist(f_nuexsec, hist.at(i), Form("numu/%s_%s", hist_name.c_str(), _util.classification_dirs.at(i).c_str()));
+                if (hist.at(i) == NULL)
+                {
+                    found_data = false;
+                }
+            }
+            // EXT
+            else if (i == _util.k_leg_ext)
+            {
+
+                _util.GetHist(f_nuexsec, hist.at(i), Form("numu/%s_%s", hist_name.c_str(), _util.classification_dirs.at(i).c_str()));
+                if (hist.at(i) == NULL)
+                {
+                    found_ext = false;
+                }
+            }
+            // Dirt
+            else if (i == _util.k_leg_dirt)
+            {
+
+                _util.GetHist(f_nuexsec, hist.at(i), Form("numu/%s_%s", hist_name.c_str(), _util.classification_dirs.at(i).c_str()));
+
+                if (hist.at(i) == NULL)
+                {
+                    found_dirt = false;
+                }
+            }
+            // MC
+            else
+            {
+
+                // MC
+                if (hist.at(i) != NULL && (i == _util.k_leg_data || i == _util.k_leg_ext || i == _util.k_leg_dirt))
+                    continue;
+
+                _util.GetHist(f_nuexsec, hist.at(i), Form("numu/%s_%s", hist_name.c_str(), _util.classification_dirs.at(i).c_str()));
+
+                // Must have MC for this to work for now...
+                if (hist.at(i) == NULL)
+                    return false;
+            }
+        
+        }
+
+    }
 
     return true;
 }
@@ -638,7 +712,7 @@ bool histogram_plotter::GetHistograms(std::vector<TH1D *> &hist, std::string his
 void histogram_plotter::SetFillColours(std::vector<TH1D *> &hist, std::string plotmode, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt)
 {
 
-    if (plotmode == "classifications" || plotmode == "classifications_pi0")
+    if (plotmode == "classifications" || plotmode == "classifications_pi0"|| plotmode == "classifications_numu")
     {
         hist.at(_util.k_nue_cc)->SetFillColor(30);
         hist.at(_util.k_nuebar_cc)->SetFillColor(32);
@@ -694,7 +768,7 @@ void histogram_plotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, 
     if (found_ext)
         leg_stack->AddEntry(hist.at(k_plot_ext), Form("Off-Beam Data (%2.1f)", hist_integrals.at(_util.k_leg_ext)), "f");
 
-    if (plotmode == "classifications" || plotmode == "classifications_pi0")
+    if (plotmode == "classifications" || plotmode == "classifications_pi0" || plotmode == "classifications_numu")
     {
         // leg_stack->AddEntry(hist.at(_util.k_unmatched),       Form("Unmatched (%2.1f)",           hist_integrals.at(_util.k_unmatched)),    "f"); // This should be zero, so dont plot
         leg_stack->AddEntry(hist.at(_util.k_nc_pi0), Form("NC #pi^{0} (%2.1f)", hist_integrals.at(_util.k_nc_pi0)), "f");
@@ -736,7 +810,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
 
     unsigned int k_plot_data, k_plot_ext, k_plot_dirt; // Maps to the correct enum value between the classifications and particle type
 
-    if (plotmode == "classifications" || plotmode == "classifications_pi0")
+    if (plotmode == "classifications" || plotmode == "classifications_pi0" || plotmode == "classifications_numu")
     {
         hist.resize(_util.k_classifications_MAX);
         hist_integrals.resize(_util.k_classifications_MAX, 0.0);
