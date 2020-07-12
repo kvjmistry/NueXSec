@@ -7,10 +7,11 @@
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
 <!ENTITY name "searchingfornues_run3b_beamoff">
-<!ENTITY indef "numi_uboone_run3b_beamoff_offset1_mcc9_reco2_v08_00_00_28_sample0_all_v2">
-<!ENTITY version "v2">
+<!ENTITY indef "numi_uboone_run3b_beamoff_offset1_mcc9_reco2_v08_00_00_28_sample1_all">
+<!ENTITY version "v3">
 
 <!-- v2 includes common optical filter-->
+<!-- v3 includes alternative beam off sample-->
 
 ]>
 
@@ -45,7 +46,7 @@
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <inputdef>&indef;</inputdef>
     <maxfilesperjob>10</maxfilesperjob>
-    <numjobs>172</numjobs>
+    <numjobs>388</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <disk>25GB</disk>

@@ -1,7 +1,11 @@
 // Script to make the cross section plot
 #include "functions.h"
+#include "TGaxis.h"
 
 void make_xsec_plot(){
+
+    // This changes the plot to average splines/flux or not
+    bool draw_averge = true;
 
     gStyle->SetOptStat(0);
 
@@ -38,6 +42,7 @@ void make_xsec_plot(){
 
     TH1D *h_spline_nue    = new TH1D("h_spline_nue", ";Energy [GeV]; Cross-Section",num_bins, 0, 125);
     TH1D *h_spline_nuebar = new TH1D("h_spline_nuebar", ";Energy [GeV]; Cross-Section",num_bins, 0, 125);
+    TH1D *h_spline_average = new TH1D("h_spline_average", ";Energy [GeV]; Cross-Section",num_bins, 0, 125);
 
     // Convert TGraph to histogram for nue and nuebar
     
@@ -54,6 +59,10 @@ void make_xsec_plot(){
         genieXsecNuebarCC->GetPoint(i, x, y);
         h_spline_nuebar->Fill(x, y/40.0);
     }
+
+    h_spline_average->Add(h_spline_nue,1);
+    h_spline_average->Add(h_spline_nuebar,1);
+    h_spline_average->Scale(0.5);
 
 
     TCanvas *c = new TCanvas();
@@ -83,37 +92,87 @@ void make_xsec_plot(){
     h_nue->GetXaxis()->SetTitleSize(18);
     h_nue->GetXaxis()->SetTitleFont(46);
 
-    h_nue->Draw("hist");
+    if (!draw_averge) h_nue->Draw("hist");
+
+    TH1D* h_nue_clone = (TH1D*)h_nue->Clone("h_nue_clone");
     
     // Nuebar flux
+    h_nuebar->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu}_{e} / cm^{2} / 6 #times 10^{20} POT");
     h_nuebar->GetXaxis()->SetRangeUser(0,3);
     h_nuebar->SetLineColor(kGreen+2);
     h_nuebar->SetFillColor(16);
-    h_nuebar->Draw("hist,same");
+    if (!draw_averge)h_nuebar->Draw("hist,same");
+
+    // Define the threshold 
+    double threshold_energy =  0.250; // 0.75*0.2065
+    std::cout << "Theshold Energy: " << threshold_energy*1000 << " MeV" << std::endl;
+    
+    double xbin_th = h_nue->GetXaxis()->FindBin(threshold_energy); // find the x bin to integrate from (threshold)
+    double kdar_max = h_nue->GetXaxis()->FindBin( 0.225); // end of KDAR spectrum
+    double flux_int_thresh_nue = h_nue->Integral( xbin_th, h_nue->GetNbinsX()+1);
+    double flux_int_thresh_nuebar = h_nuebar->Integral( xbin_th, h_nuebar->GetNbinsX()+1);
+
+    // Sum the fluxes
+    TH1D *summed_flux = (TH1D*)h_nue->Clone("h_summed_flux");
+    
+    // summed_flux->Add(h_nue, 1);
+    summed_flux->Add(h_nuebar, 1);
+
+    TH1D* h_summed_flux_clone = (TH1D*)summed_flux->Clone("h_summed_flux_clone");
+    // Here loop over the cloned histogram of nue, and zero out the flux after the threshold, this is so we can shade out the thresholded area
+    for (unsigned int p=xbin_th; p < h_summed_flux_clone->GetNbinsX()+1; p++){
+        h_summed_flux_clone->SetBinContent(p, 0);
+    }
+
+    summed_flux->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e} + #bar{#nu}_{e} / cm^{2} / 6 #times 10^{20} POT");
+    summed_flux->GetXaxis()->CenterTitle();
+    summed_flux->GetYaxis()->CenterTitle();
+    summed_flux->GetXaxis()->SetLabelFont(42);
+    summed_flux->GetXaxis()->SetLabelSize(0.04);
+    // summed_flux->GetXaxis()->SetTitleSize(0.04);
+    summed_flux->GetYaxis()->SetLabelFont(42);
+    summed_flux->GetYaxis()->SetLabelSize(0.04);
+    summed_flux->GetYaxis()->SetTitleSize(0.04);
+    summed_flux->GetXaxis()->SetRangeUser(0,3);
+    summed_flux->GetYaxis()->SetRangeUser(0,170.0e6);
+    summed_flux->SetLineColor(kRed+2);
+    summed_flux->SetFillColor(17);
+    if (draw_averge) summed_flux->Draw("hist");
+    
     
 
     // Now setup the twin axis
     gPad->SetRightMargin(0.17 );
 
+    c->Update();
+
     Float_t rightmax =  3.0;
-    Float_t scale = 150.0e6/rightmax;
+    Float_t scale =  gPad->GetUymax()/rightmax;
     
     // nue spline
     h_spline_nue->SetLineWidth(2);
     h_spline_nue->SetLineColor(kBlue+2);
     h_spline_nue->SetLineStyle(3);
     h_spline_nue->Scale(scale);
-    h_spline_nue->Draw("hist,L,P,same");
+    if (!draw_averge)h_spline_nue->Draw("hist,L,P,same");
 
     //nuebar spline
     h_spline_nuebar->SetLineWidth(2);
     h_spline_nuebar->SetLineColor(kGreen+2);
     h_spline_nuebar->SetLineStyle(3);
     h_spline_nuebar->Scale(scale);
-    h_spline_nuebar->Draw("hist,L,P,same");
+    if (!draw_averge)h_spline_nuebar->Draw("hist,L,P,same");
+
+    // Averge spline
+    h_spline_average->SetLineWidth(2);
+    h_spline_average->SetLineColor(kRed+2);
+    h_spline_average->SetLineStyle(3);
+    h_spline_average->Scale(scale);
+    h_spline_average->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e} + #bar{#nu}_{e} / cm^{2} / 6 #times 10^{20} POT");
+    if (draw_averge) h_spline_average->Draw("hist,L,P,same");
 
     // The second axis
-    TGaxis *axis = new TGaxis(3.0, 0, 3.0, 150.0e6, 0, rightmax, 510, "+L");
+    TGaxis *axis = new TGaxis(gPad->GetUxmax(), gPad->GetUymin(), gPad->GetUxmax(), gPad->GetUymax(), 0, rightmax, 510, "+L");
     axis->SetTitle("#nu_{e} + #bar{#nu}_{e} CC Cross-Section [10^{-38} cm^{2}]");
     axis->SetTitleOffset(1.1);
     axis->SetLineColor(kBlack);
@@ -125,62 +184,87 @@ void make_xsec_plot(){
 
     axis->Draw();
 
+
+    
+
+
+    // Here loop over the cloned histogram of nue, and zero out the flux after the threshold, this is so we can shade out the thresholded area
+    for (unsigned int p=xbin_th; p < h_nue_clone->GetNbinsX()+1; p++){
+        h_nue_clone->SetBinContent(p, 0);
+    }
+
+    h_nue_clone->SetLineColor(kBlue+2);
+    h_nue_clone->SetLineWidth(0);
+    h_nue_clone->SetFillColorAlpha(46, 0.4);
+    if (!draw_averge)h_nue_clone->Draw("hist,same");
+    // h_nuebar->Draw("hist,same");
+
+
+
     // Get the energy values
     double average_num = 0; // flux numerator
-    double average_den = h_nue->Integral() +  h_nuebar->Integral(); // flux denominator
+    double average_den = h_nue->Integral( xbin_th, h_nue->GetNbinsX()+1) +  h_nuebar->Integral(xbin_th, h_nuebar->GetNbinsX()+1); // flux denominator
 
     int nue_flux_bins  = h_nue->GetNbinsX();
     int anue_flux_bins = h_nuebar->GetNbinsX();
 
-    for (int k = 0; k < nue_flux_bins; k++ ){
+    for (int k = 1; k < nue_flux_bins+1; k++ ){
+        if (k < xbin_th) continue; // skip the thresholded bins
         average_num = average_num + (h_nue->GetBinContent(k) * h_nue->GetBinCenter(k));
     }
 
-    for (int k = 0; k < anue_flux_bins; k++ ){
+    for (int k = 1; k < anue_flux_bins+1; k++ ){
+        if (k < xbin_th) continue; // skip the thresholded bins
         average_num = average_num + (h_nuebar->GetBinContent(k) * h_nuebar->GetBinCenter(k));
     }
 
     double average = average_num / average_den;
     std::cout << "Average Energy: " << average << std::endl;
+    
 
-    // Sum the fluxes
-    TH1D *summed_flux = new TH1D("summed_flux", "summed_flux", 400, 0, 20);
-    summed_flux->Add(h_nue, 1);
-    summed_flux->Add(h_nuebar, 1);
+    std::cout << "Total Nue Flux: " << h_nue->Integral() << std::endl;
+    std::cout << "Total Nuebar Flux: " << h_nuebar->Integral() << std::endl;
+    std::cout << "Total Nue Flux with threshold: " << flux_int_thresh_nue << std::endl;
+    std::cout << "Total Nuebar Flux with threshold: " << flux_int_thresh_nuebar << std::endl;
+
+    double sum_flux_thresh_to_KDAR_end = h_nue->Integral( xbin_th, kdar_max) + h_nuebar->Integral( xbin_th, kdar_max);
 
     
-    double summed_flux_integral = summed_flux->Integral();
+
+    h_summed_flux_clone->SetLineWidth(0);
+    h_summed_flux_clone->SetFillColorAlpha(46, 0.4);
+    h_summed_flux_clone->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e} + #bar{#nu}_{e} / cm^{2} / 6 #times 10^{20} POT");
+    if (draw_averge) h_summed_flux_clone->Draw("hist,same");
+
+    
+    double summed_flux_integral = summed_flux->Integral( xbin_th, summed_flux->GetNbinsX()+1);
     
     std::cout <<  "summed_flux_integral: " << summed_flux_integral << std::endl;
+    std::cout << "Fraction of flux from thresh to KDAR end point: " << 100 * sum_flux_thresh_to_KDAR_end / summed_flux_integral << std::endl;
 
+    // Get the bin where the average is located
     double average_bin = 0;
-    for (int bin = 0 ; bin < nue_flux_bins; bin++ ){
-        
-        if (summed_flux->GetBinCenter(bin) <= average){
-            continue;
-        }
+    average_bin  = summed_flux->GetXaxis()->FindBin(average);
+    std::cout << "Average bin number: " << average_bin << std::endl;
 
-        // here we should get the bin with the average in it
-        average_bin = bin;
-        break;
-    }
-
-    double max_sum = 0;
+    // Get the max error bar = 34% of the flux after the average
+    double integral_max = 0;
     double max_bin_val = 0;
-    for (int bin = average_bin; bin < nue_flux_bins; bin++){
+    for (int bin = average_bin; bin < summed_flux->GetNbinsX()+1; bin++){
         
-        max_sum = max_sum + summed_flux->GetBinContent(bin);
+        integral_max = summed_flux->Integral( average_bin, bin);
         
-        if (max_sum / summed_flux_integral >= 0.34){
+        if (integral_max / summed_flux_integral >= 0.34){
             max_bin_val = summed_flux->GetBinCenter(bin);
             break;
         }
     }
        
-
+    // Get the min error bar = 34% of the flux beforethe average
     double min_sum = 0;
     double min_bin_val = 0;
     for (int bin = average_bin; bin > 0; bin--){
+        if (bin < xbin_th) continue; // skip the thresholded bins
         
         // print "Bin: ", bin
         min_sum = min_sum + summed_flux->GetBinContent(bin);
@@ -199,13 +283,13 @@ void make_xsec_plot(){
 
 
     // Now draw the data cross section
-    double data_xsec = 0.467 * scale; // Scale is to take it to the flux axes
+    double data_xsec = 0.667 * scale; // Scale is to take it to the flux axes
 
-    double data_stat_err_plus = 0.101 * scale;
-    double data_stat_err_minus = 0.101 * scale;
+    double data_stat_err_plus = 0.144 * scale;
+    double data_stat_err_minus = 0.144 * scale;
 
-    double data_stat_plus_sys_err_plus = 0.1907 * scale;
-    double data_stat__plus_sys_err_minus = 0.1907 * scale;
+    double data_stat_plus_sys_err_plus = 0.267 * scale;
+    double data_stat__plus_sys_err_minus = 0.267 * scale;
 
     const Int_t n = 2;
     Double_t x[n]   = {average, average};
@@ -223,13 +307,17 @@ void make_xsec_plot(){
     gr->Draw("L,P,same");
 
     // Draw the Legend
-    TLegend *leg = new TLegend(0.17, 0.5, 0.48, 0.9);
+    TLegend *leg;
+    if (!draw_averge)leg = new TLegend(0.17, 0.5, 0.48, 0.9);
+    if (draw_averge)leg  = new TLegend(0.17, 0.5, 0.48, 0.8);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
-    leg->AddEntry(h_nue,             "NuMI #nu_{e} Flux",                       "l");
-    leg->AddEntry(h_nuebar,          "NuMI #bar{#nu}_{e} Flux",                 "l");
-    leg->AddEntry(h_spline_nue,      "GENIE #nu_{e} CC Cross-Section",          "l");
-    leg->AddEntry(h_spline_nuebar,   "GENIE #bar{#nu}_{e} CC Cross-Section",    "l");
+    if (!draw_averge)leg->AddEntry(h_nue,             "NuMI #nu_{e} Flux",                       "f");
+    if (!draw_averge)leg->AddEntry(h_nuebar,          "NuMI #bar{#nu}_{e} Flux",                 "f");
+    if (!draw_averge)leg->AddEntry(h_spline_nue,      "GENIE #nu_{e} CC Cross-Section",          "l");
+    if (!draw_averge)leg->AddEntry(h_spline_nuebar,   "GENIE #bar{#nu}_{e} CC Cross-Section",    "l");
+    if (draw_averge)leg->AddEntry(summed_flux,        "NuMI #nu_{e} + #bar{#nu}_{e} Flux",       "f");
+    if (draw_averge)leg->AddEntry(h_spline_average,   "GENIE #nu_{e} + #bar{#nu}_{e} CC Cross-Section",    "l");
     leg->AddEntry(gr, "Data #sigma_{#nu_{e} + #bar{#nu}_{e}} (Stat. + Sys.)",   "lep");
     leg->Draw();
 
@@ -244,18 +332,21 @@ void make_xsec_plot(){
     pt->SetTextSize(0.04);
     pt->Draw();
 
+    // summed_flux->GetXaxis()->SetTitle("test");
+    // c->Modified();
 
-    c->Print("../../Analysis/plots/flux_combo_morebins_v3.pdf");
 
+    if (!draw_averge)c->Print("../../Analysis/plots/flux_combo_morebins_v3.pdf");
+    if (draw_averge)c->Print("../../Analysis/plots/flux_combo_morebins_v3_average.pdf");
 
 
     // Now create the other flux integrated cross sec plot
     TCanvas *c2  = new TCanvas();
     double x1[]  = {0, 1};
-    double y1[]  = {4.65e-39, 4.65e-39};
+    double y1[]  = {6.67e-39, 6.67e-39};
     double ex1[] = {0.0, 0.0};
-    double ey1[] = {0.1907e-38, 0.1907e-38};
-    double ey2[] = {0.101e-38, 0.101e-38};
+    double ey1[] = {0.267e-38, 0.267e-38};
+    double ey2[] = {0.144e-38, 0.144e-38};
     
     // Stats band
     auto g_xsec_sys = new TGraphErrors(2, x1, y1, ex1, ey1);
@@ -263,7 +354,7 @@ void make_xsec_plot(){
     g_xsec_sys->SetFillColorAlpha(12, 0.15);
     g_xsec_sys->SetTitle(";;#nu_{e} + #bar{#nu}_{e} CC Cross-Section [cm^{2}]");
     g_xsec_sys->GetXaxis()->SetRangeUser(0,1);
-    g_xsec_sys->GetYaxis()->SetRangeUser(0,1.0e-38);
+    g_xsec_sys->GetYaxis()->SetRangeUser(0.2e-38,1.4e-38);
     g_xsec_sys->GetXaxis()->SetLabelOffset(10);
     gStyle->SetTickLength(0.00,"x"); 
     g_xsec_sys->GetXaxis()->SetLabelOffset(999);
@@ -284,14 +375,14 @@ void make_xsec_plot(){
     g_xsec_stat->Draw("3, same");
 
     // data xsec
-    double y_xsec[]  = {4.65e-39, 4.65e-39};
+    double y_xsec[]  = {6.67e-39, 6.67e-39};
     auto g_xsec = new TGraphErrors(2, x1, y_xsec);
     g_xsec->SetLineColor(kBlack);
     g_xsec->SetLineWidth(2);
     g_xsec->Draw("same");
 
     // Genie nue
-    double y_nue[]  = {6.34569e-39, 6.34569e-39};
+    double y_nue[]  = {9.4e-39, 9.4e-39};
     auto g_xsec_nue = new TGraphErrors(2, x1, y_nue);
     g_xsec_nue->SetLineColor(kBlue+2);
     g_xsec_nue->SetLineWidth(2);
@@ -299,7 +390,7 @@ void make_xsec_plot(){
     g_xsec_nue->Draw("same");
 
     // Genie nuebar
-    double y_nuebar[]  = {2.24685e-39, 2.24685e-39};
+    double y_nuebar[]  = {2.85e-39, 2.85e-39};
     auto g_xsec_nuebar = new TGraphErrors(2, x1, y_nuebar);
     g_xsec_nuebar->SetLineColor(kGreen+2);
     g_xsec_nuebar->SetLineWidth(2);
@@ -307,7 +398,7 @@ void make_xsec_plot(){
     g_xsec_nuebar->Draw("same");
 
     // Genie nue + nuebar
-    double y_nue_nuebar[]  = {4.83e-39, 4.83e-39};
+    double y_nue_nuebar[]  = {6.9e-39, 6.9e-39};
     auto g_xsec_nue_nuebar = new TGraphErrors(2, x1, y_nue_nuebar);
     g_xsec_nue_nuebar->SetLineColor(kViolet-5);
     g_xsec_nue_nuebar->SetLineWidth(2);

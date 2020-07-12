@@ -7,7 +7,7 @@
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
 <!ENTITY name "searchingfornues_run1_overlay">
-<!ENTITY version "v5">
+<!ENTITY version "v6">
 
 <!-- v4 includes ppfx_cv weight in the ntuple tree  -->
 <!-- v5 includes all the swtrigger modes in the ntuple tree  -->
@@ -47,7 +47,7 @@
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <maxfilesperjob>5</maxfilesperjob>
-    <numjobs>2000</numjobs>
+    <numjobs>800</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <schema>root</schema>

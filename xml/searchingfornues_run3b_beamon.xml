@@ -7,9 +7,11 @@
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
 <!ENTITY name "searchingfornues_run3b_beamon">
-<!ENTITY indef "numi_uboone_run3b_beamon_offset1_mcc9_reco2_v08_00_00_28_sample0_beam_good_bad">
-<!ENTITY version "v1">
+<!ENTITY indef "numi_uboone_run3b_beamon_offset1_mcc9_reco2_v08_00_00_28_sample1_beam_good">
+<!ENTITY version "v2">
 ]>
+
+<!-- v2 includes sample 1 files  -->
 
 <job>
 
@@ -33,6 +35,7 @@
 
   <!-- Project stages -->
   <stage name="ntuple">
+    <fcl>reco_uboone_mcc9_8_driver_data_numi_optical_updated.fcl</fcl>
     <fcl>run_neutrinoselectionfilter_run3_dataON_cc0pinp.fcl</fcl>
     <datafiletypes>root,pndr</datafiletypes>
     <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</outdir>
@@ -41,11 +44,11 @@
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <inputdef>&indef;</inputdef>
     <maxfilesperjob>10</maxfilesperjob>
-    <numjobs>97</numjobs>
+    <numjobs>390</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <disk>25GB</disk>
-    <schema>root</schema>
+    <schema>gsiftp</schema>
     <jobsub>--expected-lifetime=12h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
     <jobsub_start> --expected-lifetime=short</jobsub_start>
     <blacklist>Lancaster</blacklist>
