@@ -74,9 +74,17 @@ class selection_cuts{
     // Shower Moliere Average
     bool shr_moliere_avg(SliceContainer &SC);
     // -------------------------------------------------------------------------
+    // 2D cut in dEdx and shower vertex distance
+    bool shr_dist_dEdx_y(SliceContainer &SC);
     // -------------------------------------------------------------------------
+    // dEdx cut in the case of no tracks
+    bool dEdx_y_no_tracks(SliceContainer &SC);
     // -------------------------------------------------------------------------
+    // Pi0 Selection Cuts
+    bool pi_zero_cuts(SliceContainer &SC);
     // -------------------------------------------------------------------------
+    // NuMu Selection Cuts
+    bool numu_cuts(SliceContainer &SC);
     // -------------------------------------------------------------------------
 
 

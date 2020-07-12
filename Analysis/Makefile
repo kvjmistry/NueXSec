@@ -21,20 +21,19 @@ all: $(MAIN)
 
 $(MAIN): $(OBJ_FILES)
 	@echo
-	@echo -e  "\033[0;32mBuilding $(MAIN)\033[0;36m"
+	@echo "\033[0;32mBuilding $(MAIN)\033[0;36m"
 	$(CXX) $(LIBS) -o $@ $^
-	@echo -e "\033[0;31mDone!"
-	@mv include/*.gch bin
+	@echo "\033[0;31mDone!"
 	@echo
 
 # Build the Object files
-bin/%.o: src/%.cxx include/%.h
+bin/%.o: src/%.cxx
 	@mkdir -p bin
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) -c $^
 	@mv *.o bin
 
 # Clean compilation
 clean:
-	@echo -e "\033[0;31m"
-	rm nuexsec bin/* include/*.gch
+	@echo "\033[0;31m"
+	rm nuexsec bin/*
 	@echo

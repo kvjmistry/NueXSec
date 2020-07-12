@@ -114,7 +114,7 @@ void selection::Initialise( const char * mc_file,
         mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights, run_period, _util);
 
         // Initialise the Tree Helper
-        _thelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_tree_file_name_out, weight_cfg);
+        _thelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_tree_file_name_out);
 
         // Initialise the histogram helper
         if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_file_out, weight_cfg, _util);
@@ -146,7 +146,7 @@ void selection::Initialise( const char * mc_file,
         if (!_slim) _hhelper.at(_util.k_data).InitHistograms();
         
         // Initialise the Tree Helper
-        _thelper.at(_util.k_data).Initialise(_util.k_data, run_period, "empty", weight_cfg);
+        _thelper.at(_util.k_data).Initialise(_util.k_data, run_period, "empty");
 
         data_tree_total_entries = data_tree->GetEntries();
         std::cout << "Total Data Events:         " << data_tree_total_entries << std::endl;
@@ -176,7 +176,7 @@ void selection::Initialise( const char * mc_file,
         if (!_slim) _hhelper.at(_util.k_ext).InitHistograms();
         
         // Initialise the Tree Helper
-        _thelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, "empty", weight_cfg);
+        _thelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, "empty");
 
         ext_tree_total_entries = ext_tree->GetEntries();
         std::cout << "Total EXT Events:        " << ext_tree_total_entries << std::endl;
@@ -206,7 +206,7 @@ void selection::Initialise( const char * mc_file,
         if (!_slim) _hhelper.at(_util.k_dirt).InitHistograms();
         
         // Initialise the Tree Helper
-        _thelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, "empty", weight_cfg);
+        _thelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, "empty");
 
         dirt_tree_total_entries = dirt_tree->GetEntries();
         std::cout << "Total Dirt Events:         " << dirt_tree_total_entries << std::endl;
@@ -238,6 +238,8 @@ void selection::MakeSelection(){
     if (bool_use_mc){
         std::cout << "\nStarting Selection over MC" << std::endl;
 
+        int numu_pi{0}, numubar_pi{0}, nue_pi{0}, nuebar_pi{0}; // Total number of 1pi events
+
         // Event loop
         for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
 
@@ -249,10 +251,36 @@ void selection::MakeSelection(){
             // Alert the user
             if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
 
-            // std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
             // Get the entry in the tree
             mc_tree->GetEntry(ievent); 
 
+            // Get the 1 pion events for kirsty
+            if (mc_SC.isVtxInFiducial){
+                if (mc_SC.nu_pdg == 14){
+                    if (mc_SC.npion == 1) numu_pi ++;
+                }
+                if (mc_SC.nu_pdg == -14){
+                    if (mc_SC.npion == 1) numubar_pi ++;
+                }
+
+                if (mc_SC.nu_pdg == 12){
+                    if (mc_SC.npion == 1) nue_pi ++;
+                }
+
+                if (mc_SC.nu_pdg == -12){
+                    if (mc_SC.npion == 1) nuebar_pi ++;
+                }
+            }
+            
+
+            // std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
+
+            // Apply Pi0 Selection
+            ApplyPiZeroSelection(_util.k_mc, mc_SC);
+
+            // Apply NuMu Selection
+            ApplyNuMuSelection(_util.k_mc, mc_SC);
+            
             // Apply the selection cuts 
             bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
             if (!pass) continue;
@@ -260,6 +288,10 @@ void selection::MakeSelection(){
         } // End Event loop
 
         std::cout << "Ending Selection over MC" << std::endl;
+        std::cout << "numu_pi: " << numu_pi << std::endl;
+        std::cout << "numubar_pi: " << numubar_pi << std::endl;
+        std::cout << "nue_pi: "  << nue_pi  << std::endl;
+        std::cout << "nuebar_pi: "  << nuebar_pi  << std::endl;
 
         // Loop again to look at background events that still pass
         // Event loop
@@ -303,8 +335,14 @@ void selection::MakeSelection(){
 
             // Skip the RHC events contaminated in the FHC files
             if (_run_period == 3 && data_SC.run < 16880 ){
-                continue;
+                //continue;
             }
+
+            // Apply Pi0 Selection
+            ApplyPiZeroSelection(_util.k_data, data_SC);
+
+            // Apply NuMu Selection
+            ApplyNuMuSelection(_util.k_data, data_SC);
 
             bool pass = ApplyCuts(_util.k_data, ievent, counter_v, data_passed_v, data_SC);
             if (!pass) continue;
@@ -365,6 +403,12 @@ void selection::MakeSelection(){
             // Get the entry in the tree
             ext_tree->GetEntry(ievent); // TPC Objects
 
+            // Apply Pi0 Selection
+            ApplyPiZeroSelection(_util.k_ext, ext_SC);
+
+            // Apply NuMu Selection
+            ApplyNuMuSelection(_util.k_ext, ext_SC);
+
             bool pass = ApplyCuts(_util.k_ext, ievent, counter_v, ext_passed_v, ext_SC);
             if (!pass) continue;
         }
@@ -389,6 +433,12 @@ void selection::MakeSelection(){
             // Get the entry in the tree
             dirt_tree->GetEntry(ievent);
 
+            // Apply Pi0 Selection
+            ApplyPiZeroSelection(_util.k_dirt, dirt_SC);
+
+            // Apply NuMu Selection
+            ApplyNuMuSelection(_util.k_dirt, dirt_SC);
+
             bool pass = ApplyCuts(_util.k_dirt, ievent, counter_v, dirt_passed_v, dirt_SC);
             if (!pass) continue;
         }
@@ -403,10 +453,10 @@ void selection::MakeSelection(){
     for (unsigned int p=0; p < counter_v.size();p++){
 
         // Fill the counter trees
-        if (bool_use_mc)   _thelper.at(_util.k_mc)  .Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
-        if (bool_use_data) _thelper.at(_util.k_data).Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
-        if (bool_use_ext)  _thelper.at(_util.k_ext) .Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
-        if (bool_use_dirt) _thelper.at(_util.k_dirt).Fill_counters(counter_v.at(p), _util.cut_dirs.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
+        if (bool_use_mc)   _thelper.at(_util.k_mc)  .Fill_counters(counter_v.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
+        if (bool_use_data) _thelper.at(_util.k_data).Fill_counters(counter_v.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
+        if (bool_use_ext)  _thelper.at(_util.k_ext) .Fill_counters(counter_v.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
+        if (bool_use_dirt) _thelper.at(_util.k_dirt).Fill_counters(counter_v.at(p), bool_use_mc, bool_use_ext, bool_use_data, bool_use_dirt);
 
     }
     
@@ -422,11 +472,15 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Here we apply the selection cuts ----------------------------------------
     bool pass; // A flag to see if an event passes an event
 
+    
     // Classify the event
     std::pair<std::string, int> classification = SC.SliceClassifier(type);      // Classification of the event
     std::string interaction                    = SC.SliceInteractionType(type); // Genie interaction type
+    //std::string interaction = "nue_cc_qe";
     std::string category                       = SC.SliceCategory();            // The pandora group slice category
     std::pair<std::string, int> particle_type  = SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
+
+
 
     // Test code to isolate the low E nues in truth
     // if (type == _util.k_mc && SC.nu_e > 0.5) return false;
@@ -447,24 +501,6 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_swtrig, counter_v );
-
-    // *************************************************************************
-    // Op Filt PE --------------------------------------------------------------
-    // *************************************************************************
-    // pass = _scuts.opfilt_pe(SC, type);
-    // passed_v.at(ievent).cut_v.at(_util.k_opfilt_pe) = pass;
-    // if(!pass) return false; // Failed the cut!
-    
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_opfilt_pe, counter_v );
-
-    // *************************************************************************
-    // Op Filt Michel Veto -----------------------------------------------------
-    // *************************************************************************
-    // pass = _scuts.opfilt_veto(SC, type);
-    // passed_v.at(ievent).cut_v.at(_util.k_opfilt_veto) = pass;
-    // if(!pass) return false; // Failed the cut!
-    
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_opfilt_veto, counter_v );
 
     // *************************************************************************
     // Slice ID ----------------------------------------------------------------
@@ -501,24 +537,6 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_topo_score, counter_v );
-
-    // *************************************************************************
-    // Cosmic Impact Parameter -------------------------------------------------
-    // *************************************************************************
-    // pass = _scuts.shr_cosmic_IP(SC);
-    // passed_v.at(ievent).cut_v.at(_util.k_cosmic_ip) = pass;
-    // if(!pass) return false; // Failed the cut!
-    
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_cosmic_ip, counter_v );
-
-    // *************************************************************************
-    // Cluster Fraction --------------------------------------------------------
-    // *************************************************************************
-    // pass = _scuts.cluster_frac(SC);
-    // passed_v.at(ievent).cut_v.at(_util.k_cluster_frac) = pass;
-    // if(!pass) return false; // Failed the cut!
-    
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_cluster_frac, counter_v );
 
     // *************************************************************************
     // Slice Contained Fraction ------------------------------------------------
@@ -575,40 +593,41 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_moliere_avg, counter_v );
 
     // *************************************************************************
-    // Shower to Vertex Distance --------------------------------------------
+    // 2D cut for Shower to Vertex Distance and dEdx ---------------------------
     // *************************************************************************
-    pass = _scuts.shr_distance(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_shr_distance) = pass;
+    pass = _scuts.shr_dist_dEdx_y(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_vtx_dist_dedx) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_distance, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_vtx_dist_dedx, counter_v );
 
     // *************************************************************************
-    // dEdx in y plane ---------------------------------------------------------
+    // dEdx in y plane for 0 track events --------------------------------------
     // *************************************************************************
-    pass = _scuts.dEdx_y(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_dEdx_y) = pass;
+    pass = _scuts.dEdx_y_no_tracks(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_dEdx_y_no_tracks) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_y, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_y_no_tracks, counter_v );
 
-    // *************************************************************************
-    // dEdx in v plane ---------------------------------------------------------
-    // *************************************************************************
-    // pass = _scuts.dEdx_v(SC);
-    // passed_v.at(ievent).cut_v.at(_util.k_dEdx_v) = pass;
+
+    // // *************************************************************************
+    // // Shower to Vertex Distance --------------------------------------------
+    // // *************************************************************************
+    // pass = _scuts.shr_distance(SC);
+    // passed_v.at(ievent).cut_v.at(_util.k_shr_distance) = pass;
     // if(!pass) return false; // Failed the cut!
     
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_v, counter_v );
+    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_distance, counter_v );
 
-    // *************************************************************************
-    // dEdx in u plane ---------------------------------------------------------
-    // *************************************************************************
-    // pass = _scuts.dEdx_u(SC);
-    // passed_v.at(ievent).cut_v.at(_util.k_dEdx_u) = pass;
-    // if(!pass) return false; // Failed the cut!
+    // // *************************************************************************
+    // // dEdx in y plane ---------------------------------------------------------
+    // // *************************************************************************
+    // pass = _scuts.dEdx_y(SC);
+    // passed_v.at(ievent).cut_v.at(_util.k_dEdx_y) = pass;
+    // // if(!pass) return false; // Failed the cut!
     
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_u, counter_v );
+    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_y, counter_v );
 
     // ************************************************************************n*
     return true;
@@ -628,16 +647,21 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_mc).WriteFlash();
         _hhelper.at(_util.k_mc).WriteInteractions();
         _hhelper.at(_util.k_mc).Write_2DSigBkgHists();
+        _hhelper.at(_util.k_mc).WritePiZero(_util.k_mc);
+        _hhelper.at(_util.k_mc).WriteNuMu(_util.k_mc);
 
-        _thelper.at(_util.k_mc).WriteTree(_util.k_mc);
+        _thelper.at(_util.k_mc).WriteTree();
+
 
     }
     if (bool_use_data) {
         _hhelper.at(_util.k_data).WriteReco(_util.k_data);
         _hhelper.at(_util.k_data).WriteRecoPar(_util.k_data);
         _hhelper.at(_util.k_data).WriteFlash();
+        _hhelper.at(_util.k_data).WritePiZero(_util.k_data);
+        _hhelper.at(_util.k_data).WriteNuMu(_util.k_data);
 
-        _thelper.at(_util.k_data).WriteTree(_util.k_data);
+        _thelper.at(_util.k_data).WriteTree();
 
     }
     if (bool_use_ext) {
@@ -645,8 +669,10 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_ext).WriteRecoPar(_util.k_ext);
         _hhelper.at(_util.k_ext).WriteFlash();
         _hhelper.at(_util.k_ext).Write_2DSigBkgHists();
+        _hhelper.at(_util.k_ext).WritePiZero(_util.k_ext);
+        _hhelper.at(_util.k_ext).WriteNuMu(_util.k_ext);
 
-        _thelper.at(_util.k_ext).WriteTree(_util.k_ext);
+        _thelper.at(_util.k_ext).WriteTree();
 
     }
     if (bool_use_dirt) {
@@ -655,8 +681,10 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_dirt).WriteRecoPar(_util.k_dirt);
         _hhelper.at(_util.k_dirt).WriteFlash();
         _hhelper.at(_util.k_dirt).Write_2DSigBkgHists();
+        _hhelper.at(_util.k_dirt).WritePiZero(_util.k_dirt);
+        _hhelper.at(_util.k_dirt).WriteNuMu(_util.k_dirt);
 
-        _thelper.at(_util.k_dirt).WriteTree(_util.k_dirt);
+        _thelper.at(_util.k_dirt).WriteTree();
 
     }
 
@@ -667,6 +695,11 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     // Get the CV weight
     double weight = 1.0;
     weight = GetCVWeight(type, SC);
+
+    // Try scaling the pi0
+    // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
+    GetPiZeroWeight(weight, 2, SC);
+
     
     // This is in many places, need to have a way for setting this number by default
     double INTERCEPT = 0.0;
@@ -683,10 +716,10 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC, weight);
 
     // For the last cut we fill the tree  or the first cut and nue_cc (generated and unselected)
-    if ( (cut_index == _util.k_cuts_MAX - 1) || (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nue_cc_mixed) ) ){
+    if ( (cut_index == _util.k_cuts_MAX - 1) || (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc) ) ){
 
         // This is a generated event, but unselected
-        if (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nue_cc_mixed )){
+        if (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc )){
             _thelper.at(type).FillVars(SC, classification, true, weight, reco_nu_e);
         }
         else {
@@ -696,9 +729,9 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     }
 
     // Fill the dedx ttree before shr dist cut and after cut dedx
-    if (cut_index == _util.k_shr_distance - 1 || cut_index == _util.k_shr_distance || cut_index == _util.k_dEdx_y ){
-        _thelper.at(type).Fill_dedxVars(SC, classification, _util.cut_dirs.at(cut_index), weight);
-    }
+    // if (cut_index == _util.k_shr_distance - 1 || cut_index == _util.k_shr_distance || cut_index == _util.k_dEdx_y ){
+    //     _thelper.at(type).Fill_dedxVars(SC, classification, _util.cut_dirs.at(cut_index), weight);
+    // }
 
 }
 // -----------------------------------------------------------------------------
@@ -756,14 +789,178 @@ double selection::GetCVWeight(int type, SliceContainer SC){
 
     if (weight_ppfx) weight = weight * weight_flux;
 
-    // Try energy dependent scaling for pi0
-    if (SC.npi0 > 0) {
-        weight = weight * (1 - 0.4 * SC.pi0_e);
-    }
-
     // std::cout << SC.weightSplineTimesTune << "   "<< SC.ppfx_cv << std::endl;
 
     return weight;
+
+}
+// -----------------------------------------------------------------------------
+void selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
+
+    bool pass; // A flag to see if an event passes an event
+
+    // Classify the event
+    std::pair<std::string, int> classification = SC.SliceClassifier(type);      // Classification of the event
+    std::string interaction                    = SC.SliceInteractionType(type); // Genie interaction type
+    std::pair<std::string, int> particle_type  = SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
+    
+    // *************************************************************************
+    // Software Trigger -- MC Only  --------------------------------------------
+    // *************************************************************************
+    pass = _scuts.swtrig(SC, type);
+    if(!pass) return; // Failed the cut!
+    
+    // *************************************************************************
+    // Common Optical Filter PE  -----------------------------------------------
+    // *************************************************************************
+    pass = _scuts.opfilt_pe(SC, type);
+    if(!pass) return; // Failed the cut!
+
+    // *************************************************************************
+    // Common Optical Filter Veto  ---------------------------------------------
+    // *************************************************************************
+    pass = _scuts.opfilt_veto(SC, type);
+    if(!pass) return; // Failed the cut!
+
+    // *************************************************************************
+    // Slice ID ----------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.slice_id(SC);
+    if(!pass) return; // Failed the cut!
+
+    // *************************************************************************
+    // In FV -------------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.in_fv(SC);
+    if(!pass) return; // Failed the cut!
+    
+    // *************************************************************************
+    // Pi0 Selection Cuts ------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.pi_zero_cuts(SC);
+    if(!pass) return; // Failed the cut!
+
+    // Get the Central Value weight
+    double weight = GetCVWeight(type, SC);
+
+    double weight_norm = weight;
+    double weight_Escale = weight;
+
+    // Try scaling the pi0
+    // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
+    GetPiZeroWeight(weight, 0, SC);
+    GetPiZeroWeight(weight_norm, 1, SC);
+    GetPiZeroWeight(weight_Escale, 2, SC);
+
+    // Now Fill the histograms
+    if (!slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight, 0);
+    if (!slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight_norm, 1);
+    if (!slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight_Escale, 2);
+
+
+}
+// -----------------------------------------------------------------------------
+void selection::GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer &SC){
+
+    // Fix the normalisation
+    if (pizero_mode == 1){
+        
+        if (SC.npi0 > 0) {
+            weight = weight * 0.759;
+        }
+
+    }
+    // Try energy dependent scaling for pi0
+    else if (pizero_mode == 2){
+        
+        if (SC.npi0 > 0) {
+            double pi0emax = 0.6;
+            if (SC.pi0_e > 0.1 && SC.pi0_e < pi0emax){
+                weight = weight * (1 - 0.4 * SC.pi0_e);
+            }
+            else if (SC.pi0_e > 0.1 && SC.pi0_e >= pi0emax){
+                weight = weight * (1 - 0.4 * pi0emax);
+            }
+            
+        }
+    }
+    else {
+        // Dont touch the weight
+    }
+    
+
+}
+// -----------------------------------------------------------------------------
+void selection::ApplyNuMuSelection(int type, SliceContainer &SC){
+
+    bool pass; // A flag to see if an event passes an event
+
+    // Classify the event
+    std::pair<std::string, int> classification = SC.SliceClassifier(type);      // Classification of the event
+    std::string interaction                    = SC.SliceInteractionType(type); // Genie interaction type
+    std::pair<std::string, int> particle_type  = SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
+    
+    // *************************************************************************
+    // Software Trigger -- MC Only  --------------------------------------------
+    // *************************************************************************
+    pass = _scuts.swtrig(SC, type);
+    if(!pass) return; // Failed the cut!
+    
+    // *************************************************************************
+    // Common Optical Filter PE  -----------------------------------------------
+    // *************************************************************************
+    pass = _scuts.opfilt_pe(SC, type);
+    if(!pass) return; // Failed the cut!
+
+    // *************************************************************************
+    // Common Optical Filter Veto  ---------------------------------------------
+    // *************************************************************************
+    pass = _scuts.opfilt_veto(SC, type);
+    if(!pass) return; // Failed the cut!
+
+    // *************************************************************************
+    // Slice ID ----------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.slice_id(SC);
+    if(!pass) return; // Failed the cut!
+
+    // *************************************************************************
+    // In FV -------------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.in_fv(SC);
+    if(!pass) return; // Failed the cut!
+        
+    // *************************************************************************
+    // Topological Score -------------------------------------------------------
+    // *************************************************************************
+    if (SC.topological_score < 0.5) return;
+    
+    // *************************************************************************
+    // Slice Contained Fraction ------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.contained_frac(SC);
+    if(!pass) return; // Failed the cut!
+
+    // Cuts to kill the shower backgrounds and EXT
+    // Skip slices which have a reco shower
+    if (SC.n_showers > 0) return;  
+
+    // Require more than 0 tracks
+    // if (SC.n_tracks <= 1) return;   
+
+    // *************************************************************************
+    // NuMu Selection Cuts ------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.numu_cuts(SC);
+    if(!pass) return; // Failed the cut!
+
+    // Get the Central Value weight
+    double weight = GetCVWeight(type, SC);
+    
+    // Also apply the pi0 weight
+    GetPiZeroWeight(weight, 2, SC);
+
+    if (!slim) _hhelper.at(type).FillNuMuHists(classification.second, SC, weight);
 
 }
 // -----------------------------------------------------------------------------

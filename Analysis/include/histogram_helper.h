@@ -65,6 +65,19 @@ class histogram_helper{
     // Function to write the 2D signal vs Background Histograms
     void Write_2DSigBkgHists();
     // -------------------------------------------------------------------------
+    // Pi Zero Stacked Histogram
+    void FillPiZeroHists(int classification_index, SliceContainer SC, double weight, int pizero_mode);
+    // -------------------------------------------------------------------------
+    // Write the PiZero Histograms
+    void WritePiZero(int type);
+    // -------------------------------------------------------------------------
+    // Write the NuMi Histograms
+    void WriteNuMu(int type);
+    // -------------------------------------------------------------------------
+    // NuMu Stacked Histogram
+    void FillNuMuHists(int classification_index, SliceContainer SC, double weight);
+    // -------------------------------------------------------------------------
+
 
 
     private:
@@ -76,6 +89,12 @@ class histogram_helper{
 
     // vector of histograms to make, indexed by enums -- for particle type
     std::vector<std::vector<std::vector<TH1D*>>> TH1D_hists_particle; 
+
+    // Histograms for pi0 
+    std::vector<std::vector<TH1D*>> TH1D_pi0_hists;
+
+    // Histograms for NuMu
+    std::vector<std::vector<TH1D*>> TH1D_numu_hists;
 
     // Histograms for the efficiency plot
     std::vector<TH1D*> TEfficiency_hists;
@@ -144,6 +163,7 @@ class histogram_helper{
         k_reco_shr_tkfit_dedx_u,                                                // The dEdx using the trackfit variable u plane
         k_reco_shr_tkfit_dedx_v,                                                // The dEdx using the trackfit variable v plane
         k_reco_shr_tkfit_dedx_y,                                                // The dEdx using the trackfit variable collection
+        k_reco_shr_tkfit_dedx_y_no_tracks,                                      // The dEdx using the trackfit variable collection in the case there is no tracks
         k_reco_shr_tkfit_dedx_y_good_theta,                                     // The dEdx using the trackfit variable collection for angles not close to parallel to the y plane
         k_reco_shr_tkfit_dedx_y_bad_theta,                                      // The dEdx using the trackfit variable collection for angles close to parallel to the y plane
         k_reco_shr_tkfit_dedx_v_bad_theta,                                      // The dEdx using the trackfit variable v plane for angles close to parallel to the y plane
@@ -162,6 +182,9 @@ class histogram_helper{
         k_reco_nu_e,                                                            // Reconstructed Neutrino Energy
         k_reco_contained_fraction,                                              // Ratio of PFP hits in FV to the slice
         k_reco_run_number,                                                      // Wont be used for stack, but for run normalisation plot
+        k_reco_nu_purity_from_pfp,                                              // Purity
+        k_reco_crtveto,                                                         // CRT veto
+        k_reco_crthitpe,                                                        // CRT hit pe
         k_TH1D_MAX
     };
 
@@ -217,7 +240,26 @@ class histogram_helper{
     // 2D Histograms for separating signal and background
     enum TH2D_reco_hist_vars {
         k_reco_shr_dEdx_shr_dist,
+        k_reco_shr_dEdx_shr_dist_post, // after the cut
+        k_reco_shr_dEdx_shr_dist_large_dedx, // for dedx values > 10 MeV/cm
+        k_reco_shr_dEdx_moliere, // dedx y and moliere average
+        k_reco_shr_moliere_shr_dist, // moliere average and shr vertex distance
         k_TH2D_reco_MAX
+    };
+
+    enum TH1D_pi0_hist_vars {
+        k_pi0_mass,      // The pi0 mass peak no weighting 
+        k_pi0_mass_norm,      // The pi0 mass peak normalisation fix
+        k_pi0_mass_EScale,      // The pi0 mass peak energy dependent scaling
+        k_TH1D_pi0_MAX
+    };
+
+    enum TH1D_numu_hist_vars {
+        k_track_theta,      // Longest track theta 
+        k_track_cos_theta,      // Longest track cos theta
+        k_track_phi,      // Longest track phi
+        k_muon_topo_score,      // Topological score (after muon selection)
+        k_TH1D_numu_MAX
     };
 
 }; // End Class Histogram Helper 

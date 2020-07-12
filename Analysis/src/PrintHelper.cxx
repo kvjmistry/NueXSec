@@ -1,7 +1,7 @@
 #include "../include/PrintHelper.h"
 
 // -----------------------------------------------------------------------------
-void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, int weight_cfg, bool _print_mc, bool _print_data, bool _print_ext, bool _print_dirt, utility _utility ){
+void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bool _print_mc, bool _print_data, bool _print_ext, bool _print_dirt, utility _utility ){
 
     std::cout << "Initalising Print Helper..." << std::endl;
 
@@ -131,7 +131,7 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, in
         mc_counter_tree->SetBranchAddress("count_numubar_cc_incryo", &count_numubar_cc_incryo);
         
         mc_counter_tree->SetBranchAddress("count_nue_cc",       &count_nue_cc);
-        mc_counter_tree->SetBranchAddress("count_nue_cc_mixed", &count_nue_cc_mixed);
+        mc_counter_tree->SetBranchAddress("count_nuebar_cc",    &count_nuebar_cc);
         mc_counter_tree->SetBranchAddress("count_nu_out_fv",    &count_nu_out_fv);
         mc_counter_tree->SetBranchAddress("count_cosmic",       &count_cosmic);
         mc_counter_tree->SetBranchAddress("count_numu_cc",      &count_numu_cc);
@@ -168,11 +168,34 @@ void PrintHelper::PrintResults(){
         if (print_ext)  ext_counter_tree->GetEntry(p);
         if (print_dirt) dirt_counter_tree->GetEntry(p);
 
-        if (p == 0) tot_true_infv_nues = count_nue_cc + count_nue_cc_mixed;
+        // Set counters at the start
+        if (p == 0) {
+            tot_true_infv_nues = count_nue_cc + count_nuebar_cc;
+
+            init_count_nue_cc       = count_nue_cc;
+            init_count_nuebar_cc    = count_nuebar_cc;
+            init_count_nu_out_fv    = count_nu_out_fv;
+            init_count_cosmic       = count_cosmic;
+            init_count_numu_cc      = count_numu_cc;
+            init_count_numu_cc_pi0  = count_numu_cc_pi0;
+            init_count_nc           = count_nc;
+            init_count_nc_pi0       = count_nc_pi0;
+            init_count_unmatched    = count_unmatched;
+            if (print_ext) init_count_ext = count_ext;
+            if (print_dirt) init_count_dirt = count_dirt;
+
+        }
 
         
-        // // Sum of selected mc, dirt and ext. The dirt and ext are scaled to the MC POT
+        // Sum of selected mc, dirt and ext. The dirt and ext are scaled to the MC POT
         double sum_mc_dirt_ext = count_total_mc+ (count_ext * (intime_scale_factor / mc_scale_factor)) + (count_dirt * (dirt_scale_factor / mc_scale_factor));
+
+        // Set the efficiency and purity for case zero
+        if (p == 0){
+            efficiency_last = double(count_nue_cc + count_nuebar_cc) / double(tot_true_infv_nues);
+            purity_last     = double(count_nue_cc + count_nuebar_cc) / double(sum_mc_dirt_ext);
+        }
+
 
         if (print_mc && print_data && print_ext && print_dirt){
             std::cout << "\n------------------------------------------------" << std::endl;
@@ -183,66 +206,81 @@ void PrintHelper::PrintResults(){
         std::cout << "\n\033[0;33m <" << _util.cut_dirs.at(p) << "> \033[0m" << std::endl;
         
         if (!print_mc) {
-            if (p == 0) std::cout << "                    Scaled to MC POT | Scaled to Data POT | Unscaled" << std::endl;
+            if (p == 0) printf (" %-21s %-10s %-10s %-10s %-10s\n", " " , "MC POT", "Data POT", "Unscaled", "% Remaining");
         }
-        else std::cout << "                    Scaled to MC POT | Scaled to Data POT | Unscaled" << std::endl;
+        else printf (" %-21s %-10s %-10s %-10s %-10s\n", " " , "MC POT", "Data POT", "Unscaled", "\% Remaining");
 
         if (print_mc){
-            std::cout << " Total Candidate Nue     : " << sum_mc_dirt_ext                 << "    " << double(sum_mc_dirt_ext                * mc_scale_factor  ) << std::endl;
-            std::cout << " Number of Nue CC        : " << count_nue_cc          << "    " << double(count_nue_cc         * mc_scale_factor  ) << std::endl;
-            std::cout << " Number of Nue CC Mixed  : " << count_nue_cc_mixed    << "    " << double(count_nue_cc_mixed   * mc_scale_factor  ) << std::endl;
-            std::cout << " Number of Nu out FV     : " << count_nu_out_fv       << "    " << double(count_nu_out_fv      * mc_scale_factor  ) << std::endl;
-            std::cout << " Number of Cosmic        : " << count_cosmic          << "    " << double(count_cosmic         * mc_scale_factor  ) << std::endl;
-            std::cout << " Number of Numu CC       : " << count_numu_cc         << "    " << double(count_numu_cc        * mc_scale_factor  ) << std::endl;
-            std::cout << " Number of Numu CC Pi0   : " << count_numu_cc_pi0     << "    " << double(count_numu_cc_pi0    * mc_scale_factor  ) << std::endl;
-            std::cout << " Number of NC            : " << count_nc              << "    " << double(count_nc             * mc_scale_factor  ) << std::endl;
-            std::cout << " Number of NC Pi0        : " << count_nc_pi0          << "    " << double(count_nc_pi0         * mc_scale_factor  ) << std::endl;
-            std::cout << " Number of Unmatched     : " << count_unmatched       << "    " << double(count_unmatched      * mc_scale_factor  ) << std::endl;
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Nue CC",       count_nue_cc,       double(count_nue_cc       * mc_scale_factor  ), " ", double( 100 * count_nue_cc / init_count_nue_cc));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "NueBar CC",    count_nuebar_cc,    double(count_nuebar_cc    * mc_scale_factor  ), " ", double( 100 * count_nuebar_cc / init_count_nuebar_cc));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Nu out FV",    count_nu_out_fv,    double(count_nu_out_fv    * mc_scale_factor  ), " ", double( 100 * count_nu_out_fv / init_count_nu_out_fv));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Cosmic",       count_cosmic,       double(count_cosmic       * mc_scale_factor  ), " ", double( 100 * count_cosmic / init_count_cosmic));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Numu CC",      count_numu_cc,      double(count_numu_cc      * mc_scale_factor  ), " ", double( 100 * count_numu_cc / init_count_numu_cc));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Numu CC Pi0",  count_numu_cc_pi0,  double(count_numu_cc_pi0  * mc_scale_factor  ), " ", double( 100 * count_numu_cc_pi0 / init_count_numu_cc_pi0));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "NC",           count_nc,           double(count_nc           * mc_scale_factor  ), " ", double( 100 * count_nc / init_count_nc));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "NC Pi0",       count_nc_pi0,       double(count_nc_pi0       * mc_scale_factor  ), " ", double( 100 * count_nc_pi0 / init_count_nc_pi0));
+            // printf (" %-20s: %-10.2f %-10.2f %-10s %10.1f\n", "Unmatched",    count_unmatched,    double(count_unmatched    * mc_scale_factor  ), " ", double( 100 * count_unmatched / init_count_unmatched));
+        }
+
+        if (print_dirt){
+            printf (" %-20s: %-10.2f %-10.2f %-10.2f %f\n", "Dirt", double(count_dirt * (dirt_scale_factor / mc_scale_factor)), double(count_dirt * dirt_scale_factor), count_dirt, double( 100 * count_dirt / init_count_dirt) );
+            
         }
 
         if (print_ext) { 
-            std::cout << " Number of InTime Cosmics: " << double(count_ext * (intime_scale_factor / mc_scale_factor))
-                << "\t " << double(count_ext * intime_scale_factor) << "\t " << count_ext << std::endl;
-        }
-        
-        if (print_dirt){
-            std::cout << " Number of Dirt          : " << double(count_dirt * dirt_scale_factor / mc_scale_factor)
-                << "\t "                         << double(count_dirt * dirt_scale_factor) << "\t " << count_dirt << std::endl;
+            printf (" %-20s: %-10.2f %-10.2f %-10.2f %f\n", "Off-Beam Data", double(count_ext * (intime_scale_factor / mc_scale_factor)), double(count_ext * intime_scale_factor), count_ext, double( 100 * count_ext / init_count_ext) );
+            
         }
         
         if (print_mc){
-            std::cout << "----------- Neutrinos in FV Truth -------------" << std::endl;
-            std::cout << " Nue CC QE    : " << count_nue_cc_qe   <<  "   Nuebar CC QE    : " << count_nuebar_cc_qe  << std::endl;
-            std::cout << " Nue CC Res   : " << count_nue_cc_res  <<  "   Nuebar CC Res   : " << count_nuebar_cc_res << std::endl;
-            std::cout << " Nue CC DIS   : " << count_nue_cc_dis  <<  "   Nuebar CC DIS   : " << count_nuebar_cc_dis << std::endl;
-            std::cout << " Nue CC COH   : " << count_nue_cc_coh  <<  "   Nuebar CC COH   : " << count_nuebar_cc_coh << std::endl;
-            std::cout << " Nue CC MEC   : " << count_nue_cc_mec  <<  "   Nuebar CC MEC   : " << count_nuebar_cc_mec << std::endl;
+            printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Candidate Nue", sum_mc_dirt_ext, double(sum_mc_dirt_ext         * mc_scale_factor  ));
+        }
+  
+        if (print_mc){
+            std::cout << "\n----------- Neutrinos in FV Truth -------------" << std::endl;
+            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC QE",    count_nue_cc_qe,  "Nuebar CC QE",    count_nuebar_cc_qe);
+            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC Res",   count_nue_cc_res, "Nuebar CC Res",   count_nuebar_cc_res);
+            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC DIS",   count_nue_cc_dis, "Nuebar CC DIS",   count_nuebar_cc_dis);
+            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC COH",   count_nue_cc_coh, "Nuebar CC COH",   count_nuebar_cc_coh);
+            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC MEC",   count_nue_cc_mec, "Nuebar CC MEC",   count_nuebar_cc_mec);
             std::cout << std::endl;
-            std::cout << " Numu CC QE   : " << count_numu_cc_qe  <<  "   Numubar CC QE   : " << count_numubar_cc_qe << std::endl;
-            std::cout << " Numu CC Res  : " << count_numu_cc_res <<  "   Numubar CC Res  : " << count_numubar_cc_res<< std::endl;
-            std::cout << " Numu CC DIS  : " << count_numu_cc_dis <<  "   Numubar CC DIS  : " << count_numubar_cc_dis<< std::endl;
-            std::cout << " Numu CC COH  : " << count_numu_cc_coh <<  "   Numubar CC COH  : " << count_numubar_cc_coh<< std::endl;
-            std::cout << " Numu CC MEC  : " << count_numu_cc_mec <<  "   Numubar CC MEC  : " << count_numubar_cc_mec<< std::endl;
+            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Numu CC QE",    count_numu_cc_qe,  "Numubar CC QE",    count_numubar_cc_qe);
+            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Numu CC Res",   count_numu_cc_res, "Numubar CC Res",   count_numubar_cc_res);
+            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Numu CC DIS",   count_numu_cc_dis, "Numubar CC DIS",   count_numubar_cc_dis);
+            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Numu CC COH",   count_numu_cc_coh, "Numubar CC COH",   count_numubar_cc_coh);
+            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Numu CC MEC",   count_numu_cc_mec, "Numubar CC MEC",   count_numubar_cc_mec);
             std::cout << "------------------------------------------------" << std::endl;
-            std::cout << " Tot Nue in FV                 : " << count_nue_cc_infv     << "   Tot Nue in Cryo                 : " << count_nue_cc_incryo     << std::endl;
-            std::cout << " Tot Nuebar in FV              : " << count_nuebar_cc_infv  << "   Tot Nuebar in Cryo              : " << count_nuebar_cc_incryo << std::endl;
-            std::cout << " Tot NuMu in FV                : " << count_numu_cc_infv    << "   Tot NuMu in Cryo                : " << count_numu_cc_incryo<< std::endl;
-            std::cout << " Tot NuMubar in FV             : " << count_numubar_cc_infv << "   Tot NuMubar in Cryo             : " << count_numubar_cc_incryo<< std::endl;
-            // std::cout << " Tot NC                  : " << counter_tot_nue_numu_nc << std::endl;
-            // std::cout << " Sum Neutrinos           : " <<  << std::endl;
+            printf (" %-17s: %-10.2f %-20s: %-10.2f\n", "Tot Nue in FV",     count_nue_cc_infv,     "Tot Nue in Cryo",       count_nue_cc_incryo);
+            printf (" %-17s: %-10.2f %-20s: %-10.2f\n", "Tot Nuebar in FV",  count_nuebar_cc_infv,  "Tot Nuebar in Cryo",    count_nuebar_cc_incryo);
+            printf (" %-17s: %-10.2f %-20s: %-10.2f\n", "Tot NuMu in FV",    count_numu_cc_infv,    "Tot NuMu in Cryo",      count_numu_cc_incryo);
+            printf (" %-17s: %-10.2f %-20s: %-10.2f\n", "Tot NuMubar in FV", count_numubar_cc_infv, "Tot NuMubar in Cryo",   count_numubar_cc_incryo);
         }
         
         if (print_mc){
             std::cout << "------------------------------------------------" << std::endl;
-            efficiency = double(count_nue_cc + count_nue_cc_mixed) / double(tot_true_infv_nues);
-            purity     = double(count_nue_cc + count_nue_cc_mixed) / double(sum_mc_dirt_ext);
-            std::cout << " Efficiency       : " << "( " << count_nue_cc + count_nue_cc_mixed << " / " << tot_true_infv_nues << " ) = " << efficiency << std::endl;
-            std::cout << " Purity           : " << "( " << count_nue_cc + count_nue_cc_mixed << " / " << sum_mc_dirt_ext           << " ) = " << purity << std::endl;
+            efficiency = double(count_nue_cc + count_nuebar_cc) / double(tot_true_infv_nues);
+            purity     = double(count_nue_cc + count_nuebar_cc) / double(sum_mc_dirt_ext);
+            printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Efficiency", count_nue_cc + count_nuebar_cc, tot_true_infv_nues, 100 * efficiency);
+            printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Purity", count_nue_cc + count_nuebar_cc, sum_mc_dirt_ext, 100 * purity);
+            
+            std::cout << std::endl;
+            std::cout << " Efficiency Change : "  << 100 * (efficiency -efficiency_last) << " \%" << std::endl;
+            std::cout << " Purity Change     : " <<  100 * (purity - purity_last) << " \%" << std::endl;
+
+            efficiency_last = efficiency;
+            purity_last     = purity;
         }
 
         if (print_data){
             std::cout << "------------------------------------------------" << std::endl;
-            std::cout << " Total Nue Candidates in data : " << count_data << std::endl;
+            double tot_bkg = 0;
+            if (print_mc && print_dirt && print_ext) tot_bkg = (count_nu_out_fv + count_cosmic + count_numu_cc + count_numu_cc_pi0 + count_nc + count_nc_pi0 + count_unmatched) * mc_scale_factor +
+                              count_dirt * dirt_scale_factor + count_ext * intime_scale_factor;
+            
+            std::cout << " Total Selected Data : " << count_data << std::endl;
+            
+            if (print_mc && print_dirt && print_ext) std::cout << " Total Nue Candidates in data : " << count_data - tot_bkg<< std::endl;
+            
             std::cout << "------------------------------------------------" << std::endl;
         }
 

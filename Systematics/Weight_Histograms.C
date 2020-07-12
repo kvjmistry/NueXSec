@@ -123,8 +123,8 @@ void Weight_Histograms(std::string horn){
 
     bool boolfile;
     
-    if (horn == "fhc" )boolfile = GetFile(fin , "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold/output_uboone_run0.root");
-    else if (horn == "rhc") boolfile = GetFile(fin , "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold/RHC/output_uboone_run0.root"); 
+    if (horn == "fhc" )boolfile = GetFile(fin , "/Users/kvjmistry/Documents/work/NueXSec/Systematics/output_fhc_uboone_run0.root");
+    else if (horn == "rhc") boolfile = GetFile(fin , "/Users/kvjmistry/Documents/work/NueXSec/Systematics/output_rhc_uboone_run0.root"); 
     else {
         std::cout << "You misepelt the horn config...."<< std::endl;
         gSystem->Exit(0);

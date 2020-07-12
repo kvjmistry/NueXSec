@@ -428,6 +428,18 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     // tree->SetBranchAddress("peSpectrum",               &peSpectrum_v);
     // tree->SetBranchAddress("peHypothesisNu",           &peHypothesisNu_v);
     // tree->SetBranchAddress("peHypothesisCosmic",       &peHypothesisCosmic_v);
+
+    tree->SetBranchAddress("pi0_shrscore1",  &pi0_shrscore1);
+    tree->SetBranchAddress("pi0_shrscore2",  &pi0_shrscore2);
+    tree->SetBranchAddress("pi0_dot1",       &pi0_dot1);
+    tree->SetBranchAddress("pi0_dot2",       &pi0_dot2);
+    tree->SetBranchAddress("pi0_radlen1",    &pi0_radlen1);
+    tree->SetBranchAddress("pi0_radlen2",    &pi0_radlen2);
+    tree->SetBranchAddress("pi0_gammadot",   &pi0_gammadot);
+    tree->SetBranchAddress("pi0_energy1_Y",  &pi0_energy1_Y);
+    tree->SetBranchAddress("pi0_energy2_Y",  &pi0_energy2_Y);
+    tree->SetBranchAddress("pi0_dedx1_fit_Y",&pi0_dedx1_fit_Y);
+    tree->SetBranchAddress("pi0_mass_Y",     &pi0_mass_Y);
     
     // tree->SetBranchAddress("shr_dedx_u_v",             &shr_dedx_u_v);
     // tree->SetBranchAddress("shr_dedx_v_v",             &shr_dedx_v_v);
@@ -524,21 +536,21 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     // tree->SetBranchAddress("trk_start_x_v",            &trk_start_x_v);
     // tree->SetBranchAddress("trk_start_y_v",            &trk_start_y_v);
     // tree->SetBranchAddress("trk_start_z_v",            &trk_start_z_v);
-    // tree->SetBranchAddress("trk_sce_start_x_v",        &trk_sce_start_x_v);
-    // tree->SetBranchAddress("trk_sce_start_y_v",        &trk_sce_start_y_v);
-    // tree->SetBranchAddress("trk_sce_start_z_v",        &trk_sce_start_z_v);
+    tree->SetBranchAddress("trk_sce_start_x_v",        &trk_sce_start_x_v);
+    tree->SetBranchAddress("trk_sce_start_y_v",        &trk_sce_start_y_v);
+    tree->SetBranchAddress("trk_sce_start_z_v",        &trk_sce_start_z_v);
     // tree->SetBranchAddress("trk_end_x_v",              &trk_end_x_v);
     // tree->SetBranchAddress("trk_end_y_v",              &trk_end_y_v);
     // tree->SetBranchAddress("trk_end_z_v",              &trk_end_z_v);
-    // tree->SetBranchAddress("trk_sce_end_x_v",          &trk_sce_end_x_v);
-    // tree->SetBranchAddress("trk_sce_end_y_v",          &trk_sce_end_y_v);
-    // tree->SetBranchAddress("trk_sce_end_z_v",          &trk_sce_end_z_v);
-    // tree->SetBranchAddress("trk_distance_v",           &trk_distance_v);
+    tree->SetBranchAddress("trk_sce_end_x_v",          &trk_sce_end_x_v);
+    tree->SetBranchAddress("trk_sce_end_y_v",          &trk_sce_end_y_v);
+    tree->SetBranchAddress("trk_sce_end_z_v",          &trk_sce_end_z_v);
+    tree->SetBranchAddress("trk_distance_v",           &trk_distance_v);
     // tree->SetBranchAddress("trk_theta_v",              &trk_theta_v);
     // tree->SetBranchAddress("trk_phi_v",                &trk_phi_v);
-    // tree->SetBranchAddress("trk_len_v",                &trk_len_v);
-    // tree->SetBranchAddress("trk_mcs_muon_mom_v",       &trk_mcs_muon_mom_v);
-    // tree->SetBranchAddress("trk_range_muon_mom_v",     &trk_range_muon_mom_v);
+    tree->SetBranchAddress("trk_len_v",                &trk_len_v);
+    tree->SetBranchAddress("trk_mcs_muon_mom_v",       &trk_mcs_muon_mom_v);
+    tree->SetBranchAddress("trk_range_muon_mom_v",     &trk_range_muon_mom_v);
     // tree->SetBranchAddress("trk_energy_proton_v",      &trk_energy_proton_v);
     // tree->SetBranchAddress("trk_energy_muon_v",        &trk_energy_muon_v);
     // tree->SetBranchAddress("trk_calo_energy_u_v",      &trk_calo_energy_u_v);
@@ -549,7 +561,7 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     // tree->SetBranchAddress("trk_llr_pid_v_v",          &trk_llr_pid_v_v);
     // tree->SetBranchAddress("trk_llr_pid_y_v",          &trk_llr_pid_y_v);
     // tree->SetBranchAddress("trk_llr_pid_v",            &trk_llr_pid_v);
-    // tree->SetBranchAddress("trk_llr_pid_score_v",      &trk_llr_pid_score_v);
+    tree->SetBranchAddress("trk_llr_pid_score_v",      &trk_llr_pid_score_v);
 
 
     // weightstree->SetBranchAddress("weights", &_mapWeight);
@@ -579,7 +591,7 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
         // Out of Fiducial Volume Event
         if (!is_in_fv) {
             // std::cout << "Purity of out of FV event: "<< nu_purity_from_pfp << std::endl;
-            if (nu_purity_from_pfp == 0) return std::make_pair("cosmic",_util.k_cosmic);
+            if (nu_purity_from_pfp <= 0.05) return std::make_pair("cosmic",_util.k_cosmic);
             else return std::make_pair("nu_out_fv",_util.k_nu_out_fv);
         }
 
@@ -597,10 +609,15 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
 
             }
             // Nue CC
-            else if (nu_pdg == 12 || nu_pdg == -12){
+            else if (nu_pdg == 12){
                 
-                if (nu_purity_from_pfp >= 0.6)                                  return std::make_pair("nue_cc",_util.k_nue_cc); // purity > 60% so pure nue
-                else if (nu_purity_from_pfp < 0.6 && nu_purity_from_pfp > 0.0)  return std::make_pair("nue_cc_mixed",_util.k_nue_cc_mixed); // purity from >0 to 60% mixed event.
+                if (nu_purity_from_pfp >= 0.05)                                 return std::make_pair("nue_cc",_util.k_nue_cc); // purity > 0.05% so signal
+                else return std::make_pair("cosmic",_util.k_cosmic); // Classify as a cosmic with very low purity
+
+            }
+            else if (nu_pdg == -12){
+                
+                if (nu_purity_from_pfp >= 0.05)                                 return std::make_pair("nuebar_cc",_util.k_nuebar_cc); // purity > 0.05% so signal
                 else return std::make_pair("cosmic",_util.k_cosmic); // Classify as a cosmic with very low purity
 
             }
@@ -615,7 +632,7 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
         else {
 
             // Purity is low so return cosmic
-            if (nu_purity_from_pfp == 0) return std::make_pair("cosmic",_util.k_cosmic);
+            if (nu_purity_from_pfp <= 0.05) return std::make_pair("cosmic",_util.k_cosmic);
 
             if (npi0 > 0) return std::make_pair("nc_pi0",_util.k_nc_pi0);
             else return std::make_pair("nc",_util.k_nc);
@@ -799,6 +816,9 @@ std::string SliceContainer::SliceInteractionType(int type){
         else if (interaction == _util.k_mec) {
             return nu + CCNC + "mec";
 
+        }
+        else {
+            return nu + CCNC + "unknown";
         }
     }
     else return "data";

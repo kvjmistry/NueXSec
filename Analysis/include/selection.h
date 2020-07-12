@@ -9,7 +9,6 @@
 #include "Passed_Container.h"
 #include "TreeHelper.h"
 
-#include <omp.h>
 #include "TThread.h"
 
 /* 
@@ -139,6 +138,18 @@ namespace xsecSelection {
             // Get the CV weights for histograms
             double GetCVWeight(int type, SliceContainer SC);
             // -----------------------------------------------------------------
+            // Apply the pi0 selection cuts
+            void ApplyPiZeroSelection(int type, SliceContainer &SC);
+            // -----------------------------------------------------------------
+            // Get the Pi) correction weight
+            void GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer &SC);
+            // -----------------------------------------------------------------
+            // Apply a NuMu Selection
+            void ApplyNuMuSelection(int type, SliceContainer &SC);
+            // -----------------------------------------------------------------
+            
+
+
 
     }; // END Class
 

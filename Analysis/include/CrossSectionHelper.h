@@ -92,7 +92,7 @@ class CrossSectionHelper{
     double GetIntegratedFlux();
     // -------------------------------------------------------------------------
     // Function to get the POT from the flux file
-    double GetPOT(TFile* f, bool disp);
+    double GetPOT(TFile* f);
     // -------------------------------------------------------------------------
     int GetBinIndex(double reco_energy);
     // -------------------------------------------------------------------------

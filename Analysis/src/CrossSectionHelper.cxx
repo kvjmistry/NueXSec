@@ -101,7 +101,7 @@ void CrossSectionHelper::LoopEvents(){
         if (reco_energy > 6.0 && *classifcation == "data" ) std::cout << "reco energy was:  " << reco_energy << "  Consider updating the bins" <<std::endl;
 
         // Signal event
-        if ((*classifcation == "nue_cc" || *classifcation == "nue_cc_mixed") && gen == false) {
+        if ((*classifcation == "nue_cc" || *classifcation == "nuebar_cc") && gen == false) {
             n_sel+=weight;
             n_sig+=weight;
             h_cross_sec.at(k_xsec_sel)->Fill(reco_energy, weight);
@@ -119,7 +119,7 @@ void CrossSectionHelper::LoopEvents(){
         }
         
         // Generated event
-        if ( (*classifcation == "nue_cc"|| *classifcation == "nue_cc_mixed" ) && gen == true) {
+        if ( (*classifcation == "nue_cc"|| *classifcation == "nuebar_cc" ) && gen == true) {
             n_gen+=weight;
             h_cross_sec.at(k_xsec_gen)->Fill(reco_energy, weight);
         }
@@ -255,11 +255,11 @@ double CrossSectionHelper::GetIntegratedFlux(){
     std::string flux_file_name;
 
     if (run_period == "1"){
-        flux_file_name = "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold/output_uboone_run0.root";
+        flux_file_name = "../Systematics/output_fhc_uboone_run0.root";
         boolfile = _util.GetFile(f_flux, flux_file_name);
     }
     else {
-        flux_file_name = "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold/RHC/output_uboone_run0.root";
+        flux_file_name = "../Systematics/output_rhc_uboone_run0.root";
         boolfile = _util.GetFile(f_flux, flux_file_name );
     }
     std::cout << "Using Flux file name: \033[0;31m" << flux_file_name << "\033[0m" <<  std::endl;
@@ -284,7 +284,7 @@ double CrossSectionHelper::GetIntegratedFlux(){
 
 
     double POT_flux{0.0}; // The POT of the flux file (i.e the POT used in the flux histogram)
-    POT_flux = GetPOT(f_flux, true);
+    POT_flux = GetPOT(f_flux);
 
     f_flux->Close();
 
@@ -293,7 +293,7 @@ double CrossSectionHelper::GetIntegratedFlux(){
 
 }
 // -----------------------------------------------------------------------------
-double CrossSectionHelper::GetPOT(TFile* f, bool disp){
+double CrossSectionHelper::GetPOT(TFile* f){
     TTree* TPOT = (TTree*) f->Get("POT");
     if (TPOT == NULL) std::cout << "Error cant get POT info" << std::endl;
 

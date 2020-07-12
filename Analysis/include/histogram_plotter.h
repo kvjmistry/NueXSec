@@ -93,22 +93,22 @@ class histogram_plotter{
     void MakeEfficiencyPlot(const char* print_name, const char *run_period);
     // -------------------------------------------------------------------------
     // The efficiency made by each cut
-    void MakeEfficiencyPlotByCut(const char* print_name, const char *run_period);
+    void MakeEfficiencyPlotByCut(const char *run_period);
     // -------------------------------------------------------------------------
     // True Neutino energy for nues broken down by genie interaction type
-    void MakeInteractionPlot(const char* print_name, const char *run_period);
+    void MakeInteractionPlot(const char* print_name);
     // -------------------------------------------------------------------------
     // Plot the 2D signal vs Background Plots
-    void Plot2D_Signal_Background(const char* print_name, const char* histname, const char *run_period);
+    void Plot2D_Signal_Background(const char* print_name, const char* histname);
     // -------------------------------------------------------------------------
     // Create another directory in the plots folder
     void CreateDirectory(std::string folder, const char *run_period);
     // -------------------------------------------------------------------------
     // Script to get the 1D histograms and save them as a PDF
-    void Save1DHists(const char* print_name, const char* histname, const char *run_period);
+    void Save1DHists(const char* print_name, const char* histname);
     // -------------------------------------------------------------------------
     // Script to get the 2D histograms and save them as a PDF
-    void Save2DHists(const char* print_name, const char* histname, const char *run_period);
+    void Save2DHists(const char* print_name, const char* histname);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

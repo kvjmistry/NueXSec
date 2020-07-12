@@ -13,8 +13,8 @@ void utility::Initalise(const char* variation, bool overwritePOT, const char* ru
         // Loop over the POT config names and overwrite the name of the CV MC POT
         for (unsigned int p = 0; p < confignames.size(); p++){
             
-            // std::string match_name = Form("Run%s_MC_POT", run_period);
-            std::string match_name = "Run1_MC_POT";
+            std::string match_name = Form("Run%s_MC_POT", run_period);
+            // std::string match_name = "Run1_MC_POT";
             
             // If matched then overwrite the POT config for the MC to the variation
             if (confignames.at(p) == match_name){
@@ -170,7 +170,7 @@ void utility::Tabulate(bool inFV, std::string interaction, std::string classific
         
         // Classification
         if (classification == "nue_cc")       counter_v.at(k_count_nue_cc)       += weight;
-        if (classification == "nue_cc_mixed") counter_v.at(k_count_nue_cc_mixed) += weight;
+        if (classification == "nuebar_cc")    counter_v.at(k_count_nuebar_cc)    += weight;
         if (classification == "nu_out_fv")    counter_v.at(k_count_nu_out_fv)    += weight;
         if (classification == "nc")           counter_v.at(k_count_nc)           += weight;
         if (classification == "nc_pi0")       counter_v.at(k_count_nc_pi0)       += weight;
@@ -213,7 +213,7 @@ void utility::PrintInfo(std::vector<double> c_v, double intime_scale_factor, dou
     std::cout << "                    Scaled to MC POT | Scaled to Data POT | Unscaled" << std::endl;
     std::cout << " Total Candidate Nue     : " << sum_mc_dirt_ext                 << "    " << double(sum_mc_dirt_ext                * mc_scale_factor  ) << std::endl;
     std::cout << " Number of Nue CC        : " << c_v.at(k_count_nue_cc)          << "    " << double(c_v.at(k_count_nue_cc)         * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Nue CC Mixed  : " << c_v.at(k_count_nue_cc_mixed)    << "    " << double(c_v.at(k_count_nue_cc_mixed)   * mc_scale_factor  ) << std::endl;
+    std::cout << " Number of Nue bar CC    : " << c_v.at(k_count_nuebar_cc)       << "    " << double(c_v.at(k_count_nuebar_cc)      * mc_scale_factor  ) << std::endl;
     std::cout << " Number of Nu out FV     : " << c_v.at(k_count_nu_out_fv)       << "    " << double(c_v.at(k_count_nu_out_fv)      * mc_scale_factor  ) << std::endl;
     std::cout << " Number of Cosmic        : " << c_v.at(k_count_cosmic)          << "    " << double(c_v.at(k_count_cosmic)         * mc_scale_factor  ) << std::endl;
     std::cout << " Number of Numu CC       : " << c_v.at(k_count_numu_cc)         << "    " << double(c_v.at(k_count_numu_cc)        * mc_scale_factor  ) << std::endl;
@@ -249,10 +249,10 @@ void utility::PrintInfo(std::vector<double> c_v, double intime_scale_factor, dou
     // std::cout << " Sum Neutrinos           : " <<  << std::endl;
 
     std::cout << "------------------------------------------------" << std::endl;
-    efficiency = double(c_v.at(k_count_nue_cc) + c_v.at(k_count_nue_cc_mixed)) / double(tot_true_infv_nues);
-    purity     = double(c_v.at(k_count_nue_cc) + c_v.at(k_count_nue_cc_mixed)) / double(sum_mc_dirt_ext);
-    std::cout << " Efficiency       : " << "( " << c_v.at(k_count_nue_cc) + c_v.at(k_count_nue_cc_mixed) << " / " << tot_true_infv_nues << " ) = " << efficiency << std::endl;
-    std::cout << " Purity           : " << "( " << c_v.at(k_count_nue_cc) + c_v.at(k_count_nue_cc_mixed) << " / " << sum_mc_dirt_ext           << " ) = " << purity << std::endl;
+    efficiency = double(c_v.at(k_count_nue_cc) + c_v.at(k_count_nuebar_cc)) / double(tot_true_infv_nues);
+    purity     = double(c_v.at(k_count_nue_cc) + c_v.at(k_count_nuebar_cc)) / double(sum_mc_dirt_ext);
+    std::cout << " Efficiency       : " << "( " << c_v.at(k_count_nue_cc) + c_v.at(k_count_nuebar_cc) << " / " << tot_true_infv_nues << " ) = " << efficiency << std::endl;
+    std::cout << " Purity           : " << "( " << c_v.at(k_count_nue_cc) + c_v.at(k_count_nuebar_cc) << " / " << sum_mc_dirt_ext           << " ) = " << purity << std::endl;
     std::cout << "------------------------------------------------" << std::endl;
     std::cout << " Total Nue Candidates in data : " << c_v.at(k_count_data) << std::endl;
     std::cout << "------------------------------------------------" << std::endl;

@@ -12,7 +12,7 @@ class PrintHelper{
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(const char* run_period, const char * mc_file_in, int weight_cfg, bool _print_mc, bool _print_data, bool _print_ext, bool _print_dirt, utility _utility );
+    void Initialise(const char* run_period, const char * mc_file_in, bool _print_mc, bool _print_data, bool _print_ext, bool _print_dirt, utility _utility );
     // -------------------------------------------------------------------------
     // Function to print the selection
     void PrintResults();
@@ -94,7 +94,7 @@ class PrintHelper{
     double count_numubar_cc_incryo{0.0};
     
     double count_nue_cc{0.0};
-    double count_nue_cc_mixed{0.0};
+    double count_nuebar_cc{0.0};
     double count_nu_out_fv{0.0};
     double count_cosmic{0.0};
     double count_numu_cc{0.0};
@@ -107,6 +107,22 @@ class PrintHelper{
     double count_ext{0.0};
     double count_dirt{0.0};
 
+    // Counters at no cuts applied
+    double init_count_nue_cc{0.0};
+    double init_count_nuebar_cc{0.0};
+    double init_count_nu_out_fv{0.0};
+    double init_count_cosmic{0.0};
+    double init_count_numu_cc{0.0};
+    double init_count_numu_cc_pi0{0.0};
+    double init_count_nc{0.0};
+    double init_count_nc_pi0{0.0};
+    double init_count_unmatched{0.0};
+    double init_count_ext{0.0};
+    double init_count_dirt{0.0};
+
+    // The efficiency and purity from the previous cut
+    double efficiency_last{0.0};
+    double purity_last{0.0};
     
 
     private:

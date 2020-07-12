@@ -1,7 +1,7 @@
 #include "../include/TreeHelper.h"
 
 // -----------------------------------------------------------------------------
-void TreeHelper::Initialise(int type, const char* run_period, const char * file_out, int weight_cfg ){
+void TreeHelper::Initialise(int type, const char* run_period, const char * file_out ){
 
     std::cout << "Initalising Tree Helper..." << std::endl;
 
@@ -169,7 +169,7 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     counter_tree->Branch("count_numubar_cc_incryo", &count_numubar_cc_incryo);
     
     counter_tree->Branch("count_nue_cc",       &count_nue_cc);
-    counter_tree->Branch("count_nue_cc_mixed", &count_nue_cc_mixed);
+    counter_tree->Branch("count_nuebar_cc",    &count_nuebar_cc);
     counter_tree->Branch("count_nu_out_fv",    &count_nu_out_fv);
     counter_tree->Branch("count_cosmic",       &count_cosmic);
     counter_tree->Branch("count_numu_cc",      &count_numu_cc);
@@ -245,7 +245,7 @@ void TreeHelper::Fill_dedxVars(SliceContainer &SC, std::pair<std::string, int> _
 
 }
 // -----------------------------------------------------------------------------
-void TreeHelper::WriteTree(int type){
+void TreeHelper::WriteTree(){
 
     f_nuexsec->cd();
 
@@ -257,7 +257,7 @@ void TreeHelper::WriteTree(int type){
 
 }
 // -----------------------------------------------------------------------------
-void TreeHelper::Fill_counters(std::vector<double> counter_v, std::string cut_name, bool bool_use_mc, bool bool_use_ext, bool bool_use_data, bool bool_use_dirt){
+void TreeHelper::Fill_counters(std::vector<double> counter_v, bool bool_use_mc, bool bool_use_ext, bool bool_use_data, bool bool_use_dirt){
 
     f_nuexsec->cd();
 
@@ -297,7 +297,7 @@ void TreeHelper::Fill_counters(std::vector<double> counter_v, std::string cut_na
         count_numubar_cc_incryo = counter_v.at(_util.k_count_numubar_cc_incryo);
         
         count_nue_cc       = counter_v.at(_util.k_count_nue_cc);
-        count_nue_cc_mixed = counter_v.at(_util.k_count_nue_cc_mixed);
+        count_nuebar_cc    = counter_v.at(_util.k_count_nuebar_cc);
         count_nu_out_fv    = counter_v.at(_util.k_count_nu_out_fv);
         count_cosmic       = counter_v.at(_util.k_count_cosmic);
         count_numu_cc      = counter_v.at(_util.k_count_numu_cc);
