@@ -274,7 +274,13 @@ bool selection_cuts::numu_cuts(SliceContainer &SC){
         bool track_dist = false;
         if (SC.trk_distance_v->at(l) < 4) track_dist = true;
 
-        if (trk_start && trk_end && pid_score && track_length && track_score && pfp_gen && track_dist) {
+        // MCS Quality 
+        bool b_mcs_quality = false;
+        double mcs_quality = (SC.trk_mcs_muon_mom_v->at(l) - SC.trk_range_muon_mom_v->at(l)) / SC.trk_range_muon_mom_v->at(l);
+        if (mcs_quality > -0.5 && mcs_quality < 0.5) b_mcs_quality = true;
+
+
+        if (trk_start && trk_end && pid_score && track_length && track_score && pfp_gen && track_dist && b_mcs_quality) {
             passed = true;
             break;
         }

@@ -472,13 +472,13 @@ void histogram_helper::InitHistograms(){
 
     // Flash histograms
     TH1D_flash_hists.resize(k_TH1D_flash_MAX);
-    TH1D_flash_hists.at(k_flash_time) = new TH1D( Form("h_flash_time_%s", _util.type_prefix.at(_type).c_str()), "; Flash Time [us]; Entries", 100, 0, 25 );
+    TH1D_flash_hists.at(k_flash_time) = new TH1D( Form("h_flash_time_%s", _util.type_prefix.at(_type).c_str()), "; Flash Time [us]; Entries", 50, 0, 25 );
     TH1D_flash_hists.at(k_flash_pe)   = new TH1D( Form("h_flash_pe_%s", _util.type_prefix.at(_type).c_str()),   "; Largest Flash Intensity [PE]; Entries", 40, 0, 10000 );
 
-    TH1D_flash_hists.at(k_flash_time_sid1) = new TH1D( Form("h_flash_time_sid1_%s", _util.type_prefix.at(_type).c_str()), "; Flash Time Neutrino Candiate [us]; Entries", 100, 0, 25 );
+    TH1D_flash_hists.at(k_flash_time_sid1) = new TH1D( Form("h_flash_time_sid1_%s", _util.type_prefix.at(_type).c_str()), "; Flash Time Neutrino Candiate [us]; Entries", 50, 0, 25 );
     TH1D_flash_hists.at(k_flash_pe_sid1)   = new TH1D( Form("h_flash_pe_sid1_%s", _util.type_prefix.at(_type).c_str()),   "; Largest Flash Intensity (Neutrino Candiate) [PE]; Entries", 40, 0, 10000 );
 
-    TH1D_flash_hists.at(k_flash_time_sid0) = new TH1D( Form("h_flash_time_sid0_%s", _util.type_prefix.at(_type).c_str()), "; Flash Time Non Neutrino Canidate [us]; Entries", 100, 0, 25 );
+    TH1D_flash_hists.at(k_flash_time_sid0) = new TH1D( Form("h_flash_time_sid0_%s", _util.type_prefix.at(_type).c_str()), "; Flash Time Non Neutrino Canidate [us]; Entries", 50, 0, 25 );
     TH1D_flash_hists.at(k_flash_pe_sid0)   = new TH1D( Form("h_flash_pe_sid0_%s", _util.type_prefix.at(_type).c_str()),   "; Largest Flash Intensity (Non Neutrino Canidate) [PE]; Entries", 40, 0, 10000 );
     
     // Interaction Histograms
@@ -543,6 +543,8 @@ void histogram_helper::InitHistograms(){
         TH1D_numu_hists.at(k_track_theta).at(j)     = new TH1D(Form("h_track_theta_%s", _util.classification_dirs.at(j).c_str()) ,"", 13, 0, 190 );
         TH1D_numu_hists.at(k_track_cos_theta).at(j) = new TH1D(Form("h_track_cos_theta_%s", _util.classification_dirs.at(j).c_str()) ,"", 16, -1, 1);
         TH1D_numu_hists.at(k_track_phi).at(j)       = new TH1D(Form("h_track_phi_%s", _util.classification_dirs.at(j).c_str()) ,"", 14, -190, 190);
+        TH1D_numu_hists.at(k_muon_topo_score).at(j) = new TH1D(Form("h_muon_topo_score_%s", _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 1);
+        
     }
     
 
@@ -1132,6 +1134,7 @@ void histogram_helper::FillNuMuHists(int classification_index, SliceContainer SC
     TH1D_numu_hists.at(k_track_theta).at(classification_index)->Fill(SC.trk_theta* 180/3.14159, weight);
     TH1D_numu_hists.at(k_track_phi).at(classification_index)->Fill(SC.trk_phi* 180/3.14159, weight);
     TH1D_numu_hists.at(k_track_cos_theta).at(classification_index)->Fill(std::cos(SC.trk_theta), weight);
+    TH1D_numu_hists.at(k_muon_topo_score).at(classification_index)->Fill(SC.topological_score, weight);
     
     
 

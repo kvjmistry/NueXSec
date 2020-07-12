@@ -258,6 +258,7 @@ class histogram_helper{
         k_track_theta,      // Longest track theta 
         k_track_cos_theta,      // Longest track cos theta
         k_track_phi,      // Longest track phi
+        k_muon_topo_score,      // Topological score (after muon selection)
         k_TH1D_numu_MAX
     };
 

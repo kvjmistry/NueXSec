@@ -22,16 +22,16 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
     // Set the scale factors
     if (strcmp(run_period, "1") == 0)
     {
-        mc_scale_factor = _util.config_v.at(_util.k_Run1_Data_POT) / _util.config_v.at(_util.k_Run1_MC_POT);
-        dirt_scale_factor = _util.config_v.at(_util.k_Run1_Data_POT) / _util.config_v.at(_util.k_Run1_Dirt_POT);
-        intime_scale_factor = _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
+        mc_scale_factor     =       _util.config_v.at(_util.k_Run1_Data_POT) / _util.config_v.at(_util.k_Run1_MC_POT);
+        dirt_scale_factor   = 0.45* _util.config_v.at(_util.k_Run1_Data_POT) / _util.config_v.at(_util.k_Run1_Dirt_POT); //0.45
+        intime_scale_factor = 0.98* _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig); // 0.98
         Data_POT = _util.config_v.at(_util.k_Run1_Data_POT); // Define this variable here for easier reading
     }
     else if (strcmp(run_period, "3") == 0)
     {
-        mc_scale_factor = _util.config_v.at(_util.k_Run3_Data_POT) / _util.config_v.at(_util.k_Run3_MC_POT);
-        dirt_scale_factor = _util.config_v.at(_util.k_Run3_Data_POT) / _util.config_v.at(_util.k_Run3_Dirt_POT);
-        intime_scale_factor = _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
+        mc_scale_factor     = 0.85* _util.config_v.at(_util.k_Run3_Data_POT) / _util.config_v.at(_util.k_Run3_MC_POT);
+        dirt_scale_factor   = 0.45* _util.config_v.at(_util.k_Run3_Data_POT) / _util.config_v.at(_util.k_Run3_Dirt_POT);
+        intime_scale_factor = 0.98* _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
         Data_POT = _util.config_v.at(_util.k_Run3_Data_POT); // Define this variable here for easier reading
     }
     else
@@ -160,20 +160,25 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
         // Create the Truth folder
         CreateDirectory("numu", run_period);
 
-        // pi0 mass peak unweighted
+        // Track Theta
         MakeStack("h_track_theta", " ",
                 area_norm, false, 1.0, "Leading Track Theta [deg]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                 Form("plots/run%s/numu/track_theta.pdf", run_period), false, "classifications_numu", false, variation, run_period, false);
 
-        // pi0 mass normlaisation fixed
+        // Track phi
         MakeStack("h_track_phi", " ",
                 area_norm, false, 1.0, "Leading Track Phi [deg]", 0.8, 0.98, 0.87, 0.32, Data_POT,
                 Form("plots/run%s/numu/track_phi.pdf", run_period), false, "classifications_numu", false, variation, run_period, false);
 
-        // pi0 mass peak unweighted
+        // Track Cos theta
         MakeStack("h_track_cos_theta", " ",
                 area_norm, false, 1.0, "Leading Track Cos(#theta)", 0.8, 0.98, 0.87, 0.32, Data_POT,
                 Form("plots/run%s/numu/track_cos_theta.pdf", run_period), false, "classifications_numu", false, variation, run_period, false);
+
+        // Track Cos theta
+        MakeStack("h_muon_topo_score", " ",
+                area_norm, false, 1.0, "Topological Score", 0.8, 0.98, 0.87, 0.32, Data_POT,
+                Form("plots/run%s/numu/topo_score.pdf", run_period), false, "classifications_numu", false, variation, run_period, false);
 
     }
 
@@ -1127,7 +1132,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         if (cut_name == "Unselected" || cut_name == "SoftwareTrig" || cut_name == "Slice_ID" || cut_name == "Topo_Score" || cut_name == "In_FV" || cut_name == "e_candidate")
             h_ratio->GetYaxis()->SetRangeUser(0.8, 1.2);
         else
-            h_ratio->GetYaxis()->SetRangeUser(0, 2);
+            h_ratio->GetYaxis()->SetRangeUser(0.5, 1.5);
 
         h_ratio->GetYaxis()->SetTitle("#frac{On-Beam}{(Overlay + Off-Beam)}");
 
@@ -1195,7 +1200,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         Draw_WeightLabels(c);
     }
 
-    if (plotmode == "classifications_pi0"){
+    if (plotmode == "classifications_pi0" || plotmode == "classifications_numu"){
         c->Print(print_name);
         return;
     }
@@ -1642,7 +1647,7 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char *print_name, s
         else
         {
             hist.at(i)->SetStats(kFALSE);
-            hist.at(i)->Scale(mc_scale_factor * 0.75);
+            hist.at(i)->Scale(mc_scale_factor);
             hist.at(i)->SetFillColor(30);
             hist_integrals.at(_util.k_mc) = hist.at(_util.k_mc)->Integral();
             integral_mc_ext += hist_integrals.at(_util.k_mc);

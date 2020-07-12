@@ -335,7 +335,7 @@ void selection::MakeSelection(){
 
             // Skip the RHC events contaminated in the FHC files
             if (_run_period == 3 && data_SC.run < 16880 ){
-                continue;
+                //continue;
             }
 
             // Apply Pi0 Selection
@@ -933,15 +933,20 @@ void selection::ApplyNuMuSelection(int type, SliceContainer &SC){
     // *************************************************************************
     // Topological Score -------------------------------------------------------
     // *************************************************************************
-    pass = _scuts.topo_score(SC);
-    if(!pass) return; // Failed the cut!
+    if (SC.topological_score < 0.5) return;
     
     // *************************************************************************
     // Slice Contained Fraction ------------------------------------------------
     // *************************************************************************
     pass = _scuts.contained_frac(SC);
     if(!pass) return; // Failed the cut!
-    
+
+    // Cuts to kill the shower backgrounds and EXT
+    // Skip slices which have a reco shower
+    if (SC.n_showers > 0) return;  
+
+    // Require more than 0 tracks
+    // if (SC.n_tracks <= 1) return;   
 
     // *************************************************************************
     // NuMu Selection Cuts ------------------------------------------------------

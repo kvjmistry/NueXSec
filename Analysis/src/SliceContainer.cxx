@@ -549,8 +549,8 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     // tree->SetBranchAddress("trk_theta_v",              &trk_theta_v);
     // tree->SetBranchAddress("trk_phi_v",                &trk_phi_v);
     tree->SetBranchAddress("trk_len_v",                &trk_len_v);
-    // tree->SetBranchAddress("trk_mcs_muon_mom_v",       &trk_mcs_muon_mom_v);
-    // tree->SetBranchAddress("trk_range_muon_mom_v",     &trk_range_muon_mom_v);
+    tree->SetBranchAddress("trk_mcs_muon_mom_v",       &trk_mcs_muon_mom_v);
+    tree->SetBranchAddress("trk_range_muon_mom_v",     &trk_range_muon_mom_v);
     // tree->SetBranchAddress("trk_energy_proton_v",      &trk_energy_proton_v);
     // tree->SetBranchAddress("trk_energy_muon_v",        &trk_energy_muon_v);
     // tree->SetBranchAddress("trk_calo_energy_u_v",      &trk_calo_energy_u_v);
