@@ -503,9 +503,33 @@ public:
     std::vector<float> *mc_purity_v       = nullptr;
     
     std::map<std::string, std::vector<double>> *weights_v = nullptr;
-    std::vector<double> *weightsFlux_v   = nullptr;
-    std::vector<double> *weightsGenie_v  = nullptr;
-    std::vector<double> *weightsReint_v  = nullptr;
+    std::vector<unsigned short> *weightsGenie_v  = nullptr;
+    std::vector<unsigned short> *weightsReint_v  = nullptr;
+    std::vector<unsigned short> *weightsPPFX     = nullptr;
+
+
+    double knobRPAup;
+    double knobCCMECup;
+    double knobAxFFCCQEup;
+    double knobVecFFCCQEup;
+    double knobDecayAngMECup;
+    double knobThetaDelta2Npiup;
+    double knobThetaDelta2NRadup;
+    double knobRPA_CCQE_Reducedup;
+    double knobNormCCCOHup;
+    double knobNormNCCOHup;
+    double knobRPAdn;
+    double knobCCMECdn;
+    double knobAxFFCCQEdn;
+    double knobVecFFCCQEdn;
+    double knobDecayAngMECdn;
+    double knobThetaDelta2Npidn;
+    double knobThetaDelta2NRaddn;
+    double knobRPA_CCQE_Reduceddn;
+    double knobNormCCCOHdn;
+    double knobNormNCCOHdn;
+
+
     
     std::vector<float> *cosmic_flashmatch_score_v = nullptr;
     std::vector<float> *peSpectrum_v              = nullptr;

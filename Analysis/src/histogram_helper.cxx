@@ -473,6 +473,7 @@ void histogram_helper::InitHistograms(){
     // Flash histograms
     TH1D_flash_hists.resize(k_TH1D_flash_MAX);
     TH1D_flash_hists.at(k_flash_time) = new TH1D( Form("h_flash_time_%s", _util.type_prefix.at(_type).c_str()), "; Flash Time [us]; Entries", 50, 0, 25 );
+    TH1D_flash_hists.at(k_flash_time_single_bin) = new TH1D( Form("h_flash_time_single_bin_%s", _util.type_prefix.at(_type).c_str()), "; Flash Time [us]; Entries", 1, 5.6, 15.4 );
     TH1D_flash_hists.at(k_flash_pe)   = new TH1D( Form("h_flash_pe_%s", _util.type_prefix.at(_type).c_str()),   "; Largest Flash Intensity [PE]; Entries", 40, 0, 10000 );
 
     TH1D_flash_hists.at(k_flash_time_sid1) = new TH1D( Form("h_flash_time_sid1_%s", _util.type_prefix.at(_type).c_str()), "; Flash Time Neutrino Candiate [us]; Entries", 50, 0, 25 );
@@ -802,6 +803,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
         // Flash histograms
         if (type == _util.k_mc){
             TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
+            TH1D_flash_hists.at(k_flash_time_single_bin)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
             TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight); // See numi documentation page to see what these numbers mean
            
             if (SC.nslice == 1){
@@ -817,6 +819,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
         }
         if (type == _util.k_dirt){
             TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + 0.055 -0.359, weight);
+            TH1D_flash_hists.at(k_flash_time_single_bin)->Fill(SC.flash_time + 0.055 -0.359, weight);
             TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
            
             if (SC.nslice == 1){
@@ -832,6 +835,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
         }
         if (type == _util.k_ext){
             TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + -0.359, weight);
+            TH1D_flash_hists.at(k_flash_time_single_bin)->Fill(SC.flash_time + -0.359, weight);
             TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
            
             if (SC.nslice == 1){
@@ -847,6 +851,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
         }
         if (type == _util.k_data){
             TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time, weight);
+            TH1D_flash_hists.at(k_flash_time_single_bin)->Fill(SC.flash_time, weight);
             TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
             
             if (SC.nslice == 1){

@@ -215,6 +215,7 @@ class histogram_helper{
 
     enum TH1D_flash_hist_vars {
         k_flash_time,
+        k_flash_time_single_bin,
         k_flash_pe,
         k_flash_time_sid1,   // Slice Id 1 (neutrino candidates)
         k_flash_pe_sid1,

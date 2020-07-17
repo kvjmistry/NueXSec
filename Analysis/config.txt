@@ -55,19 +55,19 @@ Run3_Dirt_POT 4.32295e+20
 -
 // Run 3 Data POT (tortgt) beam good, bad runs removed
 // Run3_Data_POT 3.991e+19
-// Run3_Data_POT 2.996e+19 // with runs < 16880 removed
-Run3_Data_POT 6.077e+19 // Set 1
+Run3_Data_POT 2.996e+19 // Set 0 with runs < 16880 removed
+// Run3_Data_POT 6.077e+19 // Set 1
 // Run3_Data_POT 1.007e+20 // Set 0 and Set 1 combined, no cuts on run number applied
 -
 // Run 3 data HW Triggers (EA9CNT) beam good, bad runs removed
 // Run3_Data_trig  815631.0
-// Run3_Data_trig  611581.0 // Set 0
-Run3_Data_trig 1257598.0 // Set 1 data triggers
+Run3_Data_trig  611581.0 // Set 0
+// Run3_Data_trig 1257598.0 // Set 1 data triggers
 // Run3_Data_trig 2073229.0 // Set 0 and Set 1 combined, no cuts on run number applied
 -
 // Run 3 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
-// Run3_EXT_trig 1550231.025000
-Run3_EXT_trig 1677886.350000 // Set 1
+Run3_EXT_trig 1550231.025000 // Set 0
+// Run3_EXT_trig 1677886.350000 // Set 1
 // Run3_EXT_trig 3228117.375000 // Set 0 and Set 1 with no cuts on the run number applied
 -
 // ---------------------------------------------

@@ -29,9 +29,9 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
     }
     else if (strcmp(run_period, "3") == 0)
     {
-        mc_scale_factor     = 0.85* _util.config_v.at(_util.k_Run3_Data_POT) / _util.config_v.at(_util.k_Run3_MC_POT);
-        dirt_scale_factor   = 0.45* _util.config_v.at(_util.k_Run3_Data_POT) / _util.config_v.at(_util.k_Run3_Dirt_POT);
-        intime_scale_factor = 0.98* _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
+        mc_scale_factor     = 1.00* _util.config_v.at(_util.k_Run3_Data_POT) / _util.config_v.at(_util.k_Run3_MC_POT);
+        dirt_scale_factor   = 0.45* _util.config_v.at(_util.k_Run3_Data_POT) / _util.config_v.at(_util.k_Run3_Dirt_POT); //0.45
+        intime_scale_factor = 0.94* _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig); //0.94
         Data_POT = _util.config_v.at(_util.k_Run3_Data_POT); // Define this variable here for easier reading
     }
     else
@@ -63,6 +63,7 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
 
         // Flash time plots
         MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time.pdf", run_period), "h_flash_time");
+        MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time_single_bin.pdf", run_period), "h_flash_time_single_bin"); // Single bin in the beam window
         MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time_sid1.pdf", run_period), "h_flash_time_sid1"); // Slice ID 1
         MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time_sid0.pdf", run_period), "h_flash_time_sid0"); // Slice ID 0
 
@@ -767,11 +768,11 @@ void histogram_plotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, 
 {
 
     if (found_data)
-        leg_stack->AddEntry(hist.at(k_plot_data), Form("On-Beam Data (%2.1f)", hist_integrals.at(_util.k_leg_data)), "lep");
+        leg_stack->AddEntry(hist.at(k_plot_data), Form("Beam-On Data (%2.1f)", hist_integrals.at(_util.k_leg_data)), "lep");
     if (found_dirt)
         leg_stack->AddEntry(hist.at(k_plot_dirt), Form("Dirt (%2.1f)", hist_integrals.at(_util.k_leg_dirt)), "f");
     if (found_ext)
-        leg_stack->AddEntry(hist.at(k_plot_ext), Form("Off-Beam Data (%2.1f)", hist_integrals.at(_util.k_leg_ext)), "f");
+        leg_stack->AddEntry(hist.at(k_plot_ext), Form("Beam-On Data (%2.1f)", hist_integrals.at(_util.k_leg_ext)), "f");
 
     if (plotmode == "classifications" || plotmode == "classifications_pi0" || plotmode == "classifications_numu")
     {
@@ -1010,8 +1011,8 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         h_stack->GetYaxis()->SetTitle("Entries [A.U.]");
 
     // Customise the stacked histogram
-    h_stack->GetYaxis()->SetTitleSize(17);
-    h_stack->GetYaxis()->SetTitleFont(46);
+    h_stack->GetYaxis()->SetTitleSize(0.03);
+    
     if (!found_data)
         h_stack->GetXaxis()->SetLabelSize(0);
 
@@ -1097,13 +1098,10 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         // h_ratio->Add(h_mc_ext_sum, -1); // Turn off for data / MC + ext
         h_ratio->Divide(h_mc_ext_sum);
 
-        h_ratio->GetXaxis()->SetLabelSize(12);
-        h_ratio->GetXaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
-        h_ratio->GetYaxis()->SetLabelSize(11);
-        h_ratio->GetYaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
-        h_ratio->GetXaxis()->SetTitleOffset(3.0);
-        h_ratio->GetXaxis()->SetTitleSize(17);
-        h_ratio->GetXaxis()->SetTitleFont(46);
+        h_ratio->GetXaxis()->SetLabelSize(0.13);
+        h_ratio->GetYaxis()->SetLabelSize(0.13);
+        h_ratio->GetXaxis()->SetTitleOffset(0.9);
+        h_ratio->GetXaxis()->SetTitleSize(0.13);
 
         // Customise bin labels for pass and fail type of histograms (ones with 2 bins)
         if (h_ratio->GetXaxis()->GetNbins() == 2)
@@ -1134,7 +1132,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         else
             h_ratio->GetYaxis()->SetRangeUser(0.5, 1.5);
 
-        h_ratio->GetYaxis()->SetTitle("#frac{On-Beam}{(Overlay + Off-Beam)}");
+        h_ratio->GetYaxis()->SetTitle("#frac{Beam-On}{(Overlay + Beam-Off)}");
 
         h_ratio->GetXaxis()->SetTitle(x_axis_name);
         h_ratio->GetYaxis()->SetTitleSize(10);
@@ -1684,8 +1682,8 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char *print_name, s
     else
         h_stack->GetYaxis()->SetTitle("Entries");
 
-    h_stack->GetYaxis()->SetTitleSize(17);
-    h_stack->GetYaxis()->SetTitleFont(46);
+    h_stack->GetYaxis()->SetTitleSize(0.05);
+    h_stack->GetYaxis()->SetLabelSize(0.05);
     h_stack->GetXaxis()->SetLabelSize(0);
 
     // MC error histogram ------------------------------------------------------
@@ -1708,10 +1706,10 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char *print_name, s
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
 
-    leg_stack->AddEntry(hist.at(_util.k_data), "On-Beam Data", "lep");
+    leg_stack->AddEntry(hist.at(_util.k_data), "Beam-On Data", "lep");
     leg_stack->AddEntry(hist.at(_util.k_dirt), "Dirt", "f");
     leg_stack->AddEntry(hist.at(_util.k_mc), "Overlay", "f");
-    leg_stack->AddEntry(hist.at(_util.k_ext), "Off-Beam Data", "f");
+    leg_stack->AddEntry(hist.at(_util.k_ext), "Beam-Off Data", "f");
 
     leg_stack->Draw();
 
@@ -1730,11 +1728,9 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char *print_name, s
     // h_ratio->Add(h_mc_ext_sum, -1);
     h_ratio->Divide(h_mc_ext_sum);
 
-    h_ratio->GetXaxis()->SetLabelSize(12);
-    h_ratio->GetXaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
-    h_ratio->GetXaxis()->SetTitleOffset(3.0);
-    h_ratio->GetXaxis()->SetTitleSize(17);
-    h_ratio->GetXaxis()->SetTitleFont(46);
+    h_ratio->GetXaxis()->SetLabelSize(0.13);
+    h_ratio->GetXaxis()->SetTitleOffset(0.9);
+    h_ratio->GetXaxis()->SetTitleSize(0.13);
     h_ratio->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
 
     // For percent difference
@@ -1744,13 +1740,11 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char *print_name, s
     // For ratio
 
     h_ratio->GetYaxis()->SetRangeUser(0.80, 1.20);
-    h_ratio->GetYaxis()->SetTitle("#frac{On-Beam}{(Overlay + Off-Beam)}");
+    h_ratio->GetYaxis()->SetTitle("#frac{Beam-On}{(Overlay + Beam-Off)}");
 
-    h_ratio->GetYaxis()->SetLabelSize(11);
-    h_ratio->GetYaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
-    h_ratio->GetYaxis()->SetTitleSize(10);
-    h_ratio->GetYaxis()->SetTitleFont(44);
-    h_ratio->GetYaxis()->SetTitleOffset(1.5);
+    h_ratio->GetYaxis()->SetLabelSize(0.13);
+    h_ratio->GetYaxis()->SetTitleSize(0.13);
+    h_ratio->GetYaxis()->SetTitleOffset(0.9);
     h_ratio->SetTitle(" ");
     h_ratio->GetYaxis()->CenterTitle();
     h_ratio->Draw("E");
@@ -1874,7 +1868,7 @@ void histogram_plotter::MakeFlashPlotOMO(double Data_POT, const char *print_name
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
 
-    leg_stack->AddEntry(hist.at(_util.k_data), "On-Beam - Off-Beam Data", "lep");
+    leg_stack->AddEntry(hist.at(_util.k_data), "Beam-On - Beam-Off Data", "lep");
     leg_stack->AddEntry(hist.at(_util.k_dirt), "Dirt", "f");
     leg_stack->AddEntry(hist.at(_util.k_mc), "Overlay", "f");
 

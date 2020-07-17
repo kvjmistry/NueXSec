@@ -293,27 +293,36 @@ void selection::MakeSelection(){
         std::cout << "nue_pi: "  << nue_pi  << std::endl;
         std::cout << "nuebar_pi: "  << nuebar_pi  << std::endl;
 
-        // Loop again to look at background events that still pass
-        // Event loop
-        // for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
-            
-        //     if (mc_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true ){
-            
-        //         mc_tree->GetEntry(ievent); 
 
-        //         std::pair<std::string, int> classification = mc_SC.SliceClassifier(_util.k_mc);
+        if (make_list){
 
-        //         // Background events
-        //         if (classification.second == _util.k_nue_cc){
-        //             if (mc_SC.shr_tkfit_dedx_Y > 6.8){
-        //                 std::cout <<  mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt <<  std::endl;
-        //             }
+            // Loop again to and write events that pass to a file
+            std::cout << "Making the run subrun list for selected mc events..." << std::endl;
+            int run, subrun, event;
+            std::ofstream run_subrun_file;
+            run_subrun_file.open(Form("files/run%i_run_subrun_list_mc.txt",_run_period));
 
-        //         }
-        //     }
+            // Event loop
+            for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
 
-        // } // End Event loop
+                mc_tree->GetEntry(ievent); 
 
+                std::pair<std::string, int> classification = mc_SC.SliceClassifier(_util.k_mc);
+                
+                // If Passed selection or was a nue(bar) cc in the fv
+                if ( (mc_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true) || classification.first == "nue_cc" || classification.first == "nuebar_cc" ){
+                
+                    run    = mc_SC.run;
+                    subrun = mc_SC.sub;
+                    event  = mc_SC.evt;
+                    
+                    // std::cout <<  mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt <<  std::endl;
+                    run_subrun_file << run << " " << subrun << " " << event << '\n';
+                    
+                }
+
+            } // End Event loop
+        }
 
     }
     // Data --------------------------------------------------------------------
@@ -335,7 +344,7 @@ void selection::MakeSelection(){
 
             // Skip the RHC events contaminated in the FHC files
             if (_run_period == 3 && data_SC.run < 16880 ){
-                //continue;
+                continue;
             }
 
             // Apply Pi0 Selection

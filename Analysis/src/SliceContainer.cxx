@@ -181,12 +181,6 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("trk_hits_y_tot", &trk_hits_y_tot);
     tree->SetBranchAddress("trk_hits_u_tot", &trk_hits_u_tot);
     tree->SetBranchAddress("trk_hits_v_tot", &trk_hits_v_tot);
-    // tree->SetBranchAddress("elecclusters_U_charge", &elecclusters_U_charge);
-    // tree->SetBranchAddress("elecclusters_V_charge", &elecclusters_V_charge);
-    // tree->SetBranchAddress("elecclusters_Y_charge", &elecclusters_Y_charge);
-    // tree->SetBranchAddress("elecclusters_U_N", &elecclusters_U_N);
-    // tree->SetBranchAddress("elecclusters_V_N", &elecclusters_V_N);
-    // tree->SetBranchAddress("elecclusters_Y_N", &elecclusters_Y_N);
     tree->SetBranchAddress("n_tracks_contained",  &n_tracks_contained);
     tree->SetBranchAddress("n_showers_contained", &n_showers_contained);
     
@@ -293,11 +287,7 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("n_pfps", &n_pfps);
     tree->SetBranchAddress("n_tracks", &n_tracks);
     tree->SetBranchAddress("n_showers", &n_showers);
-    
-    // tree->SetBranchAddress("hits_u", &hits_u);
-    // tree->SetBranchAddress("hits_v", &hits_v);
-    // tree->SetBranchAddress("hits_y", &hits_y);
-    
+
     tree->SetBranchAddress("topological_score", &topological_score);
     tree->SetBranchAddress("slclustfrac", &slclustfrac);
     tree->SetBranchAddress("endmuonmichel", &endmuonmichel);
@@ -323,26 +313,7 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("nslnoise_pl1", &nslnoise_pl1);
     tree->SetBranchAddress("nhits_pl1", &nhits_pl1);
     tree->SetBranchAddress("frac_slnoise_pl1", &frac_slnoise_pl1);
-    
-    // tree->SetBranchAddress("secondshower_U_charge", &secondshower_U_charge);
-    // tree->SetBranchAddress("secondshower_U_nhit", &secondshower_U_nhit);
-    // tree->SetBranchAddress("secondshower_U_vtxdist", &secondshower_U_vtxdist);
-    // tree->SetBranchAddress("secondshower_U_eigenratio", &secondshower_U_eigenratio);
-    // tree->SetBranchAddress("secondshower_U_dot", &secondshower_U_dot);
-    // tree->SetBranchAddress("secondshower_U_dir", &secondshower_U_dir);
-    // tree->SetBranchAddress("secondshower_V_charge", &secondshower_V_charge);
-    // tree->SetBranchAddress("secondshower_V_nhit", &secondshower_V_nhit);
-    // tree->SetBranchAddress("secondshower_V_vtxdist", &secondshower_V_vtxdist);
-    // tree->SetBranchAddress("secondshower_V_eigenratio", &secondshower_V_eigenratio);
-    // tree->SetBranchAddress("secondshower_V_dot", &secondshower_V_dot);
-    // tree->SetBranchAddress("secondshower_V_dir", &secondshower_V_dir);
-    // tree->SetBranchAddress("secondshower_Y_charge", &secondshower_Y_charge);
-    // tree->SetBranchAddress("secondshower_Y_nhit", &secondshower_Y_nhit);
-    // tree->SetBranchAddress("secondshower_Y_vtxdist", &secondshower_Y_vtxdist);
-    // tree->SetBranchAddress("secondshower_Y_eigenratio", &secondshower_Y_eigenratio);
-    // tree->SetBranchAddress("secondshower_Y_dot", &secondshower_Y_dot);
-    // tree->SetBranchAddress("secondshower_Y_dir", &secondshower_Y_dir);
-    
+
     tree->SetBranchAddress("evnunhits", &evnunhits);
     tree->SetBranchAddress("evlepnhits", &evlepnhits);
     tree->SetBranchAddress("evpronhits", &evpronhits);
@@ -366,15 +337,6 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     // tree->SetBranchAddress("n_tracks_pandora", &n_tracks_pandora);
     
     tree->SetBranchAddress("_closestNuCosmicDist",&_closestNuCosmicDist);
-    
-    // tree->SetBranchAddress("vtx_fit_pandora_x", &vtx_fit_pandora_x);
-    // tree->SetBranchAddress("vtx_fit_pandora_y", &vtx_fit_pandora_y);
-    // tree->SetBranchAddress("vtx_fit_pandora_z", &vtx_fit_pandora_z);
-    
-    // tree->SetBranchAddress("n_tracks_tkfit", &n_tracks_tkfit);
-    // tree->SetBranchAddress("vtx_fit_tkfit_x", &vtx_fit_tkfit_x);
-    // tree->SetBranchAddress("vtx_fit_tkfit_y", &vtx_fit_tkfit_y);
-    // tree->SetBranchAddress("vtx_fit_tkfit_z", &vtx_fit_tkfit_z);
     
     tree->SetBranchAddress("bdt_nuNCpi0",   &bdt_nuNCpi0);
     tree->SetBranchAddress("bdt_numuCCpi0", &bdt_numuCCpi0);
@@ -415,19 +377,40 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     
     // MC specific branches
     if (type == _util.k_mc || type == _util.k_dirt){
-        // tree->SetBranchAddress("weights",         &weights_v);
-        // tree->SetBranchAddress("weightsFlux",     &weightsFlux_v);
-        // tree->SetBranchAddress("weightsGenie",    &weightsGenie_v);
-        // tree->SetBranchAddress("weightsReint",    &weightsReint_v);
+
         tree->SetBranchAddress("weightSplineTimesTune",      &weightSplineTimesTune);
-        tree->SetBranchAddress("ppfx_cv",         &ppfx_cv);
+        tree->SetBranchAddress("ppfx_cv",                    &ppfx_cv);
+        
+        // weightstree->SetBranchAddress("weights", &_mapWeight);
+        // tree->SetBranchAddress("weights",         &weights_v);
+        
+        tree->SetBranchAddress("weightsGenie",          &weightsGenie_v);
+        tree->SetBranchAddress("weightsReint",          &weightsReint_v);
+        tree->SetBranchAddress("weightsPPFX",           &weightsPPFX);
+        tree->SetBranchAddress("knobRPAup",             &knobRPAup);
+        tree->SetBranchAddress("knobRPAdn",             &knobRPAdn);
+        tree->SetBranchAddress("knobCCMECup",           &knobCCMECup);
+        tree->SetBranchAddress("knobCCMECdn",           &knobCCMECdn);
+        tree->SetBranchAddress("knobAxFFCCQEup",        &knobAxFFCCQEup);
+        tree->SetBranchAddress("knobAxFFCCQEdn",        &knobAxFFCCQEdn);
+        tree->SetBranchAddress("knobVecFFCCQEup",       &knobVecFFCCQEup);
+        tree->SetBranchAddress("knobVecFFCCQEdn",       &knobVecFFCCQEdn);
+        tree->SetBranchAddress("knobDecayAngMECup",     &knobDecayAngMECup);
+        tree->SetBranchAddress("knobDecayAngMECdn",     &knobDecayAngMECdn);
+        tree->SetBranchAddress("knobThetaDelta2Npiup",  &knobThetaDelta2Npiup);
+        tree->SetBranchAddress("knobThetaDelta2Npidn",  &knobThetaDelta2Npidn);
+        tree->SetBranchAddress("knobThetaDelta2NRadup", &knobThetaDelta2NRadup);
+        tree->SetBranchAddress("knobThetaDelta2NRaddn", &knobThetaDelta2NRaddn);
+        tree->SetBranchAddress("knobRPA_CCQE_Reducedup",&knobRPA_CCQE_Reducedup);
+        tree->SetBranchAddress("knobRPA_CCQE_Reduceddn",&knobRPA_CCQE_Reduceddn);
+        tree->SetBranchAddress("knobNormCCCOHup",       &knobNormCCCOHup);
+        tree->SetBranchAddress("knobNormCCCOHdn",       &knobNormCCCOHdn);
+        tree->SetBranchAddress("knobNormNCCOHup",       &knobNormNCCOHup);
+        tree->SetBranchAddress("knobNormNCCOHdn",       &knobNormNCCOHdn);
     }
     
     
     tree->SetBranchAddress("cosmic_flashmatch_score_v",&cosmic_flashmatch_score_v);
-    // tree->SetBranchAddress("peSpectrum",               &peSpectrum_v);
-    // tree->SetBranchAddress("peHypothesisNu",           &peHypothesisNu_v);
-    // tree->SetBranchAddress("peHypothesisCosmic",       &peHypothesisCosmic_v);
 
     tree->SetBranchAddress("pi0_shrscore1",  &pi0_shrscore1);
     tree->SetBranchAddress("pi0_shrscore2",  &pi0_shrscore2);
@@ -441,130 +424,17 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("pi0_dedx1_fit_Y",&pi0_dedx1_fit_Y);
     tree->SetBranchAddress("pi0_mass_Y",     &pi0_mass_Y);
     
-    // tree->SetBranchAddress("shr_dedx_u_v",             &shr_dedx_u_v);
-    // tree->SetBranchAddress("shr_dedx_v_v",             &shr_dedx_v_v);
-    // tree->SetBranchAddress("shr_dedx_y_v",             &shr_dedx_y_v);
-    // tree->SetBranchAddress("shr_energy_u_v",           &shr_energy_u_v);
-    // tree->SetBranchAddress("shr_energy_v_v",           &shr_energy_v_v);
-    // tree->SetBranchAddress("shr_energy_y_v",           &shr_energy_y_v);
-    // tree->SetBranchAddress("shr_pfp_id_v",             &shr_pfp_id_v);
-    // tree->SetBranchAddress("shr_start_x_v",            &shr_start_x_v);
-    // tree->SetBranchAddress("shr_start_y_v",            &shr_start_y_v);
-    // tree->SetBranchAddress("shr_start_z_v",            &shr_start_z_v);
-    // tree->SetBranchAddress("shr_dist_v",               &shr_dist_v);
-    // tree->SetBranchAddress("shr_start_U_v",            &shr_start_U_v);
-    // tree->SetBranchAddress("shr_start_V_v",            &shr_start_V_v);
-    // tree->SetBranchAddress("shr_px_v",                 &shr_px_v);
-    // tree->SetBranchAddress("shr_py_v",                 &shr_py_v);
-    // tree->SetBranchAddress("shr_pz_v",                 &shr_pz_v);
-    // tree->SetBranchAddress("shr_openangle_v",          &shr_openangle_v);
-    // tree->SetBranchAddress("shr_theta_v",              &shr_theta_v);
-    // tree->SetBranchAddress("shr_phi_v",                &shr_phi_v);
-    // tree->SetBranchAddress("shr_pitch_u_v",            &shr_pitch_u_v);
-    // tree->SetBranchAddress("shr_pitch_v_v",            &shr_pitch_v_v);
-    // tree->SetBranchAddress("shr_pitch_y_v",            &shr_pitch_y_v);
-    // tree->SetBranchAddress("shr_tkfit_nhits_v",        &shr_tkfit_nhits_v);
-    // tree->SetBranchAddress("shr_tkfit_start_x_v",      &shr_tkfit_start_x_v);
-    // tree->SetBranchAddress("shr_tkfit_start_y_v",      &shr_tkfit_start_y_v);
-    // tree->SetBranchAddress("shr_tkfit_start_z_v",      &shr_tkfit_start_z_v);
-    // tree->SetBranchAddress("shr_tkfit_start_U_v",      &shr_tkfit_start_U_v);
-    // tree->SetBranchAddress("shr_tkfit_start_V_v",      &shr_tkfit_start_V_v);
-    // tree->SetBranchAddress("shr_tkfit_theta_v",        &shr_tkfit_theta_v);
-    // tree->SetBranchAddress("shr_tkfit_phi_v",          &shr_tkfit_phi_v);
-    // tree->SetBranchAddress("shr_tkfit_pitch_u_v",      &shr_tkfit_pitch_u_v);
-    // tree->SetBranchAddress("shr_tkfit_pitch_v_v",      &shr_tkfit_pitch_v_v);
-    // tree->SetBranchAddress("shr_tkfit_pitch_y_v",      &shr_tkfit_pitch_y_v);
-    // tree->SetBranchAddress("shr_tkfit_dedx_u_v",       &shr_tkfit_dedx_u_v);
-    // tree->SetBranchAddress("shr_tkfit_dedx_v_v",       &shr_tkfit_dedx_v_v);
-    // tree->SetBranchAddress("shr_tkfit_dedx_y_v",       &shr_tkfit_dedx_y_v);
-    // tree->SetBranchAddress("shr_tkfit_gap10_dedx_u_v", &shr_tkfit_gap10_dedx_u_v);
-    // tree->SetBranchAddress("shr_tkfit_gap10_dedx_v_v", &shr_tkfit_gap10_dedx_v_v);
-    // tree->SetBranchAddress("shr_tkfit_gap10_dedx_y_v", &shr_tkfit_gap10_dedx_y_v);
-    // tree->SetBranchAddress("shr_tkfit_dedx_nhits_u_v", &shr_tkfit_dedx_nhits_u_v);
-    // tree->SetBranchAddress("shr_tkfit_dedx_nhits_v_v", &shr_tkfit_dedx_nhits_v_v);
-    // tree->SetBranchAddress("shr_tkfit_dedx_nhits_y_v", &shr_tkfit_dedx_nhits_y_v);
-    // tree->SetBranchAddress("shr_llr_pid_u_v",          &shr_llr_pid_u_v);
-    // tree->SetBranchAddress("shr_llr_pid_v_v",          &shr_llr_pid_v_v);
-    // tree->SetBranchAddress("shr_llr_pid_y_v",          &shr_llr_pid_y_v);
-    // tree->SetBranchAddress("shr_llr_pid_v",            &shr_llr_pid_v);
-    // tree->SetBranchAddress("shr_llr_pid_score_v",      &shr_llr_pid_score_v);
-    // tree->SetBranchAddress("shr_moliere_avg_v",        &shr_moliere_avg_v);
-    // tree->SetBranchAddress("shr_moliere_rms_v",        &shr_moliere_rms_v);
-    
-    // // tree->SetBranchAddress("shr_spacepoint_start_x_v", &shr_spacepoint_start_x_v);
-    // // tree->SetBranchAddress("shr_spacepoint_start_y_v", &shr_spacepoint_start_y_v);
-    // // tree->SetBranchAddress("shr_spacepoint_start_z_v", &shr_spacepoint_start_z_v);
-    // // tree->SetBranchAddress("shr_spacepoint_start_U_v", &shr_spacepoint_start_U_v);
-    // // tree->SetBranchAddress("shr_spacepoint_start_V_v", &shr_spacepoint_start_V_v);
-    // // tree->SetBranchAddress("shr_hits_start_U_wire_v",  &shr_hits_start_U_wire_v);
-    // // tree->SetBranchAddress("shr_hits_start_U_x_v",     &shr_hits_start_U_x_v);
-    // // tree->SetBranchAddress("shr_hits_start_V_wire_v",  &shr_hits_start_V_wire_v);
-    // // tree->SetBranchAddress("shr_hits_start_V_x_v",     &shr_hits_start_V_x_v);
-    // // tree->SetBranchAddress("shr_hits_start_Y_wire_v",  &shr_hits_start_Y_wire_v);
-    // // tree->SetBranchAddress("shr_hits_start_Y_x_v",     &shr_hits_start_Y_x_v);
-    
-    // tree->SetBranchAddress("trk_bragg_p_v",            &trk_bragg_p_v);
-    // tree->SetBranchAddress("trk_bragg_mu_v",           &trk_bragg_mu_v);
-    // tree->SetBranchAddress("trk_bragg_mip_v",          &trk_bragg_mip_v);
-    // tree->SetBranchAddress("trk_pida_v",               &trk_pida_v);
-    
-    // tree->SetBranchAddress("trk_pid_chipr_v",          &trk_pid_chipr_v);
-    // tree->SetBranchAddress("trk_pid_chipi_v",          &trk_pid_chipi_v);
-    // tree->SetBranchAddress("trk_pid_chika_v",          &trk_pid_chika_v);
-    // tree->SetBranchAddress("trk_pid_chimu_v",          &trk_pid_chimu_v);
-    
-    // tree->SetBranchAddress("trk_bragg_p_u_v",          &trk_bragg_p_u_v);
-    // tree->SetBranchAddress("trk_bragg_mu_u_v",         &trk_bragg_mu_u_v);
-    // tree->SetBranchAddress("trk_bragg_mip_u_v",        &trk_bragg_mip_u_v);
-    // tree->SetBranchAddress("trk_pida_u_v",             &trk_pida_u_v);
-    // tree->SetBranchAddress("trk_pid_chipr_u_v",        &trk_pid_chipr_u_v);
-    // tree->SetBranchAddress("trk_pid_chipi_u_v",        &trk_pid_chipi_u_v);
-    // tree->SetBranchAddress("trk_pid_chika_u_v",        &trk_pid_chika_u_v);
-    // tree->SetBranchAddress("trk_pid_chimu_u_v",        &trk_pid_chimu_u_v);
-    // tree->SetBranchAddress("trk_bragg_p_v_v",          &trk_bragg_p_v_v);
-    // tree->SetBranchAddress("trk_bragg_mu_v_v",         &trk_bragg_mu_v_v);
-    // tree->SetBranchAddress("trk_bragg_mip_v_v",        &trk_bragg_mip_v_v);
-    // tree->SetBranchAddress("trk_pida_v_v",             &trk_pida_v_v);
-    // tree->SetBranchAddress("trk_pid_chipr_v_v",        &trk_pid_chipr_v_v);
-    // tree->SetBranchAddress("trk_pid_chipi_v_v",        &trk_pid_chipi_v_v);
-    // tree->SetBranchAddress("trk_pid_chika_v_v",        &trk_pid_chika_v_v);
-    // tree->SetBranchAddress("trk_pid_chimu_v_v",        &trk_pid_chimu_v_v);
-    // tree->SetBranchAddress("trk_pfp_id_v",             &trk_pfp_id_v);
-    // tree->SetBranchAddress("trk_dir_x_v",              &trk_dir_x_v);
-    // tree->SetBranchAddress("trk_dir_y_v",              &trk_dir_y_v);
-    // tree->SetBranchAddress("trk_dir_z_v",              &trk_dir_z_v);
-    // tree->SetBranchAddress("trk_start_x_v",            &trk_start_x_v);
-    // tree->SetBranchAddress("trk_start_y_v",            &trk_start_y_v);
-    // tree->SetBranchAddress("trk_start_z_v",            &trk_start_z_v);
     tree->SetBranchAddress("trk_sce_start_x_v",        &trk_sce_start_x_v);
     tree->SetBranchAddress("trk_sce_start_y_v",        &trk_sce_start_y_v);
     tree->SetBranchAddress("trk_sce_start_z_v",        &trk_sce_start_z_v);
-    // tree->SetBranchAddress("trk_end_x_v",              &trk_end_x_v);
-    // tree->SetBranchAddress("trk_end_y_v",              &trk_end_y_v);
-    // tree->SetBranchAddress("trk_end_z_v",              &trk_end_z_v);
     tree->SetBranchAddress("trk_sce_end_x_v",          &trk_sce_end_x_v);
     tree->SetBranchAddress("trk_sce_end_y_v",          &trk_sce_end_y_v);
     tree->SetBranchAddress("trk_sce_end_z_v",          &trk_sce_end_z_v);
     tree->SetBranchAddress("trk_distance_v",           &trk_distance_v);
-    // tree->SetBranchAddress("trk_theta_v",              &trk_theta_v);
-    // tree->SetBranchAddress("trk_phi_v",                &trk_phi_v);
     tree->SetBranchAddress("trk_len_v",                &trk_len_v);
     tree->SetBranchAddress("trk_mcs_muon_mom_v",       &trk_mcs_muon_mom_v);
     tree->SetBranchAddress("trk_range_muon_mom_v",     &trk_range_muon_mom_v);
-    // tree->SetBranchAddress("trk_energy_proton_v",      &trk_energy_proton_v);
-    // tree->SetBranchAddress("trk_energy_muon_v",        &trk_energy_muon_v);
-    // tree->SetBranchAddress("trk_calo_energy_u_v",      &trk_calo_energy_u_v);
-    // tree->SetBranchAddress("trk_calo_energy_v_v",      &trk_calo_energy_v_v);
-    // tree->SetBranchAddress("trk_calo_energy_y_v",      &trk_calo_energy_y_v);
-    
-    // tree->SetBranchAddress("trk_llr_pid_u_v",          &trk_llr_pid_u_v);
-    // tree->SetBranchAddress("trk_llr_pid_v_v",          &trk_llr_pid_v_v);
-    // tree->SetBranchAddress("trk_llr_pid_y_v",          &trk_llr_pid_y_v);
-    // tree->SetBranchAddress("trk_llr_pid_v",            &trk_llr_pid_v);
     tree->SetBranchAddress("trk_llr_pid_score_v",      &trk_llr_pid_score_v);
-
-
-    // weightstree->SetBranchAddress("weights", &_mapWeight);
 
     // Initalise the flux histograms if MC only
     if (type == _util.k_mc){

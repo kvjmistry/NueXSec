@@ -32,6 +32,7 @@ class CrossSectionHelper{
     double weight{0.0};        // This is not going to be integer if we already weight the CV
 
     double true_energy{0.0}, reco_energy{0.0};
+    float shr_energy_tot_cali{0.0};
 
     TTree * tree;
 
@@ -55,8 +56,8 @@ class CrossSectionHelper{
     double data_flux_scale_factor{1.0};
 
     // Energy Bins
-    const int nbins = 5;
-    double edges[6] = {0.0, 0.05, 0.25, 1.0, 2.0, 6.0};
+    const int nbins = 6;
+    double edges[7] = {0.0, 0.05, 0.25, 1.0, 2.0, 3.0, 4.0};
     
     // Define histograms for the cross section calculation
     std::vector<TH1D*> h_cross_sec;

@@ -62,6 +62,7 @@ class TreeHelper{
     float shr_energy_tot_cali{0.0};
     float shrmoliereavg{0.0};
     float shr_hits_max{0.0};
+    float elec_e{0.0};
 
     TTree * tree;       // Main tree with the selected events
     TTree * dedx_tree;  // Tree for optimising the dedx cut

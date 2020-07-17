@@ -59,6 +59,7 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
     tree->SetBranchAddress("weight", &weight);
     tree->SetBranchAddress("reco_energy", &reco_energy);
     tree->SetBranchAddress("classifcation",   &classifcation);
+    tree->SetBranchAddress("shr_energy_tot_cali", &shr_energy_tot_cali);
 
     // Get the integrated flux
     integrated_flux = GetIntegratedFlux();
@@ -82,7 +83,12 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
 
     // loop over and create the histograms
     for (unsigned int i=0; i < xsec_types.size();i++){    
-        h_cross_sec.at(i) = new TH1D ( Form("h_run%s_%s",_run_period, xsec_types.at(i).c_str()) ,"", nbins, edges);
+        if (i == k_xsec_sel || i == k_xsec_bkg || i == k_xsec_gen || i == k_xsec_sig || i == k_xsec_ext || i == k_xsec_dirt || i == k_xsec_data){
+            h_cross_sec.at(i) = new TH1D ( Form("h_run%s_%s",_run_period, xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; Entries", nbins, edges);
+        }
+        else {
+            h_cross_sec.at(i) = new TH1D ( Form("h_run%s_%s",_run_period, xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; #nu_{e} + #bar{#nu}_{e} CC Cross-Section [10^{-40} cm^{2}]", nbins, edges);
+        }
     }
     // Now loop over events and caluclate the cross section
     LoopEvents();
@@ -98,14 +104,14 @@ void CrossSectionHelper::LoopEvents(){
 
         tree->GetEntry(ievent); 
 
-        if (reco_energy > 6.0 && *classifcation == "data" ) std::cout << "reco energy was:  " << reco_energy << "  Consider updating the bins" <<std::endl;
+        if (shr_energy_tot_cali > 6.0 && *classifcation == "data" ) std::cout << "reco shower energy was:  " << shr_energy_tot_cali << "  Consider updating the bins" <<std::endl;
 
         // Signal event
         if ((*classifcation == "nue_cc" || *classifcation == "nuebar_cc") && gen == false) {
             n_sel+=weight;
             n_sig+=weight;
-            h_cross_sec.at(k_xsec_sel)->Fill(reco_energy, weight);
-            h_cross_sec.at(k_xsec_sig)->Fill(reco_energy, weight);
+            h_cross_sec.at(k_xsec_sel)->Fill(shr_energy_tot_cali, weight);
+            h_cross_sec.at(k_xsec_sig)->Fill(shr_energy_tot_cali, weight);
         }
 
         // Background event
@@ -114,32 +120,32 @@ void CrossSectionHelper::LoopEvents(){
            *classifcation == "nc_pi0" || *classifcation == "unmatched"){
             n_bkg+=weight;
             n_sel+=weight;
-            h_cross_sec.at(k_xsec_bkg)->Fill(reco_energy, weight);
-            h_cross_sec.at(k_xsec_sel)->Fill(reco_energy, weight);
+            h_cross_sec.at(k_xsec_bkg)->Fill(shr_energy_tot_cali, weight);
+            h_cross_sec.at(k_xsec_sel)->Fill(shr_energy_tot_cali, weight);
         }
         
         // Generated event
         if ( (*classifcation == "nue_cc"|| *classifcation == "nuebar_cc" ) && gen == true) {
             n_gen+=weight;
-            h_cross_sec.at(k_xsec_gen)->Fill(reco_energy, weight);
+            h_cross_sec.at(k_xsec_gen)->Fill(shr_energy_tot_cali, weight);
         }
 
         // Data event
         if (*classifcation == "data"){
             n_data+=weight;
-            h_cross_sec.at(k_xsec_data)->Fill(reco_energy, weight);
+            h_cross_sec.at(k_xsec_data)->Fill(shr_energy_tot_cali, weight);
         }
 
         // Off beam event
         if (*classifcation == "ext"){
             n_ext+=weight;
-            h_cross_sec.at(k_xsec_ext)->Fill(reco_energy, weight);
+            h_cross_sec.at(k_xsec_ext)->Fill(shr_energy_tot_cali, weight);
         }
 
         // Dirt event
         if (*classifcation == "dirt"){
             n_dirt+=weight;
-            h_cross_sec.at(k_xsec_dirt)->Fill(reco_energy, weight);
+            h_cross_sec.at(k_xsec_dirt)->Fill(shr_energy_tot_cali, weight);
         }
 
     }
@@ -200,14 +206,21 @@ void CrossSectionHelper::LoopEvents(){
                                              h_cross_sec.at(k_xsec_bkg)->GetBinContent(k)* mc_scale_factor, 
                                              integrated_flux * data_flux_scale_factor,
                                              h_cross_sec.at(k_xsec_ext)->GetBinContent(k) * intime_scale_factor,
-                                             h_cross_sec.at(k_xsec_dirt)->GetBinContent(k)* dirt_scale_factor*0.45,
+                                             h_cross_sec.at(k_xsec_dirt)->GetBinContent(k)* dirt_scale_factor,
                                              N_target_Data);
 
         if (std::isnan(temp_xsec_mc) == 1) temp_xsec_mc = 0.0;
         if (std::isnan(temp_xsec_data) == 1) temp_xsec_data = 0.0;
 
-        h_cross_sec.at(k_xsec_mcxsec)->SetBinContent(k, temp_xsec_mc);
-        h_cross_sec.at(k_xsec_dataxsec)->SetBinContent(k, temp_xsec_data);
+        // Add the cross sec, but only if its > 0...
+        if (std::isinf(temp_xsec_mc))      temp_xsec_mc = 0.0; 
+        if (std::isnan(temp_xsec_mc) == 1) temp_xsec_mc = 0.0;
+        if (std::isinf(temp_xsec_data))      temp_xsec_data = 0.0; 
+        if (std::isnan(temp_xsec_data) == 1) temp_xsec_data = 0.0;
+
+
+        if (temp_xsec_mc > 0)   h_cross_sec.at(k_xsec_mcxsec)->SetBinContent(k, temp_xsec_mc/(10e-40) );
+        if (temp_xsec_data > 0) h_cross_sec.at(k_xsec_dataxsec)->SetBinContent(k, temp_xsec_data/(10e-40));
 
         std::cout << "Bin: " << k << "  MC XSec: " << temp_xsec_mc << std::endl;
         std::cout << "Bin: " << k << "  Data XSec: " << temp_xsec_data << std::endl;
@@ -221,7 +234,7 @@ void CrossSectionHelper::LoopEvents(){
 // -----------------------------------------------------------------------------
 double CrossSectionHelper::CalcCrossSec(double sel, double gen, double sig, double bkg, double flux, double ext, double dirt, double targ){
 
-    bool DEBUG{false};
+    bool DEBUG{true};
 
     if (DEBUG) {
         std::cout << 
@@ -322,6 +335,7 @@ void CrossSectionHelper::WriteHists(){
     if (bool_dir) dir->cd();
     
     for (unsigned int p = 0; p < h_cross_sec.size(); p++){
+        h_cross_sec.at(p)->SetOption("hist");
         h_cross_sec.at(p)->Write("",TObject::kOverwrite);
     }
 

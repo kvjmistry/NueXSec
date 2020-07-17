@@ -5,8 +5,8 @@ if [ -z "$1" ]; then
 
   # Parallel processing version
   mc="./nuexsec --run 3 --mc ../ntuples/neutrinoselection_filt_run3b_overlay.root"
-  data="./nuexsec --run 3 --data ../ntuples/neutrinoselection_filt_run3b_beamon_beamgood_set1.root"
-  ext="./nuexsec --run 3 --ext ../ntuples/neutrinoselection_filt_run3b_beamoff_set1.root"
+  data="./nuexsec --run 3 --data ../ntuples/neutrinoselection_filt_run3b_beamon_beamgood.root"
+  ext="./nuexsec --run 3 --ext ../ntuples/neutrinoselection_filt_run3b_beamoff.root"
   dirt="./nuexsec --run 3 --dirt ../ntuples/neutrinoselection_filt_run3b_dirt_overlay.root"
 
   eval $mc | tee log/run3_mc.log | sed -e 's/^/[MC] /' &
