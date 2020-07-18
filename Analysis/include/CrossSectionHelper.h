@@ -51,7 +51,7 @@ class CrossSectionHelper{
 
     // Fluxes need to be defined by reading in the flux file and integrating
     double integrated_flux{0.0};
-    double flux_scale_factor{1.0e-4}; // m2 to cm2
+    double flux_scale_factor{1.0e-4}; // unit conversion of flux from m2 to cm2
     double mc_flux_scale_factor{1.0};
     double data_flux_scale_factor{1.0};
 

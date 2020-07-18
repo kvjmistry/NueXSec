@@ -29,6 +29,35 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
     float shr_energy_tot_cali{0.0}, _shr_energy_tot_cali{0.0};
     float shrmoliereavg{0.0}, _shrmoliereavg{0.0};
     float shr_hits_max{0.0},  _shr_hits_max{0.0};
+    float elec_e{0.0}, _elec_e{0.0};
+
+    std::vector<unsigned short> weightsGenie;
+    std::vector<unsigned short> weightsReint;
+    std::vector<unsigned short> weightsPPFX ;
+    std::vector<unsigned short> *_weightsGenie  = NULL;
+    std::vector<unsigned short> *_weightsReint  = NULL;
+    std::vector<unsigned short> *_weightsPPFX   = NULL;
+    
+    double knobRPAup{0.0}, _knobRPAup{0.0};
+    double knobCCMECup{0.0}, _knobCCMECup{0.0};
+    double knobAxFFCCQEup{0.0}, _knobAxFFCCQEup{0.0};
+    double knobVecFFCCQEup{0.0}, _knobVecFFCCQEup{0.0};
+    double knobDecayAngMECup{0.0}, _knobDecayAngMECup{0.0};
+    double knobThetaDelta2Npiup{0.0}, _knobThetaDelta2Npiup{0.0};
+    double knobThetaDelta2NRadup{0.0}, _knobThetaDelta2NRadup{0.0};
+    double knobRPA_CCQE_Reducedup{0.0}, _knobRPA_CCQE_Reducedup{0.0};
+    double knobNormCCCOHup{0.0}, _knobNormCCCOHup{0.0};
+    double knobNormNCCOHup{0.0}, _knobNormNCCOHup{0.0};
+    double knobRPAdn{0.0}, _knobRPAdn{0.0};
+    double knobCCMECdn{0.0}, _knobCCMECdn{0.0};
+    double knobAxFFCCQEdn{0.0}, _knobAxFFCCQEdn{0.0};
+    double knobVecFFCCQEdn{0.0}, _knobVecFFCCQEdn{0.0};
+    double knobDecayAngMECdn{0.0}, _knobDecayAngMECdn{0.0};
+    double knobThetaDelta2Npidn{0.0}, _knobThetaDelta2Npidn{0.0};
+    double knobThetaDelta2NRaddn{0.0}, _knobThetaDelta2NRaddn{0.0};
+    double knobRPA_CCQE_Reduceddn{0.0}, _knobRPA_CCQE_Reduceddn{0.0};
+    double knobNormCCCOHdn{0.0}, _knobNormCCCOHdn{0.0};
+    double knobNormNCCOHdn{0.0}, _knobNormNCCOHdn{0.0};
 
 
 
@@ -57,6 +86,31 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
     outtree->Branch("shr_energy_tot_cali", &shr_energy_tot_cali);
     outtree->Branch("shrmoliereavg", &shrmoliereavg);
     outtree->Branch("shr_hits_max",  &shr_hits_max);
+    outtree->Branch("elec_e",  &elec_e,  "elec_e/F");
+    
+    outtree->Branch("weightsGenie", "std::vector<unsigned short>", &weightsGenie);
+    outtree->Branch("weightsReint", "std::vector<unsigned short>", &weightsReint);
+    outtree->Branch("weightsPPFX", "std::vector<unsigned short>",  &weightsPPFX);
+    outtree->Branch("knobRPAup",&knobRPAup);
+    outtree->Branch("knobRPAdn",&knobRPAdn);
+    outtree->Branch("knobCCMECup",&knobCCMECup);
+    outtree->Branch("knobCCMECdn",&knobCCMECdn);
+    outtree->Branch("knobAxFFCCQEup",&knobAxFFCCQEup);
+    outtree->Branch("knobAxFFCCQEdn",&knobAxFFCCQEdn);
+    outtree->Branch("knobVecFFCCQEup",&knobVecFFCCQEup);
+    outtree->Branch("knobVecFFCCQEdn",&knobVecFFCCQEdn);
+    outtree->Branch("knobDecayAngMECup",&knobDecayAngMECup);
+    outtree->Branch("knobDecayAngMECdn",&knobDecayAngMECdn);
+    outtree->Branch("knobThetaDelta2Npiup",&knobThetaDelta2Npiup);
+    outtree->Branch("knobThetaDelta2Npidn",&knobThetaDelta2Npidn);
+    outtree->Branch("knobThetaDelta2NRadup",&knobThetaDelta2NRadup);
+    outtree->Branch("knobThetaDelta2NRaddn",&knobThetaDelta2NRaddn);
+    outtree->Branch("knobRPA_CCQE_Reducedup",&knobRPA_CCQE_Reducedup);
+    outtree->Branch("knobRPA_CCQE_Reduceddn",&knobRPA_CCQE_Reduceddn);
+    outtree->Branch("knobNormCCCOHup",&knobNormCCCOHup);
+    outtree->Branch("knobNormCCCOHdn",&knobNormCCCOHdn);
+    outtree->Branch("knobNormNCCOHup",&knobNormNCCOHup);
+    outtree->Branch("knobNormNCCOHdn",&knobNormNCCOHdn);
 
     // Loop over the flles
     for (unsigned int k = 0; k < files.size(); k++){
@@ -84,6 +138,30 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
         trees.at(k)->SetBranchAddress("shr_energy_tot_cali", &_shr_energy_tot_cali);
         trees.at(k)->SetBranchAddress("shrmoliereavg", &_shrmoliereavg);
         trees.at(k)->SetBranchAddress("shr_hits_max",  &_shr_hits_max);
+        trees.at(k)->SetBranchAddress("elec_e",  &_elec_e);
+        trees.at(k)->SetBranchAddress("weightsGenie",          &_weightsGenie);
+        trees.at(k)->SetBranchAddress("weightsReint",          &_weightsReint);
+        trees.at(k)->SetBranchAddress("weightsPPFX",           &_weightsPPFX);
+        trees.at(k)->SetBranchAddress("knobRPAup",             &_knobRPAup);
+        trees.at(k)->SetBranchAddress("knobRPAdn",             &_knobRPAdn);
+        trees.at(k)->SetBranchAddress("knobCCMECup",           &_knobCCMECup);
+        trees.at(k)->SetBranchAddress("knobCCMECdn",           &_knobCCMECdn);
+        trees.at(k)->SetBranchAddress("knobAxFFCCQEup",        &_knobAxFFCCQEup);
+        trees.at(k)->SetBranchAddress("knobAxFFCCQEdn",        &_knobAxFFCCQEdn);
+        trees.at(k)->SetBranchAddress("knobVecFFCCQEup",       &_knobVecFFCCQEup);
+        trees.at(k)->SetBranchAddress("knobVecFFCCQEdn",       &_knobVecFFCCQEdn);
+        trees.at(k)->SetBranchAddress("knobDecayAngMECup",     &_knobDecayAngMECup);
+        trees.at(k)->SetBranchAddress("knobDecayAngMECdn",     &_knobDecayAngMECdn);
+        trees.at(k)->SetBranchAddress("knobThetaDelta2Npiup",  &_knobThetaDelta2Npiup);
+        trees.at(k)->SetBranchAddress("knobThetaDelta2Npidn",  &_knobThetaDelta2Npidn);
+        trees.at(k)->SetBranchAddress("knobThetaDelta2NRadup", &_knobThetaDelta2NRadup);
+        trees.at(k)->SetBranchAddress("knobThetaDelta2NRaddn", &_knobThetaDelta2NRaddn);
+        trees.at(k)->SetBranchAddress("knobRPA_CCQE_Reducedup",&_knobRPA_CCQE_Reducedup);
+        trees.at(k)->SetBranchAddress("knobRPA_CCQE_Reduceddn",&_knobRPA_CCQE_Reduceddn);
+        trees.at(k)->SetBranchAddress("knobNormCCCOHup",       &_knobNormCCCOHup);
+        trees.at(k)->SetBranchAddress("knobNormCCCOHdn",       &_knobNormCCCOHdn);
+        trees.at(k)->SetBranchAddress("knobNormNCCOHup",       &_knobNormNCCOHup);
+        trees.at(k)->SetBranchAddress("knobNormNCCOHdn",       &_knobNormNCCOHdn);
 
         int tree_entries = trees.at(k)->GetEntries();
 
@@ -107,6 +185,31 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
                 shr_energy_tot_cali = _shr_energy_tot_cali;
                 shrmoliereavg = _shrmoliereavg;
                 shr_hits_max = _shr_hits_max;
+                elec_e = _elec_e;
+
+                if (_weightsGenie != NULL) weightsGenie           = *_weightsGenie; // If these aren't set by default then bad things happen in memory land
+                if (_weightsReint != NULL) weightsReint           = *_weightsReint;
+                if (_weightsPPFX  != NULL) weightsPPFX            = *_weightsPPFX;
+                knobRPAup = _knobRPAup;
+                knobCCMECup = _knobCCMECup;
+                knobAxFFCCQEup = _knobAxFFCCQEup;
+                knobVecFFCCQEup = _knobVecFFCCQEup;
+                knobDecayAngMECup = _knobDecayAngMECup;
+                knobThetaDelta2Npiup = _knobThetaDelta2Npiup;
+                knobThetaDelta2NRadup = _knobThetaDelta2NRadup;
+                knobRPA_CCQE_Reducedup = _knobRPA_CCQE_Reducedup;
+                knobNormCCCOHup = _knobNormCCCOHup;
+                knobNormNCCOHup = _knobNormNCCOHup;
+                knobRPAdn = _knobRPAdn;
+                knobCCMECdn = _knobCCMECdn;
+                knobAxFFCCQEdn = _knobAxFFCCQEdn;
+                knobVecFFCCQEdn = _knobVecFFCCQEdn;
+                knobDecayAngMECdn = _knobDecayAngMECdn;
+                knobThetaDelta2Npidn = _knobThetaDelta2Npidn;
+                knobThetaDelta2NRaddn = _knobThetaDelta2NRaddn;
+                knobRPA_CCQE_Reduceddn = _knobRPA_CCQE_Reduceddn;
+                knobNormCCCOHdn = _knobNormCCCOHdn;
+                knobNormNCCOHdn = _knobNormNCCOHdn;
 
                 outtree->Fill();
         }

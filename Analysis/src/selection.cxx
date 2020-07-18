@@ -288,10 +288,10 @@ void selection::MakeSelection(){
         } // End Event loop
 
         std::cout << "Ending Selection over MC" << std::endl;
-        std::cout << "numu_pi: " << numu_pi << std::endl;
-        std::cout << "numubar_pi: " << numubar_pi << std::endl;
-        std::cout << "nue_pi: "  << nue_pi  << std::endl;
-        std::cout << "nuebar_pi: "  << nuebar_pi  << std::endl;
+        // std::cout << "numu_pi: " << numu_pi << std::endl;
+        // std::cout << "numubar_pi: " << numubar_pi << std::endl;
+        // std::cout << "nue_pi: "  << nue_pi  << std::endl;
+        // std::cout << "nuebar_pi: "  << nuebar_pi  << std::endl;
 
 
         if (make_list){
@@ -301,6 +301,10 @@ void selection::MakeSelection(){
             int run, subrun, event;
             std::ofstream run_subrun_file;
             run_subrun_file.open(Form("files/run%i_run_subrun_list_mc.txt",_run_period));
+
+            int tot_gen{0};
+            int tot_sig{0};
+            int tot_bkg{0};
 
             // Event loop
             for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
@@ -315,13 +319,24 @@ void selection::MakeSelection(){
                     run    = mc_SC.run;
                     subrun = mc_SC.sub;
                     event  = mc_SC.evt;
+
+                    if (classification.first == "nue_cc" || classification.first == "nuebar_cc" ) tot_gen++;
+                    
+                    if (mc_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true){
+                        if (classification.first == "nue_cc" || classification.first == "nuebar_cc") tot_sig++;
+                        else tot_bkg++;
+                    } 
                     
                     // std::cout <<  mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt <<  std::endl;
                     run_subrun_file << run << " " << subrun << " " << event << '\n';
                     
                 }
 
+                
+
             } // End Event loop
+
+            // std::cout << "tot gen: " << tot_gen << "  tot sig: " << tot_sig << "  tot bkg: " << tot_bkg<< std::endl;
         }
 
     }
@@ -707,7 +722,7 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
 
     // Try scaling the pi0
     // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
-    GetPiZeroWeight(weight, 2, SC);
+    GetPiZeroWeight(weight, 0, SC);
 
     
     // This is in many places, need to have a way for setting this number by default

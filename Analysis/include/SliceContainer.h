@@ -503,31 +503,31 @@ public:
     std::vector<float> *mc_purity_v       = nullptr;
     
     std::map<std::string, std::vector<double>> *weights_v = nullptr;
-    std::vector<unsigned short> *weightsGenie_v  = nullptr;
-    std::vector<unsigned short> *weightsReint_v  = nullptr;
+    std::vector<unsigned short> *weightsGenie  = nullptr;
+    std::vector<unsigned short> *weightsReint  = nullptr;
     std::vector<unsigned short> *weightsPPFX     = nullptr;
 
 
-    double knobRPAup;
-    double knobCCMECup;
-    double knobAxFFCCQEup;
-    double knobVecFFCCQEup;
-    double knobDecayAngMECup;
-    double knobThetaDelta2Npiup;
-    double knobThetaDelta2NRadup;
-    double knobRPA_CCQE_Reducedup;
-    double knobNormCCCOHup;
-    double knobNormNCCOHup;
-    double knobRPAdn;
-    double knobCCMECdn;
-    double knobAxFFCCQEdn;
-    double knobVecFFCCQEdn;
-    double knobDecayAngMECdn;
-    double knobThetaDelta2Npidn;
-    double knobThetaDelta2NRaddn;
-    double knobRPA_CCQE_Reduceddn;
-    double knobNormCCCOHdn;
-    double knobNormNCCOHdn;
+    double knobRPAup{1.0};
+    double knobCCMECup{1.0};
+    double knobAxFFCCQEup{1.0};
+    double knobVecFFCCQEup{1.0};
+    double knobDecayAngMECup{1.0};
+    double knobThetaDelta2Npiup{1.0};
+    double knobThetaDelta2NRadup{1.0};
+    double knobRPA_CCQE_Reducedup{1.0};
+    double knobNormCCCOHup{1.0};
+    double knobNormNCCOHup{1.0};
+    double knobRPAdn{1.0};
+    double knobCCMECdn{1.0};
+    double knobAxFFCCQEdn{1.0};
+    double knobVecFFCCQEdn{1.0};
+    double knobDecayAngMECdn{1.0};
+    double knobThetaDelta2Npidn{1.0};
+    double knobThetaDelta2NRaddn{1.0};
+    double knobRPA_CCQE_Reduceddn{1.0};
+    double knobNormCCCOHdn{1.0};
+    double knobNormNCCOHdn{1.0};
 
 
     

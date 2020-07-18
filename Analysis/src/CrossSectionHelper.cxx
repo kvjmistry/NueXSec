@@ -21,7 +21,7 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
         mc_scale_factor     = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_MC_POT);
         dirt_scale_factor   = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_Dirt_POT);
         intime_scale_factor = _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
-        mc_flux_scale_factor   = flux_scale_factor * _util.config_v.at(_util.k_Run3_MC_POT);
+        mc_flux_scale_factor   = flux_scale_factor * _util.config_v.at(_util.k_Run3_MC_POT); 
         data_flux_scale_factor = flux_scale_factor * _util.config_v.at(_util.k_Run3_Data_POT);
     }
     else {
@@ -209,17 +209,14 @@ void CrossSectionHelper::LoopEvents(){
                                              h_cross_sec.at(k_xsec_dirt)->GetBinContent(k)* dirt_scale_factor,
                                              N_target_Data);
 
-        if (std::isnan(temp_xsec_mc) == 1) temp_xsec_mc = 0.0;
-        if (std::isnan(temp_xsec_data) == 1) temp_xsec_data = 0.0;
-
         // Add the cross sec, but only if its > 0...
-        if (std::isinf(temp_xsec_mc))      temp_xsec_mc = 0.0; 
-        if (std::isnan(temp_xsec_mc) == 1) temp_xsec_mc = 0.0;
-        if (std::isinf(temp_xsec_data))      temp_xsec_data = 0.0; 
+        if (std::isnan(temp_xsec_mc) == 1)   temp_xsec_mc   = 0.0;
         if (std::isnan(temp_xsec_data) == 1) temp_xsec_data = 0.0;
+        if (std::isinf(temp_xsec_mc))        temp_xsec_mc   = 0.0; 
+        if (std::isinf(temp_xsec_data))      temp_xsec_data = 0.0; 
 
 
-        if (temp_xsec_mc > 0)   h_cross_sec.at(k_xsec_mcxsec)->SetBinContent(k, temp_xsec_mc/(10e-40) );
+        if (temp_xsec_mc > 0)   h_cross_sec.at(k_xsec_mcxsec)  ->SetBinContent(k, temp_xsec_mc/(10e-40) );
         if (temp_xsec_data > 0) h_cross_sec.at(k_xsec_dataxsec)->SetBinContent(k, temp_xsec_data/(10e-40));
 
         std::cout << "Bin: " << k << "  MC XSec: " << temp_xsec_mc << std::endl;

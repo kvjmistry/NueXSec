@@ -34,6 +34,9 @@ Run1_EXT_trig 4015961.990000 // v3 with michel veto updated
 -
 // ------- Additional Run 1 POT Definitions -----
 -
+// Run 1 slimmed version with event weights
+Run1_MC_POT_weight 2.07136e+21
+-
 // Run 1 Det var CV
 Run1_MC_POT_CV 4.44874e+20
 -

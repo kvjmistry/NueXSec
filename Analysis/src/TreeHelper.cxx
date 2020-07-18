@@ -103,6 +103,30 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     tree->Branch("shr_hits_max",  &shr_hits_max,  "shr_hits_max/F");
     tree->Branch("elec_e",  &elec_e,  "elec_e/F");
 
+    tree->Branch("weightsGenie", "std::vector<unsigned short>", &weightsGenie);
+    tree->Branch("weightsReint", "std::vector<unsigned short>", &weightsReint);
+    tree->Branch("weightsPPFX", "std::vector<unsigned short>", &weightsPPFX);
+    tree->Branch("knobRPAup",&knobRPAup,"knobRPAup/D");
+    tree->Branch("knobRPAdn",&knobRPAdn,"knobRPAdn/D");
+    tree->Branch("knobCCMECup",&knobCCMECup,"knobCCMECup/D");
+    tree->Branch("knobCCMECdn",&knobCCMECdn,"knobCCMECdn/D");
+    tree->Branch("knobAxFFCCQEup",&knobAxFFCCQEup,"knobAxFFCCQEup/D");
+    tree->Branch("knobAxFFCCQEdn",&knobAxFFCCQEdn,"knobAxFFCCQEdn/D");
+    tree->Branch("knobVecFFCCQEup",&knobVecFFCCQEup,"knobVecFFCCQEup/D");
+    tree->Branch("knobVecFFCCQEdn",&knobVecFFCCQEdn,"knobVecFFCCQEdn/D");
+    tree->Branch("knobDecayAngMECup",&knobDecayAngMECup,"knobDecayAngMECup/D");
+    tree->Branch("knobDecayAngMECdn",&knobDecayAngMECdn,"knobDecayAngMECdn/D");
+    tree->Branch("knobThetaDelta2Npiup",&knobThetaDelta2Npiup,"knobThetaDelta2Npiup/D");
+    tree->Branch("knobThetaDelta2Npidn",&knobThetaDelta2Npidn,"knobThetaDelta2Npidn/D");
+    tree->Branch("knobThetaDelta2NRadup",&knobThetaDelta2NRadup,"knobThetaDelta2NRadup/D");
+    tree->Branch("knobThetaDelta2NRaddn",&knobThetaDelta2NRaddn,"knobThetaDelta2NRaddn/D");
+    tree->Branch("knobRPA_CCQE_Reducedup",&knobRPA_CCQE_Reducedup,"knobRPA_CCQE_Reducedup/D");
+    tree->Branch("knobRPA_CCQE_Reduceddn",&knobRPA_CCQE_Reduceddn,"knobRPA_CCQE_Reduceddn/D");
+    tree->Branch("knobNormCCCOHup",&knobNormCCCOHup,"knobNormCCCOHup/D");
+    tree->Branch("knobNormCCCOHdn",&knobNormCCCOHdn,"knobNormCCCOHdn/D");
+    tree->Branch("knobNormNCCOHup",&knobNormNCCOHup,"knobNormNCCOHup/D");
+    tree->Branch("knobNormNCCOHdn",&knobNormNCCOHdn,"knobNormNCCOHdn/D");
+
     dedx_tree->Branch("shr_dedx_Y_cali", &shr_dedx_Y_cali, "shr_dedx_Y_cali/F");
     dedx_tree->Branch("shr_dedx_V_cali", &shr_dedx_V_cali, "shr_dedx_V_cali/F");
     dedx_tree->Branch("shr_dedx_U_cali", &shr_dedx_U_cali, "shr_dedx_U_cali/F");
@@ -208,6 +232,32 @@ void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _class
     shrmoliereavg = SC.shrmoliereavg;
     shr_hits_max  = SC.shr_hits_max;
     elec_e   = SC.elec_e;
+
+    
+    if (SC.weightsGenie != NULL) weightsGenie           = *SC.weightsGenie; // If these aren't set by default then bad things happen in memory land
+    if (SC.weightsReint != NULL) weightsReint           = *SC.weightsReint;
+    if (SC.weightsPPFX  != NULL) weightsPPFX            = *SC.weightsPPFX;
+    knobRPAup              = SC.knobRPAup;
+    knobCCMECup            = SC.knobCCMECup;
+    knobAxFFCCQEup         = SC.knobAxFFCCQEup;
+    knobVecFFCCQEup        = SC.knobVecFFCCQEup;
+    knobDecayAngMECup      = SC.knobDecayAngMECup;
+    knobThetaDelta2Npiup   = SC.knobThetaDelta2Npiup;
+    knobThetaDelta2NRadup  = SC.knobThetaDelta2NRadup;
+    knobRPA_CCQE_Reducedup = SC.knobRPA_CCQE_Reducedup;
+    knobNormCCCOHup        = SC.knobNormCCCOHup;
+    knobNormNCCOHup        = SC.knobNormNCCOHup;
+    knobRPAdn              = SC.knobRPAdn;
+    knobCCMECdn            = SC.knobCCMECdn;
+    knobAxFFCCQEdn         = SC.knobAxFFCCQEdn;
+    knobVecFFCCQEdn        = SC.knobVecFFCCQEdn;
+    knobDecayAngMECdn      = SC.knobDecayAngMECdn;
+    knobThetaDelta2Npidn   = SC.knobThetaDelta2Npidn;
+    knobThetaDelta2NRaddn  = SC.knobThetaDelta2NRaddn;
+    knobRPA_CCQE_Reduceddn = SC.knobRPA_CCQE_Reduceddn;
+    knobNormCCCOHdn        = SC.knobNormCCCOHdn;
+    knobNormNCCOHdn        = SC.knobNormNCCOHdn;
+
 
     tree->Fill();
 

@@ -64,6 +64,33 @@ class TreeHelper{
     float shr_hits_max{0.0};
     float elec_e{0.0};
 
+    // Weights
+    std::vector<unsigned short> weightsGenie;
+    std::vector<unsigned short> weightsReint;
+    std::vector<unsigned short> weightsPPFX ;
+    double knobRPAup;
+    double knobCCMECup;
+    double knobAxFFCCQEup;
+    double knobVecFFCCQEup;
+    double knobDecayAngMECup;
+    double knobThetaDelta2Npiup;
+    double knobThetaDelta2NRadup;
+    double knobRPA_CCQE_Reducedup;
+    double knobNormCCCOHup;
+    double knobNormNCCOHup;
+    double knobRPAdn;
+    double knobCCMECdn;
+    double knobAxFFCCQEdn;
+    double knobVecFFCCQEdn;
+    double knobDecayAngMECdn;
+    double knobThetaDelta2Npidn;
+    double knobThetaDelta2NRaddn;
+    double knobRPA_CCQE_Reduceddn;
+    double knobNormCCCOHdn;
+    double knobNormNCCOHdn;
+
+
+
     TTree * tree;       // Main tree with the selected events
     TTree * dedx_tree;  // Tree for optimising the dedx cut
     TTree * counter_tree; // Tree for storing the selection results

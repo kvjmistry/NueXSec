@@ -336,7 +336,7 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("nu_purity_from_pfp", &nu_purity_from_pfp);
     // tree->SetBranchAddress("n_tracks_pandora", &n_tracks_pandora);
     
-    tree->SetBranchAddress("_closestNuCosmicDist",&_closestNuCosmicDist);
+    if (std::string(_run_period) != "1") tree->SetBranchAddress("_closestNuCosmicDist",&_closestNuCosmicDist);
     
     tree->SetBranchAddress("bdt_nuNCpi0",   &bdt_nuNCpi0);
     tree->SetBranchAddress("bdt_numuCCpi0", &bdt_numuCCpi0);
@@ -384,29 +384,31 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
         // weightstree->SetBranchAddress("weights", &_mapWeight);
         // tree->SetBranchAddress("weights",         &weights_v);
         
-        tree->SetBranchAddress("weightsGenie",          &weightsGenie_v);
-        tree->SetBranchAddress("weightsReint",          &weightsReint_v);
-        tree->SetBranchAddress("weightsPPFX",           &weightsPPFX);
-        tree->SetBranchAddress("knobRPAup",             &knobRPAup);
-        tree->SetBranchAddress("knobRPAdn",             &knobRPAdn);
-        tree->SetBranchAddress("knobCCMECup",           &knobCCMECup);
-        tree->SetBranchAddress("knobCCMECdn",           &knobCCMECdn);
-        tree->SetBranchAddress("knobAxFFCCQEup",        &knobAxFFCCQEup);
-        tree->SetBranchAddress("knobAxFFCCQEdn",        &knobAxFFCCQEdn);
-        tree->SetBranchAddress("knobVecFFCCQEup",       &knobVecFFCCQEup);
-        tree->SetBranchAddress("knobVecFFCCQEdn",       &knobVecFFCCQEdn);
-        tree->SetBranchAddress("knobDecayAngMECup",     &knobDecayAngMECup);
-        tree->SetBranchAddress("knobDecayAngMECdn",     &knobDecayAngMECdn);
-        tree->SetBranchAddress("knobThetaDelta2Npiup",  &knobThetaDelta2Npiup);
-        tree->SetBranchAddress("knobThetaDelta2Npidn",  &knobThetaDelta2Npidn);
-        tree->SetBranchAddress("knobThetaDelta2NRadup", &knobThetaDelta2NRadup);
-        tree->SetBranchAddress("knobThetaDelta2NRaddn", &knobThetaDelta2NRaddn);
-        tree->SetBranchAddress("knobRPA_CCQE_Reducedup",&knobRPA_CCQE_Reducedup);
-        tree->SetBranchAddress("knobRPA_CCQE_Reduceddn",&knobRPA_CCQE_Reduceddn);
-        tree->SetBranchAddress("knobNormCCCOHup",       &knobNormCCCOHup);
-        tree->SetBranchAddress("knobNormCCCOHdn",       &knobNormCCCOHdn);
-        tree->SetBranchAddress("knobNormNCCOHup",       &knobNormNCCOHup);
-        tree->SetBranchAddress("knobNormNCCOHdn",       &knobNormNCCOHdn);
+        if (type == _util.k_mc){
+            tree->SetBranchAddress("weightsGenie",          &weightsGenie);
+            tree->SetBranchAddress("weightsReint",          &weightsReint);
+            tree->SetBranchAddress("weightsPPFX",           &weightsPPFX);
+            tree->SetBranchAddress("knobRPAup",             &knobRPAup);
+            tree->SetBranchAddress("knobRPAdn",             &knobRPAdn);
+            tree->SetBranchAddress("knobCCMECup",           &knobCCMECup);
+            tree->SetBranchAddress("knobCCMECdn",           &knobCCMECdn);
+            tree->SetBranchAddress("knobAxFFCCQEup",        &knobAxFFCCQEup);
+            tree->SetBranchAddress("knobAxFFCCQEdn",        &knobAxFFCCQEdn);
+            tree->SetBranchAddress("knobVecFFCCQEup",       &knobVecFFCCQEup);
+            tree->SetBranchAddress("knobVecFFCCQEdn",       &knobVecFFCCQEdn);
+            tree->SetBranchAddress("knobDecayAngMECup",     &knobDecayAngMECup);
+            tree->SetBranchAddress("knobDecayAngMECdn",     &knobDecayAngMECdn);
+            tree->SetBranchAddress("knobThetaDelta2Npiup",  &knobThetaDelta2Npiup);
+            tree->SetBranchAddress("knobThetaDelta2Npidn",  &knobThetaDelta2Npidn);
+            tree->SetBranchAddress("knobThetaDelta2NRadup", &knobThetaDelta2NRadup);
+            tree->SetBranchAddress("knobThetaDelta2NRaddn", &knobThetaDelta2NRaddn);
+            tree->SetBranchAddress("knobRPA_CCQE_Reducedup",&knobRPA_CCQE_Reducedup);
+            tree->SetBranchAddress("knobRPA_CCQE_Reduceddn",&knobRPA_CCQE_Reduceddn);
+            tree->SetBranchAddress("knobNormCCCOHup",       &knobNormCCCOHup);
+            tree->SetBranchAddress("knobNormCCCOHdn",       &knobNormCCCOHdn);
+            tree->SetBranchAddress("knobNormNCCOHup",       &knobNormNCCOHup);
+            tree->SetBranchAddress("knobNormNCCOHdn",       &knobNormNCCOHdn);
+        }
     }
     
     
