@@ -33,6 +33,34 @@ class CrossSectionHelper{
 
     double true_energy{0.0}, reco_energy{0.0};
     float shr_energy_tot_cali{0.0};
+    float elec_e{0.0};
+
+    // Weights
+    std::vector<unsigned short> *weightsGenie = NULL;
+    std::vector<unsigned short> *weightsReint = NULL;
+    std::vector<unsigned short> *weightsPPFX = NULL ;
+    double knobRPAup{0.0};
+    double knobCCMECup{0.0};
+    double knobAxFFCCQEup{0.0};
+    double knobVecFFCCQEup{0.0};
+    double knobDecayAngMECup{0.0};
+    double knobThetaDelta2Npiup{0.0};
+    double knobThetaDelta2NRadup{0.0};
+    double knobRPA_CCQE_Reducedup{0.0};
+    double knobNormCCCOHup{0.0};
+    double knobNormNCCOHup{0.0};
+    double knobRPAdn{0.0};
+    double knobCCMECdn{0.0};
+    double knobAxFFCCQEdn{0.0};
+    double knobVecFFCCQEdn{0.0};
+    double knobDecayAngMECdn{0.0};
+    double knobThetaDelta2Npidn{0.0};
+    double knobThetaDelta2NRaddn{0.0};
+    double knobRPA_CCQE_Reduceddn{0.0};
+    double knobNormCCCOHdn{0.0};
+    double knobNormNCCOHdn{0.0};
+
+    std::vector<double> vec_universes;
 
     TTree * tree;
 
@@ -55,12 +83,14 @@ class CrossSectionHelper{
     double mc_flux_scale_factor{1.0};
     double data_flux_scale_factor{1.0};
 
+    int uni_reint{1000}, uni_genie{500}, uni_ppfx{600}; // For resizing data, ext and dirt in multisims
+
     // Energy Bins
     const int nbins = 6;
-    double edges[7] = {0.0, 0.05, 0.25, 1.0, 2.0, 3.0, 4.0};
+    double edges[7] = {0.0, 0.05, 0.25, 1.0, 2.0, 3.0, 5.0};
     
     // Define histograms for the cross section calculation
-    std::vector<TH1D*> h_cross_sec;
+    std::vector<std::vector<std::vector<TH1D*>>> h_cross_sec;
 
     // enum for histogram vars
     enum TH1D_xsec_hist_vars {
@@ -79,9 +109,64 @@ class CrossSectionHelper{
     // Names for cross section histograms
     std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "sig", "ext", "dirt", "data", "mc_xsec", "data_xsec"};
 
+    std::vector<std::string> reweighter_labels = {
+        "CV",
+        "RPAup",
+        "CCMECup",
+        "AxFFCCQEup",
+        "VecFFCCQEup",
+        "DecayAngMECup",
+        "ThetaDelta2Npiup",
+        "ThetaDelta2NRadup",
+        "RPA_CCQE_Reducedup",
+        "NormCCCOHup",
+        "NormNCCOHup",
+        "RPAdn",
+        "CCMECdn",
+        "AxFFCCQEdn",
+        "VecFFCCQEdn",
+        "DecayAngMECdn",
+        "ThetaDelta2Npidn",
+        "ThetaDelta2NRaddn",
+        "RPA_CCQE_Reduceddn",
+        "NormCCCOHdn",
+        "NormNCCOHdn",
+        "weightsGenie",
+        "weightsReint",
+        "weightsPPFX"
+    };
+
+    // enum for reweighter labels
+    enum TH1D_xsec_label_vars {
+        k_RPAup,
+        k_CCMECup,
+        k_AxFFCCQEup,
+        k_VecFFCCQEup,
+        k_DecayAngMECup,
+        k_ThetaDelta2Npiup,
+        k_ThetaDelta2NRadup,
+        k_RPA_CCQE_Reducedup,
+        k_NormCCCOHup,
+        k_NormNCCOHup,
+        k_RPAdn,
+        k_CCMECdn,
+        k_AxFFCCQEdn,
+        k_VecFFCCQEdn,
+        k_DecayAngMECdn,
+        k_ThetaDelta2Npidn,
+        k_ThetaDelta2NRaddn,
+        k_RPA_CCQE_Reduceddn,
+        k_NormCCCOHdn,
+        k_NormNCCOHdn,
+        k_weightsGenie,
+        k_weightsReint,
+        k_weightsPPFX,
+        k_TH1D_reweighter_labels_MAX
+    };
+
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(const char *run_period, const char * xsec_file_in, utility _utility);
+    void Initialise(const char *run_period, const char * xsec_file_in, utility _utility, const char* run_mode);
     // -------------------------------------------------------------------------
     // Function to loop over events and calculate the cross section
     void LoopEvents(); 
@@ -99,7 +184,16 @@ class CrossSectionHelper{
     // -------------------------------------------------------------------------
     void WriteHists();
     // -------------------------------------------------------------------------
+    // Initialise the ttree reading from the input file
+    void InitTree();
     // -------------------------------------------------------------------------
+    // Function will set the reweight vector to the corresponding label per event
+    void SwitchReweighterLabel(std::string label);
+    // -------------------------------------------------------------------------
+    // Initialise the histograms for this class
+    void InitialiseHistograms(std::string run_mode);
+    // -------------------------------------------------------------------------
+
 
     private:
 

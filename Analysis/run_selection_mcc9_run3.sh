@@ -36,7 +36,8 @@ if [ -z "$1" ]; then
   root -l -b -q 'merge/merge_uneaventrees.C("3","files/trees/nuexsec_selected_tree_mc_run3.root", "files/trees/nuexsec_selected_tree_data_run3.root", "files/trees/nuexsec_selected_tree_ext_run3.root","files/trees/nuexsec_selected_tree_dirt_run3.root", "")'
 
   # Now run the cross section calculator
-  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root | tee -a log/run3.log 
+  # Not running this until happy its working...
+  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode default | tee -a log/run3.log 
 
 fi
 

@@ -55,7 +55,7 @@ if [ -z "$1" ]; then
   root -l -b -q 'merge/merge_uneaventrees.C("1","files/trees/nuexsec_selected_tree_mc_run1.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "")'
 
   # Now run the cross section calculator
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root | tee -a log/run1.log 
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode default | tee -a log/run1.log 
 fi
 # ---------------------
 
@@ -65,7 +65,7 @@ if [ "$1" == "weight" ]; then
 
   root -l -b -q 'merge/merge_uneaventrees.C("1","files/trees/nuexsec_selected_tree_mc_run1_weight.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "weight")'
 
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_weight.root --var dummy weight
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_weight.root --var dummy weight --xsecmode reweight
 
 fi
 
@@ -82,7 +82,7 @@ if [ "$1" == "CV" ]; then
 
   root -l -b -q 'merge/merge_uneaventrees.C("1","files/trees/nuexsec_selected_tree_mc_run1_CV.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "CV")'
 
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_CV.root --var dummy CV
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_CV.root --var dummy CV --xsecmode default
 
 fi
 
@@ -99,7 +99,7 @@ if [ "$1" == "BNB_Diffusion" ]; then
 
   root -l -b -q 'merge/merge_uneaventrees.C("1","files/trees/nuexsec_selected_tree_mc_run1_BNB_Diffusion.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "BNB_Diffusion")'
 
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_BNB_Diffusion.root --var dummy BNB_Diffusion
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_BNB_Diffusion.root --var dummy BNB_Diffusion --xsecmode default
 
 fi
 

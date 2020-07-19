@@ -33,6 +33,7 @@ int main(int argc, char *argv[]){
     char * tree_file_name        = (char *)"empty";
     char * run_period            = (char *)"empty";
     char * sysmode               = (char *)"default";
+    char * xsecmode              = (char *)"default";
     int num_events{-1};
     int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
     int weight{1};  // level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only
@@ -76,7 +77,9 @@ int main(int argc, char *argv[]){
     "-------------------------------------------------------"
     "\n\nTo run the cross section calculation code, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --xsec <input merged nuexsec tree file> [options (see below)]\033[0m \n\n"
-    "The <input merged nuexsec ttree file> corresponds to merged ttree file of the mc, data, ext and dirt. See the bash script merge_uneaventrees.C for more details\n\n";
+    "The <input merged nuexsec ttree file> corresponds to merged ttree file of the mc, data, ext and dirt. See the bash script merge_uneaventrees.C for more details\n\n"
+    "\033[0;34m[--xsecmode <cross-section mode>]\033[0m                      \033[0;32mThe input mode of xsec code to run. Options are default or reweight \033[0m\n\n"
+    "-------------------------------------------------------\n\n";
 
     std::string usage3 = "\n\nTo run the detector systematics code, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --sys <systematics mode>\033[0m \n\n"
@@ -222,6 +225,12 @@ int main(int argc, char *argv[]){
             sysmode = argv[i+1];
         }
 
+        // Cross-Section
+        if (strcmp(arg, "--xsecmode") == 0){
+            std::cout << "Using Cross-Section code with mode: " << argv[i+1] << std::endl;
+            xsecmode = argv[i+1];
+        }
+
         // Only run the print function
         if (strcmp(arg, "--printonly") == 0) {
             run_selection = false;
@@ -290,7 +299,7 @@ int main(int argc, char *argv[]){
     if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, weight, area_norm, _utility, variation);
 
     // Run the calculate cross section function
-    if (calc_cross_sec) _xsec.Initialise(run_period, tree_file_name, _utility);
+    if (calc_cross_sec) _xsec.Initialise(run_period, tree_file_name, _utility, xsecmode);
 
     // Run the systematics helper code
     if (run_sys) _syshelper.Initialise(run_period, _utility, sysmode);
