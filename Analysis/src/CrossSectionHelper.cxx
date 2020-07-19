@@ -82,8 +82,6 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
 // -----------------------------------------------------------------------------
 void CrossSectionHelper::LoopEvents(){
 
-    double n_data{0.0}, n_dirt{0.0}, n_ext{0.0}, n_selected{0.0}, n_gen{0.0}, n_bkg{0.0}, n_sig{0.0}, n_sel{0.0};
-
     // Loop over the tree entries
     std::cout << "Total Tree Entries: "<< tree->GetEntries() << std::endl;
 
@@ -112,6 +110,7 @@ void CrossSectionHelper::LoopEvents(){
 
             // Now loop over the universes
             for (unsigned int uni = 0; uni < h_cross_sec.at(label).size(); uni++){
+                
                 // Update the CV weight to CV * universe i
                 if (std::isnan(vec_universes.at(uni)) == 1)   vec_universes.at(uni)   = 1.0;
                 if (std::isinf(vec_universes.at(uni)))        vec_universes.at(uni)   = 1.0;
@@ -121,13 +120,9 @@ void CrossSectionHelper::LoopEvents(){
                 // Signal event
                 if ((*classifcation == "nue_cc" || *classifcation == "nuebar_cc") && gen == false) {
                     
-                    // Tally up the CV numbers
-                    if (reweighter_labels.at(label) == "CV") n_sel+=weight_uni;
-                    if (reweighter_labels.at(label) == "CV") n_sig+=weight_uni;
-                    
                     // Fill histograms
-                    h_cross_sec.at(label).at(uni).at(k_xsec_sel)->Fill(shr_energy_tot_cali, weight_uni);
                     h_cross_sec.at(label).at(uni).at(k_xsec_sig)->Fill(shr_energy_tot_cali, weight_uni);
+                    h_cross_sec.at(label).at(uni).at(k_xsec_sel)->Fill(shr_energy_tot_cali, cv_weight); // Selected events (N term) we dont weight
                 }
 
                 // Background event
@@ -135,20 +130,15 @@ void CrossSectionHelper::LoopEvents(){
                      *classifcation == "numu_cc"    || *classifcation == "numu_cc_pi0" || *classifcation == "nc" || 
                      *classifcation == "nc_pi0"     || *classifcation == "unmatched"){
                     
-                    // Tally up the CV numbers
-                    if (reweighter_labels.at(label) == "CV") n_bkg+=weight_uni;
-                    if (reweighter_labels.at(label) == "CV") n_sel+=weight_uni;
-                    
                     // Fill histograms
                     h_cross_sec.at(label).at(uni).at(k_xsec_bkg)->Fill(shr_energy_tot_cali, weight_uni);
-                    h_cross_sec.at(label).at(uni).at(k_xsec_sel)->Fill(shr_energy_tot_cali, weight_uni);
+                    h_cross_sec.at(label).at(uni).at(k_xsec_sel)->Fill(shr_energy_tot_cali, cv_weight); // Selected events (N term) we dont weight
                 }
                 
                 // Generated event
                 if ( (*classifcation == "nue_cc"|| *classifcation == "nuebar_cc" ) && gen == true) {
                     
-                    // Tally up the CV numbers
-                    if (reweighter_labels.at(label) == "CV") n_gen+=weight_uni;
+                    // Fill histograms
                     h_cross_sec.at(label).at(uni).at(k_xsec_gen)->Fill(shr_energy_tot_cali, weight_uni);
                 }
 
@@ -157,9 +147,6 @@ void CrossSectionHelper::LoopEvents(){
 
                     if (cv_weight != 1.0) std::cout << "Error weight for data is not 1, this means your weighting the data... bad!"<< std::endl;
                     
-                    // Tally up the CV numbers
-                    if (reweighter_labels.at(label) == "CV") n_data+=cv_weight;
-                    
                     // Fill histograms
                     h_cross_sec.at(label).at(uni).at(k_xsec_data)->Fill(shr_energy_tot_cali, cv_weight);
                 }
@@ -167,18 +154,12 @@ void CrossSectionHelper::LoopEvents(){
                 // Off beam event
                 if (*classifcation == "ext"){
                     
-                    // Tally up the CV numbers
-                    if (reweighter_labels.at(label) == "CV") n_ext+=cv_weight;
-                    
                     // Fill histograms
                     h_cross_sec.at(label).at(uni).at(k_xsec_ext)->Fill(shr_energy_tot_cali, cv_weight);
                 }
 
                 // Dirt event
                 if (*classifcation == "dirt"){
-                    
-                    // Tally up the CV numbers
-                    if (reweighter_labels.at(label) == "CV") n_dirt+=cv_weight;
                     
                     // Fill histograms
                     h_cross_sec.at(label).at(uni).at(k_xsec_dirt)->Fill(shr_energy_tot_cali, cv_weight);
@@ -189,42 +170,9 @@ void CrossSectionHelper::LoopEvents(){
         
     } // End loop over events
 
-    // MC 
-    double n_dirt_mc   = n_dirt * (dirt_scale_factor / mc_scale_factor);
-    double n_ext_mc    = n_ext  * (intime_scale_factor / mc_scale_factor);
-    
-    double n_sig_data = n_sig * mc_scale_factor;
-    double n_bkg_data = n_bkg * mc_scale_factor;
-    double n_gen_data = n_gen * mc_scale_factor;
-    double n_dirt_data = n_dirt * dirt_scale_factor;
-    double n_ext_data  = n_ext  * intime_scale_factor;
+    std::cout << "Finished Event Loop"<< std::endl;
 
-    std::cout << "\n" <<
-    "Selected MC:     " << n_sel << "\n" << 
-    "Signal MC:       " << n_sig << "\n" << 
-    "Background MC:   " << n_bkg << "\n" << 
-    "Generated MC:    " << n_gen << "\n" << 
-    "EXT MC:          " << n_ext_mc << "\n" << 
-    "Dirt MC:         " << n_dirt_mc << "\n\n" << 
-    
-    "Selected Data:   " << n_data << "\n" << 
-    "Signal Data:     " << n_sig_data << "\n" << 
-    "Background Data: " << n_bkg_data << "\n" << 
-    "Generated Data:  " << n_gen_data << "\n" << 
-    "EXT Data:        " << n_ext_data  << "\n" << 
-    "Dirt Data:       " << n_dirt_data << "\n"
-    << std::endl;
-
-    // MC Cross section
-    double mc_xsec   = CalcCrossSec(n_sel, n_gen, n_sig, n_bkg, integrated_flux * mc_flux_scale_factor , n_ext_mc, n_dirt_mc, N_target_MC);
-
-    double data_xsec = CalcCrossSec(n_data, n_gen_data, n_sig_data, n_bkg_data, integrated_flux * data_flux_scale_factor , n_ext_data, n_dirt_data, N_target_Data);
-
-    std::cout << 
-    "MC XSEC: "   << mc_xsec << "\n" << 
-    "Data XSEC: " << data_xsec
-    << std::endl;
-
+    // ----
 
     // Now we have rewieghted the evnts, we want to calculate the cross-sections for each label for each universe
     
@@ -256,6 +204,7 @@ void CrossSectionHelper::LoopEvents(){
                                                      h_cross_sec.at(label).at(uni).at(k_xsec_dirt)->GetBinContent(bin)* dirt_scale_factor, // N Dirt
                                                      N_target_Data);
 
+
                 // Validate the cross sec, only accept if its > 0...
                 if (std::isnan(temp_xsec_mc) == 1)   temp_xsec_mc   = 0.0;
                 if (std::isnan(temp_xsec_data) == 1) temp_xsec_data = 0.0;
@@ -263,17 +212,72 @@ void CrossSectionHelper::LoopEvents(){
                 if (std::isinf(temp_xsec_data))      temp_xsec_data = 0.0; 
 
 
-                if (temp_xsec_mc > 0)   h_cross_sec.at(label).at(uni).at(k_xsec_mcxsec)  ->SetBinContent(bin, temp_xsec_mc/(10e-40) );
-                if (temp_xsec_data > 0) h_cross_sec.at(label).at(uni).at(k_xsec_dataxsec)->SetBinContent(bin, temp_xsec_data/(10e-40));
+                if (temp_xsec_mc > 0)   h_cross_sec.at(label).at(uni).at(k_xsec_mcxsec)  ->SetBinContent(bin, temp_xsec_mc/(1e-39) );
+                if (temp_xsec_data > 0) h_cross_sec.at(label).at(uni).at(k_xsec_dataxsec)->SetBinContent(bin, temp_xsec_data/(1e-39));
 
                 // std::cout << "Bin: " << bin << "  MC XSec: " << temp_xsec_mc << std::endl;
                 // std::cout << "Bin: " << bin << "  Data XSec: " << temp_xsec_data << std::endl;
             
             } // End loop over bins
+
+            // Calculate the Flux integrated Cross section
+            double temp_xsec_mc_int = CalcCrossSec(h_cross_sec.at(label).at(uni).at(k_xsec_sel)->Integral(), // N Sel
+                                                   h_cross_sec.at(label).at(uni).at(k_xsec_gen)->Integral(), // N Gen
+                                                   h_cross_sec.at(label).at(uni).at(k_xsec_sig)->Integral(), // N Sig
+                                                   h_cross_sec.at(label).at(uni).at(k_xsec_bkg)->Integral(), // N Bkg
+                                                   integrated_flux * mc_flux_scale_factor,                           // Flux
+                                                   h_cross_sec.at(label).at(uni).at(k_xsec_ext)->Integral()  * (intime_scale_factor / mc_scale_factor), // N EXT
+                                                   h_cross_sec.at(label).at(uni).at(k_xsec_dirt)->Integral() * (dirt_scale_factor / mc_scale_factor),   // N Dirt
+                                                   N_target_MC);
+
+
+            double temp_xsec_data_int = CalcCrossSec(h_cross_sec.at(label).at(uni).at(k_xsec_data)->Integral(),             // N Sel
+                                                    h_cross_sec.at(label).at(uni).at(k_xsec_gen)->Integral()* mc_scale_factor, // N Gen
+                                                    h_cross_sec.at(label).at(uni).at(k_xsec_sig)->Integral()* mc_scale_factor, // N Sig
+                                                    h_cross_sec.at(label).at(uni).at(k_xsec_bkg)->Integral()* mc_scale_factor, // N Bkg
+                                                    integrated_flux * data_flux_scale_factor,                                       // Flux
+                                                    h_cross_sec.at(label).at(uni).at(k_xsec_ext)->Integral() * intime_scale_factor, // N EXT
+                                                    h_cross_sec.at(label).at(uni).at(k_xsec_dirt)->Integral()* dirt_scale_factor,   // N Dirt
+                                                    N_target_Data);
+
+            // Validate the cross sec, only accept if its > 0...
+            if (std::isnan(temp_xsec_mc_int) == 1)   temp_xsec_mc_int   = 0.0;
+            if (std::isnan(temp_xsec_data_int) == 1) temp_xsec_data_int = 0.0;
+            if (std::isinf(temp_xsec_mc_int))        temp_xsec_mc_int   = 0.0; 
+            if (std::isinf(temp_xsec_data_int))      temp_xsec_data_int = 0.0; 
+
+
+            if (temp_xsec_mc_int > 0)   h_cross_sec.at(label).at(uni).at(k_xsec_mcxsec_int)->SetBinContent(1, temp_xsec_mc_int/(1e-39) );
+            if (temp_xsec_data_int > 0) h_cross_sec.at(label).at(uni).at(k_xsec_dataxsec_int)->SetBinContent(1, temp_xsec_data_int/(1e-39));
         
         } // End loop over universes
     
     } // End loop over labels
+
+    // Print the CV Results for the Flux Integrated Measurement
+    // Label 0 should always be the CV with 1 universe
+
+    std::cout << "\n" <<
+    "Selected MC:     " << h_cross_sec.at(0).at(0).at(k_xsec_sel)->Integral() << "\n" << 
+    "Signal MC:       " << h_cross_sec.at(0).at(0).at(k_xsec_sig)->Integral() << "\n" << 
+    "Background MC:   " << h_cross_sec.at(0).at(0).at(k_xsec_bkg)->Integral() << "\n" << 
+    "Generated MC:    " << h_cross_sec.at(0).at(0).at(k_xsec_gen)->Integral() << "\n" << 
+    "EXT MC:          " << h_cross_sec.at(0).at(0).at(k_xsec_ext)->Integral()* (intime_scale_factor / mc_scale_factor) << "\n" << 
+    "Dirt MC:         " << h_cross_sec.at(0).at(0).at(k_xsec_dirt)->Integral()* (dirt_scale_factor / mc_scale_factor) << "\n\n" << 
+    
+    "Selected Data:   " << h_cross_sec.at(0).at(0).at(k_xsec_data)->Integral() << "\n" << 
+    "Signal Data:     " << h_cross_sec.at(0).at(0).at(k_xsec_sig)->Integral()* mc_scale_factor << "\n" << 
+    "Background Data: " << h_cross_sec.at(0).at(0).at(k_xsec_bkg)->Integral()* mc_scale_factor << "\n" << 
+    "Generated Data:  " << h_cross_sec.at(0).at(0).at(k_xsec_gen)->Integral()* mc_scale_factor << "\n" << 
+    "EXT Data:        " << h_cross_sec.at(0).at(0).at(k_xsec_ext)->Integral()* intime_scale_factor  << "\n" << 
+    "Dirt Data:       " << h_cross_sec.at(0).at(0).at(k_xsec_dirt)->Integral()* dirt_scale_factor << "\n"
+    << std::endl;
+
+    std::cout << 
+    "MC XSEC: "   << h_cross_sec.at(0).at(0).at(k_xsec_mcxsec_int)->Integral() << "e-39 cm2" << "\n" << 
+    "Data XSEC: " << h_cross_sec.at(0).at(0).at(k_xsec_dataxsec_int)->Integral() << "e-39 cm2\n"
+    << std::endl;
+
 
     // Write the histograms to file for inspection
     WriteHists();
@@ -388,7 +392,7 @@ void CrossSectionHelper::WriteHists(){
     for (unsigned int label = 0; label < reweighter_labels.size(); label++) {
         
         // See if the directory already exists
-        bool bool_dir = _util.GetDirectory(fnuexsec_out, dir_labels[label] ,reweighter_labels.at(label).c_str());
+        bool bool_dir = _util.GetDirectory(fnuexsec_out, dir_labels[label], reweighter_labels.at(label).c_str());
 
         // If it doesnt exist then create it
         if (!bool_dir) dir_labels[label] = fnuexsec_out->mkdir(reweighter_labels.at(label).c_str());
@@ -463,7 +467,7 @@ void CrossSectionHelper::SwitchReweighterLabel(std::string label){
     if (label == "weightsGenie"){
         
         // Convert from unsigned short to double and push back -- divide by 1000 to undo previous *1000
-        for (unsigned int j =0; j < weightsGenie->size(); j++){
+        for (unsigned int j = 0; j < weightsGenie->size(); j++){
             vec_universes.push_back( (double) weightsGenie->at(j)/1000.0 );
         }
 
@@ -472,7 +476,7 @@ void CrossSectionHelper::SwitchReweighterLabel(std::string label){
     else if (label == "weightsReint"){
         
         // Convert from unsigned short to double and push back -- divide by 1000 to undo previous *1000
-        for (unsigned int j =0; j < weightsReint->size(); j++){
+        for (unsigned int j = 0; j < weightsReint->size(); j++){
             vec_universes.push_back( (double) weightsReint->at(j)/1000.0 );
         }
 
@@ -481,7 +485,7 @@ void CrossSectionHelper::SwitchReweighterLabel(std::string label){
     else if (label == "weightsPPFX"){
         
         // Convert from unsigned short to double and push back -- divide by 1000 to undo previous *1000
-        for (unsigned int j =0; j < weightsPPFX->size(); j++){
+        for (unsigned int j = 0; j < weightsPPFX->size(); j++){
             vec_universes.push_back( (double) weightsPPFX->at(j)/1000.0);
         }
 
@@ -575,7 +579,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
             h_cross_sec.at(j).resize(uni_genie);
         }
         // Specific resizing -- hardcoded and may break in the future
-        if ( reweighter_labels.at(j) == "weightsPPFX"){
+        else if ( reweighter_labels.at(j) == "weightsPPFX"){
             std::cout << "Setting PPFX All Histogram universe vector to size: " << uni_ppfx << std::endl;
             h_cross_sec.at(j).resize(uni_ppfx);
         }
@@ -613,8 +617,12 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 if (i == k_xsec_sel || i == k_xsec_bkg || i == k_xsec_gen || i == k_xsec_sig || i == k_xsec_ext || i == k_xsec_dirt || i == k_xsec_data){
                     h_cross_sec.at(label).at(uni).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni , xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; Entries", nbins, edges);
                 }
+                else if (i == k_xsec_dataxsec || i == k_xsec_mcxsec){
+                    h_cross_sec.at(label).at(uni).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni , xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; #frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{e}} CC Cross-Section [10^{-39} cm^{2}]", nbins, edges);
+                }
                 else {
-                    h_cross_sec.at(label).at(uni).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni , xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; #frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{e}} CC Cross-Section [10^{-40} cm^{2}]", nbins, edges);
+                    // Flux Integrated Histograms
+                    h_cross_sec.at(label).at(uni).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni , xsec_types.at(i).c_str()) ,";; #nu_{e} + #bar{#nu}_{e} CC Cross-Section [10^{-39} cm^{2}]", 1, 0, 1);
                 }
             }
         }

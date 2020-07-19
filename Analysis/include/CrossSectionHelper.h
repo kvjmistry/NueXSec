@@ -103,11 +103,13 @@ class CrossSectionHelper{
         k_xsec_data,    // Data event histogram binned in energy
         k_xsec_mcxsec,  // MC Cross Section
         k_xsec_dataxsec,// Data Cross Section
+        k_xsec_mcxsec_int,  // MC Cross Section Flux Integrated
+        k_xsec_dataxsec_int,// Data Cross Section Flux Integrated
         k_TH1D_xsec_MAX
     };
 
     // Names for cross section histograms
-    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "sig", "ext", "dirt", "data", "mc_xsec", "data_xsec"};
+    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "sig", "ext", "dirt", "data", "mc_xsec", "data_xsec", "mc_xsec_int", "data_xsec_int"};
 
     std::vector<std::string> reweighter_labels = {
         "CV",
