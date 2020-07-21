@@ -170,7 +170,7 @@ void CrossSectionHelper::LoopEvents(){
         
     } // End loop over events
 
-    std::cout << "Finished Event Loop"<< std::endl;
+    std::cout << "Finished Event Loop, now calculating the cross-sections"<< std::endl;
 
     // ----
 
@@ -178,47 +178,43 @@ void CrossSectionHelper::LoopEvents(){
     
     // Loop over the reweighter labels
     for (unsigned int label = 0; label < reweighter_labels.size(); label++){
+
+        std::cout << "calculating cross sections for: " << reweighter_labels.at(label) << std::endl;
         
         // Now loop over the universes
         for (unsigned int uni = 0; uni < h_cross_sec.at(label).size(); uni++){
-    
-            // loop over the bins in the histogram and calculate the cross section
-            for (int bin =1; bin < h_cross_sec.at(label).at(uni).at(k_xsec_sel)->GetNbinsX()+1; bin++){
 
-                double temp_xsec_mc = CalcCrossSec(h_cross_sec.at(label).at(uni).at(k_xsec_sel)->GetBinContent(bin), // N Sel
-                                                   h_cross_sec.at(label).at(uni).at(k_xsec_gen)->GetBinContent(bin), // N Gen
-                                                   h_cross_sec.at(label).at(uni).at(k_xsec_sig)->GetBinContent(bin), // N Sig
-                                                   h_cross_sec.at(label).at(uni).at(k_xsec_bkg)->GetBinContent(bin), // N Bkg
-                                                   integrated_flux * mc_flux_scale_factor,                           // Flux
-                                                   h_cross_sec.at(label).at(uni).at(k_xsec_ext)->GetBinContent(bin) * (intime_scale_factor / mc_scale_factor), // N EXT
-                                                   h_cross_sec.at(label).at(uni).at(k_xsec_dirt)->GetBinContent(bin)* (dirt_scale_factor / mc_scale_factor),   // N Dirt
-                                                   N_target_MC);
+            // Calculate the efficiency histogram
+            h_cross_sec.at(label).at(uni).at(k_xsec_eff)->Divide(h_cross_sec.at(label).at(uni).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(k_xsec_gen));
+
+            // MC Cross section
+            CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(k_xsec_sel), // N Sel
+                             h_cross_sec.at(label).at(uni).at(k_xsec_eff), // Eff
+                             h_cross_sec.at(label).at(uni).at(k_xsec_bkg), // N Bkg
+                             mc_scale_factor,
+                             integrated_flux * mc_flux_scale_factor,           // Flux
+                             intime_scale_factor,
+                             h_cross_sec.at(label).at(uni).at(k_xsec_ext),     // N EXT
+                             dirt_scale_factor,
+                             h_cross_sec.at(label).at(uni).at(k_xsec_dirt),   // N Dirt
+                             h_cross_sec.at(label).at(uni).at(k_xsec_mcxsec),
+                             N_target_MC, "MC");
+
+            // Data Cross section
+            CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(k_xsec_data), // N Sel
+                             h_cross_sec.at(label).at(uni).at(k_xsec_eff),  // Eff
+                             h_cross_sec.at(label).at(uni).at(k_xsec_bkg),  // N Bkg
+                             mc_scale_factor,
+                             integrated_flux * data_flux_scale_factor,      // Flux
+                             intime_scale_factor,
+                             h_cross_sec.at(label).at(uni).at(k_xsec_ext),  // N EXT
+                             dirt_scale_factor,
+                             h_cross_sec.at(label).at(uni).at(k_xsec_dirt), // N Dirt
+                             h_cross_sec.at(label).at(uni).at(k_xsec_dataxsec),
+                             N_target_Data, "Data");
 
 
-                double temp_xsec_data = CalcCrossSec(h_cross_sec.at(label).at(uni).at(k_xsec_data)->GetBinContent(bin),                 // N Sel
-                                                     h_cross_sec.at(label).at(uni).at(k_xsec_gen)->GetBinContent(bin)* mc_scale_factor, // N Gen
-                                                     h_cross_sec.at(label).at(uni).at(k_xsec_sig)->GetBinContent(bin)* mc_scale_factor, // N Sig
-                                                     h_cross_sec.at(label).at(uni).at(k_xsec_bkg)->GetBinContent(bin)* mc_scale_factor, // N Bkg
-                                                     integrated_flux * data_flux_scale_factor,                                          // Flux
-                                                     h_cross_sec.at(label).at(uni).at(k_xsec_ext)->GetBinContent(bin) * intime_scale_factor, // N EXT
-                                                     h_cross_sec.at(label).at(uni).at(k_xsec_dirt)->GetBinContent(bin)* dirt_scale_factor, // N Dirt
-                                                     N_target_Data);
-
-
-                // Validate the cross sec, only accept if its > 0...
-                if (std::isnan(temp_xsec_mc) == 1)   temp_xsec_mc   = 0.0;
-                if (std::isnan(temp_xsec_data) == 1) temp_xsec_data = 0.0;
-                if (std::isinf(temp_xsec_mc))        temp_xsec_mc   = 0.0; 
-                if (std::isinf(temp_xsec_data))      temp_xsec_data = 0.0; 
-
-
-                if (temp_xsec_mc > 0)   h_cross_sec.at(label).at(uni).at(k_xsec_mcxsec)  ->SetBinContent(bin, temp_xsec_mc/(1e-39) );
-                if (temp_xsec_data > 0) h_cross_sec.at(label).at(uni).at(k_xsec_dataxsec)->SetBinContent(bin, temp_xsec_data/(1e-39));
-
-                // std::cout << "Bin: " << bin << "  MC XSec: " << temp_xsec_mc << std::endl;
-                // std::cout << "Bin: " << bin << "  Data XSec: " << temp_xsec_data << std::endl;
-            
-            } // End loop over bins
+                       
 
             // Calculate the Flux integrated Cross section
             double temp_xsec_mc_int = CalcCrossSec(h_cross_sec.at(label).at(uni).at(k_xsec_sel)->Integral(), // N Sel
@@ -307,6 +303,44 @@ double CrossSectionHelper::CalcCrossSec(double sel, double gen, double sig, doub
 
 }
 // -----------------------------------------------------------------------------
+void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double intime_scale_factor, TH1D* h_ext, double dirt_scale_factor ,TH1D* h_dirt, TH1D* h_xsec, double targ, std::string mcdata){
+
+
+    TH1D *h_bkg_clone  = (TH1D*)h_bkg ->Clone("h_bkg_temp");
+    TH1D *h_ext_clone  = (TH1D*)h_ext ->Clone("h_ext_temp");
+    TH1D *h_dirt_clone = (TH1D*)h_dirt->Clone("h_dirt_temp");
+
+
+    if (mcdata == "MC"){
+        h_ext_clone ->Scale(intime_scale_factor / mc_scale_factor);
+        h_dirt_clone->Scale(dirt_scale_factor / mc_scale_factor);
+    }
+    else if (mcdata == "Data"){
+        h_bkg_clone ->Scale(mc_scale_factor);
+        h_ext_clone ->Scale(intime_scale_factor);
+        h_dirt_clone->Scale(dirt_scale_factor);
+    }
+    else{
+        std::cout << "error wrong mode entering xsec calculation" << std::endl;
+    }
+
+    // (S - B) / (eff * targ * flux)
+    h_xsec->Add(h_sel,         1);
+    h_xsec->Add(h_bkg_clone,  -1);
+    h_xsec->Add(h_ext_clone,  -1);
+    h_xsec->Add(h_dirt_clone, -1);
+    
+    h_xsec->Divide(h_eff) ;
+    
+    h_xsec->Scale(1.0 / (targ*flux) );
+
+    delete h_bkg_clone;
+    delete h_ext_clone;
+    delete h_dirt_clone;
+
+}
+
+// -----------------------------------------------------------------------------
 double CrossSectionHelper::GetIntegratedFlux(){
 
     TFile * f_flux;
@@ -322,11 +356,11 @@ double CrossSectionHelper::GetIntegratedFlux(){
     std::string flux_file_name;
 
     if (run_period == "1"){
-        flux_file_name = "../Systematics/output_fhc_uboone_run0.root";
+        flux_file_name = "Systematics/output_fhc_uboone_run0.root";
         boolfile = _util.GetFile(f_flux, flux_file_name);
     }
     else {
-        flux_file_name = "../Systematics/output_rhc_uboone_run0.root";
+        flux_file_name = "Systematics/output_rhc_uboone_run0.root";
         boolfile = _util.GetFile(f_flux, flux_file_name );
     }
     std::cout << "Using Flux file name: \033[0;31m" << flux_file_name << "\033[0m" <<  std::endl;
@@ -617,6 +651,9 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
             for (unsigned int i=0; i < xsec_types.size();i++){    
                 if (i == k_xsec_sel || i == k_xsec_bkg || i == k_xsec_gen || i == k_xsec_sig || i == k_xsec_ext || i == k_xsec_dirt || i == k_xsec_data){
                     h_cross_sec.at(label).at(uni).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni , xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; Entries", nbins, edges);
+                }
+                else if (i == k_xsec_eff){
+                    h_cross_sec.at(label).at(uni).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni , xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; Efficiency", nbins, edges);
                 }
                 else if (i == k_xsec_dataxsec || i == k_xsec_mcxsec){
                     h_cross_sec.at(label).at(uni).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni , xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; #frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{e}} CC Cross-Section [10^{-39} cm^{2}]", nbins, edges);
