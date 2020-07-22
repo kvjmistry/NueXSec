@@ -199,65 +199,6 @@ void utility::Tabulate(bool inFV, std::string interaction, std::string classific
     
 }
 // -----------------------------------------------------------------------------
-void utility::PrintInfo(std::vector<double> c_v, double intime_scale_factor, double mc_scale_factor, double dirt_scale_factor, std::string cut_name, double tot_true_infv_nues, double &efficiency, double &purity) {
-
-    // c_v is short for counter vec here!
-
-    // Sum of selected mc, dirt and ext. The dirt and ext are scaled to the MC POT
-    double sum_mc_dirt_ext = c_v.at(k_count_total_mc)+ (c_v.at(k_count_ext) * (intime_scale_factor / mc_scale_factor)) + (c_v.at(k_count_dirt) * (dirt_scale_factor / mc_scale_factor));
-
-    std::cout << "\n------------------------------------------------" << std::endl;
-    std::cout << "------------------------------------------------" << std::endl;
-    std::cout.precision(6);
-    std::cout << "\n\033[0;33m <" << cut_name << "> \033[0m" << std::endl;
-    std::cout << "                    Scaled to MC POT | Scaled to Data POT | Unscaled" << std::endl;
-    std::cout << " Total Candidate Nue     : " << sum_mc_dirt_ext                 << "    " << double(sum_mc_dirt_ext                * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Nue CC        : " << c_v.at(k_count_nue_cc)          << "    " << double(c_v.at(k_count_nue_cc)         * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Nue bar CC    : " << c_v.at(k_count_nuebar_cc)       << "    " << double(c_v.at(k_count_nuebar_cc)      * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Nu out FV     : " << c_v.at(k_count_nu_out_fv)       << "    " << double(c_v.at(k_count_nu_out_fv)      * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Cosmic        : " << c_v.at(k_count_cosmic)          << "    " << double(c_v.at(k_count_cosmic)         * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Numu CC       : " << c_v.at(k_count_numu_cc)         << "    " << double(c_v.at(k_count_numu_cc)        * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Numu CC Pi0   : " << c_v.at(k_count_numu_cc_pi0)     << "    " << double(c_v.at(k_count_numu_cc_pi0)    * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of NC            : " << c_v.at(k_count_nc)              << "    " << double(c_v.at(k_count_nc)             * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of NC Pi0        : " << c_v.at(k_count_nc_pi0)          << "    " << double(c_v.at(k_count_nc_pi0)         * mc_scale_factor  ) << std::endl;
-    std::cout << " Number of Unmatched     : " << c_v.at(k_count_unmatched)       << "    " << double(c_v.at(k_count_unmatched)      * mc_scale_factor  ) << std::endl;
-    
-    std::cout << " Number of InTime Cosmics: " << double(c_v.at(k_count_ext) * (intime_scale_factor / mc_scale_factor))
-              << "\t " << double(c_v.at(k_count_ext) * intime_scale_factor) << "\t " << c_v.at(k_count_ext) << std::endl;
-    
-    std::cout << " Number of Dirt          : " << double(c_v.at(k_count_dirt) * dirt_scale_factor / mc_scale_factor)
-              << "\t "                         << double(c_v.at(k_count_dirt) * dirt_scale_factor) << "\t " << c_v.at(k_count_dirt) << std::endl;
-
-    std::cout << "----------- Neutrinos in FV Truth -------------" << std::endl;
-    std::cout << " Nue CC QE    : " << c_v.at(k_count_nue_cc_qe)   <<  "   Nuebar CC QE    : " << c_v.at(k_count_nuebar_cc_qe)  << std::endl;
-    std::cout << " Nue CC Res   : " << c_v.at(k_count_nue_cc_res)  <<  "   Nuebar CC Res   : " << c_v.at(k_count_nuebar_cc_res) << std::endl;
-    std::cout << " Nue CC DIS   : " << c_v.at(k_count_nue_cc_dis)  <<  "   Nuebar CC DIS   : " << c_v.at(k_count_nuebar_cc_dis) << std::endl;
-    std::cout << " Nue CC COH   : " << c_v.at(k_count_nue_cc_coh)  <<  "   Nuebar CC COH   : " << c_v.at(k_count_nuebar_cc_coh) << std::endl;
-    std::cout << " Nue CC MEC   : " << c_v.at(k_count_nue_cc_mec)  <<  "   Nuebar CC MEC   : " << c_v.at(k_count_nuebar_cc_mec) << std::endl;
-    std::cout << std::endl;
-    std::cout << " Numu CC QE   : " << c_v.at(k_count_numu_cc_qe)  <<  "   Numubar CC QE   : " << c_v.at(k_count_numubar_cc_qe) << std::endl;
-    std::cout << " Numu CC Res  : " << c_v.at(k_count_numu_cc_res) <<  "   Numubar CC Res  : " << c_v.at(k_count_numubar_cc_res)<< std::endl;
-    std::cout << " Numu CC DIS  : " << c_v.at(k_count_numu_cc_dis) <<  "   Numubar CC DIS  : " << c_v.at(k_count_numubar_cc_dis)<< std::endl;
-    std::cout << " Numu CC COH  : " << c_v.at(k_count_numu_cc_coh) <<  "   Numubar CC COH  : " << c_v.at(k_count_numubar_cc_coh)<< std::endl;
-    std::cout << " Numu CC MEC  : " << c_v.at(k_count_numu_cc_mec) <<  "   Numubar CC MEC  : " << c_v.at(k_count_numubar_cc_mec)<< std::endl;
-    std::cout << "------------------------------------------------" << std::endl;
-    std::cout << " Tot Nue in FV                 : " << c_v.at(k_count_nue_cc_infv)     << "   Tot Nue in Cryo                 : " << c_v.at(k_count_nue_cc_incryo)     << std::endl;
-    std::cout << " Tot Nuebar in FV              : " << c_v.at(k_count_nuebar_cc_infv)  << "   Tot Nuebar in Cryo              : " << c_v.at(k_count_nuebar_cc_incryo) << std::endl;
-    std::cout << " Tot NuMu in FV                : " << c_v.at(k_count_numu_cc_infv)    << "   Tot NuMu in Cryo                : " << c_v.at(k_count_numu_cc_incryo)<< std::endl;
-    std::cout << " Tot NuMubar in FV             : " << c_v.at(k_count_numubar_cc_infv) << "   Tot NuMubar in Cryo             : " << c_v.at(k_count_numubar_cc_incryo)<< std::endl;
-    // std::cout << " Tot NC                  : " << counter_tot_nue_numu_nc << std::endl;
-    // std::cout << " Sum Neutrinos           : " <<  << std::endl;
-
-    std::cout << "------------------------------------------------" << std::endl;
-    efficiency = double(c_v.at(k_count_nue_cc) + c_v.at(k_count_nuebar_cc)) / double(tot_true_infv_nues);
-    purity     = double(c_v.at(k_count_nue_cc) + c_v.at(k_count_nuebar_cc)) / double(sum_mc_dirt_ext);
-    std::cout << " Efficiency       : " << "( " << c_v.at(k_count_nue_cc) + c_v.at(k_count_nuebar_cc) << " / " << tot_true_infv_nues << " ) = " << efficiency << std::endl;
-    std::cout << " Purity           : " << "( " << c_v.at(k_count_nue_cc) + c_v.at(k_count_nuebar_cc) << " / " << sum_mc_dirt_ext           << " ) = " << purity << std::endl;
-    std::cout << "------------------------------------------------" << std::endl;
-    std::cout << " Total Nue Candidates in data : " << c_v.at(k_count_data) << std::endl;
-    std::cout << "------------------------------------------------" << std::endl;
-}
-// -----------------------------------------------------------------------------
 double utility::GetTheta(double px, double py, double pz){
 
     // Variables
