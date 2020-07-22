@@ -62,7 +62,7 @@ class SystematicsHelper{
     void InitialiseReweightingMode();
     // -------------------------------------------------------------------------
     // Draw Unisim histograms
-    void PlotReweightingModeUnisim(std::string label);
+    void PlotReweightingModeUnisim(std::string label, std::string label_pretty);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 

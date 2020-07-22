@@ -601,22 +601,45 @@ void SystematicsHelper::InitialiseReweightingMode(){
         cv_hist_vec.at(k)->SetLineColor(kBlack);
     }
 
+    // Create the CV directory and draw the CV
+    CreateDirectory("/Systematics/CV/", run_period);
+    
+    TCanvas *c_cv;
+    for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
+        c_cv = new TCanvas();
+       
+        cv_hist_vec.at(k)->Draw("hist");
+    
+        TLegend *leg = new TLegend(0.6, 0.8, 0.95, 0.9);
+        leg->SetBorderSize(0);
+        leg->SetFillStyle(0);
+        leg->AddEntry(cv_hist_vec.at(k),         "CV", "l");
+        // leg->Draw();
+
+        c_cv->Print(Form("plots/run%s/Systematics/CV/run%s_CV_%s.pdf", run_period.c_str(), run_period.c_str(), xsec_types.at(k).c_str()));
+
+        delete c_cv;
+        delete leg;
+    }
+
+
+
     // Plot the unisims
-    PlotReweightingModeUnisim("RPA");
-    PlotReweightingModeUnisim("CCMEC");
-    PlotReweightingModeUnisim("AxFFCCQE");
-    PlotReweightingModeUnisim("VecFFCCQE");
-    PlotReweightingModeUnisim("DecayAngMEC");
-    PlotReweightingModeUnisim("ThetaDelta2Npi");
-    PlotReweightingModeUnisim("ThetaDelta2NRad");
-    PlotReweightingModeUnisim("RPA_CCQE_Reduced");
-    PlotReweightingModeUnisim("NormCCCOH");
-    PlotReweightingModeUnisim("NormNCCOH");
+    PlotReweightingModeUnisim("RPA", "RPA" );
+    PlotReweightingModeUnisim("CCMEC", "CC MEC" );
+    PlotReweightingModeUnisim("AxFFCCQE", "Ax FF CCQE" );
+    PlotReweightingModeUnisim("VecFFCCQE", "Vec FF CCQE" );
+    PlotReweightingModeUnisim("DecayAngMEC", "Decay Ang MEC" );
+    PlotReweightingModeUnisim("ThetaDelta2Npi", "Theta Delta 2N #pi" );
+    PlotReweightingModeUnisim("ThetaDelta2NRad", "Theta Delta 2N Rad" );
+    PlotReweightingModeUnisim("RPA_CCQE_Reduced", "RPA CCQE Reduced" );
+    PlotReweightingModeUnisim("NormCCCOH", "Norm CC COH" );
+    PlotReweightingModeUnisim("NormNCCOH", "Norm NC COH" );
     
 
 }
 // -----------------------------------------------------------------------------
-void SystematicsHelper::PlotReweightingModeUnisim(std::string label){
+void SystematicsHelper::PlotReweightingModeUnisim(std::string label, std::string label_pretty){
 
     // Create the directory
     CreateDirectory("/Systematics/" + label, run_period);
@@ -653,7 +676,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label){
     // Now we want to draw them
     for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
         c = new TCanvas();
-        h_universe.at(k_up).at(k)->SetTitle(Form("%s %s", label.c_str(), xsec_types_pretty.at(k).c_str() ));
+        h_universe.at(k_up).at(k)->SetTitle(Form("%s", xsec_types_pretty.at(k).c_str() ));
 
         h_universe.at(k_up).at(k)->Draw("hist");
         cv_hist_vec.at(k)->Draw("hist,same");
@@ -667,9 +690,18 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label){
 
         h_universe.at(k_up).at(k)->GetYaxis()->SetRangeUser(0, scale_val*1.2);
 
+        TLegend *leg = new TLegend(0.6, 0.75, 0.95, 0.9);
+        leg->SetBorderSize(0);
+        leg->SetFillStyle(0);
+        leg->AddEntry(h_universe.at(k_up).at(k), Form("%s +1 #sigma", label_pretty.c_str()), "l");
+        leg->AddEntry(cv_hist_vec.at(k),         "CV", "l");
+        leg->AddEntry(h_universe.at(k_dn).at(k), Form("%s -1 #sigma", label_pretty.c_str()), "l");
+        leg->Draw();
+
         c->Print(Form("plots/run%s/Systematics/%s/run%s_%s_%s.pdf", run_period.c_str(), label.c_str(), run_period.c_str(), label.c_str(), xsec_types.at(k).c_str()));
 
         delete c;
+        delete leg;
     }
 
 
