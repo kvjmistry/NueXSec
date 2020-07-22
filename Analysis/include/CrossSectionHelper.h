@@ -139,33 +139,6 @@ class CrossSectionHelper{
         "weightsPPFX"
     };
 
-    // enum for reweighter labels
-    enum TH1D_xsec_label_vars {
-        k_RPAup,
-        k_CCMECup,
-        k_AxFFCCQEup,
-        k_VecFFCCQEup,
-        k_DecayAngMECup,
-        k_ThetaDelta2Npiup,
-        k_ThetaDelta2NRadup,
-        k_RPA_CCQE_Reducedup,
-        k_NormCCCOHup,
-        k_NormNCCOHup,
-        k_RPAdn,
-        k_CCMECdn,
-        k_AxFFCCQEdn,
-        k_VecFFCCQEdn,
-        k_DecayAngMECdn,
-        k_ThetaDelta2Npidn,
-        k_ThetaDelta2NRaddn,
-        k_RPA_CCQE_Reduceddn,
-        k_NormCCCOHdn,
-        k_NormNCCOHdn,
-        k_weightsGenie,
-        k_weightsReint,
-        k_weightsPPFX,
-        k_TH1D_reweighter_labels_MAX
-    };
 
     // -------------------------------------------------------------------------
     // Initialiser function

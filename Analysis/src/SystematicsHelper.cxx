@@ -6,18 +6,25 @@ void SystematicsHelper::Initialise(const char *_run_period, utility _utility, co
     std::cout << "Initalising Systematics Helper..." << std::endl;
     _util = _utility;
 
+    // Set the run period
+    run_period = std::string(_run_period);
+
     // Off beam mode to compare bnb and numi off beam samples
     if (std::string(_mode) == "ext"){
         var_string = { "NuMI", "BNB" };
         mode = std::string(_mode);
     }
 
+    // If we choose this mode then we actually want to use a different initialiser
+    if (std::string(_mode) == "reweight"){
+        InitialiseReweightingMode();
+        return;
+    }
+
     // Get the POT of the variations from the file
     GetPOT(_run_period);
 
-    // Set the run period
-    run_period = std::string(_run_period);
-
+    
     // Resize the file vector
     f_vars.resize(k_vars_MAX);
 
@@ -573,4 +580,102 @@ void SystematicsHelper::PlotVariationsEXT(std::string hist_name, const char* pri
 
 
 }
+// -----------------------------------------------------------------------------
+void SystematicsHelper::InitialiseReweightingMode(){
+
+    gStyle->SetOptStat(0);
+
+    // Load in the input file
+    // Should we add more protection to this command??
+    f_nuexsec = new TFile( Form("files/crosssec_run%s.root", run_period.c_str() ), "READ");
+
+    
+
+    // Get the CV histograms. These should stay constant througout the code
+    cv_hist_vec.resize(xsec_types.size());
+    for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
+        _util.GetHist(f_nuexsec, cv_hist_vec.at(k), Form( "CV/h_run%s_CV_0_%s", run_period.c_str(), xsec_types.at(k).c_str()));
+
+        // Customise
+        cv_hist_vec.at(k)->SetLineWidth(2);
+        cv_hist_vec.at(k)->SetLineColor(kBlack);
+    }
+
+    // Plot the unisims
+    PlotReweightingModeUnisim("RPA");
+    PlotReweightingModeUnisim("CCMEC");
+    PlotReweightingModeUnisim("AxFFCCQE");
+    PlotReweightingModeUnisim("VecFFCCQE");
+    PlotReweightingModeUnisim("DecayAngMEC");
+    PlotReweightingModeUnisim("ThetaDelta2Npi");
+    PlotReweightingModeUnisim("ThetaDelta2NRad");
+    PlotReweightingModeUnisim("RPA_CCQE_Reduced");
+    PlotReweightingModeUnisim("NormCCCOH");
+    PlotReweightingModeUnisim("NormNCCOH");
+    
+
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::PlotReweightingModeUnisim(std::string label){
+
+    // Create the directory
+    CreateDirectory("/Systematics/" + label, run_period);
+
+    std::vector<std::vector<TH1D*>> h_universe;
+    
+    // Resize to the number of universes
+    h_universe.resize(2);
+    h_universe.at(k_up).resize(xsec_types.size());
+    h_universe.at(k_dn).resize(xsec_types.size());
+
+    // Now get the histograms
+    std::string label_up = label + "up";
+    std::string label_dn = label + "dn";
+    
+
+    // Get the histograms and customise a bit
+    for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
+        _util.GetHist(f_nuexsec, h_universe.at(k_up).at(k), Form( "%s/h_run%s_%s_0_%s", label_up.c_str(), run_period.c_str(), label_up.c_str(), xsec_types.at(k).c_str()));
+
+        // Customise
+        h_universe.at(k_up).at(k)->SetLineWidth(2);
+        h_universe.at(k_up).at(k)->SetLineColor(kGreen+2);
+        
+        _util.GetHist(f_nuexsec, h_universe.at(k_dn).at(k), Form( "%s/h_run%s_%s_0_%s", label_dn.c_str(), run_period.c_str(), label_dn.c_str(), xsec_types.at(k).c_str()));
+
+        // Customise
+        h_universe.at(k_dn).at(k)->SetLineWidth(2);
+        h_universe.at(k_dn).at(k)->SetLineColor(kRed+2);
+    }
+
+    TCanvas *c;
+    
+    // Now we want to draw them
+    for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
+        c = new TCanvas();
+        h_universe.at(k_up).at(k)->SetTitle(Form("%s %s", label.c_str(), xsec_types_pretty.at(k).c_str() ));
+
+        h_universe.at(k_up).at(k)->Draw("hist");
+        cv_hist_vec.at(k)->Draw("hist,same");
+        h_universe.at(k_dn).at(k)->Draw("hist,same");
+
+        c->Update();
+
+        double scale_val = h_universe.at(k_up).at(k)->GetMaximum();
+        if (scale_val < cv_hist_vec.at(k)->GetMaximum()) scale_val = cv_hist_vec.at(k)->GetMaximum();
+        if (scale_val <  h_universe.at(k_dn).at(k)->GetMaximum()) scale_val =  h_universe.at(k_dn).at(k)->GetMaximum();
+
+        h_universe.at(k_up).at(k)->GetYaxis()->SetRangeUser(0, scale_val*1.2);
+
+        c->Print(Form("plots/run%s/Systematics/%s/run%s_%s_%s.pdf", run_period.c_str(), label.c_str(), run_period.c_str(), label.c_str(), xsec_types.at(k).c_str()));
+
+        delete c;
+    }
+
+
+
+
+
+}
+
 // -----------------------------------------------------------------------------
