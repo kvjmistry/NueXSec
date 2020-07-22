@@ -174,6 +174,7 @@ class CrossSectionHelper{
     // Initialise the histograms for this class
     void InitialiseHistograms(std::string run_mode);
     // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
 
     private:

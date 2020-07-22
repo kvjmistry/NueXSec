@@ -640,6 +640,9 @@ void SystematicsHelper::InitialiseReweightingMode(){
     PlotReweightingModeMultisim("weightsPPFX", "PPFX", 600);
     
 
+    CompareCVXSec("differential");
+    CompareCVXSec("integrated");
+
 }
 // -----------------------------------------------------------------------------
 void SystematicsHelper::PlotReweightingModeUnisim(std::string label, std::string label_pretty){
@@ -848,5 +851,45 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, std::stri
         
     
 }
+// -----------------------------------------------------------------------------
+void SystematicsHelper::CompareCVXSec(std::string xsec_type){
 
+    int index_data;
+    int index_mc;
+
+    if (xsec_type == "differential"){
+        index_data = k_xsec_dataxsec;
+        index_mc   = k_xsec_mcxsec;
+    }
+    else {
+        index_data = k_xsec_dataxsec_int;
+        index_mc   = k_xsec_mcxsec_int;
+    }
+
+    TH1D* h_dataxsec = (TH1D*) cv_hist_vec.at(index_data)->Clone("h_data_xsec_temp");
+    TH1D* h_mcxsec   = (TH1D*) cv_hist_vec.at(index_mc)  ->Clone("h_data_xsec_temp");
+
+
+    TCanvas *c = new TCanvas();
+
+    h_dataxsec->SetLineColor(kGreen+2);
+    h_mcxsec  ->SetLineColor(kRed+2);
+
+    if (xsec_type == "differential") h_dataxsec->GetYaxis()->SetRangeUser(0, 3e-39);
+    if (xsec_type == "integrated")   h_dataxsec->GetYaxis()->SetRangeUser(0, 10);
+
+
+    h_dataxsec->Draw("hist");
+    h_mcxsec->Draw("hist,same");
+
+     TLegend *leg = new TLegend(0.6, 0.75, 0.95, 0.9);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(h_dataxsec, "Data CV", "l");
+    leg->AddEntry(h_mcxsec,   "MC CV", "l");
+    leg->Draw();
+
+    c->Print(Form("plots/run%s/Systematics/CV/run%s_CV_data_mc_comparison_%s.pdf", run_period.c_str(), run_period.c_str(), xsec_type.c_str() ));
+
+}
 // -----------------------------------------------------------------------------

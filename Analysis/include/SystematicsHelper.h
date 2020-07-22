@@ -66,7 +66,9 @@ class SystematicsHelper{
     // -------------------------------------------------------------------------
     void PlotReweightingModeMultisim(std::string label, std::string label_pretty, int universes);
     // -------------------------------------------------------------------------
-
+    // Plots the MC and data cross sections to compare them
+    void CompareCVXSec(std::string xsec_type);
+    // -------------------------------------------------------------------------
 
 
     std::string mode{"default"}; // what mode to run this class in
