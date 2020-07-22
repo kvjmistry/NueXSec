@@ -55,15 +55,11 @@ The output of the selection will be in the files directory. We make 1 file for e
 Another feature that has been recently added is the creation of slimmed down ttree files which contain the output of the selection. These trees are used for doing the cross section calculation and the systematics. More documentation to follow on this.
 
 
-In the end, if you just want to run the selection, you can source `run_selection_mcc9_run1.sh` which will run the selection in the current form I am using.
+In the end, if you just want to run the selection, you can source `run_selection_mcc9_run1_gpvm.sh` which will run the selection in the current form I am using (if your on a gpvm). This will actually be a lot quicker to run since it makes used of the modularised nature of the code.
 
 ## Other Modules
 
 FlashValidation contains a LArSoft Module for analysing the flash information in the events. EventRate contains a LArSoft module to make the eventrate distribution. If you need to use these then ask me and I will document this further. 
-
-## Systematics
-
-This folder contains scripts related to doing systematics. For now it contains a root script to make the weight histogrmas needed for the flux.
 
 ## Tools
 

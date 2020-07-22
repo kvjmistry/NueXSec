@@ -83,7 +83,7 @@ int main(int argc, char *argv[]){
 
     std::string usage3 = "\n\nTo run the detector systematics code, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --sys <systematics mode>\033[0m \n\n"
-    "\033[0;34m[--sys <systematics mode>]\033[0m                             \033[0;32mThe input mode of systematics to run. Options are default or ext \033[0m\n\n"
+    "\033[0;34m[--sys <systematics mode>]\033[0m                             \033[0;32mThe input mode of systematics to run. Options are default/ext/reweight \033[0m\n\n"
     "This will run the detector systematics plotting code\n\n";
 
 
