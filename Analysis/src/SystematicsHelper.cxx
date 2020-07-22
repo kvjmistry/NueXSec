@@ -827,6 +827,10 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, std::stri
 
         h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, scale_val*1.2);
 
+        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec){
+            h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, 3.0e-39);
+        }
+
         TLegend *leg = new TLegend(0.6, 0.75, 0.95, 0.9);
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);

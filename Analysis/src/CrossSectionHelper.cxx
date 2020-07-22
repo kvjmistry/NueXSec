@@ -114,7 +114,21 @@ void CrossSectionHelper::LoopEvents(){
                 // Update the CV weight to CV * universe i
                 if (std::isnan(vec_universes.at(uni)) == 1)   vec_universes.at(uni)   = 1.0;
                 if (std::isinf(vec_universes.at(uni)))        vec_universes.at(uni)   = 1.0;
-                double weight_uni = cv_weight * vec_universes.at(uni);
+                double weight_uni{1.0}; 
+
+                // If we are using the genie systematics and unisim systematics then we want to undo the genie tune on them
+                if (reweighter_labels.at(label) == "weightsReint" || reweighter_labels.at(label) == "weightsPPFX" || reweighter_labels.at(label) == "CV" ){
+                    weight_uni = cv_weight * vec_universes.at(uni);
+                }
+                else {
+                    // Note we actually dont want to divide out by the spline, but since this is 1 in numi, it doesnt matter!
+                    // We do this because the interaction systematics are shifted about the genie tune as the CV
+
+                    if (std::isnan(weightSplineTimesTune) == 1)   weightSplineTimesTune   = 1.0;
+                    if (std::isinf(weightSplineTimesTune))        weightSplineTimesTune   = 1.0; 
+                    if (weightSplineTimesTune == 0) weightSplineTimesTune = 1.0;
+                    weight_uni = cv_weight * vec_universes.at(uni) / weightSplineTimesTune;
+                }
 
 
                 // Signal event
@@ -467,6 +481,9 @@ void CrossSectionHelper::InitTree(){
     tree->SetBranchAddress("classifcation",   &classifcation);
     tree->SetBranchAddress("shr_energy_tot_cali", &shr_energy_tot_cali);
     tree->SetBranchAddress("elec_e",  &elec_e);
+    tree->SetBranchAddress("ppfx_cv",  &ppfx_cv);
+    tree->SetBranchAddress("weightSplineTimesTune",  &weightSplineTimesTune);
+    
     tree->SetBranchAddress("weightsGenie",          &weightsGenie);
     tree->SetBranchAddress("weightsReint",          &weightsReint);
     tree->SetBranchAddress("weightsPPFX",           &weightsPPFX);

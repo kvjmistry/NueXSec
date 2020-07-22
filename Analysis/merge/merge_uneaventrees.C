@@ -30,6 +30,8 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
     float shrmoliereavg{0.0}, _shrmoliereavg{0.0};
     float shr_hits_max{0.0},  _shr_hits_max{0.0};
     float elec_e{0.0}, _elec_e{0.0};
+    float ppfx_cv{1.0}, _ppfx_cv{0.0};
+    float weightSplineTimesTune{1.0}, _weightSplineTimesTune{1.0};
 
     std::vector<unsigned short> weightsGenie;
     std::vector<unsigned short> weightsReint;
@@ -87,6 +89,8 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
     outtree->Branch("shrmoliereavg", &shrmoliereavg);
     outtree->Branch("shr_hits_max",  &shr_hits_max);
     outtree->Branch("elec_e",  &elec_e,  "elec_e/F");
+    outtree->Branch("ppfx_cv",  &ppfx_cv,  "ppfx_cv/F");
+    outtree->Branch("weightSplineTimesTune",  &weightSplineTimesTune,  "weightSplineTimesTune/F");
     
     outtree->Branch("weightsGenie", "std::vector<unsigned short>", &weightsGenie);
     outtree->Branch("weightsReint", "std::vector<unsigned short>", &weightsReint);
@@ -139,6 +143,9 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
         trees.at(k)->SetBranchAddress("shrmoliereavg", &_shrmoliereavg);
         trees.at(k)->SetBranchAddress("shr_hits_max",  &_shr_hits_max);
         trees.at(k)->SetBranchAddress("elec_e",  &_elec_e);
+        trees.at(k)->SetBranchAddress("ppfx_cv",  &_ppfx_cv);
+        trees.at(k)->SetBranchAddress("weightSplineTimesTune",  &_weightSplineTimesTune);
+        
         trees.at(k)->SetBranchAddress("weightsGenie",          &_weightsGenie);
         trees.at(k)->SetBranchAddress("weightsReint",          &_weightsReint);
         trees.at(k)->SetBranchAddress("weightsPPFX",           &_weightsPPFX);
@@ -186,6 +193,8 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
                 shrmoliereavg = _shrmoliereavg;
                 shr_hits_max = _shr_hits_max;
                 elec_e = _elec_e;
+                ppfx_cv = _ppfx_cv;
+                weightSplineTimesTune = _weightSplineTimesTune;
 
                 if (_weightsGenie != NULL) weightsGenie           = *_weightsGenie; // If these aren't set by default then bad things happen in memory land
                 if (_weightsReint != NULL) weightsReint           = *_weightsReint;

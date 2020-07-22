@@ -34,6 +34,8 @@ class CrossSectionHelper{
     double true_energy{0.0}, reco_energy{0.0};
     float shr_energy_tot_cali{0.0};
     float elec_e{0.0};
+    float ppfx_cv{1.0};
+    float weightSplineTimesTune{1.0};
 
     // Weights
     std::vector<unsigned short> *weightsGenie = NULL;
