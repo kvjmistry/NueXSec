@@ -623,18 +623,21 @@ void SystematicsHelper::InitialiseReweightingMode(){
     }
 
 
-
     // Plot the unisims
-    PlotReweightingModeUnisim("RPA", "RPA" );
-    PlotReweightingModeUnisim("CCMEC", "CC MEC" );
-    PlotReweightingModeUnisim("AxFFCCQE", "Ax FF CCQE" );
-    PlotReweightingModeUnisim("VecFFCCQE", "Vec FF CCQE" );
-    PlotReweightingModeUnisim("DecayAngMEC", "Decay Ang MEC" );
-    PlotReweightingModeUnisim("ThetaDelta2Npi", "Theta Delta 2N #pi" );
-    PlotReweightingModeUnisim("ThetaDelta2NRad", "Theta Delta 2N Rad" );
+    PlotReweightingModeUnisim("RPA",              "RPA" );
+    PlotReweightingModeUnisim("CCMEC",            "CC MEC" );
+    PlotReweightingModeUnisim("AxFFCCQE",         "Ax FF CCQE" );
+    PlotReweightingModeUnisim("VecFFCCQE",        "Vec FF CCQE" );
+    PlotReweightingModeUnisim("DecayAngMEC",      "Decay Ang MEC" );
+    PlotReweightingModeUnisim("ThetaDelta2Npi",   "Theta Delta 2N #pi" );
+    PlotReweightingModeUnisim("ThetaDelta2NRad",  "Theta Delta 2N Rad" );
     PlotReweightingModeUnisim("RPA_CCQE_Reduced", "RPA CCQE Reduced" );
-    PlotReweightingModeUnisim("NormCCCOH", "Norm CC COH" );
-    PlotReweightingModeUnisim("NormNCCOH", "Norm NC COH" );
+    PlotReweightingModeUnisim("NormCCCOH",        "Norm CC COH" );
+    PlotReweightingModeUnisim("NormNCCOH",        "Norm NC COH" );
+
+    PlotReweightingModeMultisim("weightsGenie", "GENIE", 500);
+    PlotReweightingModeMultisim("weightsReint", "Geant Reinteractions", 1000);
+    PlotReweightingModeMultisim("weightsPPFX", "PPFX", 600);
     
 
 }
@@ -703,11 +706,143 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, std::string
         delete c;
         delete leg;
     }
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::PlotReweightingModeMultisim(std::string label, std::string label_pretty, int universes){
+
+    // Create the directory
+    CreateDirectory("/Systematics/" + label, run_period);
+
+    std::vector<std::vector<TH1D*>> h_universe;
+
+
+    // Clone the CV histograms so we can work with them without changing them
+    std::vector<TH1D*> cv_hist_vec_clone;
+    cv_hist_vec_clone.resize(xsec_types.size());
+    for (unsigned int h_index = 0; h_index < cv_hist_vec_clone.size(); h_index++){
+        cv_hist_vec_clone.at(h_index) = (TH1D*)cv_hist_vec.at(h_index)->Clone(Form("h_%s_clone", xsec_types.at(h_index).c_str() ));
+        // Customise
+        cv_hist_vec_clone.at(h_index)->SetLineWidth(2);
+        cv_hist_vec_clone.at(h_index)->SetLineColor(kBlack);
+    }
+
+    
+    // Resize to the number of universes
+    h_universe.resize(universes);
+    
+    // Resize each universe
+    for (unsigned int uni = 0; uni < h_universe.size(); uni++){
+        h_universe.at(uni).resize(xsec_types.size());
+    }
+    
+    
+    // Get the histograms and customise a bit
+    for (unsigned int uni = 0; uni < h_universe.size(); uni++){
+        for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
+            _util.GetHist(f_nuexsec, h_universe.at(uni).at(k), Form( "%s/h_run%s_%s_%i_%s", label.c_str(), run_period.c_str(), label.c_str(), uni ,xsec_types.at(k).c_str()));
+
+            // Customise
+            h_universe.at(uni).at(k)->SetLineWidth(1);
+            h_universe.at(uni).at(k)->SetLineColor(kGreen+2);
+            
+        }
+    }
+
+    // Create vector of systematic error for each histogram
+    std::vector<std::vector<double>> sys_err;
+    sys_err.resize(xsec_types.size());
+    
+    for (unsigned int i = 0; i < sys_err.size(); i++){
+        sys_err.at(i).resize(cv_hist_vec.at(0)->GetNbinsX(), 0.0);
+    }
+
+    // We now want to get the standard deviation of all universes and the mean
+
+
+    // Loop over universes
+    for (unsigned int uni = 0; uni < h_universe.size(); uni++){
+        
+        // Loop over histograms
+        for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
+
+            // Loop over the bins
+            for (int bin = 1; bin < cv_hist_vec.at(0)->GetNbinsX()+1; bin++){
+                double uni_x_content = h_universe.at(uni).at(k)->GetBinContent(bin);
+                double cv_x_content  = cv_hist_vec.at(k)->GetBinContent(bin);
+
+                sys_err.at(k).at(bin-1) += ( uni_x_content - cv_x_content) * ( uni_x_content - cv_x_content);
+            }
+            
+        }
+    }
+
+    // Loop over the histograms
+    for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
+        
+        // loop over the bins
+        for (unsigned int bin = 0; bin < sys_err.at(k).size(); bin ++){
+            sys_err.at(k).at(bin) = std::sqrt(sys_err.at(k).at(bin) / h_universe.size());
+        }
+    }
+
+    // Now we have the systematic error computed we should now set the bin error of the CV clone to the std
+    // Loop over universes
+    for (unsigned int uni = 0; uni < h_universe.size(); uni++){
+        
+        // Loop over histograms
+        for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
+
+            // Loop over the bins
+            for (int bin = 1; bin < cv_hist_vec.at(0)->GetNbinsX()+1; bin++){
+                cv_hist_vec_clone.at(k)->SetBinError(bin, sys_err.at(k).at(bin-1));
+            }
+            
+        }
+    }
 
 
 
+    TCanvas *c;
 
+    // Now we want to draw them
+    for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
 
+        c = new TCanvas();
+
+        h_universe.at(0).at(k)->SetTitle(Form("%s", xsec_types_pretty.at(k).c_str() ));
+
+        double scale_val = h_universe.at(0).at(k)->GetMaximum();
+        
+        if (scale_val <  h_universe.at(k_dn).at(k)->GetMaximum()) scale_val =  h_universe.at(k_dn).at(k)->GetMaximum();
+
+        // Loop over universes
+        for (unsigned int uni = 0; uni < h_universe.size(); uni++){
+        
+            h_universe.at(uni).at(k)->Draw("hist,same");
+            if (scale_val < h_universe.at(uni).at(k)->GetMaximum()) scale_val = h_universe.at(uni).at(k)->GetMaximum();
+
+        }
+
+        cv_hist_vec_clone.at(k)->Draw("E,same");
+
+        h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, scale_val*1.2);
+
+        TLegend *leg = new TLegend(0.6, 0.75, 0.95, 0.9);
+        leg->SetBorderSize(0);
+        leg->SetFillStyle(0);
+        leg->AddEntry(h_universe.at(0).at(k), Form("%s - All Universes", label_pretty.c_str()), "l");
+        leg->AddEntry(cv_hist_vec_clone.at(k),           "Central Value", "le");
+        leg->Draw();
+
+        c->Print(Form("plots/run%s/Systematics/%s/run%s_%s_%s.pdf", run_period.c_str(), label.c_str(), run_period.c_str(), label.c_str(), xsec_types.at(k).c_str()));
+
+        delete c;
+        delete leg;
+
+    }
+
+        
+    
 }
 
 // -----------------------------------------------------------------------------

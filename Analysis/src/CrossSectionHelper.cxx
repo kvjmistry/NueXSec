@@ -656,7 +656,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                     h_cross_sec.at(label).at(uni).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni , xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; Efficiency", nbins, edges);
                 }
                 else if (i == k_xsec_dataxsec || i == k_xsec_mcxsec){
-                    h_cross_sec.at(label).at(uni).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni , xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; #frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{e}} CC Cross-Section [10^{-39} cm^{2}]", nbins, edges);
+                    h_cross_sec.at(label).at(uni).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni , xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; #frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]", nbins, edges);
                 }
                 else {
                     // Flux Integrated Histograms
