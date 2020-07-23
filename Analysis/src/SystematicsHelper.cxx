@@ -190,6 +190,22 @@ void SystematicsHelper::SetTPadOptions(TPad * topPad, TPad * bottomPad ){
 
 }
 // -----------------------------------------------------------------------------
+void SystematicsHelper::SetRatioOptions(TH1D* hist ){
+
+    hist->GetXaxis()->SetLabelSize(0.13);
+    hist->GetXaxis()->SetTitleOffset(0.9);
+    hist->GetXaxis()->SetTitleSize(0.13);
+    hist->GetYaxis()->SetLabelSize(0.13);
+    hist->GetYaxis()->SetRangeUser(-50, 50);
+    hist->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
+    hist->GetYaxis()->SetTitleSize(12);
+    hist->GetYaxis()->SetTitleFont(44);
+    hist->GetYaxis()->CenterTitle();
+    hist->GetYaxis()->SetTitleOffset(1.5);
+    hist->SetTitle(" ");
+
+}
+// -----------------------------------------------------------------------------
 void SystematicsHelper::CreateDirectory(std::string folder, std::string run_period){
 
     std::string a = "if [ ! -d \"plots/";
@@ -669,6 +685,10 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, std::string
         // Customise
         h_universe.at(k_up).at(k)->SetLineWidth(2);
         h_universe.at(k_up).at(k)->SetLineColor(kGreen+2);
+        h_universe.at(k_up).at(k)->GetYaxis()->SetLabelSize(0.04);
+        h_universe.at(k_up).at(k)->GetYaxis()->SetTitleSize(14);
+        h_universe.at(k_up).at(k)->GetYaxis()->SetTitleFont(44);
+        h_universe.at(k_up).at(k)->GetYaxis()->SetTitleOffset(1.5);
         
         _util.GetHist(f_nuexsec, h_universe.at(k_dn).at(k), Form( "%s/h_run%s_%s_0_%s", label_dn.c_str(), run_period.c_str(), label_dn.c_str(), xsec_types.at(k).c_str()));
 
@@ -677,12 +697,20 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, std::string
         h_universe.at(k_dn).at(k)->SetLineColor(kRed+2);
     }
 
+    TPad *topPad;
+    TPad *bottomPad;
     TCanvas *c;
     
     // Now we want to draw them
     for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
         c = new TCanvas();
+        topPad = new TPad("topPad", "", 0, 0.28, 1, 1.0);
+        bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
+        SetTPadOptions(topPad, bottomPad);
+        
         h_universe.at(k_up).at(k)->SetTitle(Form("%s", xsec_types_pretty.at(k).c_str() ));
+        h_universe.at(k_up).at(k)->GetXaxis()->SetTitle("");
+        h_universe.at(k_up).at(k)->GetXaxis()->SetLabelSize(0);
 
         h_universe.at(k_up).at(k)->Draw("hist");
         cv_hist_vec.at(k)->Draw("hist,same");
@@ -696,7 +724,12 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, std::string
 
         h_universe.at(k_up).at(k)->GetYaxis()->SetRangeUser(0, scale_val*1.2);
 
-        TLegend *leg = new TLegend(0.6, 0.75, 0.95, 0.9);
+        // FIxed scaling for differential cross section
+        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec){
+            h_universe.at(k_up).at(k)->GetYaxis()->SetRangeUser(0, 3.0e-39);
+        }
+
+        TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
         leg->AddEntry(h_universe.at(k_up).at(k), Form("%s +1 #sigma", label_pretty.c_str()), "l");
@@ -704,10 +737,40 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, std::string
         leg->AddEntry(h_universe.at(k_dn).at(k), Form("%s -1 #sigma", label_pretty.c_str()), "l");
         leg->Draw();
 
+        bottomPad->cd();
+        
+        // Up ratio to CV
+        TH1D* h_err_up = (TH1D *)cv_hist_vec.at(k)->Clone("h_ratio_up");
+        h_err_up->Add(h_universe.at(k_up).at(k), -1);
+        h_err_up->Divide(cv_hist_vec.at(k));
+        h_err_up->SetLineWidth(2);
+        h_err_up->SetLineColor(kGreen+2);
+        h_err_up->Scale(100);
+        
+        // Down ratio to CV
+        TH1D* h_err_dn = (TH1D *)cv_hist_vec.at(k)->Clone("h_ratio_dn");
+        h_err_dn->Add(h_universe.at(k_dn).at(k), -1);
+        h_err_dn->Divide(cv_hist_vec.at(k));
+        h_err_dn->SetLineWidth(2);
+        h_err_dn->SetLineColor(kRed+2);
+        h_err_dn->Scale(100);
+
+        TH1D* h_err = (TH1D *)cv_hist_vec.at(k)->Clone("h_ratio");
+        h_err->Divide(cv_hist_vec.at(k));
+
+        SetRatioOptions(h_err_up);
+        h_err_up->GetYaxis()->SetTitle("\% change from CV");
+        h_err_up->Draw("hist,same");
+        h_err_dn->Draw("hist,same");
+        h_err->Draw("hist,same");
+
         c->Print(Form("plots/run%s/Systematics/%s/run%s_%s_%s.pdf", run_period.c_str(), label.c_str(), run_period.c_str(), label.c_str(), xsec_types.at(k).c_str()));
 
         delete c;
         delete leg;
+        delete h_err;
+        delete h_err_up;
+        delete h_err_dn;
     }
 }
 // -----------------------------------------------------------------------------
@@ -869,8 +932,13 @@ void SystematicsHelper::CompareCVXSec(std::string xsec_type){
     TH1D* h_dataxsec = (TH1D*) cv_hist_vec.at(index_data)->Clone("h_data_xsec_temp");
     TH1D* h_mcxsec   = (TH1D*) cv_hist_vec.at(index_mc)  ->Clone("h_data_xsec_temp");
 
+    TPad *topPad;
+    TPad *bottomPad;
 
     TCanvas *c = new TCanvas();
+    topPad = new TPad("topPad", "", 0, 0.28, 1, 1.0);
+    bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
+    SetTPadOptions(topPad, bottomPad);
 
     h_dataxsec->SetLineColor(kGreen+2);
     h_mcxsec  ->SetLineColor(kRed+2);
@@ -878,16 +946,47 @@ void SystematicsHelper::CompareCVXSec(std::string xsec_type){
     if (xsec_type == "differential") h_dataxsec->GetYaxis()->SetRangeUser(0, 3e-39);
     if (xsec_type == "integrated")   h_dataxsec->GetYaxis()->SetRangeUser(0, 10);
 
+    h_dataxsec->GetYaxis()->SetLabelSize(0.04);
+    h_dataxsec->GetYaxis()->SetTitleSize(14);
+    h_dataxsec->GetYaxis()->SetTitleFont(44);
+    h_dataxsec->GetYaxis()->SetTitleOffset(1.5);
+    h_dataxsec->GetXaxis()->SetTitle("");
+    h_dataxsec->GetXaxis()->SetLabelSize(0);
 
-    h_dataxsec->Draw("hist");
+    h_dataxsec->Draw("hist,E");
     h_mcxsec->Draw("hist,same");
+    TH1D* h_mcxsec_clone = (TH1D *)h_mcxsec->Clone("h_mc_clone");
+    h_mcxsec_clone->SetFillColorAlpha(12, 0.15);
+    h_mcxsec_clone->Draw("E2,same");
+    
 
-     TLegend *leg = new TLegend(0.6, 0.75, 0.95, 0.9);
+    TLegend *leg = new TLegend(0.6, 0.7, 0.95, 0.85);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
-    leg->AddEntry(h_dataxsec, "Data CV", "l");
-    leg->AddEntry(h_mcxsec,   "MC CV", "l");
+    leg->AddEntry(h_dataxsec, "Data CV", "le");
+    leg->AddEntry(h_mcxsec_clone,   "MC CV", "lf");
     leg->Draw();
+
+
+    bottomPad->cd();
+        
+    // The percent difference of mc wrt data
+    TH1D* h_err = (TH1D *)h_dataxsec->Clone("h_ratio");
+    h_err->Add(h_mcxsec, -1);
+    h_err->Divide(h_dataxsec);
+    h_err->SetLineWidth(2);
+    h_err->SetLineColor(kGreen+2);
+    h_err->Scale(100);
+    
+
+    SetRatioOptions(h_err);
+    h_err->SetLineColor(kBlack);
+    h_err->GetYaxis()->SetTitleSize(11);
+    h_err->GetYaxis()->SetRangeUser(-100, 100);
+    h_err->GetYaxis()->SetTitle("Data - MC / Data [\%]");
+    if (xsec_type == "differential") h_err->GetXaxis()->SetTitle("Reco Electron Shower Energy [GeV]");
+    h_err->Draw("hist,same");
+
 
     c->Print(Form("plots/run%s/Systematics/CV/run%s_CV_data_mc_comparison_%s.pdf", run_period.c_str(), run_period.c_str(), xsec_type.c_str() ));
 

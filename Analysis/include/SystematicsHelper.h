@@ -48,6 +48,9 @@ class SystematicsHelper{
     // -------------------------------------------------------------------------
     void SetTPadOptions(TPad * topPad, TPad * bottomPad );
     // -------------------------------------------------------------------------
+    // Set options for ratio histogram
+    void SetRatioOptions(TH1D* hist);
+    // -------------------------------------------------------------------------
     void CreateDirectory(std::string folder, std::string run_period);
     // -------------------------------------------------------------------------
     // Draw area norm label
