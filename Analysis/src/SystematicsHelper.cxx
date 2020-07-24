@@ -611,6 +611,18 @@ void SystematicsHelper::InitialiseReweightingMode(){
 
         CompareCVXSec(var);
 
+        // Comparison plots for data to MC
+        CompareVariationXSec("RPA",              var, "RPA" );
+        CompareVariationXSec("CCMEC",            var, "CC MEC" );
+        CompareVariationXSec("AxFFCCQE",         var, "Ax FF CCQE" );
+        CompareVariationXSec("VecFFCCQE",        var, "Vec FF CCQE" );
+        CompareVariationXSec("DecayAngMEC",      var, "Decay Ang MEC" );
+        CompareVariationXSec("ThetaDelta2Npi",   var, "Theta Delta 2N #pi" );
+        CompareVariationXSec("ThetaDelta2NRad",  var, "Theta Delta 2N Rad" );
+        CompareVariationXSec("RPA_CCQE_Reduced", var, "RPA CCQE Reduced" );
+        CompareVariationXSec("NormCCCOH",        var, "Norm CC COH" );
+        CompareVariationXSec("NormNCCOH",        var, "Norm NC COH" );
+
         // Plot the unisims
         PlotReweightingModeUnisim("RPA",              var, "RPA" );
         PlotReweightingModeUnisim("CCMEC",            var, "CC MEC" );
@@ -623,9 +635,10 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeUnisim("NormCCCOH",        var, "Norm CC COH" );
         PlotReweightingModeUnisim("NormNCCOH",        var, "Norm NC COH" );
 
+        // Plot the multisims
         PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 500);
         PlotReweightingModeMultisim("weightsReint", var,  "Geant Reinteractions", 1000);
-        PlotReweightingModeMultisim("weightsPPFX", var,  "PPFX", 600);
+        PlotReweightingModeMultisim("weightsPPFX",  var,  "PPFX", 600);
         
     }
     
@@ -1012,3 +1025,112 @@ void SystematicsHelper::InitialsePlotCV(){
     }
 }
 // -----------------------------------------------------------------------------
+void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::string label_pretty){
+
+    
+        // Create the directory
+    CreateDirectory("/Systematics/" + label + "/" + vars.at(var), run_period);
+
+    std::vector<std::vector<TH1D*>> h_universe;
+    
+    // Resize to the number of universes
+    h_universe.resize(2);
+    h_universe.at(k_up).resize(xsec_types.size());
+    h_universe.at(k_dn).resize(xsec_types.size());
+
+    // Now get the histograms
+    std::string label_up = label + "up";
+    std::string label_dn = label + "dn";
+    
+
+    // Get the histograms and customise a bit
+    for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
+        _util.GetHist(f_nuexsec, h_universe.at(k_up).at(k), Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), run_period.c_str(), label_up.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+
+        // Customise
+        h_universe.at(k_up).at(k)->SetLineWidth(2);
+        h_universe.at(k_up).at(k)->SetLineColor(kGreen+2);
+        if (k == k_xsec_mcxsec) h_universe.at(k_up).at(k)->SetLineStyle(7);
+        h_universe.at(k_up).at(k)->GetYaxis()->SetLabelSize(0.04);
+        h_universe.at(k_up).at(k)->GetYaxis()->SetTitleSize(14);
+        h_universe.at(k_up).at(k)->GetYaxis()->SetTitleFont(44);
+        h_universe.at(k_up).at(k)->GetYaxis()->SetTitleOffset(1.5);
+        
+        _util.GetHist(f_nuexsec, h_universe.at(k_dn).at(k), Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), run_period.c_str(), label_dn.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+
+        // Customise
+        h_universe.at(k_dn).at(k)->SetLineWidth(2);
+        h_universe.at(k_dn).at(k)->SetLineColor(kRed+2);
+        if (k == k_xsec_mcxsec) h_universe.at(k_dn).at(k)->SetLineStyle(7);
+    }
+
+    TPad *topPad;
+    TPad *bottomPad;
+    TCanvas *c;
+    
+    // Now we want to draw them
+    c = new TCanvas();
+    topPad = new TPad("topPad", "", 0, 0.28, 1, 1.0);
+    bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
+    SetTPadOptions(topPad, bottomPad);
+    // topPad->SetRightMargin(0.10 );
+    // bottomPad->SetRightMargin(0.10 );
+    
+    h_universe.at(k_up).at(k_xsec_dataxsec)->SetTitle(Form("%s", xsec_types_pretty.at(k_xsec_dataxsec).c_str() ));
+    h_universe.at(k_up).at(k_xsec_dataxsec)->GetXaxis()->SetTitle("");
+    h_universe.at(k_up).at(k_xsec_dataxsec)->GetXaxis()->SetLabelSize(0);
+
+
+
+    h_universe.at(k_up).at(k_xsec_dataxsec)->Draw("hist");
+    h_universe.at(k_dn).at(k_xsec_dataxsec)->Draw("hist,same");
+    h_universe.at(k_up).at(k_xsec_mcxsec)->Draw("hist,same");
+    h_universe.at(k_dn).at(k_xsec_mcxsec)->Draw("hist,same");
+
+
+    // FIxed scaling for differential cross section
+    if (vars.at(var) != "integrated"){
+        h_universe.at(k_up).at(k_xsec_dataxsec)->GetYaxis()->SetRangeUser(0, 3.0e-39);
+    }
+
+    TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(h_universe.at(k_up).at(k_xsec_dataxsec), Form("%s +1 #sigma Data", label_pretty.c_str()), "l");
+    leg->AddEntry(h_universe.at(k_up).at(k_xsec_mcxsec),   Form("%s +1 #sigma MC",   label_pretty.c_str()), "l");
+    leg->AddEntry(h_universe.at(k_dn).at(k_xsec_dataxsec), Form("%s -1 #sigma Data", label_pretty.c_str()), "l");
+    leg->AddEntry(h_universe.at(k_dn).at(k_xsec_mcxsec),   Form("%s -1 #sigma MC",   label_pretty.c_str()), "l");
+    leg->Draw();
+
+    bottomPad->cd();
+    
+    // Up ratio to CV
+    TH1D* h_err_up = (TH1D *)h_universe.at(k_up).at(k_xsec_dataxsec)->Clone("h_ratio_up");
+    h_err_up->Add(h_universe.at(k_up).at(k_xsec_mcxsec), -1);
+    h_err_up->Divide(h_universe.at(k_up).at(k_xsec_dataxsec));
+    h_err_up->SetLineWidth(2);
+    h_err_up->SetLineColor(kGreen+2);
+    h_err_up->Scale(100);
+    
+    // Down ratio to CV
+    TH1D* h_err_dn = (TH1D *)h_universe.at(k_dn).at(k_xsec_dataxsec)->Clone("h_ratio_dn");
+    h_err_dn->Add(h_universe.at(k_dn).at(k_xsec_mcxsec), -1);
+    h_err_dn->Divide(h_universe.at(k_dn).at(k_xsec_dataxsec));
+    h_err_dn->SetLineWidth(2);
+    h_err_dn->SetLineColor(kRed+2);
+    h_err_dn->Scale(100);
+
+    TH1D* h_err = (TH1D *)cv_hist_vec.at(var).at(k_xsec_dataxsec)->Clone("h_ratio");
+    h_err->Divide(cv_hist_vec.at(var).at(k_xsec_dataxsec));
+
+    SetRatioOptions(h_err_up);
+    h_err_up->GetYaxis()->SetRangeUser(-100, 100);
+    h_err_up->GetYaxis()->SetTitle("\% change of Data to MC");
+    h_err_up->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+    h_err_up->Draw("hist,same");
+    h_err_dn->Draw("hist,same");
+    h_err->Draw("hist,same");
+
+    c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_data_mc_comparison.pdf", run_period.c_str(), label.c_str(), vars.at(var).c_str(), run_period.c_str(), label.c_str(), vars.at(var).c_str() ));
+
+}

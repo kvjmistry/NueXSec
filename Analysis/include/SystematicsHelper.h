@@ -75,6 +75,9 @@ class SystematicsHelper{
     // Function that initialises and plots the CV
     void InitialsePlotCV();
     // -------------------------------------------------------------------------
+    // Compare the data cross section to mc cross section for each variation
+    void CompareVariationXSec(std::string label, int var, std::string label_pretty);
+    // -------------------------------------------------------------------------
 
 
 
