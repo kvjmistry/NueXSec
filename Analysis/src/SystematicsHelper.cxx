@@ -605,66 +605,37 @@ void SystematicsHelper::InitialiseReweightingMode(){
     // Should we add more protection to this command??
     f_nuexsec = new TFile( Form("files/crosssec_run%s.root", run_period.c_str() ), "READ");
 
-    
+    InitialsePlotCV();
 
-    // Get the CV histograms. These should stay constant througout the code
-    cv_hist_vec.resize(xsec_types.size());
-    for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
-        _util.GetHist(f_nuexsec, cv_hist_vec.at(k), Form( "CV/h_run%s_CV_0_%s", run_period.c_str(), xsec_types.at(k).c_str()));
+    for (unsigned int var = 0; var <  vars.size(); var++){
 
-        // Customise
-        cv_hist_vec.at(k)->SetLineWidth(2);
-        cv_hist_vec.at(k)->SetLineColor(kBlack);
+        CompareCVXSec(var);
+
+        // Plot the unisims
+        PlotReweightingModeUnisim("RPA",              var, "RPA" );
+        PlotReweightingModeUnisim("CCMEC",            var, "CC MEC" );
+        PlotReweightingModeUnisim("AxFFCCQE",         var, "Ax FF CCQE" );
+        PlotReweightingModeUnisim("VecFFCCQE",        var, "Vec FF CCQE" );
+        PlotReweightingModeUnisim("DecayAngMEC",      var, "Decay Ang MEC" );
+        PlotReweightingModeUnisim("ThetaDelta2Npi",   var, "Theta Delta 2N #pi" );
+        PlotReweightingModeUnisim("ThetaDelta2NRad",  var, "Theta Delta 2N Rad" );
+        PlotReweightingModeUnisim("RPA_CCQE_Reduced", var, "RPA CCQE Reduced" );
+        PlotReweightingModeUnisim("NormCCCOH",        var, "Norm CC COH" );
+        PlotReweightingModeUnisim("NormNCCOH",        var, "Norm NC COH" );
+
+        PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 500);
+        PlotReweightingModeMultisim("weightsReint", var,  "Geant Reinteractions", 1000);
+        PlotReweightingModeMultisim("weightsPPFX", var,  "PPFX", 600);
+        
     }
-
-    // Create the CV directory and draw the CV
-    CreateDirectory("/Systematics/CV/", run_period);
     
-    TCanvas *c_cv;
-    for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
-        c_cv = new TCanvas();
-       
-        cv_hist_vec.at(k)->Draw("hist");
-    
-        TLegend *leg = new TLegend(0.6, 0.8, 0.95, 0.9);
-        leg->SetBorderSize(0);
-        leg->SetFillStyle(0);
-        leg->AddEntry(cv_hist_vec.at(k),         "CV", "l");
-        // leg->Draw();
-
-        c_cv->Print(Form("plots/run%s/Systematics/CV/run%s_CV_%s.pdf", run_period.c_str(), run_period.c_str(), xsec_types.at(k).c_str()));
-
-        delete c_cv;
-        delete leg;
-    }
-
-
-    // Plot the unisims
-    PlotReweightingModeUnisim("RPA",              "RPA" );
-    PlotReweightingModeUnisim("CCMEC",            "CC MEC" );
-    PlotReweightingModeUnisim("AxFFCCQE",         "Ax FF CCQE" );
-    PlotReweightingModeUnisim("VecFFCCQE",        "Vec FF CCQE" );
-    PlotReweightingModeUnisim("DecayAngMEC",      "Decay Ang MEC" );
-    PlotReweightingModeUnisim("ThetaDelta2Npi",   "Theta Delta 2N #pi" );
-    PlotReweightingModeUnisim("ThetaDelta2NRad",  "Theta Delta 2N Rad" );
-    PlotReweightingModeUnisim("RPA_CCQE_Reduced", "RPA CCQE Reduced" );
-    PlotReweightingModeUnisim("NormCCCOH",        "Norm CC COH" );
-    PlotReweightingModeUnisim("NormNCCOH",        "Norm NC COH" );
-
-    PlotReweightingModeMultisim("weightsGenie", "GENIE", 500);
-    PlotReweightingModeMultisim("weightsReint", "Geant Reinteractions", 1000);
-    PlotReweightingModeMultisim("weightsPPFX", "PPFX", 600);
-    
-
-    CompareCVXSec("differential");
-    CompareCVXSec("integrated");
 
 }
 // -----------------------------------------------------------------------------
-void SystematicsHelper::PlotReweightingModeUnisim(std::string label, std::string label_pretty){
+void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, std::string label_pretty){
 
     // Create the directory
-    CreateDirectory("/Systematics/" + label, run_period);
+    CreateDirectory("/Systematics/" + label + "/" + vars.at(var), run_period);
 
     std::vector<std::vector<TH1D*>> h_universe;
     
@@ -679,8 +650,8 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, std::string
     
 
     // Get the histograms and customise a bit
-    for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
-        _util.GetHist(f_nuexsec, h_universe.at(k_up).at(k), Form( "%s/h_run%s_%s_0_%s", label_up.c_str(), run_period.c_str(), label_up.c_str(), xsec_types.at(k).c_str()));
+    for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
+        _util.GetHist(f_nuexsec, h_universe.at(k_up).at(k), Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), run_period.c_str(), label_up.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
         // Customise
         h_universe.at(k_up).at(k)->SetLineWidth(2);
@@ -690,7 +661,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, std::string
         h_universe.at(k_up).at(k)->GetYaxis()->SetTitleFont(44);
         h_universe.at(k_up).at(k)->GetYaxis()->SetTitleOffset(1.5);
         
-        _util.GetHist(f_nuexsec, h_universe.at(k_dn).at(k), Form( "%s/h_run%s_%s_0_%s", label_dn.c_str(), run_period.c_str(), label_dn.c_str(), xsec_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, h_universe.at(k_dn).at(k), Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), run_period.c_str(), label_dn.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
         // Customise
         h_universe.at(k_dn).at(k)->SetLineWidth(2);
@@ -702,7 +673,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, std::string
     TCanvas *c;
     
     // Now we want to draw them
-    for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
+    for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
         c = new TCanvas();
         topPad = new TPad("topPad", "", 0, 0.28, 1, 1.0);
         bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
@@ -715,19 +686,19 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, std::string
         h_universe.at(k_up).at(k)->GetXaxis()->SetLabelSize(0);
 
         h_universe.at(k_up).at(k)->Draw("hist");
-        cv_hist_vec.at(k)->Draw("hist,same");
+        cv_hist_vec.at(var).at(k)->Draw("hist,same");
         h_universe.at(k_dn).at(k)->Draw("hist,same");
 
         c->Update();
 
         double scale_val = h_universe.at(k_up).at(k)->GetMaximum();
-        if (scale_val < cv_hist_vec.at(k)->GetMaximum()) scale_val = cv_hist_vec.at(k)->GetMaximum();
+        if (scale_val < cv_hist_vec.at(var).at(k)->GetMaximum()) scale_val = cv_hist_vec.at(var).at(k)->GetMaximum();
         if (scale_val <  h_universe.at(k_dn).at(k)->GetMaximum()) scale_val =  h_universe.at(k_dn).at(k)->GetMaximum();
 
         h_universe.at(k_up).at(k)->GetYaxis()->SetRangeUser(0, scale_val*1.2);
 
         // FIxed scaling for differential cross section
-        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec){
+        if (vars.at(var) != "integrated"){
             h_universe.at(k_up).at(k)->GetYaxis()->SetRangeUser(0, 3.0e-39);
         }
 
@@ -735,30 +706,30 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, std::string
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
         leg->AddEntry(h_universe.at(k_up).at(k), Form("%s +1 #sigma", label_pretty.c_str()), "l");
-        leg->AddEntry(cv_hist_vec.at(k),         "CV", "l");
+        leg->AddEntry(cv_hist_vec.at(var).at(k),         "CV", "l");
         leg->AddEntry(h_universe.at(k_dn).at(k), Form("%s -1 #sigma", label_pretty.c_str()), "l");
         leg->Draw();
 
         bottomPad->cd();
         
         // Up ratio to CV
-        TH1D* h_err_up = (TH1D *)cv_hist_vec.at(k)->Clone("h_ratio_up");
+        TH1D* h_err_up = (TH1D *)cv_hist_vec.at(var).at(k)->Clone("h_ratio_up");
         h_err_up->Add(h_universe.at(k_up).at(k), -1);
-        h_err_up->Divide(cv_hist_vec.at(k));
+        h_err_up->Divide(cv_hist_vec.at(var).at(k));
         h_err_up->SetLineWidth(2);
         h_err_up->SetLineColor(kGreen+2);
         h_err_up->Scale(100);
         
         // Down ratio to CV
-        TH1D* h_err_dn = (TH1D *)cv_hist_vec.at(k)->Clone("h_ratio_dn");
+        TH1D* h_err_dn = (TH1D *)cv_hist_vec.at(var).at(k)->Clone("h_ratio_dn");
         h_err_dn->Add(h_universe.at(k_dn).at(k), -1);
-        h_err_dn->Divide(cv_hist_vec.at(k));
+        h_err_dn->Divide(cv_hist_vec.at(var).at(k));
         h_err_dn->SetLineWidth(2);
         h_err_dn->SetLineColor(kRed+2);
         h_err_dn->Scale(100);
 
-        TH1D* h_err = (TH1D *)cv_hist_vec.at(k)->Clone("h_ratio");
-        h_err->Divide(cv_hist_vec.at(k));
+        TH1D* h_err = (TH1D *)cv_hist_vec.at(var).at(k)->Clone("h_ratio");
+        h_err->Divide(cv_hist_vec.at(var).at(k));
 
         SetRatioOptions(h_err_up);
         h_err_up->GetYaxis()->SetTitle("\% change from CV");
@@ -766,7 +737,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, std::string
         h_err_dn->Draw("hist,same");
         h_err->Draw("hist,same");
 
-        c->Print(Form("plots/run%s/Systematics/%s/run%s_%s_%s.pdf", run_period.c_str(), label.c_str(), run_period.c_str(), label.c_str(), xsec_types.at(k).c_str()));
+        c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", run_period.c_str(), label.c_str(), vars.at(var).c_str(), run_period.c_str(), label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
         delete c;
         delete leg;
@@ -776,10 +747,10 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, std::string
     }
 }
 // -----------------------------------------------------------------------------
-void SystematicsHelper::PlotReweightingModeMultisim(std::string label, std::string label_pretty, int universes){
+void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, std::string label_pretty, int universes){
 
     // Create the directory
-    CreateDirectory("/Systematics/" + label, run_period);
+    CreateDirectory("/Systematics/" + label + "/" + vars.at(var), run_period);
 
     std::vector<std::vector<TH1D*>> h_universe;
     std::vector<std::vector<TH1D*>> h_err;
@@ -788,8 +759,9 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, std::stri
     // Clone the CV histograms so we can work with them without changing them
     std::vector<TH1D*> cv_hist_vec_clone;
     cv_hist_vec_clone.resize(xsec_types.size());
+    
     for (unsigned int h_index = 0; h_index < cv_hist_vec_clone.size(); h_index++){
-        cv_hist_vec_clone.at(h_index) = (TH1D*)cv_hist_vec.at(h_index)->Clone(Form("h_%s_clone", xsec_types.at(h_index).c_str() ));
+        cv_hist_vec_clone.at(h_index) = (TH1D*)cv_hist_vec.at(var).at(h_index)->Clone(Form("h_%s_clone", xsec_types.at(h_index).c_str() ));
         // Customise
         cv_hist_vec_clone.at(h_index)->SetLineWidth(2);
         cv_hist_vec_clone.at(h_index)->SetLineColor(kBlack);
@@ -807,8 +779,8 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, std::stri
     
     // Get the histograms and customise a bit
     for (unsigned int uni = 0; uni < h_universe.size(); uni++){
-        for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
-            _util.GetHist(f_nuexsec, h_universe.at(uni).at(k), Form( "%s/h_run%s_%s_%i_%s", label.c_str(), run_period.c_str(), label.c_str(), uni ,xsec_types.at(k).c_str()));
+        for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
+            _util.GetHist(f_nuexsec, h_universe.at(uni).at(k), Form( "%s/%s/h_run%s_%s_%i_%s_%s", label.c_str(), vars.at(var).c_str(), run_period.c_str(), label.c_str(), uni ,vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
             // Customise
             h_universe.at(uni).at(k)->SetLineWidth(1);
@@ -822,7 +794,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, std::stri
     sys_err.resize(xsec_types.size());
     
     for (unsigned int i = 0; i < sys_err.size(); i++){
-        sys_err.at(i).resize(cv_hist_vec.at(0)->GetNbinsX(), 0.0);
+        sys_err.at(i).resize(cv_hist_vec.at(var).at(0)->GetNbinsX(), 0.0);
     }
 
     // We now want to get the standard deviation of all universes wrt to the cv
@@ -832,12 +804,12 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, std::stri
     for (unsigned int uni = 0; uni < h_universe.size(); uni++){
         
         // Loop over histograms
-        for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
+        for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
 
             // Loop over the bins
-            for (int bin = 1; bin < cv_hist_vec.at(0)->GetNbinsX()+1; bin++){
+            for (int bin = 1; bin < cv_hist_vec.at(var).at(0)->GetNbinsX()+1; bin++){
                 double uni_x_content = h_universe.at(uni).at(k)->GetBinContent(bin);
-                double cv_x_content  = cv_hist_vec.at(k)->GetBinContent(bin);
+                double cv_x_content  = cv_hist_vec.at(var).at(k)->GetBinContent(bin);
 
                 sys_err.at(k).at(bin-1) += ( uni_x_content - cv_x_content) * ( uni_x_content - cv_x_content);
             }
@@ -846,7 +818,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, std::stri
     }
 
     // Loop over the histograms
-    for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
+    for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
         
         // loop over the bins
         for (unsigned int bin = 0; bin < sys_err.at(k).size(); bin ++){
@@ -859,10 +831,10 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, std::stri
     for (unsigned int uni = 0; uni < h_universe.size(); uni++){
         
         // Loop over histograms
-        for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
+        for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
 
             // Loop over the bins
-            for (int bin = 1; bin < cv_hist_vec.at(0)->GetNbinsX()+1; bin++){
+            for (int bin = 1; bin < cv_hist_vec.at(var).at(0)->GetNbinsX()+1; bin++){
                 cv_hist_vec_clone.at(k)->SetBinError(bin, sys_err.at(k).at(bin-1));
             }
             
@@ -874,7 +846,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, std::stri
     TCanvas *c;
 
     // Now we want to draw them
-    for (unsigned int k = 0; k < cv_hist_vec.size(); k++){
+    for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
 
         c = new TCanvas();
 
@@ -887,6 +859,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, std::stri
         // Loop over universes
         for (unsigned int uni = 0; uni < h_universe.size(); uni++){
         
+            h_universe.at(uni).at(k)->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
             h_universe.at(uni).at(k)->Draw("hist,same");
             if (scale_val < h_universe.at(uni).at(k)->GetMaximum()) scale_val = h_universe.at(uni).at(k)->GetMaximum();
 
@@ -907,7 +880,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, std::stri
         leg->AddEntry(cv_hist_vec_clone.at(k),           "Central Value", "le");
         leg->Draw();
 
-        c->Print(Form("plots/run%s/Systematics/%s/run%s_%s_%s.pdf", run_period.c_str(), label.c_str(), run_period.c_str(), label.c_str(), xsec_types.at(k).c_str()));
+        c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", run_period.c_str(), label.c_str(), vars.at(var).c_str(),  run_period.c_str(), label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
         delete c;
         delete leg;
@@ -918,22 +891,11 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, std::stri
     
 }
 // -----------------------------------------------------------------------------
-void SystematicsHelper::CompareCVXSec(std::string xsec_type){
+void SystematicsHelper::CompareCVXSec(int var){
 
-    int index_data;
-    int index_mc;
-
-    if (xsec_type == "differential"){
-        index_data = k_xsec_dataxsec;
-        index_mc   = k_xsec_mcxsec;
-    }
-    else {
-        index_data = k_xsec_dataxsec_int;
-        index_mc   = k_xsec_mcxsec_int;
-    }
-
-    TH1D* h_dataxsec = (TH1D*) cv_hist_vec.at(index_data)->Clone("h_data_xsec_temp");
-    TH1D* h_mcxsec   = (TH1D*) cv_hist_vec.at(index_mc)  ->Clone("h_data_xsec_temp");
+    
+    TH1D* h_dataxsec = (TH1D*) cv_hist_vec.at(var).at(k_xsec_dataxsec)->Clone("h_data_xsec_temp");
+    TH1D* h_mcxsec   = (TH1D*) cv_hist_vec.at(var).at(k_xsec_mcxsec)  ->Clone("h_data_xsec_temp");
 
 
     TPad *topPad;
@@ -947,8 +909,8 @@ void SystematicsHelper::CompareCVXSec(std::string xsec_type){
     h_dataxsec->SetLineColor(kGreen+2);
     h_mcxsec  ->SetLineColor(kRed+2);
 
-    if (xsec_type == "differential") h_dataxsec->GetYaxis()->SetRangeUser(0, 3e-39);
-    if (xsec_type == "integrated")   h_dataxsec->GetYaxis()->SetRangeUser(0, 10);
+    h_dataxsec->GetYaxis()->SetRangeUser(0, 3e-39);
+    if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(0, 10e-39);
 
     h_dataxsec->GetYaxis()->SetLabelSize(0.04);
     h_dataxsec->GetYaxis()->SetTitleSize(14);
@@ -988,11 +950,65 @@ void SystematicsHelper::CompareCVXSec(std::string xsec_type){
     h_err->GetYaxis()->SetTitleSize(11);
     h_err->GetYaxis()->SetRangeUser(-100, 100);
     h_err->GetYaxis()->SetTitle("Data - MC / Data [\%]");
-    if (xsec_type == "differential") h_err->GetXaxis()->SetTitle("Reco Electron Shower Energy [GeV]");
+    // h_err->SetTitle(var_labels.at(var).c_str());
     h_err->Draw("hist,same");
 
 
-    c->Print(Form("plots/run%s/Systematics/CV/run%s_CV_data_mc_comparison_%s.pdf", run_period.c_str(), run_period.c_str(), xsec_type.c_str() ));
+    c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_data_mc_comparison.pdf", run_period.c_str(), vars.at(var).c_str(), run_period.c_str(), vars.at(var).c_str() ));
 
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::InitialsePlotCV(){
+
+    // Get the CV histograms. These should stay constant througout the code
+
+    cv_hist_vec.resize(vars.size());
+    
+    for (unsigned int var = 0; var < vars.size(); var++){
+        cv_hist_vec.at(var).resize(xsec_types.size());
+    }
+
+
+    // Loop over the vars
+    for (unsigned int var = 0; var < vars.size(); var++){
+        
+        // Loop over the typrs
+        for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
+            _util.GetHist(f_nuexsec, cv_hist_vec.at(var).at(k), Form( "CV/%s/h_run%s_CV_0_%s_%s", vars.at(var).c_str(), run_period.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+
+            if (cv_hist_vec.at(var).at(k) == NULL) std::cout << "Failed to get the histogram!" << std::endl;
+
+            // Customise
+            cv_hist_vec.at(var).at(k)->SetLineWidth(2);
+            cv_hist_vec.at(var).at(k)->SetLineColor(kBlack);
+        }
+
+        // Create the CV directory and draw the CV
+        CreateDirectory("/Systematics/CV/" + vars.at(var) + "/", run_period);
+    }
+    
+    TCanvas *c_cv;
+    
+    // Loop over the vars
+    for (unsigned int var = 0; var < vars.size(); var++){
+        
+        // Loop over the types
+        for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
+            c_cv = new TCanvas();
+        
+            cv_hist_vec.at(var).at(k)->Draw("hist");
+        
+            TLegend *leg = new TLegend(0.6, 0.8, 0.95, 0.9);
+            leg->SetBorderSize(0);
+            leg->SetFillStyle(0);
+            leg->AddEntry(cv_hist_vec.at(var).at(k),         "CV", "l");
+            // leg->Draw();
+
+            c_cv->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_%s.pdf", run_period.c_str(), vars.at(var).c_str(), run_period.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+
+            delete c_cv;
+            delete leg;
+        }
+    }
 }
 // -----------------------------------------------------------------------------

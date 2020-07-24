@@ -65,13 +65,17 @@ class SystematicsHelper{
     void InitialiseReweightingMode();
     // -------------------------------------------------------------------------
     // Draw Unisim histograms
-    void PlotReweightingModeUnisim(std::string label, std::string label_pretty);
+    void PlotReweightingModeUnisim(std::string label, int var, std::string label_pretty);
     // -------------------------------------------------------------------------
-    void PlotReweightingModeMultisim(std::string label, std::string label_pretty, int universes);
+    void PlotReweightingModeMultisim(std::string label, int var, std::string label_pretty, int universes);
     // -------------------------------------------------------------------------
     // Plots the MC and data cross sections to compare them
-    void CompareCVXSec(std::string xsec_type);
+    void CompareCVXSec(int var);
     // -------------------------------------------------------------------------
+    // Function that initialises and plots the CV
+    void InitialsePlotCV();
+    // -------------------------------------------------------------------------
+
 
 
     std::string mode{"default"}; // what mode to run this class in
@@ -111,17 +115,40 @@ class SystematicsHelper{
         k_xsec_data,    // Data event histogram binned in energy
         k_xsec_mcxsec,  // MC Cross Section
         k_xsec_dataxsec,// Data Cross Section
-        k_xsec_mcxsec_int,  // MC Cross Section Flux Integrated
-        k_xsec_dataxsec_int,// Data Cross Section Flux Integrated
         k_TH1D_xsec_MAX
     };
 
+    // enum for histogram vars
+    enum TH1D_xsec_var_vars {
+        k_var_integrated,     // Integrated X-Section
+        k_var_reco_el_E,      // Reconstructed electron energy
+        k_var_true_el_E,      // True electron energy
+        k_var_true_nu_E,      // True neutrino energy
+        k_var_reco_nu_E,      // Reconstructed neutrino energy
+        k_TH1D_xsec_var_MAX
+    };
+
     // Names for cross section histograms
-    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "data_xsec", "mc_xsec_int", "data_xsec_int"};
-    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC Cross-Section", "Data Cross-Section", "MC Integrated Cross-Section", "Data Integrated Cross-Section"};
+    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "data_xsec"};
+    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC Cross-Section", "Data Cross-Section"};
+
+    std::vector<std::string> vars = {"integrated", "reco_el_E", "true_el_E", "true_nu_E", "reco_nu_e"};
+
+    std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Cross-Section [10^{-39} cm^{2}]",
+                                        ";Reco Leading Shower Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
+                                        ";True Electron Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
+                                        ";True #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
+                                        ";Reco #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]"};
+
+
+    std::vector<std::string> var_labels_x = {"",
+                                        "Reco Leading Shower Energy [GeV]",
+                                        "True Electron Energy [GeV]",
+                                        "True #nu_{e} Energy [GeV]",
+                                        "Reco #nu_{e} Energy [GeV]"};
 
     // Containter for the central value histograms
-    std::vector<TH1D*> cv_hist_vec;
+    std::vector<std::vector<TH1D*>> cv_hist_vec;
 
     enum updn {k_up, k_dn};
 
