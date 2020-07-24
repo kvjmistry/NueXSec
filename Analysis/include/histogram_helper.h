@@ -211,6 +211,8 @@ class histogram_helper{
         k_true_vtx_x_sce,     // True Vertex X Space Charge Corrected
         k_true_vtx_y_sce,     // True Vertex Y Space Charge Corrected
         k_true_vtx_z_sce,     // True Vertex Z Space Charge Corrected
+        k_true_elec_ang_targ, // True angle of electron shower wrt target
+        k_true_nu_ang_targ,   // True angle of electron shower wrt target
         k_TH1D_true_MAX
     };
 
@@ -233,6 +235,7 @@ class histogram_helper{
         k_true_nue_vtx_z_y,
         k_true_nue_vtx_z_y_sce,
         k_true_elec_E_reco_elec_E,
+        k_true_nu_E_reco_nu_E,
         k_true_nu_vtx_x_reco_nu_vtx_x,
         k_true_nu_vtx_y_reco_nu_vtx_y,
         k_true_nu_vtx_z_reco_nu_vtx_z,

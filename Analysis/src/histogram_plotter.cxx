@@ -130,6 +130,8 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
             Save1DHists(Form("plots/run%s/Truth/true_vtx_x_sce_%s.pdf", run_period, cut_type.c_str()), "h_true_vtx_x_sce", cut_type);
             Save1DHists(Form("plots/run%s/Truth/true_vtx_y_sce_%s.pdf", run_period, cut_type.c_str()), "h_true_vtx_y_sce", cut_type);
             Save1DHists(Form("plots/run%s/Truth/true_vtx_z_sce_%s.pdf", run_period, cut_type.c_str()), "h_true_vtx_z_sce", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_nu_ang_targ_%s.pdf",   run_period, cut_type.c_str()), "h_true_elec_ang_targ", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_elec_ang_targ_%s.pdf", run_period, cut_type.c_str()), "h_true_elec_ang_targ", cut_type);
 
             // Make the 2D histograms
             Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta_%s.pdf",          run_period, cut_type.c_str()), "h_true_nue_phi_theta", cut_type);
@@ -139,6 +141,7 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
             Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_%s.pdf",            run_period, cut_type.c_str()), "h_true_nue_vtx_z_y", cut_type);
             Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_sce_%s.pdf",        run_period, cut_type.c_str()), "h_true_nue_vtx_z_y_sce", cut_type);
             Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s.pdf",     run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nu_E_reco_nu_E_%s.pdf",         run_period, cut_type.c_str()), "h_true_nu_E_reco_nu_E", cut_type);
             Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_x_reco_nu_vtx_x_%s.pdf", run_period, cut_type.c_str()), "h_true_nu_vtx_x_reco_nu_vtx_x", cut_type);
             Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_y_reco_nu_vtx_y_%s.pdf", run_period, cut_type.c_str()), "h_true_nu_vtx_y_reco_nu_vtx_y", cut_type);
             Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_z_reco_nu_vtx_z_%s.pdf", run_period, cut_type.c_str()), "h_true_nu_vtx_z_reco_nu_vtx_z", cut_type);
@@ -2082,6 +2085,8 @@ void histogram_plotter::MakeInteractionPlot(const char *print_name, std::string 
     }
 
     h_stack->Draw("hist");
+
+    h_stack->SetMaximum(2100);
 
     h_stack->GetXaxis()->SetTitle("True #nu_{e} Energy");
     h_stack->GetYaxis()->SetTitle("Entries");
