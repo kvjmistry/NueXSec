@@ -199,7 +199,7 @@ void utility::Tabulate(bool inFV, std::string interaction, std::string classific
     
 }
 // -----------------------------------------------------------------------------
-double utility::GetTheta(double px, double py, double pz){
+double utility::GetTheta(double px, double py, double pz, std::string direction){
 
     // Variables
     TRotation RotDet2Beam;             // Rotations
@@ -227,8 +227,18 @@ double utility::GetTheta(double px, double py, double pz){
     // Rotate to beam coords
     BeamCoords = RotDet2Beam * detxyz;
 
-    TVector3 beam_dir = {0 , 0 , 1};
-    double theta = BeamCoords.Angle(beam_dir) * 180 / 3.1415926;
+    TVector3 beamdir = {0 , 0 , 1};;
+    
+    // Get the angle wrt to the beam
+    if (direction == "beam") beamdir = {0 , 0 , 1};
+    
+    // Get the angle wrt to the target to detector direction
+    else if (direction == "target") {
+        beamdir = {5502, 7259, 67270};
+        beamdir = beamdir.Unit(); // Get the direction
+    }
+    
+    double theta = BeamCoords.Angle(beamdir) * 180 / 3.1415926;
 
 
     // Create vectors to get the angle in the yz and xz planes

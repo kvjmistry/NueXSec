@@ -285,6 +285,7 @@ void selection::MakeSelection(){
             bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
             if (!pass) continue;
 
+
         } // End Event loop
 
         std::cout << "Ending Selection over MC" << std::endl;
@@ -503,8 +504,6 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     //std::string interaction = "nue_cc_qe";
     std::string category                       = SC.SliceCategory();            // The pandora group slice category
     std::pair<std::string, int> particle_type  = SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
-
-
 
     // Test code to isolate the low E nues in truth
     // if (type == _util.k_mc && SC.nu_e > 0.5) return false;

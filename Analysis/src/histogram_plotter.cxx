@@ -95,7 +95,8 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
         CreateDirectory("Interaction", run_period);
 
         // Interaction Plot
-        MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction.pdf", run_period));
+        MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction_unselected.pdf", run_period), "unselected");
+        MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction_selected.pdf", run_period), "selected");
 
         // Create the 2D folder
         CreateDirectory("2D", run_period);
@@ -112,31 +113,36 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
 
         // Make 1D Histtograms
         // Save1DHists(Form("plots/run%s/Truth/true_nue_theta.pdf", run_period), "h_true_nue_theta", run_period);
-        Save1DHists(Form("plots/run%s/Truth/true_nue_phi.pdf", run_period), "h_true_nue_phi");
-        Save1DHists(Form("plots/run%s/Truth/true_nue_angle.pdf", run_period), "h_true_nue_angle");
-        Save1DHists(Form("plots/run%s/Truth/true_nue_px.pdf", run_period), "h_true_nue_px");
-        Save1DHists(Form("plots/run%s/Truth/true_nue_py.pdf", run_period), "h_true_nue_py");
-        Save1DHists(Form("plots/run%s/Truth/true_nue_pz.pdf", run_period), "h_true_nue_pz");
-        Save1DHists(Form("plots/run%s/Truth/true_nue_e.pdf", run_period), "h_true_nue_e");
-        Save1DHists(Form("plots/run%s/Truth/true_nue_p.pdf", run_period), "h_true_nue_p");
-        Save1DHists(Form("plots/run%s/Truth/true_vtx_x.pdf", run_period), "h_true_vtx_x");
-        Save1DHists(Form("plots/run%s/Truth/true_vtx_y.pdf", run_period), "h_true_vtx_y");
-        Save1DHists(Form("plots/run%s/Truth/true_vtx_z.pdf", run_period), "h_true_vtx_z");
-        Save1DHists(Form("plots/run%s/Truth/true_vtx_x_sce.pdf", run_period), "h_true_vtx_x_sce");
-        Save1DHists(Form("plots/run%s/Truth/true_vtx_y_sce.pdf", run_period), "h_true_vtx_y_sce");
-        Save1DHists(Form("plots/run%s/Truth/true_vtx_z_sce.pdf", run_period), "h_true_vtx_z_sce");
+        for (int i = 0; i < 2; i++){
+            std::string cut_type = "unselected";
+            if (i == 1) cut_type = "selected";
 
-        // Make the 2D histograms
-        Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta.pdf", run_period), "h_true_nue_phi_theta");
-        Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_theta.pdf", run_period), "h_true_nue_energy_theta");
-        Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_phi.pdf", run_period), "h_true_nue_energy_phi");
-        Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_angle.pdf", run_period), "h_true_nue_energy_angle");
-        Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y.pdf", run_period), "h_true_nue_vtx_z_y");
-        Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_sce.pdf", run_period), "h_true_nue_vtx_z_y_sce");
-        Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E.pdf", run_period), "h_true_elec_E_reco_elec_E");
-        Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_x_reco_nu_vtx_x.pdf", run_period), "h_true_nu_vtx_x_reco_nu_vtx_x");
-        Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_y_reco_nu_vtx_y.pdf", run_period), "h_true_nu_vtx_y_reco_nu_vtx_y");
-        Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_z_reco_nu_vtx_z.pdf", run_period), "h_true_nu_vtx_z_reco_nu_vtx_z");
+            Save1DHists(Form("plots/run%s/Truth/true_nue_phi_%s.pdf",   run_period, cut_type.c_str()), "h_true_nue_phi", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_angle_%s.pdf", run_period, cut_type.c_str()), "h_true_nue_angle", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_px_%s.pdf",    run_period, cut_type.c_str()), "h_true_nue_px", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_py_%s.pdf",    run_period, cut_type.c_str()), "h_true_nue_py", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_pz_%s.pdf",    run_period, cut_type.c_str()), "h_true_nue_pz", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_e_%s.pdf",     run_period, cut_type.c_str()), "h_true_nue_e", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_p_%s.pdf",     run_period, cut_type.c_str()), "h_true_nue_p", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_vtx_x_%s.pdf",     run_period, cut_type.c_str()), "h_true_vtx_x", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_vtx_y_%s.pdf",     run_period, cut_type.c_str()), "h_true_vtx_y", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_vtx_z_%s.pdf",     run_period, cut_type.c_str()), "h_true_vtx_z", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_vtx_x_sce_%s.pdf", run_period, cut_type.c_str()), "h_true_vtx_x_sce", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_vtx_y_sce_%s.pdf", run_period, cut_type.c_str()), "h_true_vtx_y_sce", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_vtx_z_sce_%s.pdf", run_period, cut_type.c_str()), "h_true_vtx_z_sce", cut_type);
+
+            // Make the 2D histograms
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta_%s.pdf",          run_period, cut_type.c_str()), "h_true_nue_phi_theta", cut_type);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_theta_%s.pdf",       run_period, cut_type.c_str()), "h_true_nue_energy_theta", cut_type);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_phi_%s.pdf",         run_period, cut_type.c_str()), "h_true_nue_energy_phi", cut_type);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_angle_%s.pdf",       run_period, cut_type.c_str()), "h_true_nue_energy_angle", cut_type);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_%s.pdf",            run_period, cut_type.c_str()), "h_true_nue_vtx_z_y", cut_type);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_sce_%s.pdf",        run_period, cut_type.c_str()), "h_true_nue_vtx_z_y_sce", cut_type);
+            Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s.pdf",     run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_x_reco_nu_vtx_x_%s.pdf", run_period, cut_type.c_str()), "h_true_nu_vtx_x_reco_nu_vtx_x", cut_type);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_y_reco_nu_vtx_y_%s.pdf", run_period, cut_type.c_str()), "h_true_nu_vtx_y_reco_nu_vtx_y", cut_type);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_z_reco_nu_vtx_z_%s.pdf", run_period, cut_type.c_str()), "h_true_nu_vtx_z_reco_nu_vtx_z", cut_type);
+        }
 
         // Stacked histograms for pi0
         // Create the Truth folder
@@ -764,8 +770,7 @@ void histogram_plotter::SetFillColours(std::vector<TH1D *> &hist, std::string pl
     }
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, std::vector<double> hist_integrals, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt, std::string plotmode)
-{
+void histogram_plotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, std::vector<double> hist_integrals, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt, std::string plotmode){
 
     if (found_data)
         leg_stack->AddEntry(hist.at(k_plot_data), Form("Beam-On Data (%2.1f)", hist_integrals.at(_util.k_leg_data)), "lep");
@@ -774,8 +779,7 @@ void histogram_plotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, 
     if (found_ext)
         leg_stack->AddEntry(hist.at(k_plot_ext), Form("Beam-On Data (%2.1f)", hist_integrals.at(_util.k_leg_ext)), "f");
 
-    if (plotmode == "classifications" || plotmode == "classifications_pi0" || plotmode == "classifications_numu")
-    {
+    if (plotmode == "classifications" || plotmode == "classifications_pi0" || plotmode == "classifications_numu") {
         // leg_stack->AddEntry(hist.at(_util.k_unmatched),       Form("Unmatched (%2.1f)",           hist_integrals.at(_util.k_unmatched)),    "f"); // This should be zero, so dont plot
         leg_stack->AddEntry(hist.at(_util.k_nc_pi0), Form("NC #pi^{0} (%2.1f)", hist_integrals.at(_util.k_nc_pi0)), "f");
         leg_stack->AddEntry(hist.at(_util.k_nc), Form("NC (%2.1f)", hist_integrals.at(_util.k_nc)), "f");
@@ -787,8 +791,7 @@ void histogram_plotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, 
         leg_stack->AddEntry(hist.at(_util.k_nue_cc), Form("#nu_{e} CC (%2.1f)", hist_integrals.at(_util.k_nue_cc)), "f");
     }
 
-    else
-    {
+    else {
         leg_stack->AddEntry(hist.at(_util.k_part_unmatched), Form("Unmatched (%2.1f)", hist_integrals.at(_util.k_part_unmatched)), "f");
         leg_stack->AddEntry(hist.at(_util.k_kaon), Form("K (%2.1f)", hist_integrals.at(_util.k_kaon)), "f");
         leg_stack->AddEntry(hist.at(_util.k_proton), Form("p (%2.1f)", hist_integrals.at(_util.k_proton)), "f");
@@ -804,28 +807,24 @@ void histogram_plotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, 
 void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, bool _area_norm, bool logy, double y_scale_factor, const char *x_axis_name,
                                   const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, double Data_POT,
                                   const char *print_name, bool override_data_mc_comparison, std::string plotmode, bool plotvar,
-                                  const char *variation, const char *run_period, bool centerxaxis)
-{
+                                  const char *variation, const char *run_period, bool centerxaxis) {
 
     // Check if we want this plot for variations
-    if (!plotvar && std::string(variation) != "empty")
-        return;
+    if (!plotvar && std::string(variation) != "empty") return;
 
     std::vector<TH1D *> hist;           // The vector of histograms from the file for the plot
     std::vector<double> hist_integrals; // The integrals of all the histograms
 
     unsigned int k_plot_data, k_plot_ext, k_plot_dirt; // Maps to the correct enum value between the classifications and particle type
 
-    if (plotmode == "classifications" || plotmode == "classifications_pi0" || plotmode == "classifications_numu")
-    {
+    if (plotmode == "classifications" || plotmode == "classifications_pi0" || plotmode == "classifications_numu") {
         hist.resize(_util.k_classifications_MAX);
         hist_integrals.resize(_util.k_classifications_MAX, 0.0);
         k_plot_data = _util.k_leg_data;
         k_plot_ext = _util.k_leg_ext;
         k_plot_dirt = _util.k_leg_dirt;
     }
-    else
-    {
+    else {
         hist.resize(_util.k_particles_MAX);
         hist_integrals.resize(_util.k_particles_MAX, 0.0);
         k_plot_data = _util.k_part_data;
@@ -857,52 +856,43 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
 
     // Get the histograms from the file
     bool bool_hists = GetHistograms(hist, hist_name, cut_name, plotmode, found_data, found_ext, found_dirt);
-    if (!bool_hists)
-    {
+    if (!bool_hists) {
         std::cout << "failed to get the histograms! " << hist_name << std::endl;
         return;
     }
 
     // If true, will turn off plotting of data and off beam
-    if (override_data_mc_comparison)
-    {
+    if (override_data_mc_comparison) {
         found_data = false;
         found_ext = false;
     }
 
     // If there is data and ext, then we make the ratio plot too
-    if (found_data && found_ext)
-    {
+    if (found_data && found_ext) {
         topPad = new TPad("topPad", "", 0, 0.3, 1, 1.0);
         bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
 
         SetTPadOptions(topPad, bottomPad);
     }
     // Otherwise just use an unsplit canvas
-    else
-    {
+    else {
         gPad->SetLeftMargin(0.15);
         gPad->SetRightMargin(0.20);
     }
 
     // Scaling and setting stats
-    for (unsigned int i = 0; i < hist.size(); i++)
-    {
+    for (unsigned int i = 0; i < hist.size(); i++) {
 
-        if (i == k_plot_data)
-        {
-            if (found_data)
-            {
+        if (i == k_plot_data) {
+            if (found_data) {
                 hist.at(i)->SetStats(kFALSE);
                 hist_integrals.at(i) = hist.at(i)->Integral();
             }
         }
 
         // Scale EXT
-        else if (i == k_plot_ext)
-        {
-            if (found_ext)
-            {
+        else if (i == k_plot_ext) {
+            if (found_ext) {
 
                 hist.at(i)->SetStats(kFALSE);
                 hist.at(i)->Scale(intime_scale_factor);
@@ -912,8 +902,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         }
 
         // Scale Dirt
-        else if (i == k_plot_dirt)
-        {
+        else if (i == k_plot_dirt){
             if (found_dirt)
             {
 
@@ -925,8 +914,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
         }
 
         // Scale MC
-        else
-        {
+        else {
 
             hist.at(i)->SetStats(kFALSE);
             hist.at(i)->Scale(mc_scale_factor);
@@ -940,14 +928,11 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     SetFillColours(hist, plotmode, found_data, found_dirt, found_ext, k_plot_data, k_plot_ext, k_plot_dirt);
 
     // Normalisation by area
-    if (_area_norm && found_data)
-    {
+    if (_area_norm && found_data) {
 
-        if (integral_mc_ext != 0)
-        {
+        if (integral_mc_ext != 0) {
 
-            for (unsigned int i = 0; i < hist.size(); i++)
-            {
+            for (unsigned int i = 0; i < hist.size(); i++) {
                 if (i == k_plot_data)
                     continue; // Dont scale the data
                 if (i == 0)
@@ -958,8 +943,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     }
 
     // Add the histograms to the stack
-    for (unsigned int i = 0; i < hist.size(); i++)
-    {
+    for (unsigned int i = 0; i < hist.size(); i++) {
         if (i == k_plot_data)
             continue; // Dont use the data
         if (i == k_plot_ext && !found_ext)
@@ -2065,7 +2049,7 @@ void histogram_plotter::MakeEfficiencyPlotByCut(const char *run_period)
     }
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeInteractionPlot(const char *print_name)
+void histogram_plotter::MakeInteractionPlot(const char *print_name, std::string cut_type)
 {
 
     std::vector<TH1D *> hist(_util.interaction_types.size());
@@ -2075,7 +2059,7 @@ void histogram_plotter::MakeInteractionPlot(const char *print_name)
 
     for (unsigned int k = 0; k < hist.size(); k++)
     {
-        _util.GetHist(f_nuexsec, hist.at(k), Form("Interaction/h_true_nue_E_%s", _util.interaction_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, hist.at(k), Form("Interaction/h_true_nue_E_%s_%s", _util.interaction_types.at(k).c_str(), cut_type.c_str()));
         if (hist.at(k) == NULL)
         {
             std::cout << "Couldn't get all the interaction histograms so exiting function..." << std::endl;
@@ -2115,12 +2099,12 @@ void histogram_plotter::MakeInteractionPlot(const char *print_name)
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
 
-    leg_stack->AddEntry(hist.at(_util.k_plot_nc), "NC", "f");
+    // leg_stack->AddEntry(hist.at(_util.k_plot_nc), "NC", "f");
     leg_stack->AddEntry(hist.at(_util.k_plot_mec), "CC MEC", "f");
     leg_stack->AddEntry(hist.at(_util.k_plot_coh), "CC Coh", "f");
     leg_stack->AddEntry(hist.at(_util.k_plot_dis), "CC DIS", "f");
     leg_stack->AddEntry(hist.at(_util.k_plot_res), "CC Res", "f");
-    leg_stack->AddEntry(hist.at(_util.k_plot_qe), "CC QE", "f");
+    leg_stack->AddEntry(hist.at(_util.k_plot_qe),  "CC QE", "f");
 
     leg_stack->Draw();
 
@@ -2209,16 +2193,17 @@ void histogram_plotter::CreateDirectory(std::string folder, const char *run_peri
     system(command.c_str());
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Save1DHists(const char *print_name, const char *histname)
+void histogram_plotter::Save1DHists(const char *print_name, const char *histname, std::string cut_type)
 {
 
     TH1D *hist;
-    _util.GetHist(f_nuexsec, hist, Form("True/%s_MC", histname));
+    _util.GetHist(f_nuexsec, hist, Form("True/%s_MC_%s", histname, cut_type.c_str()));
 
     if (hist == NULL)
         std::cout << "couldn't get the hist!" << std::endl;
 
     TCanvas *c = new TCanvas();
+    gPad->SetFixedAspectRatio();
 
     hist->SetStats(kFALSE);
 
@@ -2234,16 +2219,17 @@ void histogram_plotter::Save1DHists(const char *print_name, const char *histname
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Save2DHists(const char *print_name, const char *histname)
+void histogram_plotter::Save2DHists(const char *print_name, const char *histname, std::string cut_type)
 {
 
     TH2D *hist;
-    _util.GetHist(f_nuexsec, hist, Form("True/%s_MC", histname));
+    _util.GetHist(f_nuexsec, hist, Form("True/%s_MC_%s", histname, cut_type.c_str()));
 
     if (hist == NULL)
         std::cout << "couldn't get the hist!" << std::endl;
 
     TCanvas *c = new TCanvas();
+    gPad->SetFixedAspectRatio();
 
     hist->SetStats(kFALSE);
 

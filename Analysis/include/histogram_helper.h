@@ -100,14 +100,14 @@ class histogram_helper{
     std::vector<TH1D*> TEfficiency_hists;
 
     // True histograms
-    std::vector<TH1D*> TH1D_true_hists;
-    std::vector<TH2D*> TH2D_true_hists;
+    std::vector<std::vector<TH1D*>> TH1D_true_hists;
+    std::vector<std::vector<TH2D*>> TH2D_true_hists;
     
     // Flash Histograms
     std::vector<TH1D*> TH1D_flash_hists;
 
     // Interaction Histograms
-    std::vector<TH1D*> TH1D_interaction_hists;
+    std::vector<std::vector<TH1D*>> TH1D_interaction_hists; // unselected/selected -- interaction type
 
     // 2D histograms for Signal and Background Rejection
     std::vector<std::vector<TH2D*>> TH2D_hists;
@@ -185,6 +185,7 @@ class histogram_helper{
         k_reco_nu_purity_from_pfp,                                              // Purity
         k_reco_crtveto,                                                         // CRT veto
         k_reco_crthitpe,                                                        // CRT hit pe
+        k_reco_shr_ang_numi,                                                    // Angle of the reconstructed leading shower relative to the numi beamline
         k_TH1D_MAX
     };
 

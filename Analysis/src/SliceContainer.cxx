@@ -642,8 +642,8 @@ std::string SliceContainer::SliceInteractionType(int type){
 
     // Only do this for mc, otherwise return data type
     if (type == _util.k_mc || type == _util.k_dirt){
-        std::string nu;
-        std::string CCNC;
+        std::string nu = "temp";
+        std::string CCNC = "temp";
 
         // Get the nu flavour
         if (nu_pdg == 14 ){
@@ -696,13 +696,14 @@ std::string SliceContainer::SliceInteractionType(int type){
     else return "data";
 
 
+
 }
 // -----------------------------------------------------------------------------
 double SliceContainer::GetPPFXCVWeight(){
     
     double weight = 1.0;
 
-    double nu_theta = _util.GetTheta(true_nu_px, true_nu_py, true_nu_pz);
+    double nu_theta = _util.GetTheta(true_nu_px, true_nu_py, true_nu_pz, "beam");
 
     double xbin{1.0},ybin{1.0};
 

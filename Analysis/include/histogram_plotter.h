@@ -96,7 +96,7 @@ class histogram_plotter{
     void MakeEfficiencyPlotByCut(const char *run_period);
     // -------------------------------------------------------------------------
     // True Neutino energy for nues broken down by genie interaction type
-    void MakeInteractionPlot(const char* print_name);
+    void MakeInteractionPlot(const char* print_name, std::string cut_type);
     // -------------------------------------------------------------------------
     // Plot the 2D signal vs Background Plots
     void Plot2D_Signal_Background(const char* print_name, const char* histname);
@@ -105,10 +105,10 @@ class histogram_plotter{
     void CreateDirectory(std::string folder, const char *run_period);
     // -------------------------------------------------------------------------
     // Script to get the 1D histograms and save them as a PDF
-    void Save1DHists(const char* print_name, const char* histname);
+    void Save1DHists(const char* print_name, const char* histname, std::string cut_type);
     // -------------------------------------------------------------------------
     // Script to get the 2D histograms and save them as a PDF
-    void Save2DHists(const char* print_name, const char* histname);
+    void Save2DHists(const char* print_name, const char* histname, std::string cut_type);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

@@ -59,7 +59,7 @@ public:
     void Tabulate(bool inFV, std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight);
     // -------------------------------------------------------------------------
     // Function calculate theta
-    double GetTheta(double px, double py, double pz);
+    double GetTheta(double px, double py, double pz, std::string direction);
     // -------------------------------------------------------------------------
     // Check if vertex is in the FV
     bool in_fv(double x, double y, double z);
