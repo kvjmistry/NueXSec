@@ -707,6 +707,8 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, std::string
         topPad = new TPad("topPad", "", 0, 0.28, 1, 1.0);
         bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
         SetTPadOptions(topPad, bottomPad);
+        // topPad->SetRightMargin(0.10 );
+        // bottomPad->SetRightMargin(0.10 );
         
         h_universe.at(k_up).at(k)->SetTitle(Form("%s", xsec_types_pretty.at(k).c_str() ));
         h_universe.at(k_up).at(k)->GetXaxis()->SetTitle("");
@@ -780,6 +782,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, std::stri
     CreateDirectory("/Systematics/" + label, run_period);
 
     std::vector<std::vector<TH1D*>> h_universe;
+    std::vector<std::vector<TH1D*>> h_err;
 
 
     // Clone the CV histograms so we can work with them without changing them
@@ -822,7 +825,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, std::stri
         sys_err.at(i).resize(cv_hist_vec.at(0)->GetNbinsX(), 0.0);
     }
 
-    // We now want to get the standard deviation of all universes and the mean
+    // We now want to get the standard deviation of all universes wrt to the cv
 
 
     // Loop over universes
@@ -931,6 +934,7 @@ void SystematicsHelper::CompareCVXSec(std::string xsec_type){
 
     TH1D* h_dataxsec = (TH1D*) cv_hist_vec.at(index_data)->Clone("h_data_xsec_temp");
     TH1D* h_mcxsec   = (TH1D*) cv_hist_vec.at(index_mc)  ->Clone("h_data_xsec_temp");
+
 
     TPad *topPad;
     TPad *bottomPad;
