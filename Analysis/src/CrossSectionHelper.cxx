@@ -85,6 +85,8 @@ void CrossSectionHelper::LoopEvents(){
     // Loop over the tree entries
     std::cout << "Total Tree Entries: "<< tree->GetEntries() << std::endl;
 
+    int n_gen = 0;
+
     for (unsigned int ievent = 0; ievent < tree->GetEntries(); ievent++){
 
         tree->GetEntry(ievent); 
@@ -135,8 +137,9 @@ void CrossSectionHelper::LoopEvents(){
                 if ((*classifcation == "nue_cc" || *classifcation == "nuebar_cc") && gen == false) {
                     
                     // Fill histograms
-                    h_cross_sec.at(label).at(uni).at(k_xsec_sig)->Fill(shr_energy_tot_cali, weight_uni);
-                    h_cross_sec.at(label).at(uni).at(k_xsec_sel)->Fill(shr_energy_tot_cali, cv_weight); // Selected events (N term) we dont weight
+                    FillHists(label, uni, k_xsec_sig, weight_uni, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
+                    FillHists(label, uni, k_xsec_sel, weight_uni, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
+
                 }
 
                 // Background event
@@ -145,15 +148,16 @@ void CrossSectionHelper::LoopEvents(){
                      *classifcation == "nc_pi0"     || *classifcation == "unmatched"){
                     
                     // Fill histograms
-                    h_cross_sec.at(label).at(uni).at(k_xsec_bkg)->Fill(shr_energy_tot_cali, weight_uni);
-                    h_cross_sec.at(label).at(uni).at(k_xsec_sel)->Fill(shr_energy_tot_cali, cv_weight); // Selected events (N term) we dont weight
+                    FillHists(label, uni, k_xsec_bkg, weight_uni, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
+                    FillHists(label, uni, k_xsec_sel, weight_uni, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
+                    
                 }
                 
                 // Generated event
                 if ( (*classifcation == "nue_cc"|| *classifcation == "nuebar_cc" ) && gen == true) {
                     
                     // Fill histograms
-                    h_cross_sec.at(label).at(uni).at(k_xsec_gen)->Fill(shr_energy_tot_cali, weight_uni);
+                    FillHists(label, uni, k_xsec_gen, weight_uni, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
                 }
 
                 // Data event
@@ -162,21 +166,23 @@ void CrossSectionHelper::LoopEvents(){
                     if (cv_weight != 1.0) std::cout << "Error weight for data is not 1, this means your weighting the data... bad!"<< std::endl;
                     
                     // Fill histograms
-                    h_cross_sec.at(label).at(uni).at(k_xsec_data)->Fill(shr_energy_tot_cali, cv_weight);
+                    FillHists(label, uni, k_xsec_data, cv_weight, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
                 }
 
                 // Off beam event
                 if (*classifcation == "ext"){
+
+                    if (cv_weight != 1.0) std::cout << "Error weight for data is not 1, this means your weighting the data... bad!"<< std::endl;
                     
                     // Fill histograms
-                    h_cross_sec.at(label).at(uni).at(k_xsec_ext)->Fill(shr_energy_tot_cali, cv_weight);
+                    FillHists(label, uni, k_xsec_ext, cv_weight, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
                 }
 
                 // Dirt event
                 if (*classifcation == "dirt"){
                     
                     // Fill histograms
-                    h_cross_sec.at(label).at(uni).at(k_xsec_dirt)->Fill(shr_energy_tot_cali, cv_weight);
+                    FillHists(label, uni, k_xsec_dirt, cv_weight, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
                 }
             } // End loop over uni
 
@@ -198,68 +204,41 @@ void CrossSectionHelper::LoopEvents(){
         // Now loop over the universes
         for (unsigned int uni = 0; uni < h_cross_sec.at(label).size(); uni++){
 
-            // Calculate the efficiency histogram
-            h_cross_sec.at(label).at(uni).at(k_xsec_eff)->Divide(h_cross_sec.at(label).at(uni).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(k_xsec_gen));
+            // Loop over the variables
+            for (unsigned int var = 0; var < h_cross_sec.at(label).at(uni).size(); var ++){
 
-            // MC Cross section
-            CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(k_xsec_sel), // N Sel
-                             h_cross_sec.at(label).at(uni).at(k_xsec_eff), // Eff
-                             h_cross_sec.at(label).at(uni).at(k_xsec_bkg), // N Bkg
-                             mc_scale_factor,
-                             integrated_flux * mc_flux_scale_factor,           // Flux
-                             intime_scale_factor,
-                             h_cross_sec.at(label).at(uni).at(k_xsec_ext),     // N EXT
-                             dirt_scale_factor,
-                             h_cross_sec.at(label).at(uni).at(k_xsec_dirt),   // N Dirt
-                             h_cross_sec.at(label).at(uni).at(k_xsec_mcxsec),
-                             N_target_MC, "MC");
+                // Calculate the efficiency histogram
+                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff)->Divide(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(var).at(k_xsec_gen));
 
-            // Data Cross section
-            CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(k_xsec_data), // N Sel
-                             h_cross_sec.at(label).at(uni).at(k_xsec_eff),  // Eff
-                             h_cross_sec.at(label).at(uni).at(k_xsec_bkg),  // N Bkg
-                             mc_scale_factor,
-                             integrated_flux * data_flux_scale_factor,      // Flux
-                             intime_scale_factor,
-                             h_cross_sec.at(label).at(uni).at(k_xsec_ext),  // N EXT
-                             dirt_scale_factor,
-                             h_cross_sec.at(label).at(uni).at(k_xsec_dirt), // N Dirt
-                             h_cross_sec.at(label).at(uni).at(k_xsec_dataxsec),
-                             N_target_Data, "Data");
+                // MC Cross section
+                CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sel), // N Sel
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff), // Eff
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg), // N Bkg
+                                mc_scale_factor,
+                                integrated_flux * mc_flux_scale_factor,           // Flux
+                                intime_scale_factor,
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),     // N EXT
+                                dirt_scale_factor,
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dirt),   // N Dirt
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec),
+                                N_target_MC, "MC");
 
+                // Data Cross section
+                CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_data), // N Sel
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff),  // Eff
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),  // N Bkg
+                                mc_scale_factor,
+                                integrated_flux * data_flux_scale_factor,      // Flux
+                                intime_scale_factor,
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),  // N EXT
+                                dirt_scale_factor,
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dirt), // N Dirt
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dataxsec),
+                                N_target_Data, "Data");
 
-                       
-
-            // Calculate the Flux integrated Cross section
-            double temp_xsec_mc_int = CalcCrossSec(h_cross_sec.at(label).at(uni).at(k_xsec_sel)->Integral(), // N Sel
-                                                   h_cross_sec.at(label).at(uni).at(k_xsec_gen)->Integral(), // N Gen
-                                                   h_cross_sec.at(label).at(uni).at(k_xsec_sig)->Integral(), // N Sig
-                                                   h_cross_sec.at(label).at(uni).at(k_xsec_bkg)->Integral(), // N Bkg
-                                                   integrated_flux * mc_flux_scale_factor,                           // Flux
-                                                   h_cross_sec.at(label).at(uni).at(k_xsec_ext)->Integral()  * (intime_scale_factor / mc_scale_factor), // N EXT
-                                                   h_cross_sec.at(label).at(uni).at(k_xsec_dirt)->Integral() * (dirt_scale_factor / mc_scale_factor),   // N Dirt
-                                                   N_target_MC);
-
-            // ----
-            double temp_xsec_data_int = CalcCrossSec(h_cross_sec.at(label).at(uni).at(k_xsec_data)->Integral(),             // N Sel
-                                                    h_cross_sec.at(label).at(uni).at(k_xsec_gen)->Integral()* mc_scale_factor, // N Gen
-                                                    h_cross_sec.at(label).at(uni).at(k_xsec_sig)->Integral()* mc_scale_factor, // N Sig
-                                                    h_cross_sec.at(label).at(uni).at(k_xsec_bkg)->Integral()* mc_scale_factor, // N Bkg
-                                                    integrated_flux * data_flux_scale_factor,                                       // Flux
-                                                    h_cross_sec.at(label).at(uni).at(k_xsec_ext)->Integral() * intime_scale_factor, // N EXT
-                                                    h_cross_sec.at(label).at(uni).at(k_xsec_dirt)->Integral()* dirt_scale_factor,   // N Dirt
-                                                    N_target_Data);
-            // ----
-
-            // Validate the cross sec, only accept if its > 0...
-            if (std::isnan(temp_xsec_mc_int) == 1)   temp_xsec_mc_int   = 0.0;
-            if (std::isnan(temp_xsec_data_int) == 1) temp_xsec_data_int = 0.0;
-            if (std::isinf(temp_xsec_mc_int))        temp_xsec_mc_int   = 0.0; 
-            if (std::isinf(temp_xsec_data_int))      temp_xsec_data_int = 0.0; 
+            } // End loop over the vars
 
 
-            if (temp_xsec_mc_int > 0)   h_cross_sec.at(label).at(uni).at(k_xsec_mcxsec_int)->SetBinContent(1, temp_xsec_mc_int/(1e-39) );
-            if (temp_xsec_data_int > 0) h_cross_sec.at(label).at(uni).at(k_xsec_dataxsec_int)->SetBinContent(1, temp_xsec_data_int/(1e-39));
         
         } // End loop over universes
     
@@ -269,24 +248,24 @@ void CrossSectionHelper::LoopEvents(){
     // Label 0 should always be the CV with 1 universe
 
     std::cout << "\n" <<
-    "Selected MC:     " << h_cross_sec.at(0).at(0).at(k_xsec_sel)->Integral() << "\n" << 
-    "Signal MC:       " << h_cross_sec.at(0).at(0).at(k_xsec_sig)->Integral() << "\n" << 
-    "Background MC:   " << h_cross_sec.at(0).at(0).at(k_xsec_bkg)->Integral() << "\n" << 
-    "Generated MC:    " << h_cross_sec.at(0).at(0).at(k_xsec_gen)->Integral() << "\n" << 
-    "EXT MC:          " << h_cross_sec.at(0).at(0).at(k_xsec_ext)->Integral()* (intime_scale_factor / mc_scale_factor) << "\n" << 
-    "Dirt MC:         " << h_cross_sec.at(0).at(0).at(k_xsec_dirt)->Integral()* (dirt_scale_factor / mc_scale_factor) << "\n\n" << 
+    "Selected MC:     " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sel)->Integral() << "\n" << 
+    "Signal MC:       " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sig)->Integral() << "\n" << 
+    "Background MC:   " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_bkg)->Integral() << "\n" << 
+    "Generated MC:    " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_gen)->Integral() << "\n" << 
+    "EXT MC:          " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_ext)->Integral()* (intime_scale_factor / mc_scale_factor) << "\n" << 
+    "Dirt MC:         " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dirt)->Integral()* (dirt_scale_factor / mc_scale_factor) << "\n\n" << 
     
-    "Selected Data:   " << h_cross_sec.at(0).at(0).at(k_xsec_data)->Integral() << "\n" << 
-    "Signal Data:     " << h_cross_sec.at(0).at(0).at(k_xsec_sig)->Integral()* mc_scale_factor << "\n" << 
-    "Background Data: " << h_cross_sec.at(0).at(0).at(k_xsec_bkg)->Integral()* mc_scale_factor << "\n" << 
-    "Generated Data:  " << h_cross_sec.at(0).at(0).at(k_xsec_gen)->Integral()* mc_scale_factor << "\n" << 
-    "EXT Data:        " << h_cross_sec.at(0).at(0).at(k_xsec_ext)->Integral()* intime_scale_factor  << "\n" << 
-    "Dirt Data:       " << h_cross_sec.at(0).at(0).at(k_xsec_dirt)->Integral()* dirt_scale_factor << "\n"
+    "Selected Data:   " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_data)->Integral() << "\n" << 
+    "Signal Data:     " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sig)->Integral()* mc_scale_factor << "\n" << 
+    "Background Data: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_bkg)->Integral()* mc_scale_factor << "\n" << 
+    "Generated Data:  " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_gen)->Integral()* mc_scale_factor << "\n" << 
+    "EXT Data:        " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_ext)->Integral()* intime_scale_factor  << "\n" << 
+    "Dirt Data:       " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dirt)->Integral()* dirt_scale_factor << "\n"
     << std::endl;
 
     std::cout << 
-    "MC XSEC: "   << h_cross_sec.at(0).at(0).at(k_xsec_mcxsec_int)->Integral() << "e-39 cm2" << "\n" << 
-    "Data XSEC: " << h_cross_sec.at(0).at(0).at(k_xsec_dataxsec_int)->Integral() << "e-39 cm2\n"
+    "MC XSEC: "   << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_mcxsec)->Integral() << " cm2" << "\n" << 
+    "Data XSEC: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dataxsec)->Integral() << " cm2\n"
     << std::endl;
 
 
@@ -437,6 +416,9 @@ void CrossSectionHelper::WriteHists(){
     // Create subdirectory for each reweighter
     TDirectory *dir_labels[reweighter_labels.size()];
 
+    // Create subdirectory for each variable
+    TDirectory *dir_labels_var[vars.size()];
+
     // Loop over the labels
     for (unsigned int label = 0; label < reweighter_labels.size(); label++) {
         
@@ -451,12 +433,29 @@ void CrossSectionHelper::WriteHists(){
 
         // Loop over the universes
         for (unsigned int uni = 0; uni < h_cross_sec.at(label).size(); uni++ ){
+
+            // Loop over the variables
+            for (unsigned int var = 0; var < h_cross_sec.at(label).at(uni).size(); var ++){
+
+                // See if the directory already exists
+                bool bool_dir = _util.GetDirectory(fnuexsec_out, dir_labels_var[var], Form("%s/%s", reweighter_labels.at(label).c_str(), vars.at(var).c_str()));
+
+                // If it doesnt exist then create it
+                if (!bool_dir) dir_labels_var[var] = dir_labels[label]->mkdir(vars.at(var).c_str());
+
+                // Go into the directory
+                dir_labels_var[var]->cd();
             
-            // Now write the histograms, 
-            for (unsigned int p = 0; p < h_cross_sec.at(label).at(uni).size(); p++){
-                h_cross_sec.at(label).at(uni).at(p)->SetOption("hist");
-                h_cross_sec.at(label).at(uni).at(p)->Write("",TObject::kOverwrite);
-            }
+                // Now write the histograms, 
+                for (unsigned int p = 0; p < h_cross_sec.at(label).at(uni).at(var).size(); p++){
+                    h_cross_sec.at(label).at(uni).at(var).at(p)->SetOption("hist");
+                    h_cross_sec.at(label).at(uni).at(var).at(p)->Write("",TObject::kOverwrite);
+                }
+            
+            } // End loop over the variables
+
+            fnuexsec_out->cd();    // change current directory to top
+        
         } // End loop over universes
 
         fnuexsec_out->cd();    // change current directory to top
@@ -477,6 +476,7 @@ void CrossSectionHelper::InitTree(){
     tree->SetBranchAddress("event",  &event);
     tree->SetBranchAddress("gen",    &gen);
     tree->SetBranchAddress("weight", &weight);
+    tree->SetBranchAddress("true_energy", &true_energy);
     tree->SetBranchAddress("reco_energy", &reco_energy);
     tree->SetBranchAddress("classifcation",   &classifcation);
     tree->SetBranchAddress("shr_energy_tot_cali", &shr_energy_tot_cali);
@@ -619,6 +619,25 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
         reweighter_labels.push_back("CV");
     }
 
+    // Set the bins here
+    bins.resize(vars.size());
+
+    // Integrated X-Section Bin definition
+    bins.at(k_var_integrated) = { 0.0, 1.1 };
+
+    // Reconstructed electron energy Bin definition
+    bins.at(k_var_reco_el_E) = { 0.0, 0.05, 0.25, 1.0, 2.0, 3.0, 5.0};
+
+    // True electron energy Bin definition
+    bins.at(k_var_true_el_E) = { 0.0, 0.05, 0.25, 1.0, 2.0, 3.0, 5.0};
+
+    // True neutrino energy Bin definition
+    bins.at(k_var_true_nu_E) = { 0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0};
+
+    // Reconstructed neutrino energy Bin definition
+    bins.at(k_var_reco_nu_E) = { 0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0};
+
+
     // Resize to the number of reweighters
     h_cross_sec.resize(reweighter_labels.size());
 
@@ -647,16 +666,41 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
 
     }
 
-    // Now resize the universe to each type of histogram we want to plot/reweight
+    // Now resize the universe to each type of variable we want to plot/reweight
+    
     // Resize each reweighter to their number of universes
-    for (unsigned int j=0; j < reweighter_labels.size(); j++){
+    for (unsigned int label=0; label < reweighter_labels.size() ;label++){
 
-        for (unsigned int y=0; y < h_cross_sec.at(j).size(); y++){
+        for (unsigned int uni = 0; uni < h_cross_sec.at(label).size(); uni++){
             // Resize the histogram vector. plot var, cuts, classifications
-            h_cross_sec.at(j).at(y).resize(k_TH1D_xsec_MAX);
+            h_cross_sec.at(label).at(uni).resize(vars.size());
         }
 
     }
+
+    // Now resize the universe to each type of histogram we want to plot/reweight
+    
+    // Resize each reweighter to their number of universes
+    for (unsigned int j=0; j < reweighter_labels.size(); j++){
+
+        // Loop over the universes
+        for (unsigned int y=0; y < h_cross_sec.at(j).size(); y++){
+            
+            // Loop over the variables
+            for (unsigned int var = 0; var < h_cross_sec.at(j).at(y).size(); var ++){
+                
+                // Resize the histogram vector. plot var, cuts, classifications
+                h_cross_sec.at(j).at(y).at(var).resize(xsec_types.size());
+
+            }
+            
+            
+        }
+
+    }
+
+    std::vector<double> temp_bins;
+
 
     // Loop over the rewighters
     for (unsigned int label=0; label < reweighter_labels.size(); label++){
@@ -664,26 +708,60 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
         // loop over the universes
         for (unsigned int uni=0; uni < h_cross_sec.at(label).size(); uni++){
             
-            // loop over and create the histograms
-            for (unsigned int i=0; i < xsec_types.size();i++){    
-                if (i == k_xsec_sel || i == k_xsec_bkg || i == k_xsec_gen || i == k_xsec_sig || i == k_xsec_ext || i == k_xsec_dirt || i == k_xsec_data){
-                    h_cross_sec.at(label).at(uni).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni , xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; Entries", nbins, edges);
+            // Loop over the variables
+            for (unsigned int var = 0; var < h_cross_sec.at(label).at(uni).size(); var ++){
+
+                // Get the number of bins and the right vector
+                int const nbins = bins.at(var).size()-1;
+                temp_bins.clear();
+                temp_bins = bins.at(var);
+                double* edges = &temp_bins[0]; // Cast to an array 
+
+
+                // loop over and create the histograms
+                for (unsigned int i=0; i < xsec_types.size();i++){    
+                    if (i == k_xsec_sel || i == k_xsec_bkg || i == k_xsec_gen || i == k_xsec_sig || i == k_xsec_ext || i == k_xsec_dirt || i == k_xsec_data){
+                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; Entries", nbins, edges);
+                    }
+                    else if (i == k_xsec_eff){
+                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; Efficiency", nbins, edges);
+                    }
+                    else if (i == k_xsec_dataxsec || i == k_xsec_mcxsec){
+                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels.at(var).c_str()), nbins, edges);
+                    }
+                    else {
+                        // If this is the case then there is an uncaught case
+                        std::cout << "Houston we have a problem!" << std::endl;
+                    }
                 }
-                else if (i == k_xsec_eff){
-                    h_cross_sec.at(label).at(uni).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni , xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; Efficiency", nbins, edges);
-                }
-                else if (i == k_xsec_dataxsec || i == k_xsec_mcxsec){
-                    h_cross_sec.at(label).at(uni).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni , xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; #frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]", nbins, edges);
-                }
-                else {
-                    // Flux Integrated Histograms
-                    h_cross_sec.at(label).at(uni).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni , xsec_types.at(i).c_str()) ,";; #nu_{e} + #bar{#nu}_{e} CC Cross-Section [10^{-39} cm^{2}]", 1, 0, 1);
-                }
-            }
-        }
-    }
+            } // End loop over the variables
+        
+        } // End loop over the universes
+    
+    } // End loop over the labels
 
     std::cout << "Initialisation of cross-section histograms is complete!" << std::endl;
 
 
 }
+// -----------------------------------------------------------------------------
+void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double weight_uni, float shr_energy_tot_cali, float elec_e, double true_energy, double reco_energy){
+
+    // Integrated
+    h_cross_sec.at(label).at(uni).at(k_var_integrated).at(xsec_type)->Fill(1.0, weight_uni);
+
+    // Reco Electron Energy
+    h_cross_sec.at(label).at(uni).at(k_var_reco_el_E).at(xsec_type)->Fill(shr_energy_tot_cali, weight_uni);
+
+    // True Electron Energy
+    h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(xsec_type)->Fill(elec_e, weight_uni);
+
+    // True Neutrino Energy
+    h_cross_sec.at(label).at(uni).at(k_var_true_nu_E).at(xsec_type)->Fill(true_energy, weight_uni);
+
+    // Reconstructed Neutrino Energy
+    h_cross_sec.at(label).at(uni).at(k_var_reco_nu_E).at(xsec_type)->Fill(reco_energy, weight_uni);
+
+}
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

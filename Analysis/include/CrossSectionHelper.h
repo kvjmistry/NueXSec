@@ -87,12 +87,11 @@ class CrossSectionHelper{
 
     int uni_reint{1000}, uni_genie{500}, uni_ppfx{600}; // For resizing data, ext and dirt in multisims
 
-    // Energy Bins
-    const int nbins = 6;
-    double edges[7] = {0.0, 0.05, 0.25, 1.0, 2.0, 3.0, 5.0};
+    // Define the bins for each variable -- See InitialiseHistograms function to see the actual binning used
+    std::vector<std::vector<double>> bins;
     
     // Define histograms for the cross section calculation
-    std::vector<std::vector<std::vector<TH1D*>>> h_cross_sec;
+    std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_cross_sec; // Label -- Universe -- variable -- xsec_type
 
     // enum for histogram vars
     enum TH1D_xsec_hist_vars {
@@ -106,39 +105,56 @@ class CrossSectionHelper{
         k_xsec_data,    // Data event histogram binned in energy
         k_xsec_mcxsec,  // MC Cross Section
         k_xsec_dataxsec,// Data Cross Section
-        k_xsec_mcxsec_int,  // MC Cross Section Flux Integrated
-        k_xsec_dataxsec_int,// Data Cross Section Flux Integrated
         k_TH1D_xsec_MAX
     };
 
+    // enum for histogram vars
+    enum TH1D_xsec_var_vars {
+        k_var_integrated,     // Integrated X-Section
+        k_var_reco_el_E,      // Reconstructed electron energy
+        k_var_true_el_E,      // True electron energy
+        k_var_true_nu_E,      // True neutrino energy
+        k_var_reco_nu_E,      // Reconstructed neutrino energy
+        k_TH1D_xsec_var_MAX
+    };
+
     // Names for cross section histograms
-    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "data_xsec", "mc_xsec_int", "data_xsec_int"};
+    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "data_xsec"};
+
+    std::vector<std::string> vars = {"integrated", "reco_el_E", "true_el_E", "true_nu_E", "reco_nu_e"};
+    
+    std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Cross-Section [10^{-39} cm^{2}]",
+                                        ";Reco Leading Shower Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
+                                        ";True Electron Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
+                                        ";True #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
+                                        ";Reco #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]"};
+    
 
     std::vector<std::string> reweighter_labels = {
         "CV",
-        "RPAup",
-        "CCMECup",
-        "AxFFCCQEup",
-        "VecFFCCQEup",
-        "DecayAngMECup",
-        "ThetaDelta2Npiup",
-        "ThetaDelta2NRadup",
-        "RPA_CCQE_Reducedup",
-        "NormCCCOHup",
-        "NormNCCOHup",
-        "RPAdn",
-        "CCMECdn",
-        "AxFFCCQEdn",
-        "VecFFCCQEdn",
-        "DecayAngMECdn",
-        "ThetaDelta2Npidn",
-        "ThetaDelta2NRaddn",
-        "RPA_CCQE_Reduceddn",
-        "NormCCCOHdn",
-        "NormNCCOHdn",
-        "weightsGenie",
-        "weightsReint",
-        "weightsPPFX"
+        "RPAup"
+        // "CCMECup",
+        // "AxFFCCQEup",
+        // "VecFFCCQEup",
+        // "DecayAngMECup",
+        // "ThetaDelta2Npiup",
+        // "ThetaDelta2NRadup",
+        // "RPA_CCQE_Reducedup",
+        // "NormCCCOHup",
+        // "NormNCCOHup",
+        // "RPAdn",
+        // "CCMECdn",
+        // "AxFFCCQEdn",
+        // "VecFFCCQEdn",
+        // "DecayAngMECdn",
+        // "ThetaDelta2Npidn",
+        // "ThetaDelta2NRaddn",
+        // "RPA_CCQE_Reduceddn",
+        // "NormCCCOHdn",
+        // "NormNCCOHdn",
+        // "weightsGenie",
+        // "weightsReint",
+        // "weightsPPFX"
     };
 
 
@@ -174,6 +190,8 @@ class CrossSectionHelper{
     // Initialise the histograms for this class
     void InitialiseHistograms(std::string run_mode);
     // -------------------------------------------------------------------------
+    // Helper function to fill the histograms
+    void FillHists(int label, int uni, int xsec_type, double weight_uni, float shr_energy_tot_cali, float elec_e, double true_energy, double reco_energy);
     // -------------------------------------------------------------------------
 
 
