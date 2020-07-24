@@ -195,6 +195,8 @@ void CrossSectionHelper::LoopEvents(){
     // ----
 
     // Now we have rewieghted the evnts, we want to calculate the cross-sections for each label for each universe
+
+    // This part seems quite slow now we added many variables to plot the cross-section against. Maybe there is a way to speed this up?
     
     // Loop over the reweighter labels
     for (unsigned int label = 0; label < reweighter_labels.size(); label++){
@@ -203,6 +205,8 @@ void CrossSectionHelper::LoopEvents(){
         
         // Now loop over the universes
         for (unsigned int uni = 0; uni < h_cross_sec.at(label).size(); uni++){
+
+            if (uni % 100 == 0 && uni > 0) std::cout << "On universe " << uni << std::endl;
 
             // Loop over the variables
             for (unsigned int var = 0; var < h_cross_sec.at(label).at(uni).size(); var ++){
@@ -237,35 +241,33 @@ void CrossSectionHelper::LoopEvents(){
                                 N_target_Data, "Data");
 
             } // End loop over the vars
-
-
         
         } // End loop over universes
     
     } // End loop over labels
 
     // Print the CV Results for the Flux Integrated Measurement
-    // Label 0 should always be the CV with 1 universe
+    // Label 0 should always be the CV with 1 universe (which counts from 0)
 
     std::cout << "\n" <<
-    "Selected MC:     " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sel)->Integral() << "\n" << 
-    "Signal MC:       " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sig)->Integral() << "\n" << 
-    "Background MC:   " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_bkg)->Integral() << "\n" << 
-    "Generated MC:    " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_gen)->Integral() << "\n" << 
-    "EXT MC:          " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_ext)->Integral()* (intime_scale_factor / mc_scale_factor) << "\n" << 
+    "Selected MC:     " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sel) ->Integral() << "\n" << 
+    "Signal MC:       " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sig) ->Integral() << "\n" << 
+    "Background MC:   " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_bkg) ->Integral() << "\n" << 
+    "Generated MC:    " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_gen) ->Integral() << "\n" << 
+    "EXT MC:          " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_ext) ->Integral()* (intime_scale_factor / mc_scale_factor) << "\n" << 
     "Dirt MC:         " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dirt)->Integral()* (dirt_scale_factor / mc_scale_factor) << "\n\n" << 
     
     "Selected Data:   " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_data)->Integral() << "\n" << 
-    "Signal Data:     " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sig)->Integral()* mc_scale_factor << "\n" << 
-    "Background Data: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_bkg)->Integral()* mc_scale_factor << "\n" << 
-    "Generated Data:  " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_gen)->Integral()* mc_scale_factor << "\n" << 
-    "EXT Data:        " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_ext)->Integral()* intime_scale_factor  << "\n" << 
+    "Signal Data:     " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sig) ->Integral()* mc_scale_factor << "\n" << 
+    "Background Data: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_bkg) ->Integral()* mc_scale_factor << "\n" << 
+    "Generated Data:  " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_gen) ->Integral()* mc_scale_factor << "\n" << 
+    "EXT Data:        " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_ext) ->Integral()* intime_scale_factor  << "\n" << 
     "Dirt Data:       " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dirt)->Integral()* dirt_scale_factor << "\n"
     << std::endl;
 
     std::cout << 
-    "MC XSEC: "   << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_mcxsec)->Integral() << " cm2" << "\n" << 
-    "Data XSEC: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dataxsec)->Integral() << " cm2\n"
+    "MC XSEC: "   << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_mcxsec)  ->Integral() << " cm2" << "\n" << 
+    "Data XSEC: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dataxsec)->Integral() << " cm2      \n"
     << std::endl;
 
 
@@ -299,11 +301,12 @@ double CrossSectionHelper::CalcCrossSec(double sel, double gen, double sig, doub
 void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double intime_scale_factor, TH1D* h_ext, double dirt_scale_factor ,TH1D* h_dirt, TH1D* h_xsec, double targ, std::string mcdata){
 
 
+    // I think this is the slow bit -- maybe make copies only once?
     TH1D *h_bkg_clone  = (TH1D*)h_bkg ->Clone("h_bkg_temp");
     TH1D *h_ext_clone  = (TH1D*)h_ext ->Clone("h_ext_temp");
     TH1D *h_dirt_clone = (TH1D*)h_dirt->Clone("h_dirt_temp");
 
-
+    // Scale the relavent histograms to the MC/Data POT/Triggers
     if (mcdata == "MC"){
         h_ext_clone ->Scale(intime_scale_factor / mc_scale_factor);
         h_dirt_clone->Scale(dirt_scale_factor / mc_scale_factor);
@@ -326,10 +329,6 @@ void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg,
     h_xsec->Divide(h_eff) ;
     
     h_xsec->Scale(1.0 / (targ*flux) );
-
-    delete h_bkg_clone;
-    delete h_ext_clone;
-    delete h_dirt_clone;
 
 }
 

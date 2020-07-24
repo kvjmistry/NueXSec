@@ -60,11 +60,15 @@ int main(int argc, char *argv[]){
     "\033[0;33m[--weight <weight setting>]\033[0m                            \033[0;32mChange the Weight level. level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only \033[0m\n\n"
     "\033[0;33m[--slim]\033[0m                                               \033[0;32mWhen this extension is added, the histogram helper class is not initalised and no histograms will be filled or saved. This is to speed up the selection code if you just want to run the selection.\033[0m\n\n"
     // "\033[0;33m[--verbose <verbose level>]\033[0m                            \033[0;32mDoes not print the selection cut results, 1 (default) currently prints everything\033[0m\n\n"
+    "-------------------------------------------------------"
+    "\n\nTo print the results of the selection, run: \n\n"
+    "\033[0;31m./nuexsec --run <run period num> [options (see below)]\033[0m \n\n"
     "\033[0;33m[--printmc]\033[0m                                            \033[0;32mPrints the selection results if MC ran \033[0m\n\n"
     "\033[0;33m[--printdata]\033[0m                                          \033[0;32mPrints the selection results if Data ran \033[0m\n\n"
     "\033[0;33m[--printext]\033[0m                                           \033[0;32mPrints the selection results if EXT ran \033[0m\n\n"
     "\033[0;33m[--printdirt]\033[0m                                          \033[0;32mPrints the selection results if Dirt ran \033[0m\n\n"
     "\033[0;33m[--printall]\033[0m                                           \033[0;32mPrints the selection results if mc, data, ext, dirt ran \033[0m\n\n"
+    "\033[0;34m[--mc <mc file>]\033[0m                                       \033[0;32m\033[0mEntirly optional, but allows you to override the MC file that gets printed\n\n"
     "\033[0;33m[--printonly]\033[0m                                          \033[0;32mTurns off running of the selection, turns on print function. Good for checking selection results and not having to run the selection again \033[0m\n\n";
     
     std::string usage2 = "-------------------------------------------------------"
