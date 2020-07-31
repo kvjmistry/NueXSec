@@ -703,7 +703,7 @@ double SliceContainer::GetPPFXCVWeight(){
     
     double weight = 1.0;
 
-    double nu_theta = _util.GetTheta(true_nu_px, true_nu_py, true_nu_pz, "beam");
+    double nu_theta = _util.GetNuMIAngle(true_nu_px, true_nu_py, true_nu_pz, "beam");
 
     double xbin{1.0},ybin{1.0};
 
@@ -738,3 +738,43 @@ double SliceContainer::GetPPFXCVWeight(){
     return weight;
 }
 // -----------------------------------------------------------------------------
+double SliceContainer::GetdEdxMax(){
+
+    double dedx_max = -1;
+
+    // Collection plane is the largest
+    if (shr_hits_y_tot > shr_hits_u_tot && shr_hits_y_tot > shr_hits_v_tot ){
+        dedx_max = shr_tkfit_dedx_Y;
+    }
+    // V Plane is the largest
+    else if (shr_hits_v_tot > shr_hits_u_tot && shr_hits_v_tot > shr_hits_y_tot) {
+        dedx_max = shr_tkfit_dedx_V;
+    }
+    // U Plane is the largest
+    else if (shr_hits_u_tot > shr_hits_v_tot && shr_hits_u_tot > shr_hits_y_tot){
+        dedx_max = shr_tkfit_dedx_U;
+    }
+    // Ok one plane was equal, so need to prioritise planes in preference of y, v, u
+    else {
+
+        // If y == any other plane, then y wins
+        if (shr_hits_y_tot == shr_hits_u_tot || shr_hits_y_tot == shr_hits_v_tot ){
+            dedx_max = shr_tkfit_dedx_Y;
+        }
+        // U == V, ALL Y cases have been used up, so default to v
+        else if (shr_hits_u_tot == shr_hits_v_tot ){
+            dedx_max = shr_tkfit_dedx_V;
+        }
+        else {
+            dedx_max = shr_tkfit_dedx_U;
+        }
+    }
+
+    if (dedx_max == -1) {
+        std::cout << shr_tkfit_dedx_U << " " << shr_tkfit_dedx_V << " " << shr_tkfit_dedx_Y<< std::endl;
+        std::cout << "edge case of dedx comparisons, your logic is flawed!" << std::endl;
+    }
+
+    return dedx_max;
+    
+}

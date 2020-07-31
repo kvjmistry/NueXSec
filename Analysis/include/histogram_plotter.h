@@ -110,6 +110,8 @@ class histogram_plotter{
     // Script to get the 2D histograms and save them as a PDF
     void Save2DHists(const char* print_name, const char* histname, std::string cut_type);
     // -------------------------------------------------------------------------
+    // Make plot of interaction efficiency
+    void MakeInteractionEfficiency(const char *print_name);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 

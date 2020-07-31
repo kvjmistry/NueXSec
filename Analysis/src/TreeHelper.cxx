@@ -104,6 +104,8 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     tree->Branch("elec_e",  &elec_e,  "elec_e/F");
     tree->Branch("ppfx_cv",  &ppfx_cv,  "ppfx_cv/F");
     tree->Branch("weightSplineTimesTune",  &weightSplineTimesTune,  "weightSplineTimesTune/F");
+    tree->Branch("nu_pdg",  &nu_pdg,  "nu_pdg/I");
+    tree->Branch("numi_ang",  &numi_ang,  "numi_ang/F");
 
     tree->Branch("weightsGenie", "std::vector<unsigned short>", &weightsGenie);
     tree->Branch("weightsReint", "std::vector<unsigned short>", &weightsReint);
@@ -236,6 +238,8 @@ void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _class
     elec_e   = SC.elec_e;
     weight_ppfx = SC.ppfx_cv;
     weightSplineTimesTune = SC.weightSplineTimesTune;
+    nu_pdg = SC.nu_pdg;
+    numi_ang = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "beam");
 
     
     if (SC.weightsGenie != NULL) weightsGenie           = *SC.weightsGenie; // If these aren't set by default then bad things happen in memory land

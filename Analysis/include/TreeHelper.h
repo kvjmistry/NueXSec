@@ -65,6 +65,8 @@ class TreeHelper{
     float elec_e{0.0};
     float ppfx_cv{1.0};
     float weightSplineTimesTune{1.0};
+    float numi_ang{0};
+    int nu_pdg{0};
 
     // Weights
     std::vector<unsigned short> weightsGenie;

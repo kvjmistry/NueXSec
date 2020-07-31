@@ -32,6 +32,8 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
     float elec_e{0.0}, _elec_e{0.0};
     float ppfx_cv{1.0}, _ppfx_cv{0.0};
     float weightSplineTimesTune{1.0}, _weightSplineTimesTune{1.0};
+    float numi_ang{0.0}, _numi_ang{0.0};
+    int nu_pdg{0}, _nu_pdg{0.0};
 
     std::vector<unsigned short> weightsGenie;
     std::vector<unsigned short> weightsReint;
@@ -91,6 +93,8 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
     outtree->Branch("elec_e",  &elec_e,  "elec_e/F");
     outtree->Branch("ppfx_cv",  &ppfx_cv,  "ppfx_cv/F");
     outtree->Branch("weightSplineTimesTune",  &weightSplineTimesTune,  "weightSplineTimesTune/F");
+    outtree->Branch("numi_ang",  &numi_ang,  "numi_ang/F");
+    outtree->Branch("nu_pdg",  &nu_pdg,  "nu_pdg/I");
     
     outtree->Branch("weightsGenie", "std::vector<unsigned short>", &weightsGenie);
     outtree->Branch("weightsReint", "std::vector<unsigned short>", &weightsReint);
@@ -145,6 +149,8 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
         trees.at(k)->SetBranchAddress("elec_e",  &_elec_e);
         trees.at(k)->SetBranchAddress("ppfx_cv",  &_ppfx_cv);
         trees.at(k)->SetBranchAddress("weightSplineTimesTune",  &_weightSplineTimesTune);
+        trees.at(k)->SetBranchAddress("numi_ang",  &_numi_ang);
+        trees.at(k)->SetBranchAddress("nu_pdg",  &_nu_pdg);
         
         trees.at(k)->SetBranchAddress("weightsGenie",          &_weightsGenie);
         trees.at(k)->SetBranchAddress("weightsReint",          &_weightsReint);
@@ -195,6 +201,8 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
                 elec_e = _elec_e;
                 ppfx_cv = _ppfx_cv;
                 weightSplineTimesTune = _weightSplineTimesTune;
+                numi_ang = _numi_ang;
+                nu_pdg = _nu_pdg;
 
                 if (_weightsGenie != NULL) weightsGenie           = *_weightsGenie; // If these aren't set by default then bad things happen in memory land
                 if (_weightsReint != NULL) weightsReint           = *_weightsReint;

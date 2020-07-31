@@ -163,7 +163,9 @@ class histogram_helper{
         k_reco_shr_tkfit_dedx_u,                                                // The dEdx using the trackfit variable u plane
         k_reco_shr_tkfit_dedx_v,                                                // The dEdx using the trackfit variable v plane
         k_reco_shr_tkfit_dedx_y,                                                // The dEdx using the trackfit variable collection
+        k_reco_shr_tkfit_dedx_max,                                              // The dEdx using the trackfit variable plane with the max hits
         k_reco_shr_tkfit_dedx_y_no_tracks,                                      // The dEdx using the trackfit variable collection in the case there is no tracks
+        k_reco_shr_tkfit_dedx_max_no_tracks,                                   // The dEdx using the trackfit variable plane with the most hits in the case there is no tracks
         k_reco_shr_tkfit_dedx_y_good_theta,                                     // The dEdx using the trackfit variable collection for angles not close to parallel to the y plane
         k_reco_shr_tkfit_dedx_y_bad_theta,                                      // The dEdx using the trackfit variable collection for angles close to parallel to the y plane
         k_reco_shr_tkfit_dedx_v_bad_theta,                                      // The dEdx using the trackfit variable v plane for angles close to parallel to the y plane
@@ -197,8 +199,10 @@ class histogram_helper{
     };
 
     enum TH1D_true_hist_vars {
-        k_true_nue_theta,     // True nue in BNB theta coordinates (up from beam dir)
-        k_true_nue_phi,       // True nue in BNB phi coordinates (around beam dir)
+        k_true_nue_theta,     // True nue theta in BNB coordinates (up from beam dir)
+        k_true_nue_phi,       // True nue phi in BNB coordinates (around beam dir)
+        k_true_nue_theta_numi,// True nue theta in NuMI coordinates (up from beam dir)
+        k_true_nue_phi_numi,  // True nue phi in NuMI coordinates (around beam dir)
         k_true_nue_angle,     // True nue angle from numi beamline 
         k_true_nue_px,        // True nue px
         k_true_nue_py,        // True nue py
@@ -212,6 +216,9 @@ class histogram_helper{
         k_true_vtx_y_sce,     // True Vertex Y Space Charge Corrected
         k_true_vtx_z_sce,     // True Vertex Z Space Charge Corrected
         k_true_elec_ang_targ, // True angle of electron shower wrt target
+        k_true_elec_E,        // True energy of electron
+        k_true_elec_theta,    // True theta of electron in BNB coordinates
+        k_true_elec_phi,      // True phi of electron in BNB coordinates
         k_true_nu_ang_targ,   // True angle of electron shower wrt target
         k_TH1D_true_MAX
     };
@@ -244,10 +251,12 @@ class histogram_helper{
 
     // 2D Histograms for separating signal and background
     enum TH2D_reco_hist_vars {
-        k_reco_shr_dEdx_shr_dist,
-        k_reco_shr_dEdx_shr_dist_post, // after the cut
+        k_reco_shr_dEdx_shr_dist,            // dedx y vs shr vtx distance
+        k_reco_shr_dEdx_shr_dist_post,       // after the cut
+        k_reco_shr_dEdx_max_shr_dist,        // Using max variable rather than just collection plane
+        k_reco_shr_dEdx_max_shr_dist_post,   // after the cut
         k_reco_shr_dEdx_shr_dist_large_dedx, // for dedx values > 10 MeV/cm
-        k_reco_shr_dEdx_moliere, // dedx y and moliere average
+        k_reco_shr_dEdx_moliere,     // dedx y and moliere average
         k_reco_shr_moliere_shr_dist, // moliere average and shr vertex distance
         k_TH2D_reco_MAX
     };

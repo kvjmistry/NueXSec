@@ -31,7 +31,7 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
     {
         mc_scale_factor     = 1.00* _util.config_v.at(_util.k_Run3_Data_POT) / _util.config_v.at(_util.k_Run3_MC_POT);
         dirt_scale_factor   = 0.45* _util.config_v.at(_util.k_Run3_Data_POT) / _util.config_v.at(_util.k_Run3_Dirt_POT); //0.45
-        intime_scale_factor = 0.94* _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig); //0.94
+        intime_scale_factor = 1.00* _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig); //0.94
         Data_POT = _util.config_v.at(_util.k_Run3_Data_POT); // Define this variable here for easier reading
     }
     else
@@ -97,12 +97,15 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
         // Interaction Plot
         MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction_unselected.pdf", run_period), "unselected");
         MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction_selected.pdf", run_period), "selected");
+        MakeInteractionEfficiency(Form("plots/run%s/Interaction/True_nue_e_interaction_efficiency.pdf", run_period));
 
         // Create the 2D folder
         CreateDirectory("2D", run_period);
 
         Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_shr_dist.pdf", run_period), "h_reco_shr_dEdx_shr_dist");
         Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_shr_dist_post.pdf", run_period), "h_reco_shr_dEdx_shr_dist_post");
+        Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_max_shr_dist.pdf", run_period), "h_reco_shr_dEdx_max_shr_dist");
+        Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_max_shr_dist_post.pdf", run_period), "h_reco_shr_dEdx_max_shr_dist_post");
         Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_shr_dist_large_dedx.pdf", run_period), "h_reco_shr_dEdx_shr_dist_large_dedx");
 
         Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_moliere.pdf", run_period), "h_reco_shr_dEdx_moliere");
@@ -117,7 +120,10 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
             std::string cut_type = "unselected";
             if (i == 1) cut_type = "selected";
 
+            Save1DHists(Form("plots/run%s/Truth/true_nue_theta_%s.pdf", run_period, cut_type.c_str()), "h_true_nue_theta", cut_type);
             Save1DHists(Form("plots/run%s/Truth/true_nue_phi_%s.pdf",   run_period, cut_type.c_str()), "h_true_nue_phi", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_theta_numi_%s.pdf", run_period, cut_type.c_str()), "h_true_nue_theta_numi", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_phi_numi_%s.pdf",   run_period, cut_type.c_str()), "h_true_nue_phi_numi", cut_type);
             Save1DHists(Form("plots/run%s/Truth/true_nue_angle_%s.pdf", run_period, cut_type.c_str()), "h_true_nue_angle", cut_type);
             Save1DHists(Form("plots/run%s/Truth/true_nue_px_%s.pdf",    run_period, cut_type.c_str()), "h_true_nue_px", cut_type);
             Save1DHists(Form("plots/run%s/Truth/true_nue_py_%s.pdf",    run_period, cut_type.c_str()), "h_true_nue_py", cut_type);
@@ -130,8 +136,11 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
             Save1DHists(Form("plots/run%s/Truth/true_vtx_x_sce_%s.pdf", run_period, cut_type.c_str()), "h_true_vtx_x_sce", cut_type);
             Save1DHists(Form("plots/run%s/Truth/true_vtx_y_sce_%s.pdf", run_period, cut_type.c_str()), "h_true_vtx_y_sce", cut_type);
             Save1DHists(Form("plots/run%s/Truth/true_vtx_z_sce_%s.pdf", run_period, cut_type.c_str()), "h_true_vtx_z_sce", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_nu_ang_targ_%s.pdf",   run_period, cut_type.c_str()), "h_true_elec_ang_targ", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_nu_ang_targ_%s.pdf",   run_period, cut_type.c_str()), "h_true_nu_ang_targ",   cut_type);
             Save1DHists(Form("plots/run%s/Truth/true_elec_ang_targ_%s.pdf", run_period, cut_type.c_str()), "h_true_elec_ang_targ", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_elec_E_%s.pdf",     run_period, cut_type.c_str()),     "h_true_elec_E", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_elec_phi_%s.pdf",   run_period, cut_type.c_str()),     "h_true_elec_phi", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_elec_theta_%s.pdf", run_period, cut_type.c_str()),     "h_true_elec_theta", cut_type);
 
             // Make the 2D histograms
             Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta_%s.pdf",          run_period, cut_type.c_str()), "h_true_nue_phi_theta", cut_type);
@@ -470,8 +479,7 @@ void histogram_plotter::SetTPadOptions(TPad *topPad, TPad *bottomPad)
     topPad->cd();
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::IncreaseLabelSize(TH1D *h)
-{
+void histogram_plotter::IncreaseLabelSize(TH1D *h){
 
     h->GetXaxis()->SetLabelSize(0.05);
     h->GetXaxis()->SetTitleSize(0.05);
@@ -481,8 +489,7 @@ void histogram_plotter::IncreaseLabelSize(TH1D *h)
     gPad->SetBottomMargin(0.12);
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::IncreaseLabelSize(TH2D *h)
-{
+void histogram_plotter::IncreaseLabelSize(TH2D *h) {
 
     h->GetXaxis()->SetLabelSize(0.05);
     h->GetXaxis()->SetTitleSize(0.05);
@@ -1442,10 +1449,20 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
               area_norm, false, 1.0, "Leading Shower dEdx (Collection Plane) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_y.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false);
 
+    // Shower dEdx with the track fitter plane with the most hits
+    MakeStack("h_reco_shr_tkfit_dedx_max", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "Leading Shower dEdx (All Planes) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+              Form("cuts/%s/reco_shr_tkfit_dedx_max.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false);
+
     // Shower dEdx with the track fitter y plane when there is no tracks
     MakeStack("h_reco_shr_tkfit_dedx_y_no_tracks", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Leading Shower dEdx (Collection Plane) (0 tracks) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_y_no_tracks.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false);
+
+    // Shower dEdx with the track fitter plane with most hits when there is no tracks
+    MakeStack("h_reco_shr_tkfit_dedx_max_no_tracks", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "Leading Shower dEdx (All Planes) (0 tracks) [MeV/cm]", 0.8, 0.98, 0.87, 0.32, Data_POT,
+              Form("cuts/%s/reco_shr_tkfit_dedx_max_no_tracks.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false);
 
     // Shower dEdx with the track fitter y plane good theta
     MakeStack("h_reco_shr_tkfit_dedx_y_good_theta", _util.cut_dirs.at(cut_index).c_str(),
@@ -1904,8 +1921,7 @@ void histogram_plotter::MakeFlashPlotOMO(double Data_POT, const char *print_name
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeEfficiencyPlot(const char *print_name, const char *run_period)
-{
+void histogram_plotter::MakeEfficiencyPlot(const char *print_name, const char *run_period) {
 
     TTree *mc_tree;
 
@@ -1926,8 +1942,7 @@ void histogram_plotter::MakeEfficiencyPlot(const char *print_name, const char *r
     int num_entries = mc_tree->GetEntries();
 
     // Fill the efficiency and purity vectors
-    for (int y = 0; y < num_entries; y++)
-    {
+    for (int y = 0; y < num_entries; y++) {
         mc_tree->GetEntry(y);
         efficiency_v.push_back(efficiency);
         purity_v.push_back(purity);
@@ -1940,12 +1955,11 @@ void histogram_plotter::MakeEfficiencyPlot(const char *print_name, const char *r
     // c->SetGrid();
     c->SetGridy();
 
-    TLegend *leg_stack = new TLegend(0.8, 0.91, 0.90, 0.72);
+    TLegend *leg_stack = new TLegend(0.7, 0.91, 0.90, 0.72);
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
 
-    for (unsigned int k = 0; k < efficiency_v.size(); k++)
-    {
+    for (unsigned int k = 0; k < efficiency_v.size(); k++) {
         h_eff->Fill(_util.cut_dirs.at(k).c_str(), efficiency_v.at(k));
         h_pur->Fill(_util.cut_dirs.at(k).c_str(), purity_v.at(k));
         h_eff->SetBinError(k + 1, 0);
@@ -1960,6 +1974,11 @@ void histogram_plotter::MakeEfficiencyPlot(const char *print_name, const char *r
     h_eff->SetMarkerStyle(20);
     h_eff->SetMarkerSize(0.5);
     h_eff->SetLineWidth(2);
+    h_eff->GetXaxis()->SetTitleSize(0.05);
+    h_eff->GetYaxis()->SetLabelSize(0.05);
+    h_eff->GetYaxis()->SetTitleSize(0.05);
+    gPad->SetBottomMargin(0.12);
+    h_eff->GetXaxis()->SetLabelSize(0.035);
 
     h_eff->Draw("LP");
 
@@ -1974,8 +1993,7 @@ void histogram_plotter::MakeEfficiencyPlot(const char *print_name, const char *r
 
     // Draw vertical lines to help the eye
     TLine *line;
-    for (unsigned int l = 1; l < efficiency_v.size() + 1; l++)
-    {
+    for (unsigned int l = 1; l < efficiency_v.size() + 1; l++) {
         line = new TLine(h_eff->GetBinCenter(l), 0, h_eff->GetBinCenter(l), 1.1);
         line->SetLineColor(12);
         line->SetLineStyle(kDotted);
@@ -1991,8 +2009,7 @@ void histogram_plotter::MakeEfficiencyPlot(const char *print_name, const char *r
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeEfficiencyPlotByCut(const char *run_period)
-{
+void histogram_plotter::MakeEfficiencyPlotByCut(const char *run_period) {
 
     std::vector<TH1D *> hist(_util.k_cuts_MAX); // The vector of histograms from the file for the plot
     std::vector<TEfficiency *> TEff_v(_util.k_cuts_MAX);
@@ -2002,17 +2019,16 @@ void histogram_plotter::MakeEfficiencyPlotByCut(const char *run_period)
     TCanvas *c;
 
     // Loop over the classifications and get the histograms
-    for (unsigned int i = 0; i < _util.k_cuts_MAX; i++)
-    {
+    for (unsigned int i = 0; i < _util.k_cuts_MAX; i++) {
 
         // MC
         _util.GetHist(f_nuexsec, hist.at(i), Form("TEff/h_true_nu_E_%s", _util.cut_dirs.at(i).c_str()));
+        
         if (hist.at(i) == NULL)
             return;
     }
 
-    for (int p = 0; p < _util.k_cuts_MAX; p++)
-    {
+    for (int p = 0; p < _util.k_cuts_MAX; p++) {
 
         c = new TCanvas();
 
@@ -2026,6 +2042,7 @@ void histogram_plotter::MakeEfficiencyPlotByCut(const char *run_period)
         h_clone->GetYaxis()->SetRangeUser(0, 1);
         h_clone->SetLineColor(kBlack);
         h_clone->SetLineWidth(2);
+        IncreaseLabelSize(h_clone);
         h_clone->Draw("E same");
 
         TH1D *h_true_nue = (TH1D *)hist.at(_util.k_unselected)->Clone("h_clone_true_nue");
@@ -2052,55 +2069,55 @@ void histogram_plotter::MakeEfficiencyPlotByCut(const char *run_period)
     }
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeInteractionPlot(const char *print_name, std::string cut_type)
-{
+void histogram_plotter::MakeInteractionPlot(const char *print_name, std::string cut_type){
 
     std::vector<TH1D *> hist(_util.interaction_types.size());
 
     TCanvas *c = new TCanvas();
     THStack *h_stack = new THStack();
 
-    for (unsigned int k = 0; k < hist.size(); k++)
-    {
+    for (unsigned int k = 0; k < hist.size(); k++) {
+        
         _util.GetHist(f_nuexsec, hist.at(k), Form("Interaction/h_true_nue_E_%s_%s", _util.interaction_types.at(k).c_str(), cut_type.c_str()));
-        if (hist.at(k) == NULL)
-        {
+        
+        if (hist.at(k) == NULL) {
             std::cout << "Couldn't get all the interaction histograms so exiting function..." << std::endl;
             return;
         }
     }
 
-    hist.at(_util.k_plot_qe)->SetFillColor(30);
+    hist.at(_util.k_plot_qe) ->SetFillColor(30);
     hist.at(_util.k_plot_res)->SetFillColor(38);
     hist.at(_util.k_plot_dis)->SetFillColor(28);
     hist.at(_util.k_plot_coh)->SetFillColor(42);
     hist.at(_util.k_plot_mec)->SetFillColor(36);
-    hist.at(_util.k_plot_nc)->SetFillColor(1);
+    hist.at(_util.k_plot_nc) ->SetFillColor(1);
 
     // Add the histograms to the stack
-
-    for (unsigned int k = 0; k < hist.size(); k++)
-    {
+    for (unsigned int k = 0; k < hist.size(); k++) {
         h_stack->Add(hist.at(k));
     }
 
     h_stack->Draw("hist");
-
-    h_stack->SetMaximum(2100);
-
+    h_stack->GetXaxis()->SetLabelSize(0.05);
+    h_stack->GetXaxis()->SetTitleSize(0.05);
+    h_stack->GetYaxis()->SetLabelSize(0.05);
+    h_stack->GetYaxis()->SetTitleSize(0.05);
+    gPad->SetLeftMargin(0.15);
+    gPad->SetBottomMargin(0.12);
+    c->Update();
     h_stack->GetXaxis()->SetTitle("True #nu_{e} Energy");
     h_stack->GetYaxis()->SetTitle("Entries");
 
     TH1D *h_sum = (TH1D *)hist.at(_util.k_plot_qe)->Clone("h_sum");
 
-    for (unsigned int i = 1; i < hist.size(); i++)
-    {
+    for (unsigned int i = 1; i < hist.size(); i++) {
         h_sum->Add(hist.at(i), 1);
     }
 
     h_sum->Draw("same E");
 
-    TLegend *leg_stack = new TLegend(0.75, 0.89, 0.87, 0.6);
+    TLegend *leg_stack = new TLegend(0.65, 0.89, 0.87, 0.6);
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
 
@@ -2122,21 +2139,112 @@ void histogram_plotter::MakeInteractionPlot(const char *print_name, std::string 
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Plot2D_Signal_Background(const char *print_name, const char *histname)
-{
+void histogram_plotter::MakeInteractionEfficiency(const char *print_name){
+
+    gStyle->SetOptStat(0);
+
+    std::vector<std::vector<TH1D*>> hist(2);
+
+    hist.at(0).resize(_util.interaction_types.size());  // Unselected
+    hist.at(1).resize(_util.interaction_types.size());  // Selected
+
+    TCanvas *c = new TCanvas();
+
+    for (unsigned int k = 0; k < hist.at(0).size(); k++) {
+        
+        _util.GetHist(f_nuexsec, hist.at(0).at(k), Form("Interaction/h_true_nue_E_%s_unselected", _util.interaction_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, hist.at(1).at(k), Form("Interaction/h_true_nue_E_%s_selected",   _util.interaction_types.at(k).c_str()));
+        
+        if (hist.at(0).at(k) == NULL || hist.at(1).at(k) == NULL) {
+            std::cout << "Couldn't get all the interaction histograms so exiting function..." << std::endl;
+            return;
+        }
+
+        hist.at(0).at(k) ->GetXaxis()->SetTitle("True #nu_{e} Energy");
+        hist.at(0).at(k) ->GetYaxis()->SetTitle("Efficiency");
+
+        hist.at(1).at(k) ->GetXaxis()->SetTitle("True #nu_{e} Energy");
+        hist.at(1).at(k) ->GetYaxis()->SetTitle("Efficiency");
+
+    }
+
+    std::vector<TH1D*> h_ratio ;
+    h_ratio.resize(_util.interaction_types.size());
+    
+    // Make the ratio histogram
+    for (unsigned int type = 0; type < hist.at(0).size(); type++){
+        
+        h_ratio.at(type) = (TH1D*) hist.at(1).at(type)->Clone(Form("h_ratio_%s" ,_util.interaction_types.at(type).c_str()) );
+        h_ratio.at(type)  ->Divide(hist.at(0).at(type));
+
+        if (type == _util.k_plot_qe){
+            h_ratio.at(_util.k_plot_qe) ->SetLineColor(30); 
+        }
+        if (type == _util.k_plot_res){
+            h_ratio.at(_util.k_plot_res)->SetLineColor(38);
+        }
+        if (type == _util.k_plot_dis){
+            h_ratio.at(_util.k_plot_dis)->SetLineColor(28);
+        }
+        if (type == _util.k_plot_coh){
+            h_ratio.at(_util.k_plot_coh)->SetLineColor(42);
+        }
+        if (type == _util.k_plot_mec){
+            h_ratio.at(_util.k_plot_mec)->SetLineColor(36);
+        }
+
+
+        IncreaseLabelSize(h_ratio.at(type));
+        h_ratio.at(type) ->SetFillColor(0);
+        h_ratio.at(type)->GetYaxis()->SetRangeUser(0, 0.6);
+        h_ratio.at(type)->GetXaxis()->SetRangeUser(0, 3.5);
+        h_ratio.at(type)->SetLineWidth(2);
+
+        if (type == _util.k_plot_nc || type == _util.k_plot_coh) continue; // Too low stats for the plot
+        h_ratio.at(type)->Draw("hist,L,same");
+
+    }
+
+    
+    
+
+    TLegend *leg_stack = new TLegend(0.55, 0.89, 0.75, 0.6);
+    leg_stack->SetBorderSize(0);
+    leg_stack->SetFillStyle(0);
+
+    // leg_stack->AddEntry(hist.at(_util.k_plot_nc), "NC", "f");
+    leg_stack->AddEntry(h_ratio.at(_util.k_plot_mec), "CC MEC", "l");
+    // leg_stack->AddEntry(h_ratio.at(_util.k_plot_coh), "CC Coh", "l"); // Too low stats for the plot
+    leg_stack->AddEntry(h_ratio.at(_util.k_plot_dis), "CC DIS", "l");
+    leg_stack->AddEntry(h_ratio.at(_util.k_plot_res), "CC Res", "l");
+    leg_stack->AddEntry(h_ratio.at(_util.k_plot_qe),  "CC QE",  "l");
+
+    leg_stack->Draw();
+
+    // Draw the run period on the plot
+    Draw_Run_Period(c);
+
+    // Add the weight labels
+    // Draw_WeightLabels(c);
+
+    c->Print(print_name);
+}
+// -----------------------------------------------------------------------------
+void histogram_plotter::Plot2D_Signal_Background(const char *print_name, const char *histname){
 
     std::vector<TH2D *> hist(_util.sig_bkg_prefix.size());
 
     TCanvas *c = new TCanvas();
 
-    for (unsigned int k = 0; k < hist.size(); k++)
-    {
+    for (unsigned int k = 0; k < hist.size(); k++){
+        
         _util.GetHist(f_nuexsec, hist.at(k), Form("2D/%s_%s", histname, _util.sig_bkg_prefix.at(k).c_str()));
-        if (hist.at(k) == NULL)
-        {
+        
+        if (hist.at(k) == NULL){
             std::cout << "Couldn't get all the interaction histograms so exiting function..." << std::endl;
             return;
         }
+        
         hist.at(k)->SetStats(kFALSE);
     }
 
@@ -2171,8 +2279,7 @@ void histogram_plotter::Plot2D_Signal_Background(const char *print_name, const c
     line_v.at(8) = new TLine(4.7, 0, 4.7, 3);
     line_v.at(9) = new TLine(4.7, 3, 10.0, 3);
 
-    for (unsigned int l = 0; l < line_v.size(); l++)
-    {
+    for (unsigned int l = 0; l < line_v.size(); l++) {
         line_v.at(l)->SetLineColor(kBlack);
         // line_v.at(l)->SetLineStyle(kDotted);
         line_v.at(l)->Draw();
@@ -2186,8 +2293,7 @@ void histogram_plotter::Plot2D_Signal_Background(const char *print_name, const c
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::CreateDirectory(std::string folder, const char *run_period)
-{
+void histogram_plotter::CreateDirectory(std::string folder, const char *run_period) {
 
     std::string a = "if [ ! -d \"plots/";
     std::string b = "run" + std::string(run_period) + "/" + folder;
@@ -2198,8 +2304,7 @@ void histogram_plotter::CreateDirectory(std::string folder, const char *run_peri
     system(command.c_str());
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Save1DHists(const char *print_name, const char *histname, std::string cut_type)
-{
+void histogram_plotter::Save1DHists(const char *print_name, const char *histname, std::string cut_type) {
 
     TH1D *hist;
     _util.GetHist(f_nuexsec, hist, Form("True/%s_MC_%s", histname, cut_type.c_str()));
@@ -2224,8 +2329,7 @@ void histogram_plotter::Save1DHists(const char *print_name, const char *histname
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Save2DHists(const char *print_name, const char *histname, std::string cut_type)
-{
+void histogram_plotter::Save2DHists(const char *print_name, const char *histname, std::string cut_type) {
 
     TH2D *hist;
     _util.GetHist(f_nuexsec, hist, Form("True/%s_MC_%s", histname, cut_type.c_str()));

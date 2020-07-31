@@ -36,6 +36,8 @@ class CrossSectionHelper{
     float elec_e{0.0};
     float ppfx_cv{1.0};
     float weightSplineTimesTune{1.0};
+    float numi_ang{0.0};
+    int nu_pdg{0};
 
     // Weights
     std::vector<unsigned short> *weightsGenie = NULL;
@@ -193,6 +195,10 @@ class CrossSectionHelper{
     // Helper function to fill the histograms
     void FillHists(int label, int uni, int xsec_type, double weight_uni, float shr_energy_tot_cali, float elec_e, double true_energy, double reco_energy);
     // -------------------------------------------------------------------------
+    // Function to return the integrated flux for universe i or the weight in case of a beamline variation
+    double GetFluxUni(int uni, std::string value, std::string label);
+    // -------------------------------------------------------------------------
+
 
 
     private:

@@ -106,12 +106,18 @@ bool selection_cuts::dEdx_y(SliceContainer &SC){
 
 }
 // -----------------------------------------------------------------------------
-bool selection_cuts::dEdx_y_no_tracks(SliceContainer &SC){
+bool selection_cuts::dEdx_max_no_tracks(SliceContainer &SC){
 
     if (SC.n_tracks > 0) return true; // Dont apply this cut if there is no tracks
+
+    double dedx_max = SC.GetdEdxMax();
+
+    // Switch between Y and max plane
+    // double dedx_var = SC.shr_tkfit_dedx_Y;
+    double dedx_var = dedx_max;
     
     // Kill the background region
-    if ( (SC.shr_tkfit_dedx_Y >= 2.7 && SC.shr_tkfit_dedx_Y < 5.5) || (SC.shr_tkfit_dedx_Y < 1.7) ){
+    if ( (dedx_var >= 2.7 && dedx_var < 5.7) || (dedx_var < 1.7) ){
         return false;
     }
     // Try and recover the events in the other planes
@@ -164,37 +170,54 @@ bool selection_cuts::shr_distance(SliceContainer &SC){
     else return false;                      // fail
 }
 // -----------------------------------------------------------------------------
-bool selection_cuts::shr_dist_dEdx_y(SliceContainer &SC){
+bool selection_cuts::shr_dist_dEdx_max(SliceContainer &SC){
+
+    double dedx_max = SC.GetdEdxMax();
+
+    // Switch between Y and max plane
+    // double dedx_var = SC.shr_tkfit_dedx_Y;
+    double dedx_var = dedx_max;
 
     if (SC.n_tracks == 0) return true; // Dont apply this cut if there is no tracks
 
-    if (SC.shr_tkfit_dedx_Y < 0) return false;
+    if (dedx_var < 0) return false;
     
-    else if (SC.shr_tkfit_dedx_Y >= 0 && SC.shr_tkfit_dedx_Y < 0.5){
+    else if (dedx_var >= 0 && dedx_var < 0.5){
         return false;
     }
     
-    else if (SC.shr_tkfit_dedx_Y >= 0.5 && SC.shr_tkfit_dedx_Y < 1.75){
+    else if (dedx_var >= 0.5 && dedx_var < 1.75){
         if (SC.shr_distance > 4 ) return false;
         else return true;
     }
 
-    else if (SC.shr_tkfit_dedx_Y >= 1.75 && SC.shr_tkfit_dedx_Y < 2.3){
-        if (SC.shr_distance > 8 ) return false;
+    // For only y plane
+    // else if (dedx_var >= 1.75 && dedx_var < 2.3){ 
+    //     if (SC.shr_distance > 8 ) return false;
+    //     else return true;
+    // }
+    // else if (dedx_var >= 2.3 && dedx_var < 3.5){
+    //     if (SC.shr_distance > 3 ) return false;
+    //     else return true;
+    // }
+
+    // for all planes
+    else if (dedx_var >= 1.75 && dedx_var < 2.5){ 
+        if (SC.shr_distance > 12 ) return false;
         else return true;
     }
-
-    else if (SC.shr_tkfit_dedx_Y >= 2.3 && SC.shr_tkfit_dedx_Y < 3.5){
+    else if (dedx_var >= 2.5 && dedx_var < 3.5){
         if (SC.shr_distance > 3 ) return false;
         else return true;
     }
 
-    else if (SC.shr_tkfit_dedx_Y >= 3.5 && SC.shr_tkfit_dedx_Y < 4.7){
+
+    else if (dedx_var >= 3.5 && dedx_var < 4.7){
         if (SC.shr_distance > 0 ) return false;
         else return true;
     }
 
-    else if (SC.shr_tkfit_dedx_Y >= 4.7){
+    else if (dedx_var >= 4.7){
         if (SC.shr_distance > 3 ) return false;
         else return true;
     }

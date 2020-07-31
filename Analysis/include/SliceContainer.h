@@ -37,6 +37,10 @@ public:
     // Function to Get the PPFX CV correction weight
     double GetPPFXCVWeight();
     // -------------------------------------------------------------------------
+    // Get the dEdx on the plane with the most hits
+    double GetdEdxMax();
+    // -------------------------------------------------------------------------
+
 
     utility _util;
 

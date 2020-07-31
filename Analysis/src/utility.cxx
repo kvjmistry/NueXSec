@@ -199,7 +199,7 @@ void utility::Tabulate(bool inFV, std::string interaction, std::string classific
     
 }
 // -----------------------------------------------------------------------------
-double utility::GetTheta(double px, double py, double pz, std::string direction){
+double utility::GetNuMIAngle(double px, double py, double pz, std::string direction){
 
     // Variables
     TRotation RotDet2Beam;             // Rotations
@@ -236,6 +236,17 @@ double utility::GetTheta(double px, double py, double pz, std::string direction)
     else if (direction == "target") {
         beamdir = {5502, 7259, 67270};
         beamdir = beamdir.Unit(); // Get the direction
+    }
+    // NuMI acos(Pz/P)
+    else if (direction == "numi_theta"){
+        double p = std::sqrt(BeamCoords.X()*BeamCoords.X() +BeamCoords.Y()*BeamCoords.Y() +  BeamCoords.Z()*BeamCoords.Z() );
+        return acos(BeamCoords.Z()/p) * (180 / 3.1415);
+    }
+    else if (direction == "numi_phi"){
+        return atan2(BeamCoords.Y(), BeamCoords.X()) * 180 / 3.1415;
+    } 
+    else {
+        std::cout << "Warning unknown angle type specified, you should check this" << std::endl;
     }
     
     double theta = BeamCoords.Angle(beamdir) * 180 / 3.1415926;

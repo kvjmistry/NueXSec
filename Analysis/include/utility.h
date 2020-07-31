@@ -59,7 +59,7 @@ public:
     void Tabulate(bool inFV, std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight);
     // -------------------------------------------------------------------------
     // Function calculate theta
-    double GetTheta(double px, double py, double pz, std::string direction);
+    double GetNuMIAngle(double px, double py, double pz, std::string direction);
     // -------------------------------------------------------------------------
     // Check if vertex is in the FV
     bool in_fv(double x, double y, double z);
@@ -121,15 +121,34 @@ public:
             "Slice_ID",       // Slice ID
             "e_candidate",    // Electron Candidate
             "In_FV",          // In FV
-            "Topo_Score",     // Topological Score
             "Contained_Frac", // Slice Contained Fraction
+            "Topo_Score",     // Topological Score
             "Shower_Score",   // Track Score
             "Michel_Rej",     // Michel Rejection
             "ShrHits",        // Shower Hits
             "HitRatio",       // Ratio of shr hits and slice hits
             "Moliere_Avg",    // Shower Moliere Average
-            "ShrVtxDist_dEdx_y", // 2D cut for shower to vertex distance and dedx
-            "dEdx_y_no_tracks",  // dEdx y plane no tracks
+            "ShrVtxDist_dEdx_max", // 2D cut for shower to vertex distance and dedx
+            "dEdx_max_no_tracks",  // dEdx all planes no tracks
+            // "ShrVtxDistance", // Shower to vertex distance
+            // "dEdx_y",         // dEdx y plane
+            };
+    
+    std::vector<std::string> cut_dirs_pretty = {
+            "Unselected",                                 // Unselected
+            "Software Trigger",                           // Software Trigger
+            "Slice ID",                                   // Slice ID
+            "Electron Candidate",                         // Electron Candidate
+            "In Fiducial Volume",                         // In FV
+            "Contained Fraction",                         // Slice Contained Fraction
+            "Topological Score",                          // Topological Score
+            "Shower Score",                               // Track Score
+            "Michel Rejection",                           // Michel Rejection
+            "Shower Hits",                                // Shower Hits
+            "Hit Ratio",                                  // Ratio of shr hits and slice hits
+            "Moliere Average",                            // Shower Moliere Average
+            "2D Shower Vertex Distance, dEdx All Planes", // 2D cut for shower to vertex distance and dedx
+            "dEdx All Planes, 0 Tracks",                  // dEdx all planes no tracks
             // "ShrVtxDistance", // Shower to vertex distance
             // "dEdx_y",         // dEdx y plane
             };
@@ -200,15 +219,15 @@ public:
                 k_slice_id,          // Slice ID
                 k_e_candidate,       // Electron Candidate
                 k_in_fv,             // Reco Nu Vtx (SC Corr) In the FV 
-                k_topo_score,        // Topo Score
                 k_contained_frac,    // Slice Contained Fraction
+                k_topo_score,        // Topo Score
                 k_shower_score,      // Shower Score
                 k_michel_rej,        // Michel Rejection
                 k_shr_hits,          // Shower Hits
                 k_hit_ratio,         // Ratio of shr hits and slice hits
                 k_shr_moliere_avg,   // Shower Moliere Average
                 k_vtx_dist_dedx,     //  2D cut for shower to vertex distance and dEdx. Only applied for > 1 track
-                k_dEdx_y_no_tracks,  // dEdx y plane when there is no tracks
+                k_dEdx_max_no_tracks,// dEdx all planes when there is no tracks
                 // k_shr_distance,      // Shower to reco nu vertex distance
                 // k_dEdx_y,            // dEdx y plane
                 k_cuts_MAX

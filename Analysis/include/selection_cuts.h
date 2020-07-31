@@ -75,10 +75,10 @@ class selection_cuts{
     bool shr_moliere_avg(SliceContainer &SC);
     // -------------------------------------------------------------------------
     // 2D cut in dEdx and shower vertex distance
-    bool shr_dist_dEdx_y(SliceContainer &SC);
+    bool shr_dist_dEdx_max(SliceContainer &SC);
     // -------------------------------------------------------------------------
     // dEdx cut in the case of no tracks
-    bool dEdx_y_no_tracks(SliceContainer &SC);
+    bool dEdx_max_no_tracks(SliceContainer &SC);
     // -------------------------------------------------------------------------
     // Pi0 Selection Cuts
     bool pi_zero_cuts(SliceContainer &SC);

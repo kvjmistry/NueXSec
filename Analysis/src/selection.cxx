@@ -254,6 +254,8 @@ void selection::MakeSelection(){
             // Get the entry in the tree
             mc_tree->GetEntry(ievent); 
 
+            // Set the dEdx Max variable
+
             // Get the 1 pion events for kirsty
             if (mc_SC.isVtxInFiducial){
                 if (mc_SC.nu_pdg == 14){
@@ -358,8 +360,9 @@ void selection::MakeSelection(){
             // Get the entry in the tree
             data_tree->GetEntry(ievent);
 
-            // Skip the RHC events contaminated in the FHC files
+            // Skip the events with different sw trigger configured
             if (_run_period == 3 && data_SC.run < 16880 ){
+            // if (_run_period == 3 && data_SC.run > 16880 ){
                 continue;
             }
 
@@ -427,6 +430,12 @@ void selection::MakeSelection(){
         
             // Get the entry in the tree
             ext_tree->GetEntry(ievent); // TPC Objects
+
+            // Skip the RHC events contaminated in the FHC files
+            if (_run_period == 3 && ext_SC.run < 16880 ){
+            // if (_run_period == 3 && ext_SC.run > 16880 ){
+                continue;
+            }
 
             // Apply Pi0 Selection
             ApplyPiZeroSelection(_util.k_ext, ext_SC);
@@ -553,15 +562,6 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_in_fv, counter_v );
     
     // *************************************************************************
-    // Topological Score -------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.topo_score(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_topo_score) = pass;
-    if(!pass) return false; // Failed the cut!
-    
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_topo_score, counter_v );
-
-    // *************************************************************************
     // Slice Contained Fraction ------------------------------------------------
     // *************************************************************************
     pass = _scuts.contained_frac(SC);
@@ -569,6 +569,15 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_contained_frac, counter_v );
+
+    // *************************************************************************
+    // Topological Score -------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.topo_score(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_topo_score) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_topo_score, counter_v );
 
     // *************************************************************************
     // Shower Score ------------------------------------------------------------
@@ -618,20 +627,20 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     // 2D cut for Shower to Vertex Distance and dEdx ---------------------------
     // *************************************************************************
-    pass = _scuts.shr_dist_dEdx_y(SC);
+    pass = _scuts.shr_dist_dEdx_max(SC);
     passed_v.at(ievent).cut_v.at(_util.k_vtx_dist_dedx) = pass;
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_vtx_dist_dedx, counter_v );
 
     // *************************************************************************
-    // dEdx in y plane for 0 track events --------------------------------------
+    // dEdx in all planes for 0 track events --------------------------------------
     // *************************************************************************
-    pass = _scuts.dEdx_y_no_tracks(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_dEdx_y_no_tracks) = pass;
+    pass = _scuts.dEdx_max_no_tracks(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_dEdx_max_no_tracks) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_y_no_tracks, counter_v );
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_max_no_tracks, counter_v );
 
 
     // // *************************************************************************
