@@ -56,7 +56,7 @@ public:
     bool GetHist(TFile* f, TH2D* &h, TString string);
     // -------------------------------------------------------------------------
     // Function to tabulate all the nuetrino types and flavours
-    void Tabulate(bool inFV, std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight);
+    void Tabulate(bool inFV, std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight, bool &filled);
     // -------------------------------------------------------------------------
     // Function calculate theta
     double GetTheta(double px, double py, double pz, std::string direction);
@@ -117,21 +117,21 @@ public:
     // Cut directory names
     std::vector<std::string> cut_dirs = {
             "Unselected",     // Unselected
-            "SoftwareTrig",   // Software Trigger
-            "Slice_ID",       // Slice ID
-            "e_candidate",    // Electron Candidate
-            "In_FV",          // In FV
-            "Topo_Score",     // Topological Score
-            "Contained_Frac", // Slice Contained Fraction
-            "Shower_Score",   // Track Score
-            "Michel_Rej",     // Michel Rejection
-            "ShrHits",        // Shower Hits
-            "HitRatio",       // Ratio of shr hits and slice hits
-            "Moliere_Avg",    // Shower Moliere Average
-            "ShrVtxDist_dEdx_y", // 2D cut for shower to vertex distance and dedx
-            "dEdx_y_no_tracks",  // dEdx y plane no tracks
-            // "ShrVtxDistance", // Shower to vertex distance
-            // "dEdx_y",         // dEdx y plane
+            "In_Time",
+            "Flash_PE",
+            "Reco_Nue",
+            "In_FV",
+            "Vtx_to_Flash",
+            "Shr_to_Vtx",
+            "Track_to_Vtx",
+            "Hit_Thresh",
+            "Hit_Thresh_Y",
+            "Open_Angle",
+            "dEdx",
+            "Shr_Vtx_Dist_gt_1shr",
+            "Hit_per_Lenth",
+            "Trk_Shr_Lengh",
+            "Trk_Containment"
             };
 
 
@@ -196,21 +196,21 @@ public:
     // enums for cut dirs
     enum enum_cut_dirs {
                 k_unselected,        // Unselected 
-                k_swtrig,            // Software Trigger
-                k_slice_id,          // Slice ID
-                k_e_candidate,       // Electron Candidate
-                k_in_fv,             // Reco Nu Vtx (SC Corr) In the FV 
-                k_topo_score,        // Topo Score
-                k_contained_frac,    // Slice Contained Fraction
-                k_shower_score,      // Shower Score
-                k_michel_rej,        // Michel Rejection
-                k_shr_hits,          // Shower Hits
-                k_hit_ratio,         // Ratio of shr hits and slice hits
-                k_shr_moliere_avg,   // Shower Moliere Average
-                k_vtx_dist_dedx,     //  2D cut for shower to vertex distance and dEdx. Only applied for > 1 track
-                k_dEdx_y_no_tracks,  // dEdx y plane when there is no tracks
-                // k_shr_distance,      // Shower to reco nu vertex distance
-                // k_dEdx_y,            // dEdx y plane
+                k_in_time,
+                k_flash_pe,
+                k_reco_nue,
+                k_in_fv,
+                k_vtx_to_flash,
+                k_shr_to_vtx,
+                k_track_to_vtx,
+                k_hit_thresh,
+                k_hit_thresh_y,
+                k_open_angle,
+                k_dedx,
+                k_shr_vtx_dist_gt_1shr,
+                k_hit_per_lenth,
+                k_trk_shr_lengh,
+                k_trk_containment,
                 k_cuts_MAX
                 }; 
 

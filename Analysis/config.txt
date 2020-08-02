@@ -9,28 +9,28 @@ varname value
 // Run1 MC POT v33
 // Run1_MC_POT 1.30691e+21 // *BNB* overlay POT
 // Run1_MC_POT 1.18488e+21
-Run1_MC_POT 2.07136e+21 // NuMI POT for high stats file
+Run1_MC_POT 1.88e21 // NuMI POT for high stats file
 -
 // Run 1 dirt POT
 // Run1_Dirt_POT 3.22483e+20 // **BNB** dirt POT
-Run1_Dirt_POT 1.42143e+21 // v3 includes ppfx cv correction
+Run1_Dirt_POT 1.42e+21 // v3 includes ppfx cv correction
 -
 // Run 1 Data POT (tortgt) beam good and bad file
 // Run1_Data_POT 4.072e+19       // **BNB** run 1 POT
-Run1_Data_POT 8.885e+19       // v3 with michel veto updated pawels tool
+Run1_Data_POT 2.4e20       // v3 with michel veto updated pawels tool
 // Run1_Data_POT 1.012e+20       // with beam bad and beam good files
 // Run1_Data_POT 1.109e+19 // Elena's run 1 test sample
 -
 // Run 1 data HW Triggers (EA9CNT) 
 // Run1_Data_trig 9028010.0     // **BNB** run 1 Triggers
-Run1_Data_trig 2347745.0       // v3 with michel veto updated pawels tool
+Run1_Data_trig 6361077        // v3 with michel veto updated pawels tool
 // Run1_Data_trig 2785312.0       // with good and bad beam files
 // Run1_Data_trig 289753.0  // Elena's run1 sample test
 -
 // Run 1 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
 // Run1_EXT_trig 33580525.000000 // **BNB** sample triggers
 // Run1_EXT_trig 3378479.250000
-Run1_EXT_trig 4015961.990000 // v3 with michel veto updated
+Run1_EXT_trig 6264334 // v3 with michel veto updated
 -
 // ------- Additional Run 1 POT Definitions -----
 -
@@ -76,9 +76,9 @@ Run3_EXT_trig 1550231.025000 // Set 0
 // ---------------------------------------------
 // -------------- Selection Cuts ---------------
 // Fiducial Volume
-x1 10
-x2 243
-y1 -106.5
-y2 106.5
+x1 20
+x2 236.35
+y1 -96.5
+y2 96.5
 z1 20
-z2 986
+z2 1016.8

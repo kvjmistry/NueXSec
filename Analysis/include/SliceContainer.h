@@ -46,6 +46,7 @@ public:
     int   evt;                   // Event
     std::string run_period;      // Run period 
     
+    int tpc_obj_index;
     // Shower Properties 
     float shr_energy_tot;        // Shower: the energy of the showers (in GeV)
     float shr_energy;            // Shower: Energy of the shower with the largest number of hits (in GeV)
@@ -54,6 +55,7 @@ public:
     
     float shr_theta;             // Shower: Reconstructed theta angle for the leading shower
     float shr_phi;               // Shower: Reconstructed phi angle for the leading shower
+    float shr_len;
     
     float shr_pca_0;             // Shower: First eigenvalue of the PCAxis of the leading shower
     float shr_pca_1;             // Shower: Second eigenvalue of the PCAxis of the leading shower
@@ -469,6 +471,27 @@ public:
     float pi0_energy1_Y, pi0_energy2_Y;
     float pi0_dedx1_fit_Y; 
     float pi0_mass_Y;
+
+    int has_nue;
+    int has_valid_shr;
+    float flash_vtx_dist;
+    float flash_vtx_y, flash_vtx_z;
+
+    int failed_intime_cut;
+    int failed_flash_cut;
+
+    std::vector<float> *trk_vtx_dist_v = nullptr;
+    std::vector<float> *shr_vtx_dist_v = nullptr;
+    std::vector<float> *sec_shr_vtx_dist_v = nullptr;
+
+    // std::vector<float> *trk_start_x_v = nullptr;
+    // std::vector<float> *trk_start_y_v = nullptr;
+    // std::vector<float> *trk_start_z_v = nullptr;
+    // std::vector<float> *trk_end_x_v = nullptr;
+    // std::vector<float> *trk_end_y_v = nullptr;
+    // std::vector<float> *trk_end_z_v = nullptr;
+
+    std::vector<bool> already_filled; // bool to ensure we can keep track of the neutrino counting per event
 
 
 

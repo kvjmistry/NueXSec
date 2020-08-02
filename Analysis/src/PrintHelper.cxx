@@ -170,7 +170,8 @@ void PrintHelper::PrintResults(){
 
         // Set counters at the start
         if (p == 0) {
-            tot_true_infv_nues = count_nue_cc + count_nuebar_cc;
+            tot_true_infv_nues = count_nue_cc_qe + count_nue_cc_res + count_nue_cc_dis + count_nue_cc_coh + count_nue_cc_mec
+                               + count_nuebar_cc_qe + count_nuebar_cc_res + count_nuebar_cc_dis + count_nuebar_cc_coh + count_nuebar_cc_mec;
 
             init_count_nue_cc       = count_nue_cc;
             init_count_nuebar_cc    = count_nuebar_cc;
@@ -192,8 +193,8 @@ void PrintHelper::PrintResults(){
 
         // Set the efficiency and purity for case zero
         if (p == 0){
-            efficiency_last = double(count_nue_cc + count_nuebar_cc) / double(tot_true_infv_nues);
-            purity_last     = double(count_nue_cc + count_nuebar_cc) / double(sum_mc_dirt_ext);
+            efficiency_last = double(tot_true_infv_nues) / double(tot_true_infv_nues);
+            purity_last     = double(tot_true_infv_nues) / double(sum_mc_dirt_ext);
         }
 
 
@@ -258,10 +259,12 @@ void PrintHelper::PrintResults(){
         
         if (print_mc){
             std::cout << "------------------------------------------------" << std::endl;
-            efficiency = double(count_nue_cc + count_nuebar_cc) / double(tot_true_infv_nues);
-            purity     = double(count_nue_cc + count_nuebar_cc) / double(sum_mc_dirt_ext);
-            printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Efficiency", count_nue_cc + count_nuebar_cc, tot_true_infv_nues, 100 * efficiency);
-            printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Purity", count_nue_cc + count_nuebar_cc, sum_mc_dirt_ext, 100 * purity);
+            double tot_nue = count_nue_cc_qe + count_nue_cc_res + count_nue_cc_dis + count_nue_cc_coh + count_nue_cc_mec
+                               + count_nuebar_cc_qe + count_nuebar_cc_res + count_nuebar_cc_dis + count_nuebar_cc_coh + count_nuebar_cc_mec;
+            efficiency = double(tot_nue) / double(tot_true_infv_nues);
+            purity     = double(tot_nue) / double(sum_mc_dirt_ext);
+            printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Efficiency", tot_nue, tot_true_infv_nues, 100 * efficiency);
+            printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Purity", tot_nue, sum_mc_dirt_ext, 100 * purity);
             
             std::cout << std::endl;
             std::cout << " Efficiency Change : "  << 100 * (efficiency -efficiency_last) << " \%" << std::endl;

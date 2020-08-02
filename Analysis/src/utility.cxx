@@ -123,10 +123,14 @@ bool utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     }
 }
 // -----------------------------------------------------------------------------
-void utility::Tabulate(bool inFV, std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight) {
+void utility::Tabulate(bool inFV, std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight, bool &filled) {
 
     if (type == k_mc){
         
+        double weight_temp = weight;
+
+        if (filled == true) weight = 0;
+
         // Require in FV condition
         if (inFV){
             if (interaction == "nue_cc_qe")  counter_v.at(k_count_nue_cc_qe)  += weight; 
@@ -168,6 +172,8 @@ void utility::Tabulate(bool inFV, std::string interaction, std::string classific
         if (interaction == "numu_cc_qe" || interaction == "numu_cc_res" || interaction == "numu_cc_coh" || interaction == "numu_cc_dis" || interaction == "numu_cc_mec") counter_v.at(k_count_numu_cc_incryo) += weight;
         if (interaction == "numu_bar_cc_qe" || interaction == "numu_bar_cc_res" || interaction == "numu_bar_cc_coh" || interaction == "numu_bar_cc_dis" || interaction == "numu_bar_cc_mec") counter_v.at(k_count_numubar_cc_incryo) += weight;
         
+        weight = weight_temp;
+
         // Classification
         if (classification == "nue_cc")       counter_v.at(k_count_nue_cc)       += weight;
         if (classification == "nuebar_cc")    counter_v.at(k_count_nuebar_cc)    += weight;
@@ -181,6 +187,9 @@ void utility::Tabulate(bool inFV, std::string interaction, std::string classific
 
         // Total selected MC events
         counter_v.at(k_count_total_mc) += weight;
+
+        // Set the counter that we have already filled
+        filled = true;
     
     }
     else if (type == k_data) {
@@ -196,6 +205,7 @@ void utility::Tabulate(bool inFV, std::string interaction, std::string classific
 
         std::cout << "unkown type specified!!!  " << __PRETTY_FUNCTION__ << std::endl;
     }
+    
     
 }
 // -----------------------------------------------------------------------------

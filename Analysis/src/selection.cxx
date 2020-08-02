@@ -108,7 +108,7 @@ void selection::Initialise( const char * mc_file,
     // Get MC variables --------------------------------------------------------
     if (bool_use_mc){
         std::cout << "\nInitialising MC" << std::endl;
-        _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
+        _util.GetTree(f_mc, mc_tree, "NeutrinoSelectionFilter");
 
         // Initialise all the mc slice container
         mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights, run_period, _util);
@@ -254,32 +254,6 @@ void selection::MakeSelection(){
             // Get the entry in the tree
             mc_tree->GetEntry(ievent); 
 
-            // Get the 1 pion events for kirsty
-            if (mc_SC.isVtxInFiducial){
-                if (mc_SC.nu_pdg == 14){
-                    if (mc_SC.npion == 1) numu_pi ++;
-                }
-                if (mc_SC.nu_pdg == -14){
-                    if (mc_SC.npion == 1) numubar_pi ++;
-                }
-
-                if (mc_SC.nu_pdg == 12){
-                    if (mc_SC.npion == 1) nue_pi ++;
-                }
-
-                if (mc_SC.nu_pdg == -12){
-                    if (mc_SC.npion == 1) nuebar_pi ++;
-                }
-            }
-            
-
-            // std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
-
-            // Apply Pi0 Selection
-            ApplyPiZeroSelection(_util.k_mc, mc_SC);
-
-            // Apply NuMu Selection
-            ApplyNuMuSelection(_util.k_mc, mc_SC);
             
             // Apply the selection cuts 
             bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
@@ -289,56 +263,6 @@ void selection::MakeSelection(){
         } // End Event loop
 
         std::cout << "Ending Selection over MC" << std::endl;
-        // std::cout << "numu_pi: " << numu_pi << std::endl;
-        // std::cout << "numubar_pi: " << numubar_pi << std::endl;
-        // std::cout << "nue_pi: "  << nue_pi  << std::endl;
-        // std::cout << "nuebar_pi: "  << nuebar_pi  << std::endl;
-
-
-        if (make_list){
-
-            // Loop again to and write events that pass to a file
-            std::cout << "Making the run subrun list for selected mc events..." << std::endl;
-            int run, subrun, event;
-            std::ofstream run_subrun_file;
-            run_subrun_file.open(Form("files/run%i_run_subrun_list_mc.txt",_run_period));
-
-            int tot_gen{0};
-            int tot_sig{0};
-            int tot_bkg{0};
-
-            // Event loop
-            for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
-
-                mc_tree->GetEntry(ievent); 
-
-                std::pair<std::string, int> classification = mc_SC.SliceClassifier(_util.k_mc);
-                
-                // If Passed selection or was a nue(bar) cc in the fv
-                if ( (mc_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true) || classification.first == "nue_cc" || classification.first == "nuebar_cc" ){
-                
-                    run    = mc_SC.run;
-                    subrun = mc_SC.sub;
-                    event  = mc_SC.evt;
-
-                    if (classification.first == "nue_cc" || classification.first == "nuebar_cc" ) tot_gen++;
-                    
-                    if (mc_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true){
-                        if (classification.first == "nue_cc" || classification.first == "nuebar_cc") tot_sig++;
-                        else tot_bkg++;
-                    } 
-                    
-                    // std::cout <<  mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt <<  std::endl;
-                    run_subrun_file << run << " " << subrun << " " << event << '\n';
-                    
-                }
-
-                
-
-            } // End Event loop
-
-            // std::cout << "tot gen: " << tot_gen << "  tot sig: " << tot_sig << "  tot bkg: " << tot_bkg<< std::endl;
-        }
 
     }
     // Data --------------------------------------------------------------------
@@ -497,160 +421,147 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Here we apply the selection cuts ----------------------------------------
     bool pass; // A flag to see if an event passes an event
 
-    
+    if (SC.tpc_obj_index == 0) {
+        SC.already_filled.clear(); // set this to false every time when we have a new tpc object
+        SC.already_filled.resize(_util.k_cuts_MAX);
+        std::fill(SC.already_filled.begin(), SC.already_filled.end(), false);
+    }
+
     // Classify the event
     std::pair<std::string, int> classification = SC.SliceClassifier(type);      // Classification of the event
     std::string interaction                    = SC.SliceInteractionType(type); // Genie interaction type
-    //std::string interaction = "nue_cc_qe";
-    std::string category                       = SC.SliceCategory();            // The pandora group slice category
+    // //std::string interaction = "nue_cc_qe";
+    // std::string category                       = SC.SliceCategory();            // The pandora group slice category
     std::pair<std::string, int> particle_type  = SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
 
-    // Test code to isolate the low E nues in truth
-    // if (type == _util.k_mc && SC.nu_e > 0.5) return false;
-    // if (type == _util.k_mc && SC.shr_dedx_Y_cali > 7 && classification.second == _util.k_nue_cc){
-        // std::cout << SC.run << " " << SC.sub<<" " << SC.evt<<  std::endl;
-    // }
+    // if (ievent < 500) std::cout << classification.first << " " << interaction<<  std::endl;
+
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
     // *************************************************************************
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_unselected, counter_v );
     
+    // Let apply some cuts and see what happens
     // *************************************************************************
-    // Software Trigger -- MC Only  --------------------------------------------
+    // In Time-----------------------------------------------------------------
     // *************************************************************************
-    pass = _scuts.swtrig(SC, type);
-    passed_v.at(ievent).cut_v.at(_util.k_swtrig) = pass;
-    if(!pass) return false; // Failed the cut!
+    // if ((classification.first == "nue_cc" || classification.first == "nuebar_cc") && (SC.flash_time > 16.0 || SC.flash_time < 5.5 )) std::cout << SC.flash_time<< std::endl;
+    if (SC.failed_intime_cut == 1) return false;
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_in_time, counter_v );
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_swtrig, counter_v );
-
-    // *************************************************************************
-    // Slice ID ----------------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.slice_id(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_slice_id) = pass;
-    if(!pass) return false; // Failed the cut!
-    
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_slice_id, counter_v );
     
     // *************************************************************************
-    // Electron Candidate ------------------------------------------------------
+    // Flash PE ----------------------------------------------------------------
     // *************************************************************************
-    pass = _scuts.e_candidate(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_e_candidate) = pass;
-    if(!pass) return false; // Failed the cut!
+    if (SC.failed_flash_cut == 1) return false;
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_flash_pe, counter_v );
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_e_candidate, counter_v );
-
-    // *************************************************************************
-    // In FV -------------------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.in_fv(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_in_fv) = pass;
-    if(!pass) return false; // Failed the cut!
     
+    // *************************************************************************
+    // Reco Nue-----------------------------------------------------------------
+    // *************************************************************************
+    if (SC.has_valid_shr == 0 || SC.has_nue == 0) return false;
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_reco_nue, counter_v );
+    
+    
+    // *************************************************************************
+    // IN FV--------------------------------------------------------------------
+    // *************************************************************************
+    if (_util.in_fv(SC.reco_nu_vtx_x, SC.reco_nu_vtx_y, SC.reco_nu_vtx_z) == false) return false;
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_in_fv, counter_v );
     
-    // *************************************************************************
-    // Topological Score -------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.topo_score(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_topo_score) = pass;
-    if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_topo_score, counter_v );
+    // *************************************************************************
+    // Vertex to Flash ---------------------------------------------------------
+    // *************************************************************************
+    if (SC.reco_nu_vtx_z > SC.flash_vtx_z){
+        if (SC.flash_vtx_dist > 60 ) return false;
+    }
+    else {
+        if (SC.flash_vtx_dist > 80 ) return false;
+    }
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_vtx_to_flash, counter_v );
+    
+    
+    // *************************************************************************
+    // Shower to vertex --------------------------------------------------------
+    // *************************************************************************
+    if (SC.shr_distance > 4) return false;
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_to_vtx, counter_v );
+    
+    
+    // *************************************************************************
+    // Track to Vertex----------------------------------------------------------
+    // *************************************************************************
+    bool valid_track = false;
+    for (unsigned int u = 0; u < SC.trk_vtx_dist_v->size(); u++){
+        if (SC.trk_vtx_dist_v->at(u) < 4) valid_track = true;
+    }
+    if (!valid_track) return valid_track;
+    
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_track_to_vtx, counter_v );
+    
+    
+    // *************************************************************************
+    // Hit Threshold -----------------------------------------------------------
+    // *************************************************************************
+    if (SC.shr_hits_tot < 200) return false; 
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_hit_thresh, counter_v );
+    
+    
+    // *************************************************************************
+    // Hit Threshold Collection ------------------------------------------------
+    // *************************************************************************
+    if (SC.shr_hits_y_tot < 80) return false; 
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_hit_thresh_y, counter_v );
+    
+    
+    // *************************************************************************
+    // Open Angle --------------------------------------------------------------
+    // *************************************************************************
+    if (SC.shr_openangle < 2 || SC.shr_openangle > 15) return false; 
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_open_angle, counter_v );
+    
+    // *************************************************************************
+    // Shower dEdx -------------------------------------------------------------
+    // *************************************************************************
+    if (SC.shr_dedx_Y < 1.4 || SC.shr_dedx_Y > 3) return false; 
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dedx, counter_v );
 
     // *************************************************************************
-    // Slice Contained Fraction ------------------------------------------------
+    // Shr Vertex Distance > 1 shower ------------------------------------------
     // *************************************************************************
-    pass = _scuts.contained_frac(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_contained_frac) = pass;
-    if(!pass) return false; // Failed the cut!
+    for (unsigned int u = 0; u < SC.sec_shr_vtx_dist_v->size(); u++){
+        if (SC.sec_shr_vtx_dist_v->at(u) > 22) return false;
+    }
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_vtx_dist_gt_1shr, counter_v );
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_contained_frac, counter_v );
-
-    // *************************************************************************
-    // Shower Score ------------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.shower_score(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_shower_score) = pass;
-    if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shower_score, counter_v );
-
     // *************************************************************************
-    // Michel Rejection --------------------------------------------------------
+    // Hits per length ---------------------------------------------------------------
     // *************************************************************************
-    pass = _scuts.michel_rej(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_michel_rej) = pass;
-    if(!pass) return false; // Failed the cut!
+    if (SC.shr_hits_tot/SC.shr_len < 3) return false;
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_hit_per_lenth, counter_v );
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_michel_rej, counter_v );
-
-    // *************************************************************************
-    // Shower Hits -------------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.shr_hits(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_shr_hits) = pass;
-    if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_hits, counter_v );
-
     // *************************************************************************
-    // Shower Hit Ratio  -------------------------------------------------------
+    // Track Shower Length Ratio -----------------------------------------------
     // *************************************************************************
-    pass = _scuts.shr_hitratio(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_hit_ratio) = pass;
-    if(!pass) return false; // Failed the cut!
+    if (SC.trk_len/SC.shr_len > 1) return false;
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_trk_shr_lengh, counter_v );
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_hit_ratio, counter_v );
-
-    // *************************************************************************
-    // Shower Moliere Average --------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.shr_moliere_avg(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_shr_moliere_avg) = pass;
-    if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_moliere_avg, counter_v );
-
     // *************************************************************************
-    // 2D cut for Shower to Vertex Distance and dEdx ---------------------------
+    // Track Containment -------------------------------------------------------
     // *************************************************************************
-    pass = _scuts.shr_dist_dEdx_y(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_vtx_dist_dedx) = pass;
-    if(!pass) return false; // Failed the cut!
+    for (unsigned int u = 0; u < SC.trk_start_x_v->size(); u++){
+        if ( _util.in_fv(SC.trk_start_x_v->at(u), SC.trk_start_y_v->at(u), SC.trk_start_z_v->at(u)) == false) return false;
+        if ( _util.in_fv(SC.trk_end_x_v->at(u),   SC.trk_end_y_v->at(u),   SC.trk_end_z_v->at(u))   == false) return false;
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_vtx_dist_dedx, counter_v );
-
-    // *************************************************************************
-    // dEdx in y plane for 0 track events --------------------------------------
-    // *************************************************************************
-    pass = _scuts.dEdx_y_no_tracks(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_dEdx_y_no_tracks) = pass;
-    if(!pass) return false; // Failed the cut!
-    
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_y_no_tracks, counter_v );
-
-
-    // // *************************************************************************
-    // // Shower to Vertex Distance --------------------------------------------
-    // // *************************************************************************
-    // pass = _scuts.shr_distance(SC);
-    // passed_v.at(ievent).cut_v.at(_util.k_shr_distance) = pass;
-    // if(!pass) return false; // Failed the cut!
-    
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_distance, counter_v );
-
-    // // *************************************************************************
-    // // dEdx in y plane ---------------------------------------------------------
-    // // *************************************************************************
-    // pass = _scuts.dEdx_y(SC);
-    // passed_v.at(ievent).cut_v.at(_util.k_dEdx_y) = pass;
-    // // if(!pass) return false; // Failed the cut!
-    
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_y, counter_v );
+    }
+    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_trk_containment, counter_v );   
+            
 
     // ************************************************************************n*
     return true;
@@ -717,11 +628,11 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     
     // Get the CV weight
     double weight = 1.0;
-    weight = GetCVWeight(type, SC);
+    // weight = GetCVWeight(type, SC);
 
-    // Try scaling the pi0
-    // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
-    GetPiZeroWeight(weight, 0, SC);
+    // // Try scaling the pi0
+    // // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
+    // GetPiZeroWeight(weight, 0, SC);
 
     
     // This is in many places, need to have a way for setting this number by default
@@ -733,7 +644,10 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     if (!slim) _hhelper.at(type).FillHists(type, classification.second, interaction, par_type.second, cut_index, SC, weight);
 
     // Set counters for the cut
-    _util.Tabulate(SC.isVtxInFiducial, interaction, classification.first, type, counter_v.at(cut_index), weight );
+    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_x, SC.true_nu_vtx_y, SC.true_nu_vtx_z);
+    bool filled = SC.already_filled.at(cut_index);
+    _util.Tabulate(is_in_fv, interaction, classification.first, type, counter_v.at(cut_index), weight, filled);
+    SC.already_filled.at(cut_index) = filled;
 
     // Fill Plots for Efficiency
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC, weight);
