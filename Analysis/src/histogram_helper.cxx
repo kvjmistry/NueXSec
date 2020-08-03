@@ -597,9 +597,9 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
 
     
     // // Now fill the histograms!
-    // TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x, weight);
-    // TH1D_hists.at(k_reco_vtx_y).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_y, weight);
-    // TH1D_hists.at(k_reco_vtx_z).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_z, weight);
+    TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x, weight);
+    TH1D_hists.at(k_reco_vtx_y).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_y, weight);
+    TH1D_hists.at(k_reco_vtx_z).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_z, weight);
 
     // TH1D_hists.at(k_reco_vtx_x_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_x, weight);
     // TH1D_hists.at(k_reco_vtx_y_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_y, weight);
@@ -611,11 +611,9 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     
     // TH1D_hists.at(k_reco_leading_mom).at(cut_index).at(classification_index)->Fill(reco_shr_p, weight);
     
-    // TH1D_hists.at(k_reco_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.shr_distance, weight);
+    TH1D_hists.at(k_reco_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.shr_distance, weight);
 
     // TH1D_hists.at(k_reco_track_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.trk_distance, weight);
-    
-    // TH1D_hists.at(k_reco_shr_hits_max).at(cut_index).at(classification_index)->Fill(SC.shr_hits_max, weight);
     
     // TH1D_hists.at(k_reco_n_track_contained).at(cut_index).at(classification_index)->Fill(SC.n_tracks_contained, weight);
     
@@ -627,9 +625,9 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     
     // TH1D_hists.at(k_reco_leading_shower_cos_theta).at(cut_index).at(classification_index)->Fill(std::cos(SC.shr_theta), weight);
     
-    // TH1D_hists.at(k_reco_shower_multiplicity).at(cut_index).at(classification_index)->Fill(SC.n_showers, weight);
+    TH1D_hists.at(k_reco_shower_multiplicity).at(cut_index).at(classification_index)->Fill(SC.n_showers, weight);
     
-    // TH1D_hists.at(k_reco_track_multiplicity).at(cut_index).at(classification_index)->Fill(SC.n_tracks, weight);
+    TH1D_hists.at(k_reco_track_multiplicity).at(cut_index).at(classification_index)->Fill(SC.n_tracks, weight);
 
     // TH1D_hists.at(k_reco_topological_score).at(cut_index).at(classification_index)->Fill(SC.topological_score, weight);
 
@@ -645,13 +643,13 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
 
     // TH1D_hists.at(k_reco_shower_energy_tot_cali).at(cut_index).at(classification_index)->Fill(SC.shr_energy_tot_cali, weight);
 
-    // TH1D_hists.at(k_reco_shr_hits_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_tot, weight);
+    TH1D_hists.at(k_reco_shr_hits_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_tot, weight);
 
-    // TH1D_hists.at(k_reco_shr_hits_y_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot, weight);
+    TH1D_hists.at(k_reco_shr_hits_y_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot, weight);
 
-    // TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_u).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_2cm_dedx_U, weight);
-    // TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_2cm_dedx_V, weight);    
-    // TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_2cm_dedx_Y, weight);
+    TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_v).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_V, weight);    
+    TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_u).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_U, weight);
+    TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_y).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y, weight);
     
     // TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx_u).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap05_dedx_U, weight);
     // TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap05_dedx_V, weight);
@@ -708,7 +706,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
 
     // TH1D_hists.at(k_reco_closestNuCosmicDist).at(cut_index).at(classification_index)->Fill(SC._closestNuCosmicDist, weight);
 
-    // if (SC.n_tracks > 0) TH1D_hists.at(k_reco_trk_len).at(cut_index).at(classification_index)->Fill(SC.trk_len, weight);
+    if (SC.n_tracks > 0) TH1D_hists.at(k_reco_trk_len).at(cut_index).at(classification_index)->Fill(SC.trk_len, weight);
 
     // TH1D_hists.at(k_reco_nu_e).at(cut_index).at(classification_index)->Fill(reco_nu_e, weight);
 

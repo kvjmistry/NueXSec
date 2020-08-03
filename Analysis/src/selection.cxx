@@ -136,7 +136,7 @@ void selection::Initialise( const char * mc_file,
     // Initialise Data specific ------------------------------------------------
     if (bool_use_data){
         std::cout << "\nInitialising Data" << std::endl;
-        _util.GetTree(f_data, data_tree, "nuselection/NeutrinoSelectionFilter");
+        _util.GetTree(f_data, data_tree, "NeutrinoSelectionFilter");
         
         // Initialise all the data slice container
         data_SC.Initialise(data_tree, _util.k_data, f_flux_weights, run_period, _util);
@@ -166,7 +166,7 @@ void selection::Initialise( const char * mc_file,
     if (bool_use_ext){
         std::cout << "\nInitialising EXT" << std::endl;
 
-        _util.GetTree(f_ext, ext_tree, "nuselection/NeutrinoSelectionFilter");
+        _util.GetTree(f_ext, ext_tree, "NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
         ext_SC.Initialise(ext_tree, _util.k_ext, f_flux_weights, run_period, _util);
@@ -196,7 +196,7 @@ void selection::Initialise( const char * mc_file,
     if (bool_use_dirt){
         std::cout << "\nInitialising Dirt" << std::endl;
 
-        _util.GetTree(f_dirt, dirt_tree, "nuselection/NeutrinoSelectionFilter");
+        _util.GetTree(f_dirt, dirt_tree, "NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
         dirt_SC.Initialise(dirt_tree, _util.k_dirt, f_flux_weights, run_period, _util);
@@ -430,8 +430,6 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Classify the event
     std::pair<std::string, int> classification = SC.SliceClassifier(type);      // Classification of the event
     std::string interaction                    = SC.SliceInteractionType(type); // Genie interaction type
-    // //std::string interaction = "nue_cc_qe";
-    // std::string category                       = SC.SliceCategory();            // The pandora group slice category
     std::pair<std::string, int> particle_type  = SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
 
     // if (ievent < 500) std::cout << classification.first << " " << interaction<<  std::endl;
@@ -487,7 +485,12 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     // Shower to vertex --------------------------------------------------------
     // *************************************************************************
-    if (SC.shr_distance > 4) return false;
+    bool valid_shr = false;
+    if (SC.shr_vtx_dist_v->size() == 0) valid_shr= true;
+    for (unsigned int u = 0; u < SC.shr_vtx_dist_v->size(); u++){
+        if (SC.shr_vtx_dist_v->at(u) < 4) valid_shr = true;
+    }
+    if (!valid_shr) return valid_shr;
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_to_vtx, counter_v );
     
     
@@ -495,6 +498,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Track to Vertex----------------------------------------------------------
     // *************************************************************************
     bool valid_track = false;
+    if (SC.trk_vtx_dist_v->size() == 0) valid_track= true;
     for (unsigned int u = 0; u < SC.trk_vtx_dist_v->size(); u++){
         if (SC.trk_vtx_dist_v->at(u) < 4) valid_track = true;
     }
@@ -541,14 +545,16 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     // Hits per length ---------------------------------------------------------------
     // *************************************************************************
-    if (SC.shr_hits_tot/SC.shr_len < 3) return false;
+    if (double(SC.shr_hits_tot/SC.shr_len) < 3.0) return false;
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_hit_per_lenth, counter_v );
     
     
     // *************************************************************************
     // Track Shower Length Ratio -----------------------------------------------
     // *************************************************************************
-    if (SC.trk_len/SC.shr_len > 1) return false;
+    double track_shr_ratio = SC.trk_len / SC.shr_len;
+    std::cout << track_shr_ratio << std::endl;
+    if (  track_shr_ratio > 1.0) return false;
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_trk_shr_lengh, counter_v );
     
     
