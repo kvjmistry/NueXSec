@@ -143,6 +143,8 @@ class histogram_helper{
         k_reco_shower_energy_tot_cali,                                          // Calibrated energy of all the showers
         k_reco_shr_hits_tot,                                                    // Total number of hits for all showers
         k_reco_shr_hits_y_tot,                                                  // Total number of hits for all showers in the collection plane
+        k_reco_shr_hits_u_tot,                                                  // Total number of hits for all showers in the u plane
+        k_reco_shr_hits_v_tot,                                                  // Total number of hits for all showers in the v plane
         k_reco_shr_trkfit_2cm_dEdx_u,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use first 2 cm u plane
         k_reco_shr_trkfit_2cm_dEdx_v,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use first 2 cm v plane
         k_reco_shr_trkfit_2cm_dEdx_y,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use first 2 cm y plane

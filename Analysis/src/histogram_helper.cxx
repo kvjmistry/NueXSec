@@ -290,10 +290,13 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_shower_energy_tot_cali).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_tot_cali_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 3);
             
             // Total number of hits for the leading shower
-            TH1D_hists.at(k_reco_shr_hits_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 1600);
+            TH1D_hists.at(k_reco_shr_hits_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 600);
             
             // Total number of hits for the leading shower in the collection plane
-            TH1D_hists.at(k_reco_shr_hits_y_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_y_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 1600);
+            TH1D_hists.at(k_reco_shr_hits_y_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_y_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 1000);
+            TH1D_hists.at(k_reco_shr_hits_u_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_u_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 1000);
+            TH1D_hists.at(k_reco_shr_hits_v_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_v_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 1000);
+
 
             // Shower Track fit dEdx variables
             TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_u).at(i).at(j)   = new TH1D ( Form("h_reco_shr_trkfit_2cm_dEdx_u_%s_%s",_util.cut_dirs.at(i).c_str(),     _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
@@ -646,6 +649,8 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     TH1D_hists.at(k_reco_shr_hits_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_tot, weight);
 
     TH1D_hists.at(k_reco_shr_hits_y_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot, weight);
+    TH1D_hists.at(k_reco_shr_hits_u_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_u_tot, weight);
+    TH1D_hists.at(k_reco_shr_hits_v_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_v_tot, weight);
 
     TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_v).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_V, weight);    
     TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_u).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_U, weight);

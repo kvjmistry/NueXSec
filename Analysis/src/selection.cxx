@@ -553,8 +553,8 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Track Shower Length Ratio -----------------------------------------------
     // *************************************************************************
     double track_shr_ratio = SC.trk_len / SC.shr_len;
-    std::cout << track_shr_ratio << std::endl;
-    if (  track_shr_ratio > 1.0) return false;
+    // std::cout << track_shr_ratio << std::endl;
+    if ( track_shr_ratio > 1.0 && SC.n_tracks > 0) return false;
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_trk_shr_lengh, counter_v );
     
     
