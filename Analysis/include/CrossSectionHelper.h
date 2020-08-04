@@ -87,7 +87,7 @@ class CrossSectionHelper{
     double mc_flux_scale_factor{1.0};
     double data_flux_scale_factor{1.0};
 
-    int uni_reint{1000}, uni_genie{500}, uni_ppfx{600}; // For resizing data, ext and dirt in multisims
+    int uni_reint{1000}, uni_genie{600}, uni_ppfx{600}; // For resizing data, ext and dirt in multisims
 
     // Define the bins for each variable -- See InitialiseHistograms function to see the actual binning used
     std::vector<std::vector<double>> bins;

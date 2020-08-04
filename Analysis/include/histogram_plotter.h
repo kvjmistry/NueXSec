@@ -93,7 +93,7 @@ class histogram_plotter{
     void MakeEfficiencyPlot(const char* print_name, const char *run_period);
     // -------------------------------------------------------------------------
     // The efficiency made by each cut
-    void MakeEfficiencyPlotByCut(const char *run_period);
+    void MakeEfficiencyPlotByCut(const char *run_period, std::string var);
     // -------------------------------------------------------------------------
     // True Neutino energy for nues broken down by genie interaction type
     void MakeInteractionPlot(const char* print_name, std::string cut_type);
@@ -108,7 +108,7 @@ class histogram_plotter{
     void Save1DHists(const char* print_name, const char* histname, std::string cut_type);
     // -------------------------------------------------------------------------
     // Script to get the 2D histograms and save them as a PDF
-    void Save2DHists(const char* print_name, const char* histname, std::string cut_type);
+    void Save2DHists(const char* print_name, const char* histname, std::string cut_type, bool yex);
     // -------------------------------------------------------------------------
     // Make plot of interaction efficiency
     void MakeInteractionEfficiency(const char *print_name);

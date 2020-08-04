@@ -9,7 +9,8 @@ varname value
 // Run1 MC POT v33
 // Run1_MC_POT 1.30691e+21 // *BNB* overlay POT
 // Run1_MC_POT 1.18488e+21
-Run1_MC_POT 2.07136e+21 // NuMI POT for high stats file
+// Run1_MC_POT 2.07136e+21 // NuMI POT for high stats file
+Run1_MC_POT 2.31956e+21 // For Overlay file with evetnweights
 -
 // Run 1 dirt POT
 // Run1_Dirt_POT 3.22483e+20 // **BNB** dirt POT

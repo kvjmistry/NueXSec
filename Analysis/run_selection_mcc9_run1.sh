@@ -20,7 +20,7 @@ if [ -z "$1" ]; then
   # dirt="./nuexsec --run 1 --dirt /uboone/data/users/davidc/searchingfornues/v08_00_00_33/cc0pinp/0304/run1/prodgenie_bnb_dirt_overlay_mcc9.1_v08_00_00_26_run1_reco2_reco2.root --weight 2"
 
   # Parallel processing version
-  mc="./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_morestats.root"
+  mc="./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_weight.root"
   data="./nuexsec --run 1 --data ../ntuples/neutrinoselection_filt_run1_beamon_beamgood.root"
   ext="./nuexsec --run 1 --ext ../ntuples/neutrinoselection_filt_run1_beamoff.root"
   dirt="./nuexsec --run 1 --dirt ../ntuples/neutrinoselection_filt_run1_dirt_overlay.root"

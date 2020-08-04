@@ -712,7 +712,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
 
         // FIxed scaling for differential cross section
         if (vars.at(var) != "integrated"){
-            h_universe.at(k_up).at(k)->GetYaxis()->SetRangeUser(0, 3.0e-39);
+            h_universe.at(k_up).at(k)->GetYaxis()->SetRangeUser(0, 0.5e-39);
         }
 
         TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
@@ -883,7 +883,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, scale_val*1.2);
 
         if (k == k_xsec_mcxsec || k == k_xsec_dataxsec){
-            h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, 3.0e-39);
+            h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, 0.5e-39);
         }
 
         TLegend *leg = new TLegend(0.6, 0.75, 0.95, 0.9);
@@ -922,7 +922,7 @@ void SystematicsHelper::CompareCVXSec(int var){
     h_dataxsec->SetLineColor(kGreen+2);
     h_mcxsec  ->SetLineColor(kRed+2);
 
-    h_dataxsec->GetYaxis()->SetRangeUser(0, 3e-39);
+    h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
     if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(0, 10e-39);
 
     h_dataxsec->GetYaxis()->SetLabelSize(0.04);
@@ -1090,7 +1090,7 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
 
     // FIxed scaling for differential cross section
     if (vars.at(var) != "integrated"){
-        h_universe.at(k_up).at(k_xsec_dataxsec)->GetYaxis()->SetRangeUser(0, 3.0e-39);
+        h_universe.at(k_up).at(k_xsec_dataxsec)->GetYaxis()->SetRangeUser(0, 0.5e-39);
     }
 
     TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);

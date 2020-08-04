@@ -466,49 +466,53 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
             if (nu_purity_from_pfp <= 0.05) return std::make_pair("cosmic",_util.k_cosmic);
             else return std::make_pair("nu_out_fv",_util.k_nu_out_fv);
         }
-
-        // Charged Current 
-        if (ccnc == _util.k_CC){
-
-            // NuMu CC
-            if (nu_pdg == 14 || nu_pdg == -14){
-
-                // Purity is low so return cosmic
-                if (nu_purity_from_pfp == 0) return std::make_pair("cosmic",_util.k_cosmic);
-                
-                if (npi0 > 0) return std::make_pair("numu_cc_pi0", _util.k_numu_cc_pi0); // has a pi0
-                else return std::make_pair("numu_cc",_util.k_numu_cc);
-
-            }
-            // Nue CC
-            else if (nu_pdg == 12){
-                
-                if (nu_purity_from_pfp >= 0.05)                                 return std::make_pair("nue_cc",_util.k_nue_cc); // purity > 0.05% so signal
-                else return std::make_pair("cosmic",_util.k_cosmic); // Classify as a cosmic with very low purity
-
-            }
-            else if (nu_pdg == -12){
-                
-                if (nu_purity_from_pfp >= 0.05)                                 return std::make_pair("nuebar_cc",_util.k_nuebar_cc); // purity > 0.05% so signal
-                else return std::make_pair("cosmic",_util.k_cosmic); // Classify as a cosmic with very low purity
-
-            }
-            // Unknown Neutrino Type
-            else {
-                std::cout << "Unknown Neutrino Type..." << std::endl;
-                return std::make_pair("unmatched",_util.k_unmatched);
-            }
-
-        }
-        // Neutral Current
+        // In FV event
         else {
 
-            // Purity is low so return cosmic
-            if (nu_purity_from_pfp <= 0.05) return std::make_pair("cosmic",_util.k_cosmic);
+            // Charged Current 
+            if (ccnc == _util.k_CC){
 
-            if (npi0 > 0) return std::make_pair("nc_pi0",_util.k_nc_pi0);
-            else return std::make_pair("nc",_util.k_nc);
-        }
+                // NuMu CC
+                if (nu_pdg == 14 || nu_pdg == -14){
+
+                    // Purity is low so return cosmic
+                    if (nu_purity_from_pfp == 0) return std::make_pair("cosmic",_util.k_cosmic);
+                    
+                    if (npi0 > 0) return std::make_pair("numu_cc_pi0", _util.k_numu_cc_pi0); // has a pi0
+                    else return std::make_pair("numu_cc",_util.k_numu_cc);
+
+                }
+                // Nue CC
+                else if (nu_pdg == 12){
+                    
+                    if (nu_purity_from_pfp >= 0.05)                                 return std::make_pair("nue_cc",_util.k_nue_cc); // purity > 0.05% so signal
+                    else return std::make_pair("cosmic",_util.k_cosmic); // Classify as a cosmic with very low purity
+
+                }
+                else if (nu_pdg == -12){
+                    
+                    if (nu_purity_from_pfp >= 0.05)                                 return std::make_pair("nuebar_cc",_util.k_nuebar_cc); // purity > 0.05% so signal
+                    else return std::make_pair("cosmic",_util.k_cosmic); // Classify as a cosmic with very low purity
+
+                }
+                // Unknown Neutrino Type
+                else {
+                    std::cout << "Unknown Neutrino Type..." << std::endl;
+                    return std::make_pair("unmatched",_util.k_unmatched);
+                }
+
+            }
+            // Neutral Current
+            else {
+
+                // Purity is low so return cosmic
+                if (nu_purity_from_pfp <= 0.05) return std::make_pair("cosmic",_util.k_cosmic);
+
+                if (npi0 > 0) return std::make_pair("nc_pi0",_util.k_nc_pi0);
+                else return std::make_pair("nc",_util.k_nc);
+            }
+        
+        } // End if in FV
 
     }
     // Data

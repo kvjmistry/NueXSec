@@ -530,6 +530,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     pass = _scuts.swtrig(SC, type);
     passed_v.at(ievent).cut_v.at(_util.k_swtrig) = pass;
+    // if (type == _util.k_mc && !pass && classification.first == "nu_out_fv") std::cout<< SC.run << " " << SC.sub << " " << SC.evt << std::endl; // Spit out the run subrun event numbers of failed events for an event display
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_swtrig, counter_v );
@@ -638,6 +639,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     pass = _scuts.dEdx_max_no_tracks(SC);
     passed_v.at(ievent).cut_v.at(_util.k_dEdx_max_no_tracks) = pass;
+
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_max_no_tracks, counter_v );
@@ -742,7 +744,8 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     if (!slim) _hhelper.at(type).FillHists(type, classification.second, interaction, par_type.second, cut_index, SC, weight);
 
     // Set counters for the cut
-    _util.Tabulate(SC.isVtxInFiducial, interaction, classification.first, type, counter_v.at(cut_index), weight );
+    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+    _util.Tabulate(is_in_fv, interaction, classification.first, type, counter_v.at(cut_index), weight );
 
     // Fill Plots for Efficiency
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC, weight);

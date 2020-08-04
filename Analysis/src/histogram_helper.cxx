@@ -430,15 +430,20 @@ void histogram_helper::InitHistograms(){
 
 
     // Intialising true histograms in here
-    if (_type == _util.k_mc || _type == _util.k_dirt){
+    if (_type == _util.k_mc){
         
         if (_type == _util.k_mc){
             // Initalise the histograms for the TEfficency
-            TEfficiency_hists.resize(_util.k_cuts_MAX);
-
-            for (unsigned int l = 0; l < _util.k_cuts_MAX; l++ ){
-                TEfficiency_hists.at(l) = new TH1D( Form("h_true_nu_E_%s",_util.cut_dirs.at(l).c_str() ), "", 15, 0, 5 );
+            TEfficiency_hists.resize(k_TH1D_eff_MAX);
+            for (unsigned int v = 0; v < TEfficiency_hists.size(); v++){
+                TEfficiency_hists.at(v).resize(_util.k_cuts_MAX);
             }
+            
+            for (unsigned int l = 0; l < _util.k_cuts_MAX; l++ ){
+                TEfficiency_hists.at(k_eff_nu_E).at(l)   = new TH1D( Form("h_true_nu_E_%s",_util.cut_dirs.at(l).c_str() ), "", 15, 0, 5 );
+                TEfficiency_hists.at(k_eff_elec_E).at(l) = new TH1D( Form("h_true_elec_E_%s",_util.cut_dirs.at(l).c_str() ), "", 15, 0, 5 );
+            }
+            
         }
 
         // Initalise the True Nue
@@ -490,6 +495,9 @@ void histogram_helper::InitHistograms(){
         
             TH2D_true_hists.at(i).at(k_true_elec_E_reco_elec_E) = new TH2D( Form("h_true_elec_E_reco_elec_E_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True e^{-} Energy [GeV] ;Reco Leading Shower Energy [GeV]", 25, 0, 4, 25, 0, 4);
             TH2D_true_hists.at(i).at(k_true_nu_E_reco_nu_E)     = new TH2D( Form("h_true_nu_E_reco_nu_E_%s_%s",             _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} Energy [GeV] ;Reco #nu_{e} Energy [GeV]", 25, 0, 4, 25, 0, 4);
+            TH2D_true_hists.at(i).at(k_true_elec_E_reco_elec_E_extra_bins) = new TH2D( Form("h_true_elec_E_reco_elec_E_extra_bins_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True e^{-} Energy [GeV] ;Reco Leading Shower Energy [GeV]", 50, 0, 4, 50, 0, 4);
+            TH2D_true_hists.at(i).at(k_true_nu_E_reco_nu_E_extra_bins)     = new TH2D( Form("h_true_nu_E_reco_nu_E_extra_bins_%s_%s",             _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} Energy [GeV] ;Reco #nu_{e} Energy [GeV]", 50, 0, 4, 50, 0, 4);
+
             TH2D_true_hists.at(i).at(k_true_nu_vtx_x_reco_nu_vtx_x) = new TH2D( Form("h_true_nu_vtx_x_reco_nu_vtx_x_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} Vtx X [cm] ;Reco #nu_{e} Vtx X [cm]", 20, -10, 270, 20, -10, 270);
             TH2D_true_hists.at(i).at(k_true_nu_vtx_y_reco_nu_vtx_y) = new TH2D( Form("h_true_nu_vtx_y_reco_nu_vtx_y_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} Vtx Y [cm] ;Reco #nu_{e} Vtx Y [cm]", 20, -10, 120, 20, -10, 120);
             TH2D_true_hists.at(i).at(k_true_nu_vtx_z_reco_nu_vtx_z) = new TH2D( Form("h_true_nu_vtx_z_reco_nu_vtx_z_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} Vtx Z [cm] ;Reco #nu_{e} Vtx Z [cm]", 40, -10, 1050, 40, -10, 1050);
@@ -855,6 +863,8 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
                 // True vs reco histograms
                 TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E)->Fill(SC.elec_e,  SC.shr_energy_tot_cali, weight);
                 TH2D_true_hists.at(index).at(k_true_nu_E_reco_nu_E)    ->Fill(SC.nu_e,  reco_nu_e, weight);
+                TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E_extra_bins)->Fill(SC.elec_e,  SC.shr_energy_tot_cali, weight);
+                TH2D_true_hists.at(index).at(k_true_nu_E_reco_nu_E_extra_bins)    ->Fill(SC.nu_e,  reco_nu_e, weight);
                 TH2D_true_hists.at(index).at(k_true_nu_vtx_x_reco_nu_vtx_x)->Fill(SC.true_nu_vtx_sce_x,  SC.reco_nu_vtx_sce_x, weight);
                 TH2D_true_hists.at(index).at(k_true_nu_vtx_y_reco_nu_vtx_y)->Fill(SC.true_nu_vtx_sce_y,  SC.reco_nu_vtx_sce_y, weight);
                 TH2D_true_hists.at(index).at(k_true_nu_vtx_z_reco_nu_vtx_z)->Fill(SC.true_nu_vtx_sce_z,  SC.reco_nu_vtx_sce_z, weight);
@@ -1124,7 +1134,8 @@ void histogram_helper::WriteRecoPar(int type){
 void histogram_helper::FillTEfficiency(int cut_index, std::string classification, SliceContainer SC, double weight){
 
     // Fill the histogram at the specified cut
-    if (classification == "nue_cc" || classification == "nuebar_cc") TEfficiency_hists.at(cut_index)->Fill(SC.nu_e, weight);
+    if (classification == "nue_cc" || classification == "nuebar_cc") TEfficiency_hists.at(k_eff_nu_E).at(cut_index)->Fill(SC.nu_e, weight);
+    if (classification == "nue_cc" || classification == "nuebar_cc") TEfficiency_hists.at(k_eff_elec_E).at(cut_index)->Fill(SC.elec_e, weight);
 }
 // -----------------------------------------------------------------------------
 void histogram_helper::WriteTEfficiency(){
@@ -1133,11 +1144,10 @@ void histogram_helper::WriteTEfficiency(){
     bool bool_dir = _util.GetDirectory(f_nuexsec, dir ,"TEff");
     if (bool_dir) dir->cd();
     
-    for (unsigned int p = 0; p < TEfficiency_hists.size(); p++){
-
-        // TEfficiency * teff = new TEfficiency(*TEfficiency_hists.at(p), *TEfficiency_hists.at(_util.k_unselected));
-        // teff->Write( Form("h_true_nu_E_%s",_util.cut_dirs.at(p).c_str()) , TObject::kOverwrite);
-        TEfficiency_hists.at(p)->Write("",TObject::kOverwrite);
+    for (unsigned int v = 0; v < TEfficiency_hists.size(); v++){
+        for (unsigned int p = 0; p < TEfficiency_hists.at(v).size(); p++){
+            TEfficiency_hists.at(v).at(p)->Write("",TObject::kOverwrite);
+        }
     }
     
 }

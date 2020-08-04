@@ -33,7 +33,7 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
     float ppfx_cv{1.0}, _ppfx_cv{0.0};
     float weightSplineTimesTune{1.0}, _weightSplineTimesTune{1.0};
     float numi_ang{0.0}, _numi_ang{0.0};
-    int nu_pdg{0}, _nu_pdg{0.0};
+    int nu_pdg{0}, _nu_pdg{0};
 
     std::vector<unsigned short> weightsGenie;
     std::vector<unsigned short> weightsReint;

@@ -97,7 +97,7 @@ class histogram_helper{
     std::vector<std::vector<TH1D*>> TH1D_numu_hists;
 
     // Histograms for the efficiency plot
-    std::vector<TH1D*> TEfficiency_hists;
+    std::vector<std::vector<TH1D*>> TEfficiency_hists;
 
     // True histograms
     std::vector<std::vector<TH1D*>> TH1D_true_hists;
@@ -198,6 +198,13 @@ class histogram_helper{
         k_TH1D_par_MAX
     };
 
+    // enum for plots by efficiency
+    enum TH1D_eff_vars {
+        k_eff_nu_E,                  // True Electron-neutrino energy
+        k_eff_elec_E,                // True Electron Energy
+        k_TH1D_eff_MAX
+    };
+
     enum TH1D_true_hist_vars {
         k_true_nue_theta,     // True nue theta in BNB coordinates (up from beam dir)
         k_true_nue_phi,       // True nue phi in BNB coordinates (around beam dir)
@@ -243,6 +250,8 @@ class histogram_helper{
         k_true_nue_vtx_z_y_sce,
         k_true_elec_E_reco_elec_E,
         k_true_nu_E_reco_nu_E,
+        k_true_elec_E_reco_elec_E_extra_bins,
+        k_true_nu_E_reco_nu_E_extra_bins,
         k_true_nu_vtx_x_reco_nu_vtx_x,
         k_true_nu_vtx_y_reco_nu_vtx_y,
         k_true_nu_vtx_z_reco_nu_vtx_z,
