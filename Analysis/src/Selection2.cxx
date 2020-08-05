@@ -20,7 +20,7 @@ void Selection::Initialise( const char * mc_file,
     
     std::cout << "\nInitialising..." << std::endl;
 
-    _util = _utility;
+    _util = _utility; 
 
     // Initialise the Selection cuts class
     _scuts.Initalise(_utility);
