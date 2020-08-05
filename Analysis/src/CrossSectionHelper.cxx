@@ -95,6 +95,12 @@ void CrossSectionHelper::LoopEvents(){
 
         double cv_weight = weight;
 
+        // Here we fill the resolution plots for the mc only
+        if (*classifcation != "data" && *classifcation != "ext" && *classifcation != "dirt" && gen == false) {
+            // If the electron energy in truth is zero then this wasnt a true nue, so dont fill either
+            if (elec_e != 0) FillResolutionHists(shr_energy_tot_cali, elec_e);
+        }
+
         // Loop over the reweighter labels
         for (unsigned int label = 0; label < reweighter_labels.size(); label++){
             
@@ -331,7 +337,6 @@ void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg,
     h_xsec->Scale(1.0 / (targ*flux) );
 
 }
-
 // -----------------------------------------------------------------------------
 double CrossSectionHelper::GetIntegratedFlux(){
 
@@ -521,6 +526,21 @@ void CrossSectionHelper::WriteHists(){
 
         // Go into the directory
         dir_labels[label]->cd();
+
+        // If its the CV then we want to write some other histograms
+        if (reweighter_labels.at(label) == "CV"){
+            
+            // Loop over the reco/truth hists
+            for (unsigned int l = 0; l < h_resolution.size(); l++){
+
+                // Loop over each histogram for each bin
+                for (unsigned int bin = 0; bin < h_resolution.at(l).size(); bin++){
+                    h_resolution.at(l).at(bin)->Write("",TObject::kOverwrite);
+                    
+                }
+            }
+
+        }
 
         // Loop over the universes
         for (unsigned int uni = 0; uni < h_cross_sec.at(label).size(); uni++ ){
@@ -730,6 +750,20 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
     // Reconstructed neutrino energy Bin definition
     bins.at(k_var_reco_nu_E) = { 0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0};
 
+    // These are for histogram titles so we know what bin we are looking at
+    std::vector<std::string> bin_labels = {
+        "0.0 - 0.5 GeV",
+        "0.5 - 1.0 GeV",
+        "1.0 - 1.5 GeV",
+        "1.5 - 2.0 GeV",
+        "2.0 - 2.5 GeV",
+        "2.5 - 3.0 GeV",
+        "3.0 - 3.5 GeV",
+        "3.5 - 4.0 GeV",
+        "4.0 - 4.5 GeV",
+        "4.5 - 5.0 GeV"
+    };
+
 
     // Resize to the number of reweighters
     h_cross_sec.resize(reweighter_labels.size());
@@ -833,6 +867,28 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
     
     } // End loop over the labels
 
+
+    // Now we want to set the size of the resolution histograms
+    h_resolution.resize(2); // One set for as a function of reco histograms and one set for true histograms
+
+    for (unsigned int l = 0; l < h_resolution.size(); l++){
+        h_resolution.at(l).resize(bins.at(k_var_reco_el_E).size()-1);
+    }
+
+    // Loop over the reco/truth hists
+    for (unsigned int l = 0; l < h_resolution.size(); l++){
+
+        // Loop over each histogram for each bin
+        for (unsigned int bin = 0; bin < h_resolution.at(l).size(); bin++){
+
+            if (l == 0) h_resolution.at(l).at(bin) = new TH1D( Form("h_resolution_reco_bin%i", bin+1), Form("Reco %s; Reco - True / Reco; Entries", bin_labels.at(bin).c_str()), 30, -3, 3); // We shift the bin numbers by 1 so they align with the stupid root definitions
+            if (l == 1) h_resolution.at(l).at(bin) = new TH1D( Form("h_resolution_true_bin%i", bin+1), Form("Reco %s; Reco - True / True; Entries", bin_labels.at(bin).c_str()), 30, -3, 3); // We shift the bin numbers by 1 so they align with the stupid root definitions
+            h_resolution.at(l).at(bin)->SetLineWidth(2);
+            h_resolution.at(l).at(bin)->SetLineColor(kBlack);
+            h_resolution.at(l).at(bin)->SetOption("hist");
+        }
+    }
+
     std::cout << "Initialisation of cross-section histograms is complete!" << std::endl;
 
 
@@ -857,4 +913,61 @@ void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double wei
 
 }
 // -----------------------------------------------------------------------------
+void CrossSectionHelper::FillResolutionHists(float shr_energy_tot_cali, float elec_e){
+
+    // 0.0 - 0.5 GeV
+    if (shr_energy_tot_cali >=0 && shr_energy_tot_cali < 0.5){
+        h_resolution.at(0).at(0)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
+        h_resolution.at(1).at(0)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    }
+    // 0.5 - 1.0 GeV
+    else if (shr_energy_tot_cali >= 0.5 && shr_energy_tot_cali < 1.0){
+        h_resolution.at(0).at(1)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
+        h_resolution.at(1).at(1)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    }
+    // 1.0 - 1.5 GeV
+    else if (shr_energy_tot_cali >= 1.0 && shr_energy_tot_cali < 1.5){
+        h_resolution.at(0).at(2)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
+        h_resolution.at(1).at(2)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    }
+    // 1.5 - 2.0 GeV
+    else if (shr_energy_tot_cali >= 1.5 && shr_energy_tot_cali < 2.0){
+        h_resolution.at(0).at(3)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
+        h_resolution.at(1).at(3)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    }
+    // 2.0 - 2.5 GeV
+    else if (shr_energy_tot_cali >= 2.0 && shr_energy_tot_cali < 2.5){
+        h_resolution.at(0).at(4)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
+        h_resolution.at(1).at(4)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    }
+    // 2.5 - 3.0 GeV
+    else if (shr_energy_tot_cali >= 2.5 && shr_energy_tot_cali < 3.0){
+        h_resolution.at(0).at(5)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
+        h_resolution.at(1).at(5)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    }
+    // 3.0 - 3.5 GeV
+    else if (shr_energy_tot_cali >= 3.0 && shr_energy_tot_cali < 3.5){
+        h_resolution.at(0).at(6)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
+        h_resolution.at(1).at(6)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    }
+    // 3.5 - 4.0 GeV
+    else if (shr_energy_tot_cali >= 3.5 && shr_energy_tot_cali < 4.0){
+        h_resolution.at(0).at(7)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
+        h_resolution.at(1).at(7)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    }
+    // 4.0 - 4.5 GeV
+    else if (shr_energy_tot_cali >= 4.0 && shr_energy_tot_cali < 4.5){
+        h_resolution.at(0).at(8)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
+        h_resolution.at(1).at(8)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    }
+    // 4.5 - 5.0 GeV
+    else if (shr_energy_tot_cali >= 4.5 && shr_energy_tot_cali < 5.0){
+        h_resolution.at(0).at(9)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
+        h_resolution.at(1).at(9)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    }
+    else {
+        std::cout << "Bin out of range!"<< std::endl;
+    }
+
+}
 // -----------------------------------------------------------------------------
