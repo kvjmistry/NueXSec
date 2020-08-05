@@ -1,13 +1,13 @@
-#include "../include/histogram_helper.h"
+#include "../include/HistogramHelper.h"
 
 // -----------------------------------------------------------------------------
-histogram_helper::~histogram_helper() { 
+HistogramHelper::~HistogramHelper() { 
     
     // Make sure the file is closed
     // f_nuexsec->Close();
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::MakeDirectory(){
+void HistogramHelper::MakeDirectory(){
         
     f_nuexsec->cd();
 
@@ -108,7 +108,7 @@ void histogram_helper::MakeDirectory(){
    
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::Initialise(int type, const char* run_period, const char * file_out, int weight_cfg, utility util ){
+void HistogramHelper::Initialise(int type, const char* run_period, const char * file_out, int weight_cfg, Utility util ){
 
     std::cout << "Initalising Histogram Helper, creating TFile and directories..." << std::endl;
 
@@ -198,7 +198,7 @@ void histogram_helper::Initialise(int type, const char* run_period, const char *
     MakeDirectory();
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::InitHistograms(){
+void HistogramHelper::InitHistograms(){
     
     
     // Resize the histogram vector. plot var, cuts, classifications
@@ -599,7 +599,7 @@ void histogram_helper::InitHistograms(){
 
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::FillHists(int type, int classification_index, std::string interaction, int _par_type, int cut_index, SliceContainer SC, double weight){
+void HistogramHelper::FillHists(int type, int classification_index, std::string interaction, int _par_type, int cut_index, SliceContainer SC, double weight){
 
     // Calculate some variables
     double reco_shr_p = std::sqrt(SC.shr_px*SC.shr_px + SC.shr_py*SC.shr_py + SC.shr_pz*SC.shr_pz);
@@ -1028,7 +1028,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
 
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::WriteReco(int type){
+void HistogramHelper::WriteReco(int type){
 
     f_nuexsec->cd();
 
@@ -1081,7 +1081,7 @@ void histogram_helper::WriteReco(int type){
     }
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::WriteRecoPar(int type){
+void HistogramHelper::WriteRecoPar(int type){
 
     f_nuexsec->cd();
 
@@ -1131,14 +1131,14 @@ void histogram_helper::WriteRecoPar(int type){
     }
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::FillTEfficiency(int cut_index, std::string classification, SliceContainer SC, double weight){
+void HistogramHelper::FillTEfficiency(int cut_index, std::string classification, SliceContainer SC, double weight){
 
     // Fill the histogram at the specified cut
     if (classification == "nue_cc" || classification == "nuebar_cc") TEfficiency_hists.at(k_eff_nu_E).at(cut_index)->Fill(SC.nu_e, weight);
     if (classification == "nue_cc" || classification == "nuebar_cc") TEfficiency_hists.at(k_eff_elec_E).at(cut_index)->Fill(SC.elec_e, weight);
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::WriteTEfficiency(){
+void HistogramHelper::WriteTEfficiency(){
     
     TDirectory *dir;
     bool bool_dir = _util.GetDirectory(f_nuexsec, dir ,"TEff");
@@ -1152,7 +1152,7 @@ void histogram_helper::WriteTEfficiency(){
     
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::WriteTrue(){
+void HistogramHelper::WriteTrue(){
     
     TDirectory *dir;
     bool bool_dir = _util.GetDirectory(f_nuexsec, dir ,"True");
@@ -1176,7 +1176,7 @@ void histogram_helper::WriteTrue(){
     
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::WriteFlash(){
+void HistogramHelper::WriteFlash(){
     
     TDirectory *dir;
     bool bool_dir = _util.GetDirectory(f_nuexsec, dir ,"Flash");
@@ -1191,7 +1191,7 @@ void histogram_helper::WriteFlash(){
     
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::WriteInteractions(){
+void HistogramHelper::WriteInteractions(){
     
     TDirectory *dir;
     bool bool_dir = _util.GetDirectory(f_nuexsec, dir ,"Interaction");
@@ -1208,7 +1208,7 @@ void histogram_helper::WriteInteractions(){
     
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::Write_2DSigBkgHists(){
+void HistogramHelper::Write_2DSigBkgHists(){
     
     TDirectory *dir;
     bool bool_dir = _util.GetDirectory(f_nuexsec, dir ,"2D");
@@ -1228,7 +1228,7 @@ void histogram_helper::Write_2DSigBkgHists(){
     
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::FillPiZeroHists(int classification_index, SliceContainer SC, double weight, int pizero_mode){
+void HistogramHelper::FillPiZeroHists(int classification_index, SliceContainer SC, double weight, int pizero_mode){
 
     if (pizero_mode == 0){
         TH1D_pi0_hists.at(k_pi0_mass).at(classification_index)->Fill(SC.pi0_mass_Y, weight);
@@ -1246,7 +1246,7 @@ void histogram_helper::FillPiZeroHists(int classification_index, SliceContainer 
 
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::FillNuMuHists(int classification_index, SliceContainer SC, double weight){
+void HistogramHelper::FillNuMuHists(int classification_index, SliceContainer SC, double weight){
 
     
     TH1D_numu_hists.at(k_track_theta).at(classification_index)->Fill(SC.trk_theta* 180/3.14159, weight);
@@ -1259,7 +1259,7 @@ void histogram_helper::FillNuMuHists(int classification_index, SliceContainer SC
 
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::WritePiZero(int type){
+void HistogramHelper::WritePiZero(int type){
     f_nuexsec->cd();
 
     TDirectory *dir;
@@ -1303,7 +1303,7 @@ void histogram_helper::WritePiZero(int type){
 
 }
 // -----------------------------------------------------------------------------
-void histogram_helper::WriteNuMu(int type){
+void HistogramHelper::WriteNuMu(int type){
     f_nuexsec->cd();
 
     TDirectory *dir;

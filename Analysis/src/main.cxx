@@ -1,4 +1,4 @@
-#include "../include/main.h"
+#include "../include/Main.h"
 
 int main(int argc, char *argv[]){
 
@@ -39,12 +39,12 @@ int main(int argc, char *argv[]){
     int weight{1};  // level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only
     
     // Class instances
-    xsecSelection::selection  _selection_instance;
-    utility _utility;
-    histogram_plotter _hplot;
-    CrossSectionHelper _xsec;
-    PrintHelper _phelper;
-    SystematicsHelper _syshelper;
+    xsecSelection::Selection  _selection_instance;
+    Utility              _utility;
+    HistogramPlotter     _hplot;
+    CrossSectionHelper   _xsec;
+    PrintHelper          _phelper;
+    SystematicsHelper    _syshelper;
 
     std::string usage = "\nFirst run the selection with the options: \n\n\033[0;31m./nuexsec --run <run period num> [options (see below)]\033[0m \n\n"
     "\033[0;34m[--mc <mc file>]\033[0m                                       \033[0;32mThe input overlay root file\033[0m\n\n"

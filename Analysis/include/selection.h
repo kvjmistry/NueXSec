@@ -1,12 +1,12 @@
 #ifndef SELECTION_h
 #define SELECTION_h
 
-#include "utility.h"
-#include "selection_cuts.h"
-#include "histogram_helper.h"
-#include "histogram_plotter.h"
+#include "Utility.h"
+#include "SelectionCuts.h"
+#include "HistogramHelper.h"
+#include "HistogramPlotter.h"
 #include "SliceContainer.h"
-#include "Passed_Container.h"
+#include "PassedContainer.h"
 #include "TreeHelper.h"
 
 #include "TThread.h"
@@ -20,7 +20,7 @@ run.
 
 namespace xsecSelection {
 
-    class selection {
+    class Selection {
 
         private:
     
@@ -64,9 +64,9 @@ namespace xsecSelection {
             TTree * eff_tree_out; // TTree to write to the efficiency vec to file for plotting
 
             // Class Instances
-            utility _util;
-            selection_cuts    _scuts;
-            std::vector<histogram_helper>  _hhelper; // One for each type e.g MC, Data, EXT..
+            Utility                        _util;
+            SelectionCuts                  _scuts;
+            std::vector<HistogramHelper>   _hhelper; // One for each type e.g MC, Data, EXT..
             std::vector<TreeHelper>        _thelper; // One for each type e.g MC, Data, EXT..
 
             // Variables -------------------------------------------------------
@@ -81,10 +81,10 @@ namespace xsecSelection {
             bool   detector_variations;
 
             // Passed Containers
-            std::vector<Passed_Container> mc_passed_v;   // MC Passed Container
-            std::vector<Passed_Container> data_passed_v; // Data Passed Container
-            std::vector<Passed_Container> ext_passed_v;  // EXT Passed Container
-            std::vector<Passed_Container> dirt_passed_v; // Dirt Passed Container
+            std::vector<PassedContainer> mc_passed_v;   // MC Passed Container
+            std::vector<PassedContainer> data_passed_v; // Data Passed Container
+            std::vector<PassedContainer> ext_passed_v;  // EXT Passed Container
+            std::vector<PassedContainer> dirt_passed_v; // Dirt Passed Container
             
             // Counter Container
             std::vector<std::vector<double>> counter_v;
@@ -103,7 +103,7 @@ namespace xsecSelection {
         public:
             // -----------------------------------------------------------------
             // Allow the utility class to modify the private member data of this class
-            friend class utility;
+            friend class Utility;
             // -----------------------------------------------------------------
             // Function to Initialise the selection class ----------------------
             void Initialise( const char * mc_file,
@@ -115,7 +115,7 @@ namespace xsecSelection {
                              const char * data_file_out,
                              const char * dirt_file_out,
                              const char * mc_tree_file_name_out,
-                             utility _utility,
+                             Utility _utility,
                              bool _slim,
                              int num_events,
                              const char * run_period,
@@ -127,7 +127,7 @@ namespace xsecSelection {
             // -----------------------------------------------------------------
             // Template code to apply selection cuts
             bool ApplyCuts(int type, int ievent,std::vector<std::vector<double>> &counter_v,
-                           std::vector<Passed_Container> &passed_v, SliceContainer &SC);
+                           std::vector<PassedContainer> &passed_v, SliceContainer &SC);
             // -----------------------------------------------------------------
             // Function to save all written histograms to file
             void SavetoFile();

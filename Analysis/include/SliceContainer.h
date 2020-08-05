@@ -6,7 +6,7 @@
 #include <TTree.h>
 #include <iostream>
 
-#include "utility.h"
+#include "Utility.h"
 
 /* 
 Class to hold information for the eventslice in the pandora ntuples for ease of use
@@ -19,7 +19,7 @@ public:
 
     // -------------------------------------------------------------------------
     // Initialise the class
-    void Initialise(TTree* tree, int type, TFile *f_flux_weights, const char * _run_period, utility util);
+    void Initialise(TTree* tree, int type, TFile *f_flux_weights, const char * _run_period, Utility util);
     // -------------------------------------------------------------------------
     // Function to classify the slice
     std::pair<std::string, int>  SliceClassifier(int type);
@@ -42,7 +42,7 @@ public:
     // -------------------------------------------------------------------------
 
 
-    utility _util;
+    Utility _util;
 
     int   selected;              // Adds at least 1 shower and containment????
     int   run;                   // Run

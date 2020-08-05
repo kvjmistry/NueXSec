@@ -1,14 +1,14 @@
-#include "../include/histogram_plotter.h"
+#include "../include/HistogramPlotter.h"
 
 // -----------------------------------------------------------------------------
-histogram_plotter::~histogram_plotter()
+HistogramPlotter::~HistogramPlotter()
 {
 
     // Make sure the file is closed
     // f_nuexsec->Close();
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *run_period, int weight_cfg, bool _area_norm, utility _utility, const char *variation)
+void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *run_period, int weight_cfg, bool _area_norm, Utility _utility, const char *variation)
 {
 
     std::cout << "Creating histograms and making plots" << std::endl;
@@ -222,7 +222,7 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
 
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Initalise(const char *hist_file_name, const char *_run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor, int weight_cfg)
+void HistogramPlotter::Initalise(const char *hist_file_name, const char *_run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor, int weight_cfg)
 {
 
     std::cout << "Initalising Histogram Plotter..." << std::endl;
@@ -272,7 +272,7 @@ void histogram_plotter::Initalise(const char *hist_file_name, const char *_run_p
     }
 }
 // -----------------------------------------------------------------------------
-std::vector<double> histogram_plotter::Chi2Calc(TH1D *h_mc_ext, TH1D *h_data, const bool area_norm, const double return_norm)
+std::vector<double> HistogramPlotter::Chi2Calc(TH1D *h_mc_ext, TH1D *h_data, const bool area_norm, const double return_norm)
 {
     const int n_bins = h_mc_ext->GetNbinsX();
 
@@ -342,7 +342,7 @@ std::vector<double> histogram_plotter::Chi2Calc(TH1D *h_mc_ext, TH1D *h_data, co
     return chi2;
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Draw_Run_Period(TCanvas *c)
+void HistogramPlotter::Draw_Run_Period(TCanvas *c)
 {
     c->cd();
 
@@ -375,7 +375,7 @@ void histogram_plotter::Draw_Run_Period(TCanvas *c)
     pt->Draw();
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Draw_Data_MC_Ratio(TCanvas *c, double ratio)
+void HistogramPlotter::Draw_Data_MC_Ratio(TCanvas *c, double ratio)
 {
     c->cd();
 
@@ -390,7 +390,7 @@ void histogram_plotter::Draw_Data_MC_Ratio(TCanvas *c, double ratio)
     pt->Draw();
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Draw_Data_POT(TCanvas *c, double pot)
+void HistogramPlotter::Draw_Data_POT(TCanvas *c, double pot)
 {
     c->cd();
 
@@ -408,7 +408,7 @@ void histogram_plotter::Draw_Data_POT(TCanvas *c, double pot)
     pt->Draw();
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Draw_WeightLabels(TCanvas *c)
+void HistogramPlotter::Draw_WeightLabels(TCanvas *c)
 {
     c->cd();
 
@@ -433,7 +433,7 @@ void histogram_plotter::Draw_WeightLabels(TCanvas *c)
         pt2->Draw();
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Draw_VarMode(TCanvas *c, const char *variation)
+void HistogramPlotter::Draw_VarMode(TCanvas *c, const char *variation)
 {
     c->cd();
 
@@ -450,7 +450,7 @@ void histogram_plotter::Draw_VarMode(TCanvas *c, const char *variation)
         pt->Draw();
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Draw_Area_Norm(TCanvas *c)
+void HistogramPlotter::Draw_Area_Norm(TCanvas *c)
 {
     c->cd();
 
@@ -466,7 +466,7 @@ void histogram_plotter::Draw_Area_Norm(TCanvas *c)
     pt->Draw();
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::SetTPadOptions(TPad *topPad, TPad *bottomPad)
+void HistogramPlotter::SetTPadOptions(TPad *topPad, TPad *bottomPad)
 {
 
     topPad->SetBottomMargin(0.05);
@@ -483,7 +483,7 @@ void histogram_plotter::SetTPadOptions(TPad *topPad, TPad *bottomPad)
     topPad->cd();
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::IncreaseLabelSize(TH1D *h){
+void HistogramPlotter::IncreaseLabelSize(TH1D *h){
 
     h->GetXaxis()->SetLabelSize(0.05);
     h->GetXaxis()->SetTitleSize(0.05);
@@ -493,7 +493,7 @@ void histogram_plotter::IncreaseLabelSize(TH1D *h){
     gPad->SetBottomMargin(0.12);
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::IncreaseLabelSize(TH2D *h) {
+void HistogramPlotter::IncreaseLabelSize(TH2D *h) {
 
     h->GetXaxis()->SetLabelSize(0.05);
     h->GetXaxis()->SetTitleSize(0.05);
@@ -508,7 +508,7 @@ void histogram_plotter::IncreaseLabelSize(TH2D *h) {
     // gPad->SetGridx();
 }
 // -----------------------------------------------------------------------------
-bool histogram_plotter::GetHistograms(std::vector<TH1D *> &hist, std::string hist_name, std::string cut_name, std::string plotmode, bool &found_data, bool &found_ext, bool &found_dirt)
+bool HistogramPlotter::GetHistograms(std::vector<TH1D *> &hist, std::string hist_name, std::string cut_name, std::string plotmode, bool &found_data, bool &found_ext, bool &found_dirt)
 {
 
     // Plots are by classifcation
@@ -735,7 +735,7 @@ bool histogram_plotter::GetHistograms(std::vector<TH1D *> &hist, std::string his
     return true;
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::SetFillColours(std::vector<TH1D *> &hist, std::string plotmode, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt)
+void HistogramPlotter::SetFillColours(std::vector<TH1D *> &hist, std::string plotmode, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt)
 {
 
     if (plotmode == "classifications" || plotmode == "classifications_pi0"|| plotmode == "classifications_numu")
@@ -784,7 +784,7 @@ void histogram_plotter::SetFillColours(std::vector<TH1D *> &hist, std::string pl
     }
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, std::vector<double> hist_integrals, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt, std::string plotmode){
+void HistogramPlotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, std::vector<double> hist_integrals, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt, std::string plotmode){
 
     if (found_data)
         leg_stack->AddEntry(hist.at(k_plot_data), Form("Beam-On Data (%2.1f)", hist_integrals.at(_util.k_leg_data)), "lep");
@@ -818,7 +818,7 @@ void histogram_plotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, 
     }
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, bool _area_norm, bool logy, double y_scale_factor, const char *x_axis_name,
+void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bool _area_norm, bool logy, double y_scale_factor, const char *x_axis_name,
                                   const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, double Data_POT,
                                   const char *print_name, bool override_data_mc_comparison, std::string plotmode, bool plotvar,
                                   const char *variation, const char *run_period, bool centerxaxis) {
@@ -1224,7 +1224,7 @@ void histogram_plotter::MakeStack(std::string hist_name, std::string cut_name, b
     // delete c;
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, double Data_POT, const char *variation)
+void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, double Data_POT, const char *variation)
 {
 
     // MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, const char* x_axis_name, double y_scale_factor,
@@ -1619,7 +1619,7 @@ void histogram_plotter::CallMakeStack(const char *run_period, int cut_index, dou
 
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeFlashPlot(double Data_POT, const char *print_name, std::string histname) {
+void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, std::string histname) {
 
     std::vector<TH1D *> hist(_util.k_type_MAX);
     std::vector<double> hist_integrals(_util.k_type_MAX, 0.0); // The integrals of all the histograms
@@ -1818,7 +1818,7 @@ void histogram_plotter::MakeFlashPlot(double Data_POT, const char *print_name, s
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeFlashPlotOMO(double Data_POT, const char *print_name, std::string histname)
+void HistogramPlotter::MakeFlashPlotOMO(double Data_POT, const char *print_name, std::string histname)
 {
 
     std::vector<TH1D *> hist(_util.k_type_MAX);
@@ -1963,7 +1963,7 @@ void histogram_plotter::MakeFlashPlotOMO(double Data_POT, const char *print_name
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeEfficiencyPlot(const char *print_name, const char *run_period) {
+void HistogramPlotter::MakeEfficiencyPlot(const char *print_name, const char *run_period) {
 
     TTree *mc_tree;
 
@@ -2051,7 +2051,7 @@ void histogram_plotter::MakeEfficiencyPlot(const char *print_name, const char *r
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeEfficiencyPlotByCut(const char *run_period, std::string var) {
+void HistogramPlotter::MakeEfficiencyPlotByCut(const char *run_period, std::string var) {
 
     std::vector<TH1D *> hist(_util.k_cuts_MAX); // The vector of histograms from the file for the plot
     std::vector<TEfficiency *> TEff_v(_util.k_cuts_MAX);
@@ -2116,7 +2116,7 @@ void histogram_plotter::MakeEfficiencyPlotByCut(const char *run_period, std::str
     }
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeInteractionPlot(const char *print_name, std::string cut_type){
+void HistogramPlotter::MakeInteractionPlot(const char *print_name, std::string cut_type){
 
     std::vector<TH1D *> hist(_util.interaction_types.size());
 
@@ -2186,7 +2186,7 @@ void histogram_plotter::MakeInteractionPlot(const char *print_name, std::string 
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::MakeInteractionEfficiency(const char *print_name){
+void HistogramPlotter::MakeInteractionEfficiency(const char *print_name){
 
     gStyle->SetOptStat(0);
 
@@ -2277,7 +2277,7 @@ void histogram_plotter::MakeInteractionEfficiency(const char *print_name){
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Plot2D_Signal_Background(const char *print_name, const char *histname){
+void HistogramPlotter::Plot2D_Signal_Background(const char *print_name, const char *histname){
 
     std::vector<TH2D *> hist(_util.sig_bkg_prefix.size());
 
@@ -2340,7 +2340,7 @@ void histogram_plotter::Plot2D_Signal_Background(const char *print_name, const c
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::CreateDirectory(std::string folder, const char *run_period) {
+void HistogramPlotter::CreateDirectory(std::string folder, const char *run_period) {
 
     std::string a = "if [ ! -d \"plots/";
     std::string b = "run" + std::string(run_period) + "/" + folder;
@@ -2351,7 +2351,7 @@ void histogram_plotter::CreateDirectory(std::string folder, const char *run_peri
     system(command.c_str());
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Save1DHists(const char *print_name, const char *histname, std::string cut_type) {
+void HistogramPlotter::Save1DHists(const char *print_name, const char *histname, std::string cut_type) {
 
     TH1D *hist;
     _util.GetHist(f_nuexsec, hist, Form("True/%s_MC_%s", histname, cut_type.c_str()));
@@ -2376,7 +2376,7 @@ void histogram_plotter::Save1DHists(const char *print_name, const char *histname
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
-void histogram_plotter::Save2DHists(const char *print_name, const char *histname, std::string cut_type, bool yex) {
+void HistogramPlotter::Save2DHists(const char *print_name, const char *histname, std::string cut_type, bool yex) {
 
     TH2D *hist;
     _util.GetHist(f_nuexsec, hist, Form("True/%s_MC_%s", histname, cut_type.c_str()));

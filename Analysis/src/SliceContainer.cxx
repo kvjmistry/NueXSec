@@ -1,7 +1,7 @@
 #include "../include/SliceContainer.h"
 
 // -----------------------------------------------------------------------------
-void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, const char * _run_period, utility util){
+void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, const char * _run_period, Utility util){
 
     std::cout << "Initalising Slice Container" << std::endl;
     _util = util;

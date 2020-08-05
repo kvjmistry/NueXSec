@@ -1,5 +1,5 @@
-#ifndef TREEHELPER_h
-#define TREEHELPER_h
+#ifndef TREEHELPER_H
+#define TREEHELPER_H
 
 #include "SliceContainer.h"
 
@@ -39,7 +39,7 @@ class TreeHelper{
     TFile* f_nuexsec;
 
     // Class instances
-    utility _util;
+    Utility _util;
 
     int _type{1};
 

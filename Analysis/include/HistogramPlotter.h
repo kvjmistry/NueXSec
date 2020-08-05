@@ -1,22 +1,22 @@
-#ifndef HISTOGRAM_PLOTTER_h
-#define HISTOGRAM_PLOTTER_h
+#ifndef HISTOGRAMPLOTTER_H
+#define HISTOGRAMPLOTTER_H
 
-#include "utility.h"
+#include "Utility.h"
 
 // Class for getting histograms which have been written to file and plot them 
 // in a pretty way
 // Inherits all tools from the histogram helper
-class histogram_plotter{
+class HistogramPlotter{
 
     public:
     
     
     // Destructor 
-    ~histogram_plotter(); 
+    ~HistogramPlotter(); 
 
     TFile *f_nuexsec;
 
-    utility _util;
+    Utility _util;
 
     std::string run_period;
 
@@ -30,7 +30,7 @@ class histogram_plotter{
 
     // -------------------------------------------------------------------------
     // Main function call to control this class
-    void MakeHistograms(const char * hist_file_name, const char *run_period, int weight_cfg, bool _area_norm, utility _utility, const char* variation);
+    void MakeHistograms(const char * hist_file_name, const char *run_period, int weight_cfg, bool _area_norm, Utility _utility, const char* variation);
     // -------------------------------------------------------------------------
     // Initalise the file input
     void Initalise(const char *hist_file_name, const char* _run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor, int weight_cfg);

@@ -1,8 +1,8 @@
-#include "../include/selection.h"
+#include "../include/Selection.h"
 
 namespace xsecSelection {
 // -----------------------------------------------------------------------------
-void selection::Initialise( const char * mc_file,
+void Selection::Initialise( const char * mc_file,
                             const char * ext_file,
                             const char * data_file,
                             const char * dirt_file,
@@ -11,7 +11,7 @@ void selection::Initialise( const char * mc_file,
                             const char * data_file_out,
                             const char * dirt_file_out,
                             const char * mc_tree_file_name_out,
-                            utility _utility,
+                            Utility _utility,
                             bool _slim,
                             int num_events,
                             const char * run_period,
@@ -22,10 +22,10 @@ void selection::Initialise( const char * mc_file,
 
     _util = _utility;
 
-    // Initialise the selection cuts class
+    // Initialise the Selection cuts class
     _scuts.Initalise(_utility);
 
-    // Display slimmed selection
+    // Display slimmed Selection
     if (_slim){
         std::cout << "\033[0;32m-------------------------------" << std::endl;
         std::cout << "     Running in Slim Mode!" << std::endl;
@@ -223,14 +223,14 @@ void selection::Initialise( const char * mc_file,
 
     } // End intialisation of dirt variables    
     
-    // Invoke main selection function
+    // Invoke main Selection function
     MakeSelection();
 
 } // END Initialise function
 // -----------------------------------------------------------------------------
-// Main function for selection
-void selection::MakeSelection(){
-    std::cout << "\n\033[0;32mNow Running the selection!\033[0m"<< std::endl;
+// Main function for Selection
+void Selection::MakeSelection(){
+    std::cout << "\n\033[0;32mNow Running the Selection!\033[0m"<< std::endl;
     
     int counter = 0;
 
@@ -283,7 +283,7 @@ void selection::MakeSelection(){
             // Apply NuMu Selection
             ApplyNuMuSelection(_util.k_mc, mc_SC);
             
-            // Apply the selection cuts 
+            // Apply the Selection cuts 
             bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
             if (!pass) continue;
 
@@ -316,7 +316,7 @@ void selection::MakeSelection(){
 
                 std::pair<std::string, int> classification = mc_SC.SliceClassifier(_util.k_mc);
                 
-                // If Passed selection or was a nue(bar) cc in the fv
+                // If Passed Selection or was a nue(bar) cc in the fv
                 if ( (mc_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true) || classification.first == "nue_cc" || classification.first == "nuebar_cc" ){
                 
                     run    = mc_SC.run;
@@ -376,7 +376,7 @@ void selection::MakeSelection(){
             if (!pass) continue;
         }
 
-        // Make the run subrun event file list after the selection 
+        // Make the run subrun event file list after the Selection 
         if (make_list){
 
             std::cout << "Making the run subrun list for selected data events..." << std::endl;
@@ -481,9 +481,9 @@ void selection::MakeSelection(){
 
     }
     // -------------------------------------------------------------------------
-    std::cout << "Finished running the selection!"<< std::endl;
+    std::cout << "Finished running the Selection!"<< std::endl;
 
-    // Print information from the selection, loop over the cuts
+    // Print information from the Selection, loop over the cuts
     for (unsigned int p=0; p < counter_v.size();p++){
 
         // Fill the counter trees
@@ -500,10 +500,10 @@ void selection::MakeSelection(){
     return;
 } // End Selection
 // -----------------------------------------------------------------------------
-bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> &counter_v,
-                           std::vector<Passed_Container> &passed_v, SliceContainer &SC){
+bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> &counter_v,
+                           std::vector<PassedContainer> &passed_v, SliceContainer &SC){
 
-    // Here we apply the selection cuts ----------------------------------------
+    // Here we apply the Selection cuts ----------------------------------------
     bool pass; // A flag to see if an event passes an event
 
     
@@ -668,7 +668,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
 
 }
 // -----------------------------------------------------------------------------
-void selection::SavetoFile(){
+void Selection::SavetoFile(){
 
     // Now saving histograms to file
     std::cout << "Now Saving Histograms to file" << std::endl;
@@ -724,7 +724,7 @@ void selection::SavetoFile(){
 
 } // End save to file
 // -----------------------------------------------------------------------------
-void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, std::pair<std::string, int> par_type, int cut_index, std::vector<std::vector<double>> &counter_v){
+void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, std::pair<std::string, int> par_type, int cut_index, std::vector<std::vector<double>> &counter_v){
     
     // Get the CV weight
     double weight = 1.0;
@@ -770,7 +770,7 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
 
 }
 // -----------------------------------------------------------------------------
-double selection::GetCVWeight(int type, SliceContainer SC){
+double Selection::GetCVWeight(int type, SliceContainer SC){
     
 
     // Always give weights of 1 to the off beam and data
@@ -830,7 +830,7 @@ double selection::GetCVWeight(int type, SliceContainer SC){
 
 }
 // -----------------------------------------------------------------------------
-void selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
+void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
 
     bool pass; // A flag to see if an event passes an event
 
@@ -895,7 +895,7 @@ void selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
 
 }
 // -----------------------------------------------------------------------------
-void selection::GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer &SC){
+void Selection::GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer &SC){
 
     // Fix the normalisation
     if (pizero_mode == 1){
@@ -926,7 +926,7 @@ void selection::GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer 
 
 }
 // -----------------------------------------------------------------------------
-void selection::ApplyNuMuSelection(int type, SliceContainer &SC){
+void Selection::ApplyNuMuSelection(int type, SliceContainer &SC){
 
     bool pass; // A flag to see if an event passes an event
 

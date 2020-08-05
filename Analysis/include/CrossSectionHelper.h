@@ -1,7 +1,7 @@
-#ifndef CROSSSECTIONHELPER_h
-#define CROSSSECTIONHELPER_h
+#ifndef CROSSSECTIONHELPER_H
+#define CROSSSECTIONHELPER_H
 
-#include "utility.h"
+#include "Utility.h"
 
 // Class for calculating the cross section and doing systematics
 class CrossSectionHelper{
@@ -14,7 +14,7 @@ class CrossSectionHelper{
     TFile* f_nuexsec, *fnuexsec_out;
 
     // Class instances
-    utility _util;
+    Utility _util;
 
      // Scale factors (everything is scaled to data)
     double mc_scale_factor     = 1.0;
@@ -162,7 +162,7 @@ class CrossSectionHelper{
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(const char *run_period, const char * xsec_file_in, utility _utility, const char* run_mode);
+    void Initialise(const char *run_period, const char * xsec_file_in, Utility _utility, const char* run_mode);
     // -------------------------------------------------------------------------
     // Function to loop over events and calculate the cross section
     void LoopEvents(); 

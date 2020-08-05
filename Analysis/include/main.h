@@ -1,8 +1,8 @@
-#ifndef MAIN_h
-#define MAIN_h
+#ifndef MAIN_H
+#define MAIN_H
 
-#include "utility.h"
-#include "selection.h"
+#include "Utility.h"
+#include "Selection.h"
 #include "CrossSectionHelper.h"
 #include "PrintHelper.h"
 #include "SystematicsHelper.h"

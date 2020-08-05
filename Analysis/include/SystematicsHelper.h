@@ -1,7 +1,7 @@
-#ifndef SYSTEMATICSHELPER_h
-#define SYSTEMATICSHELPER_h
+#ifndef SYSTEMATICSHELPER_H
+#define SYSTEMATICSHELPER_H
 
-#include "utility.h"
+#include "Utility.h"
 
 // Class for making plots for systematic studies
 class SystematicsHelper{
@@ -17,7 +17,7 @@ class SystematicsHelper{
     TFile *f_nuexsec;
 
     // Class instances
-    utility _util;
+    Utility _util;
 
     // Variables
     int run{0}, subrun{0}, event{0};
@@ -31,7 +31,7 @@ class SystematicsHelper{
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(const char *run_period, utility _utility, const char* _mode);
+    void Initialise(const char *run_period, Utility _utility, const char* _mode);
     // -------------------------------------------------------------------------
     // Function to loop over events and calculate the cross section
     void MakeHistograms(); 

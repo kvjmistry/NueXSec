@@ -1,7 +1,7 @@
-#include "../include/utility.h"
+#include "../include/Utility.h"
 
 // -----------------------------------------------------------------------------
-void utility::Initalise(const char* variation, bool overwritePOT, const char* run_period){
+void Utility::Initalise(const char* variation, bool overwritePOT, const char* run_period){
 
     std::cout << "Initialising Utility Class..." << std::endl;
 
@@ -66,7 +66,7 @@ void utility::Initalise(const char* variation, bool overwritePOT, const char* ru
 
 }
 // -----------------------------------------------------------------------------
-bool utility::GetFile(TFile* &f, TString string){
+bool Utility::GetFile(TFile* &f, TString string){
     f = TFile::Open(string);
     
     if (f == NULL) {
@@ -78,7 +78,7 @@ bool utility::GetFile(TFile* &f, TString string){
     }
 }
 // -----------------------------------------------------------------------------
-bool utility::GetTree(TFile* f, TTree* &T, TString string){
+bool Utility::GetTree(TFile* f, TTree* &T, TString string){
     T = (TTree*) f->Get(string);
     if (T == NULL) {
         std::cout << "\nfailed to get:\t" << string << "\tThis tree might not exist in the file\n" << std::endl;
@@ -90,7 +90,7 @@ bool utility::GetTree(TFile* f, TTree* &T, TString string){
     }
 }
 // -----------------------------------------------------------------------------
-bool utility::GetHist(TFile* f, TH1D* &h, TString string){
+bool Utility::GetHist(TFile* f, TH1D* &h, TString string){
     h = (TH1D*) f->Get(string);
     if (h == NULL) {
         if (verbose) std::cout << "\nfailed to get:\t" << string << "\tThis histogram might not exist in the file\n" << std::endl;
@@ -101,7 +101,7 @@ bool utility::GetHist(TFile* f, TH1D* &h, TString string){
     }
 }
 // -----------------------------------------------------------------------------
-bool utility::GetHist(TFile* f, TH2D* &h, TString string){
+bool Utility::GetHist(TFile* f, TH2D* &h, TString string){
     h = (TH2D*) f->Get(string);
     if (h == NULL) {
         if (verbose) std::cout << "\nfailed to get:\t" << string << "\tThis histogram might not exist in the file\n" << std::endl;
@@ -112,7 +112,7 @@ bool utility::GetHist(TFile* f, TH2D* &h, TString string){
     }
 }
 // -----------------------------------------------------------------------------
-bool utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
+bool Utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     d = (TDirectory*)f->Get(string);
     if (d == NULL) {
         // std::cout << "\nfailed to get:\t" << string << "\tThis directory might not exist in the file\n" << std::endl;
@@ -123,7 +123,7 @@ bool utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     }
 }
 // -----------------------------------------------------------------------------
-void utility::Tabulate(bool inFV, std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight) {
+void Utility::Tabulate(bool inFV, std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight) {
 
     if (type == k_mc){
         
@@ -199,7 +199,7 @@ void utility::Tabulate(bool inFV, std::string interaction, std::string classific
     
 }
 // -----------------------------------------------------------------------------
-double utility::GetNuMIAngle(double px, double py, double pz, std::string direction){
+double Utility::GetNuMIAngle(double px, double py, double pz, std::string direction){
 
     // Variables
     TRotation RotDet2Beam;             // Rotations
@@ -263,7 +263,7 @@ double utility::GetNuMIAngle(double px, double py, double pz, std::string direct
     return theta;
 }
 // -----------------------------------------------------------------------------
-bool utility::in_fv(double x, double y, double z){
+bool Utility::in_fv(double x, double y, double z){
     
     // Require the vertex is in the boundary
     if ( x   >= config_v.at(k_config_x1) && x <= config_v.at(k_config_x2)

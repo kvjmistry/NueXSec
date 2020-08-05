@@ -1,7 +1,7 @@
-#ifndef PRINTHELPER_h
-#define PRINTHELPER_h
+#ifndef PRINTHELPER_H
+#define PRINTHELPER_H
 
-#include "utility.h"
+#include "Utility.h"
 
 // Class for printing the selection results
 class PrintHelper{
@@ -12,7 +12,7 @@ class PrintHelper{
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(const char* run_period, const char * mc_file_in, bool _print_mc, bool _print_data, bool _print_ext, bool _print_dirt, utility _utility );
+    void Initialise(const char* run_period, const char * mc_file_in, bool _print_mc, bool _print_data, bool _print_ext, bool _print_dirt, Utility _utility );
     // -------------------------------------------------------------------------
     // Function to print the selection
     void PrintResults();
@@ -29,7 +29,7 @@ class PrintHelper{
     TFile* f_mc, *f_data, *f_ext, *f_dirt;
 
     // Class instances
-    utility _util;
+    Utility _util;
 
    
     TTree * mc_counter_tree; // MC Counter Tree

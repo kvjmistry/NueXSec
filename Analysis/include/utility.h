@@ -1,5 +1,5 @@
-#ifndef UTILITY_h
-#define UTILITY_h
+#ifndef UTILITY_H
+#define UTILITY_H
 
 // STD includes
 #include <iostream>
@@ -35,7 +35,7 @@
 // from this class. Mainly provided useful functions.
 
 
-class utility{
+class Utility{
 
 public:
     // -------------------------------------------------------------------------

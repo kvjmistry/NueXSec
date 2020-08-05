@@ -1,21 +1,21 @@
-#ifndef SELECTION_CUTS_h
-#define SELECTION_CUTS_h
+#ifndef SELECTIONCUTS_H
+#define SELECTIONCUTS_H
 
-#include "utility.h"
+#include "Utility.h"
 #include "SliceContainer.h"
 
 // Class for applying the selection cuts. Cut classes will inherit
 // from this one and override function
-class selection_cuts{
+class SelectionCuts{
 
     private:
 
     public:
-    selection_cuts(){}; // Default constructor
+    SelectionCuts(){}; // Default constructor
 
-    utility _util;
+    Utility _util;
     // -------------------------------------------------------------------------
-    void Initalise(utility _utility);
+    void Initalise(Utility _utility);
     // -------------------------------------------------------------------------
     // Software Trigger -- MC Only
     bool swtrig(SliceContainer &SC, int type);

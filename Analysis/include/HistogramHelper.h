@@ -1,25 +1,25 @@
-#ifndef HISTOGRAM_HELPER_h
-#define HISTOGRAM_HELPER_h
+#ifndef HISTOGRAMHELPER_H
+#define HISTOGRAMHELPER_H
 
-#include "selection_cuts.h"
+#include "SelectionCuts.h"
 #include "SliceContainer.h"
 
 // Class for filling and saving histograms. 
-class histogram_helper{
+class HistogramHelper{
 
     public:
     // Default constructor
-    histogram_helper(){};
+    HistogramHelper(){};
     
     // Destructor 
-    ~histogram_helper(); 
+    ~HistogramHelper(); 
 
     // The output file
     TFile* f_nuexsec;
 
     // Class instances
-    utility _util;
-    selection_cuts _scuts;
+    Utility _util;
+    SelectionCuts _scuts;
     int _type{1};
 
     // weight variable (will equal multiple of all weights)
@@ -30,7 +30,7 @@ class histogram_helper{
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(int type, const char *run_period, const char * file_out, int weight_cfg, utility util );
+    void Initialise(int type, const char *run_period, const char * file_out, int weight_cfg, Utility util );
     // -------------------------------------------------------------------------
     // Initialise histograms
     void InitHistograms();

@@ -1,7 +1,7 @@
 #include "../include/SystematicsHelper.h"
 
 // -----------------------------------------------------------------------------
-void SystematicsHelper::Initialise(const char *_run_period, utility _utility, const char* _mode){
+void SystematicsHelper::Initialise(const char *_run_period, Utility _utility, const char* _mode){
 
     std::cout << "Initalising Systematics Helper..." << std::endl;
     _util = _utility;
