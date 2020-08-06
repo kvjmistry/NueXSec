@@ -123,7 +123,7 @@ bool Utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     }
 }
 // -----------------------------------------------------------------------------
-void Utility::Tabulate(bool inFV, std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight) {
+void Utility::Tabulate(bool inFV, std::string interaction, std::string classification, std::string pi0_classification, int type, std::vector<double> &counter_v, double weight) {
 
     if (type == k_mc){
         
@@ -159,6 +159,16 @@ void Utility::Tabulate(bool inFV, std::string interaction, std::string classific
             
             if (interaction == "numu_cc_qe" || interaction == "numu_cc_res" || interaction == "numu_cc_coh" || interaction == "numu_cc_dis" || interaction == "numu_cc_mec") counter_v.at(k_count_numu_cc_infv) += weight;
             if (interaction == "numu_bar_cc_qe" || interaction == "numu_bar_cc_res" || interaction == "numu_bar_cc_coh" || interaction == "numu_bar_cc_dis" || interaction == "numu_bar_cc_mec") counter_v.at(k_count_numubar_cc_infv) += weight;
+        
+            if (pi0_classification == "nue_cc")         counter_v.at(k_count_pi0_nue_cc_nopi0)    += weight;
+            if (pi0_classification == "nue_cc_pi0")     counter_v.at(k_count_pi0_nue_cc_pi0)      += weight;
+            if (pi0_classification == "nue_bar_cc")     counter_v.at(k_count_pi0_nuebar_cc_nopi0) += weight;
+            if (pi0_classification == "nue_bar_cc_pi0") counter_v.at(k_count_pi0_nuebar_cc_pi0)   += weight;
+            if (pi0_classification == "numu_cc")        counter_v.at(k_count_pi0_numu_cc_nopi0)   += weight;
+            if (pi0_classification == "numu_cc_pi0")    counter_v.at(k_count_pi0_numu_cc_pi0)     += weight;
+            if (pi0_classification == "nue_nc" || pi0_classification == "nue_bar_nc" || pi0_classification == "numu_nc" || pi0_classification == "numu_bar_nc")                 counter_v.at(k_count_pi0_nc_nopi0) += weight;
+            if (pi0_classification == "nue_nc_pi0" || pi0_classification == "nue_bar_nc_pi0" || pi0_classification == "numu_nc_pi0" || pi0_classification == "numu_bar_nc_pi0") counter_v.at(k_count_pi0_nc_pi0) += weight;
+        
         }
 
         // These are all the nus, but now in the cryostat volume
@@ -169,15 +179,15 @@ void Utility::Tabulate(bool inFV, std::string interaction, std::string classific
         if (interaction == "numu_bar_cc_qe" || interaction == "numu_bar_cc_res" || interaction == "numu_bar_cc_coh" || interaction == "numu_bar_cc_dis" || interaction == "numu_bar_cc_mec") counter_v.at(k_count_numubar_cc_incryo) += weight;
         
         // Classification
-        if (classification == "nue_cc")       counter_v.at(k_count_nue_cc)       += weight;
-        if (classification == "nuebar_cc")    counter_v.at(k_count_nuebar_cc)    += weight;
-        if (classification == "nu_out_fv")    counter_v.at(k_count_nu_out_fv)    += weight;
-        if (classification == "nc")           counter_v.at(k_count_nc)           += weight;
-        if (classification == "nc_pi0")       counter_v.at(k_count_nc_pi0)       += weight;
-        if (classification == "numu_cc")      counter_v.at(k_count_numu_cc)      += weight;
-        if (classification == "numu_cc_pi0")  counter_v.at(k_count_numu_cc_pi0)  += weight;
-        if (classification == "cosmic")       counter_v.at(k_count_cosmic)       += weight;
-        if (classification == "unmatched")    counter_v.at(k_count_unmatched)    += weight;
+        if (classification == "nue_cc")           counter_v.at(k_count_nue_cc)           += weight;
+        if (classification == "nuebar_cc")        counter_v.at(k_count_nuebar_cc)        += weight;
+        if (classification == "nu_out_fv")        counter_v.at(k_count_nu_out_fv)        += weight;
+        if (classification == "nc")               counter_v.at(k_count_nc)               += weight;
+        if (classification == "nc_pi0")           counter_v.at(k_count_nc_pi0)           += weight;
+        if (classification == "numu_cc")          counter_v.at(k_count_numu_cc)          += weight;
+        if (classification == "numu_cc_pi0")      counter_v.at(k_count_numu_cc_pi0)      += weight;
+        if (classification == "cosmic")           counter_v.at(k_count_cosmic)           += weight;
+        if (classification == "unmatched")        counter_v.at(k_count_unmatched)        += weight;
         if (classification == "unmatched_nue")    counter_v.at(k_count_unmatched_nue)    += weight;
         if (classification == "cosmic_nue")       counter_v.at(k_count_cosmic_nue)       += weight;
         if (classification == "unmatched_nuebar") counter_v.at(k_count_unmatched_nuebar) += weight;

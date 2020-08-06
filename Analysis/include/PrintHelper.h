@@ -93,6 +93,15 @@ class PrintHelper{
     double count_numu_cc_incryo{0.0};
     double count_numubar_cc_incryo{0.0};
     
+    double count_pi0_nue_cc_nopi0{0.0};
+    double count_pi0_nue_cc_pi0{0.0};
+    double count_pi0_nuebar_cc_nopi0{0.0};
+    double count_pi0_nuebar_cc_pi0{0.0};
+    double count_pi0_numu_cc_nopi0{0.0};
+    double count_pi0_numu_cc_pi0{0.0};
+    double count_pi0_nc_nopi0{0.0};
+    double count_pi0_nc_pi0{0.0};
+
     double count_nue_cc{0.0};
     double count_nuebar_cc{0.0};
     double count_nu_out_fv{0.0};

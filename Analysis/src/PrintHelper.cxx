@@ -17,7 +17,7 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bo
     print_dirt  = _print_dirt;
 
     // define this to scale the MC to a desired POT
-    // double additional_scaling = 6e20/_util.config_v.at(_util.k_Run3_Data_POT); // Use this to scale the POT to set amount -- also chnage the run POT
+    // double additional_scaling = 6.0e20/_util.config_v.at(_util.k_Run1_Data_POT); // Use this to scale the POT to set amount -- also chnage the run POT
     double additional_scaling = 1.0; // Use this to use default
     if ( additional_scaling != 1.0) std::cout << "\033[0;34mWarning using an additional POT scale factor to print the selection results\033[0m" << std::endl;
 
@@ -134,21 +134,30 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bo
         mc_counter_tree->SetBranchAddress("count_numubar_cc_infv",   &count_numubar_cc_infv);
         mc_counter_tree->SetBranchAddress("count_numu_cc_incryo",    &count_numu_cc_incryo);
         mc_counter_tree->SetBranchAddress("count_numubar_cc_incryo", &count_numubar_cc_incryo);
+
+        mc_counter_tree->SetBranchAddress("count_pi0_nue_cc_nopi0",    &count_pi0_nue_cc_nopi0);
+        mc_counter_tree->SetBranchAddress("count_pi0_nue_cc_pi0",      &count_pi0_nue_cc_pi0);
+        mc_counter_tree->SetBranchAddress("count_pi0_nuebar_cc_nopi0", &count_pi0_nuebar_cc_nopi0);
+        mc_counter_tree->SetBranchAddress("count_pi0_nuebar_cc_pi0",   &count_pi0_nuebar_cc_pi0);
+        mc_counter_tree->SetBranchAddress("count_pi0_numu_cc_nopi0",   &count_pi0_numu_cc_nopi0);
+        mc_counter_tree->SetBranchAddress("count_pi0_numu_cc_pi0",     &count_pi0_numu_cc_pi0);
+        mc_counter_tree->SetBranchAddress("count_pi0_nc_nopi0",        &count_pi0_nc_nopi0);
+        mc_counter_tree->SetBranchAddress("count_pi0_nc_pi0",          &count_pi0_nc_pi0);
         
-        mc_counter_tree->SetBranchAddress("count_nue_cc",       &count_nue_cc);
-        mc_counter_tree->SetBranchAddress("count_nuebar_cc",    &count_nuebar_cc);
-        mc_counter_tree->SetBranchAddress("count_nu_out_fv",    &count_nu_out_fv);
-        mc_counter_tree->SetBranchAddress("count_cosmic",       &count_cosmic);
-        mc_counter_tree->SetBranchAddress("count_numu_cc",      &count_numu_cc);
-        mc_counter_tree->SetBranchAddress("count_numu_cc_pi0",  &count_numu_cc_pi0);
-        mc_counter_tree->SetBranchAddress("count_nc",           &count_nc);
-        mc_counter_tree->SetBranchAddress("count_nc_pi0",       &count_nc_pi0);
-        mc_counter_tree->SetBranchAddress("count_unmatched",    &count_unmatched);
-        mc_counter_tree->SetBranchAddress("count_unmatched_nue",    &count_unmatched_nue);
-        mc_counter_tree->SetBranchAddress("count_cosmic_nue",    &count_cosmic_nue);
-        mc_counter_tree->SetBranchAddress("count_unmatched_nuebar",    &count_unmatched_nuebar);
-        mc_counter_tree->SetBranchAddress("count_cosmic_nuebar",    &count_cosmic_nuebar);
-        mc_counter_tree->SetBranchAddress("count_total_mc",     &count_total_mc);
+        mc_counter_tree->SetBranchAddress("count_nue_cc",          &count_nue_cc);
+        mc_counter_tree->SetBranchAddress("count_nuebar_cc",       &count_nuebar_cc);
+        mc_counter_tree->SetBranchAddress("count_nu_out_fv",       &count_nu_out_fv);
+        mc_counter_tree->SetBranchAddress("count_cosmic",          &count_cosmic);
+        mc_counter_tree->SetBranchAddress("count_numu_cc",         &count_numu_cc);
+        mc_counter_tree->SetBranchAddress("count_numu_cc_pi0",     &count_numu_cc_pi0);
+        mc_counter_tree->SetBranchAddress("count_nc",              &count_nc);
+        mc_counter_tree->SetBranchAddress("count_nc_pi0",          &count_nc_pi0);
+        mc_counter_tree->SetBranchAddress("count_unmatched",       &count_unmatched);
+        mc_counter_tree->SetBranchAddress("count_unmatched_nue",   &count_unmatched_nue);
+        mc_counter_tree->SetBranchAddress("count_cosmic_nue",      &count_cosmic_nue);
+        mc_counter_tree->SetBranchAddress("count_unmatched_nuebar",&count_unmatched_nuebar);
+        mc_counter_tree->SetBranchAddress("count_cosmic_nuebar",   &count_cosmic_nuebar);
+        mc_counter_tree->SetBranchAddress("count_total_mc",        &count_total_mc);
     }
 
     if (print_data){
@@ -270,6 +279,11 @@ void PrintHelper::PrintResults(){
             printf (" %-17s: %-10.2f %-20s: %-10.2f\n", "Tot Nuebar in FV",  count_nuebar_cc_infv*mc_scale_factor,  "Tot Nuebar in Cryo",    count_nuebar_cc_incryo*mc_scale_factor);
             printf (" %-17s: %-10.2f %-20s: %-10.2f\n", "Tot NuMu in FV",    count_numu_cc_infv*mc_scale_factor,    "Tot NuMu in Cryo",      count_numu_cc_incryo*mc_scale_factor);
             printf (" %-17s: %-10.2f %-20s: %-10.2f\n", "Tot NuMubar in FV", count_numubar_cc_infv*mc_scale_factor, "Tot NuMubar in Cryo",   count_numubar_cc_incryo*mc_scale_factor);
+            std::cout << "------------------------------------------------" << std::endl;
+            printf (" %-17s: %-10.2f %-20s: %-10.2f\n", "Tot Nue 0 Pi0",     count_pi0_nue_cc_nopi0*mc_scale_factor,     "Tot Nuebar 0 Pi0",  count_pi0_nuebar_cc_nopi0*mc_scale_factor);
+            printf (" %-17s: %-10.2f %-20s: %-10.2f\n", "Tot Nue Pi0",       count_pi0_nue_cc_pi0*mc_scale_factor,       "Tot Nuebar Pi0",    count_pi0_nuebar_cc_pi0*mc_scale_factor);
+            printf (" %-17s: %-10.2f %-20s: %-10.2f\n", "Tot Numu 0 Pi0",    count_pi0_numu_cc_nopi0*mc_scale_factor,    "Tot NC 0 Pi0",      count_pi0_nc_nopi0*mc_scale_factor);
+            printf (" %-17s: %-10.2f %-20s: %-10.2f\n", "Tot Numu Pi0",      count_pi0_numu_cc_pi0*mc_scale_factor,      "Tot NC Pi0",        count_pi0_nc_pi0*mc_scale_factor);
         }
         
         if (print_mc){

@@ -56,7 +56,7 @@ public:
     bool GetHist(TFile* f, TH2D* &h, TString string);
     // -------------------------------------------------------------------------
     // Function to tabulate all the nuetrino types and flavours
-    void Tabulate(bool inFV, std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight);
+    void Tabulate(bool inFV, std::string interaction, std::string classification, std::string pi0_classification, int type, std::vector<double> &counter_v, double weight);
     // -------------------------------------------------------------------------
     // Function calculate theta
     double GetNuMIAngle(double px, double py, double pz, std::string direction);
@@ -334,6 +334,15 @@ public:
         k_count_numubar_cc_infv,
         k_count_numu_cc_incryo,
         k_count_numubar_cc_incryo,
+
+        k_count_pi0_nue_cc_nopi0,
+        k_count_pi0_nue_cc_pi0,
+        k_count_pi0_nuebar_cc_nopi0,
+        k_count_pi0_nuebar_cc_pi0,
+        k_count_pi0_numu_cc_nopi0,
+        k_count_pi0_numu_cc_pi0,
+        k_count_pi0_nc_nopi0,
+        k_count_pi0_nc_pi0,
         
         k_count_nue_cc,
         k_count_nuebar_cc,

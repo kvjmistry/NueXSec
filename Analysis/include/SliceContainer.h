@@ -40,6 +40,9 @@ public:
     // Get the dEdx on the plane with the most hits
     double GetdEdxMax();
     // -------------------------------------------------------------------------
+    // Determine if there is a truth pi0 in the event
+    std::string Pi0Classifier(int type);
+    // -------------------------------------------------------------------------
 
 
     Utility _util;

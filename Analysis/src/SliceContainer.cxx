@@ -708,6 +708,52 @@ std::string SliceContainer::SliceInteractionType(int type){
 
 }
 // -----------------------------------------------------------------------------
+std::string SliceContainer::Pi0Classifier(int type){
+
+    // Only do this for mc, otherwise return data type
+    if (type == _util.k_mc){
+        std::string nu = "temp";
+        std::string CCNC = "temp";
+
+        // Get the nu flavour
+        if (nu_pdg == 14 ||  nu_pdg == -14){
+            nu = "numu_";
+        }
+        else if (nu_pdg == 12){
+            nu = "nue_";
+        }
+        else if (nu_pdg == -12){
+            nu = "nue_bar_";
+        }
+        else {
+            nu = "unknown_";
+        }
+
+        // The interaction type
+        if (ccnc == _util.k_CC){
+            CCNC = "cc";
+        }
+        else CCNC = "nc";
+        
+
+        if (npi0 > 0){
+            return nu + CCNC + "_pi0";
+
+        }
+        else if (npi0 == 0 ) {
+            return nu + CCNC + "";
+
+        }
+        else {
+            return nu + CCNC + "unknown";
+        }
+    }
+    else return "data";
+
+
+
+}
+// -----------------------------------------------------------------------------
 double SliceContainer::GetPPFXCVWeight(){
     
     double weight = 1.0;

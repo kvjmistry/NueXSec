@@ -196,6 +196,16 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     counter_tree->Branch("count_numubar_cc_infv",   &count_numubar_cc_infv);
     counter_tree->Branch("count_numu_cc_incryo",    &count_numu_cc_incryo);
     counter_tree->Branch("count_numubar_cc_incryo", &count_numubar_cc_incryo);
+
+
+    counter_tree->Branch("count_pi0_nue_cc_nopi0",    &count_pi0_nue_cc_nopi0);
+    counter_tree->Branch("count_pi0_nue_cc_pi0",      &count_pi0_nue_cc_pi0);
+    counter_tree->Branch("count_pi0_nuebar_cc_nopi0", &count_pi0_nuebar_cc_nopi0);
+    counter_tree->Branch("count_pi0_nuebar_cc_pi0",   &count_pi0_nuebar_cc_pi0);
+    counter_tree->Branch("count_pi0_numu_cc_nopi0",   &count_pi0_numu_cc_nopi0);
+    counter_tree->Branch("count_pi0_numu_cc_pi0",     &count_pi0_numu_cc_pi0);
+    counter_tree->Branch("count_pi0_nc_nopi0",        &count_pi0_nc_nopi0);
+    counter_tree->Branch("count_pi0_nc_pi0",          &count_pi0_nc_pi0);
     
     counter_tree->Branch("count_nue_cc",       &count_nue_cc);
     counter_tree->Branch("count_nuebar_cc",    &count_nuebar_cc);
@@ -359,21 +369,30 @@ void TreeHelper::Fill_counters(std::vector<double> counter_v, bool bool_use_mc, 
         count_numubar_cc_infv   = counter_v.at(_util.k_count_numubar_cc_infv);
         count_numu_cc_incryo    = counter_v.at(_util.k_count_numu_cc_incryo);
         count_numubar_cc_incryo = counter_v.at(_util.k_count_numubar_cc_incryo);
+
+        count_pi0_nue_cc_nopi0    = counter_v.at(_util.k_count_pi0_nue_cc_nopi0);
+        count_pi0_nue_cc_pi0      = counter_v.at(_util.k_count_pi0_nue_cc_pi0);
+        count_pi0_nuebar_cc_nopi0 = counter_v.at(_util.k_count_pi0_nuebar_cc_nopi0);
+        count_pi0_nuebar_cc_pi0   = counter_v.at(_util.k_count_pi0_nuebar_cc_pi0);
+        count_pi0_numu_cc_nopi0   = counter_v.at(_util.k_count_pi0_numu_cc_nopi0);
+        count_pi0_numu_cc_pi0     = counter_v.at(_util.k_count_pi0_numu_cc_pi0);
+        count_pi0_nc_nopi0        = counter_v.at(_util.k_count_pi0_nc_nopi0);
+        count_pi0_nc_pi0          = counter_v.at(_util.k_count_pi0_nc_pi0);
         
-        count_nue_cc       = counter_v.at(_util.k_count_nue_cc);
-        count_nuebar_cc    = counter_v.at(_util.k_count_nuebar_cc);
-        count_nu_out_fv    = counter_v.at(_util.k_count_nu_out_fv);
-        count_cosmic       = counter_v.at(_util.k_count_cosmic);
-        count_numu_cc      = counter_v.at(_util.k_count_numu_cc);
-        count_numu_cc_pi0  = counter_v.at(_util.k_count_numu_cc_pi0);
-        count_nc           = counter_v.at(_util.k_count_nc);
-        count_nc_pi0       = counter_v.at(_util.k_count_nc_pi0);
-        count_unmatched    = counter_v.at(_util.k_count_unmatched);
+        count_nue_cc           = counter_v.at(_util.k_count_nue_cc);
+        count_nuebar_cc        = counter_v.at(_util.k_count_nuebar_cc);
+        count_nu_out_fv        = counter_v.at(_util.k_count_nu_out_fv);
+        count_cosmic           = counter_v.at(_util.k_count_cosmic);
+        count_numu_cc          = counter_v.at(_util.k_count_numu_cc);
+        count_numu_cc_pi0      = counter_v.at(_util.k_count_numu_cc_pi0);
+        count_nc               = counter_v.at(_util.k_count_nc);
+        count_nc_pi0           = counter_v.at(_util.k_count_nc_pi0);
+        count_unmatched        = counter_v.at(_util.k_count_unmatched);
         count_unmatched_nue    = counter_v.at(_util.k_count_unmatched_nue);
         count_cosmic_nue       = counter_v.at(_util.k_count_cosmic_nue);
         count_unmatched_nuebar = counter_v.at(_util.k_count_unmatched_nuebar);
         count_cosmic_nuebar    = counter_v.at(_util.k_count_cosmic_nuebar);
-        count_total_mc     = counter_v.at(_util.k_count_total_mc);
+        count_total_mc         = counter_v.at(_util.k_count_total_mc);
     }
 
     if (bool_use_data)  count_data         = counter_v.at(_util.k_count_data);
