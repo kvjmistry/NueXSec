@@ -826,7 +826,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
         double nu_phi_numi = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "numi_phi");
 
         // Also require in FV
-        if ( (classification_index == _util.k_nue_cc || classification_index == _util.k_nuebar_cc) && true_in_fv ){
+        if ( (classification_index == _util.k_nue_cc || classification_index == _util.k_nuebar_cc || classification_index == _util.k_unmatched_nue || classification_index == _util.k_cosmic_nue || classification_index == _util.k_unmatched_nuebar || classification_index == _util.k_cosmic_nuebar) && true_in_fv ){
             TH1D_true_hists.at(index).at(k_true_nue_theta)->Fill(nu_theta, weight);
             TH1D_true_hists.at(index).at(k_true_nue_phi_numi)  ->Fill(nu_phi_numi, weight);
             TH1D_true_hists.at(index).at(k_true_nue_theta_numi)->Fill(nu_theta_numi, weight);
@@ -976,7 +976,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
         // For the comparisons of dedx and shr vtx distance with the moliere average we make the histogram just before the cut is applied
         if (cut_index == _util.k_shr_moliere_avg - 1 ){
             
-            // This is the signal
+            // This is the signal -- dont include the unmathced cases since they should all be removed by this point
             if (classification_index == _util.k_nue_cc || classification_index == _util.k_nuebar_cc){
                 TH2D_hists.at(k_reco_shr_dEdx_moliere).at(_util.k_signal)->Fill(SC.shr_tkfit_dedx_Y, SC.shrmoliereavg, weight);
                 if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_moliere_shr_dist).at(_util.k_signal)->Fill(SC.shrmoliereavg, SC.shr_distance, weight);
@@ -992,7 +992,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
         // For the dEdx vs shower distance we make the histogram just before the cut is applied
         if (cut_index == _util.k_vtx_dist_dedx - 1 ){
             
-            // This is the signal
+            // This is the signal -- dont include the unmathced cases since they should all be removed by this point
             if (classification_index == _util.k_nue_cc || classification_index == _util.k_nuebar_cc){
                 if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(_util.k_signal)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
                 if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_max_shr_dist).at(_util.k_signal)->Fill(dedx_max, SC.shr_distance, weight);
@@ -1010,7 +1010,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
         // For the dEdx vs shower distance we make the histogram after the cut is applied
         if (cut_index == _util.k_vtx_dist_dedx ){
             
-            // This is the signal
+            // This is the signal -- dont include the unmathced cases since they should all be removed by this point
             if (classification_index == _util.k_nue_cc || classification_index == _util.k_nuebar_cc){
                 if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist_post).at(_util.k_signal)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
                 if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_max_shr_dist_post).at(_util.k_signal)->Fill(dedx_max, SC.shr_distance, weight);
@@ -1134,8 +1134,19 @@ void HistogramHelper::WriteRecoPar(int type){
 void HistogramHelper::FillTEfficiency(int cut_index, std::string classification, SliceContainer SC, double weight){
 
     // Fill the histogram at the specified cut
-    if (classification == "nue_cc" || classification == "nuebar_cc") TEfficiency_hists.at(k_eff_nu_E).at(cut_index)->Fill(SC.nu_e, weight);
-    if (classification == "nue_cc" || classification == "nuebar_cc") TEfficiency_hists.at(k_eff_elec_E).at(cut_index)->Fill(SC.elec_e, weight);
+
+    // If start of selection, efficiency denominator includes everything
+    if (cut_index == _util.k_unselected){
+        if (classification == "nue_cc" || classification == "nuebar_cc" || classification == "unmatched_nue" || classification == "unmatched_nuebar" || classification == "cosmic_nue" || classification == "cosmic_nuebar") TEfficiency_hists.at(k_eff_nu_E).at(cut_index)->Fill(SC.nu_e, weight);
+        if (classification == "nue_cc" || classification == "nuebar_cc" || classification == "unmatched_nue" || classification == "unmatched_nuebar" || classification == "cosmic_nue" || classification == "cosmic_nuebar") TEfficiency_hists.at(k_eff_elec_E).at(cut_index)->Fill(SC.elec_e, weight);
+    }
+    // After this, we consider the low purity (cosmics) interactions background -- keep the unreconstructed stuff, but this shouldnt affect the plots all that much
+    else {
+        if (classification == "nue_cc" || classification == "nuebar_cc" || classification == "unmatched_nue" || classification == "unmatched_nuebar") TEfficiency_hists.at(k_eff_nu_E).at(cut_index)->Fill(SC.nu_e, weight);
+        if (classification == "nue_cc" || classification == "nuebar_cc" || classification == "unmatched_nue" || classification == "unmatched_nuebar") TEfficiency_hists.at(k_eff_elec_E).at(cut_index)->Fill(SC.elec_e, weight);
+    }
+    
+    
 }
 // -----------------------------------------------------------------------------
 void HistogramHelper::WriteTEfficiency(){

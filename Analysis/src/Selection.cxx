@@ -317,13 +317,13 @@ void Selection::MakeSelection(){
                 std::pair<std::string, int> classification = mc_SC.SliceClassifier(_util.k_mc);
                 
                 // If Passed Selection or was a nue(bar) cc in the fv
-                if ( (mc_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true) || classification.first == "nue_cc" || classification.first == "nuebar_cc" ){
+                if ( (mc_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true) || classification.first == "nue_cc" || classification.first == "nuebar_cc" || classification.first == "unmatched_nue" || classification.first == "cosmic_nue" || classification.first == "unmatched_nuebar" || classification.first == "cosmic_nuebar"){
                 
                     run    = mc_SC.run;
                     subrun = mc_SC.sub;
                     event  = mc_SC.evt;
 
-                    if (classification.first == "nue_cc" || classification.first == "nuebar_cc" ) tot_gen++;
+                    if (classification.first == "nue_cc" || classification.first == "nuebar_cc" || classification.first == "unmatched_nue" || classification.first == "cosmic_nue" || classification.first == "unmatched_nuebar" || classification.first == "cosmic_nuebar") tot_gen++;
                     
                     if (mc_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true){
                         if (classification.first == "nue_cc" || classification.first == "nuebar_cc") tot_sig++;
@@ -510,15 +510,9 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Classify the event
     std::pair<std::string, int> classification = SC.SliceClassifier(type);      // Classification of the event
     std::string interaction                    = SC.SliceInteractionType(type); // Genie interaction type
-    //std::string interaction = "nue_cc_qe";
     std::string category                       = SC.SliceCategory();            // The pandora group slice category
     std::pair<std::string, int> particle_type  = SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
 
-    // Test code to isolate the low E nues in truth
-    // if (type == _util.k_mc && SC.nu_e > 0.5) return false;
-    // if (type == _util.k_mc && SC.shr_dedx_Y_cali > 7 && classification.second == _util.k_nue_cc){
-        // std::cout << SC.run << " " << SC.sub<<" " << SC.evt<<  std::endl;
-    // }
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
@@ -751,10 +745,10 @@ void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC, weight);
 
     // For the last cut we fill the tree  or the first cut and nue_cc (generated and unselected)
-    if ( (cut_index == _util.k_cuts_MAX - 1) || (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc) ) ){
+    if ( (cut_index == _util.k_cuts_MAX - 1) || (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc || classification.second == _util.k_unmatched_nue || classification.second == _util.k_cosmic_nue || classification.second == _util.k_unmatched_nuebar || classification.second == _util.k_cosmic_nuebar ) ) ){
 
         // This is a generated event, but unselected
-        if (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc )){
+        if (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc || classification.second == _util.k_unmatched)){
             _thelper.at(type).FillVars(SC, classification, true, weight, reco_nu_e);
         }
         else {
@@ -762,11 +756,6 @@ void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
         }
 
     }
-
-    // Fill the dedx ttree before shr dist cut and after cut dedx
-    // if (cut_index == _util.k_shr_distance - 1 || cut_index == _util.k_shr_distance || cut_index == _util.k_dEdx_y ){
-    //     _thelper.at(type).Fill_dedxVars(SC, classification, _util.cut_dirs.at(cut_index), weight);
-    // }
 
 }
 // -----------------------------------------------------------------------------

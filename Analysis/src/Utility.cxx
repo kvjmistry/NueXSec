@@ -178,6 +178,10 @@ void Utility::Tabulate(bool inFV, std::string interaction, std::string classific
         if (classification == "numu_cc_pi0")  counter_v.at(k_count_numu_cc_pi0)  += weight;
         if (classification == "cosmic")       counter_v.at(k_count_cosmic)       += weight;
         if (classification == "unmatched")    counter_v.at(k_count_unmatched)    += weight;
+        if (classification == "unmatched_nue")    counter_v.at(k_count_unmatched_nue)    += weight;
+        if (classification == "cosmic_nue")       counter_v.at(k_count_cosmic_nue)       += weight;
+        if (classification == "unmatched_nuebar") counter_v.at(k_count_unmatched_nuebar) += weight;
+        if (classification == "cosmic_nuebar")    counter_v.at(k_count_unmatched_nuebar) += weight;
 
         // Total selected MC events
         counter_v.at(k_count_total_mc) += weight;

@@ -485,19 +485,21 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
                 // Nue CC
                 else if (nu_pdg == 12){
                     
-                    if (nu_purity_from_pfp >= 0.05)                                 return std::make_pair("nue_cc",_util.k_nue_cc); // purity > 0.05% so signal
-                    else return std::make_pair("cosmic",_util.k_cosmic); // Classify as a cosmic with very low purity
+                    if (nu_purity_from_pfp >= 0.05)                                 return std::make_pair("nue_cc",       _util.k_nue_cc);    // purity > 0.05% so signal
+                    else if (nu_purity_from_pfp >= 0 && nu_purity_from_pfp < 0.05)  return std::make_pair("cosmic_nue",   _util.k_cosmic);    // Most of the slice from pandora was unmatched hits -- probably a cosmic
+                    else                                                            return std::make_pair("unmatched_nue",_util.k_unmatched_nue); // These events were not picked up by pandora at all
 
                 }
                 else if (nu_pdg == -12){
                     
-                    if (nu_purity_from_pfp >= 0.05)                                 return std::make_pair("nuebar_cc",_util.k_nuebar_cc); // purity > 0.05% so signal
-                    else return std::make_pair("cosmic",_util.k_cosmic); // Classify as a cosmic with very low purity
+                    if (nu_purity_from_pfp >= 0.05)                                 return std::make_pair("nuebar_cc",       _util.k_nuebar_cc); // purity > 0.05% so signal
+                    else if (nu_purity_from_pfp >= 0 && nu_purity_from_pfp < 0.05)  return std::make_pair("cosmic_nuebar",   _util.k_cosmic_nuebar);    // Most of the slice from pandora was unmatched hits -- probably a cosmic
+                    else                                                            return std::make_pair("unmatched_nuebar",_util.k_unmatched_nuebar); // These events were not picked up by pandora at all
 
                 }
                 // Unknown Neutrino Type
                 else {
-                    std::cout << "Unknown Neutrino Type..." << std::endl;
+                    std::cout << "Unknown Neutrino Type..., This will also mess up the efficecy if this occurs!" << std::endl;
                     return std::make_pair("unmatched",_util.k_unmatched);
                 }
 
@@ -529,7 +531,10 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
         return std::make_pair("dirt",_util.k_leg_dirt);
     }
     // What is this type?
-    else return std::make_pair("unmatched",_util.k_unmatched);
+    else {
+        std::cout << "Got a case we are calling unmatched, this is going to mess up the efficiency in the current way!" << std::endl;
+        return std::make_pair("unmatched",_util.k_unmatched);
+    }
     
 }
 // -----------------------------------------------------------------------------

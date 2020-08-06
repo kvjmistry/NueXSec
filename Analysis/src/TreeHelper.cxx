@@ -206,6 +206,10 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     counter_tree->Branch("count_nc",           &count_nc);
     counter_tree->Branch("count_nc_pi0",       &count_nc_pi0);
     counter_tree->Branch("count_unmatched",    &count_unmatched);
+    counter_tree->Branch("count_unmatched_nue",   &count_unmatched_nue);
+    counter_tree->Branch("count_cosmic_nue",      &count_cosmic_nue);
+    counter_tree->Branch("count_unmatched_nuebar",&count_unmatched_nuebar);
+    counter_tree->Branch("count_cosmic_nuebar",   &count_cosmic_nuebar);
     counter_tree->Branch("count_total_mc",     &count_total_mc);
     counter_tree->Branch("count_data",         &count_data);
     counter_tree->Branch("count_ext",          &count_ext);
@@ -365,6 +369,10 @@ void TreeHelper::Fill_counters(std::vector<double> counter_v, bool bool_use_mc, 
         count_nc           = counter_v.at(_util.k_count_nc);
         count_nc_pi0       = counter_v.at(_util.k_count_nc_pi0);
         count_unmatched    = counter_v.at(_util.k_count_unmatched);
+        count_unmatched_nue    = counter_v.at(_util.k_count_unmatched_nue);
+        count_cosmic_nue       = counter_v.at(_util.k_count_cosmic_nue);
+        count_unmatched_nuebar = counter_v.at(_util.k_count_unmatched_nuebar);
+        count_cosmic_nuebar    = counter_v.at(_util.k_count_cosmic_nuebar);
         count_total_mc     = counter_v.at(_util.k_count_total_mc);
     }
 

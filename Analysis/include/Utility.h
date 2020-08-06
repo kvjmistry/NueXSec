@@ -178,6 +178,10 @@ public:
                 "nc",
                 "nc_pi0",
                 "unmatched",
+                "unmatched_nue", // This is a special category to count nue/nuebar cc interactions that occur inside the fv, but were not reconstructed at all (so purity ends up < 0!). We need these for the efficeicny denom. 
+                "cosmic_nue",    // Another special category to separate standard nues from other cosmics. This category contains mis-reco'd nues as cosmics. We separate these out so we can count the efficency denominator properly
+                "unmatched_nuebar",
+                "cosmic_nuebar",
                 "ext",
                 "data",
                 "dirt"
@@ -264,6 +268,10 @@ public:
                 k_nc,
                 k_nc_pi0,
                 k_unmatched,
+                k_unmatched_nue,
+                k_cosmic_nue,
+                k_unmatched_nuebar,
+                k_cosmic_nuebar,
                 k_leg_ext,
                 k_leg_data,
                 k_leg_dirt,
@@ -336,6 +344,10 @@ public:
         k_count_nc,
         k_count_nc_pi0,
         k_count_unmatched,
+        k_count_unmatched_nue,
+        k_count_cosmic_nue,
+        k_count_unmatched_nuebar,
+        k_count_cosmic_nuebar,
         k_count_total_mc,
         
         k_count_data,

@@ -140,7 +140,7 @@ void CrossSectionHelper::LoopEvents(){
 
 
                 // Signal event
-                if ((*classifcation == "nue_cc" || *classifcation == "nuebar_cc") && gen == false) {
+                if ((*classifcation == "nue_cc" || *classifcation == "nuebar_cc" || *classifcation == "unmatched_nue" || *classifcation == "unmatched_nuebar") && gen == false) {
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_sig, weight_uni, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
@@ -151,7 +151,7 @@ void CrossSectionHelper::LoopEvents(){
                 // Background event
                 if ( *classifcation == "nu_out_fv"  || *classifcation == "cosmic"      ||
                      *classifcation == "numu_cc"    || *classifcation == "numu_cc_pi0" || *classifcation == "nc" || 
-                     *classifcation == "nc_pi0"     || *classifcation == "unmatched"){
+                     *classifcation == "nc_pi0"     || *classifcation == "cosmic_nue" || *classifcation == "cosmic_nuebar"){
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_bkg, weight_uni, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
@@ -160,7 +160,7 @@ void CrossSectionHelper::LoopEvents(){
                 }
                 
                 // Generated event
-                if ( (*classifcation == "nue_cc"|| *classifcation == "nuebar_cc" ) && gen == true) {
+                if ( (*classifcation == "nue_cc"|| *classifcation == "nuebar_cc" || *classifcation == "unmatched_nue" || *classifcation == "cosmic_nue" || *classifcation == "unmatched_nuebar" || *classifcation == "cosmic_nuebar") && gen == true) {
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_gen, weight_uni, shr_energy_tot_cali, elec_e, true_energy, reco_energy);

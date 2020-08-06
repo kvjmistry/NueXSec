@@ -156,6 +156,10 @@ class TreeHelper{
     double count_nc{0.0};
     double count_nc_pi0{0.0};
     double count_unmatched{0.0};
+    double count_unmatched_nue{0.0};
+    double count_cosmic_nue{0.0};
+    double count_unmatched_nuebar{0.0};
+    double count_cosmic_nuebar{0.0};
     double count_total_mc{0.0};
     double count_data{0.0};
     double count_ext{0.0};
