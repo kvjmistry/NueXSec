@@ -361,8 +361,8 @@ void Selection::MakeSelection(){
             data_tree->GetEntry(ievent);
 
             // Skip the events with different sw trigger configured
-            if (_run_period == 3 && data_SC.run < 16880 ){
-            // if (_run_period == 3 && data_SC.run > 16880 ){
+            if (_run_period == 3 && data_SC.run > 16880 ){
+            // if (_run_period == 3 && data_SC.run < 16880 ){
                 continue;
             }
 
@@ -432,8 +432,8 @@ void Selection::MakeSelection(){
             ext_tree->GetEntry(ievent); // TPC Objects
 
             // Skip the RHC events contaminated in the FHC files
-            if (_run_period == 3 && ext_SC.run < 16880 ){
-            // if (_run_period == 3 && ext_SC.run > 16880 ){
+            if (_run_period == 3 && ext_SC.run > 16880 ){
+            // if (_run_period == 3 && ext_SC.run < 16880 ){
                 continue;
             }
 

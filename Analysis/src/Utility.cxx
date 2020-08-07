@@ -131,26 +131,26 @@ void Utility::Tabulate(bool inFV, std::string interaction, std::string classific
         if (inFV){
             if (interaction == "nue_cc_qe")  counter_v.at(k_count_nue_cc_qe)  += weight; 
             if (interaction == "nue_cc_res") counter_v.at(k_count_nue_cc_res) += weight;
-            if (interaction == "nue_cc_coh") counter_v.at(k_count_nue_cc_dis) += weight;
-            if (interaction == "nue_cc_dis") counter_v.at(k_count_nue_cc_coh) += weight;
+            if (interaction == "nue_cc_dis") counter_v.at(k_count_nue_cc_dis) += weight;
+            if (interaction == "nue_cc_coh") counter_v.at(k_count_nue_cc_coh) += weight;
             if (interaction == "nue_cc_mec") counter_v.at(k_count_nue_cc_mec) += weight;
 
             if (interaction == "nue_bar_cc_qe")  counter_v.at(k_count_nuebar_cc_qe)  += weight; 
             if (interaction == "nue_bar_cc_res") counter_v.at(k_count_nuebar_cc_res) += weight;
-            if (interaction == "nue_bar_cc_coh") counter_v.at(k_count_nuebar_cc_dis) += weight;
-            if (interaction == "nue_bar_cc_dis") counter_v.at(k_count_nuebar_cc_coh) += weight;
+            if (interaction == "nue_bar_cc_dis") counter_v.at(k_count_nuebar_cc_dis) += weight;
+            if (interaction == "nue_bar_cc_coh") counter_v.at(k_count_nuebar_cc_coh) += weight;
             if (interaction == "nue_bar_cc_mec") counter_v.at(k_count_nuebar_cc_mec) += weight;
 
             if (interaction == "numu_cc_qe"  )  counter_v.at(k_count_numu_cc_qe)  += weight;
             if (interaction == "numu_cc_res" )  counter_v.at(k_count_numu_cc_res) += weight;
-            if (interaction == "numu_cc_coh" )  counter_v.at(k_count_numu_cc_dis) += weight;
-            if (interaction == "numu_cc_dis" )  counter_v.at(k_count_numu_cc_coh) += weight;
+            if (interaction == "numu_cc_dis" )  counter_v.at(k_count_numu_cc_dis) += weight;
+            if (interaction == "numu_cc_coh" )  counter_v.at(k_count_numu_cc_coh) += weight;
             if (interaction == "numu_cc_mec" )  counter_v.at(k_count_numu_cc_mec) += weight;
 
             if (interaction == "numu_bar_cc_qe")  counter_v.at(k_count_numubar_cc_qe)  += weight;
             if (interaction == "numu_bar_cc_res") counter_v.at(k_count_numubar_cc_res) += weight;
-            if (interaction == "numu_bar_cc_coh") counter_v.at(k_count_numubar_cc_dis) += weight;
-            if (interaction == "numu_bar_cc_dis") counter_v.at(k_count_numubar_cc_coh) += weight;
+            if (interaction == "numu_bar_cc_dis") counter_v.at(k_count_numubar_cc_dis) += weight;
+            if (interaction == "numu_bar_cc_coh") counter_v.at(k_count_numubar_cc_coh) += weight;
             if (interaction == "numu_bar_cc_mec") counter_v.at(k_count_numubar_cc_mec) += weight;
 
             // These are all the nus, but now in the fv

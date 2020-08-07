@@ -39,7 +39,7 @@ class HistogramPlotter{
     void MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, double y_scale_factor, const char* x_axis_name,
                                      const double leg_x1, const double leg_x2, const double leg_y1, double Data_POT, const double leg_y2,
                                      const char* print_name, bool override_data_mc_comparison, std::string plotmode, bool plotvar,
-                                     const char * variation, const char *run_period, bool centerxaxis );
+                                     const char * variation, const char *run_period, bool centerxaxis, bool scale );
     // -------------------------------------------------------------------------
     // Calculates the chi2
     // Returns reduced chi2, num mc+ext scaled to data POT, num data, num degrees of freedom, p value in vector respectively
@@ -96,7 +96,7 @@ class HistogramPlotter{
     void MakeEfficiencyPlotByCut(const char *run_period, std::string var);
     // -------------------------------------------------------------------------
     // True Neutino energy for nues broken down by genie interaction type
-    void MakeInteractionPlot(const char* print_name, std::string cut_type);
+    void MakeInteractionPlot(const char* print_name, std::string cut_type, bool scale);
     // -------------------------------------------------------------------------
     // Plot the 2D signal vs Background Plots
     void Plot2D_Signal_Background(const char* print_name, const char* histname);
