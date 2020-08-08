@@ -463,7 +463,7 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
         // Out of Fiducial Volume Event
         if (!is_in_fv) {
             // std::cout << "Purity of out of FV event: "<< nu_purity_from_pfp << std::endl;
-            if (nu_purity_from_pfp <= 0.05) return std::make_pair("cosmic",_util.k_cosmic);
+            if (nu_purity_from_pfp <= 0.5) return std::make_pair("cosmic",_util.k_cosmic);
             else return std::make_pair("nu_out_fv",_util.k_nu_out_fv);
         }
         // In FV event
@@ -476,7 +476,7 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
                 if (nu_pdg == 14 || nu_pdg == -14){
 
                     // Purity is low so return cosmic
-                    if (nu_purity_from_pfp == 0) return std::make_pair("cosmic",_util.k_cosmic);
+                    if (nu_purity_from_pfp <= 0.5) return std::make_pair("cosmic",_util.k_cosmic);
                     
                     if (npi0 > 0) return std::make_pair("numu_cc_pi0", _util.k_numu_cc_pi0); // has a pi0
                     else return std::make_pair("numu_cc",_util.k_numu_cc);
@@ -485,16 +485,16 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
                 // Nue CC
                 else if (nu_pdg == 12){
                     
-                    if (nu_purity_from_pfp >= 0.05)                                 return std::make_pair("nue_cc",       _util.k_nue_cc);    // purity > 0.05% so signal
-                    else if (nu_purity_from_pfp >= 0 && nu_purity_from_pfp < 0.05)  return std::make_pair("cosmic_nue",   _util.k_cosmic);    // Most of the slice from pandora was unmatched hits -- probably a cosmic
-                    else                                                            return std::make_pair("unmatched_nue",_util.k_unmatched_nue); // These events were not picked up by pandora at all
+                    if (nu_purity_from_pfp > 0.5)                                  return std::make_pair("nue_cc",       _util.k_nue_cc);    // purity > 0.5% so signal
+                    else if (nu_purity_from_pfp >= 0 && nu_purity_from_pfp <= 0.5) return std::make_pair("cosmic_nue",   _util.k_cosmic);    // Most of the slice from pandora was unmatched hits -- probably a cosmic
+                    else                                                           return std::make_pair("unmatched_nue",_util.k_unmatched_nue); // These events were not picked up by pandora at all
 
                 }
                 else if (nu_pdg == -12){
                     
-                    if (nu_purity_from_pfp >= 0.05)                                 return std::make_pair("nuebar_cc",       _util.k_nuebar_cc); // purity > 0.05% so signal
-                    else if (nu_purity_from_pfp >= 0 && nu_purity_from_pfp < 0.05)  return std::make_pair("cosmic_nuebar",   _util.k_cosmic_nuebar);    // Most of the slice from pandora was unmatched hits -- probably a cosmic
-                    else                                                            return std::make_pair("unmatched_nuebar",_util.k_unmatched_nuebar); // These events were not picked up by pandora at all
+                    if (nu_purity_from_pfp > 0.5)                                  return std::make_pair("nuebar_cc",       _util.k_nuebar_cc); // purity > 0.5% so signal
+                    else if (nu_purity_from_pfp >= 0 && nu_purity_from_pfp <= 0.5) return std::make_pair("cosmic_nuebar",   _util.k_cosmic_nuebar);    // Most of the slice from pandora was unmatched hits -- probably a cosmic
+                    else                                                           return std::make_pair("unmatched_nuebar",_util.k_unmatched_nuebar); // These events were not picked up by pandora at all
 
                 }
                 // Unknown Neutrino Type
@@ -508,7 +508,7 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
             else {
 
                 // Purity is low so return cosmic
-                if (nu_purity_from_pfp <= 0.05) return std::make_pair("cosmic",_util.k_cosmic);
+                if (nu_purity_from_pfp <= 0.5) return std::make_pair("cosmic",_util.k_cosmic);
 
                 if (npi0 > 0) return std::make_pair("nc_pi0",_util.k_nc_pi0);
                 else return std::make_pair("nc",_util.k_nc);

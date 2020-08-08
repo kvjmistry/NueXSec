@@ -121,27 +121,27 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
             std::string cut_type = "unselected";
             if (i == 1) cut_type = "selected";
 
-            Save1DHists(Form("plots/run%s/Truth/true_nue_theta_%s.pdf", run_period, cut_type.c_str()), "h_true_nue_theta", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_nue_phi_%s.pdf",   run_period, cut_type.c_str()), "h_true_nue_phi", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_nue_theta_numi_%s.pdf", run_period, cut_type.c_str()), "h_true_nue_theta_numi", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_nue_phi_numi_%s.pdf",   run_period, cut_type.c_str()), "h_true_nue_phi_numi", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_nue_angle_%s.pdf", run_period, cut_type.c_str()), "h_true_nue_angle", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_nue_px_%s.pdf",    run_period, cut_type.c_str()), "h_true_nue_px", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_nue_py_%s.pdf",    run_period, cut_type.c_str()), "h_true_nue_py", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_nue_pz_%s.pdf",    run_period, cut_type.c_str()), "h_true_nue_pz", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_nue_e_%s.pdf",     run_period, cut_type.c_str()), "h_true_nue_e", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_nue_p_%s.pdf",     run_period, cut_type.c_str()), "h_true_nue_p", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_vtx_x_%s.pdf",     run_period, cut_type.c_str()), "h_true_vtx_x", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_vtx_y_%s.pdf",     run_period, cut_type.c_str()), "h_true_vtx_y", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_vtx_z_%s.pdf",     run_period, cut_type.c_str()), "h_true_vtx_z", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_vtx_x_sce_%s.pdf", run_period, cut_type.c_str()), "h_true_vtx_x_sce", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_vtx_y_sce_%s.pdf", run_period, cut_type.c_str()), "h_true_vtx_y_sce", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_vtx_z_sce_%s.pdf", run_period, cut_type.c_str()), "h_true_vtx_z_sce", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_nu_ang_targ_%s.pdf",   run_period, cut_type.c_str()), "h_true_nu_ang_targ",   cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_elec_ang_targ_%s.pdf", run_period, cut_type.c_str()), "h_true_elec_ang_targ", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_elec_E_%s.pdf",     run_period, cut_type.c_str()),     "h_true_elec_E", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_elec_phi_%s.pdf",   run_period, cut_type.c_str()),     "h_true_elec_phi", cut_type);
-            Save1DHists(Form("plots/run%s/Truth/true_elec_theta_%s.pdf", run_period, cut_type.c_str()),     "h_true_elec_theta", cut_type);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_theta_%s.pdf", run_period, cut_type.c_str()), "h_true_nue_theta", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_phi_%s.pdf",   run_period, cut_type.c_str()), "h_true_nue_phi", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_theta_numi_%s.pdf", run_period, cut_type.c_str()), "h_true_nue_theta_numi", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_phi_numi_%s.pdf",   run_period, cut_type.c_str()), "h_true_nue_phi_numi", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_angle_%s.pdf", run_period, cut_type.c_str()), "h_true_nue_angle", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_px_%s.pdf",    run_period, cut_type.c_str()), "h_true_nue_px", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_py_%s.pdf",    run_period, cut_type.c_str()), "h_true_nue_py", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_pz_%s.pdf",    run_period, cut_type.c_str()), "h_true_nue_pz", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_e_%s.pdf",     run_period, cut_type.c_str()), "h_true_nue_e", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_nue_p_%s.pdf",     run_period, cut_type.c_str()), "h_true_nue_p", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_vtx_x_%s.pdf",     run_period, cut_type.c_str()), "h_true_vtx_x", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_vtx_y_%s.pdf",     run_period, cut_type.c_str()), "h_true_vtx_y", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_vtx_z_%s.pdf",     run_period, cut_type.c_str()), "h_true_vtx_z", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_vtx_x_sce_%s.pdf", run_period, cut_type.c_str()), "h_true_vtx_x_sce", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_vtx_y_sce_%s.pdf", run_period, cut_type.c_str()), "h_true_vtx_y_sce", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_vtx_z_sce_%s.pdf", run_period, cut_type.c_str()), "h_true_vtx_z_sce", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_nu_ang_targ_%s.pdf",   run_period, cut_type.c_str()), "h_true_nu_ang_targ",   cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_elec_ang_targ_%s.pdf", run_period, cut_type.c_str()), "h_true_elec_ang_targ", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_elec_E_%s.pdf",     run_period, cut_type.c_str()),     "h_true_elec_E", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_elec_phi_%s.pdf",   run_period, cut_type.c_str()),     "h_true_elec_phi", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_elec_theta_%s.pdf", run_period, cut_type.c_str()),     "h_true_elec_theta", cut_type, true);
 
             // Make the 2D histograms
             Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta_%s.pdf",          run_period, cut_type.c_str()), "h_true_nue_phi_theta", cut_type, false);
@@ -986,7 +986,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         if (hist.at(0)->GetMinimum() == 0.0)
             hist.at(k_plot_data)->SetMinimum(hist.at(0)->GetMinimum() + 0.0001 / 2.);
 
-        hist.at(_util.k_leg_data)->SetMaximum(y_maximum * (y_scale_factor * 500));
+        h_stack->SetMaximum(y_maximum * y_scale_factor);
 
         h_stack->Draw("hist");
     }
@@ -1317,8 +1317,11 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
 
     // Leading shower multiplicity
     MakeStack("h_reco_shower_multiplicity", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, true, 1.5, "Shower Multiplicty",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.5, "Shower Multiplicty",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shower_multiplicity.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, true, true);
+    MakeStack("h_reco_shower_multiplicity", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, true, 80, "Shower Multiplicty",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_shower_multiplicity_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, true, false);
 
     // Leading track multiplicity
     MakeStack("h_reco_track_multiplicity", _util.cut_dirs.at(cut_index).c_str(),
@@ -1349,6 +1352,9 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
     MakeStack("h_reco_shower_score", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Shower Score",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shower_score.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
+    MakeStack("h_reco_shower_score", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, true, 1.0, "Shower Score",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_shower_score_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, false);
 
     // Track score
     MakeStack("h_reco_track_score", _util.cut_dirs.at(cut_index).c_str(),
@@ -1442,11 +1448,11 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
 
     // Slice ID
     MakeStack("h_reco_nslice", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Pandora Slice ID",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.6, "Pandora Slice ID",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_nslice.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
     MakeStack("h_reco_nslice", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, true, 1.0, "Pandora Slice ID",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_nslice_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
+              area_norm, true, 800, "Pandora Slice ID",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_nslice_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, false);
 
     // Slice Cluster Fraction
     MakeStack("h_reco_slclustfrac", _util.cut_dirs.at(cut_index).c_str(),
@@ -1580,10 +1586,13 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
 
     // Contained Fraction
     MakeStack("h_reco_contained_fraction", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 0.1, "Contained Fraction (PFP hits in FV / hits in slice)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.0, "Contained Fraction (PFP hits in FV / hits in slice)",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_contained_fraction.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
+    MakeStack("h_reco_contained_fraction", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, true, 1.0, "Contained Fraction (PFP hits in FV / hits in slice)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_contained_fraction_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, false);
 
-    // Contained Fraction
+    // Run number
     MakeStack("h_reco_run_number", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Run Number",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_run_number.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
@@ -2370,7 +2379,7 @@ void HistogramPlotter::CreateDirectory(std::string folder, const char *run_perio
     system(command.c_str());
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::Save1DHists(const char *print_name, const char *histname, std::string cut_type) {
+void HistogramPlotter::Save1DHists(const char *print_name, const char *histname, std::string cut_type, bool scale) {
 
     TH1D *hist;
     _util.GetHist(f_nuexsec, hist, Form("True/%s_MC_%s", histname, cut_type.c_str()));
@@ -2378,8 +2387,21 @@ void HistogramPlotter::Save1DHists(const char *print_name, const char *histname,
     if (hist == NULL)
         std::cout << "couldn't get the hist!" << std::endl;
 
-    TCanvas *c = new TCanvas();
-    gPad->SetFixedAspectRatio();
+    // Derive scale factor to scale the interaction plots to 6.0e20 POT
+    double scale_factor{1.0};
+    if (scale){
+        if (run_period =="1") 
+            scale_factor = 6.0e20 / _util.config_v.at(_util.k_Run1_MC_POT);
+        else if (run_period == "3")
+            scale_factor = 6.0e20 / _util.config_v.at(_util.k_Run3_MC_POT);
+        else
+            std::cout << "Unknown Run Period Configured" << std::endl;
+    }
+
+    if (scale) hist->Scale(scale_factor);
+
+    TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
+    c->SetTopMargin(0.11);
 
     hist->SetStats(kFALSE);
 

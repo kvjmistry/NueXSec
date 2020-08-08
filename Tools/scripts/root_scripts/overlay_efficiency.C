@@ -5,44 +5,38 @@
 
 // Cut directory names -- harcoded, so need to be updated
 std::vector<std::string> cut_dirs = {
-        "Unselected",     // Unselected
-        "SoftwareTrig",   // Software Trigger
-        "Slice_ID",       // Slice ID
-        "e_candidate",    // Electron Candidate
-        "In_FV",          // In FV
-        "Topo_Score",     // Topological Score
-        "Contained_Frac", // Slice Contained Fraction
-        "Shower_Score",   // Track Score
-        "Michel_Rej",     // Michel Rejection
-        "ShrHits",        // Shower Hits
-        "HitRatio",       // Ratio of shr hits and slice hits
-        "Moliere_Avg",    // Shower Moliere Average
-        "ShrVtxDist_dEdx_y",
-        "dEdx_y_no_tracks",  // dEdx y plane no tracks
-        // "ShrVtxDistance", // Shower to vertex distance
-        // "dEdx_y",         // dEdx y plane
-        };
+            "Unselected",     // Unselected
+            "SoftwareTrig",   // Software Trigger
+            "Slice_ID",       // Slice ID
+            "e_candidate",    // Electron Candidate
+            "In_FV",          // In FV
+            "Contained_Frac", // Slice Contained Fraction
+            "Topo_Score",     // Topological Score
+            "Cosmic_IP",      // Pandora Cosmic Impact Parameter
+            "Shower_Score",   // Track Score
+            "HitRatio",       // Ratio of shr hits and slice hits
+            "Moliere_Avg",    // Shower Moliere Average
+            "ShrVtxDist_dEdx_max", // 2D cut for shower to vertex distance and dedx
+            "dEdx_max_no_tracks",  // dEdx all planes no tracks
+            };
 
 // enums for cut dirs
 enum enum_cut_dirs {
-            k_unselected,        // Unselected 
-            k_swtrig,            // Software Trigger
-            k_slice_id,          // Slice ID
-            k_e_candidate,       // Electron Candidate
-            k_in_fv,             // Reco Nu Vtx (SC Corr) In the FV 
-            k_topo_score,        // Topo Score
-            k_contained_frac,    // Slice Contained Fraction
-            k_shower_score,      // Shower Score
-            k_michel_rej,        // Michel Rejection
-            k_shr_hits,          // Shower Hits
-            k_hit_ratio,         // Ratio of shr hits and slice hits
-            k_shr_moliere_avg,   // Shower Moliere Average
-            k_vtx_dist_dedx,     //  2D cut for shower to vertex distance and dEdx. Only applied for > 1 track
-            k_dEdx_y_no_tracks,  // dEdx y plane when there is no tracks
-            // k_shr_distance,      // Shower to reco nu vertex distance
-            // k_dEdx_y,            // dEdx y plane
-            k_cuts_MAX
-            }; 
+                k_unselected,        // Unselected 
+                k_swtrig,            // Software Trigger
+                k_slice_id,          // Slice ID
+                k_e_candidate,       // Electron Candidate
+                k_in_fv,             // Reco Nu Vtx (SC Corr) In the FV 
+                k_contained_frac,    // Slice Contained Fraction
+                k_topo_score,        // Topo Score
+                k_cosmic_ip,         // Pandora Cosmic Impact Param 3D
+                k_shower_score,      // Shower Score
+                k_hit_ratio,         // Ratio of shr hits and slice hits
+                k_shr_moliere_avg,   // Shower Moliere Average
+                k_vtx_dist_dedx,     //  2D cut for shower to vertex distance and dEdx. Only applied for > 1 track
+                k_dEdx_max_no_tracks,// dEdx all planes when there is no tracks
+                k_cuts_MAX
+                }; 
 
 void populate_efficiency_vec(TH1D* h_eff, TH1D *h_pur, const char* input_file){
 

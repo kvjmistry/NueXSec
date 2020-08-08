@@ -323,7 +323,7 @@ void HistogramHelper::InitHistograms(){
         
             // Cosmic Inpact Parameter
             TH1D_hists.at(k_reco_cosmicIP).at(i).at(j)       = new TH1D ( Form("h_reco_cosmicIP_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 250);
-            TH1D_hists.at(k_reco_CosmicIPAll3D).at(i).at(j)  = new TH1D ( Form("h_reco_CosmicIPAll3D_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 250);
+            TH1D_hists.at(k_reco_CosmicIPAll3D).at(i).at(j)  = new TH1D ( Form("h_reco_CosmicIPAll3D_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 200);
             TH1D_hists.at(k_reco_CosmicDirAll3D).at(i).at(j) = new TH1D ( Form("h_reco_CosmicDirAll3D_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, -1, 1);
 
             // dEdx with the trackfit variable
@@ -480,7 +480,7 @@ void HistogramHelper::InitHistograms(){
             TH1D_true_hists.at(i).at(k_true_nu_ang_targ)     = new TH1D( Form("h_true_nu_ang_targ_%s_%s",     _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True #nu_{e} Angle from NuMI Target [degrees]; Entries",  40, 0, 180 );
             TH1D_true_hists.at(i).at(k_true_elec_ang_targ)   = new TH1D( Form("h_true_elec_ang_targ_%s_%s",   _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True electron Angle from NuMI Target [degrees]; Entries", 25, 0, 180 );
 
-            TH1D_true_hists.at(i).at(k_true_elec_E)     = new TH1D( Form("h_true_elec_E_%s_%s",     _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True electron energy [degrees]; Entries",                15, 0, 5 );
+            TH1D_true_hists.at(i).at(k_true_elec_E)     = new TH1D( Form("h_true_elec_E_%s_%s",     _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True electron energy [GeV]; Entries",                15, 0, 5 );
             TH1D_true_hists.at(i).at(k_true_elec_theta) = new TH1D( Form("h_true_elec_theta_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True electron BNB #theta [degrees]; Entries",            14, 0, 180 );
             TH1D_true_hists.at(i).at(k_true_elec_phi)   = new TH1D( Form("h_true_elec_phi_%s_%s",   _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True electron BNB #phi [degrees]; Entries",              14, 0, 40);
 
@@ -609,7 +609,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
     double SLOPE = 0.83;
     double reco_nu_e = (SC.shr_energy_tot_cali + INTERCEPT) / SLOPE + SC.trk_energy_tot;
 
-
+    // Check if the interaction was in the FV
     bool true_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z);
 
     // The angle of the reconstructed shower relative to the NuMI target to detector direction
@@ -617,6 +617,9 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
 
     // Get the trkfit dedx max variable
     double dedx_max = SC.GetdEdxMax();
+
+    // For filling histograms, we lump the cosmic nue and cosmic nuebar into the generic cosmic category (so the plots can be normalised properly)
+    if (classification_index == _util.k_cosmic_nue || classification_index == _util.k_cosmic_nuebar) classification_index = _util.k_cosmic;
     
     // Now fill the histograms!
     TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x, weight);

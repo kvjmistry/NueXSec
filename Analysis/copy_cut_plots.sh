@@ -16,9 +16,8 @@ cuts=(
   In_FV
   Contained_Frac
   Topo_Score
+  Cosmic_IP
   Shower_Score
-  Michel_Rej
-  ShrHits
   HitRatio
   Moliere_Avg
   ShrVtxDist_dEdx_max
@@ -28,16 +27,15 @@ cuts=(
 # the list of plots to copy
 cuts2=(
 reco_softwaretrig.pdf
-reco_nslice.pdf
-reco_shower_multiplicity.pdf
+reco_nslice_logy.pdf
+reco_shower_multiplicity_logy.pdf
 reco_vtx_x_sce.pdf
 reco_vtx_y_sce.pdf
 reco_vtx_z_sce.pdf
-reco_contained_fraction.pdf
+reco_contained_fraction_logy.pdf
 reco_topological_score.pdf
+reco_CosmicIPAll3D.pdf
 reco_shower_score.pdf
-reco_shower_energy_tot_cali.pdf
-reco_shr_hits_max.pdf
 reco_hits_ratio.pdf
 reco_shrmoliereavg.pdf
 reco_shower_to_vtx_dist.pdf

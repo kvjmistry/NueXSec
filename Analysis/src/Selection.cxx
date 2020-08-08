@@ -575,6 +575,16 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SelectionFill(type, SC, classification, interaction, pi0_classification, particle_type, _util.k_topo_score, counter_v );
 
     // *************************************************************************
+    // Cosmic Impact Parameter -------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.shr_cosmic_IP(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_cosmic_ip) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    SelectionFill(type, SC, classification, interaction, pi0_classification, particle_type, _util.k_cosmic_ip, counter_v );
+
+
+    // *************************************************************************
     // Shower Score ------------------------------------------------------------
     // *************************************************************************
     pass = _scuts.shower_score(SC);
@@ -582,24 +592,6 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, classification, interaction, pi0_classification, particle_type, _util.k_shower_score, counter_v );
-
-    // *************************************************************************
-    // Michel Rejection --------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.michel_rej(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_michel_rej) = pass;
-    if(!pass) return false; // Failed the cut!
-    
-    SelectionFill(type, SC, classification, interaction, pi0_classification, particle_type, _util.k_michel_rej, counter_v );
-
-    // *************************************************************************
-    // Shower Hits -------------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.shr_hits(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_shr_hits) = pass;
-    if(!pass) return false; // Failed the cut!
-    
-    SelectionFill(type, SC, classification, interaction, pi0_classification, particle_type, _util.k_shr_hits, counter_v );
 
     // *************************************************************************
     // Shower Hit Ratio  -------------------------------------------------------
@@ -726,7 +718,7 @@ void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
 
     // Try scaling the pi0 -- need to implement this as a configurable option
     // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
-    GetPiZeroWeight(weight, 0, SC);
+    GetPiZeroWeight(weight, 1, SC);
 
     
     // This is in many places, need to have a way for setting this number by default
@@ -885,6 +877,7 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
 }
 // -----------------------------------------------------------------------------
 void Selection::GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer &SC){
+
 
     // Fix the normalisation
     if (pizero_mode == 1){

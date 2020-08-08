@@ -67,6 +67,9 @@ void Utility::Initalise(const char* variation, bool overwritePOT, const char* ru
 }
 // -----------------------------------------------------------------------------
 bool Utility::GetFile(TFile* &f, TString string){
+    
+    if (string == "empty") return false;
+    
     f = TFile::Open(string);
     
     if (f == NULL) {
@@ -191,7 +194,7 @@ void Utility::Tabulate(bool inFV, std::string interaction, std::string classific
         if (classification == "unmatched_nue")    counter_v.at(k_count_unmatched_nue)    += weight;
         if (classification == "cosmic_nue")       counter_v.at(k_count_cosmic_nue)       += weight;
         if (classification == "unmatched_nuebar") counter_v.at(k_count_unmatched_nuebar) += weight;
-        if (classification == "cosmic_nuebar")    counter_v.at(k_count_unmatched_nuebar) += weight;
+        if (classification == "cosmic_nuebar")    counter_v.at(k_count_cosmic_nuebar)    += weight;
 
         // Total selected MC events
         counter_v.at(k_count_total_mc) += weight;

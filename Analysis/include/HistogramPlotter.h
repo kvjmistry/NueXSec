@@ -105,7 +105,7 @@ class HistogramPlotter{
     void CreateDirectory(std::string folder, const char *run_period);
     // -------------------------------------------------------------------------
     // Script to get the 1D histograms and save them as a PDF
-    void Save1DHists(const char* print_name, const char* histname, std::string cut_type);
+    void Save1DHists(const char* print_name, const char* histname, std::string cut_type, bool scale);
     // -------------------------------------------------------------------------
     // Script to get the 2D histograms and save them as a PDF
     void Save2DHists(const char* print_name, const char* histname, std::string cut_type, bool yex);

@@ -229,17 +229,17 @@ bool SelectionCuts::shr_dist_dEdx_max(SliceContainer &SC){
 }
 // -----------------------------------------------------------------------------
 bool SelectionCuts::shr_hitratio(SliceContainer &SC){
-    if (SC.hits_ratio > 0.7 ) return true; // pass 
+    if (SC.hits_ratio > 0.5 ) return true; // pass 
     else return false;                     // fail
 }
 // -----------------------------------------------------------------------------
 bool SelectionCuts::shr_cosmic_IP(SliceContainer &SC){
-    if (SC.CosmicIP > 20 ) return true;    // pass 
+    if (SC.CosmicIPAll3D > 15 ) return true;    // pass 
     else return false;                     // fail
 }
 // -----------------------------------------------------------------------------
 bool SelectionCuts::contained_frac(SliceContainer &SC){
-    if (SC.contained_fraction >= 0.75 ) return true;    // pass 
+    if (SC.contained_fraction >= 0.85 ) return true;    // pass 
     else return false;                     // fail
 }
 // -----------------------------------------------------------------------------
