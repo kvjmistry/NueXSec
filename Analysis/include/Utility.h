@@ -124,7 +124,7 @@ public:
             "Contained_Frac", // Slice Contained Fraction
             "Topo_Score",     // Topological Score
             "Cosmic_IP",      // Pandora Cosmic Impact Parameter
-            "Shower Score",   // Track Score < 0.5
+            "Shower_Score",   // Track Score < 0.5
             "HitRatio",       // Ratio of shr hits and slice hits
             "Moliere_Avg",    // Shower Moliere Average
             "ShrVtxDist_dEdx_max", // 2D cut for shower to vertex distance and dedx

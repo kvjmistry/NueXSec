@@ -238,7 +238,8 @@ void Selection::MakeSelection(){
     if (bool_use_mc){
         std::cout << "\nStarting Selection over MC" << std::endl;
 
-        int numu_pi{0}, numubar_pi{0}, nue_pi{0}, nuebar_pi{0}; // Total number of 1pi events
+        std::ofstream run_subrun_file_mc;
+        run_subrun_file_mc.open(Form("files/run%i_run_subrun_list_mc.txt",_run_period));
 
         // Event loop
         for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
@@ -254,27 +255,6 @@ void Selection::MakeSelection(){
             // Get the entry in the tree
             mc_tree->GetEntry(ievent); 
 
-            // Set the dEdx Max variable
-
-            // Get the 1 pion events for kirsty
-            if (mc_SC.isVtxInFiducial){
-                if (mc_SC.nu_pdg == 14){
-                    if (mc_SC.npion == 1) numu_pi ++;
-                }
-                if (mc_SC.nu_pdg == -14){
-                    if (mc_SC.npion == 1) numubar_pi ++;
-                }
-
-                if (mc_SC.nu_pdg == 12){
-                    if (mc_SC.npion == 1) nue_pi ++;
-                }
-
-                if (mc_SC.nu_pdg == -12){
-                    if (mc_SC.npion == 1) nuebar_pi ++;
-                }
-            }
-            
-
             // std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
 
             // Apply Pi0 Selection
@@ -285,67 +265,24 @@ void Selection::MakeSelection(){
             
             // Apply the Selection cuts 
             bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
-            if (!pass) continue;
+            
+            // If the event passed the selection then save the run subrun event to file
+            if (pass) run_subrun_file_mc << mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt << '\n';
 
 
         } // End Event loop
 
+        run_subrun_file_mc.close();
+
         std::cout << "Ending Selection over MC" << std::endl;
-        // std::cout << "numu_pi: " << numu_pi << std::endl;
-        // std::cout << "numubar_pi: " << numubar_pi << std::endl;
-        // std::cout << "nue_pi: "  << nue_pi  << std::endl;
-        // std::cout << "nuebar_pi: "  << nuebar_pi  << std::endl;
-
-
-        if (make_list){
-
-            // Loop again to and write events that pass to a file
-            std::cout << "Making the run subrun list for selected mc events..." << std::endl;
-            int run, subrun, event;
-            std::ofstream run_subrun_file;
-            run_subrun_file.open(Form("files/run%i_run_subrun_list_mc.txt",_run_period));
-
-            int tot_gen{0};
-            int tot_sig{0};
-            int tot_bkg{0};
-
-            // Event loop
-            for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
-
-                mc_tree->GetEntry(ievent); 
-
-                std::pair<std::string, int> classification = mc_SC.SliceClassifier(_util.k_mc);
-                
-                // If Passed Selection or was a nue(bar) cc in the fv
-                if ( (mc_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true) || classification.first == "nue_cc" || classification.first == "nuebar_cc" || classification.first == "unmatched_nue" || classification.first == "cosmic_nue" || classification.first == "unmatched_nuebar" || classification.first == "cosmic_nuebar"){
-                
-                    run    = mc_SC.run;
-                    subrun = mc_SC.sub;
-                    event  = mc_SC.evt;
-
-                    if (classification.first == "nue_cc" || classification.first == "nuebar_cc" || classification.first == "unmatched_nue" || classification.first == "cosmic_nue" || classification.first == "unmatched_nuebar" || classification.first == "cosmic_nuebar") tot_gen++;
-                    
-                    if (mc_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true){
-                        if (classification.first == "nue_cc" || classification.first == "nuebar_cc") tot_sig++;
-                        else tot_bkg++;
-                    } 
-                    
-                    // std::cout <<  mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt <<  std::endl;
-                    run_subrun_file << run << " " << subrun << " " << event << '\n';
-                    
-                }
-
-                
-
-            } // End Event loop
-
-            // std::cout << "tot gen: " << tot_gen << "  tot sig: " << tot_sig << "  tot bkg: " << tot_bkg<< std::endl;
-        }
 
     }
     // Data --------------------------------------------------------------------
     if (bool_use_data){
         std::cout << "\nStarting Selection over Data" << std::endl;
+
+        std::ofstream run_subrun_file_data;
+        run_subrun_file_data.open(Form("files/run%i_run_subrun_list_data.txt",_run_period));
 
         for (int ievent = 0; ievent < data_tree_total_entries; ievent++){
 
@@ -373,50 +310,21 @@ void Selection::MakeSelection(){
             ApplyNuMuSelection(_util.k_data, data_SC);
 
             bool pass = ApplyCuts(_util.k_data, ievent, counter_v, data_passed_v, data_SC);
-            if (!pass) continue;
-        }
-
-        // Make the run subrun event file list after the Selection 
-        if (make_list){
-
-            std::cout << "Making the run subrun list for selected data events..." << std::endl;
-
-            int run, subrun, event;
-            std::ofstream run_subrun_file;
-            run_subrun_file.open(Form("files/run%i_run_subrun_list_data.txt",_run_period));
-
-            // Loop over the data events and make a run_subrun_event filelist
-            for (int ievent = 0; ievent < data_tree_total_entries; ievent++){
             
-                if (data_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true ){
-                    
-                    // Get the entry in the tree
-                    data_tree->GetEntry(ievent);
-
-                    run    = data_SC.run;
-                    subrun = data_SC.sub;
-                    event  = data_SC.evt;
-
-                    double INTERCEPT = 0.0;
-                    double SLOPE = 0.83;
-                    double reco_nu_e = (data_SC.shr_energy_tot_cali + INTERCEPT) / SLOPE + data_SC.trk_energy_tot;
-
-                    // std::cout << run << " " << subrun << " " << event << " " << reco_nu_e <<  '\n';
-
-                    run_subrun_file << run << " " << subrun << " " << event << '\n';
-
-                }
-                
-            }
-
-            run_subrun_file.close();
+            // If the event passed the selection then save the run subrun event to file
+            if (pass) run_subrun_file_data << data_SC.run << " " << data_SC.sub << " " << data_SC.evt << '\n';
         }
+
+        run_subrun_file_data.close();
         
         std::cout << "Ending Selection over Data" << std::endl;
     }
     // EXT ---------------------------------------------------------------------
     if (bool_use_ext){
         std::cout << "\nStarting Selection over EXT" << std::endl;
+
+        std::ofstream run_subrun_file_ext;
+        run_subrun_file_ext.open(Form("files/run%i_run_subrun_list_ext.txt",_run_period));
 
         for (int ievent = 0; ievent < ext_tree_total_entries; ievent++){
 
@@ -444,15 +352,23 @@ void Selection::MakeSelection(){
             ApplyNuMuSelection(_util.k_ext, ext_SC);
 
             bool pass = ApplyCuts(_util.k_ext, ievent, counter_v, ext_passed_v, ext_SC);
-            if (!pass) continue;
+            
+            // If the event passed the selection then save the run subrun event to file
+            if (pass) run_subrun_file_ext << ext_SC.run << " " << ext_SC.sub << " " << ext_SC.evt << '\n';
         }
          
+        run_subrun_file_ext.close();
+
         std::cout << "Ending Selection over EXT" << std::endl;
 
     }
     // Dirt --------------------------------------------------------------------
     if (bool_use_dirt){
+
         std::cout << "\nStarting Selection over Dirt" << std::endl;
+
+        std::ofstream run_subrun_file_dirt;
+        run_subrun_file_dirt.open(Form("files/run%i_run_subrun_list_dirt.txt",_run_period));
 
         for (int ievent = 0; ievent < dirt_tree_total_entries; ievent++){
 
@@ -474,8 +390,12 @@ void Selection::MakeSelection(){
             ApplyNuMuSelection(_util.k_dirt, dirt_SC);
 
             bool pass = ApplyCuts(_util.k_dirt, ievent, counter_v, dirt_passed_v, dirt_SC);
-            if (!pass) continue;
+            
+            // If the event passed the selection then save the run subrun event to file
+            if (pass) run_subrun_file_dirt << dirt_SC.run << " " << dirt_SC.sub << " " << dirt_SC.evt << '\n';
         }
+
+        run_subrun_file_dirt.close();
          
         std::cout << "Ending Selection over Dirt" << std::endl;
 
@@ -483,7 +403,7 @@ void Selection::MakeSelection(){
     // -------------------------------------------------------------------------
     std::cout << "Finished running the Selection!"<< std::endl;
 
-    // Print information from the Selection, loop over the cuts
+    // Save information from the Selection so we can print
     for (unsigned int p=0; p < counter_v.size();p++){
 
         // Fill the counter trees
@@ -629,25 +549,6 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, classification, interaction, pi0_classification, particle_type, _util.k_dEdx_max_no_tracks, counter_v );
-
-
-    // // *************************************************************************
-    // // Shower to Vertex Distance --------------------------------------------
-    // // *************************************************************************
-    // pass = _scuts.shr_distance(SC);
-    // passed_v.at(ievent).cut_v.at(_util.k_shr_distance) = pass;
-    // if(!pass) return false; // Failed the cut!
-    
-    // SelectionFill(type, SC, classification, interaction, pi0_classification, particle_type, _util.k_shr_distance, counter_v );
-
-    // // *************************************************************************
-    // // dEdx in y plane ---------------------------------------------------------
-    // // *************************************************************************
-    // pass = _scuts.dEdx_y(SC);
-    // passed_v.at(ievent).cut_v.at(_util.k_dEdx_y) = pass;
-    // // if(!pass) return false; // Failed the cut!
-    
-    // SelectionFill(type, SC, classification, interaction, pi0_classification, particle_type, _util.k_dEdx_y, counter_v );
 
     // ************************************************************************n*
     return true;
