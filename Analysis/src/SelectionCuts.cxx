@@ -117,7 +117,7 @@ bool SelectionCuts::dEdx_max_no_tracks(SliceContainer &SC){
     double dedx_var = dedx_max;
     
     // Kill the background region
-    if ( (dedx_var >= 2.7 && dedx_var < 5.7) || (dedx_var < 1.7) ){
+    if ( (dedx_var >= 2.7 && dedx_var < 5.5) || (dedx_var < 1.7) ){
         return false;
     }
     // Try and recover the events in the other planes
@@ -180,28 +180,12 @@ bool SelectionCuts::shr_dist_dEdx_max(SliceContainer &SC){
 
     if (SC.n_tracks == 0) return true; // Dont apply this cut if there is no tracks
 
-    if (dedx_var < 0) return false;
-    
-    else if (dedx_var >= 0 && dedx_var < 0.5){
-        return false;
-    }
-    
-    else if (dedx_var >= 0.5 && dedx_var < 1.75){
-        if (SC.shr_distance > 4 ) return false;
+    if (dedx_var <= 0) return false;
+
+    else if (dedx_var > 0 && dedx_var < 1.75){
+        if (SC.shr_distance > 3 ) return false;
         else return true;
     }
-
-    // For only y plane
-    // else if (dedx_var >= 1.75 && dedx_var < 2.3){ 
-    //     if (SC.shr_distance > 8 ) return false;
-    //     else return true;
-    // }
-    // else if (dedx_var >= 2.3 && dedx_var < 3.5){
-    //     if (SC.shr_distance > 3 ) return false;
-    //     else return true;
-    // }
-
-    // for all planes
     else if (dedx_var >= 1.75 && dedx_var < 2.5){ 
         if (SC.shr_distance > 12 ) return false;
         else return true;
@@ -210,8 +194,6 @@ bool SelectionCuts::shr_dist_dEdx_max(SliceContainer &SC){
         if (SC.shr_distance > 3 ) return false;
         else return true;
     }
-
-
     else if (dedx_var >= 3.5 && dedx_var < 4.7){
         if (SC.shr_distance > 0 ) return false;
         else return true;

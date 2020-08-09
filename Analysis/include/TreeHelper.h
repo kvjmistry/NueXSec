@@ -101,14 +101,11 @@ class TreeHelper{
 
 
     // vars for dedx
-    float shr_dedx_Y_cali{0.0},        shr_dedx_V_cali{0.0},        shr_dedx_U_cali{0.0};
+    unsigned int shr_hits_u_tot{0},         shr_hits_v_tot{0},         shr_hits_y_tot{0};
     float shr_tkfit_dedx_Y{0.0},       shr_tkfit_dedx_V{0.0},       shr_tkfit_dedx_U{0.0};
-    float shr_tkfit_dedx_Y_alt{0.0},   shr_tkfit_dedx_V_alt{0.0},   shr_tkfit_dedx_U_alt{0.0};
-    float shr_tkfit_2cm_dedx_Y{0.0},   shr_tkfit_2cm_dedx_V{0.0},   shr_tkfit_2cm_dedx_U{0.0};
-    float shr_tkfit_gap05_dedx_Y{0.0}, shr_tkfit_gap05_dedx_V{0.0}, shr_tkfit_gap05_dedx_U{0.0};
-    float shr_tkfit_gap10_dedx_Y{0.0}, shr_tkfit_gap10_dedx_V{0.0}, shr_tkfit_gap10_dedx_U{0.0};
     float shr_distance{0.0};
     float shr_theta{0.0};
+    int npi0{0};
 
     std::string cut;
 

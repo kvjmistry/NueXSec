@@ -503,7 +503,6 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     
     SelectionFill(type, SC, classification, interaction, pi0_classification, particle_type, _util.k_cosmic_ip, counter_v );
 
-
     // *************************************************************************
     // Shower Score ------------------------------------------------------------
     // *************************************************************************
@@ -539,6 +538,8 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, classification, interaction, pi0_classification, particle_type, _util.k_vtx_dist_dedx, counter_v );
+
+    if (data_SC.run == 4971 && data_SC.evt == 9103) std::cout << data_SC.run << " " << data_SC.sub << " " << data_SC.evt << " " << SC.GetdEdxMax() << std::endl;
 
     // *************************************************************************
     // dEdx in all planes for 0 track events --------------------------------------
@@ -648,6 +649,11 @@ void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
             _thelper.at(type).FillVars(SC, classification, false, weight, reco_nu_e);
         }
 
+    }
+
+    // Fill the dedx ttree before shr dist dedx cut and after cut dedx
+    if (cut_index == _util.k_vtx_dist_dedx - 1 || cut_index == _util.k_vtx_dist_dedx){
+        _thelper.at(type).Fill_dedxVars(SC, classification, _util.cut_dirs.at(cut_index), weight);
     }
 
 }

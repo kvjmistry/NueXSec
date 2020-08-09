@@ -797,31 +797,50 @@ double SliceContainer::GetdEdxMax(){
 
     double dedx_max = -1;
 
+    // We want to also use the dedx when it is defined properly. Sometimes, the plane can have hits but an undefined dedx
+    // use the dedx where we get the max number of hits and the dedx > 0
+    int temp_shr_hits_u_tot = shr_hits_u_tot;
+    int temp_shr_hits_v_tot = shr_hits_v_tot;
+    int temp_shr_hits_y_tot = shr_hits_y_tot;
+
+    // If the dedx is undefined, set the hits to zero
+    if (shr_tkfit_dedx_U <= 0) temp_shr_hits_u_tot = 0;
+    if (shr_tkfit_dedx_V <= 0) temp_shr_hits_v_tot = 0;
+    if (shr_tkfit_dedx_Y <= 0) temp_shr_hits_y_tot = 0;
+
+
     // Collection plane is the largest
-    if (shr_hits_y_tot > shr_hits_u_tot && shr_hits_y_tot > shr_hits_v_tot ){
+    if (temp_shr_hits_y_tot > temp_shr_hits_u_tot && temp_shr_hits_y_tot > temp_shr_hits_v_tot ){
         dedx_max = shr_tkfit_dedx_Y;
     }
     // V Plane is the largest
-    else if (shr_hits_v_tot > shr_hits_u_tot && shr_hits_v_tot > shr_hits_y_tot) {
+    else if (temp_shr_hits_v_tot > temp_shr_hits_u_tot && temp_shr_hits_v_tot > temp_shr_hits_y_tot) {
         dedx_max = shr_tkfit_dedx_V;
+        
     }
     // U Plane is the largest
-    else if (shr_hits_u_tot > shr_hits_v_tot && shr_hits_u_tot > shr_hits_y_tot){
+    else if (temp_shr_hits_u_tot > temp_shr_hits_v_tot && temp_shr_hits_u_tot > temp_shr_hits_y_tot){
         dedx_max = shr_tkfit_dedx_U;
+        // std::cout << shr_tkfit_dedx_U << " " << shr_tkfit_dedx_V << " " << shr_tkfit_dedx_Y<< "  " << shr_theta*(180/3.14)<< "  " << npi0 <<  std::endl;
+        // std::cout << shr_hits_u_tot << " " << shr_hits_v_tot << " " << shr_hits_y_tot<<"\n" <<std::endl;
     }
     // Ok one plane was equal, so need to prioritise planes in preference of y, v, u
     else {
 
         // If y == any other plane, then y wins
-        if (shr_hits_y_tot == shr_hits_u_tot || shr_hits_y_tot == shr_hits_v_tot ){
+        if (temp_shr_hits_y_tot == temp_shr_hits_u_tot || temp_shr_hits_y_tot == temp_shr_hits_v_tot ){
             dedx_max = shr_tkfit_dedx_Y;
+           
         }
         // U == V, ALL Y cases have been used up, so default to v
-        else if (shr_hits_u_tot == shr_hits_v_tot ){
+        else if (temp_shr_hits_u_tot == temp_shr_hits_v_tot ){
             dedx_max = shr_tkfit_dedx_V;
+            
         }
         else {
             dedx_max = shr_tkfit_dedx_U;
+            
+            
         }
     }
 

@@ -131,35 +131,21 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     tree->Branch("knobNormNCCOHup",&knobNormNCCOHup,"knobNormNCCOHup/D");
     tree->Branch("knobNormNCCOHdn",&knobNormNCCOHdn,"knobNormNCCOHdn/D");
 
-    dedx_tree->Branch("shr_dedx_Y_cali", &shr_dedx_Y_cali, "shr_dedx_Y_cali/F");
-    dedx_tree->Branch("shr_dedx_V_cali", &shr_dedx_V_cali, "shr_dedx_V_cali/F");
-    dedx_tree->Branch("shr_dedx_U_cali", &shr_dedx_U_cali, "shr_dedx_U_cali/F");
+    dedx_tree->Branch("shr_hits_u_tot", &shr_hits_u_tot, "shr_hits_u_tot/I");
+    dedx_tree->Branch("shr_hits_v_tot", &shr_hits_v_tot, "shr_hits_v_tot/I");
+    dedx_tree->Branch("shr_hits_y_tot", &shr_hits_y_tot, "shr_hits_y_tot/I");
     
     dedx_tree->Branch("shr_tkfit_dedx_Y", &shr_tkfit_dedx_Y, "shr_tkfit_dedx_Y/F");
     dedx_tree->Branch("shr_tkfit_dedx_V", &shr_tkfit_dedx_V, "shr_tkfit_dedx_V/F");
     dedx_tree->Branch("shr_tkfit_dedx_U", &shr_tkfit_dedx_U, "shr_tkfit_dedx_U/F");
     
-    dedx_tree->Branch("shr_tkfit_dedx_Y_alt", &shr_tkfit_dedx_Y_alt, "shr_tkfit_dedx_Y_alt/F");
-    dedx_tree->Branch("shr_tkfit_dedx_V_alt", &shr_tkfit_dedx_V_alt, "shr_tkfit_dedx_V_alt/F");
-    dedx_tree->Branch("shr_tkfit_dedx_U_alt", &shr_tkfit_dedx_U_alt, "shr_tkfit_dedx_U_alt/F");
-    
-    dedx_tree->Branch("shr_tkfit_2cm_dedx_Y", &shr_tkfit_2cm_dedx_Y, "shr_tkfit_2cm_dedx_Y/F");
-    dedx_tree->Branch("shr_tkfit_2cm_dedx_V", &shr_tkfit_2cm_dedx_V, "shr_tkfit_2cm_dedx_V/F");
-    dedx_tree->Branch("shr_tkfit_2cm_dedx_U", &shr_tkfit_2cm_dedx_U, "shr_tkfit_2cm_dedx_U/F");
-    
-    dedx_tree->Branch("shr_tkfit_gap05_dedx_Y", &shr_tkfit_gap05_dedx_Y, "shr_tkfit_gap05_dedx_Y/F");
-    dedx_tree->Branch("shr_tkfit_gap05_dedx_V", &shr_tkfit_gap05_dedx_V, "shr_tkfit_gap05_dedx_V/F");
-    dedx_tree->Branch("shr_tkfit_gap05_dedx_U", &shr_tkfit_gap05_dedx_U, "shr_tkfit_gap05_dedx_U/F");
-    
-    dedx_tree->Branch("shr_tkfit_gap10_dedx_Y", &shr_tkfit_gap10_dedx_Y, "shr_tkfit_gap10_dedx_Y/F");
-    dedx_tree->Branch("shr_tkfit_gap10_dedx_V", &shr_tkfit_gap10_dedx_V, "shr_tkfit_gap10_dedx_V/F");
-    dedx_tree->Branch("shr_tkfit_gap10_dedx_U", &shr_tkfit_gap10_dedx_U, "shr_tkfit_gap10_dedx_U/F");
-
     dedx_tree->Branch("weight",          &weight,       "weight/D");
     dedx_tree->Branch("classifcation",   &classifcation);
     dedx_tree->Branch("shr_distance",    &shr_distance, "shr_distance/F");
     dedx_tree->Branch("shr_theta",       &shr_theta,    "shr_theta/F");
     dedx_tree->Branch("cut", &cut);
+    dedx_tree->Branch("npi0", &npi0);
+    dedx_tree->Branch("nu_pdg", &nu_pdg);
 
 
     // Counter Tree
@@ -293,25 +279,38 @@ void TreeHelper::Fill_dedxVars(SliceContainer &SC, std::pair<std::string, int> _
     weight = _weight;
     cut    = _cut;
 
+    npi0 = SC.npi0;
 
-    shr_dedx_Y_cali        = SC.shr_dedx_Y_cali;
-    shr_dedx_V_cali        = SC.shr_dedx_V_cali;
-    shr_dedx_U_cali        = SC.shr_dedx_U_cali;
+    nu_pdg = SC.nu_pdg;
+
+
     shr_tkfit_dedx_Y       = SC.shr_tkfit_dedx_Y;
     shr_tkfit_dedx_V       = SC.shr_tkfit_dedx_V;
     shr_tkfit_dedx_U       = SC.shr_tkfit_dedx_U;
-    shr_tkfit_dedx_Y_alt   = SC.shr_tkfit_dedx_Y_alt;
-    shr_tkfit_dedx_V_alt   = SC.shr_tkfit_dedx_V_alt;
-    shr_tkfit_dedx_U_alt   = SC.shr_tkfit_dedx_U_alt;
-    shr_tkfit_2cm_dedx_Y   = SC.shr_tkfit_2cm_dedx_Y;
-    shr_tkfit_2cm_dedx_V   = SC.shr_tkfit_2cm_dedx_V;
-    shr_tkfit_2cm_dedx_U   = SC.shr_tkfit_2cm_dedx_U;
-    shr_tkfit_gap05_dedx_Y = SC.shr_tkfit_gap05_dedx_Y;
-    shr_tkfit_gap05_dedx_V = SC.shr_tkfit_gap05_dedx_V;
-    shr_tkfit_gap05_dedx_U = SC.shr_tkfit_gap05_dedx_U;
-    shr_tkfit_gap10_dedx_Y = SC.shr_tkfit_gap10_dedx_Y;
-    shr_tkfit_gap10_dedx_V = SC.shr_tkfit_gap10_dedx_V;
-    shr_tkfit_gap10_dedx_U = SC.shr_tkfit_gap10_dedx_U;
+
+    // Redefine some cases where we have undefined dedx for out study
+    if (shr_tkfit_dedx_Y < 0) {
+        shr_hits_y_tot = 0;
+    }
+    else {
+        shr_hits_y_tot         = SC.shr_hits_y_tot;
+    }
+
+    if (shr_tkfit_dedx_V < 0) {
+        shr_hits_v_tot = 0;
+    }
+    else {
+        shr_hits_v_tot         = SC.shr_hits_v_tot;
+    }
+
+    if (shr_tkfit_dedx_U < 0) {
+        shr_hits_u_tot = 0;
+    }
+    else {
+        shr_hits_u_tot         = SC.shr_hits_u_tot;
+    }
+    
+    
     shr_distance           = SC.shr_distance;
     shr_theta              = SC.shr_theta;
 

@@ -866,7 +866,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     TPad *topPad;
     TPad *bottomPad;
     // TCanvas *c  = new TCanvas();
-    TCanvas * c = new TCanvas(Form("c_%s_%s", hist_name.c_str(), cut_name.c_str()), "c", 500, 500);
+    TCanvas * c = new TCanvas(Form("c_%s_%s", print_name, cut_name.c_str()), "c", 500, 500);
     THStack *h_stack = new THStack();
 
     // Get the histograms from the file
@@ -2067,7 +2067,8 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(const char *run_period, std::stri
 
     TH1D *h_clone;
 
-    TCanvas *c;
+    // TCanvas * c = new TCanvas(Form("c_eff_by_cut_%s_%s_%s", run_period,_util.cut_dirs.at(0).c_str(), var.c_str()), "c", 500, 500);
+    // c->SetTopMargin(0.11);
 
     // Loop over the classifications and get the histograms
     for (unsigned int i = 0; i < _util.k_cuts_MAX; i++) {
@@ -2081,7 +2082,8 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(const char *run_period, std::stri
 
     for (int p = 0; p < _util.k_cuts_MAX; p++) {
 
-        c = new TCanvas();
+        TCanvas * c = new TCanvas(Form("c_eff_by_cut_%s_%s_%s", run_period,_util.cut_dirs.at(p).c_str(), var.c_str()), "c", 500, 500);
+        c->SetTopMargin(0.11);
 
         // TEff_v.at(p) = new TEfficiency(*hist.at(p), *hist.at(_util.k_unselected));
         // TEff_v.at(p)->Draw("AP,same");
@@ -2110,15 +2112,48 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(const char *run_period, std::stri
         h_true_nue->Scale(scale);
         h_true_nue->Draw("hist,same");
 
-        TGaxis *axis = new TGaxis(gPad->GetUxmax() + 4, gPad->GetUymin(), gPad->GetUxmax() + 4, gPad->GetUymax(), 0, rightmax, 510, "+L");
+        c->Update();
+
+        TGaxis *axis = new TGaxis(gPad->GetUxmax(), gPad->GetUymin(), gPad->GetUxmax(), gPad->GetUymax(), 0, rightmax, 510, "+L");
         if (var == "nu")axis->SetTitle("True #nu_{e} Events in FV");
         if (var == "elec")axis->SetTitle("True Electron Events in FV");
-        axis->SetTitleOffset(1.4);
+        axis->SetTitleOffset(1.8);
         axis->SetLineColor(kAzure - 6);
         axis->SetLabelColor(kAzure - 6);
         axis->SetTitleColor(kAzure - 6);
+        axis->SetTextFont(42);
+        axis->SetLabelFont(42);
 
         axis->Draw();
+
+        // Draw the run period on the plot
+        TPaveText *pt;
+
+        if (std::string(run_period) == "1")
+        {
+            pt = new TPaveText(0.76, 0.915, 0.76, 0.915, "NDC");
+            pt->AddText("Run1");
+            pt->SetTextColor(kRed + 2);
+            pt->SetTextSize(0.04);
+        }
+        else if (std::string(run_period) == "3")
+        {
+            pt = new TPaveText(0.76, 0.915, 0.76, 0.915, "NDC");
+            pt->AddText("Run3");
+            pt->SetTextColor(kBlue + 2);
+        }
+        else
+        {
+            pt = new TPaveText(0.86, 0.915, 0.86, 0.915, "NDC");
+            pt->AddText("RunXXX");
+            pt->SetTextColor(kGreen + 2);
+        }
+
+        pt->SetBorderSize(0);
+        pt->SetFillColor(0);
+        pt->SetFillStyle(0);
+        pt->SetTextSize(0.04);
+        pt->Draw();
 
         if (var == "nu") c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E.pdf", run_period, _util.cut_dirs.at(p).c_str()));
         if (var == "elec") c->Print(Form("plots/run%s/Efficiency/TEff_%s_elec_E.pdf", run_period, _util.cut_dirs.at(p).c_str()));
@@ -2309,7 +2344,8 @@ void HistogramPlotter::Plot2D_Signal_Background(const char *print_name, const ch
 
     std::vector<TH2D *> hist(_util.sig_bkg_prefix.size());
 
-    TCanvas *c = new TCanvas();
+    TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
+    c->SetTopMargin(0.11);
 
     for (unsigned int k = 0; k < hist.size(); k++){
         
@@ -2323,7 +2359,7 @@ void HistogramPlotter::Plot2D_Signal_Background(const char *print_name, const ch
         hist.at(k)->SetStats(kFALSE);
     }
 
-    TLegend *leg_stack = new TLegend(0.75, 0.89, 0.87, 0.75);
+    TLegend *leg_stack = new TLegend(0.6, 0.89, 0.87, 0.75);
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
 
@@ -2336,27 +2372,28 @@ void HistogramPlotter::Plot2D_Signal_Background(const char *print_name, const ch
     hist.at(_util.k_background)->SetFillColorAlpha(kRed + 2, 0.2);
     hist.at(_util.k_background)->Draw("box,same");
 
+    // IncreaseLabelSize(hist.at(_util.k_background));
+
     // Draw cut lines to help the eye
     std::vector<TLine *> line_v;
-    line_v.resize(10);
-    line_v.at(0) = new TLine(0.5, 0, 0.5, 4);
-    line_v.at(1) = new TLine(0.5, 4, 1.75, 4);
+    line_v.resize(9);
+    line_v.at(0) = new TLine(0, 3.5, 1.75, 3.5);
 
-    line_v.at(2) = new TLine(1.75, 4, 1.75, 8);
-    line_v.at(3) = new TLine(1.75, 8, 2.3, 8);
+    line_v.at(1) = new TLine(1.75, 3.5, 1.75, 12);
+    line_v.at(2) = new TLine(1.75, 12, 2.5, 12);
 
-    line_v.at(4) = new TLine(2.3, 3, 2.3, 8);
-    line_v.at(5) = new TLine(2.3, 3, 3.5, 3);
+    line_v.at(3) = new TLine(2.5, 3.5, 2.5, 12);
+    line_v.at(4) = new TLine(2.5, 3.5, 3.5, 3.5);
 
-    line_v.at(6) = new TLine(3.5, 0, 3.5, 3);
-    line_v.at(7) = new TLine(3.5, 0, 4.7, 0);
+    line_v.at(5) = new TLine(3.5, 0, 3.5, 3.5);
+    line_v.at(6) = new TLine(3.5, 0, 4.5, 0);
 
-    line_v.at(8) = new TLine(4.7, 0, 4.7, 3);
-    line_v.at(9) = new TLine(4.7, 3, 10.0, 3);
+    line_v.at(7) = new TLine(4.5, 0, 4.5, 3.5);
+    line_v.at(8) = new TLine(4.5, 3.5, 10.0, 3.5);
 
     for (unsigned int l = 0; l < line_v.size(); l++) {
         line_v.at(l)->SetLineColor(kBlack);
-        // line_v.at(l)->SetLineStyle(kDotted);
+        line_v.at(l)->SetLineWidth(2);
         line_v.at(l)->Draw();
     }
 
