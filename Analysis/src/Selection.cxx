@@ -232,12 +232,11 @@ void Selection::Initialise( const char * mc_file,
 void Selection::MakeSelection(){
     std::cout << "\n\033[0;32mNow Running the Selection!\033[0m"<< std::endl;
     
-    int counter = 0;
-
     // MC ----------------------------------------------------------------------
     if (bool_use_mc){
         std::cout << "\nStarting Selection over MC" << std::endl;
 
+        // Create file for saving run, subrun event
         std::ofstream run_subrun_file_mc;
         run_subrun_file_mc.open(Form("files/run%i_run_subrun_list_mc.txt",_run_period));
 
@@ -281,6 +280,7 @@ void Selection::MakeSelection(){
     if (bool_use_data){
         std::cout << "\nStarting Selection over Data" << std::endl;
 
+        // Create file for saving run, subrun event
         std::ofstream run_subrun_file_data;
         run_subrun_file_data.open(Form("files/run%i_run_subrun_list_data.txt",_run_period));
 
@@ -323,6 +323,7 @@ void Selection::MakeSelection(){
     if (bool_use_ext){
         std::cout << "\nStarting Selection over EXT" << std::endl;
 
+        // Create file for saving run, subrun event
         std::ofstream run_subrun_file_ext;
         run_subrun_file_ext.open(Form("files/run%i_run_subrun_list_ext.txt",_run_period));
 
@@ -367,6 +368,7 @@ void Selection::MakeSelection(){
 
         std::cout << "\nStarting Selection over Dirt" << std::endl;
 
+        // Create file for saving run, subrun event
         std::ofstream run_subrun_file_dirt;
         run_subrun_file_dirt.open(Form("files/run%i_run_subrun_list_dirt.txt",_run_period));
 
@@ -542,7 +544,7 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     if (data_SC.run == 4971 && data_SC.evt == 9103) std::cout << data_SC.run << " " << data_SC.sub << " " << data_SC.evt << " " << SC.GetdEdxMax() << std::endl;
 
     // *************************************************************************
-    // dEdx in all planes for 0 track events --------------------------------------
+    // dEdx in all planes for 0 track events -----------------------------------
     // *************************************************************************
     pass = _scuts.dEdx_max_no_tracks(SC);
     passed_v.at(ievent).cut_v.at(_util.k_dEdx_max_no_tracks) = pass;
@@ -551,7 +553,7 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     
     SelectionFill(type, SC, classification, interaction, pi0_classification, particle_type, _util.k_dEdx_max_no_tracks, counter_v );
 
-    // ************************************************************************n*
+    // **************************************************************************
     return true;
 
 }
@@ -614,37 +616,42 @@ void Selection::SavetoFile(){
 // -----------------------------------------------------------------------------
 void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, std::string pi0_classification,  std::pair<std::string, int> par_type, int cut_index, std::vector<std::vector<double>> &counter_v){
     
+    // *************************************************************************
     // Get the CV weight
+    // *************************************************************************
     double weight = 1.0;
     weight = GetCVWeight(type, SC);
 
     // Try scaling the pi0 -- need to implement this as a configurable option
     // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
     GetPiZeroWeight(weight, 1, SC);
-
     
+    // *************************************************************************
+    // Calculate the reconstructed neutrino energy
     // This is in many places, need to have a way for setting this number by default
+    // *************************************************************************
     double INTERCEPT = 0.0;
     double SLOPE = 0.83;
     double reco_nu_e = (SC.shr_energy_tot_cali + INTERCEPT) / SLOPE + SC.trk_energy_tot;
 
+    // *************************************************************************
     // Fill Histograms
+    // *************************************************************************
+    // Fill almost all the histograms with this function call
     if (!slim) _hhelper.at(type).FillHists(type, classification.second, interaction, par_type.second, cut_index, SC, weight);
-
-    // Set counters for the cut
-    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
-    _util.Tabulate(is_in_fv, interaction, classification.first, pi0_classification, type, counter_v.at(cut_index), weight );
 
     // Fill Plots for Efficiency
     if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC, weight);
 
-    // For the last cut we fill the tree  or the first cut and nue_cc (generated and unselected)
+    // We want to save a slimmed down version of the selection for calculating the cross section
+    // For the last cut we fill the tree or the first cut and nue_cc (generated and unselected events)
     if ( (cut_index == _util.k_cuts_MAX - 1) || (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc || classification.second == _util.k_unmatched_nue || classification.second == _util.k_cosmic_nue || classification.second == _util.k_unmatched_nuebar || classification.second == _util.k_cosmic_nuebar ) ) ){
 
         // This is a generated event, but unselected
         if (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc || classification.second == _util.k_unmatched)){
             _thelper.at(type).FillVars(SC, classification, true, weight, reco_nu_e);
         }
+        // This is selected events
         else {
             _thelper.at(type).FillVars(SC, classification, false, weight, reco_nu_e);
         }
@@ -652,9 +659,16 @@ void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     }
 
     // Fill the dedx ttree before shr dist dedx cut and after cut dedx
+    // We can use this tree to play around and optimise the dedx cut. Not essential for the analysis
     if (cut_index == _util.k_vtx_dist_dedx - 1 || cut_index == _util.k_vtx_dist_dedx){
         _thelper.at(type).Fill_dedxVars(SC, classification, _util.cut_dirs.at(cut_index), weight);
     }
+    
+    // *************************************************************************
+    // Tabulate the selection i.e count everything
+    // *************************************************************************
+    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+    _util.Tabulate(is_in_fv, interaction, classification.first, pi0_classification, type, counter_v.at(cut_index), weight );
 
 }
 // -----------------------------------------------------------------------------
@@ -673,6 +687,7 @@ double Selection::GetCVWeight(int type, SliceContainer SC){
         weight_ppfx = false;
         return weight;
     }
+    // Default
     else if (_weight_cfg == 1){
         weight_tune = true;
         weight_ppfx = true;
