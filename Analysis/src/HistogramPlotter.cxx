@@ -786,14 +786,10 @@ void HistogramPlotter::SetFillColours(std::vector<TH1D *> &hist, std::string plo
 // -----------------------------------------------------------------------------
 void HistogramPlotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, std::vector<double> hist_integrals, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt, std::string plotmode){
 
-    if (found_data)
-        leg_stack->AddEntry(hist.at(k_plot_data), Form("Beam-On Data (%2.1f)", hist_integrals.at(_util.k_leg_data)), "lep");
-    if (found_dirt)
-        leg_stack->AddEntry(hist.at(k_plot_dirt), Form("Dirt (%2.1f)", hist_integrals.at(_util.k_leg_dirt)), "f");
-    if (found_ext)
-        leg_stack->AddEntry(hist.at(k_plot_ext), Form("Beam-Off Data (%2.1f)", hist_integrals.at(_util.k_leg_ext)), "f");
-
     if (plotmode == "classifications" || plotmode == "classifications_pi0" || plotmode == "classifications_numu") {
+        if (found_data) leg_stack->AddEntry(hist.at(k_plot_data), Form("Beam-On Data (%2.1f)", hist_integrals.at(_util.k_leg_data)), "lep");
+        if (found_dirt) leg_stack->AddEntry(hist.at(k_plot_dirt), Form("Dirt (%2.1f)", hist_integrals.at(_util.k_leg_dirt)), "f");
+        if (found_ext) leg_stack->AddEntry(hist.at(k_plot_ext), Form("Beam-Off Data (%2.1f)", hist_integrals.at(_util.k_leg_ext)), "f");
         // leg_stack->AddEntry(hist.at(_util.k_unmatched),       Form("Unmatched (%2.1f)",           hist_integrals.at(_util.k_unmatched)),    "f"); // This should be zero, so dont plot
         leg_stack->AddEntry(hist.at(_util.k_nc_pi0), Form("NC #pi^{0} (%2.1f)", hist_integrals.at(_util.k_nc_pi0)), "f");
         leg_stack->AddEntry(hist.at(_util.k_nc), Form("NC (%2.1f)", hist_integrals.at(_util.k_nc)), "f");
@@ -806,7 +802,10 @@ void HistogramPlotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, s
     }
 
     else {
-        leg_stack->AddEntry(hist.at(_util.k_part_unmatched), Form("Unmatched (%2.1f)", hist_integrals.at(_util.k_part_unmatched)), "f");
+        if (found_data) leg_stack->AddEntry(hist.at(k_plot_data), Form("Beam-On Data (%2.1f)", hist_integrals.at(_util.k_part_data)), "lep");
+        if (found_dirt) leg_stack->AddEntry(hist.at(k_plot_dirt), Form("Dirt (%2.1f)", hist_integrals.at(_util.k_part_dirt)), "f");
+        if (found_ext)  leg_stack->AddEntry(hist.at(k_plot_ext), Form("Beam-Off Data (%2.1f)", hist_integrals.at(_util.k_part_ext)), "f");
+        // leg_stack->AddEntry(hist.at(_util.k_part_unmatched), Form("Unmatched (%2.1f)", hist_integrals.at(_util.k_part_unmatched)), "f");
         leg_stack->AddEntry(hist.at(_util.k_kaon), Form("K (%2.1f)", hist_integrals.at(_util.k_kaon)), "f");
         leg_stack->AddEntry(hist.at(_util.k_proton), Form("p (%2.1f)", hist_integrals.at(_util.k_proton)), "f");
         leg_stack->AddEntry(hist.at(_util.k_part_cosmic), Form("Cosmic (%2.1f)", hist_integrals.at(_util.k_part_cosmic)), "f");
@@ -1490,10 +1489,10 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
 
     // Stacked Histograms by particle type
 
-    // dEdx cali Y Plane using trackfits
-    // MakeStack("h_reco_shr_tkfit_dedx_y_par", _util.cut_dirs.at(cut_index).c_str(),
-    //           area_norm, false, 1.0, "Leading Shower dEdx (Collection Plane) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-    //           Form("cuts/%s/reco_shr_tkfit_dedx_y_par.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "particle", true, variation, run_period, false, true);
+    // dEdx Y Plane using trackfits
+    MakeStack("h_reco_shr_tkfit_dedx_y_par", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "Leading Shower dEdx (Collection Plane) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_shr_tkfit_dedx_y_par.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "particle", true, variation, run_period, false, true);
 
 
 }
