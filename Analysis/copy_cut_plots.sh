@@ -20,7 +20,7 @@ cuts=(
   Shower_Score
   HitRatio
   Moliere_Avg
-  ShrVtxDist_dEdx_max
+  Moliere_Avg
   ShrVtxDist_dEdx_max
 )
 

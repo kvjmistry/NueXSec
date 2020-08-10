@@ -1260,21 +1260,6 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
               area_norm, false, 1.0, "Reco Vertex Z (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_vtx_z_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false, true);
 
-    // dEdx cali U Plane
-    MakeStack("h_reco_dEdx_cali_u_plane", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "U Plane dEdx (calibrated) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_dEdx_cali_u_plane.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // dEdx cali V Plane
-    MakeStack("h_reco_dEdx_cali_v_plane", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "V Plane dEdx (calibrated) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_dEdx_cali_v_plane.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // dEdx cali Y Plane
-    MakeStack("h_reco_dEdx_cali_y_plane", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Collection Plane dEdx (calibrated) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_dEdx_cali_y_plane.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
     // Leading Shower Momentum
     MakeStack("h_reco_leading_mom", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Leading Shower Momentum [GeV/c]",  0.35, 0.85, 0.55, 0.85, Data_POT,
@@ -1376,51 +1361,6 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
               area_norm, false, 1.0, "Total Num of hits for all Showers in Collection Plane",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_hits_y_tot.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
 
-    // dEdx Trackfit first 2cm U plane
-    MakeStack("h_reco_shr_trkfit_2cm_dEdx_u", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Shower dEdx First 2cm Fit U Plane [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shr_trkfit_2cm_dEdx_u.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // dEdx Trackfit first 2cm V plane
-    MakeStack("h_reco_shr_trkfit_2cm_dEdx_v", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Shower dEdx First 2cm Fit V Plane [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shr_trkfit_2cm_dEdx_v.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // dEdx Trackfit first 2cm y Plane
-    MakeStack("h_reco_shr_trkfit_2cm_dEdx_y", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Shower dEdx First 2cm Fit Collection Plane [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shr_trkfit_2cm_dEdx_y.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // dEdx Fit 1x4cm box skip 5mm U Plane
-    MakeStack("h_reco_shr_trkfit_gap05_dEdx_u", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Shower dEdx 1x4cm Box Fit U Plane (skip first 5mm) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shr_trkfit_gap05_dEdx_u.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // dEdx Fit 1x4cm box skip 5mm V Plane
-    MakeStack("h_reco_shr_trkfit_gap05_dEdx_v", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Shower dEdx 1x4cm Box Fit V Plane (skip first 5mm) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shr_trkfit_gap05_dEdx_v.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // dEdx Fit 1x4cm box skip 5mm y Plane
-    MakeStack("h_reco_shr_trkfit_gap05_dEdx_y", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Shower dEdx 1x4cm Box Fit Coll. Plane (skip first 5mm) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shr_trkfit_gap05_dEdx_y.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // dEdx Fit 1x4cm box skip 10mm U Plane
-    MakeStack("h_reco_shr_trkfit_gap10_dEdx_u", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Shower dEdx 1x4cm Box Fit U Plane (skip first 10mm) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shr_trkfit_gap10_dEdx_u.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // dEdx Fit 1x4cm box skip 10mm V Plane
-    MakeStack("h_reco_shr_trkfit_gap10_dEdx_v", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Shower dEdx 1x4cm Box Fit V Plane (skip first 10mm) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shr_trkfit_gap10_dEdx_v.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // dEdx Fit 1x4cm box skip 5mm y Plane
-    MakeStack("h_reco_shr_trkfit_gap10_dEdx_y", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Shower dEdx 1x4cm Box Fit Coll. Plane (skip first 10mm) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shr_trkfit_gap10_dEdx_y.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
     // Optical Filter Beam
     MakeStack("h_reco_opfilter_beam", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Common Optical Filter PE [PE]",  0.35, 0.85, 0.55, 0.85, Data_POT,
@@ -1458,11 +1398,6 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
     MakeStack("h_reco_slclustfrac", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Slice Cluster Fraction",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_slclustfrac.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // Cosmic Inpact Parameter
-    MakeStack("h_reco_cosmicIP", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Pandora Cosmic Impact Parameter [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_cosmicIP.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
 
     // Cosmic Inpact Parameter in 3D
     MakeStack("h_reco_CosmicIPAll3D", _util.cut_dirs.at(cut_index).c_str(),
@@ -1504,26 +1439,6 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
               area_norm, false, 1.0, "Leading Shower dEdx (All Planes) (0 tracks) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_max_no_tracks.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false, true);
 
-    // Shower dEdx with the track fitter y plane good theta
-    MakeStack("h_reco_shr_tkfit_dedx_y_good_theta", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Collection Plane dEdx (track fitter), Good Theta [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shr_tkfit_dedx_y_good_theta.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // Shower dEdx with the track fitter y plane bad theta
-    MakeStack("h_reco_shr_tkfit_dedx_y_bad_theta", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Collection Plane dEdx (track fitter), Bad Theta [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shr_tkfit_dedx_y_bad_theta.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // Shower dEdx with the track fitter v plane bad theta
-    MakeStack("h_reco_shr_tkfit_dedx_v_bad_theta", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "V Plane dEdx (track fitter), Bad Theta [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shr_tkfit_dedx_v_bad_theta.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // Shower dEdx with the track fitter u plane bad theta
-    MakeStack("h_reco_shr_tkfit_dedx_u_bad_theta", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "U Plane dEdx (track fitter), Bad Theta [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shr_tkfit_dedx_u_bad_theta.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
     // Shower Flash Time
     MakeStack("h_reco_flash_time", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Flash Time [#mus]",  0.35, 0.85, 0.55, 0.85, Data_POT,
@@ -1543,26 +1458,6 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
     MakeStack("h_reco_shrmoliereavg", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.6, "Leading Shower Moliere Average [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shrmoliereavg.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // Shower Moliere RMS
-    MakeStack("h_reco_shrmoliererms", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Leading Shower Moliere RMS [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shrmoliererms.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // Fraction of spacepoints in 1cm cylinder (2nd half of shr)
-    MakeStack("h_reco_CylFrac2h_1cm", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Fraction of spacepoints in 1cm cylinder (2nd half of shr)",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_CylFrac2h_1cm.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // Median Spread of SpacePoints (second half of shower)
-    MakeStack("h_reco_DeltaRMS2h", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Median Spread of SpacePoints (second half of shower)",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_DeltaRMS2h.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // Median of 1st component of shr PCA (5cm window)
-    MakeStack("h_reco_shrPCA1CMed_5cm", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Median of 1st component of shr PCA (5cm window)",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shrPCA1CMed_5cm.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
 
     // Median of 1st component of shr PCA (5cm window)
     MakeStack("h_reco_shrMCSMom", _util.cut_dirs.at(cut_index).c_str(),

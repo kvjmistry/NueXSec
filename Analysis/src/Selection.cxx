@@ -528,7 +528,10 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // *************************************************************************
     pass = _scuts.shr_moliere_avg(SC);
     passed_v.at(ievent).cut_v.at(_util.k_shr_moliere_avg) = pass;
+
+    // if (!pass && SC.shrmoliereavg >= 7) std::cout << SC.run << " " << SC.sub << " " << SC.evt << std::endl;
     if(!pass) return false; // Failed the cut!
+
     
     SelectionFill(type, SC, classification, interaction, pi0_classification, particle_type, _util.k_shr_moliere_avg, counter_v );
 
@@ -541,7 +544,7 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     
     SelectionFill(type, SC, classification, interaction, pi0_classification, particle_type, _util.k_vtx_dist_dedx, counter_v );
 
-    if (data_SC.run == 4971 && data_SC.evt == 9103) std::cout << data_SC.run << " " << data_SC.sub << " " << data_SC.evt << " " << SC.GetdEdxMax() << std::endl;
+    
 
     // *************************************************************************
     // dEdx in all planes for 0 track events -----------------------------------
