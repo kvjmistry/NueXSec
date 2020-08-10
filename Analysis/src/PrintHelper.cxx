@@ -228,33 +228,43 @@ void PrintHelper::PrintResults(){
         std::cout << "\n\033[0;33m <" << _util.cut_dirs.at(p) << "> \033[0m" << std::endl;
         
         if (!print_mc) {
-            if (p == 0) printf (" %-21s %-10s %-10s %-10s %-10s\n", " " , "MC POT", "Data POT", "Unscaled", "% Remaining");
+            if (p == 0) printf (" %-21s %-10s %-10s %-10s %-10s %-12s\n", " " , "MC POT", "Data POT", "Unscaled", "\% Remaining", " \% Change from Prev Cut");
         }
-        else printf (" %-21s %-10s %-10s %-10s %-10s\n", " " , "MC POT", "Data POT", "Unscaled", "\% Remaining");
+        else printf (" %-21s %-10s %-10s %-10s %-10s %-12s\n", " " , "MC POT", "Data POT", "Unscaled", "\% Remaining", " \% Change from Prev Cut");
 
         if (print_mc){
-            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Nue CC",         count_nue_cc,       double(count_nue_cc       * mc_scale_factor  ), " ", double( 100 * count_nue_cc / init_count_nue_cc));
-            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "NueBar CC",      count_nuebar_cc,    double(count_nuebar_cc    * mc_scale_factor  ), " ", double( 100 * count_nuebar_cc / init_count_nuebar_cc));
-            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Nu out FV",      count_nu_out_fv,    double(count_nu_out_fv    * mc_scale_factor  ), " ", double( 100 * count_nu_out_fv / init_count_nu_out_fv));
-            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Cosmic",         count_cosmic,       double(count_cosmic       * mc_scale_factor  ), " ", double( 100 * count_cosmic / init_count_cosmic));
-            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Numu CC",        count_numu_cc,      double(count_numu_cc      * mc_scale_factor  ), " ", double( 100 * count_numu_cc / init_count_numu_cc));
-            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Numu CC Pi0",    count_numu_cc_pi0,  double(count_numu_cc_pi0  * mc_scale_factor  ), " ", double( 100 * count_numu_cc_pi0 / init_count_numu_cc_pi0));
-            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "NC",             count_nc,           double(count_nc           * mc_scale_factor  ), " ", double( 100 * count_nc / init_count_nc));
-            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "NC Pi0",         count_nc_pi0,       double(count_nc_pi0       * mc_scale_factor  ), " ", double( 100 * count_nc_pi0 / init_count_nc_pi0));
-            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Non-Reco'd Nue CC", count_unmatched_nue, double(count_unmatched_nue    * mc_scale_factor  ), " ", double( 100 * count_unmatched_nue / init_count_unmatched_nue));
-            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Cosmic Nue CC",     count_cosmic_nue,    double(count_cosmic_nue    * mc_scale_factor  ), " ",    double( 100 * count_cosmic_nue / init_count_cosmic_nue));
-            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Non-Reco'd Nuebar CC", count_unmatched_nuebar, double(count_unmatched_nuebar    * mc_scale_factor  ), " ", double( 100 * count_unmatched_nuebar / init_count_unmatched_nuebar));
-            printf (" %-20s: %-10.2f %-10.2f %-10s %-10.1f\n", "Cosmic Nuebar CC",     count_cosmic_nuebar,    double(count_cosmic_nuebar    * mc_scale_factor  ), " ",    double( 100 * count_cosmic_nuebar));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Nue CC",               count_nue_cc,           double(count_nue_cc           * mc_scale_factor  ), " ", double( 100 * count_nue_cc / init_count_nue_cc),                     double(-100 * (count_nue_cc           - prev_count_nue_cc)           / prev_count_nue_cc));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "NueBar CC",            count_nuebar_cc,        double(count_nuebar_cc        * mc_scale_factor  ), " ", double( 100 * count_nuebar_cc / init_count_nuebar_cc),               double(-100 * (count_nuebar_cc        - prev_count_nuebar_cc)        / prev_count_nuebar_cc));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Nu out FV",            count_nu_out_fv,        double(count_nu_out_fv        * mc_scale_factor  ), " ", double( 100 * count_nu_out_fv / init_count_nu_out_fv),               double(-100 * (count_nu_out_fv        - prev_count_nu_out_fv)        / prev_count_nu_out_fv));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Cosmic",               count_cosmic,           double(count_cosmic           * mc_scale_factor  ), " ", double( 100 * count_cosmic / init_count_cosmic),                     double(-100 * (count_cosmic           - prev_count_cosmic)           / prev_count_cosmic));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Numu CC",              count_numu_cc,          double(count_numu_cc          * mc_scale_factor  ), " ", double( 100 * count_numu_cc / init_count_numu_cc),                   double(-100 * (count_numu_cc          - prev_count_numu_cc)          / prev_count_numu_cc));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Numu CC Pi0",          count_numu_cc_pi0,      double(count_numu_cc_pi0      * mc_scale_factor  ), " ", double( 100 * count_numu_cc_pi0 / init_count_numu_cc_pi0),           double(-100 * (count_numu_cc_pi0      - prev_count_numu_cc_pi0)      / prev_count_numu_cc_pi0));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "NC",                   count_nc,               double(count_nc               * mc_scale_factor  ), " ", double( 100 * count_nc / init_count_nc),                             double(-100 * (count_nc               - prev_count_nc)               / prev_count_nc));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "NC Pi0",               count_nc_pi0,           double(count_nc_pi0           * mc_scale_factor  ), " ", double( 100 * count_nc_pi0 / init_count_nc_pi0),                     double(-100 * (count_nc_pi0           - prev_count_nc_pi0)           / prev_count_nc_pi0));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Cosmic Nue CC",        count_cosmic_nue,       double(count_cosmic_nue       * mc_scale_factor  ), " ", double( 100 * count_cosmic_nue / init_count_cosmic_nue),             double(-100 * (count_cosmic_nue       - prev_count_cosmic_nue)       / prev_count_cosmic_nue));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Cosmic Nuebar CC",     count_cosmic_nuebar,    double(count_cosmic_nuebar    * mc_scale_factor  ), " ", double( 100 * count_cosmic_nuebar),                                  double(-100 * (count_cosmic_nuebar    - prev_count_cosmic_nuebar)    / prev_count_cosmic_nuebar));
+            if (p == 0) printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Non-Reco'd Nue CC",    count_unmatched_nue,    double(count_unmatched_nue    * mc_scale_factor  ), " ", double( 100 * count_unmatched_nue / init_count_unmatched_nue),       double(-100 * (count_unmatched_nue    - prev_count_unmatched_nue)    / prev_count_unmatched_nue));
+            if (p == 0) printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Non-Reco'd Nuebar CC", count_unmatched_nuebar, double(count_unmatched_nuebar * mc_scale_factor  ), " ", double( 100 * count_unmatched_nuebar / init_count_unmatched_nuebar), double(-100 * (count_unmatched_nuebar - prev_count_unmatched_nuebar) / prev_count_unmatched_nuebar));
        }
 
         if (print_dirt){
-            printf (" %-20s: %-10.2f %-10.2f %-10.2f %f\n", "Dirt", double(count_dirt * (dirt_scale_factor / mc_scale_factor)), double(count_dirt * dirt_scale_factor), count_dirt, double( 100 * count_dirt / init_count_dirt) );
+            printf (" %-20s: %-10.2f %-10.2f %-10.2f %f %9.2f\n", "Dirt", double(count_dirt * (dirt_scale_factor / mc_scale_factor)), double(count_dirt * dirt_scale_factor), count_dirt, double( 100 * count_dirt / init_count_dirt), double(100 * (prev_count_dirt - count_dirt) / prev_count_dirt) );
             
         }
 
         if (print_ext) { 
-            printf (" %-20s: %-10.2f %-10.2f %-10.2f %f\n", "Off-Beam Data", double(count_ext * (intime_scale_factor / mc_scale_factor)), double(count_ext * intime_scale_factor), count_ext, double( 100 * count_ext / init_count_ext) );
+            printf (" %-20s: %-10.2f %-10.2f %-10.2f %f %9.2f\n", "Off-Beam Data", double(count_ext * (intime_scale_factor / mc_scale_factor)), double(count_ext * intime_scale_factor), count_ext, double( 100 * count_ext / init_count_ext), double( 100 * (prev_count_ext - count_ext) / prev_count_ext) );
             
+        }
+
+        if (print_mc && print_dirt){
+            double tot_mc_bkg = count_numu_cc + count_numu_cc_pi0 + count_nc + count_nc_pi0;
+            printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Beam Bkg", tot_mc_bkg + count_dirt * (dirt_scale_factor / mc_scale_factor), double(tot_mc_bkg * mc_scale_factor + count_dirt * dirt_scale_factor ) );
+        }
+
+        if (print_mc && print_ext){
+            double tot_cosmic_bkg = count_cosmic + count_cosmic_nue + count_cosmic_nuebar;
+            printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Cosmic Bkg", tot_cosmic_bkg + count_ext * (intime_scale_factor / mc_scale_factor), double(tot_cosmic_bkg * mc_scale_factor + count_ext * intime_scale_factor ));
         }
         
         if (print_mc){
@@ -316,6 +326,23 @@ void PrintHelper::PrintResults(){
 
         // Fill the efficiency tree
         if (print_mc && print_data && print_ext && print_dirt) eff_tree->Fill();
+
+        // Set counters for the previous cut
+        prev_count_nue_cc       = count_nue_cc;
+        prev_count_nuebar_cc    = count_nuebar_cc;
+        prev_count_nu_out_fv    = count_nu_out_fv;
+        prev_count_cosmic       = count_cosmic;
+        prev_count_numu_cc      = count_numu_cc;
+        prev_count_numu_cc_pi0  = count_numu_cc_pi0;
+        prev_count_nc           = count_nc;
+        prev_count_nc_pi0       = count_nc_pi0;
+        prev_count_unmatched    = count_unmatched;
+        prev_count_unmatched_nue    = count_unmatched_nue;
+        prev_count_cosmic_nue       = count_cosmic_nue;
+        prev_count_unmatched_nuebar = count_unmatched_nuebar;
+        prev_count_cosmic_nuebar    = count_cosmic_nuebar;
+        if (print_ext) prev_count_ext = count_ext;
+        if (print_dirt) prev_count_dirt = count_dirt;
         
     }
 

@@ -137,6 +137,23 @@ class PrintHelper{
     double init_count_ext{0.0};
     double init_count_dirt{0.0};
 
+    // Counters for previous cut
+    double prev_count_nue_cc{1.0};
+    double prev_count_nuebar_cc{1.0};
+    double prev_count_nu_out_fv{1.0};
+    double prev_count_cosmic{1.0};
+    double prev_count_numu_cc{1.0};
+    double prev_count_numu_cc_pi0{1.0};
+    double prev_count_nc{1.0};
+    double prev_count_nc_pi0{1.0};
+    double prev_count_unmatched{1.0};
+    double prev_count_unmatched_nue{1.0};
+    double prev_count_cosmic_nue{1.0};
+    double prev_count_unmatched_nuebar{1.0};
+    double prev_count_cosmic_nuebar{1.0};
+    double prev_count_ext{1.0};
+    double prev_count_dirt{1.0};
+
     // The efficiency and purity from the previous cut
     double efficiency_last{0.0};
     double purity_last{0.0};
