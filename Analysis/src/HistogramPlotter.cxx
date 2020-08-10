@@ -1230,21 +1230,6 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
     // MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, const char* x_axis_name, double y_scale_factor,
     //                             const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, const char* print_name, bool override_data_mc_comparison )
 
-    // Reco X
-    MakeStack("h_reco_vtx_x", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Reco Vertex X [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_vtx_x.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // Reco Y
-    MakeStack("h_reco_vtx_y", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Reco Vertex Y [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_vtx_y.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // Reco Z
-    MakeStack("h_reco_vtx_z", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Reco Vertex Z [cm]", 0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_vtx_z.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
     // Reco X SCE
     MakeStack("h_reco_vtx_x_sce", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Reco Vertex X (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
@@ -1270,20 +1255,10 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
               area_norm, false, 1.0, "Shower to Vertex Distance [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shower_to_vtx_dist.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
 
-    // Leading Shower hits in all planes -- need to redefine
+    // Leading Shower hits in all planes
     MakeStack("h_reco_shr_hits_max", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Leading Shower Hits All Planes",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_hits_max.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // Number of Tracks Contained
-    MakeStack("h_reco_n_track_contained", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Number of Tracks Contained",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_n_track_contained.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
-
-    // Number of Showers Contained
-    MakeStack("h_reco_n_shower_contained", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Number of Showers Contained",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_n_shower_contained.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
 
     // Leading shower phi
     MakeStack("h_reco_leading_shower_phi", _util.cut_dirs.at(cut_index).c_str(),
