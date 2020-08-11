@@ -164,8 +164,9 @@ class HistogramHelper{
         k_reco_shr_tkfit_dedx_v,                                                // The dEdx using the trackfit variable v plane
         k_reco_shr_tkfit_dedx_y,                                                // The dEdx using the trackfit variable collection
         k_reco_shr_tkfit_dedx_max,                                              // The dEdx using the trackfit variable plane with the max hits
+        k_reco_shr_tkfit_dedx_max_with_tracks,                                  // The dEdx using the trackfit variable plane with the max hits for events with tracks only
         k_reco_shr_tkfit_dedx_y_no_tracks,                                      // The dEdx using the trackfit variable collection in the case there is no tracks
-        k_reco_shr_tkfit_dedx_max_no_tracks,                                   // The dEdx using the trackfit variable plane with the most hits in the case there is no tracks
+        k_reco_shr_tkfit_dedx_max_no_tracks,                                    // The dEdx using the trackfit variable plane with the most hits in the case there is no tracks
         k_reco_shr_tkfit_dedx_y_good_theta,                                     // The dEdx using the trackfit variable collection for angles not close to parallel to the y plane
         k_reco_shr_tkfit_dedx_y_bad_theta,                                      // The dEdx using the trackfit variable collection for angles close to parallel to the y plane
         k_reco_shr_tkfit_dedx_v_bad_theta,                                      // The dEdx using the trackfit variable v plane for angles close to parallel to the y plane

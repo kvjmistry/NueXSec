@@ -331,6 +331,7 @@ void HistogramHelper::InitHistograms(){
             TH1D_hists.at(k_reco_shr_tkfit_dedx_v).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_v_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_shr_tkfit_dedx_y).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_y_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_shr_tkfit_dedx_max).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_max_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_shr_tkfit_dedx_max_with_tracks).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_max_with_tracks_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_shr_tkfit_dedx_y_no_tracks).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_y_no_tracks_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_shr_tkfit_dedx_max_no_tracks).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_max_no_tracks_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
 
@@ -668,7 +669,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
 
     TH1D_hists.at(k_reco_track_score).at(cut_index).at(classification_index)->Fill(SC.trk_score, weight);
 
-    TH1D_hists.at(k_reco_shower_energy_tot_cali).at(cut_index).at(classification_index)->Fill(SC.shr_energy_tot_cali, weight);
+    TH1D_hists.at(k_reco_shower_energy_tot_cali).at(cut_index).at(classification_index)->Fill(SC.shr_energy_tot_cali/0.83, weight);
 
     TH1D_hists.at(k_reco_shr_hits_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_tot, weight);
 
@@ -705,7 +706,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
     TH1D_hists.at(k_reco_shr_tkfit_dedx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_V, weight);
     TH1D_hists.at(k_reco_shr_tkfit_dedx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
     TH1D_hists.at(k_reco_shr_tkfit_dedx_max).at(cut_index).at(classification_index)->Fill(dedx_max, weight);
-    
+    if (SC.n_tracks > 0) TH1D_hists.at(k_reco_shr_tkfit_dedx_max_with_tracks).at(cut_index).at(classification_index)->Fill(dedx_max, weight);
     
     if (SC.n_tracks == 0) TH1D_hists.at(k_reco_shr_tkfit_dedx_y_no_tracks).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
     if (SC.n_tracks == 0) TH1D_hists.at(k_reco_shr_tkfit_dedx_max_no_tracks).at(cut_index).at(classification_index)->Fill(dedx_max,  weight);
@@ -803,6 +804,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
         
         // True nue theta in BNB coordinates (up from beam dir)
         double nu_theta = acos(SC.true_nu_pz/p) * 180 / 3.1415;
+        // std::cout << SC.true_nu_px<< "  "  << SC.true_nu_py <<"  " << SC.true_nu_pz<< "  "  << nu_theta<<   std::endl;
         
         // True nue phi in BNB coordinates (around beam dir)
         double nu_phi = atan2(SC.true_nu_py, SC.true_nu_px) * 180 / 3.1415;
@@ -864,7 +866,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
             if (_type == _util.k_mc){ 
 
                 // True vs reco histograms
-                TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E)->Fill(SC.elec_e,  SC.shr_energy_tot_cali, weight);
+                TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E)->Fill(SC.elec_e,  SC.shr_energy_tot_cali/0.83, weight);
                 TH2D_true_hists.at(index).at(k_true_nu_E_reco_nu_E)    ->Fill(SC.nu_e,  reco_nu_e, weight);
                 TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E_extra_bins)->Fill(SC.elec_e,  SC.shr_energy_tot_cali, weight);
                 TH2D_true_hists.at(index).at(k_true_nu_E_reco_nu_E_extra_bins)    ->Fill(SC.nu_e,  reco_nu_e, weight);

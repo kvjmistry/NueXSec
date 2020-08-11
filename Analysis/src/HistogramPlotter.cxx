@@ -1231,7 +1231,7 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
 
     // Reco X SCE
     MakeStack("h_reco_vtx_x_sce", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Reco Vertex X (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.3, "Reco Vertex X (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_vtx_x_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false, true);
 
     // Reco Y SCE
@@ -1241,7 +1241,7 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
 
     // Reco Z SCE
     MakeStack("h_reco_vtx_z_sce", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Reco Vertex Z (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.2, "Reco Vertex Z (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_vtx_z_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false, true);
 
     // Leading Shower Momentum
@@ -1375,7 +1375,7 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
 
     // Cosmic Inpact Parameter in 3D
     MakeStack("h_reco_CosmicIPAll3D", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Pandora Cosmic Impact Parameter 3D [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.7, "Pandora Cosmic Impact Parameter 3D [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_CosmicIPAll3D.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
 
     // 3D direction between closest pfp not in the neutrino slice
@@ -1402,6 +1402,11 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
     MakeStack("h_reco_shr_tkfit_dedx_max", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Leading Shower dEdx (All Planes) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_max.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false, true);
+
+    // Shower dEdx with the track fitter plane with the most hits for events with tracks only
+    MakeStack("h_reco_shr_tkfit_dedx_max_with_tracks", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "Leading Shower dEdx (All Planes) (with tracks) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_shr_tkfit_dedx_max_with_tracks.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false, true);
 
     // Shower dEdx with the track fitter y plane when there is no tracks
     MakeStack("h_reco_shr_tkfit_dedx_y_no_tracks", _util.cut_dirs.at(cut_index).c_str(),
