@@ -739,29 +739,25 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
     bins.at(k_var_integrated) = { 0.0, 1.1 };
 
     // Reconstructed electron energy Bin definition
-    bins.at(k_var_reco_el_E) = { 0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0};
+    bins.at(k_var_reco_el_E) = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
 
     // True electron energy Bin definition
-    bins.at(k_var_true_el_E) = { 0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0};
+    bins.at(k_var_true_el_E) = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
 
     // True neutrino energy Bin definition
-    bins.at(k_var_true_nu_E) = { 0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0};
+    bins.at(k_var_true_nu_E) = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
 
     // Reconstructed neutrino energy Bin definition
-    bins.at(k_var_reco_nu_E) = { 0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0};
+    bins.at(k_var_reco_nu_E) = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
 
     // These are for histogram titles so we know what bin we are looking at
     std::vector<std::string> bin_labels = {
-        "0.0 - 0.5 GeV",
-        "0.5 - 1.0 GeV",
-        "1.0 - 1.5 GeV",
-        "1.5 - 2.0 GeV",
-        "2.0 - 2.5 GeV",
-        "2.5 - 3.0 GeV",
-        "3.0 - 3.5 GeV",
-        "3.5 - 4.0 GeV",
-        "4.0 - 4.5 GeV",
-        "4.5 - 5.0 GeV"
+        "0.0  - 0.25 GeV",
+        "0.25 - 0.56 GeV",
+        "0.56 - 0.89 GeV",
+        "0.89 - 1.61 GeV",
+        "1.61 - 3.37 GeV",
+        "3.37 - 5.0 GeV"
     };
 
 

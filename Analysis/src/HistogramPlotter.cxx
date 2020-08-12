@@ -1324,6 +1324,11 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
     MakeStack("h_reco_shower_energy_tot_cali", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Total Calibrated Energy of all Showers [GeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shower_energy_tot_cali.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
+    
+    // Calibrated energy of all the showers with uneaven bins
+    MakeStack("h_reco_shower_energy_tot_cali_rebin", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "Total Calibrated Energy of all Showers [GeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_shower_energy_tot_cali_rebin.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
 
     // Total number of hits for all showers
     MakeStack("h_reco_shr_hits_tot", _util.cut_dirs.at(cut_index).c_str(),
