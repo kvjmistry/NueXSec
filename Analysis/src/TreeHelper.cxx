@@ -98,7 +98,7 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     tree->Branch("n_tracks",  &n_tracks,  "n_tracks/F");
     tree->Branch("shr_theta", &shr_theta, "shr_theta/F");
     tree->Branch("shr_phi",   &shr_phi,   "shr_phi/F");
-    tree->Branch("shr_energy_tot_cali", &shr_energy_tot_cali, "shr_energy_tot_cali/F");
+    tree->Branch("shr_energy_cali", &shr_energy_cali, "shr_energy_cali/F");
     tree->Branch("shrmoliereavg", &shrmoliereavg, "shrmoliereavg/F");
     tree->Branch("shr_hits_max",  &shr_hits_max,  "shr_hits_max/F");
     tree->Branch("elec_e",  &elec_e,  "elec_e/F");
@@ -232,7 +232,7 @@ void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _class
     n_tracks  = SC.n_tracks;
     shr_theta = SC.shr_theta;
     shr_phi   = SC.shr_phi;
-    shr_energy_tot_cali = SC.shr_energy_tot_cali;
+    shr_energy_cali = SC.shr_energy_cali;
     shrmoliereavg = SC.shrmoliereavg;
     shr_hits_max  = SC.shr_hits_max;
     elec_e   = SC.elec_e;

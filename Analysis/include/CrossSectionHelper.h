@@ -32,7 +32,7 @@ class CrossSectionHelper{
     double weight{0.0};        // This is not going to be integer if we already weight the CV
 
     double true_energy{0.0}, reco_energy{0.0};
-    float shr_energy_tot_cali{0.0};
+    float shr_energy_cali{0.0};
     float elec_e{0.0};
     float ppfx_cv{1.0};
     float weightSplineTimesTune{1.0};
@@ -118,21 +118,24 @@ class CrossSectionHelper{
         k_var_integrated,     // Integrated X-Section
         k_var_reco_el_E,      // Reconstructed electron energy
         k_var_true_el_E,      // True electron energy
-        k_var_true_nu_E,      // True neutrino energy
-        k_var_reco_nu_E,      // Reconstructed neutrino energy
+        // k_var_true_nu_E,      // True neutrino energy
+        // k_var_reco_nu_E,      // Reconstructed neutrino energy
         k_TH1D_xsec_var_MAX
     };
 
     // Names for cross section histograms
     std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "data_xsec"};
 
-    std::vector<std::string> vars = {"integrated", "reco_el_E", "true_el_E", "true_nu_E", "reco_nu_e"};
+    std::vector<std::string> vars = {"integrated", "reco_el_E", "true_el_E"
+                                    //  "true_nu_E", "reco_nu_e"
+                                     };
     
     std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Cross-Section [10^{-39} cm^{2}]",
                                         ";Reco Leading Shower Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
-                                        ";True Electron Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
-                                        ";True #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
-                                        ";Reco #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]"};
+                                        ";True Electron Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]"
+                                        // ";True #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
+                                        // ";Reco #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]"
+                                        };
     
 
     std::vector<std::string> reweighter_labels = {
@@ -196,13 +199,13 @@ class CrossSectionHelper{
     void InitialiseHistograms(std::string run_mode);
     // -------------------------------------------------------------------------
     // Helper function to fill the histograms
-    void FillHists(int label, int uni, int xsec_type, double weight_uni, float shr_energy_tot_cali, float elec_e, double true_energy, double reco_energy);
+    void FillHists(int label, int uni, int xsec_type, double weight_uni, float shr_energy_cali, float elec_e, double true_energy, double reco_energy);
     // -------------------------------------------------------------------------
     // Function to return the integrated flux for universe i or the weight in case of a beamline variation
     double GetFluxUni(int uni, std::string value, std::string label);
     // -------------------------------------------------------------------------
     // Function to fill the resolution histograms
-    void FillResolutionHists(float shr_energy_tot_cali, float elec_e);
+    void FillResolutionHists(float shr_energy_cali, float elec_e);
     // -------------------------------------------------------------------------
 
 

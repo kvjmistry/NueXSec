@@ -38,26 +38,11 @@ class SelectionCuts{
     // Cut on the topological score
     bool topo_score(SliceContainer &SC);
     // -------------------------------------------------------------------------
-    // Cut on the cluster fraction in the slice
-    bool cluster_frac(SliceContainer &SC);
-    // -------------------------------------------------------------------------
     // Cut on the shower score
     bool shower_score(SliceContainer &SC);
     // -------------------------------------------------------------------------
     // Cut on the total shower energy to reject michels
-    bool michel_rej(SliceContainer &SC);
-    // -------------------------------------------------------------------------
-    // Cut on the dEdx y plane
-    bool dEdx_y(SliceContainer &SC);
-    // -------------------------------------------------------------------------
-    // Cut on the dEdx y plane
-    bool dEdx_v(SliceContainer &SC);
-    // -------------------------------------------------------------------------
-    // Cut on the dEdx y plane
-    bool dEdx_u(SliceContainer &SC);
-    // -------------------------------------------------------------------------
-    // Cut on the total hits for the leading shower
-    bool shr_hits(SliceContainer &SC);
+    bool michel_rej(SliceContainer &SC);   
     // -------------------------------------------------------------------------
     // Cut on the shower to nu vertex distance
     bool shr_distance(SliceContainer &SC);

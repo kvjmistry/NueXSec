@@ -286,14 +286,17 @@ void HistogramHelper::InitHistograms(){
             // Track score
             TH1D_hists.at(k_reco_track_score).at(i).at(j) = new TH1D (Form("h_reco_track_score_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0.5, 1);
             
-            // Calibrated energy of all the showers
+            // YZ and X Calibrated energy of all the showers
             TH1D_hists.at(k_reco_shower_energy_tot_cali).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_tot_cali_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 3);
             
+            // Calibrated energy of just the leading shower
+            TH1D_hists.at(k_reco_shower_energy_cali).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_cali_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 3);
+
             // Set the bins for the reco energy
-            
             std::vector<double> temp_bins = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
             double* edges = &temp_bins[0]; // Cast to an array 
             TH1D_hists.at(k_reco_shower_energy_tot_cali_rebin).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_tot_cali_rebin_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", temp_bins.size()-1, edges);
+            TH1D_hists.at(k_reco_shower_energy_cali_rebin).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_cali_rebin_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", temp_bins.size()-1, edges);
 
             // Total number of hits for the leading shower
             TH1D_hists.at(k_reco_shr_hits_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 1600);
@@ -677,6 +680,8 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
 
     TH1D_hists.at(k_reco_shower_energy_tot_cali).at(cut_index).at(classification_index)->Fill(SC.shr_energy_tot_cali/0.83, weight);
     TH1D_hists.at(k_reco_shower_energy_tot_cali_rebin).at(cut_index).at(classification_index)->Fill(SC.shr_energy_tot_cali/0.83, weight);
+    TH1D_hists.at(k_reco_shower_energy_cali).at(cut_index).at(classification_index)->Fill(SC.shr_energy_cali/0.83, weight);
+    TH1D_hists.at(k_reco_shower_energy_cali_rebin).at(cut_index).at(classification_index)->Fill(SC.shr_energy_cali/0.83, weight);
 
     TH1D_hists.at(k_reco_shr_hits_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_tot, weight);
 
@@ -873,9 +878,9 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
             if (_type == _util.k_mc){ 
 
                 // True vs reco histograms
-                TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E)->Fill(SC.elec_e,  SC.shr_energy_tot_cali/0.83, weight);
+                TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E)->Fill(SC.elec_e,  SC.shr_energy_cali/0.83, weight);
                 TH2D_true_hists.at(index).at(k_true_nu_E_reco_nu_E)    ->Fill(SC.nu_e,  reco_nu_e, weight);
-                TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E_extra_bins)->Fill(SC.elec_e,  SC.shr_energy_tot_cali, weight);
+                TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E_extra_bins)->Fill(SC.elec_e,  SC.shr_energy_cali, weight);
                 TH2D_true_hists.at(index).at(k_true_nu_E_reco_nu_E_extra_bins)    ->Fill(SC.nu_e,  reco_nu_e, weight);
                 TH2D_true_hists.at(index).at(k_true_nu_vtx_x_reco_nu_vtx_x)->Fill(SC.true_nu_vtx_sce_x,  SC.reco_nu_vtx_sce_x, weight);
                 TH2D_true_hists.at(index).at(k_true_nu_vtx_y_reco_nu_vtx_y)->Fill(SC.true_nu_vtx_sce_y,  SC.reco_nu_vtx_sce_y, weight);

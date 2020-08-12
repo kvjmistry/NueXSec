@@ -59,7 +59,7 @@ class TreeHelper{
     double true_energy{0.0}, reco_energy{0.0};
     int n_showers{0}, n_tracks{0};
     float shr_phi{0.0};
-    float shr_energy_tot_cali{0.0};
+    float shr_energy_cali{0.0};
     float shrmoliereavg{0.0};
     float shr_hits_max{0.0};
     float elec_e{0.0};

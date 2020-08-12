@@ -142,6 +142,8 @@ class HistogramHelper{
         k_reco_track_score,                                                     // Track score
         k_reco_shower_energy_tot_cali,                                          // Calibrated energy of all the showers
         k_reco_shower_energy_tot_cali_rebin,                                    // Calibrated energy of all the showers with optimised bins
+        k_reco_shower_energy_cali,                                              // Calibrated energy of just the leading shower 
+        k_reco_shower_energy_cali_rebin,                                        // Calibrated energy of just the leading shower with optimised bins
         k_reco_shr_hits_tot,                                                    // Total number of hits for all showers
         k_reco_shr_hits_y_tot,                                                  // Total number of hits for all showers in the collection plane
         k_reco_shr_trkfit_2cm_dEdx_u,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use first 2 cm u plane

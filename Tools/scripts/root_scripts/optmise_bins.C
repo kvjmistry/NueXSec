@@ -3,7 +3,7 @@
 void GetFitResult(double &mean, double &sigma, float bin_lower_edge, float bin_upper_edge, TTree* tree, bool save_hist, bool &converged){
     
     TCut generic_query = "(classifcation.c_str()==\"nue_cc\" || classifcation.c_str()==\"nuebar_cc\") && !gen"; // This gets selected signal events
-    TCut bin_query = Form("shr_energy_tot_cali > %f && shr_energy_tot_cali < %f", bin_lower_edge, bin_upper_edge);
+    TCut bin_query = Form("shr_energy_cali > %f && shr_energy_cali < %f", bin_lower_edge, bin_upper_edge);
     
     TCanvas *c = new TCanvas();
 
@@ -55,6 +55,7 @@ void optmise_bins(){
     // call function which draws the tree to a canvas, fits the tree and returns the fit parameter
     // If the fit has 2xSTD = the reco bin size then we have successfully optimised the bin
     float lower_bin = 0.25;
+    // float lower_bin = 1.55;
     
     // Loop over the bins
     for (float bin = 0; bin < 4; bin++ ){
@@ -62,7 +63,7 @@ void optmise_bins(){
         converged = false;
 
         // Slide upper bin value till we get 2xthe STD of the fit
-        for (float i = lower_bin+0.1; i < 4.0; i+=0.01) {
+        for (float i = lower_bin+0.1; i < 5.0; i+=0.01) {
             std::cout << "\n\033[0;34mTrying Bin: " << i << "GeV\033[0m\n"<< std::endl;
             GetFitResult(mean, sigma, lower_bin, i, tree, false, converged);
 

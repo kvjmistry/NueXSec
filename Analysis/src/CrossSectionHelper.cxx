@@ -91,14 +91,14 @@ void CrossSectionHelper::LoopEvents(){
 
         tree->GetEntry(ievent); 
 
-        if (shr_energy_tot_cali > 5.0 && *classifcation == "data" ) std::cout << "reco shower energy was:  " << shr_energy_tot_cali << "  Consider updating the bins" <<std::endl;
+        if (shr_energy_cali > 5.0 && *classifcation == "data" ) std::cout << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins" <<std::endl;
 
         double cv_weight = weight;
 
         // Here we fill the resolution plots for the mc only
         if (*classifcation != "data" && *classifcation != "ext" && *classifcation != "dirt" && gen == false) {
             // If the electron energy in truth is zero then this wasnt a true nue, so dont fill either
-            if (elec_e != 0) FillResolutionHists(shr_energy_tot_cali, elec_e);
+            if (elec_e != 0) FillResolutionHists(shr_energy_cali, elec_e);
         }
 
         // Loop over the reweighter labels
@@ -143,8 +143,8 @@ void CrossSectionHelper::LoopEvents(){
                 if ((*classifcation == "nue_cc" || *classifcation == "nuebar_cc" || *classifcation == "unmatched_nue" || *classifcation == "unmatched_nuebar") && gen == false) {
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_sig, weight_uni, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
-                    FillHists(label, uni, k_xsec_sel, weight_uni, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
+                    FillHists(label, uni, k_xsec_sig, weight_uni, shr_energy_cali, elec_e, true_energy, reco_energy);
+                    FillHists(label, uni, k_xsec_sel, weight_uni, shr_energy_cali, elec_e, true_energy, reco_energy);
 
                 }
 
@@ -154,8 +154,8 @@ void CrossSectionHelper::LoopEvents(){
                      *classifcation == "nc_pi0"     || *classifcation == "cosmic_nue" || *classifcation == "cosmic_nuebar"){
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_bkg, weight_uni, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
-                    FillHists(label, uni, k_xsec_sel, weight_uni, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
+                    FillHists(label, uni, k_xsec_bkg, weight_uni, shr_energy_cali, elec_e, true_energy, reco_energy);
+                    FillHists(label, uni, k_xsec_sel, weight_uni, shr_energy_cali, elec_e, true_energy, reco_energy);
                     
                 }
                 
@@ -163,7 +163,7 @@ void CrossSectionHelper::LoopEvents(){
                 if ( (*classifcation == "nue_cc"|| *classifcation == "nuebar_cc" || *classifcation == "unmatched_nue" || *classifcation == "cosmic_nue" || *classifcation == "unmatched_nuebar" || *classifcation == "cosmic_nuebar") && gen == true) {
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_gen, weight_uni, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
+                    FillHists(label, uni, k_xsec_gen, weight_uni, shr_energy_cali, elec_e, true_energy, reco_energy);
                 }
 
                 // Data event
@@ -172,7 +172,7 @@ void CrossSectionHelper::LoopEvents(){
                     if (cv_weight != 1.0) std::cout << "Error weight for data is not 1, this means your weighting the data... bad!"<< std::endl;
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_data, cv_weight, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
+                    FillHists(label, uni, k_xsec_data, cv_weight, shr_energy_cali, elec_e, true_energy, reco_energy);
                 }
 
                 // Off beam event
@@ -181,14 +181,14 @@ void CrossSectionHelper::LoopEvents(){
                     if (cv_weight != 1.0) std::cout << "Error weight for data is not 1, this means your weighting the data... bad!"<< std::endl;
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_ext, cv_weight, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
+                    FillHists(label, uni, k_xsec_ext, cv_weight, shr_energy_cali, elec_e, true_energy, reco_energy);
                 }
 
                 // Dirt event
                 if (*classifcation == "dirt"){
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_dirt, cv_weight, shr_energy_tot_cali, elec_e, true_energy, reco_energy);
+                    FillHists(label, uni, k_xsec_dirt, cv_weight, shr_energy_cali, elec_e, true_energy, reco_energy);
                 }
             } // End loop over uni
 
@@ -590,7 +590,7 @@ void CrossSectionHelper::InitTree(){
     tree->SetBranchAddress("true_energy", &true_energy);
     tree->SetBranchAddress("reco_energy", &reco_energy);
     tree->SetBranchAddress("classifcation",   &classifcation);
-    tree->SetBranchAddress("shr_energy_tot_cali", &shr_energy_tot_cali);
+    tree->SetBranchAddress("shr_energy_cali", &shr_energy_cali);
     tree->SetBranchAddress("elec_e",  &elec_e);
     tree->SetBranchAddress("ppfx_cv",  &ppfx_cv);
     tree->SetBranchAddress("weightSplineTimesTune",  &weightSplineTimesTune);
@@ -890,13 +890,13 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
 
 }
 // -----------------------------------------------------------------------------
-void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double weight_uni, float shr_energy_tot_cali, float elec_e, double true_energy, double reco_energy){
+void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double weight_uni, float shr_energy_cali, float elec_e, double true_energy, double reco_energy){
 
     // Integrated
     h_cross_sec.at(label).at(uni).at(k_var_integrated).at(xsec_type)->Fill(1.0, weight_uni);
 
     // Reco Electron Energy
-    h_cross_sec.at(label).at(uni).at(k_var_reco_el_E).at(xsec_type)->Fill(shr_energy_tot_cali, weight_uni);
+    h_cross_sec.at(label).at(uni).at(k_var_reco_el_E).at(xsec_type)->Fill(shr_energy_cali, weight_uni);
 
     // True Electron Energy
     h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(xsec_type)->Fill(elec_e, weight_uni);
@@ -909,57 +909,57 @@ void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double wei
 
 }
 // -----------------------------------------------------------------------------
-void CrossSectionHelper::FillResolutionHists(float shr_energy_tot_cali, float elec_e){
+void CrossSectionHelper::FillResolutionHists(float shr_energy_cali, float elec_e){
 
     // 0.0 - 0.5 GeV
-    if (shr_energy_tot_cali >=0 && shr_energy_tot_cali < 0.5){
-        h_resolution.at(0).at(0)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
-        h_resolution.at(1).at(0)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    if (shr_energy_cali >=0 && shr_energy_cali < 0.5){
+        h_resolution.at(0).at(0)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
+        h_resolution.at(1).at(0)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
     // 0.5 - 1.0 GeV
-    else if (shr_energy_tot_cali >= 0.5 && shr_energy_tot_cali < 1.0){
-        h_resolution.at(0).at(1)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
-        h_resolution.at(1).at(1)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    else if (shr_energy_cali >= 0.5 && shr_energy_cali < 1.0){
+        h_resolution.at(0).at(1)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
+        h_resolution.at(1).at(1)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
     // 1.0 - 1.5 GeV
-    else if (shr_energy_tot_cali >= 1.0 && shr_energy_tot_cali < 1.5){
-        h_resolution.at(0).at(2)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
-        h_resolution.at(1).at(2)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    else if (shr_energy_cali >= 1.0 && shr_energy_cali < 1.5){
+        h_resolution.at(0).at(2)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
+        h_resolution.at(1).at(2)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
     // 1.5 - 2.0 GeV
-    else if (shr_energy_tot_cali >= 1.5 && shr_energy_tot_cali < 2.0){
-        h_resolution.at(0).at(3)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
-        h_resolution.at(1).at(3)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    else if (shr_energy_cali >= 1.5 && shr_energy_cali < 2.0){
+        h_resolution.at(0).at(3)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
+        h_resolution.at(1).at(3)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
     // 2.0 - 2.5 GeV
-    else if (shr_energy_tot_cali >= 2.0 && shr_energy_tot_cali < 2.5){
-        h_resolution.at(0).at(4)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
-        h_resolution.at(1).at(4)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    else if (shr_energy_cali >= 2.0 && shr_energy_cali < 2.5){
+        h_resolution.at(0).at(4)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
+        h_resolution.at(1).at(4)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
     // 2.5 - 3.0 GeV
-    else if (shr_energy_tot_cali >= 2.5 && shr_energy_tot_cali < 3.0){
-        h_resolution.at(0).at(5)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
-        h_resolution.at(1).at(5)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    else if (shr_energy_cali >= 2.5 && shr_energy_cali < 3.0){
+        h_resolution.at(0).at(5)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
+        h_resolution.at(1).at(5)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
     // 3.0 - 3.5 GeV
-    else if (shr_energy_tot_cali >= 3.0 && shr_energy_tot_cali < 3.5){
-        h_resolution.at(0).at(6)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
-        h_resolution.at(1).at(6)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    else if (shr_energy_cali >= 3.0 && shr_energy_cali < 3.5){
+        h_resolution.at(0).at(6)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
+        h_resolution.at(1).at(6)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
     // 3.5 - 4.0 GeV
-    else if (shr_energy_tot_cali >= 3.5 && shr_energy_tot_cali < 4.0){
-        h_resolution.at(0).at(7)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
-        h_resolution.at(1).at(7)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    else if (shr_energy_cali >= 3.5 && shr_energy_cali < 4.0){
+        h_resolution.at(0).at(7)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
+        h_resolution.at(1).at(7)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
     // 4.0 - 4.5 GeV
-    else if (shr_energy_tot_cali >= 4.0 && shr_energy_tot_cali < 4.5){
-        h_resolution.at(0).at(8)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
-        h_resolution.at(1).at(8)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    else if (shr_energy_cali >= 4.0 && shr_energy_cali < 4.5){
+        h_resolution.at(0).at(8)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
+        h_resolution.at(1).at(8)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
     // 4.5 - 5.0 GeV
-    else if (shr_energy_tot_cali >= 4.5 && shr_energy_tot_cali < 5.0){
-        h_resolution.at(0).at(9)->Fill((shr_energy_tot_cali - elec_e) / shr_energy_tot_cali);
-        h_resolution.at(1).at(9)->Fill((shr_energy_tot_cali - elec_e) / elec_e);
+    else if (shr_energy_cali >= 4.5 && shr_energy_cali < 5.0){
+        h_resolution.at(0).at(9)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
+        h_resolution.at(1).at(9)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
     else {
         std::cout << "Bin out of range!"<< std::endl;

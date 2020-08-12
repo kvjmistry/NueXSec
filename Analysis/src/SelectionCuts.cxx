@@ -79,11 +79,6 @@ bool SelectionCuts::in_fv(SliceContainer &SC){
 
 }
 // -----------------------------------------------------------------------------
-bool SelectionCuts::cluster_frac(SliceContainer &SC){
-    if (SC.slclustfrac > 0.4) return true; // pass 
-    else return false;                     // fail
-}
-// -----------------------------------------------------------------------------
 bool SelectionCuts::shower_score(SliceContainer &SC){
     if (SC.shr_score < 0.15) return true; // pass 
     else return false;                   // fail
@@ -92,18 +87,6 @@ bool SelectionCuts::shower_score(SliceContainer &SC){
 bool SelectionCuts::michel_rej(SliceContainer &SC){
     if (SC.shr_energy_tot_cali > 0.075) return true; // pass 
     else return false;                               // fail
-}
-// -----------------------------------------------------------------------------
-bool SelectionCuts::dEdx_y(SliceContainer &SC){
-    // Kill the background region
-    if ( (SC.shr_tkfit_dedx_Y >= 3.1 && SC.shr_tkfit_dedx_Y < 5.5) || (SC.shr_tkfit_dedx_Y < 0.5) ){
-        return false;
-    }
-    // Try and recover the events in the other planes
-    else {
-        return true;
-    }
-
 }
 // -----------------------------------------------------------------------------
 bool SelectionCuts::dEdx_max_no_tracks(SliceContainer &SC){
@@ -125,41 +108,6 @@ bool SelectionCuts::dEdx_max_no_tracks(SliceContainer &SC){
         return true;
     }
 
-}
-// -----------------------------------------------------------------------------
-bool SelectionCuts::dEdx_v(SliceContainer &SC){
-
-    // We only want to run this cut if the dedx calculation failed in the collection plane
-    if (SC.shr_tkfit_dedx_Y > 0 ) return true;
-
-
-    // Kill the background region
-    if (  (SC.shr_tkfit_dedx_V > 2.7 && SC.shr_tkfit_dedx_V < 6 ) || (SC.shr_tkfit_dedx_V > 0 && SC.shr_tkfit_dedx_V < 1.5) ){
-        return false;
-    }
-    // Try and recover the events in the other planes
-    else {
-        return true;
-    }
-
-}
-// -----------------------------------------------------------------------------
-bool SelectionCuts::dEdx_u(SliceContainer &SC){
-
-    // Signal region
-    if (SC.shr_tkfit_dedx_U >= 1.7 && SC.shr_tkfit_dedx_U < 3.2){
-        return true;
-    }
-    // failed the cut
-    else {
-        return false;
-    }
-
-}
-// -----------------------------------------------------------------------------
-bool SelectionCuts::shr_hits(SliceContainer &SC){
-    if (SC.shr_hits_max > 220 ) return true; // pass 
-    else return false;                  // fail
 }
 // -----------------------------------------------------------------------------
 bool SelectionCuts::shr_distance(SliceContainer &SC){
