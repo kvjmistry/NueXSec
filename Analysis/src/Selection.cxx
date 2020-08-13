@@ -531,7 +531,6 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
 
     // if (!pass && SC.shrmoliereavg >= 7) std::cout << SC.run << " " << SC.sub << " " << SC.evt << std::endl;
     if(!pass) return false; // Failed the cut!
-
     
     SelectionFill(type, SC, classification, interaction, pi0_classification, particle_type, _util.k_shr_moliere_avg, counter_v );
 
