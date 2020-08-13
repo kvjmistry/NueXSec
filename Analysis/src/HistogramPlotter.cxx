@@ -157,6 +157,12 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
             Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_x_reco_nu_vtx_x_%s.pdf", run_period, cut_type.c_str()), "h_true_nu_vtx_x_reco_nu_vtx_x", cut_type, false);
             Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_y_reco_nu_vtx_y_%s.pdf", run_period, cut_type.c_str()), "h_true_nu_vtx_y_reco_nu_vtx_y", cut_type, false);
             Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_z_reco_nu_vtx_z_%s.pdf", run_period, cut_type.c_str()), "h_true_nu_vtx_z_reco_nu_vtx_z", cut_type, false);
+        
+            // Normalised by reco (row)
+            Save2DHistsNorm(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s_row_norm_reco.pdf",     run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type, true, "reco");
+
+            // Normalised by true (col)
+            Save2DHistsNorm(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s_col_norm_true.pdf",     run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type, true, "true");
         }
 
         // Stacked histograms for pi0
@@ -2410,6 +2416,129 @@ void HistogramPlotter::Save2DHists(const char *print_name, const char *histname,
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
+void HistogramPlotter::Save2DHistsNorm(const char *print_name, const char *histname, std::string cut_type, bool yex, std::string normtype) {
+
+    TH2D *hist, *hist_clone;
+    _util.GetHist(f_nuexsec, hist, Form("True/%s_MC_%s", histname, cut_type.c_str()));
+
+    if (hist == NULL)
+        std::cout << "couldn't get the hist!" << std::endl;
+
+    hist_clone = (TH2D*)hist->Clone(Form("h_%s_clone", print_name));
+
+    TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
+    c->SetTopMargin(0.11);
+
+    hist->SetStats(kFALSE);
+
+    IncreaseLabelSize(hist);
+
+
+    // Now we normalise by column (true) or row (reco)
+    
+    // We are normalising by truth integral
+    if (normtype == "true"){
+
+        // Loop over rows
+        for (int row=1; row<hist_clone->GetXaxis()->GetNbins()+1; row++) {
+            double integral = 0;
+
+            // Loop over columns and get the integral
+            for (int col=1; col<hist_clone->GetYaxis()->GetNbins()+1; col++){
+                integral+=hist_clone->GetBinContent(row, col);            
+            }
+
+            // Now normalise the column entries by the integral
+            for (int col=1; col<hist_clone->GetYaxis()->GetNbins()+1; col++){
+                hist_clone->SetBinContent(row,col, hist_clone->GetBinContent(row, col)/ integral );
+                
+            }
+        } 
+    }
+    // We normalise by the row intgral (i.e. reco space)
+    else {
+        
+        // Loop over rows
+        for (int col=1; col<hist_clone->GetYaxis()->GetNbins()+1; col++) {
+            double integral = 0;
+
+            // Loop over columns and get the integral
+            for (int row=1; row<hist_clone->GetXaxis()->GetNbins()+1; row++){
+                integral+=hist_clone->GetBinContent(row, col);            
+            }
+
+            // Now normalise the column entries by the integral
+            for (int row=1; row<hist_clone->GetXaxis()->GetNbins()+1; row++){
+                hist_clone->SetBinContent(row,col, hist_clone->GetBinContent(row, col)/ integral );
+                
+            }
+        } 
+    }
+
+    hist_clone->SetMinimum(0.0);
+    hist_clone->SetMaximum(1.0);
+    gStyle->SetPaintTextFormat("4.2f");
+    hist_clone->SetMarkerSize(0.8);
+    hist_clone->SetMarkerColor(kBlack);
+    hist_clone->Draw("colz");
+
+    TH2D* hist_clone2 = (TH2D*)hist_clone->Clone(Form("h_%s_clone2", print_name));
+
+    TLatex* range;
+    if (normtype == "true")range = new TLatex(0.5,0.92, "Column Normalised");
+    else range = new TLatex(0.45,0.92,"Row Normalised");
+    range->SetTextColor(kGray+2);
+    range->SetNDC();
+    range->SetNDC();
+    range->SetTextSize(0.038);
+    range->SetTextAlign(32);
+    range->Draw();
+
+    c->Update(); 
+
+    // If yex (y=x) draw a y=x line to guide the eye
+    TLine * line;
+    if (yex){
+    
+        line = new TLine(0, 0, gPad->GetUymax(), gPad->GetUymax());
+        line->SetLineColor(kGray);
+        line->SetLineWidth(2);
+        line->Draw();
+    }
+
+    hist_clone2->Draw("text,same");
+    
+    // Draw the run period on the plot
+    TPaveText *pt;
+
+    if (std::string(run_period) == "1")
+    {
+        pt = new TPaveText(0.76, 0.915, 0.76, 0.915, "NDC");
+        pt->AddText("Run1");
+        pt->SetTextColor(kRed + 2);
+        pt->SetTextSize(0.04);
+    }
+    else if (std::string(run_period) == "3")
+    {
+        pt = new TPaveText(0.76, 0.915, 0.76, 0.915, "NDC");
+        pt->AddText("Run3");
+        pt->SetTextColor(kBlue + 2);
+    }
+    else
+    {
+        pt = new TPaveText(0.86, 0.915, 0.86, 0.915, "NDC");
+        pt->AddText("RunXXX");
+        pt->SetTextColor(kGreen + 2);
+    }
+
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.04);
+    pt->Draw();
+
+    c->Print(print_name);
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

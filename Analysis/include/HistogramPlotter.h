@@ -113,6 +113,8 @@ class HistogramPlotter{
     // Make plot of interaction efficiency
     void MakeInteractionEfficiency(const char *print_name);
     // -------------------------------------------------------------------------
+    // Plot a 2d histogram normalised by row or column
+    void Save2DHistsNorm(const char *print_name, const char *histname, std::string cut_type, bool yex, std::string normtype);
     // -------------------------------------------------------------------------
 
 
