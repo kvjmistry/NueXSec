@@ -106,6 +106,7 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     tree->Branch("weightSplineTimesTune",  &weightSplineTimesTune,  "weightSplineTimesTune/F");
     tree->Branch("nu_pdg",                 &nu_pdg,  "nu_pdg/I");
     tree->Branch("numi_ang",               &numi_ang,  "numi_ang/F");
+    tree->Branch("shr_bkt_pdg",            &shr_bkt_pdg,  "shr_bkt_pdg/I");
     tree->Branch("shr_bkt_purity",         &shr_bkt_purity);
     tree->Branch("shr_bkt_completeness",   &shr_bkt_completeness);
     tree->Branch("shr_bkt_E",              &shr_bkt_E);
@@ -239,7 +240,7 @@ void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _class
     n_tracks  = SC.n_tracks;
     shr_theta = SC.shr_theta;
     shr_phi   = SC.shr_phi;
-    shr_energy_cali = SC.shr_energy_cali;
+    shr_energy_cali = SC.shr_energy_cali/0.83; // Might be dangerous to apply this calibration factor and forget about it downstream
     shrmoliereavg = SC.shrmoliereavg;
     shr_hits_max  = SC.shr_hits_max;
     elec_e   = SC.elec_e;
@@ -247,6 +248,7 @@ void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _class
     weightSplineTimesTune = SC.weightSplineTimesTune;
     nu_pdg = SC.nu_pdg;
     numi_ang = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "beam");
+    shr_bkt_pdg = SC.shr_bkt_pdg;
 
     shr_bkt_purity       = SC.shr_bkt_purity;
     shr_bkt_completeness = SC.shr_bkt_completeness;

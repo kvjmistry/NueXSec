@@ -6,10 +6,12 @@
 #include "CrossSectionHelper.h"
 #include "PrintHelper.h"
 #include "SystematicsHelper.h"
+#include "UtilityPlotter.h"
 
 /*
 
-This is the main header
+This is the main header, just includes a bunch of other classes which are
+called within the main function
 
 Configuration is now done via the utility class
 

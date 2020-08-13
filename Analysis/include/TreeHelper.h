@@ -67,6 +67,7 @@ class TreeHelper{
     float weightSplineTimesTune{1.0};
     float numi_ang{0};
     int nu_pdg{0};
+    int shr_bkt_pdg{0};
     float shr_bkt_purity{0.0};
     float shr_bkt_completeness{0.0};
     float shr_bkt_E{0.0}; // energy of truth matched particle to the leading shower

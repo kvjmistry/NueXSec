@@ -11,6 +11,7 @@ int main(int argc, char *argv[]){
     bool calc_cross_sec            = false;
     bool overwritePOT              = false; 
     bool run_sys                   = false;
+    bool run_uplot                 = false;
     bool print                     = false;
     bool _print_mc                 = false;
     bool _print_data               = false;
@@ -34,6 +35,7 @@ int main(int argc, char *argv[]){
     char * run_period            = (char *)"empty";
     char * sysmode               = (char *)"default";
     char * xsecmode              = (char *)"default";
+    char * uplotmode             = (char *)"default";
     int num_events{-1};
     int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
     int weight{1};  // level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only
@@ -45,6 +47,7 @@ int main(int argc, char *argv[]){
     CrossSectionHelper   _xsec;
     PrintHelper          _phelper;
     SystematicsHelper    _syshelper;
+    UtilityPlotter       _uplot;
 
     std::string usage = "\nFirst run the selection with the options: \n\n\033[0;31m./nuexsec --run <run period num> [options (see below)]\033[0m \n\n"
     "\033[0;34m[--mc <mc file>]\033[0m                                       \033[0;32mThe input overlay root file\033[0m\n\n"
@@ -88,7 +91,12 @@ int main(int argc, char *argv[]){
     std::string usage3 = "\n\nTo run the detector systematics code, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --sys <systematics mode>\033[0m \n\n"
     "\033[0;34m[--sys <systematics mode>]\033[0m                             \033[0;32mThe input mode of systematics to run. Options are default/ext/reweight \033[0m\n\n"
-    "This will run the detector systematics plotting code\n\n";
+    "This will run the detector systematics plotting code\n\n"
+    "-------------------------------------------------------\n\n"
+    "\n\nTo run the utility plotter code, run: \n\n"
+    "\033[0;31m./nuexsec --run <run period num> --uplot <utility plotter mode>\033[0m \n\n"
+    "\033[0;34m[--uplot <utility plotter mode>]\033[0m                             \033[0;32mThe input mode of the utility plotter to run. Options are [to be updated] \033[0m\n\n"
+    "This will run the utility plotting code\n\n";
 
 
     // -------------------------------------------------------------------------    
@@ -235,6 +243,14 @@ int main(int argc, char *argv[]){
             xsecmode = argv[i+1];
         }
 
+        // Utility Plotter
+        if (strcmp(arg, "--uplot") == 0){
+            std::cout << "Using Utility plotting code with mode: " << argv[i+1] << std::endl;
+            run_uplot = true;
+            run_selection = false;
+            uplotmode = argv[i+1];
+        }
+
         // Only run the print function
         if (strcmp(arg, "--printonly") == 0) {
             run_selection = false;
@@ -307,6 +323,9 @@ int main(int argc, char *argv[]){
 
     // Run the systematics helper code
     if (run_sys) _syshelper.Initialise(run_period, _utility, sysmode);
+
+    // Run the utility plotting code
+    if (run_uplot) _uplot.Initialise(run_period, _utility, sysmode);
 
     // -------------------------------------------------------------------------
     // Finished!

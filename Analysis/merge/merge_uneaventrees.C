@@ -34,6 +34,14 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
     float weightSplineTimesTune{1.0}, _weightSplineTimesTune{1.0};
     float numi_ang{0.0}, _numi_ang{0.0};
     int nu_pdg{0}, _nu_pdg{0};
+    float shr_bkt_purity{0.0}, _shr_bkt_purity{0.0};
+    float shr_bkt_completeness{0.0}, _shr_bkt_completeness{0.0};
+    float shr_bkt_E{0.0}, _shr_bkt_E{0.0};
+    int shr_bkt_pdg{0}, _shr_bkt_pdg{0};
+    std::vector<float> all_shr_hits;
+    std::vector<float> all_shr_energies;
+    std::vector<float> *_all_shr_hits = NULL;
+    std::vector<float> *_all_shr_energies = NULL;
 
     std::vector<unsigned short> weightsGenie;
     std::vector<unsigned short> weightsReint;
@@ -95,6 +103,12 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
     outtree->Branch("weightSplineTimesTune",  &weightSplineTimesTune,  "weightSplineTimesTune/F");
     outtree->Branch("numi_ang",  &numi_ang,  "numi_ang/F");
     outtree->Branch("nu_pdg",  &nu_pdg,  "nu_pdg/I");
+    outtree->Branch("shr_bkt_purity", &shr_bkt_purity);
+    outtree->Branch("shr_bkt_completeness", &shr_bkt_completeness);
+    outtree->Branch("shr_bkt_E", &shr_bkt_E);
+    outtree->Branch("shr_bkt_pdg", &shr_bkt_pdg);
+    outtree->Branch("all_shr_hits", "std::vector<float>", &all_shr_hits);
+    outtree->Branch("all_shr_energies", "std::vector<float>", &all_shr_energies);
     
     outtree->Branch("weightsGenie", "std::vector<unsigned short>", &weightsGenie);
     outtree->Branch("weightsReint", "std::vector<unsigned short>", &weightsReint);
@@ -151,6 +165,12 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
         trees.at(k)->SetBranchAddress("weightSplineTimesTune",  &_weightSplineTimesTune);
         trees.at(k)->SetBranchAddress("numi_ang",  &_numi_ang);
         trees.at(k)->SetBranchAddress("nu_pdg",  &_nu_pdg);
+        trees.at(k)->SetBranchAddress("shr_bkt_purity", &_shr_bkt_purity);
+        trees.at(k)->SetBranchAddress("shr_bkt_completeness", &_shr_bkt_completeness);
+        trees.at(k)->SetBranchAddress("shr_bkt_E", &_shr_bkt_E);
+        trees.at(k)->SetBranchAddress("shr_bkt_pdg", &_shr_bkt_pdg);
+        trees.at(k)->SetBranchAddress("all_shr_hits", &_all_shr_hits);
+        trees.at(k)->SetBranchAddress("all_shr_energies", &_all_shr_energies);
         
         trees.at(k)->SetBranchAddress("weightsGenie",          &_weightsGenie);
         trees.at(k)->SetBranchAddress("weightsReint",          &_weightsReint);
@@ -203,6 +223,14 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
                 weightSplineTimesTune = _weightSplineTimesTune;
                 numi_ang = _numi_ang;
                 nu_pdg = _nu_pdg;
+                shr_bkt_pdg = _shr_bkt_pdg;
+                
+                shr_bkt_purity = _shr_bkt_purity;
+                shr_bkt_completeness = _shr_bkt_completeness;
+                shr_bkt_E = _shr_bkt_E;
+                
+                if (_all_shr_hits != NULL)    all_shr_hits = *_all_shr_hits;
+                if (_all_shr_energies != NULL)all_shr_energies = *_all_shr_energies;
 
                 if (_weightsGenie != NULL) weightsGenie           = *_weightsGenie; // If these aren't set by default then bad things happen in memory land
                 if (_weightsReint != NULL) weightsReint           = *_weightsReint;
