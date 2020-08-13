@@ -58,7 +58,13 @@ void UtilityPlotter::CompareHitstoEnergy(){
     std::cout <<"\nStudy: Tot hits to leading shower? \n" << std::endl;
 
     double total_signal_events = 0;
-    double total_non_leading_hit_events = 0; // The total number of events where the most number of hits is the most energetic shower
+    double total_non_leading_hit_events_sig = 0; // The total number of events where the most number of hits is the most energetic shower
+
+    double total_bkg_events = 0;
+    double total_non_leading_hit_events_bkg = 0;
+
+    double total_events = 0;
+    double total_non_leading_hit_events = 0;
 
     // Loop over the entries in the TTree
     for (unsigned int ievent = 0; ievent < tree->GetEntries(); ievent++){
@@ -70,7 +76,6 @@ void UtilityPlotter::CompareHitstoEnergy(){
         if ((*classifcation == "nue_cc" || *classifcation == "nuebar_cc" || *classifcation == "unmatched_nue" || *classifcation == "unmatched_nuebar") && gen == false) {
 
             // Get the leading shower index
-            
             double index_leading_shr_hits = 0;
             double leading_shr_hits = 0;
             double leading_energy_hits = 0;
@@ -98,17 +103,67 @@ void UtilityPlotter::CompareHitstoEnergy(){
             }
 
             if (index_leading_shr_E != index_leading_shr_hits){
-                std::cout << "Shr Hits: " << leading_shr_hits << "  Shr Energy: " << leading_shr_E <<  "  Leading energy hits: " << leading_energy_hits<< std::endl;
+                std::cout << *classifcation << " Shr Hits: " << leading_shr_hits << "  Shr Energy: " << leading_shr_E <<  "  Leading energy hits: " << leading_energy_hits<< std::endl;
+                total_non_leading_hit_events_sig++;
                 total_non_leading_hit_events++;
             }
 
 
             total_signal_events++;
+            total_events++;
 
         } // end if signal
 
+        // Background event
+        if ( *classifcation == "nu_out_fv"  || *classifcation == "cosmic"      ||
+                *classifcation == "numu_cc"    || *classifcation == "numu_cc_pi0" || *classifcation == "nc" || 
+                *classifcation == "nc_pi0"     || *classifcation == "cosmic_nue" || *classifcation == "cosmic_nuebar"){
+            
+            // Get the leading shower index
+            double index_leading_shr_hits = 0;
+            double leading_shr_hits = 0;
+            double leading_energy_hits = 0;
+            
+            double index_leading_shr_E = 0;
+            double leading_shr_E = 0;
+
+            if (all_shr_hits->size() != all_shr_energies->size()) std::cout <<"Warning hit vector size does not equal shower energy vector size!" <<std::endl;
+
+            for (unsigned int index = 0 ; index < all_shr_hits->size(); index++){
+
+                // Set the leading shower
+                if (all_shr_hits->at(index) > leading_shr_hits){
+                    leading_shr_hits = all_shr_hits->at(index);
+                    index_leading_shr_hits = index;
+                }
+
+                // Set the leading shower energy
+                if (all_shr_energies->at(index) > leading_shr_E){
+                    leading_shr_E = all_shr_energies->at(index);
+                    leading_energy_hits = all_shr_hits->at(index);
+                    index_leading_shr_E = index;
+                }
+
+            }
+
+            if (index_leading_shr_E != index_leading_shr_hits){
+                std::cout << *classifcation <<  " Shr Hits: " << leading_shr_hits << "  Shr Energy: " << leading_shr_E <<  "  Leading energy hits: " << leading_energy_hits<< std::endl;
+                total_non_leading_hit_events_bkg++;
+                total_non_leading_hit_events++;
+            }
+
+
+            total_bkg_events++;
+            total_events++;
+            
+        }// End if background event
+
+        
+
     } // End event loop
 
-    std::cout << "\nPercentage of signal events where shower with most hits is not the most energetic shower: " << 100*total_non_leading_hit_events / total_signal_events << std::endl;
+    std::cout << "\nPercentage of signal events where shower with most hits is not the most energetic shower: " << 100*total_non_leading_hit_events_sig / total_signal_events << std::endl;
+    std::cout << "\nPercentage of background events where shower with most hits is not the most energetic shower: " << 100*total_non_leading_hit_events_bkg / total_bkg_events << std::endl;
+    std::cout << "\nPercentage of all events where shower with most hits is not the most energetic shower: " << 100*total_non_leading_hit_events / total_events << std::endl;
 
 }
