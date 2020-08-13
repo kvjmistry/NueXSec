@@ -62,6 +62,8 @@ class UtilityPlotter{
     // really is the shower with the most energy
     void CompareHitstoEnergy();
     // -------------------------------------------------------------------------
+    // Function to see how many of the signal events we dont select the electron
+    void CompareSignalPurity();
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

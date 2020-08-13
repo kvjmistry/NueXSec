@@ -29,6 +29,9 @@ void UtilityPlotter::Initialise(const char *_run_period, Utility _utility, const
     // Look to see if the shower with the most hits is the same as the shower with the most energy
     CompareHitstoEnergy();
 
+    // Lets see how many of the leading showers that we select are not an electorn
+    CompareSignalPurity();
+
 }
 // -----------------------------------------------------------------------------
 void UtilityPlotter::InitTree(){
@@ -165,5 +168,35 @@ void UtilityPlotter::CompareHitstoEnergy(){
     std::cout << "\nPercentage of signal events where shower with most hits is not the most energetic shower: " << 100*total_non_leading_hit_events_sig / total_signal_events << std::endl;
     std::cout << "\nPercentage of background events where shower with most hits is not the most energetic shower: " << 100*total_non_leading_hit_events_bkg / total_bkg_events << std::endl;
     std::cout << "\nPercentage of all events where shower with most hits is not the most energetic shower: " << 100*total_non_leading_hit_events / total_events << std::endl;
+
+}
+// -----------------------------------------------------------------------------
+void UtilityPlotter::CompareSignalPurity(){
+
+    std::cout <<"\nStudy: Selected shower the electron? \n" << std::endl;
+
+    double total_signal_elec = 0;
+    double total_bkg_elec = 0; // Cases where the selected leading shower was not an electron
+
+
+    // Loop over the entries in the TTree
+    for (unsigned int ievent = 0; ievent < tree->GetEntries(); ievent++){
+
+        tree->GetEntry(ievent); 
+
+
+        // Lets only look at Signal events
+        if ((*classifcation == "nue_cc" || *classifcation == "nuebar_cc" || *classifcation == "unmatched_nue" || *classifcation == "unmatched_nuebar") && gen == false) {
+
+            if (shr_bkt_pdg == -11 || shr_bkt_pdg == 11) total_signal_elec++;
+            else total_bkg_elec++;
+
+        } // end if signal
+
+    } // End event loop
+
+    std::cout << "\nTotal true elec selected: " << total_signal_elec << std::endl;
+    std::cout << "\nTotal true bkg selected: " << total_bkg_elec << std::endl;
+    std::cout << "\nPecentage of selected showers that are not an electron: " << 100*total_bkg_elec/(total_bkg_elec+total_signal_elec) << std::endl;
 
 }
