@@ -739,10 +739,10 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
     bins.at(k_var_integrated) = { 0.0, 1.1 };
 
     // Reconstructed electron energy Bin definition
-    bins.at(k_var_reco_el_E) = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
+    bins.at(k_var_reco_el_E) = _util.reco_shr_bins;
 
     // True electron energy Bin definition
-    bins.at(k_var_true_el_E) = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
+    bins.at(k_var_true_el_E) = _util.reco_shr_bins;
 
     // True neutrino energy Bin definition
     // bins.at(k_var_true_nu_E) = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
@@ -752,12 +752,11 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
 
     // These are for histogram titles so we know what bin we are looking at
     std::vector<std::string> bin_labels = {
-        "0.0  - 0.25 GeV",
-        "0.25 - 0.56 GeV",
-        "0.56 - 0.89 GeV",
-        "0.89 - 1.61 GeV",
-        "1.61 - 3.37 GeV",
-        "3.37 - 5.0 GeV"
+        "0.0  - 0.28 GeV",
+        "0.28 - 0.56 GeV",
+        "0.56 - 0.88 GeV",
+        "0.88 - 1.56 GeV",
+        "1.56 - 3.5 GeV"
     };
 
 
@@ -911,58 +910,48 @@ void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double wei
 // -----------------------------------------------------------------------------
 void CrossSectionHelper::FillResolutionHists(float shr_energy_cali, float elec_e){
 
-    // 0.0 - 0.5 GeV
-    if (shr_energy_cali >=0 && shr_energy_cali < 0.5){
+    // 0.0 - 0.30 GeV
+    if (shr_energy_cali >=0 && shr_energy_cali < 0.30){
         h_resolution.at(0).at(0)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
         h_resolution.at(1).at(0)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
-    // 0.5 - 1.0 GeV
-    else if (shr_energy_cali >= 0.5 && shr_energy_cali < 1.0){
+    // 0.30 - 0.46 GeV
+    else if (shr_energy_cali >= 0.30 && shr_energy_cali < 0.46){
         h_resolution.at(0).at(1)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
         h_resolution.at(1).at(1)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
-    // 1.0 - 1.5 GeV
-    else if (shr_energy_cali >= 1.0 && shr_energy_cali < 1.5){
+    // 0.46 - 0.67 GeV
+    else if (shr_energy_cali >= 0.46 && shr_energy_cali < 0.67){
         h_resolution.at(0).at(2)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
         h_resolution.at(1).at(2)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
-    // 1.5 - 2.0 GeV
-    else if (shr_energy_cali >= 1.5 && shr_energy_cali < 2.0){
+    // 0.67 - 0.97 GeV
+    else if (shr_energy_cali >= 0.67 && shr_energy_cali < 0.97){
         h_resolution.at(0).at(3)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
         h_resolution.at(1).at(3)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
-    // 2.0 - 2.5 GeV
-    else if (shr_energy_cali >= 2.0 && shr_energy_cali < 2.5){
+    // 0.97 - 1.38 GeV
+    else if (shr_energy_cali >= 0.97 && shr_energy_cali < 1.38){
         h_resolution.at(0).at(4)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
         h_resolution.at(1).at(4)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
-    // 2.5 - 3.0 GeV
-    else if (shr_energy_cali >= 2.5 && shr_energy_cali < 3.0){
+    // 1.38 - 1.83 GeV
+    else if (shr_energy_cali >= 1.38 && shr_energy_cali < 1.83){
         h_resolution.at(0).at(5)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
         h_resolution.at(1).at(5)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
-    // 3.0 - 3.5 GeV
-    else if (shr_energy_cali >= 3.0 && shr_energy_cali < 3.5){
+    // 1.83 - 2.63 GeV
+    else if (shr_energy_cali >= 1.83 && shr_energy_cali < 2.63){
         h_resolution.at(0).at(6)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
         h_resolution.at(1).at(6)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
-    // 3.5 - 4.0 GeV
-    else if (shr_energy_cali >= 3.5 && shr_energy_cali < 4.0){
+    // 2.63 - 3.50 GeV
+    else if (shr_energy_cali >= 2.63 && shr_energy_cali < 3.50){
         h_resolution.at(0).at(7)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
         h_resolution.at(1).at(7)->Fill((shr_energy_cali - elec_e) / elec_e);
     }
-    // 4.0 - 4.5 GeV
-    else if (shr_energy_cali >= 4.0 && shr_energy_cali < 4.5){
-        h_resolution.at(0).at(8)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
-        h_resolution.at(1).at(8)->Fill((shr_energy_cali - elec_e) / elec_e);
-    }
-    // 4.5 - 5.0 GeV
-    else if (shr_energy_cali >= 4.5 && shr_energy_cali < 5.0){
-        h_resolution.at(0).at(9)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
-        h_resolution.at(1).at(9)->Fill((shr_energy_cali - elec_e) / elec_e);
-    }
     else {
-        std::cout << "Bin out of range!"<< std::endl;
+        // std::cout << "Bin out of range!"<< std::endl;
     }
 
 }

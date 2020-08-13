@@ -69,6 +69,9 @@ public:
     // -------------------------------------------------------------------------
 
     // Variables
+
+    // Bins for the reconstructed shower energy
+    std::vector<double> reco_shr_bins = { 0.0, 0.30, 0.46, 0.67, 0.97, 1.38, 1.83, 2.63, 3.50};
     
     // POT 
     std::vector<double> config_v;

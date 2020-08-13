@@ -282,16 +282,15 @@ void HistogramHelper::InitHistograms(){
             TH1D_hists.at(k_reco_track_score).at(i).at(j) = new TH1D (Form("h_reco_track_score_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0.5, 1);
             
             // YZ and X Calibrated energy of all the showers
-            TH1D_hists.at(k_reco_shower_energy_tot_cali).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_tot_cali_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 3);
+            TH1D_hists.at(k_reco_shower_energy_tot_cali).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_tot_cali_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 4);
             
             // Calibrated energy of just the leading shower
-            TH1D_hists.at(k_reco_shower_energy_cali).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_cali_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 3);
+            TH1D_hists.at(k_reco_shower_energy_cali).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_cali_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 4);
 
             // Set the bins for the reco energy
-            std::vector<double> temp_bins = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
-            double* edges = &temp_bins[0]; // Cast to an array 
-            TH1D_hists.at(k_reco_shower_energy_tot_cali_rebin).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_tot_cali_rebin_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", temp_bins.size()-1, edges);
-            TH1D_hists.at(k_reco_shower_energy_cali_rebin).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_cali_rebin_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", temp_bins.size()-1, edges);
+            double* edges = &_util.reco_shr_bins[0]; // Cast to an array 
+            TH1D_hists.at(k_reco_shower_energy_tot_cali_rebin).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_tot_cali_rebin_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", _util.reco_shr_bins.size()-1, edges);
+            TH1D_hists.at(k_reco_shower_energy_cali_rebin).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_cali_rebin_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", _util.reco_shr_bins.size()-1, edges);
 
             // Total number of hits for the leading shower
             TH1D_hists.at(k_reco_shr_hits_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 1600);
@@ -492,7 +491,8 @@ void HistogramHelper::InitHistograms(){
             TH2D_true_hists.at(i).at(k_true_nue_vtx_z_y)     = new TH2D( Form("h_true_nue_vtx_z_y_%s_%s",     _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} Vtx Z [cm] ;True #nu_{e} Vtx Y [cm]", 40, -10, 1050, 20, -10, 120);
             TH2D_true_hists.at(i).at(k_true_nue_vtx_z_y_sce) = new TH2D( Form("h_true_nue_vtx_z_y_sce_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),";True #nu_{e} Vtx Z  Space Charge Corr. [cm];True #nu_{e} Vtx Y Space Charge Corr. [cm]", 40, -10, 1050, 20, -10, 120);
         
-            TH2D_true_hists.at(i).at(k_true_elec_E_reco_elec_E) = new TH2D( Form("h_true_elec_E_reco_elec_E_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True e^{-} Energy [GeV] ;Reco Leading Shower Energy [GeV]", 25, 0, 4, 25, 0, 4);
+            double* edges = &_util.reco_shr_bins[0]; // Cast to an array 
+            TH2D_true_hists.at(i).at(k_true_elec_E_reco_elec_E) = new TH2D( Form("h_true_elec_E_reco_elec_E_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True e^{-} Energy [GeV] ;Reco Leading Shower Energy [GeV]", _util.reco_shr_bins.size()-1, edges, _util.reco_shr_bins.size()-1, edges);
             TH2D_true_hists.at(i).at(k_true_nu_E_reco_nu_E)     = new TH2D( Form("h_true_nu_E_reco_nu_E_%s_%s",             _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} Energy [GeV] ;Reco #nu_{e} Energy [GeV]", 25, 0, 4, 25, 0, 4);
             TH2D_true_hists.at(i).at(k_true_elec_E_reco_elec_E_extra_bins) = new TH2D( Form("h_true_elec_E_reco_elec_E_extra_bins_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True e^{-} Energy [GeV] ;Reco Leading Shower Energy [GeV]", 50, 0, 4, 50, 0, 4);
             TH2D_true_hists.at(i).at(k_true_nu_E_reco_nu_E_extra_bins)     = new TH2D( Form("h_true_nu_E_reco_nu_E_extra_bins_%s_%s",             _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} Energy [GeV] ;Reco #nu_{e} Energy [GeV]", 50, 0, 4, 50, 0, 4);

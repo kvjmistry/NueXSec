@@ -206,7 +206,7 @@ void UtilityPlotter::CompareSignalPurity(){
 
 }
 // -----------------------------------------------------------------------------
-void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_edge, float bin_upper_edge, TTree* tree, bool save_hist, bool &converged){
+void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_edge, float bin_upper_edge, TTree* tree, bool save_hist, bool &converged, bool draw_fit_results){
     
     TCut generic_query = "(classifcation.c_str()==\"nue_cc\" || classifcation.c_str()==\"nuebar_cc\") && !gen"; // This gets selected signal events
     TCut bin_query = Form("shr_energy_cali > %f && shr_energy_cali < %f", bin_lower_edge, bin_upper_edge);
@@ -242,6 +242,7 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
     }
 
     TLatex* range;
+    TLatex* fit_params;
     if (save_hist){
         range = new TLatex(0.88,0.86, Form("Reco Energy %0.2f - %0.2f GeV",bin_lower_edge, bin_upper_edge ));
         range->SetTextColor(kGray+2);
@@ -250,6 +251,14 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
         range->SetTextSize(0.038);
         range->SetTextAlign(32);
         range->Draw();
+
+        fit_params = new TLatex(0.88,0.92, Form("Fit Mean: %0.2f GeV, Fit Sigma: %0.2f GeV",mean, sigma ));
+        fit_params->SetTextColor(kGray+2);
+        fit_params->SetNDC();
+        fit_params->SetNDC();
+        fit_params->SetTextSize(0.038);
+        fit_params->SetTextAlign(32);
+        if (draw_fit_results) fit_params->Draw();
 
 
         htemp->SetTitle("; Truth Electron Energy; Entries");
@@ -282,21 +291,21 @@ void UtilityPlotter::OptimiseBins(){
     // float lower_bin = 1.55;
     
     // Loop over the bins
-    for (float bin = 0; bin < 5; bin++ ){
+    for (float bin = 0; bin < 8; bin++ ){
         std::cout << "\n\033[0;34mTrying to optimise the next bin\033[0m\n"<< std::endl;
         converged = false;
 
         // Slide upper bin value till we get 2xthe STD of the fit
-        for (float i = lower_bin+0.1; i <= 4.0; i+=0.01) {
+        for (float i = lower_bin+0.1; i <= 4.0; i+=0.001) {
             std::cout << "\n\033[0;34mTrying Bin: " << i << "GeV\033[0m\n"<< std::endl;
 
             // call function which draws the tree to a canvas, fits the tree and returns the fit parameter
             // If the fit has 2xSTD = the reco bin size then we have successfully optimised the bin
-            GetFitResult(mean, sigma, lower_bin, i, tree, false, converged);
+            GetFitResult(mean, sigma, lower_bin, i, tree, false, converged, false);
 
             // If it converged, do it again and print the canvas then break
             if (converged) {
-                GetFitResult(mean, sigma, lower_bin, i, tree, true, converged);
+                GetFitResult(mean, sigma, lower_bin, i, tree, true, converged, true);
                 std::cout << "\n\033[0;34mMean: " << mean << "  Sigma: " << sigma<< "\033[0m\n"<< std::endl;
                 
                 // Reset the lower bin value
@@ -305,8 +314,8 @@ void UtilityPlotter::OptimiseBins(){
             }
 
             // Since the fit doesnt want to converge for the last bin, lets jsut draw it anyway
-            if (bin == 4){
-                GetFitResult(mean, sigma, 1.56, 4.0, tree, true, converged);
+            if (bin == 7){
+                GetFitResult(mean, sigma, 2.63, 3.5, tree, true, converged, false);
                 break;
             }
 

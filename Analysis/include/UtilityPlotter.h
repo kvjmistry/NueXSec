@@ -66,7 +66,7 @@ class UtilityPlotter{
     void CompareSignalPurity();
     // -------------------------------------------------------------------------
     // Function to optimise binning for the selection
-    void GetFitResult(double &mean, double &sigma, float bin_lower_edge, float bin_upper_edge, TTree* tree, bool save_hist, bool &converged);
+    void GetFitResult(double &mean, double &sigma, float bin_lower_edge, float bin_upper_edge, TTree* tree, bool save_hist, bool &converged, bool draw_fit_results);
     // -------------------------------------------------------------------------
     // Caller class to optimise the bins
     void OptimiseBins();
