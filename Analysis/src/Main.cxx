@@ -95,7 +95,7 @@ int main(int argc, char *argv[]){
     "-------------------------------------------------------\n\n"
     "\n\nTo run the utility plotter code, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --uplot <utility plotter mode>\033[0m \n\n"
-    "\033[0;34m[--uplot <utility plotter mode>]\033[0m                             \033[0;32mThe input mode of the utility plotter to run. Options are [to be updated] \033[0m\n\n"
+    "\033[0;34m[--uplot <utility plotter mode>]\033[0m                             \033[0;32mThe input mode of the utility plotter to run. Options are default/bins \033[0m\n\n"
     "This will run the utility plotting code\n\n";
 
 
@@ -325,7 +325,7 @@ int main(int argc, char *argv[]){
     if (run_sys) _syshelper.Initialise(run_period, _utility, sysmode);
 
     // Run the utility plotting code
-    if (run_uplot) _uplot.Initialise(run_period, _utility, sysmode);
+    if (run_uplot) _uplot.Initialise(run_period, _utility, uplotmode);
 
     // -------------------------------------------------------------------------
     // Finished!

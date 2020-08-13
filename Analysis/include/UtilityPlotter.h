@@ -65,7 +65,11 @@ class UtilityPlotter{
     // Function to see how many of the signal events we dont select the electron
     void CompareSignalPurity();
     // -------------------------------------------------------------------------
+    // Function to optimise binning for the selection
+    void GetFitResult(double &mean, double &sigma, float bin_lower_edge, float bin_upper_edge, TTree* tree, bool save_hist, bool &converged);
     // -------------------------------------------------------------------------
+    // Caller class to optimise the bins
+    void OptimiseBins();
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 

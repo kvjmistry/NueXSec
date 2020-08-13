@@ -9,29 +9,34 @@ void UtilityPlotter::Initialise(const char *_run_period, Utility _utility, const
     // Set the run period
     run_period = std::string(_run_period);
 
+    f_nuexsec    = TFile::Open( Form("files/trees/nuexsec_tree_merged_run%s.root", _run_period ));
+        
+    // Get the Ttree
+    _util.GetTree(f_nuexsec, tree, "tree");
+    
+    // Initialise the TTtree
+    InitTree();
+
     // Standard variation mode
     if (std::string(mode) == "default")  {
-        f_nuexsec    = TFile::Open( Form("files/trees/nuexsec_tree_merged_run%s.root", _run_period ));
+
+        // Look to see if the shower with the most hits is the same as the shower with the most energy
+        CompareHitstoEnergy();
+
+        // Lets see how many of the leading showers that we select are not an electorn
+        CompareSignalPurity();
         
-        // Get the Ttree
-        _util.GetTree(f_nuexsec, tree, "tree");
-        
-        // Initialise the TTtree
-        InitTree();
+    }
+    // This will call the code to optimise the bin widths
+    else if (std::string(mode) == "bins"){
+        OptimiseBins();
+        return;
     }
     else {
         std::cout << "Error I dont know what mode you have configured..." << mode << std::endl;
-        exit(1);
+        return;
     }
     
-    // Now we have initialised the Ttree, we can do some studies!
-    
-    // Look to see if the shower with the most hits is the same as the shower with the most energy
-    CompareHitstoEnergy();
-
-    // Lets see how many of the leading showers that we select are not an electorn
-    CompareSignalPurity();
-
 }
 // -----------------------------------------------------------------------------
 void UtilityPlotter::InitTree(){
@@ -200,3 +205,113 @@ void UtilityPlotter::CompareSignalPurity(){
     std::cout << "\nPecentage of selected showers that are not an electron: " << 100*total_bkg_elec/(total_bkg_elec+total_signal_elec) << std::endl;
 
 }
+// -----------------------------------------------------------------------------
+void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_edge, float bin_upper_edge, TTree* tree, bool save_hist, bool &converged){
+    
+    TCut generic_query = "(classifcation.c_str()==\"nue_cc\" || classifcation.c_str()==\"nuebar_cc\") && !gen"; // This gets selected signal events
+    TCut bin_query = Form("shr_energy_cali > %f && shr_energy_cali < %f", bin_lower_edge, bin_upper_edge);
+    
+    TCanvas * c = new TCanvas(Form("c_%f_%f", bin_upper_edge, sigma), "c", 500, 500);
+
+    // Draw the Query
+    tree->Draw("elec_e", generic_query && bin_query);
+    
+    // Get the histogram from the pad
+    TH1F *htemp = (TH1F*)gPad->GetPrimitive("htemp");
+    
+    // Fit it with a Gaussian
+    htemp->Fit("gaus");
+    
+    // Get the fit result
+    TF1 *fit_gaus = htemp->GetFunction("gaus");
+    
+    // Draw the histogram
+    if (save_hist) {
+        htemp->SetLineWidth(2);
+        htemp->SetLineColor(kBlack);
+    }
+    htemp->Draw("hist");
+    if (converged) fit_gaus->Draw("same");
+
+    mean  = fit_gaus->GetParameter(1);
+	sigma = fit_gaus->GetParameter(2);
+
+    if (sigma*2 >= bin_upper_edge - bin_lower_edge - 0.01 && sigma*2 <= bin_upper_edge - bin_lower_edge + 0.01){
+        std::cout << "Fit has converged!: " << 2*sigma/(bin_upper_edge - bin_lower_edge) << std::endl;
+        converged = true;
+    }
+
+    TLatex* range;
+    if (save_hist){
+        range = new TLatex(0.88,0.86, Form("Reco Energy %0.2f - %0.2f GeV",bin_lower_edge, bin_upper_edge ));
+        range->SetTextColor(kGray+2);
+        range->SetNDC();
+        range->SetNDC();
+        range->SetTextSize(0.038);
+        range->SetTextAlign(32);
+        range->Draw();
+
+
+        htemp->SetTitle("; Truth Electron Energy; Entries");
+        htemp->SetStats(kFALSE);
+        htemp->GetXaxis()->SetLabelSize(0.05);
+        htemp->GetXaxis()->SetTitleSize(0.05);
+        htemp->GetYaxis()->SetLabelSize(0.05);
+        htemp->GetYaxis()->SetTitleSize(0.05);
+        gPad->SetLeftMargin(0.15);
+        gPad->SetBottomMargin(0.12);
+        c->SetTopMargin(0.11);
+        c->Print(Form("plots/binning/bins_%0.2fGeV_to_%0.2f_GeV.pdf",bin_lower_edge, bin_upper_edge ));
+    } 
+
+
+}
+// -----------------------------------------------------------------------------
+void UtilityPlotter::OptimiseBins(){
+
+    gSystem->Exec("if [ ! -d \"plots/binning\" ]; then echo \"\nBins folder does not exist... creating\"; mkdir -p plots/binning; fi"); 
+
+
+    // Load in the tfile and tree
+    double mean{0.0}, sigma{0.0};
+    bool converged = false;
+
+    // Were do we want to start the fit iteraction from?
+    // Generally choose the first bin width to be 0.25 GeV
+    float lower_bin = 0.001;
+    // float lower_bin = 1.55;
+    
+    // Loop over the bins
+    for (float bin = 0; bin < 5; bin++ ){
+        std::cout << "\n\033[0;34mTrying to optimise the next bin\033[0m\n"<< std::endl;
+        converged = false;
+
+        // Slide upper bin value till we get 2xthe STD of the fit
+        for (float i = lower_bin+0.1; i <= 4.0; i+=0.01) {
+            std::cout << "\n\033[0;34mTrying Bin: " << i << "GeV\033[0m\n"<< std::endl;
+
+            // call function which draws the tree to a canvas, fits the tree and returns the fit parameter
+            // If the fit has 2xSTD = the reco bin size then we have successfully optimised the bin
+            GetFitResult(mean, sigma, lower_bin, i, tree, false, converged);
+
+            // If it converged, do it again and print the canvas then break
+            if (converged) {
+                GetFitResult(mean, sigma, lower_bin, i, tree, true, converged);
+                std::cout << "\n\033[0;34mMean: " << mean << "  Sigma: " << sigma<< "\033[0m\n"<< std::endl;
+                
+                // Reset the lower bin value
+                lower_bin = i;
+                break;
+            }
+
+            // Since the fit doesnt want to converge for the last bin, lets jsut draw it anyway
+            if (bin == 4){
+                GetFitResult(mean, sigma, 1.56, 4.0, tree, true, converged);
+                break;
+            }
+
+        }
+    }
+    
+}
+// -----------------------------------------------------------------------------
