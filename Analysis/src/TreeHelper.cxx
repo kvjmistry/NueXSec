@@ -85,51 +85,58 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     _type = type;
     
     // Set the tree branches
-    tree->Branch("run",    &run,    "run/I");
-    tree->Branch("subrun", &subrun, "subrun/I");
-    tree->Branch("event",  &event,  "event/I");
-    tree->Branch("gen",    &gen,    "gen/O");
-    tree->Branch("weight", &weight, "weight/D");
-    tree->Branch("true_energy", &true_energy, "true_energy/D");
-    tree->Branch("reco_energy", &reco_energy, "reco_energy/D");
-    tree->Branch("classifcation",   &classifcation);
+    tree->Branch("run",              &run,    "run/I");
+    tree->Branch("subrun",           &subrun, "subrun/I");
+    tree->Branch("event",            &event,  "event/I");
+    tree->Branch("gen",              &gen,    "gen/O");
+    tree->Branch("weight",           &weight, "weight/D");
+    tree->Branch("true_energy",      &true_energy, "true_energy/D");
+    tree->Branch("reco_energy",      &reco_energy, "reco_energy/D");
+    tree->Branch("classifcation",    &classifcation);
     tree->Branch("shr_tkfit_dedx_Y", &shr_tkfit_dedx_Y, "shr_tkfit_dedx_Y/F");
-    tree->Branch("n_showers", &n_showers, "n_showers/F");
-    tree->Branch("n_tracks",  &n_tracks,  "n_tracks/F");
-    tree->Branch("shr_theta", &shr_theta, "shr_theta/F");
-    tree->Branch("shr_phi",   &shr_phi,   "shr_phi/F");
-    tree->Branch("shr_energy_cali", &shr_energy_cali, "shr_energy_cali/F");
-    tree->Branch("shrmoliereavg", &shrmoliereavg, "shrmoliereavg/F");
-    tree->Branch("shr_hits_max",  &shr_hits_max,  "shr_hits_max/F");
-    tree->Branch("elec_e",  &elec_e,  "elec_e/F");
-    tree->Branch("ppfx_cv",  &ppfx_cv,  "ppfx_cv/F");
+    tree->Branch("n_showers",        &n_showers, "n_showers/F");
+    tree->Branch("n_tracks",         &n_tracks,  "n_tracks/F");
+    tree->Branch("shr_theta",        &shr_theta, "shr_theta/F");
+    tree->Branch("shr_phi",          &shr_phi,   "shr_phi/F");
+    tree->Branch("shr_energy_cali",  &shr_energy_cali, "shr_energy_cali/F");
+    tree->Branch("shrmoliereavg",    &shrmoliereavg, "shrmoliereavg/F");
+    tree->Branch("shr_hits_max",     &shr_hits_max,  "shr_hits_max/F");
+    tree->Branch("elec_e",           &elec_e,  "elec_e/F");
+    tree->Branch("ppfx_cv",          &ppfx_cv,  "ppfx_cv/F");
     tree->Branch("weightSplineTimesTune",  &weightSplineTimesTune,  "weightSplineTimesTune/F");
-    tree->Branch("nu_pdg",  &nu_pdg,  "nu_pdg/I");
-    tree->Branch("numi_ang",  &numi_ang,  "numi_ang/F");
+    tree->Branch("nu_pdg",                 &nu_pdg,  "nu_pdg/I");
+    tree->Branch("numi_ang",               &numi_ang,  "numi_ang/F");
+    tree->Branch("shr_bkt_purity",         &shr_bkt_purity);
+    tree->Branch("shr_bkt_completeness",   &shr_bkt_completeness);
+    tree->Branch("shr_bkt_E",              &shr_bkt_E);
+    tree->Branch("all_shr_hits",     "std::vector<float>", &all_shr_hits);
+    tree->Branch("all_shr_energies", "std::vector<float>", &all_shr_energies);
+
+
 
     tree->Branch("weightsGenie", "std::vector<unsigned short>", &weightsGenie);
     tree->Branch("weightsReint", "std::vector<unsigned short>", &weightsReint);
-    tree->Branch("weightsPPFX", "std::vector<unsigned short>", &weightsPPFX);
-    tree->Branch("knobRPAup",&knobRPAup,"knobRPAup/D");
-    tree->Branch("knobRPAdn",&knobRPAdn,"knobRPAdn/D");
-    tree->Branch("knobCCMECup",&knobCCMECup,"knobCCMECup/D");
-    tree->Branch("knobCCMECdn",&knobCCMECdn,"knobCCMECdn/D");
-    tree->Branch("knobAxFFCCQEup",&knobAxFFCCQEup,"knobAxFFCCQEup/D");
-    tree->Branch("knobAxFFCCQEdn",&knobAxFFCCQEdn,"knobAxFFCCQEdn/D");
-    tree->Branch("knobVecFFCCQEup",&knobVecFFCCQEup,"knobVecFFCCQEup/D");
-    tree->Branch("knobVecFFCCQEdn",&knobVecFFCCQEdn,"knobVecFFCCQEdn/D");
-    tree->Branch("knobDecayAngMECup",&knobDecayAngMECup,"knobDecayAngMECup/D");
-    tree->Branch("knobDecayAngMECdn",&knobDecayAngMECdn,"knobDecayAngMECdn/D");
-    tree->Branch("knobThetaDelta2Npiup",&knobThetaDelta2Npiup,"knobThetaDelta2Npiup/D");
-    tree->Branch("knobThetaDelta2Npidn",&knobThetaDelta2Npidn,"knobThetaDelta2Npidn/D");
-    tree->Branch("knobThetaDelta2NRadup",&knobThetaDelta2NRadup,"knobThetaDelta2NRadup/D");
-    tree->Branch("knobThetaDelta2NRaddn",&knobThetaDelta2NRaddn,"knobThetaDelta2NRaddn/D");
+    tree->Branch("weightsPPFX",  "std::vector<unsigned short>", &weightsPPFX);
+    tree->Branch("knobRPAup",             &knobRPAup,             "knobRPAup/D");
+    tree->Branch("knobRPAdn",             &knobRPAdn,             "knobRPAdn/D");
+    tree->Branch("knobCCMECup",           &knobCCMECup,           "knobCCMECup/D");
+    tree->Branch("knobCCMECdn",           &knobCCMECdn,           "knobCCMECdn/D");
+    tree->Branch("knobAxFFCCQEup",        &knobAxFFCCQEup,        "knobAxFFCCQEup/D");
+    tree->Branch("knobAxFFCCQEdn",        &knobAxFFCCQEdn,        "knobAxFFCCQEdn/D");
+    tree->Branch("knobVecFFCCQEup",       &knobVecFFCCQEup,       "knobVecFFCCQEup/D");
+    tree->Branch("knobVecFFCCQEdn",       &knobVecFFCCQEdn,       "knobVecFFCCQEdn/D");
+    tree->Branch("knobDecayAngMECup",     &knobDecayAngMECup,     "knobDecayAngMECup/D");
+    tree->Branch("knobDecayAngMECdn",     &knobDecayAngMECdn,     "knobDecayAngMECdn/D");
+    tree->Branch("knobThetaDelta2Npiup",  &knobThetaDelta2Npiup,  "knobThetaDelta2Npiup/D");
+    tree->Branch("knobThetaDelta2Npidn",  &knobThetaDelta2Npidn,  "knobThetaDelta2Npidn/D");
+    tree->Branch("knobThetaDelta2NRadup", &knobThetaDelta2NRadup, "knobThetaDelta2NRadup/D");
+    tree->Branch("knobThetaDelta2NRaddn", &knobThetaDelta2NRaddn, "knobThetaDelta2NRaddn/D");
     tree->Branch("knobRPA_CCQE_Reducedup",&knobRPA_CCQE_Reducedup,"knobRPA_CCQE_Reducedup/D");
     tree->Branch("knobRPA_CCQE_Reduceddn",&knobRPA_CCQE_Reduceddn,"knobRPA_CCQE_Reduceddn/D");
-    tree->Branch("knobNormCCCOHup",&knobNormCCCOHup,"knobNormCCCOHup/D");
-    tree->Branch("knobNormCCCOHdn",&knobNormCCCOHdn,"knobNormCCCOHdn/D");
-    tree->Branch("knobNormNCCOHup",&knobNormNCCOHup,"knobNormNCCOHup/D");
-    tree->Branch("knobNormNCCOHdn",&knobNormNCCOHdn,"knobNormNCCOHdn/D");
+    tree->Branch("knobNormCCCOHup",       &knobNormCCCOHup,       "knobNormCCCOHup/D");
+    tree->Branch("knobNormCCCOHdn",       &knobNormCCCOHdn,       "knobNormCCCOHdn/D");
+    tree->Branch("knobNormNCCOHup",       &knobNormNCCOHup,       "knobNormNCCOHup/D");
+    tree->Branch("knobNormNCCOHdn",       &knobNormNCCOHdn,       "knobNormNCCOHdn/D");
 
     dedx_tree->Branch("shr_hits_u_tot", &shr_hits_u_tot, "shr_hits_u_tot/I");
     dedx_tree->Branch("shr_hits_v_tot", &shr_hits_v_tot, "shr_hits_v_tot/I");
@@ -240,6 +247,12 @@ void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _class
     weightSplineTimesTune = SC.weightSplineTimesTune;
     nu_pdg = SC.nu_pdg;
     numi_ang = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "beam");
+
+    shr_bkt_purity       = SC.shr_bkt_purity;
+    shr_bkt_completeness = SC.shr_bkt_completeness;
+    shr_bkt_E            = SC.shr_bkt_E;
+    all_shr_hits         = *SC.all_shr_hits;
+    all_shr_energies     = *SC.all_shr_energies;
 
     
     if (SC.weightsGenie != NULL) weightsGenie           = *SC.weightsGenie; // If these aren't set by default then bad things happen in memory land

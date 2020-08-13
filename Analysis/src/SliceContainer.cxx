@@ -6,7 +6,6 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     std::cout << "Initalising Slice Container" << std::endl;
     _util = util;
 
-    tree->SetBranchAddress("selected", &selected);
     tree->SetBranchAddress("run", &run);
     tree->SetBranchAddress("sub", &sub);
     tree->SetBranchAddress("evt", &evt);
@@ -68,6 +67,9 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("shr_tkfit_gap10_nhits_Y", &shr_tkfit_gap10_nhits_Y );
     tree->SetBranchAddress("shr_tkfit_gap10_nhits_V", &shr_tkfit_gap10_nhits_V );
     tree->SetBranchAddress("shr_tkfit_gap10_nhits_U", &shr_tkfit_gap10_nhits_U );
+
+    tree->SetBranchAddress("all_shr_hits",     &all_shr_hits);
+    tree->SetBranchAddress("all_shr_energies", &all_shr_energies);
 
     tree->SetBranchAddress("shrPCA1CMed_5cm", &shrPCA1CMed_5cm );
 

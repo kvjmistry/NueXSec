@@ -47,7 +47,6 @@ public:
 
     Utility _util;
 
-    int   selected;              // Adds at least 1 shower and containment????
     int   run;                   // Run
     int   sub;                   // Subrun
     int   evt;                   // Event
@@ -127,6 +126,10 @@ public:
     unsigned int   shr_tkfit_gap10_nhits_Y; // Number of hits in the 1x4 cm box on the Y plane with the track fitting, skip first 10 mm
     unsigned int   shr_tkfit_gap10_nhits_V;
     unsigned int   shr_tkfit_gap10_nhits_U;
+
+
+    std::vector<float> *all_shr_hits     = nullptr; // Vector containing the shower hits
+    std::vector<float> *all_shr_energies = nullptr; // vector containing the shower energies (not calibrated)
     
     float shrPCA1CMed_5cm; // 0 to 1
 
@@ -148,8 +151,8 @@ public:
     float shr_score;            // Shower: Pandora track score for the leading shower
     
     int   shr_bkt_pdg;          // Shower: PDG code of the MCParticle matched to the leading shower
-    float shr_bkt_purity;       // Shower: Purity of the leading shower
-    float shr_bkt_completeness; // Shower: Completeness of the leading shower
+    float shr_bkt_purity;       // Shower: Purity of the leading shower -- e.g. how many hits came from particles that werent a true electron
+    float shr_bkt_completeness; // Shower: Completeness of the leading shower - e.g. how many hits from the true electron were missed
     float shr_bkt_E;            // Shower: Energy of the MCParticle matched to the leading shower
     
     float trk_len;              // Track: Length of the longest track
