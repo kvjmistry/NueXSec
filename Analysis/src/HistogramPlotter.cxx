@@ -1514,6 +1514,11 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
     MakeStack("h_reco_shr_tkfit_dedx_y_par", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Leading Shower dEdx (Collection Plane) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_y_par.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "particle", true, variation, run_period, false, true);
+    
+    // dEdx max Plane using trackfits
+    MakeStack("h_reco_shr_tkfit_dedx_max_par", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "Leading Shower dEdx (All Planes) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_shr_tkfit_dedx_max_par.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "particle", true, variation, run_period, false, true);
 
 
 }

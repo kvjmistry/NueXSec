@@ -229,11 +229,6 @@ void HistogramHelper::InitHistograms(){
             TH1D_hists.at(k_reco_vtx_y_sce).at(i).at(j) = new TH1D ( Form("h_reco_vtx_y_sce_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, -120, 120);
             
             TH1D_hists.at(k_reco_vtx_z_sce).at(i).at(j) = new TH1D ( Form("h_reco_vtx_z_sce_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, -10, 1050);
-
-            // dEdx
-            TH1D_hists.at(k_reco_dEdx_cali_u_plane).at(i).at(j) = new TH1D ( Form("h_reco_dEdx_cali_u_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
-            TH1D_hists.at(k_reco_dEdx_cali_v_plane).at(i).at(j) = new TH1D ( Form("h_reco_dEdx_cali_v_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
-            TH1D_hists.at(k_reco_dEdx_cali_y_plane).at(i).at(j) = new TH1D ( Form("h_reco_dEdx_cali_y_plane_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             
             // Leading Shower Momentum
             TH1D_hists.at(k_reco_leading_mom).at(i).at(j) = new TH1D ( Form("h_reco_leading_mom_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 2);
@@ -365,12 +360,6 @@ void HistogramHelper::InitHistograms(){
             // Shower Moliere RMS
             TH1D_hists.at(k_reco_shrmoliererms).at(i).at(j) = new TH1D ( Form("h_reco_shrmoliererms_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 30000 );
 
-            // Shower Cylindrical Fraction 1cm in the Second half
-            TH1D_hists.at(k_reco_CylFrac2h_1cm).at(i).at(j) = new TH1D ( Form("h_reco_CylFrac2h_1cm_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 0.5 );
-
-            // Shower RMS of spacepoint to the shower center at the second half of the Shower
-            TH1D_hists.at(k_reco_DeltaRMS2h).at(i).at(j) = new TH1D ( Form("h_reco_DeltaRMS2h_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 20 );
-
             // Shower Median PCA Calculated in 5cm blocks
             TH1D_hists.at(k_reco_shrPCA1CMed_5cm).at(i).at(j) = new TH1D ( Form("h_reco_shrPCA1CMed_5cm_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 1 );
 
@@ -429,7 +418,7 @@ void HistogramHelper::InitHistograms(){
         for (unsigned int j=0; j < _util.particle_types.size();j++){
         
             // dEdx
-            TH1D_hists_particle.at(k_reco_dEdx_cali_y_plane_par).at(i).at(j) = new TH1D ( Form("h_reco_dEdx_cali_y_plane_par_%s_%s",_util.cut_dirs.at(i).c_str(), _util.particle_types.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists_particle.at(k_reco_shr_tkfit_dedx_max_par).at(i).at(j) = new TH1D ( Form("k_reco_shr_tkfit_dedx_max_par_%s_%s",_util.cut_dirs.at(i).c_str(), _util.particle_types.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists_particle.at(k_reco_shr_tkfit_dedx_y_par).at(i).at(j)  = new TH1D ( Form("h_reco_shr_tkfit_dedx_y_par_%s_%s", _util.cut_dirs.at(i).c_str(), _util.particle_types.at(j).c_str()) ,"", 40, 0, 10);
 
         }
@@ -632,11 +621,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
     TH1D_hists.at(k_reco_vtx_x_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_x, weight);
     TH1D_hists.at(k_reco_vtx_y_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_y, weight);
     TH1D_hists.at(k_reco_vtx_z_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_z, weight);
-
-    TH1D_hists.at(k_reco_dEdx_cali_u_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_U_cali, weight);
-    TH1D_hists.at(k_reco_dEdx_cali_v_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_V_cali, weight);
-    TH1D_hists.at(k_reco_dEdx_cali_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y_cali, weight);
-    
+ 
     TH1D_hists.at(k_reco_leading_mom).at(cut_index).at(classification_index)->Fill(reco_shr_p, weight);
     
     TH1D_hists.at(k_reco_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.shr_distance, weight);
@@ -732,10 +717,6 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
 
     TH1D_hists.at(k_reco_shrmoliereavg).at(cut_index).at(classification_index)->Fill(SC.shrmoliereavg, weight);
     TH1D_hists.at(k_reco_shrmoliererms).at(cut_index).at(classification_index)->Fill(SC.shrmoliererms, weight);
-
-    TH1D_hists.at(k_reco_CylFrac2h_1cm).at(cut_index).at(classification_index)->Fill(SC.CylFrac2h_1cm, weight);
-    
-    TH1D_hists.at(k_reco_DeltaRMS2h).at(cut_index).at(classification_index)->Fill(SC.DeltaRMS2h, weight);
     
     TH1D_hists.at(k_reco_shrPCA1CMed_5cm).at(cut_index).at(classification_index)->Fill(SC.shrPCA1CMed_5cm, weight);
     
@@ -763,7 +744,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
     // -------------------------------------------------------------------------
 
     // Partice Type Hists
-    TH1D_hists_particle.at(k_reco_dEdx_cali_y_plane_par).at(cut_index).at(_par_type)->Fill(SC.shr_dedx_Y_cali, weight);
+    TH1D_hists_particle.at(k_reco_shr_tkfit_dedx_max_par).at(cut_index).at(_par_type)->Fill(dedx_max, weight);
     TH1D_hists_particle.at(k_reco_shr_tkfit_dedx_y_par).at(cut_index).at(_par_type)->Fill(SC.shr_tkfit_dedx_Y, weight);
 
     // -------------------------------------------------------------------------

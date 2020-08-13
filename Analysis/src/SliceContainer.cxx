@@ -32,24 +32,12 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("shr_start_x", &shr_start_x);
     tree->SetBranchAddress("shr_start_y", &shr_start_y);
     tree->SetBranchAddress("shr_start_z", &shr_start_z);
-    tree->SetBranchAddress("shr_dedx_Y", &shr_dedx_Y);
-    tree->SetBranchAddress("shr_dedx_V", &shr_dedx_V);
-    tree->SetBranchAddress("shr_dedx_U", &shr_dedx_U);
-    tree->SetBranchAddress("shr_dedx_Y_cali", &shr_dedx_Y_cali);
-    tree->SetBranchAddress("shr_dedx_V_cali", &shr_dedx_V_cali);
-    tree->SetBranchAddress("shr_dedx_U_cali", &shr_dedx_U_cali);
     tree->SetBranchAddress("shr_tkfit_dedx_Y", &shr_tkfit_dedx_Y);
     tree->SetBranchAddress("shr_tkfit_dedx_V", &shr_tkfit_dedx_V);
     tree->SetBranchAddress("shr_tkfit_dedx_U", &shr_tkfit_dedx_U);
     // tree->SetBranchAddress("shr_tkfit_nhits_Y", &shr_tkfit_nhits_Y);
     // tree->SetBranchAddress("shr_tkfit_nhits_V", &shr_tkfit_nhits_V);
     // tree->SetBranchAddress("shr_tkfit_nhits_U", &shr_tkfit_nhits_U);
-    tree->SetBranchAddress("shr_tkfit_dedx_Y_alt", &shr_tkfit_dedx_Y_alt);
-    tree->SetBranchAddress("shr_tkfit_dedx_V_alt", &shr_tkfit_dedx_V_alt);
-    tree->SetBranchAddress("shr_tkfit_dedx_U_alt", &shr_tkfit_dedx_U_alt);
-    // tree->SetBranchAddress("shr_tkfit_nhits_Y_alt", &shr_tkfit_nhits_Y_alt);
-    // tree->SetBranchAddress("shr_tkfit_nhits_V_alt", &shr_tkfit_nhits_V_alt);
-    // tree->SetBranchAddress("shr_tkfit_nhits_U_alt", &shr_tkfit_nhits_U_alt);
     tree->SetBranchAddress("shr_trkfitmedangle", &shr_trkfitmedangle);
     tree->SetBranchAddress("shrmoliereavg", &shrmoliereavg);
     tree->SetBranchAddress("shrmoliererms", &shrmoliererms);
@@ -80,32 +68,6 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("shr_tkfit_gap10_nhits_Y", &shr_tkfit_gap10_nhits_Y );
     tree->SetBranchAddress("shr_tkfit_gap10_nhits_V", &shr_tkfit_gap10_nhits_V );
     tree->SetBranchAddress("shr_tkfit_gap10_nhits_U", &shr_tkfit_gap10_nhits_U );
-
-    tree->SetBranchAddress("CylFrac1h_1cm", &CylFrac1h_1cm );
-    tree->SetBranchAddress("CylFrac1h_2cm", &CylFrac1h_2cm );
-    tree->SetBranchAddress("CylFrac1h_3cm", &CylFrac1h_3cm );
-    tree->SetBranchAddress("CylFrac1h_4cm", &CylFrac1h_4cm );
-    tree->SetBranchAddress("CylFrac1h_5cm", &CylFrac1h_5cm );
-
-    tree->SetBranchAddress("CylFrac2h_1cm", &CylFrac2h_1cm );
-    tree->SetBranchAddress("CylFrac2h_2cm", &CylFrac2h_2cm );
-    tree->SetBranchAddress("CylFrac2h_3cm", &CylFrac2h_3cm );
-    tree->SetBranchAddress("CylFrac2h_4cm", &CylFrac2h_4cm );
-    tree->SetBranchAddress("CylFrac2h_5cm", &CylFrac2h_5cm );
-
-    tree->SetBranchAddress("CylFrac_1cm", &CylFrac_1cm );
-    tree->SetBranchAddress("CylFrac_2cm", &CylFrac_2cm );
-    tree->SetBranchAddress("CylFrac_3cm", &CylFrac_3cm );
-    tree->SetBranchAddress("CylFrac_4cm", &CylFrac_4cm );
-    tree->SetBranchAddress("CylFrac_5cm", &CylFrac_5cm );
-
-    tree->SetBranchAddress("DeltaMed",   &DeltaMed );
-    tree->SetBranchAddress("DeltaMed1h", &DeltaMed1h );
-    tree->SetBranchAddress("DeltaMed2h", &DeltaMed2h );
-
-    tree->SetBranchAddress("DeltaRMS",   &DeltaRMS );
-    tree->SetBranchAddress("DeltaRMS1h", &DeltaRMS1h );
-    tree->SetBranchAddress("DeltaRMS2h", &DeltaRMS2h );
 
     tree->SetBranchAddress("shrPCA1CMed_5cm", &shrPCA1CMed_5cm );
 
@@ -338,13 +300,6 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     
     if (std::string(_run_period) != "1") tree->SetBranchAddress("_closestNuCosmicDist",&_closestNuCosmicDist);
     
-    tree->SetBranchAddress("bdt_nuNCpi0",   &bdt_nuNCpi0);
-    tree->SetBranchAddress("bdt_numuCCpi0", &bdt_numuCCpi0);
-    tree->SetBranchAddress("bdt_numuCC",    &bdt_numuCC);
-    tree->SetBranchAddress("bdt_ext",       &bdt_ext);
-    tree->SetBranchAddress("bdt_cosmic",    &bdt_cosmic);
-    tree->SetBranchAddress("bdt_global",    &bdt_global);
-
     tree->SetBranchAddress("pfp_generation_v",        &pfp_generation_v);
     tree->SetBranchAddress("pfp_trk_daughters_v",     &pfp_trk_daughters_v);
     tree->SetBranchAddress("pfp_shr_daughters_v",     &pfp_shr_daughters_v);

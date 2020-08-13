@@ -745,10 +745,10 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
     bins.at(k_var_true_el_E) = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
 
     // True neutrino energy Bin definition
-    bins.at(k_var_true_nu_E) = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
+    // bins.at(k_var_true_nu_E) = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
 
     // Reconstructed neutrino energy Bin definition
-    bins.at(k_var_reco_nu_E) = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
+    // bins.at(k_var_reco_nu_E) = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
 
     // These are for histogram titles so we know what bin we are looking at
     std::vector<std::string> bin_labels = {
@@ -902,10 +902,10 @@ void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double wei
     h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(xsec_type)->Fill(elec_e, weight_uni);
 
     // True Neutrino Energy
-    h_cross_sec.at(label).at(uni).at(k_var_true_nu_E).at(xsec_type)->Fill(true_energy, weight_uni);
+    // h_cross_sec.at(label).at(uni).at(k_var_true_nu_E).at(xsec_type)->Fill(true_energy, weight_uni);
 
     // Reconstructed Neutrino Energy
-    h_cross_sec.at(label).at(uni).at(k_var_reco_nu_E).at(xsec_type)->Fill(reco_energy, weight_uni);
+    // h_cross_sec.at(label).at(uni).at(k_var_reco_nu_E).at(xsec_type)->Fill(reco_energy, weight_uni);
 
 }
 // -----------------------------------------------------------------------------

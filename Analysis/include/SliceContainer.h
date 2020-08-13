@@ -83,14 +83,6 @@ public:
     float shr_start_y;           // Shower: Start y coordinate of the leading shower
     float shr_start_z;           // Shower: Start z coordinate of the leading shower
     
-    float shr_dedx_Y;            // Shower: dE/dx of the leading shower on the Y plane with the 1x4 cm box method| Plane 2
-    float shr_dedx_V;            // Shower: dE/dx of the leading shower on the V plane with the 1x4 cm box method| Plane 1
-    float shr_dedx_U;            // Shower: dE/dx of the leading shower on the U plane with the 1x4 cm box method| Plane 0
-    
-    float shr_dedx_Y_cali;       // Shower: Calibrated dE/dx of the leading shower on the Y plane with the 1x4 cm box method| Plane 2
-    float shr_dedx_V_cali;       // Shower: Calibrated dE/dx of the leading shower on the V plane with the 1x4 cm box method| Plane 1
-    float shr_dedx_U_cali;       // Shower: Calibrated dE/dx of the leading shower on the U plane with the 1x4 cm box method| Plane 0
-    
     float shr_tkfit_dedx_Y;      // Shower: dE/dx of the leading shower on the Y plane with the track fitting
     float shr_tkfit_dedx_V;      // Shower: dE/dx of the leading shower on the V plane with the track fitting
     float shr_tkfit_dedx_U;      // Shower: dE/dx of the leading shower on the U plane with the track fitting
@@ -98,15 +90,7 @@ public:
     int   shr_tkfit_nhits_Y;     // Shower: Number of hits in the 1x4 cm box on the Y plane with the track fitting
     int   shr_tkfit_nhits_V;     // Shower: Number of hits in the 1x4 cm box on the V plane with the track fitting
     int   shr_tkfit_nhits_U;     // Shower: Number of hits in the 1x4 cm box on the U plane with the track fitting
-    
-    float shr_tkfit_dedx_Y_alt;  // Shower: dE/dx of the leading shower on the Y plane with the track fitting  [calculated using XYZ instead of Residual Range]
-    float shr_tkfit_dedx_V_alt;  // Shower: dE/dx of the leading shower on the V plane with the track fitting  [calculated using XYZ instead of RR]
-    float shr_tkfit_dedx_U_alt;  // Shower: dE/dx of the leading shower on the U plane with the track fitting  [calculated using XYZ instead of RR]
-    
-    int   shr_tkfit_nhits_Y_alt; // Shower: Number of hits in the 1x4 cm box on the Y plane with the track fitting [calculated using XYZ instead of RR]
-    int   shr_tkfit_nhits_V_alt; // Shower: Number of hits in the 1x4 cm box on the V plane with the track fitting [calculated using XYZ instead of RR]
-    int   shr_tkfit_nhits_U_alt; // Shower: Number of hits in the 1x4 cm box on the U plane with the track fitting [calculated using XYZ instead of RR]
-    
+        
     int   shr_tkfit_npoints;     // Shower: TrackFit Number of Points
     float shr_trkfitmedangle;    // Shower: TrackFit Median Angle
     float shrmoliereavg;         // Shower: Average angle between the shower’s direction and its 3D spacepoints.
@@ -144,32 +128,6 @@ public:
     unsigned int   shr_tkfit_gap10_nhits_V;
     unsigned int   shr_tkfit_gap10_nhits_U;
     
-    float CylFrac1h_1cm;  // Frac of spacepoints of the leading shower within 1cm of the shower axis. Only in the first half of the shower
-    float CylFrac1h_2cm;  // Frac of spacepoints of the leading shower within 2cm of the shower axis. Only in the first half of the shower
-    float CylFrac1h_3cm;  // Frac of spacepoints of the leading shower within 3cm of the shower axis. Only in the first half of the shower
-    float CylFrac1h_4cm;  // Frac of spacepoints of the leading shower within 4cm of the shower axis. Only in the first half of the shower
-    float CylFrac1h_5cm;  // Frac of spacepoints of the leading shower within 5cm of the shower axis. Only in the first half of the shower
-
-    float CylFrac2h_1cm;  // Frac of spacepoints of the leading shower within 1cm of the shower axis. Only in the second half of the shower
-    float CylFrac2h_2cm;  // Frac of spacepoints of the leading shower within 2cm of the shower axis. Only in the second half of the shower
-    float CylFrac2h_3cm;  // Frac of spacepoints of the leading shower within 3cm of the shower axis. Only in the second half of the shower
-    float CylFrac2h_4cm;  // Frac of spacepoints of the leading shower within 4cm of the shower axis. Only in the second half of the shower
-    float CylFrac2h_5cm;  // Frac of spacepoints of the leading shower within 5cm of the shower axis. Only in the second half of the shower
-
-    float CylFrac_1cm;  // Frac of spacepoints of the leading shower within 1cm of the shower axis.
-    float CylFrac_2cm;  // Frac of spacepoints of the leading shower within 2cm of the shower axis.
-    float CylFrac_3cm;  // Frac of spacepoints of the leading shower within 3cm of the shower axis.
-    float CylFrac_4cm;  // Frac of spacepoints of the leading shower within 4cm of the shower axis.
-    float CylFrac_5cm;  // Frac of spacepoints of the leading shower within 5cm of the shower axis.
-
-    float DeltaMed;   // to set branch
-    float DeltaMed1h; // to set branch
-    float DeltaMed2h; // to set branch
-
-    float DeltaRMS;   // to set branch
-    float DeltaRMS1h; // to set branch
-    float DeltaRMS2h; // 0 to 20
-
     float shrPCA1CMed_5cm; // 0 to 1
 
     float shrMCSMom; // 0 to 200
@@ -461,14 +419,6 @@ public:
     float vtx_fit_tkfit_y;
     float vtx_fit_tkfit_z;
     
-    float bdt_nuNCpi0;
-    float bdt_numuCCpi0;
-    float bdt_numuCC;
-    float bdt_ext;
-    float bdt_cosmic;
-    float bdt_global;
-
-
     float pi0_shrscore1, pi0_shrscore2;
     float pi0_dot1, pi0_dot2;
     float pi0_radlen1, pi0_radlen2;

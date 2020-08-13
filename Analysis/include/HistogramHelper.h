@@ -120,9 +120,6 @@ class HistogramHelper{
         k_reco_vtx_x_sce,                                                       // Reco Vertex X Space Charge Corrected
         k_reco_vtx_y_sce,                                                       // Reco Vertex Y Space Charge Corrected
         k_reco_vtx_z_sce,                                                       // Reco Vertex Z Space Charge Corrected
-        k_reco_dEdx_cali_u_plane,                                               // dEdx Cali on U Plane
-        k_reco_dEdx_cali_v_plane,                                               // dEdx Cali on V Plane
-        k_reco_dEdx_cali_y_plane,                                               // dEdx Cali on Collection Plane
         k_reco_leading_mom,                                                     // Leading Shower Momentum
         k_reco_shower_to_vtx_dist,                                              // 2D distance shower vertex to reco nu vertex
         k_reco_track_to_vtx_dist,                                               // 2D distance track vertex to reco nu vertex
@@ -179,8 +176,6 @@ class HistogramHelper{
         k_reco_shrsubclusters,                                                  // Number of subclusters the shower can be broken into, Sum all three planes
         k_reco_shrmoliereavg,                                                   // Average angle between the shower’s direction and its 3D spacepoints.
         k_reco_shrmoliererms,                                                   // RMS of the moliere angle
-        k_reco_CylFrac2h_1cm,                                                   // Frac of spacepoints of the leading shower within 1cm of the shower axis. Only in the second half of the shower
-        k_reco_DeltaRMS2h,                                                      // RMS of spacepoint distance from shower center in the second half of the shower.
         k_reco_shrPCA1CMed_5cm,                                                 // Median PCA component calculated in 5 cm blocks.
         k_reco_shrMCSMom,                                                       // Multiple Coulomb scattering shower momentum
         k_reco_closestNuCosmicDist,                                             // Distance between the neutrino vertex and (closest?) cosmic trajectory tagged from CRT
@@ -197,8 +192,8 @@ class HistogramHelper{
 
     // enum for histogram vars
     enum TH1D_par_hist_vars {
-        k_reco_dEdx_cali_y_plane_par,                                           // cali dEdx in the collection plane
-        k_reco_shr_tkfit_dedx_y_par,                                                // dEdx in the collection plane with trackfit 1x4 cm box
+        k_reco_shr_tkfit_dedx_max_par,  // dEdx in the plane with most hits with trackfit 1x4 cm box
+        k_reco_shr_tkfit_dedx_y_par,    // dEdx in the collection plane with trackfit 1x4 cm box
         k_TH1D_par_MAX
     };
 
