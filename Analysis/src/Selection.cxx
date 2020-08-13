@@ -544,8 +544,6 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     
     SelectionFill(type, SC, classification, interaction, pi0_classification, particle_type, _util.k_vtx_dist_dedx, counter_v );
 
-    
-
     // *************************************************************************
     // dEdx in all planes for 0 track events -----------------------------------
     // *************************************************************************
@@ -633,9 +631,7 @@ void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     // Calculate the reconstructed neutrino energy
     // This is in many places, need to have a way for setting this number by default
     // *************************************************************************
-    double INTERCEPT = 0.0;
-    double SLOPE = 0.83;
-    double reco_nu_e = (SC.shr_energy_tot_cali + INTERCEPT) / SLOPE + SC.trk_energy_tot;
+    double reco_nu_e = SC.shr_energy_tot_cali / 0.83 + SC.trk_energy_tot;
 
     // *************************************************************************
     // Fill Histograms

@@ -222,27 +222,27 @@ void CrossSectionHelper::LoopEvents(){
 
                 // MC Cross section
                 CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sel), // N Sel
-                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff), // Eff
-                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg), // N Bkg
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff),  // Eff
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),  // N Bkg
                                 mc_scale_factor,
-                                integrated_flux * mc_flux_scale_factor,           // Flux
+                                integrated_flux * mc_flux_scale_factor,                // Flux
                                 intime_scale_factor,
-                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),     // N EXT
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),  // N EXT
                                 dirt_scale_factor,
-                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dirt),   // N Dirt
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dirt), // N Dirt
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec),
                                 N_target_MC, "MC");
 
                 // Data Cross section
                 CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_data), // N Sel
-                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff),  // Eff
-                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),  // N Bkg
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff),   // Eff
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),   // N Bkg
                                 mc_scale_factor,
-                                integrated_flux * data_flux_scale_factor,      // Flux
+                                integrated_flux * data_flux_scale_factor,               // Flux
                                 intime_scale_factor,
-                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),  // N EXT
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),   // N EXT
                                 dirt_scale_factor,
-                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dirt), // N Dirt
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dirt),  // N Dirt
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dataxsec),
                                 N_target_Data, "Data");
 

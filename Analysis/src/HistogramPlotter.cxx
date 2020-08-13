@@ -2352,8 +2352,8 @@ void HistogramPlotter::Save2DHists(const char *print_name, const char *histname,
     if (hist == NULL)
         std::cout << "couldn't get the hist!" << std::endl;
 
-    TCanvas *c = new TCanvas();
-    gPad->SetFixedAspectRatio();
+    TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
+    c->SetTopMargin(0.11);
 
     hist->SetStats(kFALSE);
 
@@ -2373,10 +2373,34 @@ void HistogramPlotter::Save2DHists(const char *print_name, const char *histname,
         line->Draw();
     }
     
-    
-
     // Draw the run period on the plot
-    Draw_Run_Period(c);
+    TPaveText *pt;
+
+    if (std::string(run_period) == "1")
+    {
+        pt = new TPaveText(0.76, 0.915, 0.76, 0.915, "NDC");
+        pt->AddText("Run1");
+        pt->SetTextColor(kRed + 2);
+        pt->SetTextSize(0.04);
+    }
+    else if (std::string(run_period) == "3")
+    {
+        pt = new TPaveText(0.76, 0.915, 0.76, 0.915, "NDC");
+        pt->AddText("Run3");
+        pt->SetTextColor(kBlue + 2);
+    }
+    else
+    {
+        pt = new TPaveText(0.86, 0.915, 0.86, 0.915, "NDC");
+        pt->AddText("RunXXX");
+        pt->SetTextColor(kGreen + 2);
+    }
+
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.04);
+    pt->Draw();
 
     c->Print(print_name);
 }

@@ -26,7 +26,7 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
     float n_tracks{0},  _n_tracks{0};
     float shr_theta{0.0}, _shr_theta{0.0};
     float shr_phi{0.0},   _shr_phi{0.0};
-    float shr_energy_tot_cali{0.0}, _shr_energy_tot_cali{0.0};
+    float shr_energy_cali{0.0}, _shr_energy_cali{0.0};
     float shrmoliereavg{0.0}, _shrmoliereavg{0.0};
     float shr_hits_max{0.0},  _shr_hits_max{0.0};
     float elec_e{0.0}, _elec_e{0.0};
@@ -87,7 +87,7 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
     outtree->Branch("n_tracks",  &n_tracks);
     outtree->Branch("shr_theta", &shr_theta);
     outtree->Branch("shr_phi",   &shr_phi);
-    outtree->Branch("shr_energy_tot_cali", &shr_energy_tot_cali);
+    outtree->Branch("shr_energy_cali", &shr_energy_cali);
     outtree->Branch("shrmoliereavg", &shrmoliereavg);
     outtree->Branch("shr_hits_max",  &shr_hits_max);
     outtree->Branch("elec_e",  &elec_e,  "elec_e/F");
@@ -143,7 +143,7 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
         trees.at(k)->SetBranchAddress("n_tracks",  &_n_tracks);
         trees.at(k)->SetBranchAddress("shr_theta", &_shr_theta);
         trees.at(k)->SetBranchAddress("shr_phi",   &_shr_phi);
-        trees.at(k)->SetBranchAddress("shr_energy_tot_cali", &_shr_energy_tot_cali);
+        trees.at(k)->SetBranchAddress("shr_energy_cali", &_shr_energy_cali);
         trees.at(k)->SetBranchAddress("shrmoliereavg", &_shrmoliereavg);
         trees.at(k)->SetBranchAddress("shr_hits_max",  &_shr_hits_max);
         trees.at(k)->SetBranchAddress("elec_e",  &_elec_e);
@@ -195,7 +195,7 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
                 n_tracks = _n_tracks;
                 shr_theta = _shr_theta;
                 shr_phi = _shr_phi;
-                shr_energy_tot_cali = _shr_energy_tot_cali;
+                shr_energy_cali = _shr_energy_cali;
                 shrmoliereavg = _shrmoliereavg;
                 shr_hits_max = _shr_hits_max;
                 elec_e = _elec_e;
