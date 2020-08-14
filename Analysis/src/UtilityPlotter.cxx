@@ -216,11 +216,13 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
     
     TCanvas * c = new TCanvas(Form("c_%f_%f", bin_upper_edge, sigma), "c", 500, 500);
 
-    // Draw the Query
-    tree->Draw("elec_e", generic_query && bin_query);
-    
     // Get the histogram from the pad
-    TH1D *htemp = (TH1D*)gPad->GetPrimitive("htemp");
+    TH1D *htemp;
+    
+    htemp = new TH1D("htemp","", 80, 0, 4.0); // Set the binnning
+
+    // Draw the Query adn put into histogram
+    tree->Draw("elec_e >> htemp", generic_query && bin_query);
     
     // Fit it with a Gaussian
     htemp->Fit("gaus");
@@ -264,8 +266,11 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
         htemp->SetStats(kFALSE);
         _util.IncreaseLabelSize(htemp, c);
         c->SetTopMargin(0.11);
-        c->Print(Form("plots/Binning/bins_%0.2fGeV_to_%0.2f_GeV.pdf",bin_lower_edge, bin_upper_edge ));
+        c->Print(Form("plots/run%s/Binning/bins_%0.2fGeV_to_%0.2f_GeV.pdf",run_period.c_str(), bin_lower_edge, bin_upper_edge ));
     } 
+
+    delete htemp;
+    delete c;
 
 
 }
@@ -309,7 +314,7 @@ void UtilityPlotter::OptimiseBins(){
 
             // Since the fit doesnt want to converge for the last bin, lets jsut draw it anyway
             if (bin == 7){
-                GetFitResult(mean, sigma, 2.63, 3.5, tree, true, converged, false);
+                GetFitResult(mean, sigma, 2.32, 4.0, tree, true, converged, false);
                 break;
             }
 
@@ -332,7 +337,7 @@ void UtilityPlotter::PlotVarbyRecoBin(){
     // Loop over the bins
     for (float bin = 0; bin < bins.size()-1; bin++ ){
 
-        std::cout <<"Bin Range: " << bins.at(bin) << " - " << bins.at(bin+1) << " GeV" << std::endl;
+        std::cout <<"\nBin Range: " << bins.at(bin) << " - " << bins.at(bin+1) << " GeV" << std::endl;
         
         PlotQuery(bins.at(bin), bins.at(bin+1), tree, "reco_e");
         PlotQuery(bins.at(bin), bins.at(bin+1), tree, "true_e");
@@ -347,7 +352,7 @@ void UtilityPlotter::PlotVarbyRecoBin(){
 void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string variable_str){
     
     TCut generic_query = "(classifcation.c_str()==\"nue_cc\" || classifcation.c_str()==\"nuebar_cc\") && !gen && elec_e > 0"; // This gets selected signal events in the MC
-    TCut bin_query = Form("shr_energy_cali > %f && shr_energy_cali < %f", bin_lower_edge, bin_upper_edge);
+    TCut bin_query = Form("shr_energy_cali > %f && shr_energy_cali < %f", bin_lower_edge, bin_upper_edge); // Get the reconstructed shower energy range
     
     TCanvas * c = new TCanvas(Form("c_%f_%f_%s", bin_upper_edge, bin_lower_edge, variable_str.c_str()), "c", 500, 500);
 
@@ -388,8 +393,8 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
 
     if (variable_str == "reco_e")      htemp->SetTitle("; Reco - True / Reco; Entries");
     else if (variable_str == "true_e") htemp->SetTitle("; Reco - True / True; Entries");
-    else if (variable_str == "purity") htemp->SetTitle("; Reco Leading Shower Purity; Entries");
-    else if (variable_str == "completeness") htemp->SetTitle("; Reco Leading Shower Completeness; Entries");
+    else if (variable_str == "purity") htemp->SetTitle("; Reco Shower Purity; Entries");
+    else if (variable_str == "completeness") htemp->SetTitle("; Reco Shower Completeness; Entries");
     else {
         std::cout << "incorrect variable input" << std::endl;
         return;
