@@ -502,6 +502,8 @@ void HistogramHelper::InitHistograms(){
             TH2D_true_hists.at(i).at(k_true_nu_vtx_z_reco_nu_vtx_z)  = new TH2D( Form("h_true_nu_vtx_z_reco_nu_vtx_z_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} Vtx Z [cm] ;Reco #nu_{e} Vtx Z [cm]", 40, -10, 1050, 40, -10, 1050);
             TH2D_true_hists.at(i).at(k_true_shr_energy_purity)       = new TH2D( Form("h_true_shr_energy_purity_%s_%s",      _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";Reco Shower Energy [GeV] ;Shower Purity", _util.reco_shr_bins.size()-1, edges, 21, 0, 1.1);
             TH2D_true_hists.at(i).at(k_true_shr_energy_completeness) = new TH2D( Form("h_true_shr_energy_completeness_%s_%s",_util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";Reco Shower Energy [GeV] ;Shower Completeness", _util.reco_shr_bins.size()-1, edges, 21, 0, 1.1);
+            TH2D_true_hists.at(i).at(k_true_shr_energy_resolution_reco) = new TH2D( Form("h_true_shr_energy_resolution_reco_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";Reco Shower Energy [GeV]; Reco - True / Reco (Shower Energy)", _util.reco_shr_bins.size()-1, edges, 30, -1.2, 1.2);
+            TH2D_true_hists.at(i).at(k_true_shr_energy_resolution_true) = new TH2D( Form("h_true_shr_energy_resolution_true_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";Reco Shower Energy [GeV] ;Reco - True / True (Shower Energy)", _util.reco_shr_bins.size()-1, edges, 30, -1.2, 1.2);
         }
     }
 
@@ -861,6 +863,9 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
 
             TH2D_true_hists.at(index).at(k_true_shr_energy_purity)            ->Fill(SC.shr_energy_cali/0.83,  SC.shr_bkt_purity, weight);
             TH2D_true_hists.at(index).at(k_true_shr_energy_completeness)      ->Fill(SC.shr_energy_cali/0.83,  SC.shr_bkt_completeness, weight);
+
+            TH2D_true_hists.at(index).at(k_true_shr_energy_resolution_reco)      ->Fill( SC.shr_energy_cali/0.83, (SC.shr_energy_cali/0.83 - SC.elec_e) / SC.shr_energy_cali/0.83, weight);
+            TH2D_true_hists.at(index).at(k_true_shr_energy_resolution_true)      ->Fill( SC.shr_energy_cali/0.83, (SC.shr_energy_cali/0.83 - SC.elec_e) / SC.elec_e, weight);
 
             // True nue interaction histograms
             if (interaction == "nue_cc_qe" || interaction == "nue_bar_cc_qe"){

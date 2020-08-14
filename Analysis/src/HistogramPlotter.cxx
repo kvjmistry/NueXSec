@@ -159,6 +159,8 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
             Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_z_reco_nu_vtx_z_%s.pdf", run_period, cut_type.c_str()), "h_true_nu_vtx_z_reco_nu_vtx_z", cut_type, false);
             Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_purity_%s.pdf", run_period, cut_type.c_str()), "h_true_shr_energy_purity", cut_type, false);
             Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_completeness_%s.pdf", run_period, cut_type.c_str()), "h_true_shr_energy_completeness", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_resolution_reco_%s.pdf", run_period, cut_type.c_str()), "h_true_shr_energy_resolution_reco", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_resolution_true_%s.pdf", run_period, cut_type.c_str()), "h_true_shr_energy_resolution_true", cut_type, false);
 
             // Normalised by reco (row)
             Save2DHistsNorm(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s_row_norm_reco.pdf",     run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type, true, "reco");
