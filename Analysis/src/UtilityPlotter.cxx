@@ -27,7 +27,7 @@ void UtilityPlotter::Initialise(const char *_run_period, Utility _utility, const
         CompareSignalPurity();
 
         // Make the bin resolution plots
-        GetBinResolutions();
+        PlotVarbyRecoBin();
         
     }
     // This will call the code to optimise the bin widths
@@ -318,10 +318,12 @@ void UtilityPlotter::OptimiseBins(){
     
 }
 // -----------------------------------------------------------------------------
-void UtilityPlotter::GetBinResolutions(){
+void UtilityPlotter::PlotVarbyRecoBin(){
 
     // Create the resolutions directory for saving the plots to
     _util.CreateDirectory("Resolution", run_period);
+
+    _util.CreateDirectory("Purity_Completeness", run_period);
 
 
     // Get the vector of bins
@@ -332,35 +334,50 @@ void UtilityPlotter::GetBinResolutions(){
 
         std::cout <<"Bin Range: " << bins.at(bin) << " - " << bins.at(bin+1) << " GeV" << std::endl;
         
-        PlotResolution(bins.at(bin), bins.at(bin+1), tree, "reco");
-        PlotResolution(bins.at(bin), bins.at(bin+1), tree, "true");
+        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "reco_e");
+        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "true_e");
+        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "purity");
+        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "completeness");
 
 
     }
     
 }
 // -----------------------------------------------------------------------------
-void UtilityPlotter::PlotResolution(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string variable){
+void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string variable_str){
     
-    TCut generic_query = "(classifcation.c_str()==\"nue_cc\" || classifcation.c_str()==\"nuebar_cc\") && !gen && elec_e > 0"; // This gets selected events in the MC
+    TCut generic_query = "(classifcation.c_str()==\"nue_cc\" || classifcation.c_str()==\"nuebar_cc\") && !gen && elec_e > 0"; // This gets selected signal events in the MC
     TCut bin_query = Form("shr_energy_cali > %f && shr_energy_cali < %f", bin_lower_edge, bin_upper_edge);
     
-    TCanvas * c = new TCanvas(Form("c_%f_%f_%s", bin_upper_edge, bin_lower_edge, variable.c_str()), "c", 500, 500);
+    TCanvas * c = new TCanvas(Form("c_%f_%f_%s", bin_upper_edge, bin_lower_edge, variable_str.c_str()), "c", 500, 500);
 
-    TH1D *htemp = new TH1D("htemp","", 30, -3, 3);
+    TH1D *htemp;
+    if      (variable_str == "reco_e") htemp = new TH1D("htemp","", 30, -3, 3);
+    else if (variable_str == "true_e") htemp = new TH1D("htemp","", 30, -3, 3);
+    else if (variable_str == "purity") htemp = new TH1D("htemp","", 21, 0, 1.1);
+    else if (variable_str == "completeness") htemp = new TH1D("htemp","", 21, 0, 1.1);
+    else {
+        std::cout << "incorrect variable input" << std::endl;
+        return;
+    }
+     
 
-    // Draw the Query
-    if (variable == "reco") tree->Draw("shr_energy_cali - elec_e / shr_energy_cali >> htemp", generic_query && bin_query);
-    else                    tree->Draw("shr_energy_cali - elec_e / elec_e >> htemp", generic_query && bin_query);
-    
-    // Get the histogram from the pad
-   
+    // Draw the Query -- adjust by query type
+    if      (variable_str == "reco_e") tree->Draw("shr_energy_cali - elec_e / shr_energy_cali >> htemp", generic_query && bin_query);
+    else if (variable_str == "true_e") tree->Draw("shr_energy_cali - elec_e / elec_e >> htemp", generic_query && bin_query);
+    else if (variable_str == "purity") tree->Draw("shr_bkt_purity >> htemp", generic_query && bin_query);
+    else if (variable_str == "completeness") tree->Draw("shr_bkt_completeness >> htemp", generic_query && bin_query);
+    else {
+        std::cout << "incorrect variable input" << std::endl;
+        return;
+    }
             
     // Draw the histogram
     htemp->SetLineWidth(2);
     htemp->SetLineColor(kBlack);
     htemp->Draw("hist");
 
+    // Draw the text specifying the bin range
     TLatex* range;
     range = new TLatex(0.88,0.86, Form("Reco Energy %0.2f - %0.2f GeV",bin_lower_edge, bin_upper_edge ));
     range->SetTextColor(kGray+2);
@@ -369,14 +386,29 @@ void UtilityPlotter::PlotResolution(float bin_lower_edge, float bin_upper_edge, 
     range->SetTextAlign(32);
     range->Draw();
 
-    if (variable == "reco") htemp->SetTitle("; Reco - True / Reco; Entries");
-    else                    htemp->SetTitle("; Reco - True / True; Entries");
+    if (variable_str == "reco_e")      htemp->SetTitle("; Reco - True / Reco; Entries");
+    else if (variable_str == "true_e") htemp->SetTitle("; Reco - True / True; Entries");
+    else if (variable_str == "purity") htemp->SetTitle("; Reco Leading Shower Purity; Entries");
+    else if (variable_str == "completeness") htemp->SetTitle("; Reco Leading Shower Completeness; Entries");
+    else {
+        std::cout << "incorrect variable input" << std::endl;
+        return;
+    }
     htemp->SetStats(kFALSE);
     _util.IncreaseLabelSize(htemp, c);
     c->SetTopMargin(0.11);
-    if (variable== "reco") c->Print(Form("plots/run%s/Resolution/resolution_%0.2fGeV_to_%0.2f_GeV_reco.pdf", run_period.c_str(), bin_lower_edge, bin_upper_edge ));
-    else c->Print(Form("plots/run%s/Resolution/resolution_%0.2fGeV_to_%0.2f_GeV_true.pdf", run_period.c_str(), bin_lower_edge, bin_upper_edge ));
     
+
+    // Save it 
+    if (variable_str== "reco_e")       c->Print(Form("plots/run%s/Resolution/resolution_%0.2fGeV_to_%0.2f_GeV_reco.pdf", run_period.c_str(), bin_lower_edge, bin_upper_edge ));
+    else if (variable_str == "true_e") c->Print(Form("plots/run%s/Resolution/resolution_%0.2fGeV_to_%0.2f_GeV_true.pdf", run_period.c_str(), bin_lower_edge, bin_upper_edge ));
+    else if (variable_str == "purity") c->Print(Form("plots/run%s/Purity_Completeness/purity_%0.2fGeV_to_%0.2f_GeV.pdf", run_period.c_str(), bin_lower_edge, bin_upper_edge ));
+    else if (variable_str == "completeness") c->Print(Form("plots/run%s/Purity_Completeness/completeness_%0.2fGeV_to_%0.2f_GeV.pdf", run_period.c_str(), bin_lower_edge, bin_upper_edge ));
+    else {
+        std::cout << "incorrect variable input" << std::endl;
+        return;
+    }
+
     delete htemp;
 
 

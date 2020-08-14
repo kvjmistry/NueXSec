@@ -71,11 +71,11 @@ class UtilityPlotter{
     // Caller function to optimise the bins
     void OptimiseBins();
     // -------------------------------------------------------------------------
-    // Caller function to get the bin resolutions
-    void GetBinResolutions();
+    // Caller function to plot variables by reconstructed shower energy bin
+    void PlotVarbyRecoBin();
     // -------------------------------------------------------------------------
-    // Function that plots the resolution in different bin ranges
-    void PlotResolution(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string variable);
+    // Function that plots a variable in different bin ranges
+    void PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string variable);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
