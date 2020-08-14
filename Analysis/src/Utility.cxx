@@ -329,6 +329,7 @@ void Utility::IncreaseLabelSize(TH2D *h, TCanvas *c){
     h->GetXaxis()->SetTitleSize(0.05);
     h->GetYaxis()->SetLabelSize(0.05);
     h->GetYaxis()->SetTitleSize(0.05);
+    h->GetYaxis()->SetTitleOffset(1.4);
     h->GetZaxis()->SetLabelSize(0.05);
     h->GetZaxis()->SetTitleSize(0.05);
     c->SetLeftMargin(0.15);
