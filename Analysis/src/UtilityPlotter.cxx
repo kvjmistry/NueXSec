@@ -368,8 +368,8 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
      
 
     // Draw the Query -- adjust by query type
-    if      (variable_str == "reco_e") tree->Draw("shr_energy_cali - elec_e / shr_energy_cali >> htemp", generic_query && bin_query);
-    else if (variable_str == "true_e") tree->Draw("shr_energy_cali - elec_e / elec_e >> htemp", generic_query && bin_query);
+    if      (variable_str == "reco_e") tree->Draw("(shr_energy_cali - elec_e) / shr_energy_cali >> htemp", generic_query && bin_query);
+    else if (variable_str == "true_e") tree->Draw("(shr_energy_cali - elec_e) / elec_e >> htemp", generic_query && bin_query);
     else if (variable_str == "purity") tree->Draw("shr_bkt_purity >> htemp", generic_query && bin_query);
     else if (variable_str == "completeness") tree->Draw("shr_bkt_completeness >> htemp", generic_query && bin_query);
     else {
@@ -402,6 +402,9 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     htemp->SetStats(kFALSE);
     _util.IncreaseLabelSize(htemp, c);
     c->SetTopMargin(0.11);
+
+    // Draw the run period on the plot
+    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
     
 
     // Save it 
