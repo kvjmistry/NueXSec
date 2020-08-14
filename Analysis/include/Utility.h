@@ -59,12 +59,17 @@ public:
     // Get a TDirectory from a file
     bool GetDirectory(TFile* f, TDirectory* &d, TString string);
     // -------------------------------------------------------------------------
-    // Get a histogram from a file
+    // Get a 1D histogram from a file
     bool GetHist(TFile* f, TH1D* &h, TString string);
+    // -------------------------------------------------------------------------
+    // Get a 2D histogram from a file
     bool GetHist(TFile* f, TH2D* &h, TString string);
     // -------------------------------------------------------------------------
     // Create another directory in the plots folder
     void CreateDirectory(std::string folder, const char *run_period);
+    // -------------------------------------------------------------------------
+    // Create another directory in the plots folder -- just give the run period as a string rather than a char
+    void CreateDirectory(std::string folder, std::string run_period);
     // -------------------------------------------------------------------------
     // Function to tabulate all the nuetrino types and flavours
     void Tabulate(bool inFV, std::string interaction, std::string classification, std::string pi0_classification, int type, std::vector<double> &counter_v, double weight);
@@ -84,7 +89,11 @@ public:
     // Draw the run period on the plot
     void Draw_Run_Period(TCanvas *c, double x1, double y1, double x2, double y2, std::string run_period);
     // -------------------------------------------------------------------------
+    // Draw the data to MC ratio on the plot
+    void Draw_Data_MC_Ratio(TCanvas *c, double ratio, double x1, double y1, double x2, double y2);
     // -------------------------------------------------------------------------
+    // Draw the Data POT on the plot
+    void Draw_Data_POT(TCanvas *c, double pot, double x1, double y1, double x2, double y2);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 

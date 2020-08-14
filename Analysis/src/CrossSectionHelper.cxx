@@ -95,12 +95,6 @@ void CrossSectionHelper::LoopEvents(){
 
         double cv_weight = weight;
 
-        // Here we fill the resolution plots for the mc only
-        // if (*classifcation != "data" && *classifcation != "ext" && *classifcation != "dirt" && gen == false) {
-        //     // If the electron energy in truth is zero then this wasnt a true nue, so dont fill either
-        //     if (elec_e != 0) FillResolutionHists(shr_energy_cali, elec_e);
-        // }
-
         // Loop over the reweighter labels
         for (unsigned int label = 0; label < reweighter_labels.size(); label++){
             
@@ -143,8 +137,8 @@ void CrossSectionHelper::LoopEvents(){
                 if ((*classifcation == "nue_cc" || *classifcation == "nuebar_cc" || *classifcation == "unmatched_nue" || *classifcation == "unmatched_nuebar") && gen == false) {
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_sig, weight_uni, shr_energy_cali, elec_e, true_energy, reco_energy);
-                    FillHists(label, uni, k_xsec_sel, weight_uni, shr_energy_cali, elec_e, true_energy, reco_energy);
+                    FillHists(label, uni, k_xsec_sig, weight_uni, shr_energy_cali, elec_e);
+                    FillHists(label, uni, k_xsec_sel, weight_uni, shr_energy_cali, elec_e);
 
                 }
 
@@ -154,8 +148,8 @@ void CrossSectionHelper::LoopEvents(){
                      *classifcation == "nc_pi0"     || *classifcation == "cosmic_nue" || *classifcation == "cosmic_nuebar"){
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_bkg, weight_uni, shr_energy_cali, elec_e, true_energy, reco_energy);
-                    FillHists(label, uni, k_xsec_sel, weight_uni, shr_energy_cali, elec_e, true_energy, reco_energy);
+                    FillHists(label, uni, k_xsec_bkg, weight_uni, shr_energy_cali, elec_e);
+                    FillHists(label, uni, k_xsec_sel, weight_uni, shr_energy_cali, elec_e);
                     
                 }
                 
@@ -163,7 +157,7 @@ void CrossSectionHelper::LoopEvents(){
                 if ( (*classifcation == "nue_cc"|| *classifcation == "nuebar_cc" || *classifcation == "unmatched_nue" || *classifcation == "cosmic_nue" || *classifcation == "unmatched_nuebar" || *classifcation == "cosmic_nuebar") && gen == true) {
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_gen, weight_uni, shr_energy_cali, elec_e, true_energy, reco_energy);
+                    FillHists(label, uni, k_xsec_gen, weight_uni, shr_energy_cali, elec_e);
                 }
 
                 // Data event
@@ -172,7 +166,7 @@ void CrossSectionHelper::LoopEvents(){
                     if (cv_weight != 1.0) std::cout << "Error weight for data is not 1, this means your weighting the data... bad!"<< std::endl;
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_data, cv_weight, shr_energy_cali, elec_e, true_energy, reco_energy);
+                    FillHists(label, uni, k_xsec_data, cv_weight, shr_energy_cali, elec_e);
                 }
 
                 // Off beam event
@@ -181,14 +175,14 @@ void CrossSectionHelper::LoopEvents(){
                     if (cv_weight != 1.0) std::cout << "Error weight for data is not 1, this means your weighting the data... bad!"<< std::endl;
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_ext, cv_weight, shr_energy_cali, elec_e, true_energy, reco_energy);
+                    FillHists(label, uni, k_xsec_ext, cv_weight, shr_energy_cali, elec_e);
                 }
 
                 // Dirt event
                 if (*classifcation == "dirt"){
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_dirt, cv_weight, shr_energy_cali, elec_e, true_energy, reco_energy);
+                    FillHists(label, uni, k_xsec_dirt, cv_weight, shr_energy_cali, elec_e);
                 }
             } // End loop over uni
 
@@ -527,21 +521,6 @@ void CrossSectionHelper::WriteHists(){
         // Go into the directory
         dir_labels[label]->cd();
 
-        // If its the CV then we want to write some other histograms
-        if (reweighter_labels.at(label) == "CV"){
-            
-            // Loop over the reco/truth hists
-            for (unsigned int l = 0; l < h_resolution.size(); l++){
-
-                // Loop over each histogram for each bin
-                for (unsigned int bin = 0; bin < h_resolution.at(l).size(); bin++){
-                    h_resolution.at(l).at(bin)->Write("",TObject::kOverwrite);
-                    
-                }
-            }
-
-        }
-
         // Loop over the universes
         for (unsigned int uni = 0; uni < h_cross_sec.at(label).size(); uni++ ){
 
@@ -750,16 +729,6 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
     // Reconstructed neutrino energy Bin definition
     // bins.at(k_var_reco_nu_E) = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
 
-    // These are for histogram titles so we know what bin we are looking at
-    std::vector<std::string> bin_labels = {
-        "0.0  - 0.28 GeV",
-        "0.28 - 0.56 GeV",
-        "0.56 - 0.88 GeV",
-        "0.88 - 1.56 GeV",
-        "1.56 - 3.5 GeV"
-    };
-
-
     // Resize to the number of reweighters
     h_cross_sec.resize(reweighter_labels.size());
 
@@ -816,7 +785,6 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
 
             }
             
-            
         }
 
     }
@@ -862,34 +830,12 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
     
     } // End loop over the labels
 
-
-    // Now we want to set the size of the resolution histograms
-    h_resolution.resize(2); // One set for as a function of reco histograms and one set for true histograms
-
-    for (unsigned int l = 0; l < h_resolution.size(); l++){
-        h_resolution.at(l).resize(bins.at(k_var_reco_el_E).size()-1);
-    }
-
-    // Loop over the reco/truth hists
-    for (unsigned int l = 0; l < h_resolution.size(); l++){
-
-        // Loop over each histogram for each bin
-        for (unsigned int bin = 0; bin < h_resolution.at(l).size(); bin++){
-
-            if (l == 0) h_resolution.at(l).at(bin) = new TH1D( Form("h_resolution_reco_bin%i", bin+1), Form("Reco %s; Reco - True / Reco; Entries", bin_labels.at(bin).c_str()), 30, -3, 3); // We shift the bin numbers by 1 so they align with the stupid root definitions
-            if (l == 1) h_resolution.at(l).at(bin) = new TH1D( Form("h_resolution_true_bin%i", bin+1), Form("Reco %s; Reco - True / True; Entries", bin_labels.at(bin).c_str()), 30, -3, 3); // We shift the bin numbers by 1 so they align with the stupid root definitions
-            h_resolution.at(l).at(bin)->SetLineWidth(2);
-            h_resolution.at(l).at(bin)->SetLineColor(kBlack);
-            h_resolution.at(l).at(bin)->SetOption("hist");
-        }
-    }
-
     std::cout << "Initialisation of cross-section histograms is complete!" << std::endl;
 
 
 }
 // -----------------------------------------------------------------------------
-void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double weight_uni, float shr_energy_cali, float elec_e, double true_energy, double reco_energy){
+void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double weight_uni, float shr_energy_cali, float elec_e){
 
     // Integrated
     h_cross_sec.at(label).at(uni).at(k_var_integrated).at(xsec_type)->Fill(1.0, weight_uni);
@@ -905,54 +851,6 @@ void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double wei
 
     // Reconstructed Neutrino Energy
     // h_cross_sec.at(label).at(uni).at(k_var_reco_nu_E).at(xsec_type)->Fill(reco_energy, weight_uni);
-
-}
-// -----------------------------------------------------------------------------
-void CrossSectionHelper::FillResolutionHists(float shr_energy_cali, float elec_e){
-
-    // 0.0 - 0.30 GeV
-    if (shr_energy_cali >=0 && shr_energy_cali < 0.30){
-        h_resolution.at(0).at(0)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
-        h_resolution.at(1).at(0)->Fill((shr_energy_cali - elec_e) / elec_e);
-    }
-    // 0.30 - 0.46 GeV
-    else if (shr_energy_cali >= 0.30 && shr_energy_cali < 0.46){
-        h_resolution.at(0).at(1)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
-        h_resolution.at(1).at(1)->Fill((shr_energy_cali - elec_e) / elec_e);
-    }
-    // 0.46 - 0.67 GeV
-    else if (shr_energy_cali >= 0.46 && shr_energy_cali < 0.67){
-        h_resolution.at(0).at(2)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
-        h_resolution.at(1).at(2)->Fill((shr_energy_cali - elec_e) / elec_e);
-    }
-    // 0.67 - 0.97 GeV
-    else if (shr_energy_cali >= 0.67 && shr_energy_cali < 0.97){
-        h_resolution.at(0).at(3)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
-        h_resolution.at(1).at(3)->Fill((shr_energy_cali - elec_e) / elec_e);
-    }
-    // 0.97 - 1.38 GeV
-    else if (shr_energy_cali >= 0.97 && shr_energy_cali < 1.38){
-        h_resolution.at(0).at(4)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
-        h_resolution.at(1).at(4)->Fill((shr_energy_cali - elec_e) / elec_e);
-    }
-    // 1.38 - 1.83 GeV
-    else if (shr_energy_cali >= 1.38 && shr_energy_cali < 1.83){
-        h_resolution.at(0).at(5)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
-        h_resolution.at(1).at(5)->Fill((shr_energy_cali - elec_e) / elec_e);
-    }
-    // 1.83 - 2.63 GeV
-    else if (shr_energy_cali >= 1.83 && shr_energy_cali < 2.63){
-        h_resolution.at(0).at(6)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
-        h_resolution.at(1).at(6)->Fill((shr_energy_cali - elec_e) / elec_e);
-    }
-    // 2.63 - 3.50 GeV
-    else if (shr_energy_cali >= 2.63 && shr_energy_cali < 3.50){
-        h_resolution.at(0).at(7)->Fill((shr_energy_cali - elec_e) / shr_energy_cali);
-        h_resolution.at(1).at(7)->Fill((shr_energy_cali - elec_e) / elec_e);
-    }
-    else {
-        // std::cout << "Bin out of range!"<< std::endl;
-    }
 
 }
 // -----------------------------------------------------------------------------

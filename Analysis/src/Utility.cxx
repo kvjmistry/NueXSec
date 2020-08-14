@@ -126,12 +126,23 @@ bool Utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     }
 }
 // -----------------------------------------------------------------------------
-void Utility::CreateDirectory(std::string folder, const char *run_period) {
+void Utility::CreateDirectory(std::string folder, const char *run_period){
 
     std::string a = "if [ ! -d \"plots/";
     std::string b = "run" + std::string(run_period) + "/" + folder;
     std::string c = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
     std::string d = "run" + std::string(run_period) + "/" + folder;
+    std::string e = "; fi";
+    std::string command = a + b + c + d + e;
+    system(command.c_str());
+}
+// -----------------------------------------------------------------------------
+void Utility::CreateDirectory(std::string folder, std::string run_period){
+
+    std::string a = "if [ ! -d \"plots/";
+    std::string b = "run" + run_period + "/" + folder;
+    std::string c = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
+    std::string d = "run" + run_period + "/" + folder;
     std::string e = "; fi";
     std::string command = a + b + c + d + e;
     system(command.c_str());
@@ -355,6 +366,41 @@ void Utility::Draw_Run_Period(TCanvas *c, double x1, double y1, double x2, doubl
     pt->SetFillColor(0);
     pt->SetFillStyle(0);
     pt->SetTextSize(0.04);
+    pt->Draw();
+}
+// -----------------------------------------------------------------------------
+void Utility::Draw_Data_MC_Ratio(TCanvas *c, double ratio, double x1, double y1, double x2, double y2){
+    c->cd();
+
+    // 0.34, 0.936, 0.34, 0.936
+
+    TPaveText *pt;
+
+    pt = new TPaveText(x1, y1, x2, y2, "NDC");
+    pt->AddText(Form("Data/MC Ratio: %2.2f", ratio));
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.03);
+    pt->Draw();
+}
+// -----------------------------------------------------------------------------
+void Utility::Draw_Data_POT(TCanvas *c, double pot, double x1, double y1, double x2, double y2){
+    c->cd();
+
+    // 0.45, 0.915, 0.45, 0.915
+
+    TPaveText *pt;
+
+    // Change scale of POT
+    double POT = pot / 1.0e20;
+
+    pt = new TPaveText(x1, y1, x2, y2, "NDC");
+    pt->AddText(Form("MicroBooNE NuMI Data: %2.1f#times10^{20} POT", POT));
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.03);
     pt->Draw();
 }
 // -----------------------------------------------------------------------------

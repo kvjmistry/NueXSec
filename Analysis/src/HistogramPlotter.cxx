@@ -350,39 +350,6 @@ std::vector<double> HistogramPlotter::Chi2Calc(TH1D *h_mc_ext, TH1D *h_data, con
     return chi2;
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::Draw_Data_MC_Ratio(TCanvas *c, double ratio)
-{
-    c->cd();
-
-    TPaveText *pt;
-
-    pt = new TPaveText(0.34, 0.936, 0.34, 0.936, "NDC");
-    pt->AddText(Form("Data/MC Ratio: %2.2f", ratio));
-    pt->SetBorderSize(0);
-    pt->SetFillColor(0);
-    pt->SetFillStyle(0);
-    pt->SetTextSize(0.03);
-    pt->Draw();
-}
-// -----------------------------------------------------------------------------
-void HistogramPlotter::Draw_Data_POT(TCanvas *c, double pot)
-{
-    c->cd();
-
-    TPaveText *pt;
-
-    // Change scale of POT
-    double POT = pot / 1.0e20;
-
-    pt = new TPaveText(0.45, 0.915, 0.45, 0.915, "NDC");
-    pt->AddText(Form("MicroBooNE NuMI Data: %2.1f#times10^{20} POT", POT));
-    pt->SetBorderSize(0);
-    pt->SetFillColor(0);
-    pt->SetFillStyle(0);
-    pt->SetTextSize(0.03);
-    pt->Draw();
-}
-// -----------------------------------------------------------------------------
 void HistogramPlotter::Draw_WeightLabels(TCanvas *c)
 {
     c->cd();
@@ -1149,9 +1116,9 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     {
 
         // Turn this off for now until we understand this
-        // Draw_Data_MC_Ratio(c, hist_integrals.at(_util.k_leg_data)/integral_mc_ext );
+        // _util.Draw_Data_MC_Ratio(c, hist_integrals.at(_util.k_leg_data)/integral_mc_ext, 0.34, 0.936, 0.34, 0.936 );
 
-        Draw_Data_POT(c, Data_POT);
+        _util.Draw_Data_POT(c, Data_POT, 0.45, 0.915, 0.45, 0.915);
 
         if (_area_norm)
             Draw_Area_Norm(c);
@@ -1658,10 +1625,10 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
     _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
 
     // Draw Data to MC ratio
-    Draw_Data_MC_Ratio(c, double(hist_integrals.at(_util.k_data) * 1.0 / integral_mc_ext * 1.0));
+    _util.Draw_Data_MC_Ratio(c, double(hist_integrals.at(_util.k_data) * 1.0 / integral_mc_ext * 1.0), 0.34, 0.936, 0.34, 0.936);
 
     // Draw other data specifc quantities
-    Draw_Data_POT(c, Data_POT);
+    _util.Draw_Data_POT(c, Data_POT, 0.45, 0.915, 0.45, 0.915);
 
     // Add the weight labels
     // Draw_WeightLabels(c);
@@ -1806,10 +1773,10 @@ void HistogramPlotter::MakeFlashPlotOMO(double Data_POT, const char *print_name,
     _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
 
     // Draw Data to MC ratio
-    Draw_Data_MC_Ratio(c, double(hist_integrals.at(_util.k_data) * 1.0 / integral_mc_ext * 1.0));
+    _util.Draw_Data_MC_Ratio(c, double(hist_integrals.at(_util.k_data) * 1.0 / integral_mc_ext * 1.0), 0.34, 0.936, 0.34, 0.936);
 
     // Draw other data specifc quantities
-    Draw_Data_POT(c, Data_POT);
+    _util.Draw_Data_POT(c, Data_POT, 0.45, 0.915, 0.45, 0.915);
 
     // Add the weight labels
     Draw_WeightLabels(c);
@@ -2318,33 +2285,7 @@ void HistogramPlotter::Save2DHists(const char *print_name, const char *histname,
     }
     
     // Draw the run period on the plot
-    TPaveText *pt;
-
-    if (std::string(run_period) == "1")
-    {
-        pt = new TPaveText(0.76, 0.915, 0.76, 0.915, "NDC");
-        pt->AddText("Run1");
-        pt->SetTextColor(kRed + 2);
-        pt->SetTextSize(0.04);
-    }
-    else if (std::string(run_period) == "3")
-    {
-        pt = new TPaveText(0.76, 0.915, 0.76, 0.915, "NDC");
-        pt->AddText("Run3");
-        pt->SetTextColor(kBlue + 2);
-    }
-    else
-    {
-        pt = new TPaveText(0.86, 0.915, 0.86, 0.915, "NDC");
-        pt->AddText("RunXXX");
-        pt->SetTextColor(kGreen + 2);
-    }
-
-    pt->SetBorderSize(0);
-    pt->SetFillColor(0);
-    pt->SetFillStyle(0);
-    pt->SetTextSize(0.04);
-    pt->Draw();
+    _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915, run_period);
 
     c->Print(print_name);
 }
@@ -2441,33 +2382,7 @@ void HistogramPlotter::Save2DHistsNorm(const char *print_name, const char *histn
     hist_clone2->Draw("text,same");
     
     // Draw the run period on the plot
-    TPaveText *pt;
-
-    if (std::string(run_period) == "1")
-    {
-        pt = new TPaveText(0.76, 0.915, 0.76, 0.915, "NDC");
-        pt->AddText("Run1");
-        pt->SetTextColor(kRed + 2);
-        pt->SetTextSize(0.04);
-    }
-    else if (std::string(run_period) == "3")
-    {
-        pt = new TPaveText(0.76, 0.915, 0.76, 0.915, "NDC");
-        pt->AddText("Run3");
-        pt->SetTextColor(kBlue + 2);
-    }
-    else
-    {
-        pt = new TPaveText(0.86, 0.915, 0.86, 0.915, "NDC");
-        pt->AddText("RunXXX");
-        pt->SetTextColor(kGreen + 2);
-    }
-
-    pt->SetBorderSize(0);
-    pt->SetFillColor(0);
-    pt->SetFillStyle(0);
-    pt->SetTextSize(0.04);
-    pt->Draw();
+    _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915, run_period);
 
     c->Print(print_name);
 }

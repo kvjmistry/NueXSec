@@ -25,6 +25,9 @@ void UtilityPlotter::Initialise(const char *_run_period, Utility _utility, const
 
         // Lets see how many of the leading showers that we select are not an electorn
         CompareSignalPurity();
+
+        // Make the bin resolution plots
+        GetBinResolutions();
         
     }
     // This will call the code to optimise the bin widths
@@ -257,13 +260,11 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
         fit_params->SetTextSize(0.038);
         fit_params->SetTextAlign(32);
         if (draw_fit_results) fit_params->Draw();
-
-
-        htemp->SetTitle("; Truth Electron Energy; Entries");
+        htemp->SetTitle("; Truth Electron Energy [GeV]; Entries");
         htemp->SetStats(kFALSE);
         _util.IncreaseLabelSize(htemp, c);
         c->SetTopMargin(0.11);
-        c->Print(Form("plots/binning/bins_%0.2fGeV_to_%0.2f_GeV.pdf",bin_lower_edge, bin_upper_edge ));
+        c->Print(Form("plots/Binning/bins_%0.2fGeV_to_%0.2f_GeV.pdf",bin_lower_edge, bin_upper_edge ));
     } 
 
 
@@ -271,8 +272,8 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
 // -----------------------------------------------------------------------------
 void UtilityPlotter::OptimiseBins(){
 
-    gSystem->Exec("if [ ! -d \"plots/binning\" ]; then echo \"\nBins folder does not exist... creating\"; mkdir -p plots/binning; fi"); 
-
+    // Create the Bins directory for saving the plots to
+    _util.CreateDirectory("Binning", run_period);
 
     // Load in the tfile and tree
     double mean{0.0}, sigma{0.0};
@@ -317,50 +318,67 @@ void UtilityPlotter::OptimiseBins(){
     
 }
 // -----------------------------------------------------------------------------
-// void UtilityPlotter::GetBinResolutions(){
+void UtilityPlotter::GetBinResolutions(){
 
-//     gSystem->Exec("if [ ! -d \"plots/binning\" ]; then echo \"\nBins folder does not exist... creating\"; mkdir -p plots/binning; fi"); 
+    // Create the resolutions directory for saving the plots to
+    _util.CreateDirectory("Resolution", run_period);
 
 
-//     // Load in the tfile and tree
-//     double mean{0.0}, sigma{0.0};
-//     bool converged = false;
-
-//     // Were do we want to start the fit iteraction from?
-//     // Generally choose the first bin width to be 0.25 GeV
-//     float lower_bin = 0.001;
-//     // float lower_bin = 1.55;
+    // Get the vector of bins
+    std::vector<double> bins = _util.reco_shr_bins;
     
-//     // Loop over the bins
-//     for (float bin = 0; bin < 8; bin++ ){
-//         std::cout << "\n\033[0;34mTrying to optimise the next bin\033[0m\n"<< std::endl;
-//         converged = false;
+    // Loop over the bins
+    for (float bin = 0; bin < bins.size()-1; bin++ ){
 
-//         // Slide upper bin value till we get 2xthe STD of the fit
-//         for (float i = lower_bin+0.1; i <= 4.0; i+=0.001) {
-//             std::cout << "\n\033[0;34mTrying Bin: " << i << "GeV\033[0m\n"<< std::endl;
+        std::cout <<"Bin Range: " << bins.at(bin) << " - " << bins.at(bin+1) << " GeV" << std::endl;
+        
+        PlotResolution(bins.at(bin), bins.at(bin+1), tree, "reco");
+        PlotResolution(bins.at(bin), bins.at(bin+1), tree, "true");
 
-//             // call function which draws the tree to a canvas, fits the tree and returns the fit parameter
-//             // If the fit has 2xSTD = the reco bin size then we have successfully optimised the bin
-//             GetFitResult(mean, sigma, lower_bin, i, tree, false, converged, false);
 
-//             // If it converged, do it again and print the canvas then break
-//             if (converged) {
-//                 GetFitResult(mean, sigma, lower_bin, i, tree, true, converged, true);
-//                 std::cout << "\n\033[0;34mMean: " << mean << "  Sigma: " << sigma<< "\033[0m\n"<< std::endl;
-                
-//                 // Reset the lower bin value
-//                 lower_bin = i;
-//                 break;
-//             }
-
-//             // Since the fit doesnt want to converge for the last bin, lets jsut draw it anyway
-//             if (bin == 7){
-//                 GetFitResult(mean, sigma, 2.63, 3.5, tree, true, converged, false);
-//                 break;
-//             }
-
-//         }
-//     }
+    }
     
-// }
+}
+// -----------------------------------------------------------------------------
+void UtilityPlotter::PlotResolution(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string variable){
+    
+    TCut generic_query = "(classifcation.c_str()==\"nue_cc\" || classifcation.c_str()==\"nuebar_cc\") && !gen && elec_e > 0"; // This gets selected events in the MC
+    TCut bin_query = Form("shr_energy_cali > %f && shr_energy_cali < %f", bin_lower_edge, bin_upper_edge);
+    
+    TCanvas * c = new TCanvas(Form("c_%f_%f_%s", bin_upper_edge, bin_lower_edge, variable.c_str()), "c", 500, 500);
+
+    TH1D *htemp = new TH1D("htemp","", 30, -3, 3);
+
+    // Draw the Query
+    if (variable == "reco") tree->Draw("shr_energy_cali - elec_e / shr_energy_cali >> htemp", generic_query && bin_query);
+    else                    tree->Draw("shr_energy_cali - elec_e / elec_e >> htemp", generic_query && bin_query);
+    
+    // Get the histogram from the pad
+   
+            
+    // Draw the histogram
+    htemp->SetLineWidth(2);
+    htemp->SetLineColor(kBlack);
+    htemp->Draw("hist");
+
+    TLatex* range;
+    range = new TLatex(0.88,0.86, Form("Reco Energy %0.2f - %0.2f GeV",bin_lower_edge, bin_upper_edge ));
+    range->SetTextColor(kGray+2);
+    range->SetNDC();
+    range->SetTextSize(0.038);
+    range->SetTextAlign(32);
+    range->Draw();
+
+    if (variable == "reco") htemp->SetTitle("; Reco - True / Reco; Entries");
+    else                    htemp->SetTitle("; Reco - True / True; Entries");
+    htemp->SetStats(kFALSE);
+    _util.IncreaseLabelSize(htemp, c);
+    c->SetTopMargin(0.11);
+    if (variable== "reco") c->Print(Form("plots/run%s/Resolution/resolution_%0.2fGeV_to_%0.2f_GeV_reco.pdf", run_period.c_str(), bin_lower_edge, bin_upper_edge ));
+    else c->Print(Form("plots/run%s/Resolution/resolution_%0.2fGeV_to_%0.2f_GeV_true.pdf", run_period.c_str(), bin_lower_edge, bin_upper_edge ));
+    
+    delete htemp;
+
+
+}
+// -----------------------------------------------------------------------------

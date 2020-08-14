@@ -95,9 +95,6 @@ class CrossSectionHelper{
     // Define histograms for the cross section calculation
     std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_cross_sec; // Label -- Universe -- variable -- xsec_type
 
-    // Histograms for resolution plots
-    std::vector<std::vector<TH1D*>> h_resolution; // reco/true -- bin index
-
     // enum for histogram vars
     enum TH1D_xsec_hist_vars {
         k_xsec_sel,     // Selected event histogram binned in energy
@@ -199,13 +196,10 @@ class CrossSectionHelper{
     void InitialiseHistograms(std::string run_mode);
     // -------------------------------------------------------------------------
     // Helper function to fill the histograms
-    void FillHists(int label, int uni, int xsec_type, double weight_uni, float shr_energy_cali, float elec_e, double true_energy, double reco_energy);
+    void FillHists(int label, int uni, int xsec_type, double weight_uni, float shr_energy_cali, float elec_e);
     // -------------------------------------------------------------------------
     // Function to return the integrated flux for universe i or the weight in case of a beamline variation
     double GetFluxUni(int uni, std::string value, std::string label);
-    // -------------------------------------------------------------------------
-    // Function to fill the resolution histograms
-    void FillResolutionHists(float shr_energy_cali, float elec_e);
     // -------------------------------------------------------------------------
 
 

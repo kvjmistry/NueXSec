@@ -45,12 +45,6 @@ class HistogramPlotter{
     // Returns reduced chi2, num mc+ext scaled to data POT, num data, num degrees of freedom, p value in vector respectively
     std::vector<double> Chi2Calc(TH1D * h_mc_ext, TH1D * h_data, const bool area_norm, const double return_norm);
     // -------------------------------------------------------------------------
-    // Draw the Ratio to MC ratio
-    void Draw_Data_MC_Ratio(TCanvas* c, double ratio);
-    // -------------------------------------------------------------------------
-    // Draw the data POT
-    void Draw_Data_POT(TCanvas* c, double pot);
-    // -------------------------------------------------------------------------
     // Draw area norm text 
     void Draw_Area_Norm(TCanvas* c);
     // -------------------------------------------------------------------------
