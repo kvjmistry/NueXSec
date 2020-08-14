@@ -357,8 +357,8 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     TCanvas * c = new TCanvas(Form("c_%f_%f_%s", bin_upper_edge, bin_lower_edge, variable_str.c_str()), "c", 500, 500);
 
     TH1D *htemp;
-    if      (variable_str == "reco_e") htemp = new TH1D("htemp","", 30, -3, 3);
-    else if (variable_str == "true_e") htemp = new TH1D("htemp","", 30, -3, 3);
+    if      (variable_str == "reco_e") htemp = new TH1D("htemp","", 30, -1.2, 1.2);
+    else if (variable_str == "true_e") htemp = new TH1D("htemp","", 30, -1.2, 1.2);
     else if (variable_str == "purity") htemp = new TH1D("htemp","", 21, 0, 1.1);
     else if (variable_str == "completeness") htemp = new TH1D("htemp","", 21, 0, 1.1);
     else {
@@ -383,13 +383,24 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     htemp->Draw("hist");
 
     // Draw the text specifying the bin range
-    TLatex* range;
-    range = new TLatex(0.88,0.86, Form("Reco Energy %0.2f - %0.2f GeV",bin_lower_edge, bin_upper_edge ));
-    range->SetTextColor(kGray+2);
-    range->SetNDC();
-    range->SetTextSize(0.038);
-    range->SetTextAlign(32);
+    TLatex* range = new TLatex(0.65,0.91, Form("Reco Energy %0.2f - %0.2f GeV",bin_lower_edge, bin_upper_edge ));
+    _util.SetTextProperties(range);
     range->Draw();
+
+    double entries = htemp->Integral();
+    TLatex* text_entries = new TLatex(0.39,0.86, Form("Entries %4.0f", entries ));
+    _util.SetTextProperties(text_entries);
+    text_entries->Draw();
+
+    Double_t mean = htemp->GetMean();
+    TLatex* text_mean = new TLatex(0.39,0.82, Form("Mean %4.2f", mean));
+    _util.SetTextProperties(text_mean);
+    text_mean->Draw();
+
+    Double_t rms= htemp->GetRMS();
+    TLatex* text_rms = new TLatex(0.39,0.78, Form("STD %4.2f", rms));
+    _util.SetTextProperties(text_rms);
+    text_rms->Draw();
 
     if (variable_str == "reco_e")      htemp->SetTitle("; Reco - True / Reco; Entries");
     else if (variable_str == "true_e") htemp->SetTitle("; Reco - True / True; Entries");
@@ -403,6 +414,8 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     _util.IncreaseLabelSize(htemp, c);
     c->SetTopMargin(0.11);
 
+    
+    
     // Draw the run period on the plot
     _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
     

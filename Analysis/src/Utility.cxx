@@ -404,4 +404,10 @@ void Utility::Draw_Data_POT(TCanvas *c, double pot, double x1, double y1, double
     pt->Draw();
 }
 // -----------------------------------------------------------------------------
+void Utility::SetTextProperties(TLatex* text){
+    text->SetTextColor(kGray+2);
+    text->SetNDC();
+    text->SetTextSize(0.038);
+    text->SetTextAlign(32);
+}
 // -----------------------------------------------------------------------------

@@ -95,6 +95,8 @@ public:
     // Draw the Data POT on the plot
     void Draw_Data_POT(TCanvas *c, double pot, double x1, double y1, double x2, double y2);
     // -------------------------------------------------------------------------
+    // Function to customise the TLatex
+    void SetTextProperties(TLatex* text);
     // -------------------------------------------------------------------------
 
     // Variables
