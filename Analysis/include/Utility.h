@@ -34,8 +34,13 @@
 #include "TF1.h"
 #include "TLatex.h"
 
-// Class at the top level of the selection, so most classes will be including
-// from this class. Mainly provided useful functions.
+/*
+
+Class at the top level of the selection, so most classes will be including
+from this class. Mainly provided useful functions which are common to all classes.
+Main idea is that we dont repeat functions in multiple places
+
+*/
 
 
 class Utility{
@@ -58,6 +63,9 @@ public:
     bool GetHist(TFile* f, TH1D* &h, TString string);
     bool GetHist(TFile* f, TH2D* &h, TString string);
     // -------------------------------------------------------------------------
+    // Create another directory in the plots folder
+    void CreateDirectory(std::string folder, const char *run_period);
+    // -------------------------------------------------------------------------
     // Function to tabulate all the nuetrino types and flavours
     void Tabulate(bool inFV, std::string interaction, std::string classification, std::string pi0_classification, int type, std::vector<double> &counter_v, double weight);
     // -------------------------------------------------------------------------
@@ -66,6 +74,18 @@ public:
     // -------------------------------------------------------------------------
     // Check if vertex is in the FV
     bool in_fv(double x, double y, double z);
+    // -------------------------------------------------------------------------
+    // Increase the label size of 1D histograms
+    void IncreaseLabelSize(TH1D *h, TCanvas *c);
+    // -------------------------------------------------------------------------
+    // Increase the label size of 2D histograms
+    void IncreaseLabelSize(TH2D *h, TCanvas *c);
+    // -------------------------------------------------------------------------
+    // Draw the run period on the plot
+    void Draw_Run_Period(TCanvas *c, double x1, double y1, double x2, double y2, std::string run_period);
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 
     // Variables

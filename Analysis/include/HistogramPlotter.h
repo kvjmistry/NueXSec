@@ -45,9 +45,6 @@ class HistogramPlotter{
     // Returns reduced chi2, num mc+ext scaled to data POT, num data, num degrees of freedom, p value in vector respectively
     std::vector<double> Chi2Calc(TH1D * h_mc_ext, TH1D * h_data, const bool area_norm, const double return_norm);
     // -------------------------------------------------------------------------
-    // Draw the run period on the plot
-    void Draw_Run_Period(TCanvas* c);
-    // -------------------------------------------------------------------------
     // Draw the Ratio to MC ratio
     void Draw_Data_MC_Ratio(TCanvas* c, double ratio);
     // -------------------------------------------------------------------------
@@ -65,12 +62,6 @@ class HistogramPlotter{
     // -------------------------------------------------------------------------
     // Set the TPad Options
     void SetTPadOptions(TPad * topPad, TPad * bottomPad );
-    // -------------------------------------------------------------------------
-    // Increase the label size of the 1D histogram
-    void IncreaseLabelSize(TH1D* h);
-    // -------------------------------------------------------------------------
-    // Increase the label size of the 2D histogram
-    void IncreaseLabelSize(TH2D* h);
     // -------------------------------------------------------------------------
     // Function to get all the histograms from the file
     bool GetHistograms(std::vector<TH1D*> &hist, std::string hist_name, std::string cut_name, std::string plotmode, bool &found_data, bool &found_ext, bool &found_dirt);
@@ -100,9 +91,6 @@ class HistogramPlotter{
     // -------------------------------------------------------------------------
     // Plot the 2D signal vs Background Plots
     void Plot2D_Signal_Background(const char* print_name, const char* histname);
-    // -------------------------------------------------------------------------
-    // Create another directory in the plots folder
-    void CreateDirectory(std::string folder, const char *run_period);
     // -------------------------------------------------------------------------
     // Script to get the 1D histograms and save them as a PDF
     void Save1DHists(const char* print_name, const char* histname, std::string cut_type, bool scale);

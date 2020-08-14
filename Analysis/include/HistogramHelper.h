@@ -254,6 +254,8 @@ class HistogramHelper{
         k_true_nu_vtx_x_reco_nu_vtx_x,
         k_true_nu_vtx_y_reco_nu_vtx_y,
         k_true_nu_vtx_z_reco_nu_vtx_z,
+        k_true_shr_energy_purity,        // Actually purity as a function of reco shower
+        k_true_shr_energy_completeness,  // Actually completeness as a function of reco shower
         k_TH2D_true_MAX
     };
 

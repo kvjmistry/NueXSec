@@ -217,7 +217,7 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
     tree->Draw("elec_e", generic_query && bin_query);
     
     // Get the histogram from the pad
-    TH1F *htemp = (TH1F*)gPad->GetPrimitive("htemp");
+    TH1D *htemp = (TH1D*)gPad->GetPrimitive("htemp");
     
     // Fit it with a Gaussian
     htemp->Fit("gaus");
@@ -247,14 +247,12 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
         range = new TLatex(0.88,0.86, Form("Reco Energy %0.2f - %0.2f GeV",bin_lower_edge, bin_upper_edge ));
         range->SetTextColor(kGray+2);
         range->SetNDC();
-        range->SetNDC();
         range->SetTextSize(0.038);
         range->SetTextAlign(32);
         range->Draw();
 
         fit_params = new TLatex(0.88,0.92, Form("Fit Mean: %0.2f GeV, Fit Sigma: %0.2f GeV",mean, sigma ));
         fit_params->SetTextColor(kGray+2);
-        fit_params->SetNDC();
         fit_params->SetNDC();
         fit_params->SetTextSize(0.038);
         fit_params->SetTextAlign(32);
@@ -263,12 +261,7 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
 
         htemp->SetTitle("; Truth Electron Energy; Entries");
         htemp->SetStats(kFALSE);
-        htemp->GetXaxis()->SetLabelSize(0.05);
-        htemp->GetXaxis()->SetTitleSize(0.05);
-        htemp->GetYaxis()->SetLabelSize(0.05);
-        htemp->GetYaxis()->SetTitleSize(0.05);
-        gPad->SetLeftMargin(0.15);
-        gPad->SetBottomMargin(0.12);
+        _util.IncreaseLabelSize(htemp, c);
         c->SetTopMargin(0.11);
         c->Print(Form("plots/binning/bins_%0.2fGeV_to_%0.2f_GeV.pdf",bin_lower_edge, bin_upper_edge ));
     } 
@@ -324,3 +317,50 @@ void UtilityPlotter::OptimiseBins(){
     
 }
 // -----------------------------------------------------------------------------
+// void UtilityPlotter::GetBinResolutions(){
+
+//     gSystem->Exec("if [ ! -d \"plots/binning\" ]; then echo \"\nBins folder does not exist... creating\"; mkdir -p plots/binning; fi"); 
+
+
+//     // Load in the tfile and tree
+//     double mean{0.0}, sigma{0.0};
+//     bool converged = false;
+
+//     // Were do we want to start the fit iteraction from?
+//     // Generally choose the first bin width to be 0.25 GeV
+//     float lower_bin = 0.001;
+//     // float lower_bin = 1.55;
+    
+//     // Loop over the bins
+//     for (float bin = 0; bin < 8; bin++ ){
+//         std::cout << "\n\033[0;34mTrying to optimise the next bin\033[0m\n"<< std::endl;
+//         converged = false;
+
+//         // Slide upper bin value till we get 2xthe STD of the fit
+//         for (float i = lower_bin+0.1; i <= 4.0; i+=0.001) {
+//             std::cout << "\n\033[0;34mTrying Bin: " << i << "GeV\033[0m\n"<< std::endl;
+
+//             // call function which draws the tree to a canvas, fits the tree and returns the fit parameter
+//             // If the fit has 2xSTD = the reco bin size then we have successfully optimised the bin
+//             GetFitResult(mean, sigma, lower_bin, i, tree, false, converged, false);
+
+//             // If it converged, do it again and print the canvas then break
+//             if (converged) {
+//                 GetFitResult(mean, sigma, lower_bin, i, tree, true, converged, true);
+//                 std::cout << "\n\033[0;34mMean: " << mean << "  Sigma: " << sigma<< "\033[0m\n"<< std::endl;
+                
+//                 // Reset the lower bin value
+//                 lower_bin = i;
+//                 break;
+//             }
+
+//             // Since the fit doesnt want to converge for the last bin, lets jsut draw it anyway
+//             if (bin == 7){
+//                 GetFitResult(mean, sigma, 2.63, 3.5, tree, true, converged, false);
+//                 break;
+//             }
+
+//         }
+//     }
+    
+// }

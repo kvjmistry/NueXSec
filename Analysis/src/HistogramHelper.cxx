@@ -497,9 +497,11 @@ void HistogramHelper::InitHistograms(){
             TH2D_true_hists.at(i).at(k_true_elec_E_reco_elec_E_extra_bins) = new TH2D( Form("h_true_elec_E_reco_elec_E_extra_bins_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True e^{-} Energy [GeV] ;Reco Leading Shower Energy [GeV]", 50, 0, 4, 50, 0, 4);
             TH2D_true_hists.at(i).at(k_true_nu_E_reco_nu_E_extra_bins)     = new TH2D( Form("h_true_nu_E_reco_nu_E_extra_bins_%s_%s",             _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} Energy [GeV] ;Reco #nu_{e} Energy [GeV]", 50, 0, 4, 50, 0, 4);
 
-            TH2D_true_hists.at(i).at(k_true_nu_vtx_x_reco_nu_vtx_x) = new TH2D( Form("h_true_nu_vtx_x_reco_nu_vtx_x_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} Vtx X [cm] ;Reco #nu_{e} Vtx X [cm]", 20, -10, 270, 20, -10, 270);
-            TH2D_true_hists.at(i).at(k_true_nu_vtx_y_reco_nu_vtx_y) = new TH2D( Form("h_true_nu_vtx_y_reco_nu_vtx_y_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} Vtx Y [cm] ;Reco #nu_{e} Vtx Y [cm]", 20, -10, 120, 20, -10, 120);
-            TH2D_true_hists.at(i).at(k_true_nu_vtx_z_reco_nu_vtx_z) = new TH2D( Form("h_true_nu_vtx_z_reco_nu_vtx_z_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} Vtx Z [cm] ;Reco #nu_{e} Vtx Z [cm]", 40, -10, 1050, 40, -10, 1050);
+            TH2D_true_hists.at(i).at(k_true_nu_vtx_x_reco_nu_vtx_x)  = new TH2D( Form("h_true_nu_vtx_x_reco_nu_vtx_x_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} Vtx X [cm] ;Reco #nu_{e} Vtx X [cm]", 20, -10, 270, 20, -10, 270);
+            TH2D_true_hists.at(i).at(k_true_nu_vtx_y_reco_nu_vtx_y)  = new TH2D( Form("h_true_nu_vtx_y_reco_nu_vtx_y_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} Vtx Y [cm] ;Reco #nu_{e} Vtx Y [cm]", 20, -10, 120, 20, -10, 120);
+            TH2D_true_hists.at(i).at(k_true_nu_vtx_z_reco_nu_vtx_z)  = new TH2D( Form("h_true_nu_vtx_z_reco_nu_vtx_z_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} Vtx Z [cm] ;Reco #nu_{e} Vtx Z [cm]", 40, -10, 1050, 40, -10, 1050);
+            TH2D_true_hists.at(i).at(k_true_shr_energy_purity)       = new TH2D( Form("h_true_shr_energy_purity_%s_%s",      _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";Reco Leading Shower Energy [GeV] ;Shower Purity", _util.reco_shr_bins.size()-1, edges, 21, 0, 1.1);
+            TH2D_true_hists.at(i).at(k_true_shr_energy_completeness) = new TH2D( Form("h_true_shr_energy_completeness_%s_%s",_util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";Reco Leading Shower Energy [GeV] ;Shower Completeness", _util.reco_shr_bins.size()-1, edges, 21, 0, 1.1);
         }
     }
 
@@ -818,72 +820,68 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
 
         // Also require in FV
         if ( (classification_index == _util.k_nue_cc || classification_index == _util.k_nuebar_cc || classification_index == _util.k_unmatched_nue || classification_index == _util.k_cosmic_nue || classification_index == _util.k_unmatched_nuebar || classification_index == _util.k_cosmic_nuebar) && true_in_fv ){
-            TH1D_true_hists.at(index).at(k_true_nue_theta)->Fill(nu_theta, weight);
-            TH1D_true_hists.at(index).at(k_true_nue_phi_numi)  ->Fill(nu_phi_numi, weight);
-            TH1D_true_hists.at(index).at(k_true_nue_theta_numi)->Fill(nu_theta_numi, weight);
-            TH1D_true_hists.at(index).at(k_true_nue_phi)  ->Fill(nu_phi, weight);
-            TH1D_true_hists.at(index).at(k_true_nue_angle)->Fill(nu_angle, weight);
-            TH1D_true_hists.at(index).at(k_true_nue_px)   ->Fill(SC.true_nu_px, weight);
-            TH1D_true_hists.at(index).at(k_true_nue_py)   ->Fill(SC.true_nu_py, weight);
-            TH1D_true_hists.at(index).at(k_true_nue_pz)   ->Fill(SC.true_nu_pz, weight);
-            TH1D_true_hists.at(index).at(k_true_nue_e)    ->Fill(SC.nu_e, weight);
-            TH1D_true_hists.at(index).at(k_true_nue_p)    ->Fill(p, weight);
-            TH1D_true_hists.at(index).at(k_true_vtx_x)    ->Fill(SC.true_nu_vtx_x, weight);
-            TH1D_true_hists.at(index).at(k_true_vtx_y)    ->Fill(SC.true_nu_vtx_y, weight);
-            TH1D_true_hists.at(index).at(k_true_vtx_z)    ->Fill(SC.true_nu_vtx_z, weight);
-            TH1D_true_hists.at(index).at(k_true_vtx_x_sce)->Fill(SC.true_nu_vtx_sce_x, weight);
-            TH1D_true_hists.at(index).at(k_true_vtx_y_sce)->Fill(SC.true_nu_vtx_sce_y, weight);
-            TH1D_true_hists.at(index).at(k_true_vtx_z_sce)->Fill(SC.true_nu_vtx_sce_z, weight);
-            TH1D_true_hists.at(index).at(k_true_nu_ang_targ)  ->Fill(nu_angle_targ, weight);
-            TH1D_true_hists.at(index).at(k_true_elec_ang_targ)->Fill(elec_ang_targ, weight);
-
-            TH1D_true_hists.at(index).at(k_true_elec_E)    ->Fill(SC.elec_e, weight);
-            TH1D_true_hists.at(index).at(k_true_elec_theta)->Fill(elec_theta, weight);
-            TH1D_true_hists.at(index).at(k_true_elec_phi)  ->Fill(elec_phi, weight);
-
+            
+            // Just True histograms
+            TH1D_true_hists.at(index).at(k_true_nue_theta)       ->Fill(nu_theta, weight);
+            TH1D_true_hists.at(index).at(k_true_nue_phi_numi)    ->Fill(nu_phi_numi, weight);
+            TH1D_true_hists.at(index).at(k_true_nue_theta_numi)  ->Fill(nu_theta_numi, weight);
+            TH1D_true_hists.at(index).at(k_true_nue_phi)         ->Fill(nu_phi, weight);
+            TH1D_true_hists.at(index).at(k_true_nue_angle)       ->Fill(nu_angle, weight);
+            TH1D_true_hists.at(index).at(k_true_nue_px)          ->Fill(SC.true_nu_px, weight);
+            TH1D_true_hists.at(index).at(k_true_nue_py)          ->Fill(SC.true_nu_py, weight);
+            TH1D_true_hists.at(index).at(k_true_nue_pz)          ->Fill(SC.true_nu_pz, weight);
+            TH1D_true_hists.at(index).at(k_true_nue_e)           ->Fill(SC.nu_e, weight);
+            TH1D_true_hists.at(index).at(k_true_nue_p)           ->Fill(p, weight);
+            TH1D_true_hists.at(index).at(k_true_vtx_x)           ->Fill(SC.true_nu_vtx_x, weight);
+            TH1D_true_hists.at(index).at(k_true_vtx_y)           ->Fill(SC.true_nu_vtx_y, weight);
+            TH1D_true_hists.at(index).at(k_true_vtx_z)           ->Fill(SC.true_nu_vtx_z, weight);
+            TH1D_true_hists.at(index).at(k_true_vtx_x_sce)       ->Fill(SC.true_nu_vtx_sce_x, weight);
+            TH1D_true_hists.at(index).at(k_true_vtx_y_sce)       ->Fill(SC.true_nu_vtx_sce_y, weight);
+            TH1D_true_hists.at(index).at(k_true_vtx_z_sce)       ->Fill(SC.true_nu_vtx_sce_z, weight);
+            TH1D_true_hists.at(index).at(k_true_nu_ang_targ)     ->Fill(nu_angle_targ, weight);
+            TH1D_true_hists.at(index).at(k_true_elec_ang_targ)   ->Fill(elec_ang_targ, weight);
+            TH1D_true_hists.at(index).at(k_true_elec_E)          ->Fill(SC.elec_e, weight);
+            TH1D_true_hists.at(index).at(k_true_elec_theta)      ->Fill(elec_theta, weight);
+            TH1D_true_hists.at(index).at(k_true_elec_phi)        ->Fill(elec_phi, weight);
             TH2D_true_hists.at(index).at(k_true_nue_phi_theta)   ->Fill(nu_phi, nu_theta, weight);
             TH2D_true_hists.at(index).at(k_true_nue_energy_theta)->Fill(SC.nu_e, nu_theta, weight);
             TH2D_true_hists.at(index).at(k_true_nue_energy_phi)  ->Fill(SC.nu_e, nu_phi, weight);
             TH2D_true_hists.at(index).at(k_true_nue_energy_angle)->Fill(SC.nu_e, nu_angle, weight);
-            TH2D_true_hists.at(index).at(k_true_nue_vtx_z_y)       ->Fill(SC.true_nu_vtx_z,  SC.true_nu_vtx_y, weight);
-            TH2D_true_hists.at(index).at(k_true_nue_vtx_z_y_sce)   ->Fill(SC.true_nu_vtx_sce_z,  SC.true_nu_vtx_sce_y, weight);
+            TH2D_true_hists.at(index).at(k_true_nue_vtx_z_y)     ->Fill(SC.true_nu_vtx_z,  SC.true_nu_vtx_y, weight);
+            TH2D_true_hists.at(index).at(k_true_nue_vtx_z_y_sce) ->Fill(SC.true_nu_vtx_sce_z,  SC.true_nu_vtx_sce_y, weight);
             
+            // True vs reco histograms
+            TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E)           ->Fill(SC.elec_e,  SC.shr_energy_cali/0.83, weight);
+            TH2D_true_hists.at(index).at(k_true_nu_E_reco_nu_E)               ->Fill(SC.nu_e,  reco_nu_e, weight);
+            TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E_extra_bins)->Fill(SC.elec_e,  SC.shr_energy_cali/0.83, weight);
+            TH2D_true_hists.at(index).at(k_true_nu_E_reco_nu_E_extra_bins)    ->Fill(SC.nu_e,  reco_nu_e, weight);
+            TH2D_true_hists.at(index).at(k_true_nu_vtx_x_reco_nu_vtx_x)       ->Fill(SC.true_nu_vtx_sce_x,  SC.reco_nu_vtx_sce_x, weight);
+            TH2D_true_hists.at(index).at(k_true_nu_vtx_y_reco_nu_vtx_y)       ->Fill(SC.true_nu_vtx_sce_y,  SC.reco_nu_vtx_sce_y, weight);
+            TH2D_true_hists.at(index).at(k_true_nu_vtx_z_reco_nu_vtx_z)       ->Fill(SC.true_nu_vtx_sce_z,  SC.reco_nu_vtx_sce_z, weight);
 
-            if (_type == _util.k_mc){ 
+            TH2D_true_hists.at(index).at(k_true_shr_energy_purity)            ->Fill(SC.shr_energy_cali/0.83,  SC.shr_bkt_purity, weight);
+            TH2D_true_hists.at(index).at(k_true_shr_energy_completeness)      ->Fill(SC.shr_energy_cali/0.83,  SC.shr_bkt_completeness, weight);
 
-                // True vs reco histograms
-                TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E)->Fill(SC.elec_e,  SC.shr_energy_cali/0.83, weight);
-                TH2D_true_hists.at(index).at(k_true_nu_E_reco_nu_E)    ->Fill(SC.nu_e,  reco_nu_e, weight);
-                TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E_extra_bins)->Fill(SC.elec_e,  SC.shr_energy_cali/0.83, weight);
-                TH2D_true_hists.at(index).at(k_true_nu_E_reco_nu_E_extra_bins)    ->Fill(SC.nu_e,  reco_nu_e, weight);
-                TH2D_true_hists.at(index).at(k_true_nu_vtx_x_reco_nu_vtx_x)->Fill(SC.true_nu_vtx_sce_x,  SC.reco_nu_vtx_sce_x, weight);
-                TH2D_true_hists.at(index).at(k_true_nu_vtx_y_reco_nu_vtx_y)->Fill(SC.true_nu_vtx_sce_y,  SC.reco_nu_vtx_sce_y, weight);
-                TH2D_true_hists.at(index).at(k_true_nu_vtx_z_reco_nu_vtx_z)->Fill(SC.true_nu_vtx_sce_z,  SC.reco_nu_vtx_sce_z, weight);
-
-                // True nue interaction histograms
-                if (interaction == "nue_cc_qe" || interaction == "nue_bar_cc_qe"){
-                    TH1D_interaction_hists.at(index).at(_util.k_plot_qe)->Fill(SC.nu_e, weight);
-                }
-                else if (interaction == "nue_cc_res" || interaction == "nue_bar_cc_res"){
-                    TH1D_interaction_hists.at(index).at(_util.k_plot_res)->Fill(SC.nu_e, weight);
-                }
-                else if (interaction == "nue_cc_dis" || interaction == "nue_bar_cc_dis"){
-                    TH1D_interaction_hists.at(index).at(_util.k_plot_dis)->Fill(SC.nu_e, weight);
-                }
-                else if (interaction == "nue_cc_coh" || interaction == "nue_bar_cc_coh"){
-                    TH1D_interaction_hists.at(index).at(_util.k_plot_coh)->Fill(SC.nu_e, weight);
-                }
-                else if (interaction == "nue_cc_mec" || interaction == "nue_bar_cc_mec"){
-                    TH1D_interaction_hists.at(index).at(_util.k_plot_mec)->Fill(SC.nu_e, weight);
-                }
-                // NC
-                else {
-                    TH1D_interaction_hists.at(index).at(_util.k_plot_nc)->Fill(SC.nu_e, weight);
-                }
-
+            // True nue interaction histograms
+            if (interaction == "nue_cc_qe" || interaction == "nue_bar_cc_qe"){
+                TH1D_interaction_hists.at(index).at(_util.k_plot_qe)->Fill(SC.nu_e, weight);
             }
-
-           
+            else if (interaction == "nue_cc_res" || interaction == "nue_bar_cc_res"){
+                TH1D_interaction_hists.at(index).at(_util.k_plot_res)->Fill(SC.nu_e, weight);
+            }
+            else if (interaction == "nue_cc_dis" || interaction == "nue_bar_cc_dis"){
+                TH1D_interaction_hists.at(index).at(_util.k_plot_dis)->Fill(SC.nu_e, weight);
+            }
+            else if (interaction == "nue_cc_coh" || interaction == "nue_bar_cc_coh"){
+                TH1D_interaction_hists.at(index).at(_util.k_plot_coh)->Fill(SC.nu_e, weight);
+            }
+            else if (interaction == "nue_cc_mec" || interaction == "nue_bar_cc_mec"){
+                TH1D_interaction_hists.at(index).at(_util.k_plot_mec)->Fill(SC.nu_e, weight);
+            }
+            // NC
+            else {
+                TH1D_interaction_hists.at(index).at(_util.k_plot_nc)->Fill(SC.nu_e, weight);
+            }
 
         }
        

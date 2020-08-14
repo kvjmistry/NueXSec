@@ -96,10 +96,10 @@ void CrossSectionHelper::LoopEvents(){
         double cv_weight = weight;
 
         // Here we fill the resolution plots for the mc only
-        if (*classifcation != "data" && *classifcation != "ext" && *classifcation != "dirt" && gen == false) {
-            // If the electron energy in truth is zero then this wasnt a true nue, so dont fill either
-            if (elec_e != 0) FillResolutionHists(shr_energy_cali, elec_e);
-        }
+        // if (*classifcation != "data" && *classifcation != "ext" && *classifcation != "dirt" && gen == false) {
+        //     // If the electron energy in truth is zero then this wasnt a true nue, so dont fill either
+        //     if (elec_e != 0) FillResolutionHists(shr_energy_cali, elec_e);
+        // }
 
         // Loop over the reweighter labels
         for (unsigned int label = 0; label < reweighter_labels.size(); label++){

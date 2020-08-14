@@ -59,7 +59,7 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
 
         // Create a set of strings for creating a dynamic directory
         // Directory structure that is created will take the form plots/<cut>/
-        CreateDirectory("Flash", run_period);
+        _util.CreateDirectory("Flash", run_period);
 
         // Flash time plots
         MakeFlashPlot(Data_POT, Form("plots/run%s/Flash/flash_time.pdf", run_period), "h_flash_time");
@@ -85,7 +85,7 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
         MakeFlashPlotOMO(Data_POT, Form("plots/run%s/Flash/flash_pe_OMO_sid0.pdf", run_period), "h_flash_pe_sid0"); // Slice ID 0
 
         // Create the Efficiency Folder
-        CreateDirectory("Efficiency", run_period);
+        _util.CreateDirectory("Efficiency", run_period);
 
         MakeEfficiencyPlot(Form("plots/run%s/Efficiency/Integrated_Efficiency_Purity.pdf", run_period), run_period);
 
@@ -93,7 +93,7 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
         MakeEfficiencyPlotByCut(run_period, "elec");
 
         // Create the interaction folder
-        CreateDirectory("Interaction", run_period);
+        _util.CreateDirectory("Interaction", run_period);
 
         // Interaction Plot
         MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction_unselected.pdf", run_period), "unselected", true);
@@ -101,7 +101,7 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
         MakeInteractionEfficiency(Form("plots/run%s/Interaction/True_nue_e_interaction_efficiency.pdf", run_period));
 
         // Create the 2D folder
-        CreateDirectory("2D", run_period);
+        _util.CreateDirectory("2D", run_period);
 
         Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_shr_dist.pdf", run_period), "h_reco_shr_dEdx_shr_dist");
         Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_dEdx_shr_dist_post.pdf", run_period), "h_reco_shr_dEdx_shr_dist_post");
@@ -113,7 +113,7 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
         Plot2D_Signal_Background(Form("plots/run%s/2D/reco_shr_moliere_shr_dist.pdf", run_period), "h_reco_shr_moliere_shr_dist");
 
         // Create the Truth folder
-        CreateDirectory("Truth", run_period);
+        _util.CreateDirectory("Truth", run_period);
 
         // Make 1D Histtograms
         // Save1DHists(Form("plots/run%s/Truth/true_nue_theta.pdf", run_period), "h_true_nue_theta", run_period);
@@ -157,7 +157,9 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
             Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_x_reco_nu_vtx_x_%s.pdf", run_period, cut_type.c_str()), "h_true_nu_vtx_x_reco_nu_vtx_x", cut_type, false);
             Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_y_reco_nu_vtx_y_%s.pdf", run_period, cut_type.c_str()), "h_true_nu_vtx_y_reco_nu_vtx_y", cut_type, false);
             Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_z_reco_nu_vtx_z_%s.pdf", run_period, cut_type.c_str()), "h_true_nu_vtx_z_reco_nu_vtx_z", cut_type, false);
-        
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_purity_%s.pdf", run_period, cut_type.c_str()), "h_true_shr_energy_purity", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_completeness_%s.pdf", run_period, cut_type.c_str()), "h_true_shr_energy_completeness", cut_type, false);
+
             // Normalised by reco (row)
             Save2DHistsNorm(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s_row_norm_reco.pdf",     run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type, true, "reco");
 
@@ -167,7 +169,7 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
 
         // Stacked histograms for pi0
         // Create the Truth folder
-        CreateDirectory("pi0", run_period);
+        _util.CreateDirectory("pi0", run_period);
 
         // pi0 mass peak unweighted
         MakeStack("h_pi0_mass", " ",
@@ -186,7 +188,7 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
 
         // Stacked histograms for numu
         // Create the Truth folder
-        CreateDirectory("numu", run_period);
+        _util.CreateDirectory("numu", run_period);
 
         // Track Theta
         MakeStack("h_track_theta", " ",
@@ -216,9 +218,9 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
 
         // Create the directories
         if (std::string(variation) == "empty")
-            CreateDirectory("/cuts/" + _util.cut_dirs.at(i), run_period);
+            _util.CreateDirectory("/cuts/" + _util.cut_dirs.at(i), run_period);
         else
-            CreateDirectory("/detvar/" + std::string(variation) + "/cuts/" + _util.cut_dirs.at(i), run_period);
+            _util.CreateDirectory("/detvar/" + std::string(variation) + "/cuts/" + _util.cut_dirs.at(i), run_period);
 
         // Call the Make stack function for all the plots we want
         CallMakeStack(run_period, i, Data_POT, variation);
@@ -348,39 +350,6 @@ std::vector<double> HistogramPlotter::Chi2Calc(TH1D *h_mc_ext, TH1D *h_data, con
     return chi2;
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::Draw_Run_Period(TCanvas *c)
-{
-    c->cd();
-
-    TPaveText *pt;
-
-    if (run_period == "1")
-    {
-        pt = new TPaveText(0.86, 0.915, 0.86, 0.915, "NDC");
-        pt->AddText("Run1");
-        pt->SetTextColor(kRed + 2);
-        pt->SetTextSize(0.04);
-    }
-    else if (run_period == "3")
-    {
-        pt = new TPaveText(0.86, 0.915, 0.86, 0.915, "NDC");
-        pt->AddText("Run3");
-        pt->SetTextColor(kBlue + 2);
-    }
-    else
-    {
-        pt = new TPaveText(0.86, 0.915, 0.86, 0.915, "NDC");
-        pt->AddText("RunXXX");
-        pt->SetTextColor(kGreen + 2);
-    }
-
-    pt->SetBorderSize(0);
-    pt->SetFillColor(0);
-    pt->SetFillStyle(0);
-    pt->SetTextSize(0.04);
-    pt->Draw();
-}
-// -----------------------------------------------------------------------------
 void HistogramPlotter::Draw_Data_MC_Ratio(TCanvas *c, double ratio)
 {
     c->cd();
@@ -487,31 +456,6 @@ void HistogramPlotter::SetTPadOptions(TPad *topPad, TPad *bottomPad)
     topPad->Draw();
     bottomPad->Draw();
     topPad->cd();
-}
-// -----------------------------------------------------------------------------
-void HistogramPlotter::IncreaseLabelSize(TH1D *h){
-
-    h->GetXaxis()->SetLabelSize(0.05);
-    h->GetXaxis()->SetTitleSize(0.05);
-    h->GetYaxis()->SetLabelSize(0.05);
-    h->GetYaxis()->SetTitleSize(0.05);
-    gPad->SetLeftMargin(0.15);
-    gPad->SetBottomMargin(0.12);
-}
-// -----------------------------------------------------------------------------
-void HistogramPlotter::IncreaseLabelSize(TH2D *h) {
-
-    h->GetXaxis()->SetLabelSize(0.05);
-    h->GetXaxis()->SetTitleSize(0.05);
-    h->GetYaxis()->SetLabelSize(0.05);
-    h->GetYaxis()->SetTitleSize(0.05);
-    h->GetZaxis()->SetLabelSize(0.05);
-    h->GetZaxis()->SetTitleSize(0.05);
-    gPad->SetLeftMargin(0.15);
-    gPad->SetRightMargin(0.2);
-    gPad->SetBottomMargin(0.13);
-    h->SetMarkerSize(1.8);
-    // gPad->SetGridx();
 }
 // -----------------------------------------------------------------------------
 bool HistogramPlotter::GetHistograms(std::vector<TH1D *> &hist, std::string hist_name, std::string cut_name, std::string plotmode, bool &found_data, bool &found_ext, bool &found_dirt)
@@ -1148,7 +1092,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         if (cut_name == "Unselected" || cut_name == "SoftwareTrig" || cut_name == "Slice_ID" || cut_name == "Topo_Score" || cut_name == "In_FV" || cut_name == "e_candidate")
             h_ratio->GetYaxis()->SetRangeUser(0.8, 1.2);
         else
-            h_ratio->GetYaxis()->SetRangeUser(0.5, 1.5);
+            h_ratio->GetYaxis()->SetRangeUser(0, 2.0);
 
         h_ratio->GetYaxis()->SetTitle("#frac{Beam-On}{(Overlay + Beam-Off)}");
 
@@ -1195,7 +1139,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     }
 
     // Draw the run period on the plot
-    Draw_Run_Period(c);
+    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
 
     // Draw variation mode if in that mode
     Draw_VarMode(c, variation);
@@ -1711,7 +1655,7 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
     h_ratio_error->Draw("e2, same");
 
     // Draw the run period on the plot
-    Draw_Run_Period(c);
+    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
 
     // Draw Data to MC ratio
     Draw_Data_MC_Ratio(c, double(hist_integrals.at(_util.k_data) * 1.0 / integral_mc_ext * 1.0));
@@ -1859,7 +1803,7 @@ void HistogramPlotter::MakeFlashPlotOMO(double Data_POT, const char *print_name,
     h_ratio->Draw("E");
 
     // Draw the run period on the plot
-    Draw_Run_Period(c);
+    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
 
     // Draw Data to MC ratio
     Draw_Data_MC_Ratio(c, double(hist_integrals.at(_util.k_data) * 1.0 / integral_mc_ext * 1.0));
@@ -1956,7 +1900,7 @@ void HistogramPlotter::MakeEfficiencyPlot(const char *print_name, const char *ru
     h_pur->GetXaxis()->SetTickLength(0.00);
 
     // Draw the run period on the plot
-    Draw_Run_Period(c);
+    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
 
     c->Print(print_name);
 }
@@ -1999,7 +1943,7 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(const char *run_period, std::stri
         h_clone->GetYaxis()->SetRangeUser(0, 1);
         h_clone->SetLineColor(kBlack);
         h_clone->SetLineWidth(2);
-        IncreaseLabelSize(h_clone);
+        _util.IncreaseLabelSize(h_clone, c);
         h_clone->Draw("E same");
 
         TH1D *h_true_nue = (TH1D *)hist.at(_util.k_unselected)->Clone("h_clone_true");
@@ -2142,7 +2086,7 @@ void HistogramPlotter::MakeInteractionPlot(const char *print_name, std::string c
     leg_stack->Draw();
 
     // Draw the run period on the plot
-    Draw_Run_Period(c);
+    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
 
     // Add the weight labels
     // Draw_WeightLabels(c);
@@ -2205,7 +2149,7 @@ void HistogramPlotter::MakeInteractionEfficiency(const char *print_name){
         }
 
 
-        IncreaseLabelSize(h_ratio.at(type));
+        _util.IncreaseLabelSize(h_ratio.at(type), c);
         h_ratio.at(type) ->SetFillColor(0);
         h_ratio.at(type)->GetYaxis()->SetRangeUser(0, 0.6);
         h_ratio.at(type)->GetXaxis()->SetRangeUser(0, 3.5);
@@ -2233,7 +2177,7 @@ void HistogramPlotter::MakeInteractionEfficiency(const char *print_name){
     leg_stack->Draw();
 
     // Draw the run period on the plot
-    Draw_Run_Period(c);
+    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
 
     // Add the weight labels
     // Draw_WeightLabels(c);
@@ -2301,20 +2245,9 @@ void HistogramPlotter::Plot2D_Signal_Background(const char *print_name, const ch
     leg_stack->Draw();
 
     // Draw the run period on the plot
-    Draw_Run_Period(c);
+    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
 
     c->Print(print_name);
-}
-// -----------------------------------------------------------------------------
-void HistogramPlotter::CreateDirectory(std::string folder, const char *run_period) {
-
-    std::string a = "if [ ! -d \"plots/";
-    std::string b = "run" + std::string(run_period) + "/" + folder;
-    std::string c = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
-    std::string d = "run" + std::string(run_period) + "/" + folder;
-    std::string e = "; fi";
-    std::string command = a + b + c + d + e;
-    system(command.c_str());
 }
 // -----------------------------------------------------------------------------
 void HistogramPlotter::Save1DHists(const char *print_name, const char *histname, std::string cut_type, bool scale) {
@@ -2343,14 +2276,14 @@ void HistogramPlotter::Save1DHists(const char *print_name, const char *histname,
 
     hist->SetStats(kFALSE);
 
-    IncreaseLabelSize(hist);
+    _util.IncreaseLabelSize(hist, c);
 
     hist->SetLineColor(kAzure - 6);
     hist->SetLineWidth(2);
     hist->Draw("hist_E");
 
     // Draw the run period on the plot
-    Draw_Run_Period(c);
+    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
 
     c->Print(print_name);
 }
@@ -2368,7 +2301,7 @@ void HistogramPlotter::Save2DHists(const char *print_name, const char *histname,
 
     hist->SetStats(kFALSE);
 
-    IncreaseLabelSize(hist);
+    _util.IncreaseLabelSize(hist, c);
 
     hist->Draw("colz");
 
@@ -2431,7 +2364,7 @@ void HistogramPlotter::Save2DHistsNorm(const char *print_name, const char *histn
 
     hist->SetStats(kFALSE);
 
-    IncreaseLabelSize(hist);
+    _util.IncreaseLabelSize(hist, c);
 
 
     // Now we normalise by column (true) or row (reco)
@@ -2488,7 +2421,6 @@ void HistogramPlotter::Save2DHistsNorm(const char *print_name, const char *histn
     if (normtype == "true")range = new TLatex(0.5,0.92, "Column Normalised");
     else range = new TLatex(0.45,0.92,"Row Normalised");
     range->SetTextColor(kGray+2);
-    range->SetNDC();
     range->SetNDC();
     range->SetTextSize(0.038);
     range->SetTextAlign(32);

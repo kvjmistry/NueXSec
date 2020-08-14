@@ -126,6 +126,17 @@ bool Utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     }
 }
 // -----------------------------------------------------------------------------
+void Utility::CreateDirectory(std::string folder, const char *run_period) {
+
+    std::string a = "if [ ! -d \"plots/";
+    std::string b = "run" + std::string(run_period) + "/" + folder;
+    std::string c = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
+    std::string d = "run" + std::string(run_period) + "/" + folder;
+    std::string e = "; fi";
+    std::string command = a + b + c + d + e;
+    system(command.c_str());
+}
+// -----------------------------------------------------------------------------
 void Utility::Tabulate(bool inFV, std::string interaction, std::string classification, std::string pi0_classification, int type, std::vector<double> &counter_v, double weight) {
 
     if (type == k_mc){
@@ -290,4 +301,61 @@ bool Utility::in_fv(double x, double y, double z){
     }  
     else return false; // fail
 }
+// -----------------------------------------------------------------------------
+void Utility::IncreaseLabelSize(TH1D *h, TCanvas *c){
+
+    h->GetXaxis()->SetLabelSize(0.05);
+    h->GetXaxis()->SetTitleSize(0.05);
+    h->GetYaxis()->SetLabelSize(0.05);
+    h->GetYaxis()->SetTitleSize(0.05);
+    c->SetLeftMargin(0.15);
+    c->SetBottomMargin(0.12);
+}
+// -----------------------------------------------------------------------------
+void Utility::IncreaseLabelSize(TH2D *h, TCanvas *c){
+
+    h->GetXaxis()->SetLabelSize(0.05);
+    h->GetXaxis()->SetTitleSize(0.05);
+    h->GetYaxis()->SetLabelSize(0.05);
+    h->GetYaxis()->SetTitleSize(0.05);
+    h->GetZaxis()->SetLabelSize(0.05);
+    h->GetZaxis()->SetTitleSize(0.05);
+    c->SetLeftMargin(0.15);
+    c->SetRightMargin(0.2);
+    c->SetBottomMargin(0.13);
+    h->SetMarkerSize(1.8);
+    // gPad->SetGridx();
+}
+// -----------------------------------------------------------------------------
+void Utility::Draw_Run_Period(TCanvas *c, double x1, double y1, double x2, double y2, std::string run_period) {
+    c->cd();
+
+    //0.86, 0.915, 0.86, 0.915
+
+    TPaveText *pt;
+
+    if (run_period == "1") {
+        pt = new TPaveText(x1, y1, x2, y2, "NDC");
+        pt->AddText("Run1");
+        pt->SetTextColor(kRed + 2);
+        pt->SetTextSize(0.04);
+    }
+    else if (run_period == "3") {
+        pt = new TPaveText(x1, y1, x2, y2, "NDC");
+        pt->AddText("Run3");
+        pt->SetTextColor(kBlue + 2);
+    }
+    else {
+        pt = new TPaveText(x1, y1, x2, y2, "NDC");
+        pt->AddText("RunXXX");
+        pt->SetTextColor(kGreen + 2);
+    }
+
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.04);
+    pt->Draw();
+}
+// -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
