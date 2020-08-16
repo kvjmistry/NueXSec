@@ -13,7 +13,7 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
     if (strcmp(_run_period, "1") == 0){
         mc_scale_factor     = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_MC_POT);
         dirt_scale_factor   = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_Dirt_POT);
-        ext_scale_factor = _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
+        ext_scale_factor    = _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
         mc_flux_scale_factor   = flux_scale_factor * _util.config_v.at(_util.k_Run1_MC_POT);
         data_flux_scale_factor = flux_scale_factor * _util.config_v.at(_util.k_Run1_Data_POT);
     }
@@ -145,21 +145,21 @@ void CrossSectionHelper::LoopEvents(){
                 // Background event
                 if ( *classification == "nu_out_fv"  || *classification == "cosmic"      ||
                      *classification == "numu_cc"    || *classification == "numu_cc_pi0" || *classification == "nc" || 
-                     *classification == "nc_pi0"     || *classification == "cosmic_nue" || *classification == "cosmic_nuebar"){
+                     *classification == "nc_pi0"     || ((*classification == "cosmic_nue" || *classification == "cosmic_nuebar") && !gen)  ) {
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_bkg, weight_uni, shr_energy_cali, elec_e);
                     FillHists(label, uni, k_xsec_sel, weight_uni, shr_energy_cali, elec_e);
                     
                 }
-                
+
                 // Generated event
                 if ( (*classification == "nue_cc"|| *classification == "nuebar_cc" || *classification == "unmatched_nue" || *classification == "cosmic_nue" || *classification == "unmatched_nuebar" || *classification == "cosmic_nuebar") && gen == true) {
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_gen, weight_uni, shr_energy_cali, elec_e);
                 }
-
+                
                 // Data event
                 if (*classification == "data"){
 
@@ -264,8 +264,8 @@ void CrossSectionHelper::LoopEvents(){
     << std::endl;
 
     std::cout << 
-    "MC XSEC: "   << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_mcxsec)  ->Integral() << " cm2" << "\n" << 
-    "Data XSEC: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dataxsec)->Integral() << " cm2      \n"
+    "MC Flux Norm. Event Rate: "   << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_mcxsec)  ->Integral() << " cm2" << "\n" << 
+    "Data Flux Norm. Event Rate: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dataxsec)->Integral() << " cm2      \n"
     << std::endl;
 
 
@@ -324,7 +324,7 @@ void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg,
     h_xsec->Add(h_ext_clone,  -1);
     h_xsec->Add(h_dirt_clone, -1);
     
-    h_xsec->Divide(h_eff) ;
+    // h_xsec->Divide(h_eff) ; // For flux normalised event rate we dont do anything to the efficiency
     
     h_xsec->Scale(1.0 / (targ*flux) );
 

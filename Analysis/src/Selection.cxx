@@ -641,7 +641,7 @@ void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     if ( (cut_index == _util.k_cuts_MAX - 1) || (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc || classification.second == _util.k_unmatched_nue || classification.second == _util.k_cosmic_nue || classification.second == _util.k_unmatched_nuebar || classification.second == _util.k_cosmic_nuebar ) ) ){
 
         // This is a generated event, but unselected
-        if (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc || classification.second == _util.k_unmatched)){
+        if (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc || classification.second == _util.k_unmatched_nue || classification.second == _util.k_cosmic_nue || classification.second == _util.k_unmatched_nuebar || classification.second == _util.k_cosmic_nuebar ) ){
             _thelper.at(type).FillVars(SC, classification, true, weight, reco_nu_e);
         }
         // This is selected events
