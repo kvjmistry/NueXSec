@@ -16,7 +16,7 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
 
     // Tree variables
     int run{0}, subrun{0}, event{0}, _run{0}, _subrun{0}, _event{0};;
-    std::string classifcation, *_classifcation = NULL;
+    std::string classification, *_classification = NULL;
     bool gen{false}, _gen{false};           
     double weight{0.0}, _weight{0.0}; 
     double true_energy, _true_energy;
@@ -89,7 +89,7 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
     outtree->Branch("weight", &weight, "weight/D");
     outtree->Branch("true_energy", &true_energy, "true_energy/D");
     outtree->Branch("reco_energy", &reco_energy, "reco_energy/D");
-    outtree->Branch("classifcation",   &classifcation);
+    outtree->Branch("classification",   &classification);
     outtree->Branch("shr_tkfit_dedx_Y", &shr_tkfit_dedx_Y);
     outtree->Branch("n_showers", &n_showers);
     outtree->Branch("n_tracks",  &n_tracks);
@@ -151,7 +151,7 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
         trees.at(k)->SetBranchAddress("weight", &_weight);
         trees.at(k)->SetBranchAddress("true_energy", &_true_energy);
         trees.at(k)->SetBranchAddress("reco_energy", &_reco_energy);
-        trees.at(k)->SetBranchAddress("classifcation",   &_classifcation);
+        trees.at(k)->SetBranchAddress("classification",   &_classification);
         trees.at(k)->SetBranchAddress("shr_tkfit_dedx_Y", &_shr_tkfit_dedx_Y);
         trees.at(k)->SetBranchAddress("n_showers", &_n_showers);
         trees.at(k)->SetBranchAddress("n_tracks",  &_n_tracks);
@@ -206,7 +206,7 @@ void merge_uneaventrees(std::string run_type, std::string mc, std::string data, 
                 subrun = _subrun;
                 event = _event;
                 gen = _gen;
-                classifcation = *_classifcation;
+                classification = *_classification;
                 weight = _weight;
                 true_energy = _true_energy;
                 reco_energy = _reco_energy;
