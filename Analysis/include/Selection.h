@@ -33,7 +33,7 @@ namespace xsecSelection {
 
             // Scale factors (everything is scaled to data)
             double mc_scale_factor     = 1.0;
-            double intime_scale_factor = 1.0;
+            double ext_scale_factor    = 1.0;
             double dirt_scale_factor   = 1.0;
 
             // Bools

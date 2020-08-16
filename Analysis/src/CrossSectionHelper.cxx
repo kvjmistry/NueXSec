@@ -13,14 +13,14 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
     if (strcmp(_run_period, "1") == 0){
         mc_scale_factor     = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_MC_POT);
         dirt_scale_factor   = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_Dirt_POT);
-        intime_scale_factor = _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
+        ext_scale_factor = _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
         mc_flux_scale_factor   = flux_scale_factor * _util.config_v.at(_util.k_Run1_MC_POT);
         data_flux_scale_factor = flux_scale_factor * _util.config_v.at(_util.k_Run1_Data_POT);
     }
     else if (strcmp(_run_period, "3") == 0){
         mc_scale_factor     = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_MC_POT);
         dirt_scale_factor   = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_Dirt_POT);
-        intime_scale_factor = _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
+        ext_scale_factor = _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
         mc_flux_scale_factor   = flux_scale_factor * _util.config_v.at(_util.k_Run3_MC_POT); 
         data_flux_scale_factor = flux_scale_factor * _util.config_v.at(_util.k_Run3_Data_POT);
     }
@@ -33,7 +33,7 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
     std::cout << "Scale Factors:\n" <<
     "MC Scale factor:        " << mc_scale_factor          << "\n" <<
     "Dirt Scale factor:      " << dirt_scale_factor        << "\n" <<
-    "EXT Scale factor:       " << intime_scale_factor      << "\n" <<
+    "EXT Scale factor:       " << ext_scale_factor      << "\n" <<
     "MC Flux Scale factor:   " << mc_flux_scale_factor     << "\n" <<
     "Data Flux Scale factor: " << data_flux_scale_factor
     << std::endl;
@@ -218,7 +218,7 @@ void CrossSectionHelper::LoopEvents(){
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),  // N Bkg
                                 mc_scale_factor,
                                 integrated_flux * mc_flux_scale_factor,                // Flux
-                                intime_scale_factor,
+                                ext_scale_factor,
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),  // N EXT
                                 dirt_scale_factor,
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dirt), // N Dirt
@@ -231,7 +231,7 @@ void CrossSectionHelper::LoopEvents(){
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),   // N Bkg
                                 mc_scale_factor,
                                 integrated_flux * data_flux_scale_factor,               // Flux
-                                intime_scale_factor,
+                                ext_scale_factor,
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),   // N EXT
                                 dirt_scale_factor,
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dirt),  // N Dirt
@@ -252,14 +252,14 @@ void CrossSectionHelper::LoopEvents(){
     "Signal MC:       " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sig) ->Integral() << "\n" << 
     "Background MC:   " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_bkg) ->Integral() << "\n" << 
     "Generated MC:    " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_gen) ->Integral() << "\n" << 
-    "EXT MC:          " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_ext) ->Integral()* (intime_scale_factor / mc_scale_factor) << "\n" << 
+    "EXT MC:          " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_ext) ->Integral()* (ext_scale_factor / mc_scale_factor) << "\n" << 
     "Dirt MC:         " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dirt)->Integral()* (dirt_scale_factor / mc_scale_factor) << "\n\n" << 
     
     "Selected Data:   " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_data)->Integral() << "\n" << 
     "Signal Data:     " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sig) ->Integral()* mc_scale_factor << "\n" << 
     "Background Data: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_bkg) ->Integral()* mc_scale_factor << "\n" << 
     "Generated Data:  " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_gen) ->Integral()* mc_scale_factor << "\n" << 
-    "EXT Data:        " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_ext) ->Integral()* intime_scale_factor  << "\n" << 
+    "EXT Data:        " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_ext) ->Integral()* ext_scale_factor  << "\n" << 
     "Dirt Data:       " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dirt)->Integral()* dirt_scale_factor << "\n"
     << std::endl;
 
@@ -296,7 +296,7 @@ double CrossSectionHelper::CalcCrossSec(double sel, double gen, double sig, doub
 
 }
 // -----------------------------------------------------------------------------
-void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double intime_scale_factor, TH1D* h_ext, double dirt_scale_factor ,TH1D* h_dirt, TH1D* h_xsec, double targ, std::string mcdata){
+void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double ext_scale_factor, TH1D* h_ext, double dirt_scale_factor ,TH1D* h_dirt, TH1D* h_xsec, double targ, std::string mcdata){
 
 
     // I think this is the slow bit -- maybe make copies only once?
@@ -306,12 +306,12 @@ void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg,
 
     // Scale the relavent histograms to the MC/Data POT/Triggers
     if (mcdata == "MC"){
-        h_ext_clone ->Scale(intime_scale_factor / mc_scale_factor);
+        h_ext_clone ->Scale(ext_scale_factor / mc_scale_factor);
         h_dirt_clone->Scale(dirt_scale_factor / mc_scale_factor);
     }
     else if (mcdata == "Data"){
         h_bkg_clone ->Scale(mc_scale_factor);
-        h_ext_clone ->Scale(intime_scale_factor);
+        h_ext_clone ->Scale(ext_scale_factor);
         h_dirt_clone->Scale(dirt_scale_factor);
     }
     else{

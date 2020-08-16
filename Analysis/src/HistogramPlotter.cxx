@@ -24,14 +24,14 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
     {
         mc_scale_factor     =       _util.config_v.at(_util.k_Run1_Data_POT) / _util.config_v.at(_util.k_Run1_MC_POT);
         dirt_scale_factor   = 1.00* _util.config_v.at(_util.k_Run1_Data_POT) / _util.config_v.at(_util.k_Run1_Dirt_POT); //0.45
-        intime_scale_factor = 1.00* _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig); // 0.98
+        ext_scale_factor = 1.00* _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig); // 0.98
         Data_POT = _util.config_v.at(_util.k_Run1_Data_POT); // Define this variable here for easier reading
     }
     else if (strcmp(run_period, "3") == 0)
     {
         mc_scale_factor     = 1.00* _util.config_v.at(_util.k_Run3_Data_POT) / _util.config_v.at(_util.k_Run3_MC_POT);
         dirt_scale_factor   = 1.00* _util.config_v.at(_util.k_Run3_Data_POT) / _util.config_v.at(_util.k_Run3_Dirt_POT); //0.45
-        intime_scale_factor = 1.00* _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig); //0.94
+        ext_scale_factor = 1.00* _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig); //0.94
         Data_POT = _util.config_v.at(_util.k_Run3_Data_POT); // Define this variable here for easier reading
     }
     else
@@ -48,10 +48,10 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
     std::cout << "Scale Factors:\n"
               << "MC Scale factor:   " << mc_scale_factor << "\n"
               << "Dirt Scale factor: " << dirt_scale_factor << "\n"
-              << "EXT Scale factor:  " << intime_scale_factor << std::endl;
+              << "EXT Scale factor:  " << ext_scale_factor << std::endl;
     std::cout << "-------------------------------\033[0m" << std::endl;
 
-    Initalise(hist_file_name, run_period, mc_scale_factor, intime_scale_factor, dirt_scale_factor);
+    Initalise(hist_file_name, run_period, mc_scale_factor, ext_scale_factor, dirt_scale_factor);
 
     // Only do this stuff for the CV -- unless we really want these plots for each detvar, then we need to change the file paths!!
     if (std::string(variation) == "empty")
@@ -233,7 +233,7 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
 
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::Initalise(const char *hist_file_name, const char *_run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor)
+void HistogramPlotter::Initalise(const char *hist_file_name, const char *_run_period, double _mc_scale_factor, double _ext_scale_factor, double _dirt_scale_factor)
 {
 
     std::cout << "Initalising Histogram Plotter..." << std::endl;
@@ -242,7 +242,7 @@ void HistogramPlotter::Initalise(const char *hist_file_name, const char *_run_pe
     run_period = _run_period;
 
     mc_scale_factor = _mc_scale_factor;
-    intime_scale_factor = _intime_scale_factor;
+    ext_scale_factor = _ext_scale_factor;
     dirt_scale_factor = _dirt_scale_factor;
 
     // File not already open, open the file
@@ -804,7 +804,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
             if (found_ext) {
 
                 hist.at(i)->SetStats(kFALSE);
-                if (scale) hist.at(i)->Scale(intime_scale_factor);
+                if (scale) hist.at(i)->Scale(ext_scale_factor);
                 hist_integrals.at(i) = hist.at(i)->Integral();
                 integral_mc_ext += hist.at(i)->Integral();
             }
@@ -1465,7 +1465,7 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
         {
 
             hist.at(i)->SetStats(kFALSE);
-            hist.at(i)->Scale(intime_scale_factor);
+            hist.at(i)->Scale(ext_scale_factor);
             hist.at(_util.k_ext)->SetFillColor(41);
             hist.at(_util.k_ext)->SetFillStyle(3345);
             hist_integrals.at(_util.k_ext) = hist.at(_util.k_ext)->Integral();
@@ -1663,7 +1663,7 @@ void HistogramPlotter::MakeFlashPlotOMO(double Data_POT, const char *print_name,
         {
 
             hist.at(i)->SetStats(kFALSE);
-            // hist.at(i)->Scale(intime_scale_factor);
+            // hist.at(i)->Scale(ext_scale_factor);
         }
 
         // Scale Dirt

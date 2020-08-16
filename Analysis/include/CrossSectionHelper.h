@@ -18,7 +18,7 @@ class CrossSectionHelper{
 
      // Scale factors (everything is scaled to data)
     double mc_scale_factor     = 1.0;
-    double intime_scale_factor = 1.0;
+    double ext_scale_factor     = 1.0;
     double dirt_scale_factor   = 1.0;
 
     // Variables
@@ -174,7 +174,7 @@ class CrossSectionHelper{
     double CalcCrossSec(double sel, double gen, double sig, double bkg, double flux, double ext, double dirt, double targ);
     // -------------------------------------------------------------------------
     // Function to calculate the cross section using binned histograms
-    void CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double intime_scale_factor, TH1D* h_ext, double dirt_scale_factor, TH1D* h_dirt, TH1D* h_xsec, double targ, std::string mcdata);
+    void CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double ext_scale_factor, TH1D* h_ext, double dirt_scale_factor, TH1D* h_dirt, TH1D* h_xsec, double targ, std::string mcdata);
     // -------------------------------------------------------------------------
     // Function to get the integrated flux
     double GetIntegratedFlux();

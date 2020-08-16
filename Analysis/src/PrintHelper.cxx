@@ -25,12 +25,12 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bo
     if (strcmp(run_period, "1") == 0){
         mc_scale_factor     = additional_scaling * _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_MC_POT);
         dirt_scale_factor   = additional_scaling * _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_Dirt_POT);
-        intime_scale_factor = additional_scaling * _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
+        ext_scale_factor = additional_scaling * _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
     }
     else if (strcmp(run_period, "3") == 0){
         mc_scale_factor     = additional_scaling * _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_MC_POT);
         dirt_scale_factor   = additional_scaling * _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_Dirt_POT);
-        intime_scale_factor = additional_scaling * _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
+        ext_scale_factor = additional_scaling * _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
     }
     else {
         std::cout << "Error Krish... You havent defined the run X POT numbers yet you donut!" << std::endl;
@@ -41,7 +41,7 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bo
     std::cout << "Scale Factors:\n" <<
     "MC Scale factor:        " << mc_scale_factor          << "\n" <<
     "Dirt Scale factor:      " << dirt_scale_factor        << "\n" <<
-    "EXT Scale factor:       " << intime_scale_factor
+    "EXT Scale factor:       " << ext_scale_factor
     << std::endl;
     std::cout << "-------------------------------\033[0m" << std::endl;
 
@@ -210,7 +210,7 @@ void PrintHelper::PrintResults(){
 
         
         // Sum of selected mc, dirt and ext. The dirt and ext are scaled to the MC POT
-        double sum_mc_dirt_ext = count_total_mc+ (count_ext * (intime_scale_factor / mc_scale_factor)) + (count_dirt * (dirt_scale_factor / mc_scale_factor));
+        double sum_mc_dirt_ext = count_total_mc+ (count_ext * (ext_scale_factor / mc_scale_factor)) + (count_dirt * (dirt_scale_factor / mc_scale_factor));
 
         // Set the efficiency and purity for case zero
         if (p == 0){
@@ -253,7 +253,7 @@ void PrintHelper::PrintResults(){
         }
 
         if (print_ext) { 
-            printf (" %-20s: %-10.2f %-10.2f %-10.2f %f %9.2f\n", "Off-Beam Data", double(count_ext * (intime_scale_factor / mc_scale_factor)), double(count_ext * intime_scale_factor), count_ext, double( 100 * count_ext / init_count_ext), double( 100 * (prev_count_ext - count_ext) / prev_count_ext) );
+            printf (" %-20s: %-10.2f %-10.2f %-10.2f %f %9.2f\n", "Off-Beam Data", double(count_ext * (ext_scale_factor / mc_scale_factor)), double(count_ext * ext_scale_factor), count_ext, double( 100 * count_ext / init_count_ext), double( 100 * (prev_count_ext - count_ext) / prev_count_ext) );
             
         }
 
@@ -264,7 +264,7 @@ void PrintHelper::PrintResults(){
 
         if (print_mc && print_ext){
             double tot_cosmic_bkg = count_cosmic + count_cosmic_nue + count_cosmic_nuebar;
-            printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Cosmic Bkg", tot_cosmic_bkg + count_ext * (intime_scale_factor / mc_scale_factor), double(tot_cosmic_bkg * mc_scale_factor + count_ext * intime_scale_factor ));
+            printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Cosmic Bkg", tot_cosmic_bkg + count_ext * (ext_scale_factor / mc_scale_factor), double(tot_cosmic_bkg * mc_scale_factor + count_ext * ext_scale_factor ));
         }
         
         if (print_mc){
@@ -315,7 +315,7 @@ void PrintHelper::PrintResults(){
             std::cout << "------------------------------------------------" << std::endl;
             double tot_bkg = 0;
             if (print_mc && print_dirt && print_ext) tot_bkg = (count_nu_out_fv + count_cosmic + count_numu_cc + count_numu_cc_pi0 + count_nc + count_nc_pi0 + count_unmatched) * mc_scale_factor +
-                              count_dirt * dirt_scale_factor + count_ext * intime_scale_factor;
+                              count_dirt * dirt_scale_factor + count_ext * ext_scale_factor;
             
             std::cout << " Total Selected Data : " << count_data << std::endl;
             

@@ -21,7 +21,7 @@ class HistogramPlotter{
     std::string run_period;
 
     // Scale factors (veverything is scaled to data)
-    double mc_scale_factor, intime_scale_factor, dirt_scale_factor;
+    double mc_scale_factor, ext_scale_factor, dirt_scale_factor;
     
     bool area_norm   = false;  // Decide if to area normalse the histograms
 
@@ -31,7 +31,7 @@ class HistogramPlotter{
     void MakeHistograms(const char * hist_file_name, const char *run_period, bool _area_norm, Utility _utility, const char* variation);
     // -------------------------------------------------------------------------
     // Initalise the file input
-    void Initalise(const char *hist_file_name, const char* _run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor);
+    void Initalise(const char *hist_file_name, const char* _run_period, double _mc_scale_factor, double _ext_scale_factor, double _dirt_scale_factor);
     // -------------------------------------------------------------------------
     // Function to make a stacked histogram and save as a pdf
     void MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, double y_scale_factor, const char* x_axis_name,

@@ -42,13 +42,13 @@ void Selection::Initialise( const char * mc_file,
     if (strcmp(run_period, "1") == 0){
         mc_scale_factor     = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_MC_POT);
         dirt_scale_factor   = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_Dirt_POT);
-        intime_scale_factor = _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
+        ext_scale_factor = _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
         _run_period = 1;
     }
     else if (strcmp(run_period, "3") == 0){
         mc_scale_factor     = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_MC_POT);
         dirt_scale_factor   = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_Dirt_POT);
-        intime_scale_factor = _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
+        ext_scale_factor = _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
         _run_period = 3;
     }
     else {
@@ -61,7 +61,7 @@ void Selection::Initialise( const char * mc_file,
     std::cout << "Scale Factors:\n" <<
     "MC Scale factor:   "   << mc_scale_factor     << "\n" <<
     "Dirt Scale factor: "   << dirt_scale_factor   << "\n" <<
-    "EXT Scale factor:  "   << intime_scale_factor << std::endl;
+    "EXT Scale factor:  "   << ext_scale_factor << std::endl;
     std::cout << "-------------------------------\033[0m" << std::endl;
 
     // Set the maximum number of events tp process
