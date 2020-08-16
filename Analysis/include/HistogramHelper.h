@@ -201,6 +201,7 @@ class HistogramHelper{
     enum TH1D_eff_vars {
         k_eff_nu_E,                  // True Electron-neutrino energy
         k_eff_elec_E,                // True Electron Energy
+        k_eff_elec_E_rebin,          // True energy of electron with binning scheme
         k_TH1D_eff_MAX
     };
 

@@ -673,8 +673,14 @@ void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
 double Selection::GetCVWeight(int type, SliceContainer SC){
     
 
-    // Always give weights of 1 to the off beam and data
-    if (type == _util.k_data || type == _util.k_ext) return 1.0;
+    // Always give weights of 1 to the data
+    if (type == _util.k_data ) return 1.0;
+
+    // Run 1 and ext, correct by 2%
+    if (type == _util.k_ext && _run_period == 1 ) return 0.98;
+
+    // Run 3 and ext, correct by 5%
+    if (type == _util.k_ext && _run_period == 3 ) return 0.95;
 
     double weight = 1.0;
     bool weight_tune{true}, weight_ppfx{true};
@@ -726,6 +732,9 @@ double Selection::GetCVWeight(int type, SliceContainer SC){
     if (weight_ppfx) weight = weight * weight_flux;
 
     // std::cout << SC.weightSplineTimesTune << "   "<< SC.ppfx_cv << std::endl;
+
+    // For the dirt we correct it by 45%
+    if (type == _util.k_dirt) weight = weight*0.45;
 
     return weight;
 

@@ -180,8 +180,8 @@ public:
             "Shower Score",                               // Track Score < 0.5
             "Hit Ratio",                                  // Ratio of shr hits and slice hits
             "Moliere Average",                            // Shower Moliere Average
-            "2D Shower Vertex Distance, dEdx All Planes", // 2D cut for shower to vertex distance and dedx
-            "dEdx All Planes, 0 Tracks"                   // dEdx all planes no tracks
+            "2D Shower Vtx Dist, dE/dx",                  // 2D cut for shower to vertex distance and dedx
+            "dE/dx, 0 Tracks"                             // dEdx all planes no tracks
             };
 
 

@@ -300,12 +300,12 @@ void PrintHelper::PrintResults(){
             std::cout << "------------------------------------------------" << std::endl;
             efficiency = double(count_nue_cc + count_nuebar_cc) / double(tot_true_infv_nues);
             purity     = double(count_nue_cc + count_nuebar_cc) / double(sum_mc_dirt_ext);
-            printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Efficiency", count_nue_cc + count_nuebar_cc, tot_true_infv_nues, 100 * efficiency);
             printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Purity", count_nue_cc + count_nuebar_cc, sum_mc_dirt_ext, 100 * purity);
+            printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Efficiency", count_nue_cc + count_nuebar_cc, tot_true_infv_nues, 100 * efficiency);
             
             std::cout << std::endl;
-            std::cout << " Efficiency Change : "  << 100 * (efficiency - efficiency_last) << " \%" << std::endl;
             std::cout << " Purity Change     : " <<  100 * (purity - purity_last) << " \%" << std::endl;
+            std::cout << " Efficiency Change : "  << 100 * (efficiency - efficiency_last) << " \%" << std::endl;
 
             efficiency_last = efficiency;
             purity_last     = purity;

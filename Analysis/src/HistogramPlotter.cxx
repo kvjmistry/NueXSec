@@ -23,15 +23,15 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
     if (strcmp(run_period, "1") == 0)
     {
         mc_scale_factor     =       _util.config_v.at(_util.k_Run1_Data_POT) / _util.config_v.at(_util.k_Run1_MC_POT);
-        dirt_scale_factor   = 0.45* _util.config_v.at(_util.k_Run1_Data_POT) / _util.config_v.at(_util.k_Run1_Dirt_POT); //0.45
-        intime_scale_factor = 0.98* _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig); // 0.98
+        dirt_scale_factor   = 1.00* _util.config_v.at(_util.k_Run1_Data_POT) / _util.config_v.at(_util.k_Run1_Dirt_POT); //0.45
+        intime_scale_factor = 1.00* _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig); // 0.98
         Data_POT = _util.config_v.at(_util.k_Run1_Data_POT); // Define this variable here for easier reading
     }
     else if (strcmp(run_period, "3") == 0)
     {
         mc_scale_factor     = 1.00* _util.config_v.at(_util.k_Run3_Data_POT) / _util.config_v.at(_util.k_Run3_MC_POT);
-        dirt_scale_factor   = 0.45* _util.config_v.at(_util.k_Run3_Data_POT) / _util.config_v.at(_util.k_Run3_Dirt_POT); //0.45
-        intime_scale_factor = 0.95* _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig); //0.94
+        dirt_scale_factor   = 1.00* _util.config_v.at(_util.k_Run3_Data_POT) / _util.config_v.at(_util.k_Run3_Dirt_POT); //0.45
+        intime_scale_factor = 1.00* _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig); //0.94
         Data_POT = _util.config_v.at(_util.k_Run3_Data_POT); // Define this variable here for easier reading
     }
     else
@@ -89,8 +89,9 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
 
         MakeEfficiencyPlot(Form("plots/run%s/Efficiency/Integrated_Efficiency_Purity.pdf", run_period), run_period);
 
-        MakeEfficiencyPlotByCut(run_period, "nu");
-        MakeEfficiencyPlotByCut(run_period, "elec");
+        MakeEfficiencyPlotByCut(run_period, "h_true_nu_E", false);
+        MakeEfficiencyPlotByCut(run_period, "h_true_elec_E", false);
+        MakeEfficiencyPlotByCut(run_period, "h_true_elec_E_rebin", true);
 
         // Create the interaction folder
         _util.CreateDirectory("Interaction", run_period);
@@ -1813,20 +1814,21 @@ void HistogramPlotter::MakeEfficiencyPlot(const char *print_name, const char *ru
         purity_v.push_back(purity);
     }
 
-    TCanvas *c = new TCanvas();
+    TCanvas *c = new TCanvas("c", "c", 600, 500);
     TH1D *h_eff = new TH1D("h_efficiency", "", efficiency_v.size(), 0, efficiency_v.size());
     TH1D *h_pur = new TH1D("h_purity", "", efficiency_v.size(), 0, efficiency_v.size());
 
     // c->SetGrid();
     c->SetGridy();
+    // c->SetRightMargin(0.2);
 
     TLegend *leg_stack = new TLegend(0.7, 0.91, 0.90, 0.72);
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
 
     for (unsigned int k = 0; k < efficiency_v.size(); k++) {
-        h_eff->Fill(_util.cut_dirs.at(k).c_str(), efficiency_v.at(k));
-        h_pur->Fill(_util.cut_dirs.at(k).c_str(), purity_v.at(k));
+        h_eff->Fill(_util.cut_dirs_pretty.at(k).c_str(), efficiency_v.at(k));
+        h_pur->Fill(_util.cut_dirs_pretty.at(k).c_str(), purity_v.at(k));
         h_eff->SetBinError(k + 1, 0);
         h_pur->SetBinError(k + 1, 0);
     }
@@ -1843,7 +1845,8 @@ void HistogramPlotter::MakeEfficiencyPlot(const char *print_name, const char *ru
     h_eff->GetYaxis()->SetLabelSize(0.05);
     h_eff->GetYaxis()->SetTitleSize(0.05);
     gPad->SetBottomMargin(0.12);
-    h_eff->GetXaxis()->SetLabelSize(0.035);
+    h_eff->GetXaxis()->SetLabelFont(62);
+    h_eff->GetXaxis()->SetLabelSize(0.03);
 
     h_eff->Draw("LP");
 
@@ -1869,50 +1872,56 @@ void HistogramPlotter::MakeEfficiencyPlot(const char *print_name, const char *ru
     h_pur->GetXaxis()->SetTickLength(0.00);
 
     // Draw the run period on the plot
-    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
+    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92, run_period);
 
     c->Print(print_name);
+
+    delete c;
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::MakeEfficiencyPlotByCut(const char *run_period, std::string var) {
+void HistogramPlotter::MakeEfficiencyPlotByCut(const char *run_period, std::string var, bool mask_title) {
 
     std::vector<TH1D *> hist(_util.k_cuts_MAX); // The vector of histograms from the file for the plot
     std::vector<TEfficiency *> TEff_v(_util.k_cuts_MAX);
 
     TH1D *h_clone;
 
-    // TCanvas * c = new TCanvas(Form("c_eff_by_cut_%s_%s_%s", run_period,_util.cut_dirs.at(0).c_str(), var.c_str()), "c", 500, 500);
-    // c->SetTopMargin(0.11);
+    // Helps determine what axes labels to draw 
+    std::string var_string;
+
+    if (var == "h_true_nu_E")              var_string = "nu";
+    else if (var == "h_true_elec_E")       var_string = "elec";
+    else if (var == "h_true_elec_E_rebin") var_string = "elec";
+    else return;
 
     // Loop over the classifications and get the histograms
     for (unsigned int i = 0; i < _util.k_cuts_MAX; i++) {
 
         // MC
-        _util.GetHist(f_nuexsec, hist.at(i), Form("TEff/h_true_%s_E_%s", var.c_str() ,_util.cut_dirs.at(i).c_str()));
+        _util.GetHist(f_nuexsec, hist.at(i), Form("TEff/%s_%s", var.c_str() ,_util.cut_dirs.at(i).c_str()));
         
         if (hist.at(i) == NULL)
             return;
     }
 
+    // Loop over the cuts and draw the efficiencies
     for (int p = 0; p < _util.k_cuts_MAX; p++) {
 
-        TCanvas * c = new TCanvas(Form("c_eff_by_cut_%s_%s_%s", run_period,_util.cut_dirs.at(p).c_str(), var.c_str()), "c", 500, 500);
+        TCanvas * c = new TCanvas(Form("c_eff_by_cut_%s_%s_%s", run_period,_util.cut_dirs.at(p).c_str(), var_string.c_str()), "c", 500, 500);
         c->SetTopMargin(0.11);
 
-        // TEff_v.at(p) = new TEfficiency(*hist.at(p), *hist.at(_util.k_unselected));
-        // TEff_v.at(p)->Draw("AP,same");
         h_clone = (TH1D *)hist.at(p)->Clone("h_clone");
         h_clone->Divide(hist.at(_util.k_unselected));
-
         h_clone->SetStats(kFALSE);
         
-        if (var == "nu") h_clone->SetTitle(Form("%s;True #nu_{e} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
-        if (var == "elec") h_clone->SetTitle(Form("%s;True Electron Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
+        if (var_string == "nu") h_clone->SetTitle(Form("%s;True #nu_{e} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
+        if (var_string == "elec") h_clone->SetTitle(Form("%s;True Electron Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
 
         h_clone->GetYaxis()->SetRangeUser(0, 1);
         h_clone->SetLineColor(kBlack);
         h_clone->SetLineWidth(2);
         _util.IncreaseLabelSize(h_clone, c);
+        if (mask_title) h_clone->SetTitle("");
         h_clone->Draw("E same");
 
         TH1D *h_true_nue = (TH1D *)hist.at(_util.k_unselected)->Clone("h_clone_true");
@@ -1929,48 +1938,24 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(const char *run_period, std::stri
         c->Update();
 
         TGaxis *axis = new TGaxis(gPad->GetUxmax(), gPad->GetUymin(), gPad->GetUxmax(), gPad->GetUymax(), 0, rightmax, 510, "+L");
-        if (var == "nu")axis->SetTitle("True #nu_{e} Events in FV");
-        if (var == "elec")axis->SetTitle("True Electron Events in FV");
+        if (var_string == "nu")axis->SetTitle("True #nu_{e} Events in FV");
+        if (var_string == "elec")axis->SetTitle("True Electron Events in FV");
         axis->SetTitleOffset(1.8);
         axis->SetLineColor(kAzure - 6);
         axis->SetLabelColor(kAzure - 6);
         axis->SetTitleColor(kAzure - 6);
         axis->SetTextFont(42);
         axis->SetLabelFont(42);
-
         axis->Draw();
 
         // Draw the run period on the plot
-        TPaveText *pt;
+        _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915, run_period);
 
-        if (std::string(run_period) == "1")
-        {
-            pt = new TPaveText(0.76, 0.915, 0.76, 0.915, "NDC");
-            pt->AddText("Run1");
-            pt->SetTextColor(kRed + 2);
-            pt->SetTextSize(0.04);
-        }
-        else if (std::string(run_period) == "3")
-        {
-            pt = new TPaveText(0.76, 0.915, 0.76, 0.915, "NDC");
-            pt->AddText("Run3");
-            pt->SetTextColor(kBlue + 2);
-        }
-        else
-        {
-            pt = new TPaveText(0.86, 0.915, 0.86, 0.915, "NDC");
-            pt->AddText("RunXXX");
-            pt->SetTextColor(kGreen + 2);
-        }
+        if (var == "h_true_nu_E")         c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E.pdf", run_period, _util.cut_dirs.at(p).c_str()));
+        if (var == "h_true_elec_E")       c->Print(Form("plots/run%s/Efficiency/TEff_%s_elec_E.pdf", run_period, _util.cut_dirs.at(p).c_str()));
+        if (var == "h_true_elec_E_rebin") c->Print(Form("plots/run%s/Efficiency/TEff_%s_elec_E_rebin.pdf", run_period, _util.cut_dirs.at(p).c_str()));
 
-        pt->SetBorderSize(0);
-        pt->SetFillColor(0);
-        pt->SetFillStyle(0);
-        pt->SetTextSize(0.04);
-        pt->Draw();
-
-        if (var == "nu") c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E.pdf", run_period, _util.cut_dirs.at(p).c_str()));
-        if (var == "elec") c->Print(Form("plots/run%s/Efficiency/TEff_%s_elec_E.pdf", run_period, _util.cut_dirs.at(p).c_str()));
+        delete c;
     }
 }
 // -----------------------------------------------------------------------------

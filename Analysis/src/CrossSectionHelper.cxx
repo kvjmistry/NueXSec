@@ -171,8 +171,6 @@ void CrossSectionHelper::LoopEvents(){
 
                 // Off beam event
                 if (*classifcation == "ext"){
-
-                    if (cv_weight != 1.0) std::cout << "Error weight for data is not 1, this means your weighting the data... bad!"<< std::endl;
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_ext, cv_weight, shr_energy_cali, elec_e);
