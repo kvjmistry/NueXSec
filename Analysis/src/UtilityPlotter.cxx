@@ -49,7 +49,7 @@ void UtilityPlotter::InitTree(){
     tree->SetBranchAddress("weight", &weight);
     tree->SetBranchAddress("true_energy", &true_energy);
     tree->SetBranchAddress("reco_energy", &reco_energy);
-    tree->SetBranchAddress("classifcation",   &classifcation);
+    tree->SetBranchAddress("classification",   &classification);
     tree->SetBranchAddress("shr_energy_cali", &shr_energy_cali);
     tree->SetBranchAddress("elec_e",  &elec_e);
     tree->SetBranchAddress("ppfx_cv",  &ppfx_cv);
@@ -84,7 +84,7 @@ void UtilityPlotter::CompareHitstoEnergy(){
 
 
         // Lets only look at Signal events
-        if ((*classifcation == "nue_cc" || *classifcation == "nuebar_cc" || *classifcation == "unmatched_nue" || *classifcation == "unmatched_nuebar") && gen == false) {
+        if ((*classification == "nue_cc" || *classification == "nuebar_cc" || *classification == "unmatched_nue" || *classification == "unmatched_nuebar") && gen == false) {
 
             // Get the leading shower index
             double index_leading_shr_hits = 0;
@@ -114,7 +114,7 @@ void UtilityPlotter::CompareHitstoEnergy(){
             }
 
             if (index_leading_shr_E != index_leading_shr_hits){
-                std::cout << *classifcation << " Shr Hits: " << leading_shr_hits << "  Shr Energy: " << leading_shr_E <<  "  Leading energy hits: " << leading_energy_hits<< std::endl;
+                std::cout << *classification << " Shr Hits: " << leading_shr_hits << "  Shr Energy: " << leading_shr_E <<  "  Leading energy hits: " << leading_energy_hits<< std::endl;
                 total_non_leading_hit_events_sig++;
                 total_non_leading_hit_events++;
             }
@@ -126,9 +126,9 @@ void UtilityPlotter::CompareHitstoEnergy(){
         } // end if signal
 
         // Background event
-        if ( *classifcation == "nu_out_fv"  || *classifcation == "cosmic"      ||
-                *classifcation == "numu_cc"    || *classifcation == "numu_cc_pi0" || *classifcation == "nc" || 
-                *classifcation == "nc_pi0"     || *classifcation == "cosmic_nue" || *classifcation == "cosmic_nuebar"){
+        if ( *classification == "nu_out_fv"  || *classification == "cosmic"      ||
+                *classification == "numu_cc"    || *classification == "numu_cc_pi0" || *classification == "nc" || 
+                *classification == "nc_pi0"     || *classification == "cosmic_nue" || *classification == "cosmic_nuebar"){
             
             // Get the leading shower index
             double index_leading_shr_hits = 0;
@@ -158,7 +158,7 @@ void UtilityPlotter::CompareHitstoEnergy(){
             }
 
             if (index_leading_shr_E != index_leading_shr_hits){
-                std::cout << *classifcation <<  " Shr Hits: " << leading_shr_hits << "  Shr Energy: " << leading_shr_E <<  "  Leading energy hits: " << leading_energy_hits<< std::endl;
+                std::cout << *classification <<  " Shr Hits: " << leading_shr_hits << "  Shr Energy: " << leading_shr_E <<  "  Leading energy hits: " << leading_energy_hits<< std::endl;
                 total_non_leading_hit_events_bkg++;
                 total_non_leading_hit_events++;
             }
@@ -194,7 +194,7 @@ void UtilityPlotter::CompareSignalPurity(){
 
 
         // Lets only look at Signal events
-        if ((*classifcation == "nue_cc" || *classifcation == "nuebar_cc" || *classifcation == "unmatched_nue" || *classifcation == "unmatched_nuebar") && gen == false) {
+        if ((*classification == "nue_cc" || *classification == "nuebar_cc" || *classification == "unmatched_nue" || *classification == "unmatched_nuebar") && gen == false) {
 
             if (shr_bkt_pdg == -11 || shr_bkt_pdg == 11) total_signal_elec++;
             else total_bkg_elec++;
@@ -211,7 +211,7 @@ void UtilityPlotter::CompareSignalPurity(){
 // -----------------------------------------------------------------------------
 void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_edge, float bin_upper_edge, TTree* tree, bool save_hist, bool &converged, bool draw_fit_results){
     
-    TCut generic_query = "(classifcation.c_str()==\"nue_cc\" || classifcation.c_str()==\"nuebar_cc\") && !gen"; // This gets selected signal events
+    TCut generic_query = "(classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && !gen"; // This gets selected signal events
     TCut bin_query = Form("shr_energy_cali > %f && shr_energy_cali < %f", bin_lower_edge, bin_upper_edge);
     
     TCanvas * c = new TCanvas(Form("c_%f_%f", bin_upper_edge, sigma), "c", 500, 500);
@@ -351,7 +351,7 @@ void UtilityPlotter::PlotVarbyRecoBin(){
 // -----------------------------------------------------------------------------
 void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string variable_str){
     
-    TCut generic_query = "(classifcation.c_str()==\"nue_cc\" || classifcation.c_str()==\"nuebar_cc\") && !gen && elec_e > 0"; // This gets selected signal events in the MC
+    TCut generic_query = "(classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && !gen && elec_e > 0"; // This gets selected signal events in the MC
     TCut bin_query = Form("shr_energy_cali > %f && shr_energy_cali < %f", bin_lower_edge, bin_upper_edge); // Get the reconstructed shower energy range
     
     TCanvas * c = new TCanvas(Form("c_%f_%f_%s", bin_upper_edge, bin_lower_edge, variable_str.c_str()), "c", 500, 500);

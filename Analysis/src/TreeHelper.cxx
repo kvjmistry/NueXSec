@@ -92,7 +92,7 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     tree->Branch("weight",           &weight, "weight/D");
     tree->Branch("true_energy",      &true_energy, "true_energy/D");
     tree->Branch("reco_energy",      &reco_energy, "reco_energy/D");
-    tree->Branch("classifcation",    &classifcation);
+    tree->Branch("classification",    &classification);
     tree->Branch("shr_tkfit_dedx_Y", &shr_tkfit_dedx_Y, "shr_tkfit_dedx_Y/F");
     tree->Branch("n_showers",        &n_showers, "n_showers/F");
     tree->Branch("n_tracks",         &n_tracks,  "n_tracks/F");
@@ -148,7 +148,7 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     dedx_tree->Branch("shr_tkfit_dedx_U", &shr_tkfit_dedx_U, "shr_tkfit_dedx_U/F");
     
     dedx_tree->Branch("weight",          &weight,       "weight/D");
-    dedx_tree->Branch("classifcation",   &classifcation);
+    dedx_tree->Branch("classification",   &classification);
     dedx_tree->Branch("shr_distance",    &shr_distance, "shr_distance/F");
     dedx_tree->Branch("shr_theta",       &shr_theta,    "shr_theta/F");
     dedx_tree->Branch("cut", &cut);
@@ -231,7 +231,7 @@ void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _class
     subrun = SC.sub;
     event  = SC.evt;
     gen    = _gen;
-    classifcation = _classification.first;
+    classification = _classification.first;
     weight = _weight;
     true_energy = SC.nu_e;
     reco_energy = _reco_energy;
@@ -290,7 +290,7 @@ void TreeHelper::Fill_dedxVars(SliceContainer &SC, std::pair<std::string, int> _
 
     f_nuexsec->cd();
 
-    classifcation = _classification.first;
+    classification = _classification.first;
     weight = _weight;
     cut    = _cut;
 

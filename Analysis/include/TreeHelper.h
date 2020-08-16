@@ -48,7 +48,7 @@ class TreeHelper{
 
     // Tree variables
     int run{0}, subrun{0}, event{0};
-    std::string classifcation; // The classification of the event
+    std::string classification; // The classification of the event
     
     // Is the event a true signal event in the FV that was not selected?
     // We still need these for the efficiency

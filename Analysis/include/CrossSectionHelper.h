@@ -18,12 +18,12 @@ class CrossSectionHelper{
 
      // Scale factors (everything is scaled to data)
     double mc_scale_factor     = 1.0;
-    double ext_scale_factor     = 1.0;
+    double ext_scale_factor    = 1.0;
     double dirt_scale_factor   = 1.0;
 
     // Variables
     int run{0}, subrun{0}, event{0};
-    std::string *classifcation = NULL; // The classification of the event
+    std::string *classification = NULL; // The classification of the event
     
     // Is the event a true signal event in the FV that was not selected?
     // We still need these for the efficiency

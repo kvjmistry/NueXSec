@@ -280,7 +280,7 @@ void Utility::Tabulate(bool inFV, std::string interaction, std::string classific
         counter_v.at(k_count_data) += weight; // The weight **should** always be 1 for these
     }
     else if (type == k_ext){
-        counter_v.at(k_count_ext)  += weight; // The weight **should** always be 1 for these -- maybe not this if we decide to use the BNB stream
+        counter_v.at(k_count_ext)  += weight;
     }
     else if (type == k_dirt){
         counter_v.at(k_count_dirt) += weight;

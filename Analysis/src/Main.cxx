@@ -85,7 +85,7 @@ int main(int argc, char *argv[]){
     std::string usage2 = "-------------------------------------------------------"
     "\n\nTo make the histograms after running selection, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --hist <input merged nuexsec file> [options (see below)]\033[0m \n\n"
-    "\033[0;33m[--weight <weight setting>]\033[0m                            \033[0;32mChange the Weight level to dislay on the plots. Should be used in conjunction with the setting used in the selection stage. level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only \033[0m\n\n"
+    // "\033[0;33m[--weight <weight setting>]\033[0m                            \033[0;32mChange the Weight level to dislay on the plots. Should be used in conjunction with the setting used in the selection stage. level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only \033[0m\n\n"
     "\033[0;33m[--area]\033[0m                                               \033[0;32mArea normalise all the histograms\033[0m\n\n"
     "\033[0;33m[--var dummy <variation name>]\033[0m                         \033[0;32m(first arg) this argument is already input from the hist option, use something like -dummy- as a placeholder, (second arg) the variation name\033[0m\n\n"
     "The <input merged nuexsec file> corresponds to hadd merged file of the mc, data, ext and dirt. See the bash script merge_run1_files.sh for more details\n\n"

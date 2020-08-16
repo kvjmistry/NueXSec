@@ -26,7 +26,7 @@ class UtilityPlotter{
     TTree * tree;
     std::string run_period;
 
-    std::string *classifcation = NULL; // The classification of the event
+    std::string *classification = NULL; // The classification of the event
     
     // Is the event a true signal event in the FV that was not selected?
     // We still need these for the efficiency

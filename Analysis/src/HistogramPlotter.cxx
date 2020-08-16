@@ -406,7 +406,7 @@ void HistogramPlotter::SetTPadOptions(TPad *topPad, TPad *bottomPad)
 bool HistogramPlotter::GetHistograms(std::vector<TH1D *> &hist, std::string hist_name, std::string cut_name, std::string plotmode, bool &found_data, bool &found_ext, bool &found_dirt)
 {
 
-    // Plots are by classifcation
+    // Plots are by classification
     if (plotmode == "classifications")
     {
 

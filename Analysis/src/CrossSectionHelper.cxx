@@ -91,7 +91,7 @@ void CrossSectionHelper::LoopEvents(){
 
         tree->GetEntry(ievent); 
 
-        if (shr_energy_cali > 5.0 && *classifcation == "data" ) std::cout << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins" <<std::endl;
+        if (shr_energy_cali > 5.0 && *classification == "data" ) std::cout << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins" <<std::endl;
 
         double cv_weight = weight;
 
@@ -134,7 +134,7 @@ void CrossSectionHelper::LoopEvents(){
 
 
                 // Signal event
-                if ((*classifcation == "nue_cc" || *classifcation == "nuebar_cc" || *classifcation == "unmatched_nue" || *classifcation == "unmatched_nuebar") && gen == false) {
+                if ((*classification == "nue_cc" || *classification == "nuebar_cc" || *classification == "unmatched_nue" || *classification == "unmatched_nuebar") && gen == false) {
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_sig, weight_uni, shr_energy_cali, elec_e);
@@ -143,9 +143,9 @@ void CrossSectionHelper::LoopEvents(){
                 }
 
                 // Background event
-                if ( *classifcation == "nu_out_fv"  || *classifcation == "cosmic"      ||
-                     *classifcation == "numu_cc"    || *classifcation == "numu_cc_pi0" || *classifcation == "nc" || 
-                     *classifcation == "nc_pi0"     || *classifcation == "cosmic_nue" || *classifcation == "cosmic_nuebar"){
+                if ( *classification == "nu_out_fv"  || *classification == "cosmic"      ||
+                     *classification == "numu_cc"    || *classification == "numu_cc_pi0" || *classification == "nc" || 
+                     *classification == "nc_pi0"     || *classification == "cosmic_nue" || *classification == "cosmic_nuebar"){
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_bkg, weight_uni, shr_energy_cali, elec_e);
@@ -154,14 +154,14 @@ void CrossSectionHelper::LoopEvents(){
                 }
                 
                 // Generated event
-                if ( (*classifcation == "nue_cc"|| *classifcation == "nuebar_cc" || *classifcation == "unmatched_nue" || *classifcation == "cosmic_nue" || *classifcation == "unmatched_nuebar" || *classifcation == "cosmic_nuebar") && gen == true) {
+                if ( (*classification == "nue_cc"|| *classification == "nuebar_cc" || *classification == "unmatched_nue" || *classification == "cosmic_nue" || *classification == "unmatched_nuebar" || *classification == "cosmic_nuebar") && gen == true) {
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_gen, weight_uni, shr_energy_cali, elec_e);
                 }
 
                 // Data event
-                if (*classifcation == "data"){
+                if (*classification == "data"){
 
                     if (cv_weight != 1.0) std::cout << "Error weight for data is not 1, this means your weighting the data... bad!"<< std::endl;
                     
@@ -170,14 +170,14 @@ void CrossSectionHelper::LoopEvents(){
                 }
 
                 // Off beam event
-                if (*classifcation == "ext"){
+                if (*classification == "ext"){
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_ext, cv_weight, shr_energy_cali, elec_e);
                 }
 
                 // Dirt event
-                if (*classifcation == "dirt"){
+                if (*classification == "dirt"){
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_dirt, cv_weight, shr_energy_cali, elec_e);
@@ -566,7 +566,7 @@ void CrossSectionHelper::InitTree(){
     tree->SetBranchAddress("weight", &weight);
     tree->SetBranchAddress("true_energy", &true_energy);
     tree->SetBranchAddress("reco_energy", &reco_energy);
-    tree->SetBranchAddress("classifcation",   &classifcation);
+    tree->SetBranchAddress("classification",   &classification);
     tree->SetBranchAddress("shr_energy_cali", &shr_energy_cali);
     tree->SetBranchAddress("elec_e",  &elec_e);
     tree->SetBranchAddress("ppfx_cv",  &ppfx_cv);
