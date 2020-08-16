@@ -48,7 +48,7 @@ class Utility{
 public:
     // -------------------------------------------------------------------------
     // Initalise variables
-    void Initalise(const char* variation, bool overwritePOT, const char* run_period);
+    void Initalise(const char* variation, bool overwritePOT, const char* run_period, int _weight_tune, int _weight_ppfx, int _weight_dirt, int _weight_ext, int _pi0_correction);
     // -------------------------------------------------------------------------
     // Get a TFile from a file
     bool GetFile(TFile* &f, TString string);
@@ -104,6 +104,13 @@ public:
     // Bins for the reconstructed shower energy
     std::vector<double> reco_shr_bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 4.0};
     
+    // Weight configurations
+    bool weight_tune{true}; // Use the GENIE Tune
+    bool weight_ppfx{true}; // Use the PPFX CV Corr
+    bool weight_dirt{true}; // Weight the Dirt events
+    bool weight_ext{true};  // Weight the EXT events
+    int  pi0_correction{1}; // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
+
     // POT 
     std::vector<double> config_v;
 

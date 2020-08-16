@@ -23,17 +23,15 @@ class HistogramPlotter{
     // Scale factors (veverything is scaled to data)
     double mc_scale_factor, intime_scale_factor, dirt_scale_factor;
     
-    bool weight_tune = true; // Apply genie tune weight
-    bool weight_ppfx = true; // Apply ppfx cv weight
     bool area_norm   = false;  // Decide if to area normalse the histograms
 
 
     // -------------------------------------------------------------------------
     // Main function call to control this class
-    void MakeHistograms(const char * hist_file_name, const char *run_period, int weight_cfg, bool _area_norm, Utility _utility, const char* variation);
+    void MakeHistograms(const char * hist_file_name, const char *run_period, bool _area_norm, Utility _utility, const char* variation);
     // -------------------------------------------------------------------------
     // Initalise the file input
-    void Initalise(const char *hist_file_name, const char* _run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor, int weight_cfg);
+    void Initalise(const char *hist_file_name, const char* _run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor);
     // -------------------------------------------------------------------------
     // Function to make a stacked histogram and save as a pdf
     void MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, double y_scale_factor, const char* x_axis_name,

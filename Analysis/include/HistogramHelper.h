@@ -30,7 +30,7 @@ class HistogramHelper{
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(int type, const char *run_period, const char * file_out, int weight_cfg, Utility util );
+    void Initialise(int type, const char *run_period, const char * file_out, Utility util );
     // -------------------------------------------------------------------------
     // Initialise histograms
     void InitHistograms();

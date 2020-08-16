@@ -108,7 +108,7 @@ void HistogramHelper::MakeDirectory(){
    
 }
 // -----------------------------------------------------------------------------
-void HistogramHelper::Initialise(int type, const char* run_period, const char * file_out, int weight_cfg, Utility util ){
+void HistogramHelper::Initialise(int type, const char* run_period, const char * file_out, Utility util ){
 
     std::cout << "Initalising Histogram Helper, creating TFile and directories..." << std::endl;
 
@@ -172,28 +172,6 @@ void HistogramHelper::Initialise(int type, const char* run_period, const char * 
 
     // Set the type
     _type = type;
-
-    // Set the weight settings
-    if (weight_cfg == 0){
-        weight_tune = false;
-        weight_ppfx = false;
-    }
-    else if (weight_cfg == 1){
-        weight_tune = true;
-        weight_ppfx = true;
-    }
-    else if (weight_cfg == 2){
-        weight_tune = true;
-        weight_ppfx = false;
-    }
-    else if (weight_cfg == 3){
-        weight_tune = false;
-        weight_ppfx = true;
-    }
-    else {
-        std::cout << "Unknown weight setting specified, using defaults" << std::endl;
-    }
-
 
     MakeDirectory();
 }

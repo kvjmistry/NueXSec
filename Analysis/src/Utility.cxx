@@ -1,7 +1,7 @@
 #include "../include/Utility.h"
 
 // -----------------------------------------------------------------------------
-void Utility::Initalise(const char* variation, bool overwritePOT, const char* run_period){
+void Utility::Initalise(const char* variation, bool overwritePOT, const char* run_period, int _weight_tune, int _weight_ppfx, int _weight_dirt, int _weight_ext, int _pi0_correction){
 
     std::cout << "Initialising Utility Class..." << std::endl;
 
@@ -64,6 +64,60 @@ void Utility::Initalise(const char* variation, bool overwritePOT, const char* ru
         myfile.close();
     }
 
+    // Now set the weight configurations
+    
+    // GENIE Tune
+    if (_weight_tune == 0){
+        weight_tune = false;
+        std::cout << "GENIE Tune is turned off" << std::endl;
+    }
+    else {
+        weight_tune = true;
+        std::cout << "Using GENIE Tune"<< std::endl;
+    }
+
+    // PPFX CV
+    if (_weight_ppfx == 0){
+        weight_ppfx = false;
+        std::cout << "PPFX CV Correction is turned off" << std::endl;
+    }
+    else {
+        weight_ppfx = true;
+        std::cout << "Using PPFX CV Correction"<< std::endl;
+    }
+
+    // Dirt correction
+    if (_weight_dirt == 0){
+        weight_dirt = false;
+        std::cout << "Dirt Correction is turned off" << std::endl;
+    }
+    else {
+        weight_dirt = true;
+        std::cout << "Using Correction factor for dirt"<< std::endl;
+    }
+
+    // EXT correction
+    if (_weight_ext == 0){
+        weight_ext = false;
+        std::cout << "EXT Correction is turned off" << std::endl;
+    }
+    else {
+        weight_ext = true;
+        std::cout << "Using Correction factor for ext"<< std::endl;
+    }
+
+    // Pi0 correction
+    pi0_correction = _pi0_correction;
+    if (pi0_correction == 0){
+        std::cout << "pi0 Correction is turned off" << std::endl;
+    }
+    else if (pi0_correction == 1){
+         std::cout << "Using normalisation factor to correct pi0" << std::endl;
+    }
+    else {
+        std::cout << "Using energy dependent scaling to correct pi0" << std::endl;
+    }
+    
 }
 // -----------------------------------------------------------------------------
 bool Utility::GetFile(TFile* &f, TString string){

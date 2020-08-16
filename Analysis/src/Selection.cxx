@@ -15,8 +15,7 @@ void Selection::Initialise( const char * mc_file,
                             bool _slim,
                             int num_events,
                             const char * run_period,
-                            int _verbose,
-                            int weight_cfg){
+                            int _verbose){
     
     std::cout << "\nInitialising..." << std::endl;
 
@@ -35,10 +34,6 @@ void Selection::Initialise( const char * mc_file,
 
     std::cout << "\nSetting verbose level to: " << _verbose << std::endl;
     verbose = _verbose;
-
-    std::cout << "\nUsing a weight setting of: " << weight_cfg << std::endl;
-    std::cout << "If this is set to 1 (default) then we apply the Genie Tune and PPFX weights to the CV" << std::endl;
-    _weight_cfg = weight_cfg;
 
     // Create the file directory if it does not exist already
     gSystem->Exec("if [ ! -d \"files/trees/\" ]; then echo \"\nfiles folder does not exist... creating\"; mkdir -p files/trees; fi"); 
@@ -82,7 +77,7 @@ void Selection::Initialise( const char * mc_file,
     std::cout <<
     "Run Period Configured: run" << run_period<<"\n" <<
     "MC   File Path:      " << mc_file        <<"\n" <<
-    "Ext  File Path:      " << ext_file       <<"\n" <<
+    "EXT  File Path:      " << ext_file       <<"\n" <<
     "Data File Path:      " << data_file      <<"\n" <<
     "Dirt File Path:      " << dirt_file      <<"\n" <<
     std::endl;
@@ -117,7 +112,7 @@ void Selection::Initialise( const char * mc_file,
         _thelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_tree_file_name_out);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_file_out, weight_cfg, _util);
+        if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_file_out, _util);
         if (!_slim) _hhelper.at(_util.k_mc).InitHistograms();
 
         mc_tree_total_entries = mc_tree->GetEntries();
@@ -142,7 +137,7 @@ void Selection::Initialise( const char * mc_file,
         data_SC.Initialise(data_tree, _util.k_data, f_flux_weights, run_period, _util);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, run_period, data_file_out, weight_cfg, _util);
+        if (!_slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, run_period, data_file_out, _util);
         if (!_slim) _hhelper.at(_util.k_data).InitHistograms();
         
         // Initialise the Tree Helper
@@ -172,7 +167,7 @@ void Selection::Initialise( const char * mc_file,
         ext_SC.Initialise(ext_tree, _util.k_ext, f_flux_weights, run_period, _util);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, ext_file_out, weight_cfg, _util);
+        if (!_slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, ext_file_out, _util);
         if (!_slim) _hhelper.at(_util.k_ext).InitHistograms();
         
         // Initialise the Tree Helper
@@ -202,7 +197,7 @@ void Selection::Initialise( const char * mc_file,
         dirt_SC.Initialise(dirt_tree, _util.k_dirt, f_flux_weights, run_period, _util);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, dirt_file_out, weight_cfg, _util);
+        if (!_slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, dirt_file_out, _util);
         if (!_slim) _hhelper.at(_util.k_dirt).InitHistograms();
         
         // Initialise the Tree Helper
@@ -677,40 +672,15 @@ double Selection::GetCVWeight(int type, SliceContainer SC){
     if (type == _util.k_data ) return 1.0;
 
     // Run 1 and ext, correct by 2%
-    if (type == _util.k_ext && _run_period == 1 ) return 0.98;
+    if (type == _util.k_ext && _run_period == 1 && _util.weight_ext) return 0.98;
 
     // Run 3 and ext, correct by 5%
-    if (type == _util.k_ext && _run_period == 3 ) return 0.95;
+    if (type == _util.k_ext && _run_period == 3 && _util.weight_ext) return 0.95;
 
     double weight = 1.0;
-    bool weight_tune{true}, weight_ppfx{true};
-
-    // Set the weight settings
-    if (_weight_cfg == 0){
-        weight_tune = false;
-        weight_ppfx = false;
-        return weight;
-    }
-    // Default
-    else if (_weight_cfg == 1){
-        weight_tune = true;
-        weight_ppfx = true;
-    }
-    else if (_weight_cfg == 2){
-        weight_tune = true;
-        weight_ppfx = false;
-    }
-    else if (_weight_cfg == 3){
-        weight_tune = false;
-        weight_ppfx = true;
-    }
-    else {
-        std::cout << "Unknown weight setting specified, using defaults" << std::endl;
-    }
-
 
     // Get the tune weight
-    weight = SC.weightSplineTimesTune; // Here define the weight
+    if (_util.weight_tune) weight = SC.weightSplineTimesTune; // Here define the weight
     
     // Catch infinate/nan/unreasonably large tune weights
     if (std::isinf(weight))      weight = 1.0; 
@@ -719,22 +689,23 @@ double Selection::GetCVWeight(int type, SliceContainer SC){
     if (weight < 0)              weight = 1.0;
 
     // If tune weight turned off, just set weight to 1.0
-    if (!weight_tune) weight = 1.0;
+    if (!_util.weight_tune) weight = 1.0;
 
     // Get the PPFX CV flux correction weight
-    double weight_flux = SC.ppfx_cv;
+    double weight_flux = 1.0;
+    if (_util.weight_ppfx) weight_flux = SC.ppfx_cv;
 
     if (std::isinf(weight_flux))      weight_flux = 1.0; 
     if (std::isnan(weight_flux) == 1) weight_flux = 1.0;
     if (weight_flux > 100)            weight_flux = 1.0;
     if (weight_flux < 0)              weight_flux = 1.0;
 
-    if (weight_ppfx) weight = weight * weight_flux;
+    if (_util.weight_ppfx) weight = weight * weight_flux;
 
     // std::cout << SC.weightSplineTimesTune << "   "<< SC.ppfx_cv << std::endl;
 
     // For the dirt we correct it by 45%
-    if (type == _util.k_dirt) weight = weight*0.45;
+    if (type == _util.k_dirt && _util.weight_dirt) weight = weight*0.45;
 
     return weight;
 

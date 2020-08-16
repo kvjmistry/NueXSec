@@ -8,7 +8,7 @@ HistogramPlotter::~HistogramPlotter()
     // f_nuexsec->Close();
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *run_period, int weight_cfg, bool _area_norm, Utility _utility, const char *variation)
+void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *run_period, bool _area_norm, Utility _utility, const char *variation)
 {
 
     std::cout << "Creating histograms and making plots" << std::endl;
@@ -51,7 +51,7 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
               << "EXT Scale factor:  " << intime_scale_factor << std::endl;
     std::cout << "-------------------------------\033[0m" << std::endl;
 
-    Initalise(hist_file_name, run_period, mc_scale_factor, intime_scale_factor, dirt_scale_factor, weight_cfg);
+    Initalise(hist_file_name, run_period, mc_scale_factor, intime_scale_factor, dirt_scale_factor);
 
     // Only do this stuff for the CV -- unless we really want these plots for each detvar, then we need to change the file paths!!
     if (std::string(variation) == "empty")
@@ -233,7 +233,7 @@ void HistogramPlotter::MakeHistograms(const char *hist_file_name, const char *ru
 
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::Initalise(const char *hist_file_name, const char *_run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor, int weight_cfg)
+void HistogramPlotter::Initalise(const char *hist_file_name, const char *_run_period, double _mc_scale_factor, double _intime_scale_factor, double _dirt_scale_factor)
 {
 
     std::cout << "Initalising Histogram Plotter..." << std::endl;
@@ -256,31 +256,6 @@ void HistogramPlotter::Initalise(const char *hist_file_name, const char *_run_pe
         exit(1);
     }
 
-    // Set the weight settings
-    if (weight_cfg == 0)
-    {
-        weight_tune = false;
-        weight_ppfx = false;
-    }
-    else if (weight_cfg == 1)
-    {
-        weight_tune = true;
-        weight_ppfx = true;
-    }
-    else if (weight_cfg == 2)
-    {
-        weight_tune = true;
-        weight_ppfx = false;
-    }
-    else if (weight_cfg == 3)
-    {
-        weight_tune = false;
-        weight_ppfx = true;
-    }
-    else
-    {
-        std::cout << "Unknown weight setting specified, using defaults" << std::endl;
-    }
 }
 // -----------------------------------------------------------------------------
 std::vector<double> HistogramPlotter::Chi2Calc(TH1D *h_mc_ext, TH1D *h_data, const bool area_norm, const double return_norm)
@@ -365,7 +340,7 @@ void HistogramPlotter::Draw_WeightLabels(TCanvas *c)
     pt->SetFillColor(0);
     pt->SetFillStyle(0);
     pt->SetTextSize(0.03);
-    if (weight_tune)
+    if (_util.weight_tune)
         pt->Draw();
 
     pt2 = new TPaveText(0.839, 0.40, 0.909, 0.40, "NDC");
@@ -374,7 +349,7 @@ void HistogramPlotter::Draw_WeightLabels(TCanvas *c)
     pt2->SetFillColor(0);
     pt2->SetFillStyle(0);
     pt2->SetTextSize(0.03);
-    if (weight_ppfx)
+    if (_util.weight_ppfx)
         pt2->Draw();
 }
 // -----------------------------------------------------------------------------

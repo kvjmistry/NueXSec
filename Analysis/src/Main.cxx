@@ -38,7 +38,11 @@ int main(int argc, char *argv[]){
     char * uplotmode             = (char *)"default";
     int num_events{-1};
     int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
-    int weight{1};  // level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only
+    int weight_tune{1}; // Use the GENIE Tune
+    int weight_ppfx{1}; // Use the PPFX CV Corr
+    int weight_dirt{1}; // Weight the Dirt events
+    int weight_ext{1};  // Weight the EXT events
+    int weight_pi0{1};  // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
     
     // Class instances
     xsecSelection::Selection  _selection_instance;
@@ -60,7 +64,11 @@ int main(int argc, char *argv[]){
     "\033[0;33m[--dirt_out <dirt file output name>]\033[0m                   \033[0;32mThe output dirt overlay root file name (will put in the ./files/ folder)\033[0m\n\n"
     "\033[0;33m[--var <variation file> <variation name>]\033[0m              \033[0;32m(first arg) Path to variation file name, (second arg) the variation name -- overwrites the default MC option\033[0m\n\n"
     "\033[0;33m[-n <num events>]\033[0m                                      \033[0;32mThe number of events to run over. This is good for checking if the code doesn't segfault. All the POT scalings will not work.\033[0m\n\n"
-    "\033[0;33m[--weight <weight setting>]\033[0m                            \033[0;32mChange the Weight level. level 0 is no weights applied, level 1 (default) is all weights applied, level 2 is Genie Tune only, level 3 is PPFX CV only \033[0m\n\n"
+    "\033[0;33m[--weight_tune <weight mode>]\033[0m                          \033[0;32mTurn on/off the GENIE Tune 1 == on, 0 == off \033[0m\n\n"
+    "\033[0;33m[--weight_ppfx <weight mode>]\033[0m                          \033[0;32mTurn on/off the PPFX CV 1 == on, 0 == off \033[0m\n\n"
+    "\033[0;33m[--weight_dirt <weight mode>]\033[0m                          \033[0;32mTurn on/off the weighting of dirt 1 == on, 0 == off \033[0m\n\n"
+    "\033[0;33m[--weight_ext <weight mode>]\033[0m                           \033[0;32mTurn on/off the weighting of ext 1 == on, 0 == off \033[0m\n\n"
+    "\033[0;33m[--weight_pi0 <weight mode>]\033[0m                           \033[0;32mTurn on/off the weighting of pi0 0 == off, 1 == norm factor, 2 == E dep. scaling \033[0m\n\n"
     "\033[0;33m[--slim]\033[0m                                               \033[0;32mWhen this extension is added, the histogram helper class is not initalised and no histograms will be filled or saved. This is to speed up the selection code if you just want to run the selection.\033[0m\n\n"
     // "\033[0;33m[--verbose <verbose level>]\033[0m                            \033[0;32mDoes not print the selection cut results, 1 (default) currently prints everything\033[0m\n\n"
     "-------------------------------------------------------"
@@ -130,7 +138,7 @@ int main(int argc, char *argv[]){
         
         // MC file
         if (strcmp(arg, "--mc") == 0) {
-            std::cout << "Running with MC file: " << argv[i+1] << std::endl;
+            // std::cout << "Running with MC file: " << argv[i+1] << std::endl;
             mc_file_name = argv[i+1];
         }
 
@@ -142,7 +150,7 @@ int main(int argc, char *argv[]){
 
         // EXT file
         if (strcmp(arg, "--ext") == 0){
-            std::cout << "Running with EXT file: " << argv[i+1] << std::endl;
+            // std::cout << "Running with EXT file: " << argv[i+1] << std::endl;
             ext_file_name = argv[i+1];
         }
 
@@ -154,7 +162,7 @@ int main(int argc, char *argv[]){
 
         // Data file
         if (strcmp(arg, "--data") == 0){
-            std::cout << "Running with Data file: " << argv[i+1] << std::endl;
+            // std::cout << "Running with Data file: " << argv[i+1] << std::endl;
             data_file_name = argv[i+1];
         }
         
@@ -166,7 +174,7 @@ int main(int argc, char *argv[]){
 
         // Dirt file overlay
         if (strcmp(arg, "--dirt") == 0){
-            std::cout << "Running with Dirt file: " << argv[i+1] << std::endl;
+            // std::cout << "Running with Dirt file: " << argv[i+1] << std::endl;
             dirt_file_name = argv[i+1];
         }
 
@@ -176,10 +184,34 @@ int main(int argc, char *argv[]){
             dirt_file_name_out = argv[i+1];
         }
 
-        // Weight Settings
-        if (strcmp(arg, "--weight") == 0){
-            std::cout << "Running with weight configuration setting of: " << argv[i+1] << std::endl;
-            weight = atoi(argv[i+1]);
+        // GENIE Tune Weight Settings
+        if (strcmp(arg, "--weight_tune") == 0){
+            std::cout << "Running with GENIE Tune mode: " << argv[i+1] << std::endl;
+            weight_tune = atoi(argv[i+1]);
+        }
+        
+        // PPFX CV Weight Settings
+        if (strcmp(arg, "--weight_ppfx") == 0){
+            std::cout << "Running with PPFX CV mode: " << argv[i+1] << std::endl;
+            weight_ppfx = atoi(argv[i+1]);
+        }
+
+        // Dirt Weight Settings
+        if (strcmp(arg, "--weight_dirt") == 0){
+            std::cout << "Running with Dirt mode: " << argv[i+1] << std::endl;
+            weight_dirt = atoi(argv[i+1]);
+        }
+
+        // EXT Weight Settings
+        if (strcmp(arg, "--weight_ext") == 0){
+            std::cout << "Running with EXT mode: " << argv[i+1] << std::endl;
+            weight_ext = atoi(argv[i+1]);
+        }
+
+        // pi0 Weight Settings
+        if (strcmp(arg, "--weight_pi0") == 0){
+            std::cout << "Running with pi0 mode: " << argv[i+1] << std::endl;
+            weight_pi0 = atoi(argv[i+1]);
         }
 
         // Whats the verbose?
@@ -196,8 +228,7 @@ int main(int argc, char *argv[]){
 
         // Set the run period
         if (strcmp(arg, "--run") == 0){
-
-            std::cout << "Setting the run period as : run" << argv[i+1] <<std::endl;
+            // std::cout << "Setting the run period as : run" << argv[i+1] <<std::endl;
             run_period = argv[i+1];
         }
 
@@ -302,21 +333,21 @@ int main(int argc, char *argv[]){
     // -------------------------------------------------------------------------
     
     // Configure the utility class
-    _utility.Initalise(variation, overwritePOT, run_period);
+    _utility.Initalise(variation, overwritePOT, run_period, weight_tune, weight_ppfx, weight_dirt, weight_ext, weight_pi0);
 
     // -------------------------------------------------------------------------
 
     // Initialise the selction script
     if (run_selection) _selection_instance.Initialise(mc_file_name, ext_file_name, data_file_name, dirt_file_name,
                                                       mc_file_name_out, ext_file_name_out, data_file_name_out, dirt_file_name_out,
-                                                      mc_tree_file_name_out, _utility, using_slim_version, num_events, run_period, verbose, weight );
+                                                      mc_tree_file_name_out, _utility, using_slim_version, num_events, run_period, verbose);
 
     
     // Print the selection results
     if (print) _phelper.Initialise(run_period, mc_file_name, _print_mc, _print_data, _print_ext, _print_dirt, _utility );
 
     // Run the make histogram function
-    if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, weight, area_norm, _utility, variation);
+    if (make_histos) _hplot.MakeHistograms(hist_file_name, run_period, area_norm, _utility, variation);
 
     // Run the calculate cross section function
     if (calc_cross_sec) _xsec.Initialise(run_period, tree_file_name, _utility, xsecmode);

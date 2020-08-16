@@ -31,8 +31,6 @@ namespace xsecSelection {
 
             int max_events{-1};
 
-            int _weight_cfg{1};
-
             // Scale factors (everything is scaled to data)
             double mc_scale_factor     = 1.0;
             double intime_scale_factor = 1.0;
@@ -119,8 +117,7 @@ namespace xsecSelection {
                              bool _slim,
                              int num_events,
                              const char * run_period,
-                             int _verbose,
-                             int weight_cfg);
+                             int _verbose);
             // -----------------------------------------------------------------
             // Main function for selection
             void MakeSelection();
