@@ -642,8 +642,8 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
     
     // Now we want to draw them
     for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
-        c = new TCanvas();
-        topPad = new TPad("topPad", "", 0, 0.28, 1, 1.0);
+        c = new TCanvas("c", "c", 500, 500);
+        topPad = new TPad("topPad", "", 0, 0.3, 1, 1.0);
         bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
         _util.SetTPadOptions(topPad, bottomPad);
         // topPad->SetRightMargin(0.10 );
@@ -667,7 +667,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
 
         // FIxed scaling for differential cross section
         if (vars.at(var) != "integrated"){
-            h_universe.at(k_up).at(k)->GetYaxis()->SetRangeUser(0, 0.5e-39);
+            // h_universe.at(k_up).at(k)->GetYaxis()->SetRangeUser(0, 0.5e-39);
         }
 
         TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
@@ -816,7 +816,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
     // Now we want to draw them
     for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
 
-        c = new TCanvas();
+        c = new TCanvas("c", "c", 500, 500);
 
         h_universe.at(0).at(k)->SetTitle(Form("%s", xsec_types_pretty.at(k).c_str() ));
 
@@ -838,7 +838,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, scale_val*1.2);
 
         if (k == k_xsec_mcxsec || k == k_xsec_dataxsec){
-            h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, 0.5e-39);
+            // h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, 0.5e-39);
         }
 
         TLegend *leg = new TLegend(0.6, 0.75, 0.95, 0.9);
@@ -1031,8 +1031,8 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
     TCanvas *c;
     
     // Now we want to draw them
-    c = new TCanvas();
-    topPad = new TPad("topPad", "", 0, 0.28, 1, 1.0);
+    c = new TCanvas("c", "c", 500, 500);
+    topPad = new TPad("topPad", "", 0, 0.3, 1, 1.0);
     bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
     _util.SetTPadOptions(topPad, bottomPad);
     // topPad->SetRightMargin(0.10 );
@@ -1052,7 +1052,7 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
 
     // FIxed scaling for differential cross section
     if (vars.at(var) != "integrated"){
-        h_universe.at(k_up).at(k_xsec_dataxsec)->GetYaxis()->SetRangeUser(0, 0.5e-39);
+        // h_universe.at(k_up).at(k_xsec_dataxsec)->GetYaxis()->SetRangeUser(0, 0.5e-39);
     }
 
     TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
@@ -1095,4 +1095,5 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
 
     c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_data_mc_comparison.pdf", run_period.c_str(), label.c_str(), vars.at(var).c_str(), run_period.c_str(), label.c_str(), vars.at(var).c_str() ));
 
+    delete c;
 }
