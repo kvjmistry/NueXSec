@@ -386,23 +386,6 @@ void HistogramPlotter::Draw_Area_Norm(TCanvas *c)
     pt->Draw();
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::SetTPadOptions(TPad *topPad, TPad *bottomPad)
-{
-
-    topPad->SetBottomMargin(0.05);
-    topPad->SetTopMargin(0.15);
-    bottomPad->SetTopMargin(0.04);
-    bottomPad->SetBottomMargin(0.25);
-    bottomPad->SetGridy();
-    topPad->SetLeftMargin(0.15);
-    topPad->SetRightMargin(0.1);
-    bottomPad->SetLeftMargin(0.15);
-    bottomPad->SetRightMargin(0.1);
-    topPad->Draw();
-    bottomPad->Draw();
-    topPad->cd();
-}
-// -----------------------------------------------------------------------------
 bool HistogramPlotter::GetHistograms(std::vector<TH1D *> &hist, std::string hist_name, std::string cut_name, std::string plotmode, bool &found_data, bool &found_ext, bool &found_dirt)
 {
 
@@ -781,7 +764,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         topPad = new TPad("topPad", "", 0, 0.3, 1, 1.0);
         bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
 
-        SetTPadOptions(topPad, bottomPad);
+        _util.SetTPadOptions(topPad, bottomPad);
     }
     // Otherwise just use an unsplit canvas
     else {
@@ -1446,7 +1429,7 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
     topPad = new TPad("topPad", "", 0, 0.3, 1, 1.0);
     bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
 
-    SetTPadOptions(topPad, bottomPad);
+    _util.SetTPadOptions(topPad, bottomPad);
 
     for (unsigned int i = 0; i < hist.size(); i++)
     {
@@ -1645,7 +1628,7 @@ void HistogramPlotter::MakeFlashPlotOMO(double Data_POT, const char *print_name,
     topPad = new TPad("topPad", "", 0, 0.3, 1, 1.0);
     bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
 
-    SetTPadOptions(topPad, bottomPad);
+    _util.SetTPadOptions(topPad, bottomPad);
 
     for (unsigned int i = 0; i < hist.size(); i++)
     {

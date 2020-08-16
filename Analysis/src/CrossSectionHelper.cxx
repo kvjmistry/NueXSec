@@ -209,10 +209,10 @@ void CrossSectionHelper::LoopEvents(){
             // Loop over the variables
             for (unsigned int var = 0; var < h_cross_sec.at(label).at(uni).size(); var ++){
 
-                // Calculate the efficiency histogram
+                // Calculate the efficiency histogram -- this is incorrect, we need to smear the truth efficiency!
                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff)->Divide(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(var).at(k_xsec_gen));
 
-                // MC Cross section
+                // MC Cross section -- currently using eventrate
                 CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sel), // N Sel
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff),  // Eff
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),  // N Bkg
@@ -225,7 +225,7 @@ void CrossSectionHelper::LoopEvents(){
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec),
                                 N_target_MC, "MC");
 
-                // Data Cross section
+                // Data Cross section -- currently using eventrate
                 CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_data), // N Sel
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff),   // Eff
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),   // N Bkg
@@ -809,10 +809,10 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 // loop over and create the histograms
                 for (unsigned int i=0; i < xsec_types.size();i++){    
                     if (i == k_xsec_sel || i == k_xsec_bkg || i == k_xsec_gen || i == k_xsec_sig || i == k_xsec_ext || i == k_xsec_dirt || i == k_xsec_data){
-                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; Entries", nbins, edges);
+                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Reco. Leading Shower Energy [GeV]; Entries", nbins, edges);
                     }
                     else if (i == k_xsec_eff){
-                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Reco Electron Shower Energy [GeV]; Efficiency", nbins, edges);
+                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Reco. Leading Shower Energy [GeV]; Efficiency", nbins, edges);
                     }
                     else if (i == k_xsec_dataxsec || i == k_xsec_mcxsec){
                         h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels.at(var).c_str()), nbins, edges);

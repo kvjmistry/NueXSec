@@ -52,9 +52,6 @@ class HistogramPlotter{
     // Draw Variation Mode
     void Draw_VarMode(TCanvas* c, const char* variation);
     // -------------------------------------------------------------------------
-    // Set the TPad Options
-    void SetTPadOptions(TPad * topPad, TPad * bottomPad );
-    // -------------------------------------------------------------------------
     // Function to get all the histograms from the file
     bool GetHistograms(std::vector<TH1D*> &hist, std::string hist_name, std::string cut_name, std::string plotmode, bool &found_data, bool &found_ext, bool &found_dirt);
     // -------------------------------------------------------------------------

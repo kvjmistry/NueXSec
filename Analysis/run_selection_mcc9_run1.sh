@@ -67,7 +67,7 @@ if [ "$1" == "weight" ]; then
 
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_weight.root --var dummy weight --xsecmode reweight
 
-  ./nuexsec --run 1 --sys reweight
+  #./nuexsec --run 1 --sys reweight
 
 fi
 

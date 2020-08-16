@@ -466,3 +466,18 @@ void Utility::SetTextProperties(TLatex* text){
     text->SetTextAlign(32);
 }
 // -----------------------------------------------------------------------------
+void Utility::SetTPadOptions(TPad *topPad, TPad *bottomPad){
+    topPad->SetBottomMargin(0.05);
+    topPad->SetTopMargin(0.15);
+    bottomPad->SetTopMargin(0.04);
+    bottomPad->SetBottomMargin(0.25);
+    bottomPad->SetGridy();
+    topPad->SetLeftMargin(0.15);
+    topPad->SetRightMargin(0.1);
+    bottomPad->SetLeftMargin(0.15);
+    bottomPad->SetRightMargin(0.1);
+    topPad->Draw();
+    bottomPad->Draw();
+    topPad->cd();
+}
+// -----------------------------------------------------------------------------

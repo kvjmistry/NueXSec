@@ -145,51 +145,6 @@ void SystematicsHelper::Draw_Area_Norm(TCanvas* c){
     pt->Draw();
 }
 // -----------------------------------------------------------------------------
-void SystematicsHelper::Draw_Run_Period(TCanvas* c){
-    c->cd();
-
-    TPaveText *pt;
-
-    if (run_period == "1"){
-        pt = new TPaveText(0.66, 0.89, 0.86, 0.96,"NDC");
-        pt->AddText("Run1");
-        pt->SetTextColor(kRed+2);
-    }
-    else if (run_period == "3"){
-        pt = new TPaveText(0.66, 0.89, 0.86, 0.96,"NDC");
-        pt->AddText("Run3b");
-        pt->SetTextColor(kBlue+2);
-    }
-    else {
-        pt = new TPaveText(0.66, 0.89, 0.86, 0.96,"NDC");
-        pt->AddText("RunXXX");
-        pt->SetTextColor(kGreen+2);
-    }
-    
-    pt->SetBorderSize(0);
-    pt->SetFillColor(0);
-    pt->SetFillStyle(0);
-    pt->SetTextSize(0.04);
-    pt->Draw();
-}
-// -----------------------------------------------------------------------------
-void SystematicsHelper::SetTPadOptions(TPad * topPad, TPad * bottomPad ){
-
-    topPad   ->SetBottomMargin(0.05);
-    topPad   ->SetTopMargin(0.15);
-    bottomPad->SetTopMargin(0.04);
-    bottomPad->SetBottomMargin(0.25);
-    bottomPad->SetGridy();
-    topPad->SetLeftMargin(0.15);
-    topPad->SetRightMargin(0.20 );
-    bottomPad->SetLeftMargin(0.15);
-    bottomPad->SetRightMargin(0.20 );
-    topPad   ->Draw();
-    bottomPad->Draw();
-    topPad   ->cd();
-
-}
-// -----------------------------------------------------------------------------
 void SystematicsHelper::SetRatioOptions(TH1D* hist ){
 
     hist->GetXaxis()->SetLabelSize(0.13);
@@ -363,7 +318,7 @@ void SystematicsHelper::PlotVariations(std::string hist_name, const char* print_
     TPad * topPad    = new TPad("topPad", "", 0, 0.3, 1, 1.0);
     TPad * bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
 
-    SetTPadOptions(topPad, bottomPad );
+    _util.SetTPadOptions(topPad, bottomPad );
 
     // Loop over the variations and get the histograms
     for (unsigned int k=0; k < f_vars.size(); k++){
@@ -461,7 +416,7 @@ void SystematicsHelper::PlotVariations(std::string hist_name, const char* print_
 
 
     // Draw the run period on the plot
-    // Draw_Run_Period(c);
+    // _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
 
     // Add the weight labels
     // Draw_WeightLabels(c);
@@ -487,7 +442,7 @@ void SystematicsHelper::PlotVariationsEXT(std::string hist_name, const char* pri
     TPad * topPad    = new TPad("topPad", "", 0, 0.3, 1, 1.0);
     TPad * bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
 
-    SetTPadOptions(topPad, bottomPad );
+    _util.SetTPadOptions(topPad, bottomPad );
 
 
     // Loop over the variations and get the histograms
@@ -586,7 +541,7 @@ void SystematicsHelper::PlotVariationsEXT(std::string hist_name, const char* pri
 
 
     // Draw the run period on the plot
-    Draw_Run_Period(c);
+    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
 
     // Draw area normalisation
     Draw_Area_Norm(c);
@@ -638,7 +593,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
         // Plot the multisims
         PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 500);
         PlotReweightingModeMultisim("weightsReint", var,  "Geant Reinteractions", 1000);
-        PlotReweightingModeMultisim("weightsPPFX",  var,  "PPFX", 600);
+        // PlotReweightingModeMultisim("weightsPPFX",  var,  "PPFX", 600);
         
     }
     
@@ -690,7 +645,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         c = new TCanvas();
         topPad = new TPad("topPad", "", 0, 0.28, 1, 1.0);
         bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
-        SetTPadOptions(topPad, bottomPad);
+        _util.SetTPadOptions(topPad, bottomPad);
         // topPad->SetRightMargin(0.10 );
         // bottomPad->SetRightMargin(0.10 );
         
@@ -914,15 +869,15 @@ void SystematicsHelper::CompareCVXSec(int var){
     TPad *topPad;
     TPad *bottomPad;
 
-    TCanvas *c = new TCanvas();
-    topPad = new TPad("topPad", "", 0, 0.28, 1, 1.0);
+    TCanvas * c = new TCanvas("c", "c", 500, 500);
+    topPad = new TPad("topPad", "", 0, 0.3, 1, 1.0);
     bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
-    SetTPadOptions(topPad, bottomPad);
+    _util.SetTPadOptions(topPad, bottomPad);
 
     h_dataxsec->SetLineColor(kGreen+2);
     h_mcxsec  ->SetLineColor(kRed+2);
 
-    h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
+    // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
     if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(0, 10e-39);
 
     h_dataxsec->GetYaxis()->SetLabelSize(0.04);
@@ -963,12 +918,15 @@ void SystematicsHelper::CompareCVXSec(int var){
     h_err->GetYaxis()->SetTitleSize(11);
     h_err->GetYaxis()->SetRangeUser(-100, 100);
     h_err->GetYaxis()->SetTitle("Data - MC / Data [\%]");
-    // h_err->SetTitle(var_labels.at(var).c_str());
+    h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
     h_err->Draw("hist,same");
+
+    // Draw the run period on the plot
+    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
 
 
     c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_data_mc_comparison.pdf", run_period.c_str(), vars.at(var).c_str(), run_period.c_str(), vars.at(var).c_str() ));
-
+    delete c;
 }
 // -----------------------------------------------------------------------------
 void SystematicsHelper::InitialsePlotCV(){
@@ -1007,15 +965,19 @@ void SystematicsHelper::InitialsePlotCV(){
         
         // Loop over the types
         for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
-            c_cv = new TCanvas();
+            c_cv = new TCanvas("c", "c", 500, 500);
         
             cv_hist_vec.at(var).at(k)->Draw("hist");
+            _util.IncreaseLabelSize(cv_hist_vec.at(var).at(k), c_cv);
         
             TLegend *leg = new TLegend(0.6, 0.8, 0.95, 0.9);
             leg->SetBorderSize(0);
             leg->SetFillStyle(0);
             leg->AddEntry(cv_hist_vec.at(var).at(k),         "CV", "l");
             // leg->Draw();
+
+            // Draw the run period on the plot
+            _util.Draw_Run_Period(c_cv, 0.86, 0.92, 0.86, 0.92, run_period);
 
             c_cv->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_%s.pdf", run_period.c_str(), vars.at(var).c_str(), run_period.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
@@ -1072,7 +1034,7 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
     c = new TCanvas();
     topPad = new TPad("topPad", "", 0, 0.28, 1, 1.0);
     bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
-    SetTPadOptions(topPad, bottomPad);
+    _util.SetTPadOptions(topPad, bottomPad);
     // topPad->SetRightMargin(0.10 );
     // bottomPad->SetRightMargin(0.10 );
     

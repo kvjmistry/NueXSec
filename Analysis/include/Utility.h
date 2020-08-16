@@ -98,6 +98,10 @@ public:
     // Function to customise the TLatex
     void SetTextProperties(TLatex* text);
     // -------------------------------------------------------------------------
+    // Initialise the TPad size for a ratio type of plot
+    void SetTPadOptions(TPad *topPad, TPad *bottomPad);
+    // -------------------------------------------------------------------------
+
 
     // Variables
 
