@@ -701,8 +701,13 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
 
         SetRatioOptions(h_err_up);
         h_err_up->GetYaxis()->SetTitle("\% change from CV");
-        h_err_up->Draw("hist,same");
-        h_err_dn->Draw("hist,same");
+        h_err_up->Draw("hist,same, text00");
+        h_err_up->SetMarkerSize(1.6);
+        h_err_dn->Draw("hist,same, text00");
+        h_err_dn->SetMarkerSize(1.6);
+        
+        
+        gStyle->SetPaintTextFormat("4.2f");
         h_err->Draw("hist,same");
 
         c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", run_period.c_str(), label.c_str(), vars.at(var).c_str(), run_period.c_str(), label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
@@ -812,11 +817,16 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
 
 
     TCanvas *c;
+    TPad *topPad;
+    TPad *bottomPad;
 
     // Now we want to draw them
     for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
 
         c = new TCanvas("c", "c", 500, 500);
+        topPad = new TPad("topPad", "", 0, 0.3, 1, 1.0);
+        bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
+        _util.SetTPadOptions(topPad, bottomPad);
 
         h_universe.at(0).at(k)->SetTitle(Form("%s", xsec_types_pretty.at(k).c_str() ));
 
@@ -830,10 +840,13 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
             h_universe.at(uni).at(k)->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
             h_universe.at(uni).at(k)->Draw("hist,same");
             if (scale_val < h_universe.at(uni).at(k)->GetMaximum()) scale_val = h_universe.at(uni).at(k)->GetMaximum();
+            h_universe.at(uni).at(k)->GetXaxis()->SetTitle("");
+            h_universe.at(uni).at(k)->GetXaxis()->SetLabelSize(0);
 
         }
 
         cv_hist_vec_clone.at(k)->Draw("E,same");
+        
 
         h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, scale_val*1.2);
 
@@ -841,12 +854,41 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
             // h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, 0.5e-39);
         }
 
-        TLegend *leg = new TLegend(0.6, 0.75, 0.95, 0.9);
+        TLegend *leg = new TLegend(0.6, 0.65, 0.95, 0.8);
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
         leg->AddEntry(h_universe.at(0).at(k), Form("%s - All Universes", label_pretty.c_str()), "l");
         leg->AddEntry(cv_hist_vec_clone.at(k),           "Central Value", "le");
         leg->Draw();
+
+        bottomPad->cd();
+
+        // Up percent diff to CV
+        TH1D* h_err = (TH1D *)cv_hist_vec_clone.at(k)->Clone("h_err");
+        
+        // Loop over the bins in the up error, and set the bin content to be the percent difference
+        for (int g = 1; g < h_err->GetNbinsX()+1; g++){
+            h_err->SetBinContent(g, 100 * h_err->GetBinError(g)/h_err->GetBinContent(g));
+        }
+        h_err->SetLineWidth(2);
+        h_err->SetLineColor(kGreen+2);
+        h_err->GetYaxis()->SetRangeUser(0, 50);
+
+        h_err->GetXaxis()->SetLabelSize(0.13);
+        h_err->GetXaxis()->SetTitleOffset(0.9);
+        h_err->GetXaxis()->SetTitleSize(0.13);
+        h_err->GetYaxis()->SetLabelSize(0.13);
+        // h_err->GetYaxis()->SetNdivisions(-5, kFALSE); // Why the f*** is this freezing!!!
+        h_err->GetYaxis()->SetTitleSize(12);
+        h_err->GetYaxis()->SetTitleFont(44);
+        h_err->GetYaxis()->CenterTitle();
+        h_err->GetYaxis()->SetTitleOffset(1.5);
+        h_err->SetTitle(" ");
+        
+        h_err->GetYaxis()->SetTitle("\% Uncertainty");
+        h_err->Draw("hist, text00");
+        h_err->SetMarkerSize(3);
+        gStyle->SetPaintTextFormat("4.2f");
 
         c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", run_period.c_str(), label.c_str(), vars.at(var).c_str(),  run_period.c_str(), label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
@@ -911,6 +953,8 @@ void SystematicsHelper::CompareCVXSec(int var){
     h_err->SetLineWidth(2);
     h_err->SetLineColor(kGreen+2);
     h_err->Scale(100);
+
+    bottomPad->SetGridy(kFALSE);
     
 
     SetRatioOptions(h_err);

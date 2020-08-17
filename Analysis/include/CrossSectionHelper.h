@@ -18,7 +18,7 @@ class CrossSectionHelper{
 
     // Set threshold to integrate the flux from [GeV]
     // Remember to make sure you set this number past the bin boundary or it wont work
-    double energy_threshold = 0.00; 
+    double energy_threshold = 0.0; 
 
     // Scale factors (everything is scaled to data)
     double mc_scale_factor     = 1.0;
