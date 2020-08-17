@@ -593,7 +593,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
         // Plot the multisims
         PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 500);
         PlotReweightingModeMultisim("weightsReint", var,  "Geant Reinteractions", 1000);
-        // PlotReweightingModeMultisim("weightsPPFX",  var,  "PPFX", 600);
+        PlotReweightingModeMultisim("weightsPPFX",  var,  "PPFX", 600);
         
     }
     

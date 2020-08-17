@@ -11,12 +11,16 @@ class CrossSectionHelper{
     CrossSectionHelper(){};
     
     // The input and output files
-    TFile* f_nuexsec, *fnuexsec_out;
+    TFile* f_nuexsec, *fnuexsec_out, *f_flux;
 
     // Class instances
     Utility _util;
 
-     // Scale factors (everything is scaled to data)
+    // Set threshold to integrate the flux from [GeV]
+    // Remember to make sure you set this number past the bin boundary or it wont work
+    double energy_threshold = 0.00; 
+
+    // Scale factors (everything is scaled to data)
     double mc_scale_factor     = 1.0;
     double ext_scale_factor    = 1.0;
     double dirt_scale_factor   = 1.0;
@@ -146,29 +150,29 @@ class CrossSectionHelper{
 
     std::vector<std::string> reweighter_labels = {
         "CV",
-        "RPAup",
-        "CCMECup",
-        "AxFFCCQEup",
-        "VecFFCCQEup",
-        "DecayAngMECup",
-        "ThetaDelta2Npiup",
-        "ThetaDelta2NRadup",
-        "RPA_CCQE_Reducedup",
-        "NormCCCOHup",
-        "NormNCCOHup",
-        "RPAdn",
-        "CCMECdn",
-        "AxFFCCQEdn",
-        "VecFFCCQEdn",
-        "DecayAngMECdn",
-        "ThetaDelta2Npidn",
-        "ThetaDelta2NRaddn",
-        "RPA_CCQE_Reduceddn",
-        "NormCCCOHdn",
-        "NormNCCOHdn",
-        "weightsGenie",
-        "weightsReint"
-        // "weightsPPFX"
+        // "RPAup",
+        // "CCMECup",
+        // "AxFFCCQEup",
+        // "VecFFCCQEup",
+        // "DecayAngMECup",
+        // "ThetaDelta2Npiup",
+        // "ThetaDelta2NRadup",
+        // "RPA_CCQE_Reducedup",
+        // "NormCCCOHup",
+        // "NormNCCOHup",
+        // "RPAdn",
+        // "CCMECdn",
+        // "AxFFCCQEdn",
+        // "VecFFCCQEdn",
+        // "DecayAngMECdn",
+        // "ThetaDelta2Npidn",
+        // "ThetaDelta2NRaddn",
+        // "RPA_CCQE_Reduceddn",
+        // "NormCCCOHdn",
+        // "NormNCCOHdn",
+        // "weightsGenie",
+        // "weightsReint"
+        "weightsPPFX"
     };
 
 
@@ -185,8 +189,8 @@ class CrossSectionHelper{
     // Function to calculate the cross section using binned histograms
     void CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double ext_scale_factor, TH1D* h_ext, double dirt_scale_factor, TH1D* h_dirt, TH1D* h_xsec, double targ, std::string mcdata);
     // -------------------------------------------------------------------------
-    // Function to get the integrated flux
-    double GetIntegratedFlux();
+    // Function to get the integrated flux OR a weight
+    double GetIntegratedFlux(int uni, std::string value, std::string label);
     // -------------------------------------------------------------------------
     // Function to get the POT from the flux file
     double GetPOT(TFile* f);
@@ -206,9 +210,6 @@ class CrossSectionHelper{
     // -------------------------------------------------------------------------
     // Helper function to fill the histograms
     void FillHists(int label, int uni, int xsec_type, double weight_uni, float shr_energy_cali, float elec_e);
-    // -------------------------------------------------------------------------
-    // Function to return the integrated flux for universe i or the weight in case of a beamline variation
-    double GetFluxUni(int uni, std::string value, std::string label);
     // -------------------------------------------------------------------------
 
 

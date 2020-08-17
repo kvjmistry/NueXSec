@@ -20,7 +20,7 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
     else if (strcmp(_run_period, "3") == 0){
         mc_scale_factor     = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_MC_POT);
         dirt_scale_factor   = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_Dirt_POT);
-        ext_scale_factor = _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
+        ext_scale_factor    = _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
         mc_flux_scale_factor   = flux_scale_factor * _util.config_v.at(_util.k_Run3_MC_POT); 
         data_flux_scale_factor = flux_scale_factor * _util.config_v.at(_util.k_Run3_Data_POT);
     }
@@ -54,8 +54,26 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
     // Initialise the tree (set a bunch of tree branches)
     InitTree();
 
-    // Get the integrated flux
-    integrated_flux = GetIntegratedFlux();
+    // Initialise the Flux file
+    if (run_period == "1"){
+        std::cout << "Using Flux file name: \033[0;31m" << "Systematics/output_fhc_uboone_run0.root" << "\033[0m" <<  std::endl;
+        bool boolfile = _util.GetFile(f_flux, "Systematics/output_fhc_uboone_run0.root");
+        if (boolfile == false) gSystem->Exit(0); 
+    }
+    else if (run_period == "3") {
+        std::cout << "Using Flux file name: \033[0;31m" << "Systematics/output_rhc_uboone_run0.root" << "\033[0m" <<  std::endl;
+        bool boolfile = _util.GetFile(f_flux, "Systematics/output_rhc_uboone_run0.root" );
+        if (boolfile == false) gSystem->Exit(0); 
+    }
+    else{
+        std::cout << "Unknown Run period configured, exiting..." << std::endl;
+        return;
+    }
+    
+    // Get the integrated flux for the CV
+    integrated_flux = GetIntegratedFlux(0, "CV", "");
+
+    f_nuexsec->cd();
 
     // Calculate the volume as used in the cuts
     volume = (_util.config_v.at(_util.k_config_x2) - _util.config_v.at(_util.k_config_x1)) * 
@@ -69,6 +87,7 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
     
     N_target_Data = (lar_density_data * volume * NA * N_nuc) / m_mol;
     std::cout << "Number of Target Nucleons in Data: " << N_target_Data << std::endl;
+    std::cout << "  "<< std::endl;
 
 
     // Create and initialise vector of histograms
@@ -209,6 +228,13 @@ void CrossSectionHelper::LoopEvents(){
             // Loop over the variables
             for (unsigned int var = 0; var < h_cross_sec.at(label).at(uni).size(); var ++){
 
+                double temp_integrated_flux;
+                
+                temp_integrated_flux = integrated_flux;
+
+                // If we are reweighting by the PPFX Multisims, we need to change the integrated flux too
+                if (reweighter_labels.at(label) == "weightsPPFX") temp_integrated_flux = GetIntegratedFlux(uni, "HP", "ppfx_ms_UBPPFX");
+
                 // Calculate the efficiency histogram -- this is incorrect, we need to smear the truth efficiency!
                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff)->Divide(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(var).at(k_xsec_gen));
 
@@ -217,7 +243,7 @@ void CrossSectionHelper::LoopEvents(){
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff),  // Eff
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),  // N Bkg
                                 mc_scale_factor,
-                                integrated_flux * mc_flux_scale_factor,                // Flux
+                                temp_integrated_flux * mc_flux_scale_factor,           // Flux
                                 ext_scale_factor,
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),  // N EXT
                                 dirt_scale_factor,
@@ -230,7 +256,7 @@ void CrossSectionHelper::LoopEvents(){
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff),   // Eff
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),   // N Bkg
                                 mc_scale_factor,
-                                integrated_flux * data_flux_scale_factor,               // Flux
+                                temp_integrated_flux * data_flux_scale_factor,          // Flux
                                 ext_scale_factor,
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),   // N EXT
                                 dirt_scale_factor,
@@ -325,118 +351,77 @@ void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg,
     h_xsec->Add(h_dirt_clone, -1);
     
     // h_xsec->Divide(h_eff) ; // For flux normalised event rate we dont do anything to the efficiency
-    
+
     h_xsec->Scale(1.0 / (targ*flux) );
 
 }
 // -----------------------------------------------------------------------------
-double CrossSectionHelper::GetIntegratedFlux(){
+double CrossSectionHelper::GetIntegratedFlux(int uni, std::string value, std::string label){
 
-    TFile * f_flux;
+    f_flux->cd();
 
-    TH1D* h_nue, *h_nuebar;
-
-    double energy_threshold = 0.00; // Set threshold to integrate the flux from [GeV]
-    std::cout << "Using a flux energy threshold of :" << energy_threshold * 1000 << " MeV"<< std::endl;
-
-    // Hardcoded for run 1 right now.. urgh krish you lazy
-    bool boolfile;
-    
-    std::string flux_file_name;
-
-    if (run_period == "1"){
-        flux_file_name = "Systematics/output_fhc_uboone_run0.root";
-        boolfile = _util.GetFile(f_flux, flux_file_name);
-    }
-    else {
-        flux_file_name = "Systematics/output_rhc_uboone_run0.root";
-        boolfile = _util.GetFile(f_flux, flux_file_name );
-    }
-    std::cout << "Using Flux file name: \033[0;31m" << flux_file_name << "\033[0m" <<  std::endl;
-
-    if (boolfile == false) gSystem->Exit(0); // Most up to date version of CV
-
-    bool boolhist = _util.GetHist(f_flux, h_nue, "nue/Detsmear/nue_CV_AV_TPC_5MeV_bin");     if (boolhist == false) gSystem->Exit(0); // Get the PPFX weighted CV for nue
-    boolhist      = _util.GetHist(f_flux, h_nuebar, "nuebar/Detsmear/nuebar_CV_AV_TPC_5MeV_bin"); if (boolhist == false) gSystem->Exit(0); // Get the PPFX weighted CV for nuebar
-
-    double integral_nue{0};
-    double integral_nuebar{0};
-
-    double xbin_th = h_nue->GetXaxis()->FindBin(energy_threshold); // find the x bin to integrate from -- remove the MuDAR Peak where the cross sec is zero
-    integral_nue += h_nue->Integral( xbin_th, h_nue->GetNbinsX()+1); // Integrate over the flux for nue
-
-    std::cout << "Integral Nue Flux: " << integral_nue << std::endl;
-
-    xbin_th   = h_nuebar->GetXaxis()->FindBin(energy_threshold); // find the x bin to integrate from -- remove the MuDAR Peak where the cross sec is zero
-    integral_nuebar += h_nuebar->Integral( xbin_th, h_nuebar->GetNbinsX()+1); // Integrate over the flux for nue
-
-    std::cout << "Integral Nuebar Flux: " << integral_nuebar << std::endl;
-
-
-    double POT_flux{0.0}; // The POT of the flux file (i.e the POT used in the flux histogram)
-    POT_flux = GetPOT(f_flux);
-
-    f_flux->Close();
-
-    // Return the flux per POT
-    return (integral_nue + integral_nuebar) / POT_flux;
-
-}
-// -----------------------------------------------------------------------------
-double CrossSectionHelper::GetFluxUni(int uni, std::string value, std::string label){
-
-    TFile * f_flux;
-
-    TH1D* h_nue, *h_nuebar;
-    TH1D* h_uni;
+    TH2D* h_nue, *h_nuebar;
+    TH2D *h_uni_nue, *h_uni_nuebar;
     double weight = {1.0};
     double xbin, ybin;
-
-    double energy_threshold = 0.00; // Set threshold to integrate the flux from [GeV]
-    std::cout << "Using a flux energy threshold of :" << energy_threshold * 1000 << " MeV"<< std::endl;
-
-    bool boolfile;
+    double POT_flux{0.0}; // The POT of the flux file (i.e the POT used in the flux histogram)
+    double xbin_th{0.0};
+    double integral_nue{0.0}, integral_nuebar{0.0};
+    bool boolfile, boolhist;
     
-    std::string flux_file_name;
+    // Get the CV flux from the 5MeV binned histograms
+    if (value == "CV"){
 
-    if (run_period == "1"){
-        flux_file_name = "Systematics/output_fhc_uboone_run0.root";
-        boolfile = _util.GetFile(f_flux, flux_file_name);
-    }
-    else {
-        flux_file_name = "Systematics/output_rhc_uboone_run0.root";
-        boolfile = _util.GetFile(f_flux, flux_file_name );
-    }
-    std::cout << "Using Flux file name: \033[0;31m" << flux_file_name << "\033[0m" <<  std::endl;
-
-    if (boolfile == false) gSystem->Exit(0); // Most up to date version of CV
-
-    bool boolhist;
-    
-    // Will return the integrated nue+nuebar flux for universe i
-    if (value == "flux"){
-
-        boolhist = _util.GetHist(f_flux, h_nue, "nue/Detsmear/nue_CV_AV_TPC_5MeV_bin");
-        if (boolhist == false) gSystem->Exit(0);
+        // Get the nue flux histogram from the file
+        boolhist = _util.GetHist(f_flux, h_nue,         "nue/Detsmear/nue_CV_AV_TPC_2D");       
+        if (boolhist == false) gSystem->Exit(0); 
         
-        boolhist      = _util.GetHist(f_flux, h_nuebar, "nuebar/Detsmear/nuebar_CV_AV_TPC_5MeV_bin");
-        if (boolhist == false) gSystem->Exit(0);
+        // Get the nuebar flux histogram from the file
+        boolhist      = _util.GetHist(f_flux, h_nuebar, "nuebar/Detsmear/nuebar_CV_AV_TPC_2D");
+        if (boolhist == false) gSystem->Exit(0); 
 
-        double integral_nue{0}, integral_nuebar{0};
+        std::cout << "Using Energy Threshold of: \033[0;31m" << energy_threshold * 1000 << " MeV" << "\033[0m" <<  std::endl;
 
-        double xbin_th = h_nue->GetXaxis()->FindBin(energy_threshold); // find the x bin to integrate from -- remove the MuDAR Peak where the cross sec is zero
-        integral_nue += h_nue->Integral( xbin_th, h_nue->GetNbinsX()+1); // Integrate over the flux for nue
-
-
-        xbin_th   = h_nuebar->GetXaxis()->FindBin(energy_threshold); // find the x bin to integrate from -- remove the MuDAR Peak where the cross sec is zero
-        integral_nuebar += h_nuebar->Integral( xbin_th, h_nuebar->GetNbinsX()+1); // Integrate over the flux for nue
-
-        // std::cout << "Integral Flux: " << integral_nue << std::endl;
-
-        double POT_flux{0.0}; // The POT of the flux file (i.e the POT used in the flux histogram)
         POT_flux = GetPOT(f_flux);
 
-        f_flux->Close();
+        double xbin_th = h_nue->GetXaxis()->FindBin(energy_threshold);   // find the x bin to integrate from
+        integral_nue = h_nue->Integral( xbin_th, h_nue->GetNbinsX()+1, 0, h_nue->GetNbinsY()+1); // Integrate over the flux for nue
+
+        std::cout << "\nIntegral Nue Flux: " << flux_scale_factor * integral_nue / POT_flux << " nue / POT / GeV / cm2" << std::endl;
+
+        xbin_th   = h_nuebar->GetXaxis()->FindBin(energy_threshold);              // find the x bin to integrate from
+        integral_nuebar = h_nuebar->Integral( xbin_th, h_nuebar->GetNbinsX()+1, 0, h_nuebar->GetNbinsY()+1); // Integrate over the flux for nue
+
+        std::cout << "\nIntegral Nuebar Flux: " << flux_scale_factor * integral_nuebar / POT_flux << " nuebar / POT / GeV / cm2" << "\n" << std::endl;
+
+        // Return the flux per POT
+        return (integral_nue + integral_nuebar) / POT_flux;
+
+    }
+    // Will return the integrated nue+nuebar flux for universe i
+    else if (value == "HP"){
+
+        // Get the POT from the file
+        POT_flux = GetPOT(f_flux);
+
+        boolhist = _util.GetHist(f_flux, h_uni_nue, Form("nue/Multisims/nue_%s_Uni_%i_AV_TPC_2D", label.c_str(), uni));
+
+        if (boolhist == false) gSystem->Exit(0);
+        
+        boolhist = _util.GetHist(f_flux, h_uni_nuebar, Form("nuebar/Multisims/nuebar_%s_Uni_%i_AV_TPC_2D", label.c_str(), uni));
+        if (boolhist == false) gSystem->Exit(0);
+
+        xbin_th = h_uni_nue->GetXaxis()->FindBin(energy_threshold);   // find the x bin to integrate from
+        integral_nue = h_uni_nue->Integral( xbin_th, h_uni_nue->GetNbinsX()+1, 0, h_uni_nue->GetNbinsY()+1); // Integrate over the flux for nue
+
+        // std::cout << xbin_th << std::endl;
+
+        // std::cout << "\nIntegral Nue Flux: " << flux_scale_factor * integral_nue / POT_flux << " nue / POT / GeV / cm2" << std::endl;
+
+        xbin_th   = h_uni_nuebar->GetXaxis()->FindBin(energy_threshold);              // find the x bin to integrate from 
+        integral_nuebar = h_uni_nuebar->Integral( xbin_th, h_uni_nuebar->GetNbinsX()+1, 0, h_uni_nuebar->GetNbinsY()+1); // Integrate over the flux for nuebar
+
+        // std::cout << "Integral Nuebar Flux: " << flux_scale_factor * integral_nuebar / POT_flux << " nuebar / POT / GeV / cm2" << "\n" << std::endl;
 
         // Return the flux per POT
         return (integral_nue + integral_nuebar) / POT_flux;
@@ -446,28 +431,28 @@ double CrossSectionHelper::GetFluxUni(int uni, std::string value, std::string la
     // Return a weight based on the energy and angle of the event -- used for weighting by beamline variations and ppfx HP types broken down 
     else {
 
-        // Nue
-        if (nu_pdg == 12){
-            boolhist = _util.GetHist(f_flux, h_uni, Form("nue/Multisims/nue_%s_Uni_%i_AV_TPC_2D", label.c_str(), uni));
-        }
-        // Nuebar
-        else if (nu_pdg == -12){
-            boolhist = _util.GetHist(f_flux, h_uni, Form("nuebar/Multisims/nuebar_%s_Uni_%i_AV_TPC_2D", label.c_str(), uni));
-        }
-        // Numu
-        else if (nu_pdg == 14){
-            boolhist = _util.GetHist(f_flux, h_uni, Form("numu/Multisims/numu_%s_Uni_%i_AV_TPC_2D", label.c_str(), uni));
-        }
-        // NumuBar
-        else if (nu_pdg == -14){
-            boolhist = _util.GetHist(f_flux, h_uni, Form("numubar/Multisims/numubar_%s_Uni_%i_AV_TPC_2D", label.c_str(), uni));
-        }
+        // // Nue
+        // if (nu_pdg == 12){
+        //     boolhist = _util.GetHist(f_flux, h_uni, Form("nue/Multisims/nue_%s_Uni_%i_AV_TPC_2D", label.c_str(), uni));
+        // }
+        // // Nuebar
+        // else if (nu_pdg == -12){
+        //     boolhist = _util.GetHist(f_flux, h_uni, Form("nuebar/Multisims/nuebar_%s_Uni_%i_AV_TPC_2D", label.c_str(), uni));
+        // }
+        // // Numu
+        // else if (nu_pdg == 14){
+        //     boolhist = _util.GetHist(f_flux, h_uni, Form("numu/Multisims/numu_%s_Uni_%i_AV_TPC_2D", label.c_str(), uni));
+        // }
+        // // NumuBar
+        // else if (nu_pdg == -14){
+        //     boolhist = _util.GetHist(f_flux, h_uni, Form("numubar/Multisims/numubar_%s_Uni_%i_AV_TPC_2D", label.c_str(), uni));
+        // }
         
-        if (boolhist == false) gSystem->Exit(0);
+        // if (boolhist == false) gSystem->Exit(0);
 
-        xbin = h_uni->GetXaxis()->FindBin(true_energy);
-        ybin = h_uni->GetYaxis()->FindBin(numi_ang);
-        weight = h_uni->GetBinContent(xbin, ybin);
+        // xbin = h_uni->GetXaxis()->FindBin(true_energy);
+        // ybin = h_uni->GetYaxis()->FindBin(numi_ang);
+        // weight = h_uni->GetBinContent(xbin, ybin);
 
         return weight;
 
