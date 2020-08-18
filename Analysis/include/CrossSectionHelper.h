@@ -149,7 +149,7 @@ class CrossSectionHelper{
     
 
     std::vector<std::string> reweighter_labels = {
-        "CV",
+        "CV",    // Dont comment this out
         // "RPAup",
         // "CCMECup",
         // "AxFFCCQEup",
@@ -170,9 +170,9 @@ class CrossSectionHelper{
         // "RPA_CCQE_Reduceddn",
         // "NormCCCOHdn",
         // "NormNCCOHdn",
-        // "weightsGenie",
+        "weightsGenie"
         // "weightsReint"
-        "weightsPPFX"
+        // "weightsPPFX"
     };
 
 

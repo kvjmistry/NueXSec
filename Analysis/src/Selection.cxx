@@ -685,7 +685,7 @@ double Selection::GetCVWeight(int type, SliceContainer SC){
     // Catch infinate/nan/unreasonably large tune weights
     if (std::isinf(weight))      weight = 1.0; 
     if (std::isnan(weight) == 1) weight = 1.0;
-    if (weight > 100)            weight = 1.0;
+    if (weight > 30)            weight = 1.0;
     if (weight < 0)              weight = 1.0;
 
     // If tune weight turned off, just set weight to 1.0
@@ -697,7 +697,7 @@ double Selection::GetCVWeight(int type, SliceContainer SC){
 
     if (std::isinf(weight_flux))      weight_flux = 1.0; 
     if (std::isnan(weight_flux) == 1) weight_flux = 1.0;
-    if (weight_flux > 100)            weight_flux = 1.0;
+    if (weight_flux > 30)            weight_flux = 1.0;
     if (weight_flux < 0)              weight_flux = 1.0;
 
     if (_util.weight_ppfx) weight = weight * weight_flux;

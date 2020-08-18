@@ -666,7 +666,7 @@ void HistogramPlotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, s
 
     if (plotmode == "classifications" || plotmode == "classifications_pi0" || plotmode == "classifications_numu") {
         if (found_data) leg_stack->AddEntry(hist.at(k_plot_data), Form("Beam-On Data (%2.1f)", hist_integrals.at(_util.k_leg_data)), "lep");
-        if (found_dirt) leg_stack->AddEntry(hist.at(k_plot_dirt), Form("Dirt (%2.1f)", hist_integrals.at(_util.k_leg_dirt)), "f");
+        if (found_dirt) leg_stack->AddEntry(hist.at(k_plot_dirt), Form("Out-of Cryo (%2.1f)", hist_integrals.at(_util.k_leg_dirt)), "f");
         if (found_ext) leg_stack->AddEntry(hist.at(k_plot_ext), Form("Beam-Off Data (%2.1f)", hist_integrals.at(_util.k_leg_ext)), "f");
         // leg_stack->AddEntry(hist.at(_util.k_unmatched),       Form("Unmatched (%2.1f)",           hist_integrals.at(_util.k_unmatched)),    "f"); // This should be zero, so dont plot
         leg_stack->AddEntry(hist.at(_util.k_nc_pi0), Form("NC #pi^{0} (%2.1f)", hist_integrals.at(_util.k_nc_pi0)), "f");
@@ -681,7 +681,7 @@ void HistogramPlotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, s
 
     else {
         if (found_data) leg_stack->AddEntry(hist.at(k_plot_data), Form("Beam-On Data (%2.1f)", hist_integrals.at(_util.k_part_data)), "lep");
-        if (found_dirt) leg_stack->AddEntry(hist.at(k_plot_dirt), Form("Dirt (%2.1f)", hist_integrals.at(_util.k_part_dirt)), "f");
+        if (found_dirt) leg_stack->AddEntry(hist.at(k_plot_dirt), Form("Out-of Cryo (%2.1f)", hist_integrals.at(_util.k_part_dirt)), "f");
         if (found_ext)  leg_stack->AddEntry(hist.at(k_plot_ext), Form("Beam-Off Data (%2.1f)", hist_integrals.at(_util.k_part_ext)), "f");
         // leg_stack->AddEntry(hist.at(_util.k_part_unmatched), Form("Unmatched (%2.1f)", hist_integrals.at(_util.k_part_unmatched)), "f");
         leg_stack->AddEntry(hist.at(_util.k_kaon), Form("K (%2.1f)", hist_integrals.at(_util.k_kaon)), "f");
@@ -1534,7 +1534,7 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
     leg_stack->SetFillStyle(0);
 
     leg_stack->AddEntry(hist.at(_util.k_data), "Beam-On Data", "lep");
-    leg_stack->AddEntry(hist.at(_util.k_dirt), "Dirt", "f");
+    leg_stack->AddEntry(hist.at(_util.k_dirt), "Out-of Cryo", "f");
     leg_stack->AddEntry(hist.at(_util.k_mc),   "Overlay", "f");
     leg_stack->AddEntry(hist.at(_util.k_ext),  "Beam-Off Data", "f");
 
@@ -1697,8 +1697,8 @@ void HistogramPlotter::MakeFlashPlotOMO(double Data_POT, const char *print_name,
     leg_stack->SetFillStyle(0);
 
     leg_stack->AddEntry(hist.at(_util.k_data), "Beam-On - Beam-Off Data", "lep");
-    leg_stack->AddEntry(hist.at(_util.k_dirt), "Dirt", "f");
-    leg_stack->AddEntry(hist.at(_util.k_mc), "Overlay", "f");
+    leg_stack->AddEntry(hist.at(_util.k_dirt), "Out-of Cryo", "f");
+    leg_stack->AddEntry(hist.at(_util.k_mc),   "Overlay", "f");
 
     leg_stack->Draw();
 

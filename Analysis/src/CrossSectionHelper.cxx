@@ -145,10 +145,23 @@ void CrossSectionHelper::LoopEvents(){
                     // Note we actually dont want to divide out by the spline, but since this is 1 in numi, it doesnt matter!
                     // We do this because the interaction systematics are shifted about the genie tune as the CV
 
-                    if (std::isnan(weightSplineTimesTune) == 1)   weightSplineTimesTune   = 1.0;
-                    if (std::isinf(weightSplineTimesTune))        weightSplineTimesTune   = 1.0; 
-                    if (weightSplineTimesTune == 0) weightSplineTimesTune = 1.0;
-                    weight_uni = cv_weight * vec_universes.at(uni) / weightSplineTimesTune;
+                    if (std::isnan(weightSplineTimesTune) == 1 || std::isinf(weightSplineTimesTune) || weightSplineTimesTune <= 0 || weightSplineTimesTune > 30) {
+                        // std::cout << "Bad Tune weight: " << weightSplineTimesTune << " " << *classification << "   "<< gen<< std::endl;
+                        weightSplineTimesTune   = 1.0;
+                    }
+
+                    if (std::isnan(vec_universes.at(uni)) == 1 || std::isinf(vec_universes.at(uni)) || vec_universes.at(uni) < 0 || vec_universes.at(uni) > 30) {
+                        // std::cout << "Bad Uni weight: " << vec_universes.at(uni) << " " << *classification << "   "<< gen<< std::endl;
+                        
+                        // We set the universe to be the spline times tune, so it cancels with the divide below to just return the CV weight
+                        // i.e. a universe weight of 1
+                        vec_universes.at(uni)   = weightSplineTimesTune;
+                    }
+
+                    weight_uni = (cv_weight * vec_universes.at(uni)) / weightSplineTimesTune;
+
+                    // std::cout << vec_universes.at(uni) << " " << weight_uni << "   "<< weightSplineTimesTune<< std::endl;
+
                 }
 
 
