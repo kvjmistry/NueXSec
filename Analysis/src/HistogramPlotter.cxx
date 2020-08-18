@@ -667,31 +667,31 @@ void HistogramPlotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, s
     if (plotmode == "classifications" || plotmode == "classifications_pi0" || plotmode == "classifications_numu") {
         if (found_data) leg_stack->AddEntry(hist.at(k_plot_data), Form("Beam-On Data (%2.1f)", hist_integrals.at(_util.k_leg_data)), "lep");
         if (found_dirt) leg_stack->AddEntry(hist.at(k_plot_dirt), Form("Out-of Cryo (%2.1f)", hist_integrals.at(_util.k_leg_dirt)), "f");
-        if (found_ext) leg_stack->AddEntry(hist.at(k_plot_ext), Form("Beam-Off Data (%2.1f)", hist_integrals.at(_util.k_leg_ext)), "f");
+        if (found_ext)  leg_stack->AddEntry(hist.at(k_plot_ext),  Form("Beam-Off Data (%2.1f)", hist_integrals.at(_util.k_leg_ext)), "f");
         // leg_stack->AddEntry(hist.at(_util.k_unmatched),       Form("Unmatched (%2.1f)",           hist_integrals.at(_util.k_unmatched)),    "f"); // This should be zero, so dont plot
-        leg_stack->AddEntry(hist.at(_util.k_nc_pi0), Form("NC #pi^{0} (%2.1f)", hist_integrals.at(_util.k_nc_pi0)), "f");
-        leg_stack->AddEntry(hist.at(_util.k_nc), Form("NC (%2.1f)", hist_integrals.at(_util.k_nc)), "f");
+        leg_stack->AddEntry(hist.at(_util.k_nc_pi0),      Form("NC #pi^{0} (%2.1f)", hist_integrals.at(_util.k_nc_pi0)), "f");
+        leg_stack->AddEntry(hist.at(_util.k_nc),          Form("NC (%2.1f)", hist_integrals.at(_util.k_nc)), "f");
         leg_stack->AddEntry(hist.at(_util.k_numu_cc_pi0), Form("#nu_{#mu} CC #pi^{0} (%2.1f)", hist_integrals.at(_util.k_numu_cc_pi0)), "f");
-        leg_stack->AddEntry(hist.at(_util.k_numu_cc), Form("#nu_{#mu} CC (%2.1f)", hist_integrals.at(_util.k_numu_cc)), "f");
-        leg_stack->AddEntry(hist.at(_util.k_cosmic), Form("Cosmic (%2.1f)", hist_integrals.at(_util.k_cosmic)), "f");
-        leg_stack->AddEntry(hist.at(_util.k_nu_out_fv), Form("#nu OutFV (%2.1f)", hist_integrals.at(_util.k_nu_out_fv)), "f");
-        leg_stack->AddEntry(hist.at(_util.k_nuebar_cc), Form("#bar{#nu}_{e} CC (%2.1f)", hist_integrals.at(_util.k_nuebar_cc)), "f");
-        leg_stack->AddEntry(hist.at(_util.k_nue_cc), Form("#nu_{e} CC (%2.1f)", hist_integrals.at(_util.k_nue_cc)), "f");
+        leg_stack->AddEntry(hist.at(_util.k_numu_cc),     Form("#nu_{#mu} CC (%2.1f)", hist_integrals.at(_util.k_numu_cc)), "f");
+        leg_stack->AddEntry(hist.at(_util.k_cosmic),      Form("Cosmic (%2.1f)", hist_integrals.at(_util.k_cosmic)), "f");
+        leg_stack->AddEntry(hist.at(_util.k_nu_out_fv),   Form("#nu OutFV (%2.1f)", hist_integrals.at(_util.k_nu_out_fv)), "f");
+        leg_stack->AddEntry(hist.at(_util.k_nuebar_cc),   Form("#bar{#nu}_{e} CC (%2.1f)", hist_integrals.at(_util.k_nuebar_cc)), "f");
+        leg_stack->AddEntry(hist.at(_util.k_nue_cc),      Form("#nu_{e} CC (%2.1f)", hist_integrals.at(_util.k_nue_cc)), "f");
     }
 
     else {
         if (found_data) leg_stack->AddEntry(hist.at(k_plot_data), Form("Beam-On Data (%2.1f)", hist_integrals.at(_util.k_part_data)), "lep");
         if (found_dirt) leg_stack->AddEntry(hist.at(k_plot_dirt), Form("Out-of Cryo (%2.1f)", hist_integrals.at(_util.k_part_dirt)), "f");
-        if (found_ext)  leg_stack->AddEntry(hist.at(k_plot_ext), Form("Beam-Off Data (%2.1f)", hist_integrals.at(_util.k_part_ext)), "f");
+        if (found_ext)  leg_stack->AddEntry(hist.at(k_plot_ext),  Form("Beam-Off Data (%2.1f)", hist_integrals.at(_util.k_part_ext)), "f");
         // leg_stack->AddEntry(hist.at(_util.k_part_unmatched), Form("Unmatched (%2.1f)", hist_integrals.at(_util.k_part_unmatched)), "f");
-        leg_stack->AddEntry(hist.at(_util.k_kaon), Form("K (%2.1f)", hist_integrals.at(_util.k_kaon)), "f");
-        leg_stack->AddEntry(hist.at(_util.k_proton), Form("p (%2.1f)", hist_integrals.at(_util.k_proton)), "f");
+        leg_stack->AddEntry(hist.at(_util.k_kaon),        Form("K (%2.1f)", hist_integrals.at(_util.k_kaon)), "f");
+        leg_stack->AddEntry(hist.at(_util.k_proton),      Form("p (%2.1f)", hist_integrals.at(_util.k_proton)), "f");
         leg_stack->AddEntry(hist.at(_util.k_part_cosmic), Form("Cosmic (%2.1f)", hist_integrals.at(_util.k_part_cosmic)), "f");
-        leg_stack->AddEntry(hist.at(_util.k_muon), Form("#mu (%2.1f)", hist_integrals.at(_util.k_muon)), "f");
-        leg_stack->AddEntry(hist.at(_util.k_photon), Form("#gamma (%2.1f)", hist_integrals.at(_util.k_photon)), "f");
-        leg_stack->AddEntry(hist.at(_util.k_pion), Form("#pi (%2.1f)", hist_integrals.at(_util.k_pion)), "f");
-        leg_stack->AddEntry(hist.at(_util.k_neutron), Form("n (%2.1f)", hist_integrals.at(_util.k_neutron)), "f");
-        leg_stack->AddEntry(hist.at(_util.k_electron), Form("e (%2.1f)", hist_integrals.at(_util.k_electron)), "f");
+        leg_stack->AddEntry(hist.at(_util.k_muon),        Form("#mu (%2.1f)", hist_integrals.at(_util.k_muon)), "f");
+        leg_stack->AddEntry(hist.at(_util.k_photon),      Form("#gamma (%2.1f)", hist_integrals.at(_util.k_photon)), "f");
+        leg_stack->AddEntry(hist.at(_util.k_pion),        Form("#pi (%2.1f)", hist_integrals.at(_util.k_pion)), "f");
+        leg_stack->AddEntry(hist.at(_util.k_neutron),     Form("n (%2.1f)", hist_integrals.at(_util.k_neutron)), "f");
+        leg_stack->AddEntry(hist.at(_util.k_electron),    Form("e (%2.1f)", hist_integrals.at(_util.k_electron)), "f");
     }
 }
 // -----------------------------------------------------------------------------

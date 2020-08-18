@@ -757,7 +757,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
 
             // Customise
             h_universe.at(uni).at(k)->SetLineWidth(1);
-            h_universe.at(uni).at(k)->SetLineColor(kGreen+2);
+            h_universe.at(uni).at(k)->SetLineColor(kAzure+5);
             
         }
     }
@@ -845,7 +845,24 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
 
         }
 
-        cv_hist_vec_clone.at(k)->Draw("E,same");
+        if (xsec_types.at(k) == "mc_xsec") {
+            // cv_hist_vec_clone.at(k)->SetFillColorAlpha(kRed+2, 0.00);
+            // cv_hist_vec_clone.at(k)->SetFillColor(kBlack);
+            // cv_hist_vec_clone.at(k)->SetFillStyle(3444);
+            cv_hist_vec_clone.at(k)->SetLineColor(kBlack);
+            cv_hist_vec_clone.at(k)->SetFillStyle(0);
+            // cv_hist_vec_clone.at(k)->SetMarkerStyle(47);
+            // cv_hist_vec_clone.at(k)->SetMarkerSize(0.4);
+            cv_hist_vec_clone.at(k)->SetMarkerColor(kBlack);
+            cv_hist_vec_clone.at(k)->Draw("E2,hist,same");
+        }
+        else { 
+            cv_hist_vec_clone.at(k)->Draw("E,same");
+        }
+
+        
+
+        
         
 
         h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, scale_val*1.2);
@@ -858,7 +875,8 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
         leg->AddEntry(h_universe.at(0).at(k), Form("%s - All Universes", label_pretty.c_str()), "l");
-        leg->AddEntry(cv_hist_vec_clone.at(k),           "Central Value", "le");
+        if (xsec_types.at(k) == "mc_xsec")leg->AddEntry(cv_hist_vec_clone.at(k),           "Central Value", "ef");
+        else leg->AddEntry(cv_hist_vec_clone.at(k),           "Central Value", "le");
         leg->Draw();
 
         bottomPad->cd();
@@ -871,14 +889,14 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
             h_err->SetBinContent(g, 100 * h_err->GetBinError(g)/h_err->GetBinContent(g));
         }
         h_err->SetLineWidth(2);
-        h_err->SetLineColor(kGreen+2);
+        h_err->SetLineColor(kAzure+5);
         h_err->GetYaxis()->SetRangeUser(0, 50);
 
         h_err->GetXaxis()->SetLabelSize(0.13);
         h_err->GetXaxis()->SetTitleOffset(0.9);
         h_err->GetXaxis()->SetTitleSize(0.13);
         h_err->GetYaxis()->SetLabelSize(0.13);
-        // h_err->GetYaxis()->SetNdivisions(-5, kFALSE); // Why the f*** is this freezing!!!
+        h_err->GetYaxis()->SetNdivisions(4, 0, 0, kTRUE);
         h_err->GetYaxis()->SetTitleSize(12);
         h_err->GetYaxis()->SetTitleFont(44);
         h_err->GetYaxis()->CenterTitle();
