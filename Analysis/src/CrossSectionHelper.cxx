@@ -170,18 +170,18 @@ void CrossSectionHelper::LoopEvents(){
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_sig, weight_uni, shr_energy_cali, elec_e);
-                    FillHists(label, uni, k_xsec_sel, weight_uni, shr_energy_cali, elec_e);
+                    FillHists(label, uni, k_xsec_sel, cv_weight, shr_energy_cali, elec_e);  // Selected events (N term) we dont weight
 
                 }
 
                 // Background event
-                if ( *classification == "nu_out_fv"  || *classification == "cosmic"      ||
-                     *classification == "numu_cc"    || *classification == "numu_cc_pi0" || *classification == "nc" || 
+                if ( *classification == "nu_out_fv"  || *classification == "cosmic"       ||
+                     *classification == "numu_cc"    || *classification == "numu_cc_pi0"  || *classification == "nc" || 
                      *classification == "nc_pi0"     || ((*classification == "cosmic_nue" || *classification == "cosmic_nuebar") && !gen)  ) {
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_bkg, weight_uni, shr_energy_cali, elec_e);
-                    FillHists(label, uni, k_xsec_sel, weight_uni, shr_energy_cali, elec_e);
+                    FillHists(label, uni, k_xsec_sel, cv_weight, shr_energy_cali, elec_e);  // Selected events (N term) we dont weight
                     
                 }
 
