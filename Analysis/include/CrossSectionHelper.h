@@ -151,6 +151,29 @@ class CrossSectionHelper{
 
     std::vector<std::string> reweighter_labels = {
         "CV",    // Dont comment this out
+        "Horn_p2kA",
+        "Horn_m2kA",
+        "Horn1_x_p3mm",
+        "Horm1_x_m3mm",
+        "Horn1_y_p3mm",
+        "Horn1_y_m3mm",
+        "Beam_spot_1_1mm",
+        "Beam_spot_1_5mm",
+        "Horn2_x_p3mm",
+        "Horm2_x_m3mm",
+        "Horn2_y_p3mm",
+        "Horn2_y_m3mm",
+        "Horns_0mm_water",
+        "Horns_2mm_water",
+        "Beam_shift_x_p1mm",
+        "Beam_shift_x_m1mm",
+        "Beam_shift_y_p1mm",
+        "Beam_shift_y_m1mm",
+        "Target_z_p7mm",
+        "Target_z_m7mm",
+        "Horn1_refined_descr",
+        "Decay_pipe_Bfield",
+        "Old_Horn_Geometry",
         "RPAup",
         "CCMECup",
         "AxFFCCQEup",
@@ -170,10 +193,10 @@ class CrossSectionHelper{
         "ThetaDelta2NRaddn",
         "RPA_CCQE_Reduceddn",
         "NormCCCOHdn",
-        "NormNCCOHdn",
-        // "weightsGenie"
-        // "weightsReint",
-        "weightsPPFX"
+        "NormNCCOHdn"
+        // // "weightsGenie"
+        // // "weightsReint",
+        // "weightsPPFX"
     };
 
     std::vector<std::vector<TH2D*>> beamline_hists;
@@ -287,6 +310,10 @@ class CrossSectionHelper{
     // from the beamline file
     bool CheckBeamline(std::string variation);
     // -------------------------------------------------------------------------
+    // Get the index of the beamline variation so we can get the correct histogram to weight from
+    int GetBeamlineIndex(std::string variation);
+    // -------------------------------------------------------------------------
+
 
 
 

@@ -590,6 +590,30 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeUnisim("NormCCCOH",        var, "Norm CC COH" );
         PlotReweightingModeUnisim("NormNCCOH",        var, "Norm NC COH" );
 
+        // PlotReweightingModeUnisim("Horn_p2kA",          var, "Horn +2kA" );
+        // PlotReweightingModeUnisim("Horn_m2kA",          var, "Horn -2kA" );
+        // PlotReweightingModeUnisim("Horn1_x_p3mm",       var, "Horn 1 x +3mm" );
+        // PlotReweightingModeUnisim("Horm1_x_m3mm",       var, "Horm 1 x -3mm" );
+        // PlotReweightingModeUnisim("Horn1_y_p3mm",       var, "Horn1 y +3mm" );
+        // PlotReweightingModeUnisim("Horn1_y_m3mm",       var, "Horn1 y -3mm" );
+        // PlotReweightingModeUnisim("Beam_spot_1_1mm",    var, "Beam spot 1.1mm" );
+        // PlotReweightingModeUnisim("Beam_spot_1_5mm",    var, "Beam spot 1.5mm" );
+        // PlotReweightingModeUnisim("Horn2_x_p3mm",       var, "Horn 2 x +3mm" );
+        // PlotReweightingModeUnisim("Horm2_x_m3mm",       var, "Horm 2 x -3mm" );
+        // PlotReweightingModeUnisim("Horn2_y_p3mm",       var, "Horn 2 y +3mm" );
+        // PlotReweightingModeUnisim("Horn2_y_m3mm",       var, "Horn 2 y -3mm" );
+        // PlotReweightingModeUnisim("Horns_0mm_water",    var, "Horns 0mm water" );
+        // PlotReweightingModeUnisim("Horns_2mm_water",    var, "Horns 2mm water" );
+        // PlotReweightingModeUnisim("Beam_shift_x_p1mm",  var, "Beam shift x +1mm" );
+        // PlotReweightingModeUnisim("Beam_shift_x_m1mm",  var, "Beam shift x -1mm" );
+        // PlotReweightingModeUnisim("Beam_shift_y_p1mm",  var, "Beam shift y +1mm" );
+        // PlotReweightingModeUnisim("Beam_shift_y_m1mm",  var, "Beam shift y -1mm" );
+        // PlotReweightingModeUnisim("Target_z_p7mm",      var, "Target z +7mm" );
+        // PlotReweightingModeUnisim("Target_z_m7mm",      var, "Target z -7mm" );
+        // PlotReweightingModeUnisim("Horn1_refined_descr",var, "Horn 1 Refined Desc." );
+        // PlotReweightingModeUnisim("Decay_pipe_Bfield",  var, "Decay pipe Bfield" );
+        // PlotReweightingModeUnisim("Old_Horn_Geometry",  var, "Old Horn Geometry" );
+
         // Plot the multisims
         PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 500);
         PlotReweightingModeMultisim("weightsReint", var,  "Geant Reinteractions", 1000);
