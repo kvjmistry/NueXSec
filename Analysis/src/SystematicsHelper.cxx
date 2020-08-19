@@ -902,6 +902,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_err->GetYaxis()->CenterTitle();
         h_err->GetYaxis()->SetTitleOffset(1.5);
         h_err->SetTitle(" ");
+        h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
         
         h_err->GetYaxis()->SetTitle("\% Uncertainty");
         h_err->Draw("hist, text00");

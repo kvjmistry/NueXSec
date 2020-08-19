@@ -71,7 +71,11 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
     }
     
     // Get the integrated flux for the CV
-    integrated_flux = GetIntegratedFlux(0, "CV", "");
+    integrated_flux = GetIntegratedFlux(0, "CV", "", "");
+
+
+    // Now lets open the beamline variation files
+    GetBeamlineHists();
 
     f_nuexsec->cd();
 
@@ -101,16 +105,17 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
 // -----------------------------------------------------------------------------
 void CrossSectionHelper::LoopEvents(){
 
-    // Loop over the tree entries
+    
     std::cout << "Total Tree Entries: "<< tree->GetEntries() << std::endl;
 
     int n_gen = 0;
 
+    // Loop over the tree entries and weight the events in each universe
     for (unsigned int ievent = 0; ievent < tree->GetEntries(); ievent++){
 
         tree->GetEntry(ievent); 
 
-        if (shr_energy_cali > 5.0 && *classification == "data" ) std::cout << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins" <<std::endl;
+        if (shr_energy_cali > 4.0 && *classification == "data" ) std::cout << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins" <<std::endl;
 
         double cv_weight = weight;
 
@@ -140,6 +145,11 @@ void CrossSectionHelper::LoopEvents(){
                 // If we are using the genie systematics and unisim systematics then we want to undo the genie tune on them
                 if (reweighter_labels.at(label) == "weightsReint" || reweighter_labels.at(label) == "weightsPPFX" || reweighter_labels.at(label) == "CV" ){
                     weight_uni = cv_weight * vec_universes.at(uni);
+                }
+                // This is a beamline variation
+                else if (CheckBeamline(reweighter_labels.at(label))){
+                    std::cout << "Beamline variation!" << std::endl;
+                    // weight_uni = cv_weight * 
                 }
                 else {
                     // Note we actually dont want to divide out by the spline, but since this is 1 in numi, it doesnt matter!
@@ -246,7 +256,7 @@ void CrossSectionHelper::LoopEvents(){
                 temp_integrated_flux = integrated_flux;
 
                 // If we are reweighting by the PPFX Multisims, we need to change the integrated flux too
-                if (reweighter_labels.at(label) == "weightsPPFX") temp_integrated_flux = GetIntegratedFlux(uni, "HP", "ppfx_ms_UBPPFX");
+                if (reweighter_labels.at(label) == "weightsPPFX") temp_integrated_flux = GetIntegratedFlux(uni, "HP", "ppfx_ms_UBPPFX", reweighter_labels.at(label));
 
                 // Calculate the efficiency histogram -- this is incorrect, we need to smear the truth efficiency!
                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff)->Divide(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(var).at(k_xsec_gen));
@@ -369,7 +379,7 @@ void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg,
 
 }
 // -----------------------------------------------------------------------------
-double CrossSectionHelper::GetIntegratedFlux(int uni, std::string value, std::string label){
+double CrossSectionHelper::GetIntegratedFlux(int uni, std::string value, std::string label, std::string variation){
 
     f_flux->cd();
 
@@ -690,7 +700,7 @@ void CrossSectionHelper::SwitchReweighterLabel(std::string label){
     else if (label == "NormNCCOHdn"){
         vec_universes.push_back(knobNormNCCOHdn);
     }
-    // This can be the CV
+    // This can be the CV or any beamline variation
     else {
         vec_universes.push_back(1.0);
     }
@@ -850,3 +860,138 @@ void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double wei
 
 }
 // -----------------------------------------------------------------------------
+void CrossSectionHelper::GetBeamlineHists(){
+
+    // Resize the vector
+    beamline_hists.resize(beamline_map.size());
+
+    for (unsigned int f = 0; f < beamline_map.size(); f++){
+        beamline_hists.at(f).resize(k_flav_max);
+    }
+
+    // resize the beamline flux vector
+    beamline_flux.resize(beamline_map.size(), 0.0);
+
+
+    // Loop over the beamline files and store the locations in a TFile
+    for (unsigned int f = 0; f < beamline_map.size(); f++){
+        TFile *f_temp;
+        TH2D *htemp;
+        TH2D* h_cv;
+
+        // Get the beamline file
+        if (run_period == "1"){
+            f_temp = TFile::Open(Form("Systematics/beamline/FHC/output_uboone_fhc_run%i.root", beamline_map.at(f).second));
+        }
+        else if(run_period == "3") {
+            f_temp = TFile::Open(Form("Systematics/beamline/RHC/output_uboone_rhc_run%i.root", beamline_map.at(f).second));
+        }
+        else {
+            std::cout << "Unknown run period, exiting...."<< std::endl;
+            exit(1);
+        }
+
+        if (f_temp == NULL){
+            std::cout << "Error in opening beamline file!, EXITING"<< std::endl;
+            exit(2);
+        }
+
+
+        // -------------------------------------------------------------------------
+        
+        // Get the NuMu histogram from the beamline file
+        htemp = (TH2D*)f_temp->Get("numu/Detsmear/numu_CV_AV_TPC_2D");
+        beamline_hists.at(f).at(k_numu) = (TH2D*) htemp->Clone(Form("%s_%i", beamline_map.at(f).first.c_str(), k_numu));
+
+        // Now divide it by the CV
+        f_flux->cd();
+        _util.GetHist(f_flux, h_cv,         "numu/Detsmear/numu_CV_AV_TPC_2D");       
+        beamline_hists.at(f).at(k_numu)->Divide(h_cv);
+        f_temp->cd();
+
+        // -------------------------------------------------------------------------
+        
+        // Get the NuMubar histogram from the beamline file
+        htemp = (TH2D*)f_temp->Get("numubar/Detsmear/numubar_CV_AV_TPC_2D");
+        beamline_hists.at(f).at(k_numubar) = (TH2D*) htemp->Clone(Form("%s_%i", beamline_map.at(f).first.c_str(), k_numubar));
+
+        // Now divide it by the CV
+        f_flux->cd();
+        _util.GetHist(f_flux, h_cv,         "numubar/Detsmear/numubar_CV_AV_TPC_2D");       
+        beamline_hists.at(f).at(k_numubar)->Divide(h_cv);
+        f_temp->cd();
+
+        // -------------------------------------------------------------------------
+
+        // Get the Nue histogram from the beamline file
+        htemp = (TH2D*)f_temp->Get("nue/Detsmear/nue_CV_AV_TPC_2D");
+        beamline_hists.at(f).at(k_nue) = (TH2D*) htemp->Clone(Form("%s_%i", beamline_map.at(f).first.c_str(), k_nue));
+
+        // Get the flux before dividing
+        double xbin_th   = beamline_hists.at(f).at(k_nue)->GetXaxis()->FindBin(energy_threshold);              // find the x bin to integrate from 
+        beamline_flux.at(f) += beamline_hists.at(f).at(k_nue)->Integral( xbin_th, beamline_hists.at(f).at(k_nue)->GetNbinsX()+1, 0, beamline_hists.at(f).at(k_nue)->GetNbinsY()+1); // Integrate over the flux
+    
+        // Now divide it by the CV
+        f_flux->cd();
+        _util.GetHist(f_flux, h_cv,         "nue/Detsmear/nue_CV_AV_TPC_2D");       
+        beamline_hists.at(f).at(k_nue)->Divide(h_cv);
+        f_temp->cd();
+
+        // -------------------------------------------------------------------------
+
+        // Get the Nuebar histogram from the beamline file
+        htemp = (TH2D*)f_temp->Get("nuebar/Detsmear/nuebar_CV_AV_TPC_2D");
+        beamline_hists.at(f).at(k_nuebar) = (TH2D*) htemp->Clone(Form("%s_%i", beamline_map.at(f).first.c_str(), k_nuebar));
+        
+        // Get the flux before dividing
+        xbin_th   = beamline_hists.at(f).at(k_nuebar)->GetXaxis()->FindBin(energy_threshold);              // find the x bin to integrate from 
+        beamline_flux.at(f) += beamline_hists.at(f).at(k_nuebar)->Integral( xbin_th, beamline_hists.at(f).at(k_nuebar)->GetNbinsX()+1, 0, beamline_hists.at(f).at(k_nuebar)->GetNbinsY()+1); // Integrate over the flux
+
+        // Now divide it by the CV
+        f_flux->cd();
+        _util.GetHist(f_flux, h_cv,         "nuebar/Detsmear/nuebar_CV_AV_TPC_2D");       
+        beamline_hists.at(f).at(k_nuebar)->Divide(h_cv);
+        f_temp->cd();
+
+        // Now divide by the total POT 
+        beamline_flux.at(f) /= GetPOT(f_temp);
+
+        f_temp->Close();
+
+        // -------------------------------------------------------------------------
+    }
+
+}
+// -----------------------------------------------------------------------------
+bool CrossSectionHelper::CheckBeamline(std::string variation){
+
+    if (variation == "Horn_p2kA"           ||
+        variation == "Horn_m2kA"           ||
+        variation == "Horn1_x_p3mm"        ||
+        variation == "Horm1_x_m3mm"        ||
+        variation == "Horn1_y_p3mm"        ||
+        variation == "Horn1_y_m3mm"        ||
+        variation == "Beam_spot_1_1mm"     ||
+        variation == "Beam_spot_1_5mm"     ||
+        variation == "Horn2_x_p3mm"        ||
+        variation == "Horm2_x_m3mm"        ||
+        variation == "Horn2_y_p3mm"        ||
+        variation == "Horn2_y_m3mm"        ||
+        variation == "Horns_0mm_water"     ||
+        variation == "Horns_2mm_water"     ||
+        variation == "Beam_shift_x_p1mm"   ||
+        variation == "Beam_shift_x_m1mm"   ||
+        variation == "Beam_shift_y_p1mm"   ||
+        variation == "Beam_shift_y_m1mm"   ||
+        variation == "Target_z_p7mm"       ||
+        variation == "Target_z_m7mm"       ||
+        variation == "Horn1_refined_descr" ||
+        variation == "Decay_pipe_Bfield"   ||
+        variation == "Old_Horn_Geometry") {
+        return true;
+    }
+    else {
+        return false;
+    }
+
+}

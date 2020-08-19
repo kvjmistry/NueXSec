@@ -18,7 +18,8 @@ class CrossSectionHelper{
 
     // Set threshold to integrate the flux from [GeV]
     // Remember to make sure you set this number past the bin boundary or it wont work
-    double energy_threshold = 0.0; 
+    // Current flux bins are 0.00 ,0.06, 0.125, 0.25, 0.5... GeV
+    double energy_threshold = 0.07; 
 
     // Scale factors (everything is scaled to data)
     double mc_scale_factor     = 1.0;
@@ -150,30 +151,97 @@ class CrossSectionHelper{
 
     std::vector<std::string> reweighter_labels = {
         "CV",    // Dont comment this out
-        // "RPAup",
-        // "CCMECup",
-        // "AxFFCCQEup",
-        // "VecFFCCQEup",
-        // "DecayAngMECup",
-        // "ThetaDelta2Npiup",
-        // "ThetaDelta2NRadup",
-        // "RPA_CCQE_Reducedup",
-        // "NormCCCOHup",
-        // "NormNCCOHup",
-        // "RPAdn",
-        // "CCMECdn",
-        // "AxFFCCQEdn",
-        // "VecFFCCQEdn",
-        // "DecayAngMECdn",
-        // "ThetaDelta2Npidn",
-        // "ThetaDelta2NRaddn",
-        // "RPA_CCQE_Reduceddn",
-        // "NormCCCOHdn",
-        // "NormNCCOHdn",
-        "weightsGenie"
+        "RPAup",
+        "CCMECup",
+        "AxFFCCQEup",
+        "VecFFCCQEup",
+        "DecayAngMECup",
+        "ThetaDelta2Npiup",
+        "ThetaDelta2NRadup",
+        "RPA_CCQE_Reducedup",
+        "NormCCCOHup",
+        "NormNCCOHup",
+        "RPAdn",
+        "CCMECdn",
+        "AxFFCCQEdn",
+        "VecFFCCQEdn",
+        "DecayAngMECdn",
+        "ThetaDelta2Npidn",
+        "ThetaDelta2NRaddn",
+        "RPA_CCQE_Reduceddn",
+        "NormCCCOHdn",
+        "NormNCCOHdn",
+        // "weightsGenie"
         // "weightsReint",
-        // "weightsPPFX"
+        "weightsPPFX"
     };
+
+    std::vector<std::vector<TH2D*>> beamline_hists;
+    std::vector<double> beamline_flux;
+
+    enum nu_flav {
+        k_numu,
+        k_numubar,
+        k_nue,
+        k_nuebar,
+        k_flav_max
+    };
+
+    // vector fo going to and from each beamline pair
+    std::vector< std::pair<std::string,int>> beamline_map= {
+        {"Horn_p2kA",           1}, 
+        {"Horn_m2kA",           2}, 
+        {"Horn1_x_p3mm",        3},
+        {"Horm1_x_m3mm",        4},
+        {"Horn1_y_p3mm",        5},
+        {"Horn1_y_m3mm",        6},
+        {"Beam_spot_1_1mm",     7},
+        {"Beam_spot_1_5mm",     8},
+        {"Horn2_x_p3mm",        9},
+        {"Horm2_x_m3mm",        10},
+        {"Horn2_y_p3mm",        11},
+        {"Horn2_y_m3mm",        12},
+        {"Horns_0mm_water",     13},
+        {"Horns_2mm_water",     14},
+        {"Beam_shift_x_p1mm",   15},
+        {"Beam_shift_x_m1mm",   16},
+        {"Beam_shift_y_p1mm",   17},
+        {"Beam_shift_y_m1mm",   18},
+        {"Target_z_p7mm",       19},
+        {"Target_z_m7mm",       20},
+        {"Horn1_refined_descr", 21},
+        {"Decay_pipe_Bfield",   22},
+        {"Old_Horn_Geometry",   23}
+    };
+
+    enum beamline_enums {
+        k_Horn_p2kA,
+        k_Horn_m2kA,
+        k_Horn1_x_p3mm,
+        k_Horm1_x_m3mm,
+        k_Horn1_y_p3mm,
+        k_Horn1_y_m3mm,
+        k_Beam_spot_1_1mm,
+        k_Beam_spot_1_5mm,
+        k_Horn2_x_p3mm,
+        k_Horm2_x_m3mm,
+        k_Horn2_y_p3mm,
+        k_Horn2_y_m3mm,
+        k_Horns_0mm_water,
+        k_Horns_2mm_water,
+        k_Beam_shift_x_p1mm,
+        k_Beam_shift_x_m1mm,
+        k_Beam_shift_y_p1mm,
+        k_Beam_shift_y_m1mm,
+        k_Target_z_p7mm,
+        k_Target_z_m7mm,
+        k_Horn1_refined_descr,
+        k_Decay_pipe_Bfield,
+        k_Old_Horn_Geometry,
+        k_beamline_max
+    };
+
+
 
 
     // -------------------------------------------------------------------------
@@ -190,7 +258,7 @@ class CrossSectionHelper{
     void CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double ext_scale_factor, TH1D* h_ext, double dirt_scale_factor, TH1D* h_dirt, TH1D* h_xsec, double targ, std::string mcdata);
     // -------------------------------------------------------------------------
     // Function to get the integrated flux OR a weight
-    double GetIntegratedFlux(int uni, std::string value, std::string label);
+    double GetIntegratedFlux(int uni, std::string value, std::string label, std::string variation);
     // -------------------------------------------------------------------------
     // Function to get the POT from the flux file
     double GetPOT(TFile* f);
@@ -211,6 +279,15 @@ class CrossSectionHelper{
     // Helper function to fill the histograms
     void FillHists(int label, int uni, int xsec_type, double weight_uni, float shr_energy_cali, float elec_e);
     // -------------------------------------------------------------------------
+    // Function to get the beamline files and open them
+    void GetBeamlineHists();
+    // -------------------------------------------------------------------------
+    // Checks whether the variation is a beamline
+    // We use this to override the weights and integrated flux so we can get them
+    // from the beamline file
+    bool CheckBeamline(std::string variation);
+    // -------------------------------------------------------------------------
+
 
 
 
