@@ -19,7 +19,7 @@ class CrossSectionHelper{
     // Set threshold to integrate the flux from [GeV]
     // Remember to make sure you set this number past the bin boundary or it wont work
     // Current flux bins are 0.00 ,0.06, 0.125, 0.25, 0.5... GeV
-    double energy_threshold = 0.07; 
+    double energy_threshold = 0.130; 
 
     // Scale factors (everything is scaled to data)
     double mc_scale_factor     = 1.0;
@@ -193,10 +193,10 @@ class CrossSectionHelper{
         "ThetaDelta2NRaddn",
         "RPA_CCQE_Reduceddn",
         "NormCCCOHdn",
-        "NormNCCOHdn"
-        // // "weightsGenie"
-        // // "weightsReint",
-        // "weightsPPFX"
+        "NormNCCOHdn",
+        // "weightsGenie",
+        // "weightsReint"
+        "weightsPPFX"
     };
 
     std::vector<std::vector<TH2D*>> beamline_hists;

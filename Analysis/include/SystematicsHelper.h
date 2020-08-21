@@ -73,6 +73,9 @@ class SystematicsHelper{
     // Compare the data cross section to mc cross section for each variation
     void CompareVariationXSec(std::string label, int var, std::string label_pretty);
     // -------------------------------------------------------------------------
+    // Set the up down variation names
+    void SetLabelName(std::string label, std::string &label_up, std::string &label_dn);
+    // -------------------------------------------------------------------------
 
 
 

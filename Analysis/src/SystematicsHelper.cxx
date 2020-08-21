@@ -590,29 +590,19 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeUnisim("NormCCCOH",        var, "Norm CC COH" );
         PlotReweightingModeUnisim("NormNCCOH",        var, "Norm NC COH" );
 
-        // PlotReweightingModeUnisim("Horn_p2kA",          var, "Horn +2kA" );
-        // PlotReweightingModeUnisim("Horn_m2kA",          var, "Horn -2kA" );
-        // PlotReweightingModeUnisim("Horn1_x_p3mm",       var, "Horn 1 x +3mm" );
-        // PlotReweightingModeUnisim("Horm1_x_m3mm",       var, "Horm 1 x -3mm" );
-        // PlotReweightingModeUnisim("Horn1_y_p3mm",       var, "Horn1 y +3mm" );
-        // PlotReweightingModeUnisim("Horn1_y_m3mm",       var, "Horn1 y -3mm" );
-        // PlotReweightingModeUnisim("Beam_spot_1_1mm",    var, "Beam spot 1.1mm" );
-        // PlotReweightingModeUnisim("Beam_spot_1_5mm",    var, "Beam spot 1.5mm" );
-        // PlotReweightingModeUnisim("Horn2_x_p3mm",       var, "Horn 2 x +3mm" );
-        // PlotReweightingModeUnisim("Horm2_x_m3mm",       var, "Horm 2 x -3mm" );
-        // PlotReweightingModeUnisim("Horn2_y_p3mm",       var, "Horn 2 y +3mm" );
-        // PlotReweightingModeUnisim("Horn2_y_m3mm",       var, "Horn 2 y -3mm" );
-        // PlotReweightingModeUnisim("Horns_0mm_water",    var, "Horns 0mm water" );
-        // PlotReweightingModeUnisim("Horns_2mm_water",    var, "Horns 2mm water" );
-        // PlotReweightingModeUnisim("Beam_shift_x_p1mm",  var, "Beam shift x +1mm" );
-        // PlotReweightingModeUnisim("Beam_shift_x_m1mm",  var, "Beam shift x -1mm" );
-        // PlotReweightingModeUnisim("Beam_shift_y_p1mm",  var, "Beam shift y +1mm" );
-        // PlotReweightingModeUnisim("Beam_shift_y_m1mm",  var, "Beam shift y -1mm" );
-        // PlotReweightingModeUnisim("Target_z_p7mm",      var, "Target z +7mm" );
-        // PlotReweightingModeUnisim("Target_z_m7mm",      var, "Target z -7mm" );
-        // PlotReweightingModeUnisim("Horn1_refined_descr",var, "Horn 1 Refined Desc." );
-        // PlotReweightingModeUnisim("Decay_pipe_Bfield",  var, "Decay pipe Bfield" );
-        // PlotReweightingModeUnisim("Old_Horn_Geometry",  var, "Old Horn Geometry" );
+        PlotReweightingModeUnisim("Horn_curr",          var, "Horn Current" );
+        PlotReweightingModeUnisim("Horn1_x",            var, "Horn 1 x" );
+        PlotReweightingModeUnisim("Horn1_y",            var, "Horn 1 y" );
+        PlotReweightingModeUnisim("Beam_spot",          var, "Beam Spot Size" );
+        PlotReweightingModeUnisim("Horn2_x",            var, "Horn 2 x" );
+        PlotReweightingModeUnisim("Horn2_y",            var, "Horn 2 y" );
+        PlotReweightingModeUnisim("Horn_Water",         var, "Horns Water" );
+        PlotReweightingModeUnisim("Beam_shift_x",       var, "Beam shift x" );
+        PlotReweightingModeUnisim("Beam_shift_y",       var, "Beam shift y" );
+        PlotReweightingModeUnisim("Target_z",           var, "Target z" );
+        PlotReweightingModeUnisim("Horn1_refined_descr",var, "Horn 1 Refined Desc." );
+        PlotReweightingModeUnisim("Decay_pipe_Bfield",  var, "Decay pipe Bfield" );
+        PlotReweightingModeUnisim("Old_Horn_Geometry",  var, "Old Horn Geometry" );
 
         // Plot the multisims
         PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 500);
@@ -621,6 +611,60 @@ void SystematicsHelper::InitialiseReweightingMode(){
         
     }
     
+
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::SetLabelName(std::string label, std::string &label_up, std::string &label_dn){
+
+    if       (label == "Horn_curr"          ){
+        label_up = "Horn_p2kA";
+        label_dn = "Horn_m2kA";
+    }
+    else if  (label == "Horn1_x"       ){
+        label_up = label + "_p3mm";
+        label_dn = "Horm1_x_m3mm";
+    }
+    else if  (label == "Horn1_y"       ){
+        label_up = label + "_p3mm";
+        label_dn = label + "_m3mm";
+    }
+    else if  (label == "Beam_spot"    ){
+        label_up = label + "_1_1mm";
+        label_dn = label + "_1_5mm";
+    }
+    else if  (label == "Horn2_x"       ){
+        label_up = label + "_p3mm";
+        label_dn = "Horm2_x_m3mm";
+    }
+    else if  (label == "Horn2_y"       ){
+        label_up = label + "_p3mm";
+        label_dn = label + "_m3mm";
+    }
+    else if  (label == "Horn_Water"    ){
+        label_up = "Horns_0mm_water";
+        label_dn = "Horns_2mm_water";
+    }
+    else if  (label == "Beam_shift_x"  ){
+        label_up = label + "_p1mm";
+        label_dn = label + "_m1mm";
+    }
+    else if  (label == "Beam_shift_y"  ){
+        label_up = label + "_p1mm";
+        label_dn = label + "_m1mm";
+    }
+    else if  (label == "Target_z"      ){
+        label_up = label + "_p7mm";
+        label_dn = label + "_m7mm";
+    }
+    else if  (label == "Horn1_refined_descr" || label == "Decay_pipe_Bfield" || label == "Old_Horn_Geometry"){
+        label_up = label;
+        label_dn = label;
+    }
+    // Other variation
+    else {
+        label_up = label + "up";
+        label_dn = label + "dn";
+    }
 
 }
 // -----------------------------------------------------------------------------
@@ -639,7 +683,14 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
     // Now get the histograms
     std::string label_up = label + "up";
     std::string label_dn = label + "dn";
-    
+
+    // Set the Unisim up down variation name
+    SetLabelName(label, label_up, label_dn);
+
+    // Check if its just a single on/off type variation
+    // This case we dont want to plot the up/dn, but just once
+    bool single_var = false;
+    if (label_up == label_dn) single_var = true;
 
     // Get the histograms and customise a bit
     for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
@@ -679,7 +730,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
 
         h_universe.at(k_up).at(k)->Draw("hist");
         cv_hist_vec.at(var).at(k)->Draw("hist,same");
-        h_universe.at(k_dn).at(k)->Draw("hist,same");
+        if (!single_var) h_universe.at(k_dn).at(k)->Draw("hist,same");
 
         c->Update();
 
@@ -697,9 +748,16 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
-        leg->AddEntry(h_universe.at(k_up).at(k), Form("%s +1 #sigma", label_pretty.c_str()), "l");
-        leg->AddEntry(cv_hist_vec.at(var).at(k),         "CV", "l");
-        leg->AddEntry(h_universe.at(k_dn).at(k), Form("%s -1 #sigma", label_pretty.c_str()), "l");
+        if (!single_var){
+            leg->AddEntry(h_universe.at(k_up).at(k), Form("%s +1 #sigma", label_pretty.c_str()), "l");
+            leg->AddEntry(cv_hist_vec.at(var).at(k),         "CV", "l");
+            leg->AddEntry(h_universe.at(k_dn).at(k), Form("%s -1 #sigma", label_pretty.c_str()), "l");
+        }
+        else {
+            leg->AddEntry(h_universe.at(k_up).at(k), Form("%s", label_pretty.c_str()), "l");
+            leg->AddEntry(cv_hist_vec.at(var).at(k),         "CV", "l");
+        }
+        
         leg->Draw();
 
         bottomPad->cd();
@@ -727,7 +785,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         h_err_up->GetYaxis()->SetTitle("\% change from CV");
         h_err_up->Draw("hist,same, text00");
         h_err_up->SetMarkerSize(1.6);
-        h_err_dn->Draw("hist,same, text00");
+        if (!single_var) h_err_dn->Draw("hist,same, text00");
         h_err_dn->SetMarkerSize(1.6);
         
         
@@ -869,14 +927,9 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
 
         }
 
-        if (xsec_types.at(k) == "mc_xsec") {
-            // cv_hist_vec_clone.at(k)->SetFillColorAlpha(kRed+2, 0.00);
-            // cv_hist_vec_clone.at(k)->SetFillColor(kBlack);
-            // cv_hist_vec_clone.at(k)->SetFillStyle(3444);
+        if (xsec_types.at(k) != "data_xsec") {
             cv_hist_vec_clone.at(k)->SetLineColor(kBlack);
             cv_hist_vec_clone.at(k)->SetFillStyle(0);
-            // cv_hist_vec_clone.at(k)->SetMarkerStyle(47);
-            // cv_hist_vec_clone.at(k)->SetMarkerSize(0.4);
             cv_hist_vec_clone.at(k)->SetMarkerColor(kBlack);
             cv_hist_vec_clone.at(k)->Draw("E2,hist,same");
         }
@@ -884,23 +937,18 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
             cv_hist_vec_clone.at(k)->Draw("E,same");
         }
 
-        
-
-        
-        
-
         h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, scale_val*1.2);
 
         if (k == k_xsec_mcxsec || k == k_xsec_dataxsec){
             // h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, 0.5e-39);
         }
 
-        TLegend *leg = new TLegend(0.6, 0.65, 0.95, 0.8);
+        TLegend *leg = new TLegend(0.5, 0.65, 0.85, 0.8);
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
-        leg->AddEntry(h_universe.at(0).at(k), Form("%s - All Universes", label_pretty.c_str()), "l");
-        if (xsec_types.at(k) == "mc_xsec")leg->AddEntry(cv_hist_vec_clone.at(k),           "Central Value", "ef");
-        else leg->AddEntry(cv_hist_vec_clone.at(k),           "Central Value", "le");
+        leg->AddEntry(h_universe.at(0).at(k), Form("%s", label_pretty.c_str()), "l");
+        if (xsec_types.at(k) != "data_xsec") leg->AddEntry(cv_hist_vec_clone.at(k),           "CV (Sys Only)", "ef");
+        else                                 leg->AddEntry(cv_hist_vec_clone.at(k),           "CV (Sys Only)", "le");
         leg->Draw();
 
         bottomPad->cd();
@@ -959,7 +1007,7 @@ void SystematicsHelper::CompareCVXSec(int var){
     bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
     _util.SetTPadOptions(topPad, bottomPad);
 
-    h_dataxsec->SetLineColor(kGreen+2);
+    h_dataxsec->SetLineColor(kBlack);
     h_mcxsec  ->SetLineColor(kRed+2);
 
     // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
@@ -971,19 +1019,21 @@ void SystematicsHelper::CompareCVXSec(int var){
     h_dataxsec->GetYaxis()->SetTitleOffset(1.5);
     h_dataxsec->GetXaxis()->SetTitle("");
     h_dataxsec->GetXaxis()->SetLabelSize(0);
+    h_dataxsec->SetMarkerStyle(20);
+    h_dataxsec->SetMarkerSize(0.5);
 
-    h_dataxsec->Draw("hist,E");
+    h_dataxsec->Draw("E");
     h_mcxsec->Draw("hist,same");
     TH1D* h_mcxsec_clone = (TH1D *)h_mcxsec->Clone("h_mc_clone");
     h_mcxsec_clone->SetFillColorAlpha(12, 0.15);
     h_mcxsec_clone->Draw("E2,same");
     
 
-    TLegend *leg = new TLegend(0.6, 0.7, 0.95, 0.85);
+    TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
-    leg->AddEntry(h_dataxsec, "Data CV", "le");
-    leg->AddEntry(h_mcxsec_clone,   "MC CV", "lf");
+    leg->AddEntry(h_dataxsec, "Data (Stat Only)", "le");
+    leg->AddEntry(h_mcxsec_clone,   "MC CV (Stat Only)", "lf");
     leg->Draw();
 
 
