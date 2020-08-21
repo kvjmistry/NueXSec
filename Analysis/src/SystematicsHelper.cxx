@@ -783,10 +783,47 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
 
         SetRatioOptions(h_err_up);
         h_err_up->GetYaxis()->SetTitle("\% change from CV");
-        h_err_up->Draw("hist,same, text00");
-        h_err_up->SetMarkerSize(1.6);
-        if (!single_var) h_err_dn->Draw("hist,same, text00");
-        h_err_dn->SetMarkerSize(1.6);
+        h_err_up->SetBarOffset(0.5);
+        h_err_up->Draw("hist,same");
+        h_err_up->SetMarkerSize(3);
+
+        h_err_dn->SetBarOffset(-3);
+        if (!single_var) h_err_dn->Draw("hist,same");
+        h_err_dn->SetMarkerSize(3);
+
+        bottomPad->Update();
+
+        // Draw on the percentage errors manually so they dont overlap
+        TLatex* text_up, *text_dn;
+        for (int bin = 1; bin < h_err_up->GetNbinsX()+1; bin++){
+            
+            double bin_up_max = h_err_up->GetBinContent(bin);
+            double bin_dn_max = h_err_dn->GetBinContent(bin);
+
+            double shift_up = 0;
+            if (bin_up_max >= 0) shift_up = 6;
+            else shift_up = -10;
+
+            double shift_dn = 0;
+            if (bin_dn_max >= 0) shift_dn = 6;
+            else shift_dn = -10;
+
+            if (shift_up < 0 && shift_dn < 0) shift_dn-= 10;
+            if (shift_up >= 0 && shift_dn >= 0) shift_up+= 10;
+            
+            text_up = new TLatex(h_err_up->GetXaxis()->GetBinCenter(bin), bin_up_max+shift_up, Form("%4.1f", h_err_up->GetBinContent(bin)));
+            text_dn = new TLatex(h_err_dn->GetXaxis()->GetBinCenter(bin), bin_dn_max+shift_dn, Form("%4.1f", h_err_dn->GetBinContent(bin)));
+            text_up->SetTextAlign(21);
+            text_up->SetTextColor(kGreen+2);
+            text_up->SetTextFont(gStyle->GetTextFont());
+            text_up->SetTextSize(0.07);
+            text_up->Draw();
+            text_dn->SetTextAlign(21);
+            text_dn->SetTextColor(kRed+2);
+            text_dn->SetTextFont(gStyle->GetTextFont());
+            text_dn->SetTextSize(0.07);
+            text_dn->Draw();
+        }
         
         
         gStyle->SetPaintTextFormat("4.2f");
@@ -977,9 +1014,9 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
         
         h_err->GetYaxis()->SetTitle("\% Uncertainty");
+        h_err->SetMarkerSize(4);
         h_err->Draw("hist, text00");
-        h_err->SetMarkerSize(3);
-        gStyle->SetPaintTextFormat("4.2f");
+        gStyle->SetPaintTextFormat("4.1f");
 
         c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", run_period.c_str(), label.c_str(), vars.at(var).c_str(),  run_period.c_str(), label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
