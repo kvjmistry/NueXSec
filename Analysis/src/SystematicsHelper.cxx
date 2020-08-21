@@ -709,6 +709,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         // Customise
         h_universe.at(k_dn).at(k)->SetLineWidth(2);
         h_universe.at(k_dn).at(k)->SetLineColor(kRed+2);
+        h_universe.at(k_up).at(k)->SetLineColor(kGreen+2);
     }
 
     TPad *topPad;
@@ -763,16 +764,18 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         bottomPad->cd();
         
         // Up ratio to CV
-        TH1D* h_err_up = (TH1D *)cv_hist_vec.at(var).at(k)->Clone("h_ratio_up");
-        h_err_up->Add(h_universe.at(k_up).at(k), -1);
+        TH1D* h_err_up = (TH1D *)h_universe.at(k_up).at(k)->Clone("h_ratio_up");
+        h_err_up->Add(cv_hist_vec.at(var).at(k), -1);
         h_err_up->Divide(cv_hist_vec.at(var).at(k));
         h_err_up->SetLineWidth(2);
         h_err_up->SetLineColor(kGreen+2);
         h_err_up->Scale(100);
+
+        h_err_up->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
         
         // Down ratio to CV
-        TH1D* h_err_dn = (TH1D *)cv_hist_vec.at(var).at(k)->Clone("h_ratio_dn");
-        h_err_dn->Add(h_universe.at(k_dn).at(k), -1);
+        TH1D* h_err_dn = (TH1D *)h_universe.at(k_dn).at(k)->Clone("h_ratio_dn");
+        h_err_dn->Add(cv_hist_vec.at(var).at(k), -1);
         h_err_dn->Divide(cv_hist_vec.at(var).at(k));
         h_err_dn->SetLineWidth(2);
         h_err_dn->SetLineColor(kRed+2);
@@ -783,13 +786,9 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
 
         SetRatioOptions(h_err_up);
         h_err_up->GetYaxis()->SetTitle("\% change from CV");
-        h_err_up->SetBarOffset(0.5);
         h_err_up->Draw("hist,same");
-        h_err_up->SetMarkerSize(3);
 
-        h_err_dn->SetBarOffset(-3);
         if (!single_var) h_err_dn->Draw("hist,same");
-        h_err_dn->SetMarkerSize(3);
 
         bottomPad->Update();
 
@@ -822,11 +821,9 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
             text_dn->SetTextColor(kRed+2);
             text_dn->SetTextFont(gStyle->GetTextFont());
             text_dn->SetTextSize(0.07);
-            text_dn->Draw();
+            if (!single_var) text_dn->Draw();
         }
         
-        
-        gStyle->SetPaintTextFormat("4.2f");
         h_err->Draw("hist,same");
 
         c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", run_period.c_str(), label.c_str(), vars.at(var).c_str(), run_period.c_str(), label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
