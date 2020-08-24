@@ -807,8 +807,10 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
             if (bin_dn_max >= 0) shift_dn = 6;
             else shift_dn = -10;
 
-            if (shift_up < 0 && shift_dn < 0) shift_dn-= 10;
-            if (shift_up >= 0 && shift_dn >= 0) shift_up+= 10;
+            if (!single_var){
+                if (shift_up < 0 && shift_dn < 0) shift_dn-= 10;
+                if (shift_up >= 0 && shift_dn >= 0) shift_up+= 10;
+            }
             
             text_up = new TLatex(h_err_up->GetXaxis()->GetBinCenter(bin), bin_up_max+shift_up, Form("%4.1f", h_err_up->GetBinContent(bin)));
             text_dn = new TLatex(h_err_dn->GetXaxis()->GetBinCenter(bin), bin_dn_max+shift_dn, Form("%4.1f", h_err_dn->GetBinContent(bin)));

@@ -421,10 +421,10 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     
 
     // Save it 
-    if (variable_str== "reco_e")       c->Print(Form("plots/run%s/Resolution/resolution_%0.2fGeV_to_%0.2f_GeV_reco.pdf", run_period.c_str(), bin_lower_edge, bin_upper_edge ));
-    else if (variable_str == "true_e") c->Print(Form("plots/run%s/Resolution/resolution_%0.2fGeV_to_%0.2f_GeV_true.pdf", run_period.c_str(), bin_lower_edge, bin_upper_edge ));
-    else if (variable_str == "purity") c->Print(Form("plots/run%s/Purity_Completeness/purity_%0.2fGeV_to_%0.2f_GeV.pdf", run_period.c_str(), bin_lower_edge, bin_upper_edge ));
-    else if (variable_str == "completeness") c->Print(Form("plots/run%s/Purity_Completeness/completeness_%0.2fGeV_to_%0.2f_GeV.pdf", run_period.c_str(), bin_lower_edge, bin_upper_edge ));
+    if (variable_str== "reco_e")       c->Print(Form("plots/run%s/Resolution/resolution_%0.0fMeV_to_%0.0f_MeV_reco.pdf", run_period.c_str(), bin_lower_edge*1000, bin_upper_edge*1000 ));
+    else if (variable_str == "true_e") c->Print(Form("plots/run%s/Resolution/resolution_%0.0fMeV_to_%0.0f_MeV_true.pdf", run_period.c_str(), bin_lower_edge*1000, bin_upper_edge*1000 ));
+    else if (variable_str == "purity") c->Print(Form("plots/run%s/Purity_Completeness/purity_%0.0fMeV_to_%0.0f_MeV.pdf", run_period.c_str(), bin_lower_edge*1000, bin_upper_edge*1000 ));
+    else if (variable_str == "completeness") c->Print(Form("plots/run%s/Purity_Completeness/completeness_%0.0fMeV_to_%0.0f_MeV.pdf", run_period.c_str(), bin_lower_edge*1000, bin_upper_edge*1000 ));
     else {
         std::cout << "incorrect variable input" << std::endl;
         return;

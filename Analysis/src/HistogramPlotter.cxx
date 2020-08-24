@@ -1169,6 +1169,9 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
     MakeStack("h_reco_topological_score", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Topological Score",  0.3, 0.8, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_topological_score.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false, true);
+    MakeStack("h_reco_topological_score", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, true, 50, "Topological Score",  0.3, 0.8, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_topological_score_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false, false);
 
     // Track shower dist
     MakeStack("h_reco_track_shower_dist", _util.cut_dirs.at(cut_index).c_str(),
@@ -1182,7 +1185,7 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
 
     // Ratio hits from showers to slice
     MakeStack("h_reco_hits_ratio", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Hit Ratio of all Showers and the Slice",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.0, "Hit Ratio",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_hits_ratio.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, variation, run_period, false, true);
 
     // Shower score
@@ -1309,7 +1312,7 @@ void HistogramPlotter::CallMakeStack(const char *run_period, int cut_index, doub
 
     // Shower dEdx with the track fitter plane with most hits when there is no tracks
     MakeStack("h_reco_shr_tkfit_dedx_max_no_tracks", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Leading Shower dEdx (All Planes) (0 tracks) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.5, "Leading Shower dEdx (All Planes) (0 tracks) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_max_no_tracks.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, variation, run_period, false, true);
 
     // Shower Flash Time
@@ -1512,6 +1515,7 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
     h_stack->GetYaxis()->SetLabelSize(0.05);
     h_stack->GetXaxis()->SetLabelSize(0);
     h_stack->GetXaxis()->SetRangeUser(0, 23);
+    if (histname == "h_flash_time_single_bin") h_stack->GetXaxis()->SetRangeUser(5.6,15.4);
 
     // MC error histogram ------------------------------------------------------
     TH1D *h_error_hist = (TH1D *)hist.at(_util.k_mc)->Clone("h_error_hist");
@@ -1529,9 +1533,11 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
     h_error_hist->SetFillColorAlpha(12, 0.15);
     h_error_hist->Draw("e2, same");
 
-    TLegend *leg_stack = new TLegend(0.7, 0.6, 0.9, 0.85);
+    TLegend *leg_stack;
+    if (histname == "h_flash_time_single_bin") leg_stack = new TLegend(0.7, 0.2, 0.9, 0.45);
+    else leg_stack = new TLegend(0.7, 0.6, 0.9, 0.85);
     leg_stack->SetBorderSize(0);
-    leg_stack->SetFillStyle(0);
+    if (histname != "h_flash_time_single_bin")leg_stack->SetFillStyle(0);
 
     leg_stack->AddEntry(hist.at(_util.k_data), "Beam-On Data", "lep");
     leg_stack->AddEntry(hist.at(_util.k_dirt), "Out-of Cryo", "f");
@@ -1568,6 +1574,7 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
 
     h_ratio->GetYaxis()->SetRangeUser(0.80, 1.20);
     h_ratio->GetXaxis()->SetRangeUser(0, 23);
+    if (histname == "h_flash_time_single_bin") h_ratio->GetXaxis()->SetRangeUser(5.6,15.4);
     h_ratio->GetYaxis()->SetTitle("#frac{Beam-On}{(Overlay + Beam-Off)}");
 
     h_ratio->GetYaxis()->SetLabelSize(0.13);
@@ -2134,19 +2141,19 @@ void HistogramPlotter::Plot2D_Signal_Background(const char *print_name, const ch
     // Draw cut lines to help the eye
     std::vector<TLine *> line_v;
     line_v.resize(9);
-    line_v.at(0) = new TLine(0, 3.5, 1.75, 3.5);
+    line_v.at(0) = new TLine(0, 3, 1.75, 3);
 
-    line_v.at(1) = new TLine(1.75, 3.5, 1.75, 12);
+    line_v.at(1) = new TLine(1.75, 3, 1.75, 12);
     line_v.at(2) = new TLine(1.75, 12, 2.5, 12);
 
-    line_v.at(3) = new TLine(2.5, 3.5, 2.5, 12);
-    line_v.at(4) = new TLine(2.5, 3.5, 3.5, 3.5);
+    line_v.at(3) = new TLine(2.5, 3, 2.5, 12);
+    line_v.at(4) = new TLine(2.5, 3, 3.5, 3);
 
-    line_v.at(5) = new TLine(3.5, 0, 3.5, 3.5);
+    line_v.at(5) = new TLine(3.5, 0, 3.5, 3);
     line_v.at(6) = new TLine(3.5, 0, 4.5, 0);
 
-    line_v.at(7) = new TLine(4.5, 0, 4.5, 3.5);
-    line_v.at(8) = new TLine(4.5, 3.5, 10.0, 3.5);
+    line_v.at(7) = new TLine(4.5, 0, 4.5, 3);
+    line_v.at(8) = new TLine(4.5, 3, 10.0, 3);
 
     for (unsigned int l = 0; l < line_v.size(); l++) {
         line_v.at(l)->SetLineColor(kBlack);
