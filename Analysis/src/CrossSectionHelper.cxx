@@ -142,8 +142,11 @@ void CrossSectionHelper::LoopEvents(){
                 if (std::isinf(vec_universes.at(uni)))        vec_universes.at(uni)   = 1.0;
                 double weight_uni{1.0}; 
 
-                // If we are using the genie systematics and unisim systematics then we want to undo the genie tune on them
+                // Weight equal to universe weight times cv weight
                 if (reweighter_labels.at(label) == "weightsReint" || reweighter_labels.at(label) == "weightsPPFX" || reweighter_labels.at(label) == "CV" ){
+                    
+                    _util.CheckWeight(vec_universes.at(uni));
+
                     weight_uni = cv_weight * vec_universes.at(uni);
                 }
                 // This is a beamline variation
@@ -151,24 +154,24 @@ void CrossSectionHelper::LoopEvents(){
                     weight_uni = cv_weight * GetIntegratedFlux(0, "", "", reweighter_labels.at(label));
                     // std::cout << GetIntegratedFlux(0, "", "", reweighter_labels.at(label)) << std::endl;
                 }
+                // If we are using the genie systematics and unisim systematics then we want to undo the genie tune on them
                 else {
                     // Note we actually dont want to divide out by the spline, but since this is 1 in numi, it doesnt matter!
                     // We do this because the interaction systematics are shifted about the genie tune as the CV
 
-                    if (std::isnan(weightSplineTimesTune) == 1 || std::isinf(weightSplineTimesTune) || weightSplineTimesTune <= 0 || weightSplineTimesTune > 30) {
-                        // std::cout << "Bad Tune weight: " << weightSplineTimesTune << " " << *classification << "   "<< gen<< std::endl;
-                        weightSplineTimesTune   = 1.0;
-                    }
+                    // Check the spline times tune weight
+                    _util.CheckWeight(weightSplineTimesTune);
 
+                    // Check the uiverse weight
                     if (std::isnan(vec_universes.at(uni)) == 1 || std::isinf(vec_universes.at(uni)) || vec_universes.at(uni) < 0 || vec_universes.at(uni) > 30) {
-                        // std::cout << "Bad Uni weight: " << vec_universes.at(uni) << " " << *classification << "   "<< gen<< std::endl;
                         
                         // We set the universe to be the spline times tune, so it cancels with the divide below to just return the CV weight
                         // i.e. a universe weight of 1
                         vec_universes.at(uni)   = weightSplineTimesTune;
                     }
 
-                    weight_uni = (cv_weight * vec_universes.at(uni)) / weightSplineTimesTune;
+                    if (weightSplineTimesTune == 0) weight_uni = 0.0; // Special case where the genie tune or we have thresholded events are zero
+                    else weight_uni = (cv_weight * vec_universes.at(uni)) / weightSplineTimesTune;
 
                     // std::cout << vec_universes.at(uni) << " " << weight_uni << "   "<< weightSplineTimesTune<< std::endl;
 
@@ -372,7 +375,8 @@ void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg,
         std::cout << "error wrong mode entering xsec calculation" << std::endl;
     }
 
-    // (S - B) / (eff * targ * flux)
+    // (N - B) / (eff * targ * flux)
+    h_xsec->Sumw2();
     h_xsec->Add(h_sel,         1);
     h_xsec->Add(h_bkg_clone,  -1);
     h_xsec->Add(h_ext_clone,  -1);

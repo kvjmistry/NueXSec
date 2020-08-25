@@ -691,32 +691,24 @@ double Selection::GetCVWeight(int type, SliceContainer SC){
     double weight = 1.0;
 
     // Get the tune weight
-    if (_util.weight_tune) weight = SC.weightSplineTimesTune; // Here define the weight
+    if (_util.weight_tune) weight = SC.weightSplineTimesTune;
     
     // Catch infinate/nan/unreasonably large tune weights
-    if (std::isinf(weight))      weight = 1.0; 
-    if (std::isnan(weight) == 1) weight = 1.0;
-    if (weight > 30)             weight = 1.0;
-    if (weight < 0)              weight = 1.0;
-
-    // If tune weight turned off, just set weight to 1.0
-    if (!_util.weight_tune) weight = 1.0;
+    _util.CheckWeight(weight);
 
     // Get the PPFX CV flux correction weight
     double weight_flux = 1.0;
     if (_util.weight_ppfx) weight_flux = SC.ppfx_cv;
 
-    if (std::isinf(weight_flux))      weight_flux = 1.0; 
-    if (std::isnan(weight_flux) == 1) weight_flux = 1.0;
-    if (weight_flux > 30)             weight_flux = 1.0;
-    if (weight_flux < 0)              weight_flux = 1.0;
+    _util.CheckWeight(weight_flux);
 
     if (_util.weight_ppfx) weight = weight * weight_flux;
 
-    // std::cout << SC.weightSplineTimesTune << "   "<< SC.ppfx_cv << std::endl;
-
     // For the dirt we correct it by 45%
     if (type == _util.k_dirt && _util.weight_dirt) weight = weight*0.45;
+
+    // Weight the below threshold events to zero. Current threhsold is 125 MeV
+    if (type == _util.k_mc && SC.nu_e <= 0.125) weight = 0.0;
 
     return weight;
 

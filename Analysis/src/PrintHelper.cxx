@@ -258,7 +258,7 @@ void PrintHelper::PrintResults(){
         }
 
         if (print_mc && print_dirt){
-            double tot_mc_bkg = count_numu_cc + count_numu_cc_pi0 + count_nc + count_nc_pi0;
+            double tot_mc_bkg = count_nu_out_fv + count_numu_cc + count_numu_cc_pi0 + count_nc + count_nc_pi0;
             printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Beam Bkg", tot_mc_bkg + count_dirt * (dirt_scale_factor / mc_scale_factor), double(tot_mc_bkg * mc_scale_factor + count_dirt * dirt_scale_factor ) );
         }
 

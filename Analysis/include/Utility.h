@@ -65,6 +65,12 @@ public:
     // Get a 2D histogram from a file
     bool GetHist(TFile* f, TH2D* &h, TString string);
     // -------------------------------------------------------------------------
+    // Check whether a weight has a suitable value
+    void CheckWeight(double &weight);
+    // -------------------------------------------------------------------------
+    // Check whether a weight has a suitable value
+    void CheckWeight(float &weight);
+    // -------------------------------------------------------------------------
     // Create another directory in the plots folder
     void CreateDirectory(std::string folder, const char *run_period);
     // -------------------------------------------------------------------------

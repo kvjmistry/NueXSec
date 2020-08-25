@@ -28,6 +28,9 @@ void UtilityPlotter::Initialise(const char *_run_period, Utility _utility, const
 
         // Make the bin resolution plots
         PlotVarbyRecoBin();
+
+        // Plot the 1D flux with the threhsold line
+        PlotIntegratedFluxwithThrehold();
         
     }
     // This will call the code to optimise the bin widths
@@ -432,6 +435,187 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
 
     delete htemp;
 
+
+}
+// -----------------------------------------------------------------------------
+void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
+    
+    // This changes the plot to average flux or not
+    bool draw_averge = true;
+
+    gStyle->SetOptStat(0);
+
+
+    TFile *f;
+
+    TH1D *h_nue, *h_nuebar;
+
+    double flux_scale_factor{1.0e-4}; // unit conversion of flux from m2 to cm2
+
+    // Get the flux File
+    _util.GetFile(f, "Systematics/output_fhc_uboone_run0.root");
+    
+    // Get the Flux Histograms
+    _util.GetHist(f, h_nue,    "nue/Detsmear/nue_CV_AV_TPC_5MeV_bin");
+    _util.GetHist(f, h_nuebar, "nuebar/Detsmear/nuebar_CV_AV_TPC_5MeV_bin");
+
+    double POT_flux = 1.0;
+
+    double POT_Scale_Factor = (flux_scale_factor * _util.config_v.at(_util.k_Run1_Data_POT)) / POT_flux ;
+
+    h_nue->Scale(POT_Scale_Factor);
+    h_nuebar->Scale(POT_Scale_Factor);
+
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+    c->SetLeftMargin(0.15);
+    c->SetLogy();
+    
+    // Nue flux
+    h_nue->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu}_{e} / cm^{2} / 5 MeV / 0.9 #times 10^{20} POT");
+    h_nue->GetXaxis()->CenterTitle();
+    h_nue->GetYaxis()->CenterTitle();
+
+    h_nue->GetXaxis()->SetLabelFont(42);
+    h_nue->GetXaxis()->SetLabelSize(0.04);
+    h_nue->GetYaxis()->SetLabelFont(42);
+    h_nue->GetYaxis()->SetLabelSize(0.04);
+    h_nue->GetYaxis()->SetTitleSize(0.04);
+
+    h_nue->GetXaxis()->SetRangeUser(0,4);
+    // h_nue->GetYaxis()->SetRangeUser(0,150.0e6);
+    h_nue->SetLineColor(kBlue+2);
+    h_nue->SetFillColor(17);
+    
+    h_nue->GetXaxis()->SetTitleFont(46);
+    h_nue->GetXaxis()->SetTitleSize(18);
+
+    if (!draw_averge) h_nue->Draw("hist");
+
+    TH1D* h_nue_clone = (TH1D*)h_nue->Clone("h_nue_clone");
+    
+    // Nuebar flux
+    h_nuebar->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu}_{e} / cm^{2} / 5 MeV / 0.9 #times 10^{20} POT");
+    h_nuebar->GetXaxis()->SetRangeUser(0,4);
+    h_nuebar->SetLineColor(kGreen+2);
+    h_nuebar->SetFillColor(16);
+    if (!draw_averge)h_nuebar->Draw("hist,same");
+
+    // Define the threshold 
+    double threshold_energy =  0.125; // Current threshold
+    std::cout << "Theshold Energy: " << threshold_energy*1000 << " MeV" << std::endl;
+    
+    double xbin_th = h_nue->GetXaxis()->FindBin(threshold_energy); // find the x bin to integrate from (threshold)
+    double kdar_max = h_nue->GetXaxis()->FindBin( 0.225); // end of KDAR spectrum
+    double flux_int_thresh_nue = h_nue->Integral( xbin_th, h_nue->GetNbinsX()+1);
+    double flux_int_thresh_nuebar = h_nuebar->Integral( xbin_th, h_nuebar->GetNbinsX()+1);
+
+    // Sum the fluxes
+    TH1D *summed_flux = (TH1D*)h_nue->Clone("h_summed_flux");
+
+    summed_flux->Add(h_nuebar, 1);
+
+    TH1D* h_summed_flux_clone = (TH1D*)summed_flux->Clone("h_summed_flux_clone");
+    
+    // Here loop over the cloned histogram of nue, and zero out the flux after the threshold, this is so we can shade out the thresholded area
+    for (int p=xbin_th; p < h_summed_flux_clone->GetNbinsX()+1; p++){
+        h_summed_flux_clone->SetBinContent(p, 0);
+    }
+
+    summed_flux->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e} + #bar{#nu}_{e} / cm^{2} / 5 MeV / 0.9 #times 10^{20} POT");
+    summed_flux->GetXaxis()->CenterTitle();
+    summed_flux->GetYaxis()->CenterTitle();
+    summed_flux->GetXaxis()->SetLabelFont(42);
+    summed_flux->GetXaxis()->SetLabelSize(0.04);
+    // summed_flux->GetXaxis()->SetTitleSize(0.04);
+    summed_flux->GetYaxis()->SetLabelFont(42);
+    summed_flux->GetYaxis()->SetLabelSize(0.04);
+    summed_flux->GetYaxis()->SetTitleSize(0.04);
+    summed_flux->GetXaxis()->SetRangeUser(0,4);
+    // summed_flux->GetYaxis()->SetRangeUser(0,170.0e6);
+    summed_flux->SetLineColor(kRed+2);
+    summed_flux->SetFillColor(17);
+    if (draw_averge) summed_flux->Draw("hist");
+    
+
+    // Here loop over the cloned histogram of nue, and zero out the flux after the threshold, this is so we can shade out the thresholded area
+    for (int p=xbin_th; p < h_nue_clone->GetNbinsX()+1; p++){
+        h_nue_clone->SetBinContent(p, 0);
+    }
+
+    h_nue_clone->SetLineColor(kBlue+2);
+    h_nue_clone->SetLineWidth(0);
+    h_nue_clone->SetFillColorAlpha(46, 0.4);
+    if (!draw_averge)h_nue_clone->Draw("hist,same");
+    // h_nuebar->Draw("hist,same");
+
+
+
+    // Get the energy values
+    double average_num = 0; // flux numerator
+    double average_den = h_nue->Integral( xbin_th, h_nue->GetNbinsX()+1) +  h_nuebar->Integral(xbin_th, h_nuebar->GetNbinsX()+1); // flux denominator
+
+    int nue_flux_bins  = h_nue->GetNbinsX();
+    int anue_flux_bins = h_nuebar->GetNbinsX();
+
+    for (int k = 1; k < nue_flux_bins+1; k++ ){
+        if (k < xbin_th) continue; // skip the thresholded bins
+        average_num = average_num + (h_nue->GetBinContent(k) * h_nue->GetBinCenter(k));
+    }
+
+    for (int k = 1; k < anue_flux_bins+1; k++ ){
+        if (k < xbin_th) continue; // skip the thresholded bins
+        average_num = average_num + (h_nuebar->GetBinContent(k) * h_nuebar->GetBinCenter(k));
+    }
+
+    double average = average_num / average_den;
+    std::cout << "Average Energy: " << average << std::endl;
+    
+
+    std::cout << "Total Nue Flux: " << h_nue->Integral() << std::endl;
+    std::cout << "Total Nuebar Flux: " << h_nuebar->Integral() << std::endl;
+    std::cout << "Total Nue Flux with threshold: " << flux_int_thresh_nue << std::endl;
+    std::cout << "Total Nuebar Flux with threshold: " << flux_int_thresh_nuebar << std::endl;
+
+    double sum_flux_thresh_to_KDAR_end = h_nue->Integral( xbin_th, kdar_max) + h_nuebar->Integral( xbin_th, kdar_max);
+
+    h_summed_flux_clone->SetLineWidth(0);
+    h_summed_flux_clone->SetFillColorAlpha(46, 0.4);
+    h_summed_flux_clone->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e} + #bar{#nu}_{e} / cm^{2} / 0.9 #times 10^{20} POT");
+    if (draw_averge) h_summed_flux_clone->Draw("hist,same");
+
+    
+    double summed_flux_integral = summed_flux->Integral( xbin_th, summed_flux->GetNbinsX()+1);
+    
+    std::cout <<  "summed_flux_integral: " << summed_flux_integral << std::endl;
+    std::cout << "Fraction of flux from thresh to KDAR end point: " << 100 * sum_flux_thresh_to_KDAR_end / summed_flux_integral << std::endl;
+
+    // Draw the Legend
+    TLegend *leg;
+    if (!draw_averge)leg = new TLegend(0.27, 0.7, 0.48, 0.9);
+    if (draw_averge)leg  = new TLegend(0.27, 0.7, 0.48, 0.8);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    if (!draw_averge)leg->AddEntry(h_nue,             "NuMI #nu_{e} Flux",                       "f");
+    if (!draw_averge)leg->AddEntry(h_nuebar,          "NuMI #bar{#nu}_{e} Flux",                 "f");
+    if (draw_averge)leg->AddEntry(summed_flux,        "NuMI #nu_{e} + #bar{#nu}_{e} Flux",       "f");
+    if (!draw_averge)leg->Draw();
+
+    TPaveText *pt;
+
+    pt = new TPaveText(0.37, 0.92, 0.37, 0.92,"NDC");
+    pt->AddText("MicroBooNE Simulation");
+    pt->SetTextColor(kBlack);
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.04);
+    pt->Draw();
+
+    // Draw the run period on the plot
+    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92, "1");
+
+    if (!draw_averge)c->Print("plots/Integrated_Flux_Separate.pdf");
+    if (draw_averge)c->Print("plots/Integrated_Flux_Average.pdf");
 
 }
 // -----------------------------------------------------------------------------

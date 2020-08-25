@@ -152,7 +152,6 @@ void SystematicsHelper::SetRatioOptions(TH1D* hist ){
     hist->GetXaxis()->SetTitleSize(0.13);
     hist->GetYaxis()->SetLabelSize(0.13);
     hist->GetYaxis()->SetRangeUser(-50, 50);
-    hist->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
     hist->GetYaxis()->SetTitleSize(12);
     hist->GetYaxis()->SetTitleFont(44);
     hist->GetYaxis()->CenterTitle();
@@ -564,7 +563,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
 
     for (unsigned int var = 0; var <  vars.size(); var++){
 
-        CompareCVXSec(var);
+        if (vars.at(var) != "true_el_E") CompareCVXSec(var);
 
         // Comparison plots for data to MC
         CompareVariationXSec("RPA",              var, "RPA" );
@@ -785,6 +784,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         h_err->Divide(cv_hist_vec.at(var).at(k));
 
         SetRatioOptions(h_err_up);
+        h_err_up->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
         h_err_up->GetYaxis()->SetTitle("\% change from CV");
         h_err_up->Draw("hist,same");
 
@@ -1058,6 +1058,8 @@ void SystematicsHelper::CompareCVXSec(int var){
     h_dataxsec->SetMarkerStyle(20);
     h_dataxsec->SetMarkerSize(0.5);
 
+    h_dataxsec->SetMinimum(0);
+
     h_dataxsec->Draw("E");
     h_mcxsec->Draw("hist,same");
     TH1D* h_mcxsec_clone = (TH1D *)h_mcxsec->Clone("h_mc_clone");
@@ -1069,7 +1071,7 @@ void SystematicsHelper::CompareCVXSec(int var){
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(h_dataxsec, "Data (Stat Only)", "le");
-    leg->AddEntry(h_mcxsec_clone,   "MC CV (Stat Only)", "lf");
+    leg->AddEntry(h_mcxsec_clone,   "MC (Stat Only)", "lf");
     leg->Draw();
 
 
@@ -1077,22 +1079,34 @@ void SystematicsHelper::CompareCVXSec(int var){
         
     // The percent difference of mc wrt data
     TH1D* h_err = (TH1D *)h_dataxsec->Clone("h_ratio");
-    h_err->Add(h_mcxsec, -1);
-    h_err->Divide(h_dataxsec);
+    
+    for (int bin = 1; bin < h_err->GetNbinsX()+1; bin++){
+        h_err->SetBinContent(bin, 100 * h_dataxsec->GetBinError(bin) / h_dataxsec->GetBinContent(bin) );
+    }
+    
+    // This is if we want the percent difference of data to MC
+    // h_err->Add(h_mcxsec, -1);
+    // h_err->Divide(h_dataxsec);
+    // h_err->Scale(100);
+    
+    
     h_err->SetLineWidth(2);
     h_err->SetLineColor(kGreen+2);
-    h_err->Scale(100);
+
 
     bottomPad->SetGridy(kFALSE);
     
 
     SetRatioOptions(h_err);
+    h_err->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
     h_err->SetLineColor(kBlack);
     h_err->GetYaxis()->SetTitleSize(11);
-    h_err->GetYaxis()->SetRangeUser(-100, 100);
-    h_err->GetYaxis()->SetTitle("Data - MC / Data [\%]");
+    h_err->GetYaxis()->SetRangeUser(0, 100);
+    h_err->GetYaxis()->SetTitle("Stat. Uncertainty [\%]");
+    h_err->GetYaxis()->SetTitleOffset(2.5);
     h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
-    h_err->Draw("hist,same");
+    h_err->SetMarkerSize(3.0);
+    h_err->Draw("hist,text00");
 
     // Draw the run period on the plot
     _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
@@ -1259,6 +1273,7 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
     h_err->Divide(cv_hist_vec.at(var).at(k_xsec_dataxsec));
 
     SetRatioOptions(h_err_up);
+    h_err_up->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
     h_err_up->GetYaxis()->SetRangeUser(-100, 100);
     h_err_up->GetYaxis()->SetTitle("\% change of Data to MC");
     h_err_up->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());

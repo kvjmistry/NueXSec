@@ -169,6 +169,46 @@ bool Utility::GetHist(TFile* f, TH2D* &h, TString string){
     }
 }
 // -----------------------------------------------------------------------------
+void Utility::CheckWeight(double &weight){
+
+    // Infinate weight
+    if (std::isinf(weight))           weight = 1.0;
+    
+    // NAN weight 
+    else if (std::isnan(weight) == 1) weight = 1.0;
+    
+    // Large weight
+    else if (weight > 30)             weight = 1.0;
+    
+    // Negative weight
+    else if (weight < 0)              weight = 1.0;
+    
+    else {
+        // Do nothing to the weight
+    }
+
+}
+// -----------------------------------------------------------------------------
+void Utility::CheckWeight(float &weight){
+
+    // Infinate weight
+    if (std::isinf(weight))           weight = 1.0;
+    
+    // NAN weight 
+    else if (std::isnan(weight) == 1) weight = 1.0;
+    
+    // Large weight
+    else if (weight > 30)             weight = 1.0;
+    
+    // Negative weight
+    else if (weight < 0)              weight = 1.0;
+    
+    else {
+        // Do nothing to the weight
+    }
+
+}
+// -----------------------------------------------------------------------------
 bool Utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     d = (TDirectory*)f->Get(string);
     if (d == NULL) {
