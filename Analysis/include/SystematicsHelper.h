@@ -76,6 +76,10 @@ class SystematicsHelper{
     // Set the up down variation names
     void SetLabelName(std::string label, std::string &label_up, std::string &label_dn);
     // -------------------------------------------------------------------------
+    // Calculate the covariance matrix for the multisims
+    void CalcCovariance(std::string label, int var, std::vector<std::vector<TH1D*>> h_universe );
+    // -------------------------------------------------------------------------
+
 
 
 
@@ -166,7 +170,7 @@ class SystematicsHelper{
                                         };
 
     // Containter for the central value histograms
-    std::vector<std::vector<TH1D*>> cv_hist_vec;
+    std::vector<std::vector<TH1D*>> cv_hist_vec; // reco elec e, <gen, sig, etc>
 
     enum updn {k_up, k_dn};
 

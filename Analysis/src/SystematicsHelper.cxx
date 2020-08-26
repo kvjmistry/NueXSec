@@ -604,7 +604,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeUnisim("Old_Horn_Geometry",  var, "Old Horn Geometry" );
 
         // Plot the multisims
-        PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 500);
+        PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 600);
         PlotReweightingModeMultisim("weightsReint", var,  "Geant Reinteractions", 1000);
         PlotReweightingModeMultisim("weightsPPFX",  var,  "PPFX", 600);
         
@@ -843,7 +843,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
     // Create the directory
     CreateDirectory("/Systematics/" + label + "/" + vars.at(var), run_period);
 
-    std::vector<std::vector<TH1D*>> h_universe;
+    std::vector<std::vector<TH1D*>> h_universe; // Universe, <gen/sig/xsec etc>
     std::vector<std::vector<TH1D*>> h_err;
 
 
@@ -880,16 +880,17 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         }
     }
 
+    // Get the covariance matrix
+    CalcCovariance(label, var, h_universe );
+
     // Create vector of systematic error for each histogram
     std::vector<std::vector<double>> sys_err;
     sys_err.resize(xsec_types.size());
     
+    // We now want to get the standard deviation of all universes wrt to the cv
     for (unsigned int i = 0; i < sys_err.size(); i++){
         sys_err.at(i).resize(cv_hist_vec.at(var).at(0)->GetNbinsX(), 0.0);
     }
-
-    // We now want to get the standard deviation of all universes wrt to the cv
-
 
     // Loop over universes
     for (unsigned int uni = 0; uni < h_universe.size(); uni++){
@@ -1047,7 +1048,7 @@ void SystematicsHelper::CompareCVXSec(int var){
     h_mcxsec  ->SetLineColor(kRed+2);
 
     // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
-    if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(0, 10e-39);
+    if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(0.5e-39, 2.5e-39);
 
     h_dataxsec->GetYaxis()->SetLabelSize(0.04);
     h_dataxsec->GetYaxis()->SetTitleSize(14);
@@ -1081,13 +1082,16 @@ void SystematicsHelper::CompareCVXSec(int var){
     TH1D* h_err = (TH1D *)h_dataxsec->Clone("h_ratio");
     
     for (int bin = 1; bin < h_err->GetNbinsX()+1; bin++){
-        h_err->SetBinContent(bin, 100 * h_dataxsec->GetBinError(bin) / h_dataxsec->GetBinContent(bin) );
+        std::cout <<"[" << vars.at(var) << ", "<< "Data"<< "] " <<"Bin: " << bin << "  Stat Uncertainty: " <<  100 * h_dataxsec->GetBinError(bin) / h_dataxsec->GetBinContent(bin) << std::endl;
+        std::cout <<"[" << vars.at(var) << ", "<< "MC"<< "]   " <<"Bin: " << bin << "  Stat Uncertainty: " <<  100 * h_mcxsec->GetBinError(bin) / h_mcxsec->GetBinContent(bin) <<"\n" << std::endl;
     }
+    // h_err->GetYaxis()->SetTitle("Stat. Uncertainty [\%]");
     
     // This is if we want the percent difference of data to MC
-    // h_err->Add(h_mcxsec, -1);
-    // h_err->Divide(h_dataxsec);
-    // h_err->Scale(100);
+    h_err->Add(h_mcxsec, -1);
+    h_err->Divide(h_dataxsec);
+    h_err->Scale(100);
+    h_err->GetYaxis()->SetTitle("Data - MC / Data [\%]");
     
     
     h_err->SetLineWidth(2);
@@ -1101,10 +1105,11 @@ void SystematicsHelper::CompareCVXSec(int var){
     h_err->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
     h_err->SetLineColor(kBlack);
     h_err->GetYaxis()->SetTitleSize(11);
-    h_err->GetYaxis()->SetRangeUser(0, 100);
-    h_err->GetYaxis()->SetTitle("Stat. Uncertainty [\%]");
+    h_err->GetYaxis()->SetRangeUser(-100, 100);
+    
     h_err->GetYaxis()->SetTitleOffset(2.5);
     h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+    if (vars.at(var) == "integrated")  h_err->GetXaxis()->SetLabelSize(0);
     h_err->SetMarkerSize(3.0);
     h_err->Draw("hist,text00");
 
@@ -1284,4 +1289,132 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
     c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_data_mc_comparison.pdf", run_period.c_str(), label.c_str(), vars.at(var).c_str(), run_period.c_str(), label.c_str(), vars.at(var).c_str() ));
 
     delete c;
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::CalcCovariance(std::string label, int var, std::vector<std::vector<TH1D*>> h_universe ){
+
+    int n_bins = cv_hist_vec.at(var).at(0)->GetNbinsX();
+
+    TH2D* cov  = new TH2D("h_cov",   ";Bin i; Bin j",n_bins, 1, n_bins+1, n_bins, 1, n_bins+1 ); // Create the covariance matrix
+    TH2D* cor  = new TH2D("h_cor",   ";Bin i; Bin j",n_bins, 1, n_bins+1, n_bins, 1, n_bins+1 ); // Create the correlation matrix
+
+
+    // Loop over universes
+    std::cout << "Universes: " << h_universe.size() << std::endl;
+    for (unsigned int uni = 0; uni < h_universe.size(); uni++){
+        
+        // Loop over the rows
+        for (int row = 1; row < cv_hist_vec.at(var).at(0)->GetNbinsX()+1; row++){
+            
+            double uni_row = h_universe.at(uni).at(k_xsec_mcxsec)->GetBinContent(row);
+            double cv_row  = cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(row);
+
+            // Loop over the columns
+            for (int col = 1; col < cv_hist_vec.at(var).at(0)->GetNbinsX()+1; col++){
+
+                double uni_col = h_universe.at(uni).at(k_xsec_mcxsec)->GetBinContent(col);
+                double cv_col  = cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(col);
+                
+                double c = (uni_row - cv_row) * (uni_col - cv_col);
+
+                if (uni != h_universe.size()-1)    cov->SetBinContent(row, col, cov->GetBinContent(row, col) + c ); // Fill with variance 
+                else cov->SetBinContent(row, col, (cov->GetBinContent(row, col) + c) / h_universe.size());       // Fill with variance and divide by nuni
+            
+            }
+
+        }
+            
+    }
+
+
+    // ------------ Now calculate the correlation matrix ------------
+    double cor_bini;
+    // loop over rows
+    for (int i=1; i<cv_hist_vec.at(var).at(0)->GetNbinsX()+1; i++) {
+        double cii = cov->GetBinContent(i, i);
+
+        // Loop over columns
+        for (int j=1; j<cv_hist_vec.at(var).at(0)->GetNbinsX()+1; j++) {
+            double cjj = cov->GetBinContent(j, j);
+            double n = sqrt(cii * cjj);
+
+            // Catch Zeros, set to arbitary 1.0
+            if (n == 0) cor_bini = 0;
+            else cor_bini = cov->GetBinContent(i, j) / n;
+
+            cor->SetBinContent(i, j, cor_bini );
+        }
+    }
+
+    TH2D *frac_cov = (TH2D*) cov->Clone("h_frac_cov");
+
+    // ------------ Now calculate the fractional covariance matrix ------------
+    double setbin;
+    // loop over rows
+    for (int i=1; i<cv_hist_vec.at(var).at(0)->GetNbinsX()+1; i++) {
+        double cii = cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(i);
+
+        // Loop over columns
+        for (int j=1; j<cv_hist_vec.at(var).at(0)->GetNbinsX()+1; j++) {
+            double cjj = cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(j);
+            double n = cii * cjj;
+
+            // Catch Zeros, set to arbitary 0
+            if (n == 0) setbin = 0;
+            else setbin = frac_cov->GetBinContent(i, j) / n;
+
+            frac_cov->SetBinContent(i, j, setbin );
+        }
+    }
+
+    const Int_t NCont = 100;
+    const Int_t NRGBs = 5;
+    Double_t mainColour[NRGBs]   = { 1.00, 1.00, 1.00, 1.00, 1.00 };
+    Double_t otherColour[NRGBs]   = { 0.99,0.80, 0.60, 0.40, 0.20 };
+    Double_t stops[NRGBs] = { 0.00, 0.05, 0.1, 0.4, 1.00 };
+
+    TColor::CreateGradientColorTable(NRGBs, stops, mainColour, otherColour, otherColour, NCont);
+    gStyle->SetNumberContours(NCont);
+
+
+
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+    cov->GetXaxis()->CenterLabels(kTRUE);
+    cov->GetYaxis()->CenterLabels(kTRUE);
+    cov->SetTitle("Covariance Matrix");
+    cov->Draw("colz");
+    _util.IncreaseLabelSize(cov, c);
+    c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_cov.pdf", run_period.c_str(), label.c_str(), vars.at(var).c_str(),  run_period.c_str(), label.c_str(), vars.at(var).c_str()));
+
+    TCanvas *c2 = new TCanvas("c2", "c2", 500, 500);
+    cor->GetXaxis()->CenterLabels(kTRUE);
+    cor->GetYaxis()->CenterLabels(kTRUE);
+    cor->SetTitle("Correlation Matrix");
+    // cor->SetMaximum(1);
+    // cor->SetMinimum(0);
+    cor->Draw("colz, text00");
+    _util.IncreaseLabelSize(cor, c2);
+    cor->SetMarkerSize(1.3);
+    gStyle->SetPaintTextFormat("0.3f");
+    c2->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_cor.pdf", run_period.c_str(), label.c_str(), vars.at(var).c_str(),  run_period.c_str(), label.c_str(), vars.at(var).c_str()));
+
+    TCanvas *c3 = new TCanvas("c3", "c3", 500, 500);
+    frac_cov->GetXaxis()->CenterLabels(kTRUE);
+    frac_cov->GetYaxis()->CenterLabels(kTRUE);
+    frac_cov->Draw("colz, text00");
+    frac_cov->SetTitle("Fractional Covariance Matrix");
+    _util.IncreaseLabelSize(frac_cov, c3);
+    frac_cov->SetMarkerSize(1.3);
+    gStyle->SetPaintTextFormat("0.3f");
+    c3->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_frac_cov.pdf", run_period.c_str(), label.c_str(), vars.at(var).c_str(),  run_period.c_str(), label.c_str(), vars.at(var).c_str()));
+
+    delete cov;
+    delete c;
+    delete c2;
+    delete cor;
+    delete c3;
+    delete frac_cov;
+
+
+
 }
