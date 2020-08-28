@@ -142,7 +142,7 @@ namespace xsecSelection {
             void ApplyPiZeroSelection(int type, SliceContainer &SC);
             // -----------------------------------------------------------------
             // Get the Pi) correction weight
-            void GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer &SC);
+            void GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer &SC, std::string classification);
             // -----------------------------------------------------------------
             // Apply a NuMu Selection
             void ApplyNuMuSelection(int type, SliceContainer &SC);

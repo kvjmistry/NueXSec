@@ -245,7 +245,7 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_track_to_vtx_dist).at(i).at(j) = new TH1D ( Form("h_reco_track_to_vtx_dist_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 20);
 
             // Leading Shower hits in all planes
-            TH1D_hists.at(k_reco_shr_hits_max).at(i).at(j) = new TH1D ( Form("h_reco_shr_hits_max_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 2000);
+            TH1D_hists.at(k_reco_shr_hits_max).at(i).at(j) = new TH1D ( Form("h_reco_shr_hits_max_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 60, 0, 1200);
 
             // Number of Tracks Contained
             TH1D_hists.at(k_reco_n_track_contained).at(i).at(j) = new TH1D ( Form("h_reco_n_track_contained_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 5, 0, 5);
@@ -277,6 +277,9 @@ void histogram_helper::InitHistograms(){
             // Track shower angle
             TH1D_hists.at(k_reco_track_shower_angle).at(i).at(j) = new TH1D (Form("h_reco_track_shower_angle_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, -180, 180);
             
+            // Track shower ratio
+            TH1D_hists.at(k_reco_track_shower_ratio).at(i).at(j) = new TH1D (Form("h_reco_track_shower_ratio_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 3);
+
             // Ratio hits from showers to slice
             TH1D_hists.at(k_reco_hits_ratio).at(i).at(j) = new TH1D (Form("h_reco_hits_ratio_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 21, 0, 1.05);
             
@@ -290,7 +293,7 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_shower_energy_tot_cali).at(i).at(j) = new TH1D (Form("h_reco_shower_energy_tot_cali_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 3);
             
             // Total number of hits for the leading shower
-            TH1D_hists.at(k_reco_shr_hits_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 600);
+            TH1D_hists.at(k_reco_shr_hits_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 1600);
             
             // Total number of hits for the leading shower in the collection plane
             TH1D_hists.at(k_reco_shr_hits_y_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_y_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 1000);
@@ -351,7 +354,7 @@ void histogram_helper::InitHistograms(){
             TH1D_hists.at(k_reco_shrsubclusters).at(i).at(j)  = new TH1D ( Form("h_reco_shrsubclusters_%s_%s", _util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 20);
 
             // Shower Moliers Average
-            TH1D_hists.at(k_reco_shrmoliereavg).at(i).at(j) = new TH1D ( Form("h_reco_shrmoliereavg_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 30);
+            TH1D_hists.at(k_reco_shrmoliereavg).at(i).at(j) = new TH1D ( Form("h_reco_shrmoliereavg_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 50);
 
             // Shower Moliere RMS
             TH1D_hists.at(k_reco_shrmoliererms).at(i).at(j) = new TH1D ( Form("h_reco_shrmoliererms_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 50, 0, 30000 );
@@ -394,6 +397,12 @@ void histogram_helper::InitHistograms(){
 
             // Shower angle with respect to the numi target direction
             TH1D_hists.at(k_reco_shr_ang_numi).at(i).at(j) = new TH1D ( Form("h_reco_shr_ang_numi_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 14, -190, 190);
+
+            // Number of tpc objects in the event
+            TH1D_hists.at(k_reco_n_tpc_obj).at(i).at(j) = new TH1D ( Form("h_reco_n_tpc_obj_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 10, 0, 10);
+
+            // Number of tpc objects that passed in the event
+            TH1D_hists.at(k_reco_n_tpc_obj_passed).at(i).at(j) = new TH1D ( Form("h_reco_n_tpc_obj_passed_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 10, 0, 10);
 
         }
         
@@ -598,6 +607,10 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     // // The angle of the reconstructed shower relative to the NuMI target to detector direction
     // double shr_ang_numi = _util.GetTheta(SC.shr_px, SC.shr_py, SC.shr_pz, "target");
 
+    double track_shr_ratio = SC.trk_len / SC.shr_len;
+
+    // if (SC.shr_hits_tot != (SC.shr_hits_y_tot + SC.shr_hits_u_tot + SC.shr_hits_v_tot)) std::cout << "Houston we have a problem!"<< std::endl;
+
     
     // // Now fill the histograms!
     TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x, weight);
@@ -613,8 +626,10 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     // TH1D_hists.at(k_reco_dEdx_cali_y_plane).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y_cali, weight); // Just the collection plane!
     
     // TH1D_hists.at(k_reco_leading_mom).at(cut_index).at(classification_index)->Fill(reco_shr_p, weight);
+    for (unsigned int u = 0; u < SC.shr_vtx_dist_v->size(); u++){
+        TH1D_hists.at(k_reco_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.shr_vtx_dist_v->at(u), weight);
+    }
     
-    TH1D_hists.at(k_reco_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.shr_distance, weight);
 
     // TH1D_hists.at(k_reco_track_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.trk_distance, weight);
     
@@ -622,9 +637,9 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     
     // TH1D_hists.at(k_reco_n_shower_contained).at(cut_index).at(classification_index)->Fill(SC.n_showers_contained, weight);
     
-    // TH1D_hists.at(k_reco_leading_shower_phi).at(cut_index).at(classification_index)->Fill(SC.shr_phi * 180/3.14159, weight);
+    TH1D_hists.at(k_reco_leading_shower_phi).at(cut_index).at(classification_index)->Fill(SC.shr_phi, weight);
     
-    // TH1D_hists.at(k_reco_leading_shower_theta).at(cut_index).at(classification_index)->Fill(SC.shr_theta * 180/3.14159, weight);
+    TH1D_hists.at(k_reco_leading_shower_theta).at(cut_index).at(classification_index)->Fill(SC.shr_theta, weight);
     
     // TH1D_hists.at(k_reco_leading_shower_cos_theta).at(cut_index).at(classification_index)->Fill(std::cos(SC.shr_theta), weight);
     
@@ -635,6 +650,8 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     // TH1D_hists.at(k_reco_topological_score).at(cut_index).at(classification_index)->Fill(SC.topological_score, weight);
 
     // TH1D_hists.at(k_reco_track_shower_dist).at(cut_index).at(classification_index)->Fill(SC.tksh_distance, weight);
+
+    if (SC.n_tracks > 0) TH1D_hists.at(k_reco_track_shower_ratio).at(cut_index).at(classification_index)->Fill(track_shr_ratio, weight);
 
     // if (SC.n_tracks > 0) TH1D_hists.at(k_reco_track_shower_angle).at(cut_index).at(classification_index)->Fill(SC.tksh_angle*180/3.14159, weight);
 
@@ -647,6 +664,8 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     // TH1D_hists.at(k_reco_shower_energy_tot_cali).at(cut_index).at(classification_index)->Fill(SC.shr_energy_tot_cali, weight);
 
     TH1D_hists.at(k_reco_shr_hits_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_tot, weight);
+    TH1D_hists.at(k_reco_shr_hits_max).at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot + SC.shr_hits_u_tot + SC.shr_hits_v_tot, weight);
+    
 
     TH1D_hists.at(k_reco_shr_hits_y_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot, weight);
     TH1D_hists.at(k_reco_shr_hits_u_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_u_tot, weight);
@@ -698,7 +717,7 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
 
     // TH1D_hists.at(k_reco_shrsubclusters).at(cut_index).at(classification_index)->Fill(SC.shrsubclusters0 + SC.shrsubclusters1 + SC.shrsubclusters2, weight);
 
-    // TH1D_hists.at(k_reco_shrmoliereavg).at(cut_index).at(classification_index)->Fill(SC.shrmoliereavg, weight);
+    TH1D_hists.at(k_reco_shrmoliereavg).at(cut_index).at(classification_index)->Fill(SC.shr_openangle, weight);
     // TH1D_hists.at(k_reco_shrmoliererms).at(cut_index).at(classification_index)->Fill(SC.shrmoliererms, weight);
 
     // TH1D_hists.at(k_reco_CylFrac2h_1cm).at(cut_index).at(classification_index)->Fill(SC.CylFrac2h_1cm, weight);
@@ -726,6 +745,11 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     // TH1D_hists.at(k_reco_crthitpe).at(cut_index).at(classification_index)->Fill(SC.crthitpe, weight);
 
     // TH1D_hists.at(k_reco_shr_ang_numi).at(cut_index).at(classification_index)->Fill(shr_ang_numi, weight);
+
+    // if we havent already filled the histogram then fill this plot
+    if (SC.already_filled.at(cut_index) == false) TH1D_hists.at(k_reco_n_tpc_obj).at(cut_index).at(classification_index)->Fill(SC.number_tpcobj, weight);
+
+    if (SC.tpc_obj_index == 0) TH1D_hists.at(k_reco_n_tpc_obj_passed).at(cut_index).at(classification_index)->Fill(SC.tpc_obj_counter_prev, weight);
     
     // // -------------------------------------------------------------------------
     // // -------------------------------------------------------------------------
@@ -856,74 +880,36 @@ void histogram_helper::FillHists(int type, int classification_index, std::string
     // // -----------------------------------------------------------------------------
 
     // // Only do this for after the software trigger
-    // if (cut_index == _util.k_swtrig){
+    if (cut_index == _util.k_unselected){
 
-    //     // Flash histograms
-    //     if (type == _util.k_mc){
-    //         TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
-    //         TH1D_flash_hists.at(k_flash_time_single_bin)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
-    //         TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight); // See numi documentation page to see what these numbers mean
+        // Flash histograms
+        if (type == _util.k_mc){
+            TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time, weight); // See numi documentation page to see what these numbers mean
+            TH1D_flash_hists.at(k_flash_time_single_bin)->Fill(SC.flash_time + 1.0, weight); // See numi documentation page to see what these numbers mean
+            TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight); // See numi documentation page to see what these numbers mean
            
-    //         if (SC.nslice == 1){
-    //             TH1D_flash_hists.at(k_flash_time_sid1)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
-    //             TH1D_flash_hists.at(k_flash_pe_sid1)->Fill(SC.flash_pe, weight); // See numi documentation page to see what these numbers mean
-
-    //         }
-    //         if (SC.nslice == 0){
-    //             TH1D_flash_hists.at(k_flash_time_sid0)->Fill(SC.flash_time + 0.055 -0.359, weight); // See numi documentation page to see what these numbers mean
-    //             TH1D_flash_hists.at(k_flash_pe_sid0)->Fill(SC.flash_pe, weight); // See numi documentation page to see what these numbers mean
-
-    //         }
-    //     }
-    //     if (type == _util.k_dirt){
-    //         TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + 0.055 -0.359, weight);
-    //         TH1D_flash_hists.at(k_flash_time_single_bin)->Fill(SC.flash_time + 0.055 -0.359, weight);
-    //         TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
+        }
+        if (type == _util.k_dirt){
+            TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time, weight);
+            TH1D_flash_hists.at(k_flash_time_single_bin)->Fill(SC.flash_time + 1.0, weight);
+            TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
            
-    //         if (SC.nslice == 1){
-    //             TH1D_flash_hists.at(k_flash_time_sid1)->Fill(SC.flash_time + 0.055 -0.359, weight);
-    //             TH1D_flash_hists.at(k_flash_pe_sid1)->Fill(SC.flash_pe, weight);
-
-    //         }
-    //         if (SC.nslice == 0){
-    //             TH1D_flash_hists.at(k_flash_time_sid0)->Fill(SC.flash_time + 0.055 -0.359, weight);
-    //             TH1D_flash_hists.at(k_flash_pe_sid0)->Fill(SC.flash_pe, weight);
-                
-    //         }
-    //     }
-    //     if (type == _util.k_ext){
-    //         TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time + -0.359, weight);
-    //         TH1D_flash_hists.at(k_flash_time_single_bin)->Fill(SC.flash_time + -0.359, weight);
-    //         TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
+        }
+        if (type == _util.k_ext){
+            TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time, weight);
+            TH1D_flash_hists.at(k_flash_time_single_bin)->Fill(SC.flash_time + -0.359, weight);
+            TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
            
-    //         if (SC.nslice == 1){
-    //             TH1D_flash_hists.at(k_flash_time_sid1)->Fill(SC.flash_time + -0.359, weight);
-    //             TH1D_flash_hists.at(k_flash_pe_sid1)->Fill(SC.flash_pe, weight);
-
-    //         }
-    //         if (SC.nslice == 0){
-    //             TH1D_flash_hists.at(k_flash_time_sid0)->Fill(SC.flash_time + -0.359, weight);
-    //             TH1D_flash_hists.at(k_flash_pe_sid0)->Fill(SC.flash_pe, weight);
-                
-    //         }
-    //     }
-    //     if (type == _util.k_data){
-    //         TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time, weight);
-    //         TH1D_flash_hists.at(k_flash_time_single_bin)->Fill(SC.flash_time, weight);
-    //         TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
+        }
+        if (type == _util.k_data){
+            TH1D_flash_hists.at(k_flash_time)->Fill(SC.flash_time, weight);
+            TH1D_flash_hists.at(k_flash_time_single_bin)->Fill(SC.flash_time, weight);
+            TH1D_flash_hists.at(k_flash_pe)->Fill(SC.flash_pe, weight);
             
-    //         if (SC.nslice == 1){
-    //             TH1D_flash_hists.at(k_flash_time_sid1)->Fill(SC.flash_time, weight);
-    //             TH1D_flash_hists.at(k_flash_pe_sid1)->Fill(SC.flash_pe, weight);
 
-    //         }
-    //         if (SC.nslice == 0){
-    //             TH1D_flash_hists.at(k_flash_time_sid0)->Fill(SC.flash_time, weight);
-    //             TH1D_flash_hists.at(k_flash_pe_sid0)->Fill(SC.flash_pe, weight);
-    //         }
-    //     }
+        }
         
-    // }
+    }
 
     // // Fill 2D histograms for signal background rejection -- only for MC, dirt and EXT
     // if (_type != _util.k_data){ 

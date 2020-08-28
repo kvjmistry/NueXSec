@@ -238,8 +238,6 @@ void selection::MakeSelection(){
     if (bool_use_mc){
         std::cout << "\nStarting Selection over MC" << std::endl;
 
-        int numu_pi{0}, numubar_pi{0}, nue_pi{0}, nuebar_pi{0}; // Total number of 1pi events
-
         // Event loop
         for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
 
@@ -425,6 +423,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
         SC.already_filled.clear(); // set this to false every time when we have a new tpc object
         SC.already_filled.resize(_util.k_cuts_MAX);
         std::fill(SC.already_filled.begin(), SC.already_filled.end(), false);
+
     }
 
     // Classify the event
@@ -567,6 +566,9 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     
     }
     SelectionFill(type, SC, classification, interaction, particle_type, _util.k_trk_containment, counter_v );   
+
+    if (SC.tpc_obj_index == 0) SC.tpc_obj_counter_prev = 0; // Set back to 0
+    else                       SC.tpc_obj_counter_prev++;   // Add to counter
             
 
     // ************************************************************************n*
@@ -638,7 +640,7 @@ void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
 
     // // Try scaling the pi0
     // // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
-    // GetPiZeroWeight(weight, 0, SC);
+    // if (type == _util.k_mc || type == _util.k_dirt) GetPiZeroWeight(weight, 1, SC, classification.first);
 
     
     // This is in many places, need to have a way for setting this number by default
@@ -791,9 +793,9 @@ void selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
 
     // Try scaling the pi0
     // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
-    GetPiZeroWeight(weight, 0, SC);
-    GetPiZeroWeight(weight_norm, 1, SC);
-    GetPiZeroWeight(weight_Escale, 2, SC);
+    GetPiZeroWeight(weight, 0, SC, "whocares");
+    GetPiZeroWeight(weight_norm, 1, SC, "whocares");
+    GetPiZeroWeight(weight_Escale, 2, SC, "whocares");
 
     // Now Fill the histograms
     if (!slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight, 0);
@@ -803,29 +805,28 @@ void selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
 
 }
 // -----------------------------------------------------------------------------
-void selection::GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer &SC){
+void selection::GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer &SC, std::string classification){
 
     // Fix the normalisation
     if (pizero_mode == 1){
         
         if (SC.npi0 > 0) {
-            weight = weight * 0.759;
+            weight = weight * 1.3;
         }
 
     }
-    // Try energy dependent scaling for pi0
+    // Here we scale the signal to see if these are also causing the data to MC differences
     else if (pizero_mode == 2){
-        
-        if (SC.npi0 > 0) {
-            double pi0emax = 0.6;
-            if (SC.pi0_e > 0.1 && SC.pi0_e < pi0emax){
-                weight = weight * (1 - 0.4 * SC.pi0_e);
-            }
-            else if (SC.pi0_e > 0.1 && SC.pi0_e >= pi0emax){
-                weight = weight * (1 - 0.4 * pi0emax);
-            }
-            
+        if (classification == "nue_cc" || classification == "nue_bar_cc"){
+            weight = weight * 1.5;
         }
+        
+    }
+    else if (pizero_mode == 3){
+        if (classification != "dirt"){
+            weight = weight * 1.3;
+        }
+        
     }
     else {
         // Dont touch the weight
@@ -901,7 +902,7 @@ void selection::ApplyNuMuSelection(int type, SliceContainer &SC){
     double weight = GetCVWeight(type, SC);
     
     // Also apply the pi0 weight
-    GetPiZeroWeight(weight, 2, SC);
+    GetPiZeroWeight(weight, 2, SC, "whocares");
 
     if (!slim) _hhelper.at(type).FillNuMuHists(classification.second, SC, weight);
 

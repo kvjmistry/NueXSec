@@ -18,9 +18,9 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bo
 
     // Set the scale factors
     if (strcmp(run_period, "1") == 0){
-        mc_scale_factor     = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_MC_POT);
-        dirt_scale_factor   = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_Dirt_POT);
-        intime_scale_factor = _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
+        mc_scale_factor     = 0.1301;
+        dirt_scale_factor   = 0.16411;
+        intime_scale_factor =1.0154;
     }
     else if (strcmp(run_period, "3") == 0){
         mc_scale_factor     = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_MC_POT);
@@ -159,6 +159,10 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bo
 }
 // -----------------------------------------------------------------------------
 void PrintHelper::PrintResults(){
+
+    std::cout << double(792694*(6361077.0/6264334.55 ) ) << std::endl;
+    std::cout << double(792694*intime_scale_factor) << std::endl;
+    std::cout <<  1.01544 << " " << intime_scale_factor <<  std::endl;
 
     // Loop over the cuts
     for (int p =0; p < tree_total_entries; p++){

@@ -6,6 +6,8 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     std::cout << "Initalising Slice Container" << std::endl;
     _util = util;
 
+    tree->SetBranchAddress("flash_time_v", &flash_time_v);
+
     tree->SetBranchAddress("has_nue", &has_nue);
     tree->SetBranchAddress("has_valid_shr", &has_valid_shr);
     tree->SetBranchAddress("trk_vtx_dist_v", &trk_vtx_dist_v);
@@ -19,14 +21,19 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("trk_end_z_v", &trk_end_z_v);
 
     tree->SetBranchAddress("flash_vtx_dist", &flash_vtx_dist);
+    tree->SetBranchAddress("flash_vtx_dist_updated", &flash_vtx_dist_updated);
     tree->SetBranchAddress("flash_vtx_y", &flash_vtx_y);
     tree->SetBranchAddress("flash_vtx_z", &flash_vtx_z);
+    tree->SetBranchAddress("flash_vtx_y_updated", &flash_vtx_y_updated);
+    tree->SetBranchAddress("flash_vtx_z_updated", &flash_vtx_z_updated);
 
     // tree->SetBranchAddress("selected", &selected);
     // tree->SetBranchAddress("run", &run);
     // tree->SetBranchAddress("sub", &sub);
     // tree->SetBranchAddress("evt", &evt);
     tree->SetBranchAddress("tpc_obj_id", &tpc_obj_index);
+    tree->SetBranchAddress("number_tpcobj", &number_tpcobj);
+
     
     
     // tree->SetBranchAddress("shr_energy_tot", &shr_energy_tot);

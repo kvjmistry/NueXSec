@@ -137,6 +137,7 @@ class histogram_helper{
         k_reco_topological_score,                                               // Pandora Topological Score
         k_reco_track_shower_dist,                                               // Track shower dist
         k_reco_track_shower_angle,                                              // Track shower angle
+        k_reco_track_shower_ratio,                                              // Track shower ratio
         k_reco_hits_ratio,                                                      // Ratio hits from showers to slice
         k_reco_shower_score,                                                    // Shower score
         k_reco_track_score,                                                     // Track score
@@ -188,6 +189,8 @@ class histogram_helper{
         k_reco_crtveto,                                                         // CRT veto
         k_reco_crthitpe,                                                        // CRT hit pe
         k_reco_shr_ang_numi,                                                    // Angle of the reconstructed leading shower relative to the numi beamline
+        k_reco_n_tpc_obj,                                                       // Number of tpc objects in the event
+        k_reco_n_tpc_obj_passed,                                                // Number of passed tpc objects in the event
         k_TH1D_MAX
     };
 

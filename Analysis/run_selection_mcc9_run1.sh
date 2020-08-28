@@ -91,17 +91,13 @@ fi
 # ----------------------
 
 
-# BNB_Diffusion
-if [ "$1" == "BNB_Diffusion" ]; then
-  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_diffusion.root BNB_Diffusion 2> /dev/null | tee log/run1_BNB_Diffusion.log
+# DIC
+if [ "$1" == "DIC" ]; then
+  ./nuexsec --run 1 --var ../files/f_dic_mcc8.root DIC
 
-  source merge/merge_run1_files.sh files/nuexsec_mc_run1_BNB_Diffusion.root files/nuexsec_run1_BNB_Diffusion_merged.root
+  source merge/merge_run1_files.sh files/nuexsec_mc_run1_DIC.root files/nuexsec_run1_DIC_merged.root
 
-  ./nuexsec --run 1 --hist files/nuexsec_run1_BNB_Diffusion_merged.root --var dummy BNB_Diffusion
-
-  root -l -b -q 'merge/merge_uneaventrees.C("1","files/trees/nuexsec_selected_tree_mc_run1_BNB_Diffusion.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "BNB_Diffusion")'
-
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_BNB_Diffusion.root --var dummy BNB_Diffusion --xsecmode default
+  ./nuexsec --run 1 --hist files/nuexsec_run1_DIC_merged.root --var dummy DIC
 
 fi
 
