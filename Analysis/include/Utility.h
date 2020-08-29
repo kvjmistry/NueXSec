@@ -48,7 +48,7 @@ class Utility{
 public:
     // -------------------------------------------------------------------------
     // Initalise variables
-    void Initalise(const char* variation, bool overwritePOT, const char* run_period, int _weight_tune, int _weight_ppfx, int _weight_dirt, int _weight_ext, int _pi0_correction);
+    void Initalise(int argc, char *argv[], std::string usage,std::string usage2, std::string usage3);
     // -------------------------------------------------------------------------
     // Get a TFile from a file
     bool GetFile(TFile* &f, TString string);
@@ -72,10 +72,7 @@ public:
     void CheckWeight(float &weight);
     // -------------------------------------------------------------------------
     // Create another directory in the plots folder
-    void CreateDirectory(std::string folder, const char *run_period);
-    // -------------------------------------------------------------------------
-    // Create another directory in the plots folder -- just give the run period as a string rather than a char
-    void CreateDirectory(std::string folder, std::string run_period);
+    void CreateDirectory(std::string folder);
     // -------------------------------------------------------------------------
     // Function to tabulate all the nuetrino types and flavours
     void Tabulate(bool inFV, std::string interaction, std::string classification, std::string pi0_classification, int type, std::vector<double> &counter_v, double weight);
@@ -93,7 +90,7 @@ public:
     void IncreaseLabelSize(TH2D *h, TCanvas *c);
     // -------------------------------------------------------------------------
     // Draw the run period on the plot
-    void Draw_Run_Period(TCanvas *c, double x1, double y1, double x2, double y2, std::string run_period);
+    void Draw_Run_Period(TCanvas *c, double x1, double y1, double x2, double y2);
     // -------------------------------------------------------------------------
     // Draw the data to MC ratio on the plot
     void Draw_Data_MC_Ratio(TCanvas *c, double ratio, double x1, double y1, double x2, double y2);
@@ -114,12 +111,58 @@ public:
     // Bins for the reconstructed shower energy
     std::vector<double> reco_shr_bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 4.0};
     
+    bool slim                      = false;
+    bool make_histos               = false;
+    bool run_selection             = true;
+    bool area_norm                 = false;
+    bool calc_cross_sec            = false;
+    bool overwritePOT              = false; 
+    bool run_sys                   = false;
+    bool run_uplot                 = false;
+    bool print                     = false;
+    bool print_mc                 = false;
+    bool print_data               = false;
+    bool print_ext                = false;
+    bool print_dirt               = false;
+
+    // inputs 
+    char * mc_file_name          = (char *)"empty";
+    char * ext_file_name         = (char *)"empty";
+    char * data_file_name        = (char *)"empty";
+    char * dirt_file_name        = (char *)"empty";
+    char * mc_file_name_out      = (char *)"empty";
+    char * ext_file_name_out     = (char *)"empty";
+    char * data_file_name_out    = (char *)"empty";
+    char * dirt_file_name_out    = (char *)"empty";
+    char * variation             = (char *)"empty";
+    char * variation_file_name   = (char *)"empty";
+    char * mc_tree_file_name_out = (char *)"empty";
+    char * hist_file_name        = (char *)"empty";
+    char * tree_file_name        = (char *)"empty";
+    char * run_period            = (char *)"empty";
+    char * sysmode               = (char *)"default";
+    char * xsecmode              = (char *)"default";
+    char * uplotmode             = (char *)"default";
+    int num_events{-1};
+    int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
+    int _weight_tune{1}; // Use the GENIE Tune
+    int _weight_ppfx{1}; // Use the PPFX CV Corr
+    int _weight_dirt{1}; // Weight the Dirt events
+    int _weight_ext{1};  // Weight the EXT events
+    int _pi0_correction{1};  // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
+
+
     // Weight configurations
     bool weight_tune{true}; // Use the GENIE Tune
     bool weight_ppfx{true}; // Use the PPFX CV Corr
     bool weight_dirt{true}; // Weight the Dirt events
     bool weight_ext{true};  // Weight the EXT events
     int  pi0_correction{1}; // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
+
+    // Scale factors to scale samples to data)
+    double mc_scale_factor     = 1.0;
+    double ext_scale_factor    = 1.0;
+    double dirt_scale_factor   = 1.0;
 
     // POT 
     std::vector<double> config_v;
@@ -158,10 +201,6 @@ public:
                 k_config_z2,
                 k_config_MAX
                 };
-
-
-    // Other definitions for code
-    bool verbose = false; // This should be set in the config file
 
     // For creating histogram names
     std::vector<std::string> type_prefix = {"MC", "Data", "EXT", "Dirt"};

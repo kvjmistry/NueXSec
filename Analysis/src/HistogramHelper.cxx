@@ -108,7 +108,7 @@ void HistogramHelper::MakeDirectory(){
    
 }
 // -----------------------------------------------------------------------------
-void HistogramHelper::Initialise(int type, const char* run_period, const char * file_out, Utility util ){
+void HistogramHelper::Initialise(int type, const char * file_out, Utility util ){
 
     std::cout << "Initalising Histogram Helper, creating TFile and directories..." << std::endl;
 
@@ -121,7 +121,7 @@ void HistogramHelper::Initialise(int type, const char* run_period, const char * 
     if (type == _util.k_mc){
 
         // If the file name is empty then we use the default file name
-        if (file_out_str == "empty") file_name = Form("files/nuexsec_mc_run%s.root", run_period);
+        if (file_out_str == "empty") file_name = Form("files/nuexsec_mc_run%s.root", _util.run_period);
         else file_name = "files/" + file_out_str;
         
         // File not already open, open the file
@@ -132,7 +132,7 @@ void HistogramHelper::Initialise(int type, const char* run_period, const char * 
     else if (type == _util.k_data){
         
         // If the file name is empty then we use the default file name
-        if (file_out_str == "empty") file_name = Form("files/nuexsec_data_run%s.root", run_period);
+        if (file_out_str == "empty") file_name = Form("files/nuexsec_data_run%s.root", _util.run_period);
         else file_name = "files/" + file_out_str;
 
         // File not already open, open the file
@@ -144,7 +144,7 @@ void HistogramHelper::Initialise(int type, const char* run_period, const char * 
     else if (type == _util.k_ext){
 
         // If the file name is empty then we use the default file name
-        if (file_out_str == "empty") file_name = Form("files/nuexsec_ext_run%s.root", run_period);
+        if (file_out_str == "empty") file_name = Form("files/nuexsec_ext_run%s.root", _util.run_period);
         else file_name = "files/" + file_out_str;
         
         // File not already open, open the file
@@ -156,7 +156,7 @@ void HistogramHelper::Initialise(int type, const char* run_period, const char * 
     else if (type == _util.k_dirt){
         
         // If the file name is empty then we use the default file name
-        if (file_out_str == "empty") file_name = Form("files/nuexsec_dirt_run%s.root", run_period);
+        if (file_out_str == "empty") file_name = Form("files/nuexsec_dirt_run%s.root", _util.run_period);
         else file_name = "files/" + file_out_str;
 
         // File not already open, open the file

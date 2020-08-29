@@ -1,26 +1,17 @@
 #include "../include/CrossSectionHelper.h"
 
 // -----------------------------------------------------------------------------
-void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_file_in, Utility _utility, const char* run_mode){
+void CrossSectionHelper::Initialise(Utility _utility){
 
     std::cout << "Initalising Cross Section Helper..." << std::endl;
     _util = _utility;
 
-    // Set the run period
-    run_period = std::string(_run_period);
-
     // Set the scale factors
-    if (strcmp(_run_period, "1") == 0){
-        mc_scale_factor     = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_MC_POT);
-        dirt_scale_factor   = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_Dirt_POT);
-        ext_scale_factor    = _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
+    if (strcmp(_util.run_period, "1") == 0){
         mc_flux_scale_factor   = flux_scale_factor * _util.config_v.at(_util.k_Run1_MC_POT);
         data_flux_scale_factor = flux_scale_factor * _util.config_v.at(_util.k_Run1_Data_POT);
     }
-    else if (strcmp(_run_period, "3") == 0){
-        mc_scale_factor     = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_MC_POT);
-        dirt_scale_factor   = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_Dirt_POT);
-        ext_scale_factor    = _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
+    else if (strcmp(_util.run_period, "3") == 0){
         mc_flux_scale_factor   = flux_scale_factor * _util.config_v.at(_util.k_Run3_MC_POT); 
         data_flux_scale_factor = flux_scale_factor * _util.config_v.at(_util.k_Run3_Data_POT);
     }
@@ -31,17 +22,14 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
     
     std::cout << "\033[0;32m-------------------------------" << std::endl;
     std::cout << "Scale Factors:\n" <<
-    "MC Scale factor:        " << mc_scale_factor          << "\n" <<
-    "Dirt Scale factor:      " << dirt_scale_factor        << "\n" <<
-    "EXT Scale factor:       " << ext_scale_factor      << "\n" <<
     "MC Flux Scale factor:   " << mc_flux_scale_factor     << "\n" <<
     "Data Flux Scale factor: " << data_flux_scale_factor
     << std::endl;
     std::cout << "-------------------------------\033[0m" << std::endl;
 
     // File not already open, open the file
-    if (!gROOT->GetListOfFiles()->FindObject( xsec_file_in ) ) {
-        f_nuexsec = new TFile( xsec_file_in, "READ");
+    if (!gROOT->GetListOfFiles()->FindObject( _util.tree_file_name ) ) {
+        f_nuexsec = new TFile( _util.tree_file_name, "READ");
     }
 
     // Get the Input TTree
@@ -55,12 +43,12 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
     InitTree();
 
     // Initialise the Flux file
-    if (run_period == "1"){
+    if (std::string(_util.run_period) == "1"){
         std::cout << "Using Flux file name: \033[0;31m" << "Systematics/output_fhc_uboone_run0.root" << "\033[0m" <<  std::endl;
         bool boolfile = _util.GetFile(f_flux, "Systematics/output_fhc_uboone_run0.root");
         if (boolfile == false) gSystem->Exit(0); 
     }
-    else if (run_period == "3") {
+    else if (std::string(_util.run_period) == "3") {
         std::cout << "Using Flux file name: \033[0;31m" << "Systematics/output_rhc_uboone_run0.root" << "\033[0m" <<  std::endl;
         bool boolfile = _util.GetFile(f_flux, "Systematics/output_rhc_uboone_run0.root" );
         if (boolfile == false) gSystem->Exit(0); 
@@ -95,7 +83,7 @@ void CrossSectionHelper::Initialise(const char *_run_period, const char * xsec_f
 
 
     // Create and initialise vector of histograms
-    InitialiseHistograms(std::string(run_mode));
+    InitialiseHistograms(std::string(_util.xsecmode));
 
 
     // Now loop over events and caluclate the cross section
@@ -273,11 +261,11 @@ void CrossSectionHelper::LoopEvents(){
                 CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sel), // N Sel
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff),  // Eff
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),  // N Bkg
-                                mc_scale_factor,
+                                _util.mc_scale_factor,
                                 temp_integrated_flux * mc_flux_scale_factor,           // Flux
-                                ext_scale_factor,
+                                _util.ext_scale_factor,
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),  // N EXT
-                                dirt_scale_factor,
+                                _util.dirt_scale_factor,
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dirt), // N Dirt
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec),
                                 N_target_MC, "MC");
@@ -286,11 +274,11 @@ void CrossSectionHelper::LoopEvents(){
                 CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_data), // N Sel
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff),   // Eff
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),   // N Bkg
-                                mc_scale_factor,
+                                _util.mc_scale_factor,
                                 temp_integrated_flux * data_flux_scale_factor,          // Flux
-                                ext_scale_factor,
+                                _util.ext_scale_factor,
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),   // N EXT
-                                dirt_scale_factor,
+                                _util.dirt_scale_factor,
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dirt),  // N Dirt
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dataxsec),
                                 N_target_Data, "Data");
@@ -309,15 +297,15 @@ void CrossSectionHelper::LoopEvents(){
     "Signal MC:       " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sig) ->Integral() << "\n" << 
     "Background MC:   " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_bkg) ->Integral() << "\n" << 
     "Generated MC:    " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_gen) ->Integral() << "\n" << 
-    "EXT MC:          " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_ext) ->Integral()* (ext_scale_factor / mc_scale_factor) << "\n" << 
-    "Dirt MC:         " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dirt)->Integral()* (dirt_scale_factor / mc_scale_factor) << "\n\n" << 
+    "EXT MC:          " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_ext) ->Integral()* (_util.ext_scale_factor / _util.mc_scale_factor) << "\n" << 
+    "Dirt MC:         " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dirt)->Integral()* (_util.dirt_scale_factor / _util.mc_scale_factor) << "\n\n" << 
     
     "Selected Data:   " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_data)->Integral() << "\n" << 
-    "Signal Data:     " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sig) ->Integral()* mc_scale_factor << "\n" << 
-    "Background Data: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_bkg) ->Integral()* mc_scale_factor << "\n" << 
-    "Generated Data:  " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_gen) ->Integral()* mc_scale_factor << "\n" << 
-    "EXT Data:        " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_ext) ->Integral()* ext_scale_factor  << "\n" << 
-    "Dirt Data:       " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dirt)->Integral()* dirt_scale_factor << "\n"
+    "Signal Data:     " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sig) ->Integral()* _util.mc_scale_factor << "\n" << 
+    "Background Data: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_bkg) ->Integral()* _util.mc_scale_factor << "\n" << 
+    "Generated Data:  " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_gen) ->Integral()* _util.mc_scale_factor << "\n" << 
+    "EXT Data:        " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_ext) ->Integral()* _util.ext_scale_factor  << "\n" << 
+    "Dirt Data:       " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dirt)->Integral()* _util.dirt_scale_factor << "\n"
     << std::endl;
 
     std::cout << 
@@ -516,8 +504,8 @@ void CrossSectionHelper::WriteHists(){
 
     // Now open the output file
     // File not already open, open the file
-    if (!gROOT->GetListOfFiles()->FindObject( Form("files/crosssec_run%s.root", run_period.c_str()) ) ) {
-        fnuexsec_out = new TFile( Form("files/crosssec_run%s.root", run_period.c_str()) , "UPDATE");
+    if (!gROOT->GetListOfFiles()->FindObject( Form("files/crosssec_run%s.root", _util.run_period ) )) {
+        fnuexsec_out = new TFile( Form("files/crosssec_run%s.root", _util.run_period) , "UPDATE");
     }
 
     fnuexsec_out->cd();
@@ -830,13 +818,13 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 // loop over and create the histograms
                 for (unsigned int i=0; i < xsec_types.size();i++){    
                     if (i == k_xsec_sel || i == k_xsec_bkg || i == k_xsec_gen || i == k_xsec_sig || i == k_xsec_ext || i == k_xsec_dirt || i == k_xsec_data){
-                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Reco. Leading Shower Energy [GeV]; Entries", nbins, edges);
+                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Reco. Leading Shower Energy [GeV]; Entries", nbins, edges);
                     }
                     else if (i == k_xsec_eff){
-                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Reco. Leading Shower Energy [GeV]; Efficiency", nbins, edges);
+                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Reco. Leading Shower Energy [GeV]; Efficiency", nbins, edges);
                     }
                     else if (i == k_xsec_dataxsec || i == k_xsec_mcxsec){
-                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",run_period.c_str(), reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels.at(var).c_str()), nbins, edges);
+                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels.at(var).c_str()), nbins, edges);
                     }
                     else {
                         // If this is the case then there is an uncaught case
@@ -894,10 +882,10 @@ void CrossSectionHelper::GetBeamlineHists(){
         TH2D* h_cv;
 
         // Get the beamline file
-        if (run_period == "1"){
+        if (std::string(_util.run_period) == "1"){
             f_temp = TFile::Open(Form("Systematics/beamline/FHC/output_uboone_fhc_run%i.root", beamline_map.at(f).second));
         }
-        else if(run_period == "3") {
+        else if(std::string(_util.run_period) == "3") {
             f_temp = TFile::Open(Form("Systematics/beamline/RHC/output_uboone_rhc_run%i.root", beamline_map.at(f).second));
         }
         else {

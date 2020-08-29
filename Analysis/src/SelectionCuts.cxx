@@ -13,7 +13,7 @@ bool SelectionCuts::swtrig(SliceContainer &SC, int type){
     if (type == _util.k_mc || type == _util.k_dirt){
         
         // Run 1 uses a different software trigger
-        if (SC.run_period == "1"){
+        if (std::string(_util.run_period) == "1"){
             if (SC.swtrig_pre == 1) return true;  // pass 
             else return false;                    // fail
         }

@@ -1,15 +1,12 @@
 #include "../include/UtilityPlotter.h"
 
 // -----------------------------------------------------------------------------
-void UtilityPlotter::Initialise(const char *_run_period, Utility _utility, const char* mode){
+void UtilityPlotter::Initialise(Utility _utility){
 
     std::cout << "Initalising Utility Plotter ..." << std::endl;
     _util = _utility;
 
-    // Set the run period
-    run_period = std::string(_run_period);
-
-    f_nuexsec    = TFile::Open( Form("files/trees/nuexsec_tree_merged_run%s.root", _run_period ));
+    f_nuexsec    = TFile::Open( Form("files/trees/nuexsec_tree_merged_run%s.root", _util.run_period ));
         
     // Get the Ttree
     _util.GetTree(f_nuexsec, tree, "tree");
@@ -18,7 +15,7 @@ void UtilityPlotter::Initialise(const char *_run_period, Utility _utility, const
     InitTree();
 
     // Standard variation mode
-    if (std::string(mode) == "default")  {
+    if (std::string(_util.uplotmode) == "default")  {
 
         // Look to see if the shower with the most hits is the same as the shower with the most energy
         CompareHitstoEnergy();
@@ -34,12 +31,12 @@ void UtilityPlotter::Initialise(const char *_run_period, Utility _utility, const
         
     }
     // This will call the code to optimise the bin widths
-    else if (std::string(mode) == "bins"){
+    else if (std::string(_util.uplotmode) == "bins"){
         OptimiseBins();
         return;
     }
     else {
-        std::cout << "Error I dont know what mode you have configured..." << mode << std::endl;
+        std::cout << "Error I dont know what mode you have configured..." << _util.uplotmode << std::endl;
         return;
     }
     
@@ -269,7 +266,7 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
         htemp->SetStats(kFALSE);
         _util.IncreaseLabelSize(htemp, c);
         c->SetTopMargin(0.11);
-        c->Print(Form("plots/run%s/Binning/bins_%0.2fGeV_to_%0.2f_GeV.pdf",run_period.c_str(), bin_lower_edge, bin_upper_edge ));
+        c->Print(Form("plots/run%s/Binning/bins_%0.2fGeV_to_%0.2f_GeV.pdf",_util.run_period, bin_lower_edge, bin_upper_edge ));
     } 
 
     delete htemp;
@@ -281,7 +278,7 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
 void UtilityPlotter::OptimiseBins(){
 
     // Create the Bins directory for saving the plots to
-    _util.CreateDirectory("Binning", run_period);
+    _util.CreateDirectory("Binning");
 
     // Load in the tfile and tree
     double mean{0.0}, sigma{0.0};
@@ -329,9 +326,9 @@ void UtilityPlotter::OptimiseBins(){
 void UtilityPlotter::PlotVarbyRecoBin(){
 
     // Create the resolutions directory for saving the plots to
-    _util.CreateDirectory("Resolution", run_period);
+    _util.CreateDirectory("Resolution");
 
-    _util.CreateDirectory("Purity_Completeness", run_period);
+    _util.CreateDirectory("Purity_Completeness");
 
 
     // Get the vector of bins
@@ -420,14 +417,14 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     
     
     // Draw the run period on the plot
-    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915, run_period);
+    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
     
 
     // Save it 
-    if (variable_str== "reco_e")       c->Print(Form("plots/run%s/Resolution/resolution_%0.0fMeV_to_%0.0f_MeV_reco.pdf", run_period.c_str(), bin_lower_edge*1000, bin_upper_edge*1000 ));
-    else if (variable_str == "true_e") c->Print(Form("plots/run%s/Resolution/resolution_%0.0fMeV_to_%0.0f_MeV_true.pdf", run_period.c_str(), bin_lower_edge*1000, bin_upper_edge*1000 ));
-    else if (variable_str == "purity") c->Print(Form("plots/run%s/Purity_Completeness/purity_%0.0fMeV_to_%0.0f_MeV.pdf", run_period.c_str(), bin_lower_edge*1000, bin_upper_edge*1000 ));
-    else if (variable_str == "completeness") c->Print(Form("plots/run%s/Purity_Completeness/completeness_%0.0fMeV_to_%0.0f_MeV.pdf", run_period.c_str(), bin_lower_edge*1000, bin_upper_edge*1000 ));
+    if (variable_str== "reco_e")       c->Print(Form("plots/run%s/Resolution/resolution_%0.0fMeV_to_%0.0f_MeV_reco.pdf", _util.run_period, bin_lower_edge*1000, bin_upper_edge*1000 ));
+    else if (variable_str == "true_e") c->Print(Form("plots/run%s/Resolution/resolution_%0.0fMeV_to_%0.0f_MeV_true.pdf", _util.run_period, bin_lower_edge*1000, bin_upper_edge*1000 ));
+    else if (variable_str == "purity") c->Print(Form("plots/run%s/Purity_Completeness/purity_%0.0fMeV_to_%0.0f_MeV.pdf", _util.run_period, bin_lower_edge*1000, bin_upper_edge*1000 ));
+    else if (variable_str == "completeness") c->Print(Form("plots/run%s/Purity_Completeness/completeness_%0.0fMeV_to_%0.0f_MeV.pdf", _util.run_period, bin_lower_edge*1000, bin_upper_edge*1000 ));
     else {
         std::cout << "incorrect variable input" << std::endl;
         return;
@@ -612,7 +609,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     pt->Draw();
 
     // Draw the run period on the plot
-    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92, "1");
+    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
 
     if (!draw_averge)c->Print("plots/Integrated_Flux_Separate.pdf");
     if (draw_averge)c->Print("plots/Integrated_Flux_Average.pdf");

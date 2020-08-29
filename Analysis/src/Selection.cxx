@@ -2,70 +2,27 @@
 
 namespace xsecSelection {
 // -----------------------------------------------------------------------------
-void Selection::Initialise( const char * mc_file,
-                            const char * ext_file,
-                            const char * data_file,
-                            const char * dirt_file,
-                            const char * mc_file_out,
-                            const char * ext_file_out,
-                            const char * data_file_out,
-                            const char * dirt_file_out,
-                            const char * mc_tree_file_name_out,
-                            Utility _utility,
-                            bool _slim,
-                            int num_events,
-                            const char * run_period,
-                            int _verbose){
+void Selection::Initialise(Utility _utility){
     
     std::cout << "\nInitialising..." << std::endl;
 
     _util = _utility; 
 
     // Initialise the Selection cuts class
-    _scuts.Initalise(_utility);
+    _scuts.Initalise(_util);
 
     // Display slimmed Selection
-    if (_slim){
+    if (_util.slim){
         std::cout << "\033[0;32m-------------------------------" << std::endl;
         std::cout << "     Running in Slim Mode!" << std::endl;
         std::cout << "-------------------------------\033[0m" << std::endl;
-        slim = _slim;
     }
-
-    std::cout << "\nSetting verbose level to: " << _verbose << std::endl;
-    verbose = _verbose;
 
     // Create the file directory if it does not exist already
     gSystem->Exec("if [ ! -d \"files/trees/\" ]; then echo \"\nfiles folder does not exist... creating\"; mkdir -p files/trees; fi"); 
 
-    // Set the scale factors
-    if (strcmp(run_period, "1") == 0){
-        mc_scale_factor     = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_MC_POT);
-        dirt_scale_factor   = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_Dirt_POT);
-        ext_scale_factor = _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
-        _run_period = 1;
-    }
-    else if (strcmp(run_period, "3") == 0){
-        mc_scale_factor     = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_MC_POT);
-        dirt_scale_factor   = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_Dirt_POT);
-        ext_scale_factor = _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
-        _run_period = 3;
-    }
-    else {
-        std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;
-        exit(1);
-    }
-
-
-    std::cout << "\033[0;32m-------------------------------" << std::endl;
-    std::cout << "Scale Factors:\n" <<
-    "MC Scale factor:   "   << mc_scale_factor     << "\n" <<
-    "Dirt Scale factor: "   << dirt_scale_factor   << "\n" <<
-    "EXT Scale factor:  "   << ext_scale_factor << std::endl;
-    std::cout << "-------------------------------\033[0m" << std::endl;
-
     // Set the maximum number of events tp process
-    if (num_events > 0 ) max_events = num_events;
+    if (_util.num_events > 0 ) max_events = _util.num_events;
 
     // Resize the histogram helper instance vectors, one instance per type e.g MC, data, ..
     _hhelper.resize(_util.k_type_MAX);
@@ -75,29 +32,29 @@ void Selection::Initialise( const char * mc_file,
 
     // Print the input files
     std::cout <<
-    "Run Period Configured: run" << run_period<<"\n" <<
-    "MC   File Path:      " << mc_file        <<"\n" <<
-    "EXT  File Path:      " << ext_file       <<"\n" <<
-    "Data File Path:      " << data_file      <<"\n" <<
-    "Dirt File Path:      " << dirt_file      <<"\n" <<
+    "Run Period Configured: run" << _util.run_period<<"\n" <<
+    "MC   File Path:      " << _util.mc_file_name        <<"\n" <<
+    "EXT  File Path:      " << _util.ext_file_name       <<"\n" <<
+    "Data File Path:      " << _util.data_file_name      <<"\n" <<
+    "Dirt File Path:      " << _util.dirt_file_name      <<"\n" <<
     std::endl;
 
     // Now get the files, if file isnt specified then set bool to skip
-    bool_use_mc        = _util.GetFile(f_mc,        mc_file);
-    bool_use_ext       = _util.GetFile(f_ext,       ext_file);
-    bool_use_data      = _util.GetFile(f_data,      data_file);
-    bool_use_dirt      = _util.GetFile(f_dirt,      dirt_file);
+    bool_use_mc        = _util.GetFile(f_mc,        _util.mc_file_name);
+    bool_use_ext       = _util.GetFile(f_ext,       _util.ext_file_name);
+    bool_use_data      = _util.GetFile(f_data,      _util.data_file_name);
+    bool_use_dirt      = _util.GetFile(f_dirt,      _util.dirt_file_name);
 
     // Load in the flux weights file
     std::cout << "Getting the CV flux file..."<< std::endl;
-    if (strcmp(run_period, "1") == 0) {
+    if (strcmp(_util.run_period, "1") == 0) {
         f_flux_weights = new TFile("Systematics/f_flux_CV_weights_fhc.root", "READ");
 
         // If its null then default to location on gpvm
         if (f_flux_weights == NULL) f_flux_weights = new TFile("/uboone/data/users/kmistry/work/nuexsec_files/f_flux_CV_weights_fhc.root", "READ");
 
     }
-    if (strcmp(run_period, "3") == 0) {
+    if (strcmp(_util.run_period, "3") == 0) {
         f_flux_weights = new TFile("Systematics/f_flux_CV_weights_rhc.root", "READ");
 
         // If its null then default to location on gpvm
@@ -117,14 +74,14 @@ void Selection::Initialise( const char * mc_file,
         _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the mc slice container
-        mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights, run_period, _util);
+        mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights, _util);
 
         // Initialise the Tree Helper
-        _thelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_tree_file_name_out);
+        _thelper.at(_util.k_mc).Initialise(_util.k_mc, _util.mc_tree_file_name_out);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_file_out, _util);
-        if (!_slim) _hhelper.at(_util.k_mc).InitHistograms();
+        if (!_util.slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, _util.mc_file_name_out, _util);
+        if (!_util.slim) _hhelper.at(_util.k_mc).InitHistograms();
 
         mc_tree_total_entries = mc_tree->GetEntries();
         std::cout << "Total MC Events:         " << mc_tree_total_entries << std::endl;
@@ -145,14 +102,14 @@ void Selection::Initialise( const char * mc_file,
         _util.GetTree(f_data, data_tree, "nuselection/NeutrinoSelectionFilter");
         
         // Initialise all the data slice container
-        data_SC.Initialise(data_tree, _util.k_data, f_flux_weights, run_period, _util);
+        data_SC.Initialise(data_tree, _util.k_data, f_flux_weights, _util);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, run_period, data_file_out, _util);
-        if (!_slim) _hhelper.at(_util.k_data).InitHistograms();
+        if (!_util.slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, _util.data_file_name_out, _util);
+        if (!_util.slim) _hhelper.at(_util.k_data).InitHistograms();
         
         // Initialise the Tree Helper
-        _thelper.at(_util.k_data).Initialise(_util.k_data, run_period, "empty");
+        _thelper.at(_util.k_data).Initialise(_util.k_data, "empty");
 
         data_tree_total_entries = data_tree->GetEntries();
         std::cout << "Total Data Events:         " << data_tree_total_entries << std::endl;
@@ -175,14 +132,14 @@ void Selection::Initialise( const char * mc_file,
         _util.GetTree(f_ext, ext_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
-        ext_SC.Initialise(ext_tree, _util.k_ext, f_flux_weights, run_period, _util);
+        ext_SC.Initialise(ext_tree, _util.k_ext, f_flux_weights, _util);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, ext_file_out, _util);
-        if (!_slim) _hhelper.at(_util.k_ext).InitHistograms();
+        if (!_util.slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, _util.ext_file_name_out, _util);
+        if (!_util.slim) _hhelper.at(_util.k_ext).InitHistograms();
         
         // Initialise the Tree Helper
-        _thelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, "empty");
+        _thelper.at(_util.k_ext).Initialise(_util.k_ext, "empty");
 
         ext_tree_total_entries = ext_tree->GetEntries();
         std::cout << "Total EXT Events:        " << ext_tree_total_entries << std::endl;
@@ -205,14 +162,14 @@ void Selection::Initialise( const char * mc_file,
         _util.GetTree(f_dirt, dirt_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
-        dirt_SC.Initialise(dirt_tree, _util.k_dirt, f_flux_weights, run_period, _util);
+        dirt_SC.Initialise(dirt_tree, _util.k_dirt, f_flux_weights, _util);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, dirt_file_out, _util);
-        if (!_slim) _hhelper.at(_util.k_dirt).InitHistograms();
+        if (!_util.slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, _util.dirt_file_name_out ,_util);
+        if (!_util.slim) _hhelper.at(_util.k_dirt).InitHistograms();
         
         // Initialise the Tree Helper
-        _thelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, "empty");
+        _thelper.at(_util.k_dirt).Initialise(_util.k_dirt, "empty");
 
         dirt_tree_total_entries = dirt_tree->GetEntries();
         std::cout << "Total Dirt Events:         " << dirt_tree_total_entries << std::endl;
@@ -244,7 +201,7 @@ void Selection::MakeSelection(){
 
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_mc;
-        run_subrun_file_mc.open(Form("files/run%i_run_subrun_list_mc.txt",_run_period));
+        run_subrun_file_mc.open(Form("files/run%s_run_subrun_list_mc.txt",_util.run_period));
 
         // Event loop
         for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
@@ -288,7 +245,7 @@ void Selection::MakeSelection(){
 
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_data;
-        run_subrun_file_data.open(Form("files/run%i_run_subrun_list_data.txt",_run_period));
+        run_subrun_file_data.open(Form("files/run%s_run_subrun_list_data.txt",_util.run_period));
 
         for (int ievent = 0; ievent < data_tree_total_entries; ievent++){
 
@@ -304,7 +261,7 @@ void Selection::MakeSelection(){
             data_tree->GetEntry(ievent);
 
             // Skip the events with different sw trigger configured
-            if (_run_period == 3 && data_SC.run > 16880 ){
+            if (std::string(_util.run_period) == "3" && data_SC.run > 16880 ){
             // if (_run_period == 3 && data_SC.run < 16880 ){
                 continue;
             }
@@ -331,7 +288,7 @@ void Selection::MakeSelection(){
 
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_ext;
-        run_subrun_file_ext.open(Form("files/run%i_run_subrun_list_ext.txt",_run_period));
+        run_subrun_file_ext.open(Form("files/run%s_run_subrun_list_ext.txt",_util.run_period));
 
         for (int ievent = 0; ievent < ext_tree_total_entries; ievent++){
 
@@ -347,7 +304,7 @@ void Selection::MakeSelection(){
             ext_tree->GetEntry(ievent); // TPC Objects
 
             // Skip the RHC events contaminated in the FHC files
-            if (_run_period == 3 && ext_SC.run > 16880 ){
+            if (std::string(_util.run_period) == "3" && ext_SC.run > 16880 ){
             // if (_run_period == 3 && ext_SC.run < 16880 ){
                 continue;
             }
@@ -376,7 +333,7 @@ void Selection::MakeSelection(){
 
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_dirt;
-        run_subrun_file_dirt.open(Form("files/run%i_run_subrun_list_dirt.txt",_run_period));
+        run_subrun_file_dirt.open(Form("files/run%s_run_subrun_list_dirt.txt",_util.run_period));
 
         for (int ievent = 0; ievent < dirt_tree_total_entries; ievent++){
 
@@ -423,7 +380,7 @@ void Selection::MakeSelection(){
     }
     
     // Now save all the outputs to file
-    if (!slim) SavetoFile();
+    if (!_util.slim) SavetoFile();
 
     return;
 } // End Selection
@@ -642,10 +599,10 @@ void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     // Fill Histograms
     // *************************************************************************
     // Fill almost all the histograms with this function call
-    if (!slim) _hhelper.at(type).FillHists(type, classification.second, interaction, par_type.second, cut_index, SC, weight);
+    if (!_util.slim) _hhelper.at(type).FillHists(type, classification.second, interaction, par_type.second, cut_index, SC, weight);
 
     // Fill Plots for Efficiency
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC, weight);
+    if (!_util.slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC, weight);
 
     // We want to save a slimmed down version of the selection for calculating the cross section
     // For the last cut we fill the tree or the first cut and nue_cc (generated and unselected events)
@@ -683,10 +640,10 @@ double Selection::GetCVWeight(int type, SliceContainer SC){
     if (type == _util.k_data ) return 1.0;
 
     // Run 1 and ext, correct by 2%
-    if (type == _util.k_ext && _run_period == 1 && _util.weight_ext) return 0.98;
+    if (type == _util.k_ext && std::string(_util.run_period) == "1" && _util.weight_ext) return 0.98;
 
     // Run 3 and ext, correct by 5%
-    if (type == _util.k_ext && _run_period == 3 && _util.weight_ext) return 0.95;
+    if (type == _util.k_ext && std::string(_util.run_period) == "3" && _util.weight_ext) return 0.95;
 
     double weight = 1.0;
 
@@ -772,9 +729,9 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
     GetPiZeroWeight(weight_Escale, 2, SC);
 
     // Now Fill the histograms
-    if (!slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight, 0);
-    if (!slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight_norm, 1);
-    if (!slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight_Escale, 2);
+    if (!_util.slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight, 0);
+    if (!_util.slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight_norm, 1);
+    if (!_util.slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight_Escale, 2);
 
 
 }
@@ -880,7 +837,7 @@ void Selection::ApplyNuMuSelection(int type, SliceContainer &SC){
     // Also apply the pi0 weight
     GetPiZeroWeight(weight, 2, SC);
 
-    if (!slim) _hhelper.at(type).FillNuMuHists(classification.second, SC, weight);
+    if (!_util.slim) _hhelper.at(type).FillNuMuHists(classification.second, SC, weight);
 
 }
 // -----------------------------------------------------------------------------

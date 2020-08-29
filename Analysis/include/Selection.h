@@ -31,17 +31,11 @@ namespace xsecSelection {
 
             int max_events{-1};
 
-            // Scale factors (everything is scaled to data)
-            double mc_scale_factor     = 1.0;
-            double ext_scale_factor    = 1.0;
-            double dirt_scale_factor   = 1.0;
-
             // Bools
             bool bool_use_mc{false};
             bool bool_use_ext{false};
             bool bool_use_data{false};
             bool bool_use_dirt{false};
-            bool slim{false};               // Flag to decide whether to make, fill and plot histograms
 
             // Decide whether to make a run subrun event filelist for the selected data events
             bool make_list{false};
@@ -104,20 +98,7 @@ namespace xsecSelection {
             friend class Utility;
             // -----------------------------------------------------------------
             // Function to Initialise the selection class ----------------------
-            void Initialise( const char * mc_file,
-                             const char * ext_file,
-                             const char * data_file,
-                             const char * dirt_file,
-                             const char * mc_file_out,
-                             const char * ext_file_out,
-                             const char * data_file_out,
-                             const char * dirt_file_out,
-                             const char * mc_tree_file_name_out,
-                             Utility _utility,
-                             bool _slim,
-                             int num_events,
-                             const char * run_period,
-                             int _verbose);
+            void Initialise(Utility _utility);
             // -----------------------------------------------------------------
             // Main function for selection
             void MakeSelection();

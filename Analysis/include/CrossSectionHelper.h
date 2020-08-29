@@ -21,11 +21,6 @@ class CrossSectionHelper{
     // Current flux bins are 0.00 ,0.06, 0.125, 0.25, 0.5... GeV
     double energy_threshold = 0.130; 
 
-    // Scale factors (everything is scaled to data)
-    double mc_scale_factor     = 1.0;
-    double ext_scale_factor    = 1.0;
-    double dirt_scale_factor   = 1.0;
-
     // Variables
     int run{0}, subrun{0}, event{0};
     std::string *classification = NULL; // The classification of the event
@@ -269,7 +264,7 @@ class CrossSectionHelper{
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(const char *run_period, const char * xsec_file_in, Utility _utility, const char* run_mode);
+    void Initialise(Utility _utility);
     // -------------------------------------------------------------------------
     // Function to loop over events and calculate the cross section
     void LoopEvents(); 

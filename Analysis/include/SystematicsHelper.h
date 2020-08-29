@@ -24,19 +24,17 @@ class SystematicsHelper{
     
     TTree * tree;
 
-    std::string run_period;
-
     std::vector<double> POT_v; // vector of POT for each variation 
 
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(const char *run_period, Utility _utility, const char* _mode);
+    void Initialise( Utility _utility);
     // -------------------------------------------------------------------------
     // Function to loop over events and calculate the cross section
     void MakeHistograms(); 
     // -------------------------------------------------------------------------
-    void GetPOT(const char* run_period);
+    void GetPOT();
     // -------------------------------------------------------------------------
     // Plots the variation comparisons
     void PlotVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name);
@@ -48,8 +46,6 @@ class SystematicsHelper{
     // -------------------------------------------------------------------------
     // Set options for ratio histogram
     void SetRatioOptions(TH1D* hist);
-    // -------------------------------------------------------------------------
-    void CreateDirectory(std::string folder, std::string run_period);
     // -------------------------------------------------------------------------
     // Draw area norm label
     void Draw_Area_Norm(TCanvas* c);

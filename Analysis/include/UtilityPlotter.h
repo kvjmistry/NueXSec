@@ -24,7 +24,6 @@ class UtilityPlotter{
 
     // Variables
     TTree * tree;
-    std::string run_period;
 
     std::string *classification = NULL; // The classification of the event
     
@@ -53,7 +52,7 @@ class UtilityPlotter{
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(const char *run_period, Utility _utility, const char* mode);
+    void Initialise(Utility _utility);
     // -------------------------------------------------------------------------
     // Initialsise the TTree
     void InitTree();

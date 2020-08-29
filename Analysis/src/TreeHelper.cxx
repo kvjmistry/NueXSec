@@ -1,18 +1,18 @@
 #include "../include/TreeHelper.h"
 
 // -----------------------------------------------------------------------------
-void TreeHelper::Initialise(int type, const char* run_period, const char * file_out ){
+void TreeHelper::Initialise(int type, const char* file_out ){
 
     std::cout << "Initalising Tree Helper..." << std::endl;
 
-    std::string file_out_str = file_out;
+    std::string file_out_str = std::string(file_out);
 
     std::string file_name;
 
     if (type == _util.k_mc){
 
         // If the file name is empty then we use the default file name
-        if (file_out_str == "empty") file_name = Form("files/trees/nuexsec_selected_tree_mc_run%s.root", run_period);
+        if (file_out_str == "empty") file_name = Form("files/trees/nuexsec_selected_tree_mc_run%s.root", _util.run_period);
         else file_name = "files/trees/" + file_out_str;
         
         // File not already open, open the file
@@ -28,7 +28,7 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     else if (type == _util.k_data){
         
         // If the file name is empty then we use the default file name
-        if (file_out_str == "empty") file_name = Form("files/trees/nuexsec_selected_tree_data_run%s.root", run_period);
+        if (file_out_str == "empty") file_name = Form("files/trees/nuexsec_selected_tree_data_run%s.root", _util.run_period);
         else file_name = "files/trees/" + file_out_str;
 
         // File not already open, open the file
@@ -45,7 +45,7 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     else if (type == _util.k_ext){
 
         // If the file name is empty then we use the default file name
-        if (file_out_str == "empty") file_name = Form("files/trees/nuexsec_selected_tree_ext_run%s.root", run_period);
+        if (file_out_str == "empty") file_name = Form("files/trees/nuexsec_selected_tree_ext_run%s.root", _util.run_period);
         else file_name = "files/trees/" + file_out_str;
         
         // File not already open, open the file
@@ -62,7 +62,7 @@ void TreeHelper::Initialise(int type, const char* run_period, const char * file_
     else if (type == _util.k_dirt){
         
         // If the file name is empty then we use the default file name
-        if (file_out_str == "empty") file_name = Form("files/trees/nuexsec_selected_tree_dirt_run%s.root", run_period);
+        if (file_out_str == "empty") file_name = Form("files/trees/nuexsec_selected_tree_dirt_run%s.root", _util.run_period);
         else file_name = "files/trees/" + file_out_str;
 
         // File not already open, open the file
@@ -244,7 +244,7 @@ void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _class
     shrmoliereavg = SC.shrmoliereavg;
     shr_hits_max  = SC.shr_hits_max;
     elec_e   = SC.elec_e;
-    weight_ppfx = SC.ppfx_cv;
+    // weight_ppfx = SC.ppfx_cv;
     weightSplineTimesTune = SC.weightSplineTimesTune;
     nu_pdg = SC.nu_pdg;
     numi_ang = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "beam");

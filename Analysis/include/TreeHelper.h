@@ -13,7 +13,7 @@ class TreeHelper{
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(int type, const char *run_period, const char * file_out );
+    void Initialise(int type, const char* file_out);
     // -------------------------------------------------------------------------
     // Function to fill the tree vars
     void FillVars(SliceContainer &SC, std::pair<std::string, int> _classification, bool _gen, double _weight, double _reco_energy);
@@ -42,9 +42,6 @@ class TreeHelper{
     Utility _util;
 
     int _type{1};
-
-    bool weight_tune = true; // Apply genie tune weight
-    bool weight_ppfx = true; // Apply ppfx cv weight
 
     // Tree variables
     int run{0}, subrun{0}, event{0};

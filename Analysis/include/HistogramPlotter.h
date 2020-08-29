@@ -18,26 +18,21 @@ class HistogramPlotter{
 
     Utility _util;
 
-    std::string run_period;
-
-    // Scale factors (veverything is scaled to data)
-    double mc_scale_factor, ext_scale_factor, dirt_scale_factor;
-    
     bool area_norm   = false;  // Decide if to area normalse the histograms
 
 
     // -------------------------------------------------------------------------
     // Main function call to control this class
-    void MakeHistograms(const char * hist_file_name, const char *run_period, bool _area_norm, Utility _utility, const char* variation);
+    void MakeHistograms(Utility _utility);
     // -------------------------------------------------------------------------
     // Initalise the file input
-    void Initalise(const char *hist_file_name, const char* _run_period, double _mc_scale_factor, double _ext_scale_factor, double _dirt_scale_factor);
+    void Initalise();
     // -------------------------------------------------------------------------
     // Function to make a stacked histogram and save as a pdf
     void MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, double y_scale_factor, const char* x_axis_name,
                                      const double leg_x1, const double leg_x2, const double leg_y1, double Data_POT, const double leg_y2,
                                      const char* print_name, bool override_data_mc_comparison, std::string plotmode, bool plotvar,
-                                     const char * variation, const char *run_period, bool centerxaxis, bool scale );
+                                    bool centerxaxis, bool scale );
     // -------------------------------------------------------------------------
     // Calculates the chi2
     // Returns reduced chi2, num mc+ext scaled to data POT, num data, num degrees of freedom, p value in vector respectively
@@ -50,7 +45,7 @@ class HistogramPlotter{
     void Draw_WeightLabels(TCanvas* c);
     // -------------------------------------------------------------------------
     // Draw Variation Mode
-    void Draw_VarMode(TCanvas* c, const char* variation);
+    void Draw_VarMode(TCanvas* c);
     // -------------------------------------------------------------------------
     // Function to get all the histograms from the file
     bool GetHistograms(std::vector<TH1D*> &hist, std::string hist_name, std::string cut_name, std::string plotmode, bool &found_data, bool &found_ext, bool &found_dirt);
@@ -62,7 +57,7 @@ class HistogramPlotter{
     void SetLegend(std::vector<TH1D*> hist, TLegend *leg_stack, std::vector<double> hist_integrals, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt, std::string plotmode );
     // -------------------------------------------------------------------------
     // Call make stacked histograms
-    void CallMakeStack(const char *run_period, int cut_index, double Data_POT, const char *variation);
+    void CallMakeStack(int cut_index, double Data_POT);
     // -------------------------------------------------------------------------
     void MakeFlashPlot(double Data_POT, const char* print_name, std::string histname);
     // -------------------------------------------------------------------------
@@ -70,10 +65,10 @@ class HistogramPlotter{
     void MakeFlashPlotOMO(double Data_POT, const char* print_name, std::string histname);
     // -------------------------------------------------------------------------
     // Make efficiency plots
-    void MakeEfficiencyPlot(const char* print_name, const char *run_period);
+    void MakeEfficiencyPlot(const char* print_name);
     // -------------------------------------------------------------------------
     // The efficiency made by each cut
-    void MakeEfficiencyPlotByCut(const char *run_period, std::string var, bool mask_title);
+    void MakeEfficiencyPlotByCut(std::string var, bool mask_title);
     // -------------------------------------------------------------------------
     // True Neutino energy for nues broken down by genie interaction type
     void MakeInteractionPlot(const char* print_name, std::string cut_type, bool scale);

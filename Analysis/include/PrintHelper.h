@@ -12,7 +12,7 @@ class PrintHelper{
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(const char* run_period, const char * mc_file_in, bool _print_mc, bool _print_data, bool _print_ext, bool _print_dirt, Utility _utility );
+    void Initialise(Utility _utility );
     // -------------------------------------------------------------------------
     // Function to print the selection
     void PrintResults();
@@ -39,10 +39,6 @@ class PrintHelper{
 
     TTree * eff_tree;   // Efficiency and Purity tree
 
-    bool print_mc;
-    bool print_data;
-    bool print_ext;
-    bool print_dirt;
 
     int tree_total_entries{0}; // Should equal number of cuts
 

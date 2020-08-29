@@ -1,20 +1,15 @@
 #include "../include/PrintHelper.h"
 
 // -----------------------------------------------------------------------------
-void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bool _print_mc, bool _print_data, bool _print_ext, bool _print_dirt, Utility _utility ){
+void PrintHelper::Initialise(Utility _utility ){
 
     std::cout << "Initalising Print Helper..." << std::endl;
 
     _util = _utility;
 
-    std::string file_out_str = mc_file_in;
+    std::string file_out_str = std::string(_util.mc_file_name);
 
     std::string file_name;
-
-    print_mc    = _print_mc;
-    print_data  = _print_data;
-    print_ext   = _print_ext;
-    print_dirt  = _print_dirt;
 
     // define this to scale the MC to a desired POT
     // double additional_scaling = 6.0e20/_util.config_v.at(_util.k_Run1_Data_POT); // Use this to scale the POT to set amount -- also chnage the run POT
@@ -22,15 +17,15 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bo
     if ( additional_scaling != 1.0) std::cout << "\033[0;34mWarning using an additional POT scale factor to print the selection results\033[0m" << std::endl;
 
     // Set the scale factors
-    if (strcmp(run_period, "1") == 0){
+    if (strcmp(_util.run_period, "1") == 0){
         mc_scale_factor     = additional_scaling * _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_MC_POT);
         dirt_scale_factor   = additional_scaling * _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_Dirt_POT);
-        ext_scale_factor = additional_scaling * _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
+        ext_scale_factor    = additional_scaling * _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
     }
-    else if (strcmp(run_period, "3") == 0){
+    else if (strcmp(_util.run_period, "3") == 0){
         mc_scale_factor     = additional_scaling * _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_MC_POT);
         dirt_scale_factor   = additional_scaling * _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_Dirt_POT);
-        ext_scale_factor = additional_scaling * _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
+        ext_scale_factor    = additional_scaling * _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
     }
     else {
         std::cout << "Error Krish... You havent defined the run X POT numbers yet you donut!" << std::endl;
@@ -46,8 +41,8 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bo
     std::cout << "-------------------------------\033[0m" << std::endl;
 
     // Data -----------------------
-    if (print_data){
-        file_name = Form("files/trees/nuexsec_selected_tree_data_run%s.root", run_period);
+    if (_util.print_data){
+        file_name = Form("files/trees/nuexsec_selected_tree_data_run%s.root", _util.run_period);
 
         // File not already open, open the file
         if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
@@ -58,8 +53,8 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bo
     }
 
     // EXT -----------------------
-    if (print_ext){
-        file_name = Form("files/trees/nuexsec_selected_tree_ext_run%s.root", run_period);
+    if (_util.print_ext){
+        file_name = Form("files/trees/nuexsec_selected_tree_ext_run%s.root", _util.run_period);
         
         // File not already open, open the file
         if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
@@ -70,8 +65,8 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bo
     }
 
     // dirt -----------------------
-    if (print_dirt){
-        file_name = Form("files/trees/nuexsec_selected_tree_dirt_run%s.root", run_period);
+    if (_util.print_dirt){
+        file_name = Form("files/trees/nuexsec_selected_tree_dirt_run%s.root", _util.run_period);
 
         // File not already open, open the file
         if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
@@ -82,8 +77,8 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bo
     }
 
     // MC -----------------------
-    if (print_mc){
-        if (file_out_str == "empty") file_name = Form("files/trees/nuexsec_selected_tree_mc_run%s.root", run_period);
+    if (_util.print_mc){
+        if (file_out_str == "empty") file_name = Form("files/trees/nuexsec_selected_tree_mc_run%s.root", _util.run_period);
         else file_name = "files/trees/" + file_out_str;
         
         // File not already open, open the file
@@ -100,7 +95,7 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bo
     }
     
     // Counter Tree
-    if (print_mc){
+    if (_util.print_mc){
         mc_counter_tree->SetBranchAddress("count_nue_cc_qe",  &count_nue_cc_qe);
         mc_counter_tree->SetBranchAddress("count_nue_cc_res", &count_nue_cc_res);
         mc_counter_tree->SetBranchAddress("count_nue_cc_dis", &count_nue_cc_dis);
@@ -160,15 +155,15 @@ void PrintHelper::Initialise(const char* run_period, const char * mc_file_in, bo
         mc_counter_tree->SetBranchAddress("count_total_mc",        &count_total_mc);
     }
 
-    if (print_data){
+    if (_util.print_data){
         data_counter_tree->SetBranchAddress("count_data",         &count_data);
     }
     
-    if (print_ext){
+    if (_util.print_ext){
         ext_counter_tree->SetBranchAddress("count_ext",          &count_ext);
     }
     
-    if (print_dirt){
+    if (_util.print_dirt){
         dirt_counter_tree->SetBranchAddress("count_dirt",         &count_dirt);
     }
 
@@ -181,10 +176,10 @@ void PrintHelper::PrintResults(){
     // Loop over the cuts
     for (int p =0; p < tree_total_entries; p++){
 
-        if (print_mc)   mc_counter_tree->GetEntry(p);
-        if (print_data) data_counter_tree->GetEntry(p);
-        if (print_ext)  ext_counter_tree->GetEntry(p);
-        if (print_dirt) dirt_counter_tree->GetEntry(p);
+        if (_util.print_mc)   mc_counter_tree->GetEntry(p);
+        if (_util.print_data) data_counter_tree->GetEntry(p);
+        if (_util.print_ext)  ext_counter_tree->GetEntry(p);
+        if (_util.print_dirt) dirt_counter_tree->GetEntry(p);
 
         // Set counters at the start
         if (p == 0) {
@@ -203,8 +198,8 @@ void PrintHelper::PrintResults(){
             init_count_cosmic_nue       = count_cosmic_nue;
             init_count_unmatched_nuebar = count_unmatched_nuebar;
             init_count_cosmic_nuebar    = count_cosmic_nuebar;
-            if (print_ext) init_count_ext = count_ext;
-            if (print_dirt) init_count_dirt = count_dirt;
+            if (_util.print_ext) init_count_ext = count_ext;
+            if (_util.print_dirt) init_count_dirt = count_dirt;
 
         }
 
@@ -219,7 +214,7 @@ void PrintHelper::PrintResults(){
         }
 
 
-        if (print_mc && print_data && print_ext && print_dirt){
+        if (_util.print_mc && _util.print_data && _util.print_ext && _util.print_dirt){
             std::cout << "\n------------------------------------------------" << std::endl;
         }
         std::cout << "------------------------------------------------" << std::endl;
@@ -227,12 +222,12 @@ void PrintHelper::PrintResults(){
         std::cout.precision(6);
         std::cout << "\n\033[0;33m <" << _util.cut_dirs.at(p) << "> \033[0m" << std::endl;
         
-        if (!print_mc) {
+        if (!_util.print_mc) {
             if (p == 0) printf (" %-21s %-10s %-10s %-10s %-10s %-12s\n", " " , "MC POT", "Data POT", "Unscaled", "\% Remaining", " \% Change from Prev Cut");
         }
         else printf (" %-21s %-10s %-10s %-10s %-10s %-12s\n", " " , "MC POT", "Data POT", "Unscaled", "\% Remaining", " \% Change from Prev Cut");
 
-        if (print_mc){
+        if (_util.print_mc){
             printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Nue CC",               count_nue_cc,           double(count_nue_cc           * mc_scale_factor  ), " ", double( 100 * count_nue_cc / init_count_nue_cc),                     double(-100 * (count_nue_cc           - prev_count_nue_cc)           / prev_count_nue_cc));
             printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "NueBar CC",            count_nuebar_cc,        double(count_nuebar_cc        * mc_scale_factor  ), " ", double( 100 * count_nuebar_cc / init_count_nuebar_cc),               double(-100 * (count_nuebar_cc        - prev_count_nuebar_cc)        / prev_count_nuebar_cc));
             printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Nu out FV",            count_nu_out_fv,        double(count_nu_out_fv        * mc_scale_factor  ), " ", double( 100 * count_nu_out_fv / init_count_nu_out_fv),               double(-100 * (count_nu_out_fv        - prev_count_nu_out_fv)        / prev_count_nu_out_fv));
@@ -247,31 +242,31 @@ void PrintHelper::PrintResults(){
             if (p == 0) printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Non-Reco'd Nuebar CC", count_unmatched_nuebar, double(count_unmatched_nuebar * mc_scale_factor  ), " ", double( 100 * count_unmatched_nuebar / init_count_unmatched_nuebar), double(-100 * (count_unmatched_nuebar - prev_count_unmatched_nuebar) / prev_count_unmatched_nuebar));
        }
 
-        if (print_dirt){
+        if (_util.print_dirt){
             printf (" %-20s: %-10.2f %-10.2f %-10.2f %f %9.2f\n", "Dirt", double(count_dirt * (dirt_scale_factor / mc_scale_factor)), double(count_dirt * dirt_scale_factor), count_dirt, double( 100 * count_dirt / init_count_dirt), double(100 * (prev_count_dirt - count_dirt) / prev_count_dirt) );
             
         }
 
-        if (print_ext) { 
+        if (_util.print_ext) { 
             printf (" %-20s: %-10.2f %-10.2f %-10.2f %f %9.2f\n", "Off-Beam Data", double(count_ext * (ext_scale_factor / mc_scale_factor)), double(count_ext * ext_scale_factor), count_ext, double( 100 * count_ext / init_count_ext), double( 100 * (prev_count_ext - count_ext) / prev_count_ext) );
             
         }
 
-        if (print_mc && print_dirt){
+        if (_util.print_mc && _util.print_dirt){
             double tot_mc_bkg = count_nu_out_fv + count_numu_cc + count_numu_cc_pi0 + count_nc + count_nc_pi0;
             printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Beam Bkg", tot_mc_bkg + count_dirt * (dirt_scale_factor / mc_scale_factor), double(tot_mc_bkg * mc_scale_factor + count_dirt * dirt_scale_factor ) );
         }
 
-        if (print_mc && print_ext){
+        if (_util.print_mc && _util.print_ext){
             double tot_cosmic_bkg = count_cosmic + count_cosmic_nue + count_cosmic_nuebar;
             printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Cosmic Bkg", tot_cosmic_bkg + count_ext * (ext_scale_factor / mc_scale_factor), double(tot_cosmic_bkg * mc_scale_factor + count_ext * ext_scale_factor ));
         }
         
-        if (print_mc){
+        if (_util.print_mc){
             printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Candidate Nue", sum_mc_dirt_ext, double(sum_mc_dirt_ext         * mc_scale_factor  ));
         }
   
-        if (print_mc){
+        if (_util.print_mc){
             std::cout << "\n----------- Neutrinos in FV Truth -------------" << std::endl;
             printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC QE",    count_nue_cc_qe*mc_scale_factor,  "Nuebar CC QE",    count_nuebar_cc_qe*mc_scale_factor);
             printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC Res",   count_nue_cc_res*mc_scale_factor, "Nuebar CC Res",   count_nuebar_cc_res*mc_scale_factor);
@@ -296,7 +291,7 @@ void PrintHelper::PrintResults(){
             printf (" %-17s: %-10.2f %-20s: %-10.2f\n", "Tot Numu Pi0",      count_pi0_numu_cc_pi0*mc_scale_factor,      "Tot NC Pi0",        count_pi0_nc_pi0*mc_scale_factor);
         }
         
-        if (print_mc){
+        if (_util.print_mc){
             std::cout << "------------------------------------------------" << std::endl;
             efficiency = double(count_nue_cc + count_nuebar_cc) / double(tot_true_infv_nues);
             purity     = double(count_nue_cc + count_nuebar_cc) / double(sum_mc_dirt_ext);
@@ -311,21 +306,21 @@ void PrintHelper::PrintResults(){
             purity_last     = purity;
         }
 
-        if (print_data){
+        if (_util.print_data){
             std::cout << "------------------------------------------------" << std::endl;
             double tot_bkg = 0;
-            if (print_mc && print_dirt && print_ext) tot_bkg = (count_nu_out_fv + count_cosmic + count_numu_cc + count_numu_cc_pi0 + count_nc + count_nc_pi0 + count_unmatched) * mc_scale_factor +
+            if (_util.print_mc && _util.print_dirt && _util.print_ext) tot_bkg = (count_nu_out_fv + count_cosmic + count_numu_cc + count_numu_cc_pi0 + count_nc + count_nc_pi0 + count_unmatched) * mc_scale_factor +
                               count_dirt * dirt_scale_factor + count_ext * ext_scale_factor;
             
             std::cout << " Total Selected Data : " << count_data << std::endl;
             
-            if (print_mc && print_dirt && print_ext) std::cout << " Total Nue Candidates in data : " << count_data - tot_bkg<< std::endl;
+            if (_util.print_mc && _util.print_dirt && _util.print_ext) std::cout << " Total Nue Candidates in data : " << count_data - tot_bkg<< std::endl;
             
             std::cout << "------------------------------------------------" << std::endl;
         }
 
         // Fill the efficiency tree
-        if (print_mc && print_data && print_ext && print_dirt) eff_tree->Fill();
+        if (_util.print_mc && _util.print_data && _util.print_ext && _util.print_dirt) eff_tree->Fill();
 
         // Set counters for the previous cut
         prev_count_nue_cc       = count_nue_cc;
@@ -341,15 +336,15 @@ void PrintHelper::PrintResults(){
         prev_count_cosmic_nue       = count_cosmic_nue;
         prev_count_unmatched_nuebar = count_unmatched_nuebar;
         prev_count_cosmic_nuebar    = count_cosmic_nuebar;
-        if (print_ext) prev_count_ext = count_ext;
-        if (print_dirt) prev_count_dirt = count_dirt;
+        if (_util.print_ext) prev_count_ext = count_ext;
+        if (_util.print_dirt) prev_count_dirt = count_dirt;
         
     }
 
     // Save the efficiency tree
-    if (print_mc && print_data && print_ext && print_dirt) {
+    if (_util.print_mc && _util.print_data && _util.print_ext && _util.print_dirt) {
         
-        if (print_mc){
+        if (_util.print_mc){
             f_mc->cd();
             eff_tree->Write("",TObject::kOverwrite);
         }

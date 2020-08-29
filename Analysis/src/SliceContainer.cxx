@@ -1,7 +1,7 @@
 #include "../include/SliceContainer.h"
 
 // -----------------------------------------------------------------------------
-void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, const char * _run_period, Utility util){
+void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, Utility util){
 
     std::cout << "Initalising Slice Container" << std::endl;
     _util = util;
@@ -300,7 +300,7 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("nu_purity_from_pfp", &nu_purity_from_pfp);
     // tree->SetBranchAddress("n_tracks_pandora", &n_tracks_pandora);
     
-    if (std::string(_run_period) != "1") tree->SetBranchAddress("_closestNuCosmicDist",&_closestNuCosmicDist);
+    if (std::string(_util.run_period) != "1") tree->SetBranchAddress("_closestNuCosmicDist",&_closestNuCosmicDist);
     
     tree->SetBranchAddress("pfp_generation_v",        &pfp_generation_v);
     tree->SetBranchAddress("pfp_trk_daughters_v",     &pfp_trk_daughters_v);
@@ -403,8 +403,6 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
         boolhist = _util.GetHist(f_flux_weights, h_2D_CV_UW_PPFX_ratio_numu,    "h_2D_CV_UW_PPFX_ratio_numu");    if (boolhist == false) exit(2);
         boolhist = _util.GetHist(f_flux_weights, h_2D_CV_UW_PPFX_ratio_numubar, "h_2D_CV_UW_PPFX_ratio_numubar"); if (boolhist == false) exit(2);
     }
-
-    run_period = std::string(_run_period);
 
 
 }

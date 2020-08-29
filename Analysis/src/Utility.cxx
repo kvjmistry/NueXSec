@@ -1,9 +1,227 @@
 #include "../include/Utility.h"
 
 // -----------------------------------------------------------------------------
-void Utility::Initalise(const char* variation, bool overwritePOT, const char* run_period, int _weight_tune, int _weight_ppfx, int _weight_dirt, int _weight_ext, int _pi0_correction){
+void Utility::Initalise(int argc, char *argv[], std::string usage,std::string usage2, std::string usage3 ){
 
     std::cout << "Initialising Utility Class..." << std::endl;
+
+    // Loop over input arguments
+    for (int i =1; i < argc; i++){
+        auto const arg = argv[i];
+        //std::cout << arg << std::endl; // This is for debugging
+        
+        // Slim input
+        if (strcmp(arg, "--slim") == 0) {
+            std::cout << "Running with slim mode"<< std::endl;
+            slim = true;
+            std::cout << " *** \t Running with Slimmed Selection (no histograms will be made)\t *** " << std::endl;
+        }
+
+        // Histogram Mode
+        if (strcmp(arg, "--hist") == 0) {
+            std::cout << "Making Histograms, file to make histograms with: "<< argv[i+1] << std::endl;
+            make_histos = true;
+            run_selection = false; // switch this bool out
+            hist_file_name = argv[i+1];
+        }
+
+        // XSec mode
+        if (strcmp(arg, "--xsec") == 0) {
+            std::cout << "Calculating the Cross Section with input file name: " << argv[i+1] << std::endl;
+            calc_cross_sec = true;
+            run_selection = false; // switch this bool out
+            tree_file_name = argv[i+1];
+        }
+        
+        // MC file
+        if (strcmp(arg, "--mc") == 0) {
+            // std::cout << "Running with MC file: " << argv[i+1] << std::endl;
+            mc_file_name = argv[i+1];
+        }
+
+        // Overwrite output mc file name
+        if (strcmp(arg, "--mc_out") == 0) {
+            std::cout << "New Output MC File name: " << argv[i+1] << std::endl;
+            mc_file_name_out = argv[i+1];
+        }
+
+        // EXT file
+        if (strcmp(arg, "--ext") == 0){
+            // std::cout << "Running with EXT file: " << argv[i+1] << std::endl;
+            ext_file_name = argv[i+1];
+        }
+
+        // Overwrite output ext file name
+        if (strcmp(arg, "--ext_out") == 0) {
+            std::cout << "New Output EXT File name: " << argv[i+1] << std::endl;
+            ext_file_name_out = argv[i+1];
+        }
+
+        // Data file
+        if (strcmp(arg, "--data") == 0){
+            // std::cout << "Running with Data file: " << argv[i+1] << std::endl;
+            data_file_name = argv[i+1];
+        }
+        
+        // Overwrite output data file name
+        if (strcmp(arg, "--data_out") == 0) {
+            std::cout << "New Output Data File name: " << argv[i+1] << std::endl;
+            data_file_name_out = argv[i+1];
+        }
+
+        // Dirt file overlay
+        if (strcmp(arg, "--dirt") == 0){
+            // std::cout << "Running with Dirt file: " << argv[i+1] << std::endl;
+            dirt_file_name = argv[i+1];
+        }
+
+        // Overwrite output dirt file name
+        if (strcmp(arg, "--dirt_out") == 0) {
+            std::cout << "New Output Dirt File name: " << argv[i+1] << std::endl;
+            dirt_file_name_out = argv[i+1];
+        }
+
+        // GENIE Tune Weight Settings
+        if (strcmp(arg, "--weight_tune") == 0){
+            std::cout << "Running with GENIE Tune mode: " << argv[i+1] << std::endl;
+            weight_tune = atoi(argv[i+1]);
+        }
+        
+        // PPFX CV Weight Settings
+        if (strcmp(arg, "--weight_ppfx") == 0){
+            std::cout << "Running with PPFX CV mode: " << argv[i+1] << std::endl;
+            weight_ppfx = atoi(argv[i+1]);
+        }
+
+        // Dirt Weight Settings
+        if (strcmp(arg, "--weight_dirt") == 0){
+            std::cout << "Running with Dirt mode: " << argv[i+1] << std::endl;
+            weight_dirt = atoi(argv[i+1]);
+        }
+
+        // EXT Weight Settings
+        if (strcmp(arg, "--weight_ext") == 0){
+            std::cout << "Running with EXT mode: " << argv[i+1] << std::endl;
+            weight_ext = atoi(argv[i+1]);
+        }
+
+        // pi0 Weight Settings
+        if (strcmp(arg, "--weight_pi0") == 0){
+            std::cout << "Running with pi0 mode: " << argv[i+1] << std::endl;
+            _pi0_correction = atoi(argv[i+1]);
+        }
+
+        // Whats the verbose?
+        if (strcmp(arg, "-v") == 0 || strcmp(arg, "--verbose") == 0 || strcmp(arg, "--v") == 0){
+            std::cout << "Setting Verbose Level to : " << argv[i+1] << std::endl;
+            verbose = atoi(argv[i+1]);
+        }
+
+        // Max number of events specified?
+        if (strcmp(arg, "-n") == 0 || strcmp(arg, "--n") == 0){
+            std::cout << "Running with a maximum of : " << argv[i+1] << " events" <<std::endl;
+            num_events = atoi(argv[i+1]);
+        }
+
+        // Set the run period
+        if (strcmp(arg, "--run") == 0){
+            // std::cout << "Setting the run period as : run" << argv[i+1] <<std::endl;
+            run_period = argv[i+1];
+        }
+
+        // Help!
+        if (strcmp(arg, "--h") == 0 || strcmp(arg, "-h") == 0|| strcmp(arg, "--help") == 0 || strcmp(arg, "--usage") == 0){
+            std::cout << usage <<  usage2 << usage3 << std::endl; 
+            exit(1);
+        }
+
+        // Area Normalise the histograms
+        if (strcmp(arg, "--area") == 0) {
+            std::cout << "Area Normalising the histograms"<< std::endl;
+            area_norm = true;
+        }
+
+        // Variation file
+        if (strcmp(arg, "--var") == 0){
+            std::cout << "Using Variation: " << argv[i+2] << std::endl;
+            
+            variation = argv[i+2];
+            mc_file_name = argv[i+1];
+            
+            mc_file_name_out      = Form("nuexsec_mc_run%s_%s.root", run_period, variation);
+            mc_tree_file_name_out = Form("nuexsec_selected_tree_mc_run%s_%s.root", run_period, variation);
+            
+            std::cout  << "Output filename will be overwritten with name: "      << mc_file_name_out << std::endl;
+            std::cout << "Output tree filename will be overwritten with name: " << mc_tree_file_name_out << std::endl;
+            
+            overwritePOT = true;
+        }
+
+        // Systematics
+        if (strcmp(arg, "--sys") == 0){
+            std::cout << "Using Systematics plotting code with mode: " << argv[i+1] << std::endl;
+            run_sys = true;
+            run_selection = false;
+            sysmode = argv[i+1];
+        }
+
+        // Cross-Section
+        if (strcmp(arg, "--xsecmode") == 0){
+            std::cout << "Using Cross-Section code with mode: " << argv[i+1] << std::endl;
+            xsecmode = argv[i+1];
+        }
+
+        // Utility Plotter
+        if (strcmp(arg, "--uplot") == 0){
+            std::cout << "Using Utility plotting code with mode: " << argv[i+1] << std::endl;
+            run_uplot = true;
+            run_selection = false;
+            uplotmode = argv[i+1];
+        }
+
+        // Only run the print function
+        if (strcmp(arg, "--printonly") == 0) {
+            run_selection = false;
+            print = true;
+        }
+
+        // Print all
+        if (strcmp(arg, "--printall") == 0) {
+            print = true;
+            print_mc                 = true;
+            print_data               = true;
+            print_ext                = true;
+            print_dirt               = true;
+        }
+        
+        // Print MC
+        if (strcmp(arg, "--printmc") == 0) {
+            print = true;
+            print_mc = true;
+        }
+        
+        // Print Data
+        if (strcmp(arg, "--printdata") == 0) {
+            print = true;
+            print_data = true;
+        }
+
+        // Print ext
+        if (strcmp(arg, "--printext") == 0) {
+            print = true;
+            print_ext = true;
+        }
+
+        // Print Dirt
+        if (strcmp(arg, "--printdirt") == 0) {
+            print = true;
+            print_dirt = true;
+        }
+   
+    }
+
+    // Finished getting all the input parameters to the code
+    // ----------------------------------------------------------------------------
 
     std::string variation_str = variation;
 
@@ -117,6 +335,29 @@ void Utility::Initalise(const char* variation, bool overwritePOT, const char* ru
     else {
         std::cout << "Using energy dependent scaling to correct pi0" << std::endl;
     }
+
+    // Set the scale factors
+    if (strcmp(run_period, "1") == 0){
+        mc_scale_factor     = config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_MC_POT);
+        dirt_scale_factor   = config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_Dirt_POT);
+        ext_scale_factor = config_v.at(k_Run1_Data_trig) / config_v.at(k_Run1_EXT_trig);
+    }
+    else if (strcmp(run_period, "3") == 0){
+        mc_scale_factor     = config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_MC_POT);
+        dirt_scale_factor   = config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_Dirt_POT);
+        ext_scale_factor = config_v.at(k_Run3_Data_trig) / config_v.at(k_Run3_EXT_trig);
+    }
+    else {
+        std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;
+        exit(1);
+    }
+
+    std::cout << "\033[0;32m-------------------------------" << std::endl;
+    std::cout << "Scale Factors:\n" <<
+    "MC Scale factor:   "   << mc_scale_factor     << "\n" <<
+    "Dirt Scale factor: "   << dirt_scale_factor   << "\n" <<
+    "EXT Scale factor:  "   << ext_scale_factor << std::endl;
+    std::cout << "-------------------------------\033[0m" << std::endl;
     
 }
 // -----------------------------------------------------------------------------
@@ -150,7 +391,7 @@ bool Utility::GetTree(TFile* f, TTree* &T, TString string){
 bool Utility::GetHist(TFile* f, TH1D* &h, TString string){
     h = (TH1D*) f->Get(string);
     if (h == NULL) {
-        if (verbose) std::cout << "\nfailed to get:\t" << string << "\tThis histogram might not exist in the file\n" << std::endl;
+        std::cout << "\nfailed to get:\t" << string << "\tThis histogram might not exist in the file\n" << std::endl;
         return false;
     }
     else {
@@ -161,7 +402,7 @@ bool Utility::GetHist(TFile* f, TH1D* &h, TString string){
 bool Utility::GetHist(TFile* f, TH2D* &h, TString string){
     h = (TH2D*) f->Get(string);
     if (h == NULL) {
-        if (verbose) std::cout << "\nfailed to get:\t" << string << "\tThis histogram might not exist in the file\n" << std::endl;
+        std::cout << "\nfailed to get:\t" << string << "\tThis histogram might not exist in the file\n" << std::endl;
         return false;
     }
     else {
@@ -220,23 +461,12 @@ bool Utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     }
 }
 // -----------------------------------------------------------------------------
-void Utility::CreateDirectory(std::string folder, const char *run_period){
+void Utility::CreateDirectory(std::string folder){
 
     std::string a = "if [ ! -d \"plots/";
     std::string b = "run" + std::string(run_period) + "/" + folder;
     std::string c = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
     std::string d = "run" + std::string(run_period) + "/" + folder;
-    std::string e = "; fi";
-    std::string command = a + b + c + d + e;
-    system(command.c_str());
-}
-// -----------------------------------------------------------------------------
-void Utility::CreateDirectory(std::string folder, std::string run_period){
-
-    std::string a = "if [ ! -d \"plots/";
-    std::string b = "run" + run_period + "/" + folder;
-    std::string c = "\" ]; then echo \"\nPlots folder does not exist... creating\"; mkdir -p plots/";
-    std::string d = "run" + run_period + "/" + folder;
     std::string e = "; fi";
     std::string command = a + b + c + d + e;
     system(command.c_str());
@@ -433,20 +663,20 @@ void Utility::IncreaseLabelSize(TH2D *h, TCanvas *c){
     // gPad->SetGridx();
 }
 // -----------------------------------------------------------------------------
-void Utility::Draw_Run_Period(TCanvas *c, double x1, double y1, double x2, double y2, std::string run_period) {
+void Utility::Draw_Run_Period(TCanvas *c, double x1, double y1, double x2, double y2) {
     c->cd();
 
     //0.86, 0.915, 0.86, 0.915
 
     TPaveText *pt;
 
-    if (run_period == "1") {
+    if (std::string(run_period) == "1") {
         pt = new TPaveText(x1, y1, x2, y2, "NDC");
         pt->AddText("Run1");
         pt->SetTextColor(kRed + 2);
         pt->SetTextSize(0.04);
     }
-    else if (run_period == "3") {
+    else if (std::string(run_period) == "3") {
         pt = new TPaveText(x1, y1, x2, y2, "NDC");
         pt->AddText("Run3");
         pt->SetTextColor(kBlue + 2);
