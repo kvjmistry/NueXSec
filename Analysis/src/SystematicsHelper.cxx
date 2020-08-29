@@ -577,7 +577,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
         CompareVariationXSec("NormCCCOH",        var, "Norm CC COH" );
         CompareVariationXSec("NormNCCOH",        var, "Norm NC COH" );
 
-        // Plot the unisims
+        // Plot the interaction unisims
         PlotReweightingModeUnisim("RPA",              var, "RPA" );
         PlotReweightingModeUnisim("CCMEC",            var, "CC MEC" );
         PlotReweightingModeUnisim("AxFFCCQE",         var, "Ax FF CCQE" );
@@ -589,6 +589,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeUnisim("NormCCCOH",        var, "Norm CC COH" );
         PlotReweightingModeUnisim("NormNCCOH",        var, "Norm NC COH" );
 
+        // Plot the beamline unisims
         PlotReweightingModeUnisim("Horn_curr",          var, "Horn Current" );
         PlotReweightingModeUnisim("Horn1_x",            var, "Horn 1 x" );
         PlotReweightingModeUnisim("Horn1_y",            var, "Horn 1 y" );
@@ -1415,6 +1416,10 @@ void SystematicsHelper::CalcCovariance(std::string label, int var, std::vector<s
     delete c3;
     delete frac_cov;
 
-
-
 }
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
