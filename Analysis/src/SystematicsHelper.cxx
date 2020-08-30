@@ -581,8 +581,6 @@ void SystematicsHelper::InitialiseReweightingMode(){
     // Loop over the cross-section variables
     for (unsigned int var = 0; var <  vars.size(); var++){
 
-        if (vars.at(var) != "true_el_E") CompareCVXSec(var);
-
         // Comparison plots for data to MC
         CompareVariationXSec("RPA",              var, "RPA" );
         CompareVariationXSec("CCMEC",            var, "CC MEC" );
@@ -638,10 +636,11 @@ void SystematicsHelper::InitialiseReweightingMode(){
     std::cout << "Beamline Tot MC X-Sec Sys:           " <<std::sqrt(v_beamline_total.at(k_var_integrated).at(k_xsec_mcxsec)   .at(0)) << " \%"<< std::endl;
     std::cout << "Hadron Prod. Tot MC X-Sec Sys:       " <<std::sqrt(v_hp_total.at(k_var_integrated).at(k_xsec_mcxsec)         .at(0)) << " \%"<< std::endl;
     std::cout << "Geant Rein. Tot MC X-Sec Sys:        " <<std::sqrt(v_reint_total.at(k_var_integrated).at(k_xsec_mcxsec)      .at(0)) << " \%"<< std::endl;
-    std::cout << "\nTot MC X-Sec Stat:                   " <<std::sqrt(v_stat_total.at(k_var_integrated).at(k_xsec_mcxsec)        .at(0)) << " \%"<< std::endl;
+    std::cout << "\nTot Data X-Sec Stat:                 " <<std::sqrt(v_stat_total.at(k_var_integrated).at(k_xsec_dataxsec)        .at(0)) << " \%"<< std::endl;
     std::cout << "Tot MC X-Sec Sys:                    " <<std::sqrt(v_sys_total.at(k_var_integrated).at(k_xsec_mcxsec)        .at(0)) << " \%"<< std::endl;
     
-    
+    // Compare the MC and Data X-Section
+    CompareCVXSec();
     
 
 }
@@ -1019,7 +1018,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
         leg->AddEntry(h_universe.at(0).at(k), Form("%s", label_pretty.c_str()), "l");
-        if (xsec_types.at(k) != "data_xsec") leg->AddEntry(cv_hist_vec_clone.at(k),           "CV (Sys Only)", "ef");
+        if (xsec_types.at(k) != "data_xsec") leg->AddEntry(cv_hist_vec_clone.at(k),           "CV (Sys Only)", "f");
         else                                 leg->AddEntry(cv_hist_vec_clone.at(k),           "CV (Sys Only)", "le");
         leg->Draw();
 
@@ -1066,96 +1065,128 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
     
 }
 // -----------------------------------------------------------------------------
-void SystematicsHelper::CompareCVXSec(int var){
+void SystematicsHelper::CompareCVXSec(){
 
-    
-    TH1D* h_dataxsec = (TH1D*) cv_hist_vec.at(var).at(k_xsec_dataxsec)->Clone("h_data_xsec_temp");
-    TH1D* h_mcxsec   = (TH1D*) cv_hist_vec.at(var).at(k_xsec_mcxsec)  ->Clone("h_data_xsec_temp");
+    std::vector<std::string> error_type = {"stat", "sys", "tot"};
+
+    // Loop over the variables
+    for (unsigned int var = 0; var < vars.size(); var++){
+
+        // Loop over the error labels
+        for (unsigned int err_lab = 0; err_lab < error_type.size(); err_lab++){
+
+            TH1D* h_dataxsec     = (TH1D*) cv_hist_vec.at(var).at(k_xsec_dataxsec)->Clone("h_data_xsec_temp");
+            TH1D* h_dataxsec_tot = (TH1D*) cv_hist_vec.at(var).at(k_xsec_dataxsec)->Clone("h_data_xsec_tot_temp"); // For total uncertainty
+            TH1D* h_mcxsec       = (TH1D*) cv_hist_vec.at(var).at(k_xsec_mcxsec)  ->Clone("h_mx_xsec_temp");
+
+            TPad *topPad;
+            TPad *bottomPad;
+
+            TCanvas * c = new TCanvas("c", "c", 500, 500);
+            topPad = new TPad("topPad", "", 0, 0.3, 1, 1.0);
+            bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
+            _util.SetTPadOptions(topPad, bottomPad);
+
+            h_dataxsec->SetLineColor(kBlack);
+            h_mcxsec  ->SetLineColor(kRed+2);
+
+            // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
+            if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(0.5e-39, 2.5e-39);
+            else h_dataxsec->GetYaxis()->SetRangeUser(0.0e-39, 0.5e-39);
+
+            h_dataxsec->GetYaxis()->SetLabelSize(0.04);
+            h_dataxsec->GetYaxis()->SetTitleSize(14);
+            h_dataxsec->GetYaxis()->SetTitleFont(44);
+            h_dataxsec->GetYaxis()->SetTitleOffset(1.5);
+            h_dataxsec->GetXaxis()->SetTitle("");
+            h_dataxsec->GetXaxis()->SetLabelSize(0);
+            h_dataxsec->SetMarkerStyle(20);
+            h_dataxsec->SetMarkerSize(0.5);
+            h_dataxsec->SetMinimum(0);
+            
+            // Rewrite the errors for data to sys
+            if (error_type.at(err_lab) == "sys"){
+                for (int bin = 0; bin < h_dataxsec->GetNbinsX(); bin++){
+                    h_dataxsec->SetBinError(bin+1, 0.01*std::sqrt(v_sys_total.at(var).at(k_xsec_mcxsec).at(bin)) * h_dataxsec->GetBinContent(bin+1));
+                }
+
+            }
+            // Overwrite error to stat + sys
+            else {
+                for (int bin = 0; bin < h_dataxsec->GetNbinsX(); bin++){
+                    h_dataxsec_tot->SetBinError(bin+1, 0.01*std::sqrt(v_sys_total.at(var).at(k_xsec_mcxsec).at(bin) + v_stat_total.at(var).at(k_xsec_dataxsec).at(bin)) * h_dataxsec->GetBinContent(bin+1));
+                }
+
+            }
+            
+            
+            
+            h_dataxsec->Draw("E,X0");
+            if (error_type.at(err_lab) == "tot"){
+                h_dataxsec_tot->Draw("E1,same,X0");
+                h_dataxsec->Draw("E1,same,X0");
+
+            } 
+
+            h_mcxsec->Draw("hist,same");
+            
+            TH1D* h_mcxsec_clone = (TH1D *)h_mcxsec->Clone("h_mc_clone");
+            h_mcxsec_clone->SetFillColorAlpha(12, 0.15);
+            h_mcxsec_clone->Draw("E2,same");
+            
+
+            TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
+            leg->SetBorderSize(0);
+            leg->SetFillStyle(0);
+            if (error_type.at(err_lab) == "stat")      leg->AddEntry(h_dataxsec, "Data (Stat Only)", "le");
+            else if (error_type.at(err_lab) == "sys") leg->AddEntry(h_dataxsec, "Data (Sys Only)", "le");
+            else                                      leg->AddEntry(h_dataxsec, "Data (Stat+Sys)", "le");
+            leg->AddEntry(h_mcxsec_clone,   "MC (Stat Only)", "lf");
+            leg->Draw();
 
 
-    TPad *topPad;
-    TPad *bottomPad;
-
-    TCanvas * c = new TCanvas("c", "c", 500, 500);
-    topPad = new TPad("topPad", "", 0, 0.3, 1, 1.0);
-    bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
-    _util.SetTPadOptions(topPad, bottomPad);
-
-    h_dataxsec->SetLineColor(kBlack);
-    h_mcxsec  ->SetLineColor(kRed+2);
-
-    // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
-    if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(0.5e-39, 2.5e-39);
-
-    h_dataxsec->GetYaxis()->SetLabelSize(0.04);
-    h_dataxsec->GetYaxis()->SetTitleSize(14);
-    h_dataxsec->GetYaxis()->SetTitleFont(44);
-    h_dataxsec->GetYaxis()->SetTitleOffset(1.5);
-    h_dataxsec->GetXaxis()->SetTitle("");
-    h_dataxsec->GetXaxis()->SetLabelSize(0);
-    h_dataxsec->SetMarkerStyle(20);
-    h_dataxsec->SetMarkerSize(0.5);
-
-    h_dataxsec->SetMinimum(0);
-
-    h_dataxsec->Draw("E");
-    h_mcxsec->Draw("hist,same");
-    TH1D* h_mcxsec_clone = (TH1D *)h_mcxsec->Clone("h_mc_clone");
-    h_mcxsec_clone->SetFillColorAlpha(12, 0.15);
-    h_mcxsec_clone->Draw("E2,same");
-    
-
-    TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
-    leg->SetBorderSize(0);
-    leg->SetFillStyle(0);
-    leg->AddEntry(h_dataxsec, "Data (Stat Only)", "le");
-    leg->AddEntry(h_mcxsec_clone,   "MC (Stat Only)", "lf");
-    leg->Draw();
+            bottomPad->cd();
+                
+            // The percent difference of mc wrt data
+            TH1D* h_err = (TH1D *)h_dataxsec->Clone("h_ratio");
+            h_err->Add(h_mcxsec, -1);
+            h_err->Divide(h_dataxsec);
+            h_err->Scale(100);
+            h_err->GetYaxis()->SetTitle("Data - MC / Data [\%]");
+            h_err->SetLineWidth(2);
+            h_err->SetLineColor(kGreen+2);
 
 
-    bottomPad->cd();
+            bottomPad->SetGridy(kFALSE);
+            
+            SetRatioOptions(h_err);
+            h_err->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
+            h_err->SetLineColor(kBlack);
+            h_err->GetYaxis()->SetTitleSize(11);
+            h_err->GetYaxis()->SetRangeUser(-100, 100);
+            
+            h_err->GetYaxis()->SetTitleOffset(2.5);
+            h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+            if (vars.at(var) == "integrated")  h_err->GetXaxis()->SetLabelSize(0);
+            h_err->SetMarkerSize(3.0);
+            h_err->Draw("hist,text00");
+
+            // Draw the run period on the plot
+            _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
+
+            
+            c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_data_mc_comparison_%s.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), error_type.at(err_lab).c_str() ));
+            delete c;
+            delete h_dataxsec;
+            delete h_mcxsec;
+            delete h_err;
+
         
-    // The percent difference of mc wrt data
-    TH1D* h_err = (TH1D *)h_dataxsec->Clone("h_ratio");
-    
-    for (int bin = 1; bin < h_err->GetNbinsX()+1; bin++){
-        std::cout <<"[" << vars.at(var) << ", "<< "Data"<< "] " <<"Bin: " << bin << "  Stat Uncertainty: " <<  100 * h_dataxsec->GetBinError(bin) / h_dataxsec->GetBinContent(bin) << std::endl;
-        std::cout <<"[" << vars.at(var) << ", "<< "MC"<< "]   " <<"Bin: " << bin << "  Stat Uncertainty: " <<  100 * h_mcxsec->GetBinError(bin) / h_mcxsec->GetBinContent(bin) <<"\n" << std::endl;
+        }
+
     }
-    // h_err->GetYaxis()->SetTitle("Stat. Uncertainty [\%]");
-    
-    // This is if we want the percent difference of data to MC
-    h_err->Add(h_mcxsec, -1);
-    h_err->Divide(h_dataxsec);
-    h_err->Scale(100);
-    h_err->GetYaxis()->SetTitle("Data - MC / Data [\%]");
-    
-    
-    h_err->SetLineWidth(2);
-    h_err->SetLineColor(kGreen+2);
 
 
-    bottomPad->SetGridy(kFALSE);
-    
-
-    SetRatioOptions(h_err);
-    h_err->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
-    h_err->SetLineColor(kBlack);
-    h_err->GetYaxis()->SetTitleSize(11);
-    h_err->GetYaxis()->SetRangeUser(-100, 100);
-    
-    h_err->GetYaxis()->SetTitleOffset(2.5);
-    h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
-    if (vars.at(var) == "integrated")  h_err->GetXaxis()->SetLabelSize(0);
-    h_err->SetMarkerSize(3.0);
-    h_err->Draw("hist,text00");
-
-    // Draw the run period on the plot
-    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
-
-
-    c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_data_mc_comparison.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str() ));
-    delete c;
 }
 // -----------------------------------------------------------------------------
 void SystematicsHelper::InitialsePlotCV(){
