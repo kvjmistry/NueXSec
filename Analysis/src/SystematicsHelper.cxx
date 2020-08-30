@@ -552,6 +552,8 @@ void SystematicsHelper::InitialiseReweightingMode(){
     v_beamline_total   .resize(vars.size());
     v_hp_total         .resize(vars.size());
     v_reint_total      .resize(vars.size());
+    v_sys_total        .resize(vars.size());
+    v_stat_total        .resize(vars.size());
 
     for (unsigned int var = 0; var < vars.size(); var++ ){
         v_genie_uni_total.at(var)  .resize(xsec_types.size());
@@ -559,6 +561,8 @@ void SystematicsHelper::InitialiseReweightingMode(){
         v_beamline_total.at(var)   .resize(xsec_types.size());
         v_hp_total.at(var)         .resize(xsec_types.size());
         v_reint_total.at(var)      .resize(xsec_types.size());
+        v_sys_total.at(var)        .resize(xsec_types.size());
+        v_stat_total.at(var)        .resize(xsec_types.size());
     }
 
     for (unsigned int var = 0; var < vars.size(); var++ ){
@@ -568,6 +572,8 @@ void SystematicsHelper::InitialiseReweightingMode(){
             v_beamline_total.at(var).at(type)   .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
             v_hp_total.at(var).at(type)         .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
             v_reint_total.at(var).at(type)      .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+            v_sys_total.at(var).at(type)        .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+            v_stat_total.at(var).at(type)        .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
         }
     }
 
@@ -623,13 +629,17 @@ void SystematicsHelper::InitialiseReweightingMode(){
         
     }
 
+    // Get the statistical uncertainties
+    FillStatVector();
 
     
-    std::cout << "\n\nGENIE Unisim Tot Sys MC X-Sec Err:   " <<std::sqrt(v_genie_uni_total.at(k_var_integrated).at(k_xsec_mcxsec)  .at(0)) << " \%"<< std::endl;
-    std::cout << "GENIE Multisim Tot Sys MC X-Sec Err: " <<std::sqrt(v_genie_multi_total.at(k_var_integrated).at(k_xsec_mcxsec).at(0)) << " \%"<< std::endl;
-    std::cout << "Beamline Tot Sys MC X-Sec Err:       " <<std::sqrt(v_beamline_total.at(k_var_integrated).at(k_xsec_mcxsec)   .at(0)) << " \%"<< std::endl;
-    std::cout << "Hadron Prod. Tot Sys MC X-Sec Err:   " <<std::sqrt(v_hp_total.at(k_var_integrated).at(k_xsec_mcxsec)         .at(0)) << " \%"<< std::endl;
-    std::cout << "Geant Rein. Tot Sys MC X-Sec Err:    " <<std::sqrt(v_reint_total.at(k_var_integrated).at(k_xsec_mcxsec)      .at(0)) << " \%"<< std::endl;
+    std::cout << "\n\nGENIE Unisim Tot MC X-Sec Sys:       " <<std::sqrt(v_genie_uni_total.at(k_var_integrated).at(k_xsec_mcxsec)  .at(0)) << " \%"<< std::endl;
+    std::cout << "GENIE Multisim Tot MC X-Sec Sys:     " <<std::sqrt(v_genie_multi_total.at(k_var_integrated).at(k_xsec_mcxsec).at(0)) << " \%"<< std::endl;
+    std::cout << "Beamline Tot MC X-Sec Sys:           " <<std::sqrt(v_beamline_total.at(k_var_integrated).at(k_xsec_mcxsec)   .at(0)) << " \%"<< std::endl;
+    std::cout << "Hadron Prod. Tot MC X-Sec Sys:       " <<std::sqrt(v_hp_total.at(k_var_integrated).at(k_xsec_mcxsec)         .at(0)) << " \%"<< std::endl;
+    std::cout << "Geant Rein. Tot MC X-Sec Sys:        " <<std::sqrt(v_reint_total.at(k_var_integrated).at(k_xsec_mcxsec)      .at(0)) << " \%"<< std::endl;
+    std::cout << "\nTot MC X-Sec Stat:                   " <<std::sqrt(v_stat_total.at(k_var_integrated).at(k_xsec_mcxsec)        .at(0)) << " \%"<< std::endl;
+    std::cout << "Tot MC X-Sec Sys:                    " <<std::sqrt(v_sys_total.at(k_var_integrated).at(k_xsec_mcxsec)        .at(0)) << " \%"<< std::endl;
     
     
     
@@ -1493,6 +1503,7 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
             if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
             else max_err = h_dn->GetBinContent(bin+1);
             v_beamline_total.at(var).at(type).at(bin) += max_err*max_err;
+            v_sys_total.at(var).at(type).at(bin) += max_err*max_err;
             
         }
     }
@@ -1505,6 +1516,7 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
             if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
             else max_err = h_dn->GetBinContent(bin+1);
             v_genie_multi_total.at(var).at(type).at(bin) += max_err*max_err;
+            v_sys_total.at(var).at(type).at(bin) += max_err*max_err;
             
         }
 
@@ -1518,6 +1530,7 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
             if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
             else max_err = h_dn->GetBinContent(bin+1);
             v_reint_total.at(var).at(type).at(bin) += max_err*max_err;
+            v_sys_total.at(var).at(type).at(bin) += max_err*max_err;
             
         }
 
@@ -1531,6 +1544,7 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
             if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
             else max_err = h_dn->GetBinContent(bin+1);
             v_hp_total.at(var).at(type).at(bin) += max_err*max_err;
+            v_sys_total.at(var).at(type).at(bin) += max_err*max_err;
             
         }
 
@@ -1541,6 +1555,26 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
 
 }
 // -----------------------------------------------------------------------------
+void SystematicsHelper::FillStatVector(){
+
+    // Loop over the differential variables
+    for (unsigned int var = 0; var < vars.size(); var++ ){
+        
+        // Loop over the types
+        for (unsigned int type = 0; type < xsec_types.size(); type++ ){
+            
+            // Get the uncertainty in each bin
+            for (int bin = 0; bin < cv_hist_vec.at(var).at(type)->GetNbinsX(); bin++){
+            
+                double stat_err = 100 * cv_hist_vec.at(var).at(type)->GetBinError(bin+1) / cv_hist_vec.at(var).at(type)->GetBinContent(bin+1);
+                v_stat_total.at(var).at(type).at(bin) += stat_err*stat_err;
+
+            }
+        
+        }
+    }
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

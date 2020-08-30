@@ -78,6 +78,8 @@ class SystematicsHelper{
     // Fill the total systematic vector with the square sum of the uncertainty
     void FillSysVector(std::string variation, int var, int type, TH1D *h_up, TH1D *h_dn);
     // -------------------------------------------------------------------------
+    // Fill vector with the statistical uncertainties
+    void FillStatVector();
     // -------------------------------------------------------------------------
 
 
@@ -177,6 +179,8 @@ class SystematicsHelper{
 
     // Vectors to store the quadrature sum of the uncertainties
     // We combine all of these to then get the total error and plot it
+    std::vector<std::vector<std::vector<double>>> v_sys_total;         // differential variable, type, bin error [total systematic]
+    std::vector<std::vector<std::vector<double>>> v_stat_total;        // differential variable, type, bin error [total statistical]
     std::vector<std::vector<std::vector<double>>> v_genie_uni_total;   // differential variable, type, bin error [genie unisim]
     std::vector<std::vector<std::vector<double>>> v_genie_multi_total; // differential variable, type, bin error [genie multisim]
     std::vector<std::vector<std::vector<double>>> v_beamline_total;    // differential variable, type, bin error [beamline unisim]
