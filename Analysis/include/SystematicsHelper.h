@@ -26,6 +26,8 @@ class SystematicsHelper{
 
     std::vector<double> POT_v; // vector of POT for each variation 
 
+    double Data_POT;
+
 
     // -------------------------------------------------------------------------
     // Initialiser function
@@ -62,6 +64,10 @@ class SystematicsHelper{
     // -------------------------------------------------------------------------
     // Plots the MC and data cross sections to compare them
     void CompareCVXSec();
+    // -------------------------------------------------------------------------
+    // Plots the MC and data cross sections to compare them
+    // This is with no ratio plot
+    void CompareCVXSecNoRatio();
     // -------------------------------------------------------------------------
     // Function that initialises and plots the CV
     void InitialsePlotCV();
@@ -159,14 +165,14 @@ class SystematicsHelper{
     // Use these for when we do the flux normalised event rate
     std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",
                                         ";Reco. Leading Shower Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]",
-                                        ";True Electron Energy [GeV]; #nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate[cm^{2}/GeV]"
+                                        ";True Electron Energy [GeV]; #nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
                                         // ";True #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
                                         // ";Reco #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]"
                                         };
 
 
     std::vector<std::string> var_labels_x = {"",
-                                        "Reco Leading Shower Energy [GeV]",
+                                        "Reco. Leading Shower Energy [GeV]",
                                         "True Electron Energy [GeV]"
                                         // "True #nu_{e} Energy [GeV]",
                                         // "Reco #nu_{e} Energy [GeV]"

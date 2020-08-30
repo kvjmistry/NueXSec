@@ -6,6 +6,18 @@ void SystematicsHelper::Initialise(Utility _utility){
     std::cout << "Initalising Systematics Helper..." << std::endl;
     _util = _utility;
 
+    // Set the scale factors
+    if (strcmp(_util.run_period, "1") == 0){
+        Data_POT = _util.config_v.at(_util.k_Run1_Data_POT); // Define this variable here for easier reading
+    }
+    else if (strcmp(_util.run_period, "3") == 0){
+        Data_POT = _util.config_v.at(_util.k_Run3_Data_POT); // Define this variable here for easier reading
+    }
+    else {
+        std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;
+        exit(1);
+    }
+
     // Off beam mode to compare bnb and numi off beam samples
     if (std::string(_util.sysmode) == "ext"){
         var_string = { "NuMI", "BNB" };
@@ -641,6 +653,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
     
     // Compare the MC and Data X-Section
     CompareCVXSec();
+    CompareCVXSecNoRatio();
     
 
 }
@@ -1138,8 +1151,8 @@ void SystematicsHelper::CompareCVXSec(){
             TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
             leg->SetBorderSize(0);
             leg->SetFillStyle(0);
-            if (error_type.at(err_lab) == "stat")      leg->AddEntry(h_dataxsec, "Data (Stat Only)", "le");
-            else if (error_type.at(err_lab) == "sys") leg->AddEntry(h_dataxsec, "Data (Sys Only)", "le");
+            if (error_type.at(err_lab) == "stat")      leg->AddEntry(h_dataxsec, "Data (Stat)", "le");
+            else if (error_type.at(err_lab) == "sys") leg->AddEntry(h_dataxsec, "Data (Sys)", "le");
             else                                      leg->AddEntry(h_dataxsec, "Data (Stat+Sys)", "le");
             leg->AddEntry(h_mcxsec_clone,   "MC (Stat Only)", "lf");
             leg->Draw();
@@ -1174,12 +1187,107 @@ void SystematicsHelper::CompareCVXSec(){
             // Draw the run period on the plot
             _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
 
+            _util.Draw_Data_POT(c, Data_POT, 0.47, 0.915, 0.47, 0.915);
+
             
             c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_data_mc_comparison_%s.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), error_type.at(err_lab).c_str() ));
             delete c;
             delete h_dataxsec;
             delete h_mcxsec;
             delete h_err;
+
+        
+        }
+
+    }
+
+
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::CompareCVXSecNoRatio(){
+
+    std::vector<std::string> error_type = {"stat", "sys", "tot"};
+
+    // Loop over the variables
+    for (unsigned int var = 0; var < vars.size(); var++){
+
+        // Loop over the error labels
+        for (unsigned int err_lab = 0; err_lab < error_type.size(); err_lab++){
+
+            TH1D* h_dataxsec     = (TH1D*) cv_hist_vec.at(var).at(k_xsec_dataxsec)->Clone("h_data_xsec_temp");
+            TH1D* h_dataxsec_tot = (TH1D*) cv_hist_vec.at(var).at(k_xsec_dataxsec)->Clone("h_data_xsec_tot_temp"); // For total uncertainty
+            TH1D* h_mcxsec       = (TH1D*) cv_hist_vec.at(var).at(k_xsec_mcxsec)  ->Clone("h_mx_xsec_temp");
+
+            TPad *topPad;
+            TPad *bottomPad;
+
+            TCanvas * c = new TCanvas("c", "c", 500, 500);
+
+            h_dataxsec->SetLineColor(kBlack);
+            h_mcxsec  ->SetLineColor(kRed+2);
+
+            // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
+            if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(0.5e-39, 2.5e-39);
+            else h_dataxsec->GetYaxis()->SetRangeUser(0.0e-39, 0.5e-39);
+
+            _util.IncreaseLabelSize(h_dataxsec, c);
+            if (vars.at(var) == "integrated")h_dataxsec->GetXaxis()->SetLabelSize(0);
+            h_dataxsec->GetYaxis()->SetTitleSize(0.04);
+            h_dataxsec->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+            h_dataxsec->SetMarkerStyle(20);
+            h_dataxsec->SetMarkerSize(0.5);
+            h_dataxsec->SetMinimum(0);
+            
+            // Rewrite the errors for data to sys
+            if (error_type.at(err_lab) == "sys"){
+                for (int bin = 0; bin < h_dataxsec->GetNbinsX(); bin++){
+                    h_dataxsec->SetBinError(bin+1, 0.01*std::sqrt(v_sys_total.at(var).at(k_xsec_mcxsec).at(bin)) * h_dataxsec->GetBinContent(bin+1));
+                }
+
+            }
+            // Overwrite error to stat + sys
+            else {
+                for (int bin = 0; bin < h_dataxsec->GetNbinsX(); bin++){
+                    h_dataxsec_tot->SetBinError(bin+1, 0.01*std::sqrt(v_sys_total.at(var).at(k_xsec_mcxsec).at(bin) + v_stat_total.at(var).at(k_xsec_dataxsec).at(bin)) * h_dataxsec->GetBinContent(bin+1));
+                }
+
+            }
+            
+            
+            
+            h_dataxsec->Draw("E,X0");
+            if (error_type.at(err_lab) == "tot"){
+                h_dataxsec_tot->Draw("E1,same,X0");
+                h_dataxsec->Draw("E1,same,X0");
+
+            } 
+
+            h_mcxsec->Draw("hist,same");
+            
+            TH1D* h_mcxsec_clone = (TH1D *)h_mcxsec->Clone("h_mc_clone");
+            h_mcxsec_clone->SetFillColorAlpha(12, 0.15);
+            h_mcxsec_clone->Draw("E2,same");
+            
+
+            TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
+            leg->SetBorderSize(0);
+            leg->SetFillStyle(0);
+            if (error_type.at(err_lab) == "stat")     leg->AddEntry(h_dataxsec, "Data (Stat)", "le");
+            else if (error_type.at(err_lab) == "sys") leg->AddEntry(h_dataxsec, "Data (Sys)", "le");
+            else                                      leg->AddEntry(h_dataxsec, "Data (Stat+Sys)", "le");
+            leg->AddEntry(h_mcxsec_clone,   "MC (Stat Only)", "lf");
+            leg->Draw();
+
+            // Draw the run period on the plot
+            _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+
+            _util.Draw_Data_POT(c, Data_POT, 0.52, 0.92, 0.52, 0.92);
+
+            
+            c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_data_mc_comparison_%s_no_ratio.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), error_type.at(err_lab).c_str() ));
+            delete c;
+            delete h_dataxsec;
+            delete h_mcxsec;
 
         
         }
