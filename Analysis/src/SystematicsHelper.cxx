@@ -545,6 +545,34 @@ void SystematicsHelper::InitialiseReweightingMode(){
 
     InitialsePlotCV();
 
+    // Now lets initialse the vectors which will store the total uncertainties
+    // differential variable, type, bin error
+    v_genie_uni_total  .resize(vars.size());
+    v_genie_multi_total.resize(vars.size());
+    v_beamline_total   .resize(vars.size());
+    v_hp_total         .resize(vars.size());
+    v_reint_total      .resize(vars.size());
+
+    for (unsigned int var = 0; var < vars.size(); var++ ){
+        v_genie_uni_total.at(var)  .resize(xsec_types.size());
+        v_genie_multi_total.at(var).resize(xsec_types.size());
+        v_beamline_total.at(var)   .resize(xsec_types.size());
+        v_hp_total.at(var)         .resize(xsec_types.size());
+        v_reint_total.at(var)      .resize(xsec_types.size());
+    }
+
+    for (unsigned int var = 0; var < vars.size(); var++ ){
+        for (unsigned int type = 0; type < xsec_types.size(); type++ ){
+            v_genie_uni_total.at(var).at(type)  .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+            v_genie_multi_total.at(var).at(type).resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+            v_beamline_total.at(var).at(type)   .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+            v_hp_total.at(var).at(type)         .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+            v_reint_total.at(var).at(type)      .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+        }
+    }
+
+
+    // Loop over the cross-section variables
     for (unsigned int var = 0; var <  vars.size(); var++){
 
         if (vars.at(var) != "true_el_E") CompareCVXSec(var);
@@ -594,6 +622,16 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeMultisim("weightsPPFX",  var,  "PPFX", 600);
         
     }
+
+
+    
+    std::cout << "\n\nGENIE Unisim Tot Sys MC X-Sec Err:   " <<std::sqrt(v_genie_uni_total.at(k_var_integrated).at(k_xsec_mcxsec)  .at(0)) << " \%"<< std::endl;
+    std::cout << "GENIE Multisim Tot Sys MC X-Sec Err: " <<std::sqrt(v_genie_multi_total.at(k_var_integrated).at(k_xsec_mcxsec).at(0)) << " \%"<< std::endl;
+    std::cout << "Beamline Tot Sys MC X-Sec Err:       " <<std::sqrt(v_beamline_total.at(k_var_integrated).at(k_xsec_mcxsec)   .at(0)) << " \%"<< std::endl;
+    std::cout << "Hadron Prod. Tot Sys MC X-Sec Err:   " <<std::sqrt(v_hp_total.at(k_var_integrated).at(k_xsec_mcxsec)         .at(0)) << " \%"<< std::endl;
+    std::cout << "Geant Rein. Tot Sys MC X-Sec Err:    " <<std::sqrt(v_reint_total.at(k_var_integrated).at(k_xsec_mcxsec)      .at(0)) << " \%"<< std::endl;
+    
+    
     
 
 }
@@ -813,6 +851,8 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         
         h_err->Draw("hist,same");
 
+        FillSysVector(label, var, k, h_err_up, h_err_dn);
+
         c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(), _util.run_period, label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
         delete c;
@@ -1002,6 +1042,8 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_err->SetMarkerSize(4);
         h_err->Draw("hist, text00");
         gStyle->SetPaintTextFormat("4.1f");
+
+        FillSysVector(label, var, k, h_err, h_err);
 
         c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(),  _util.run_period, label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
@@ -1402,6 +1444,102 @@ void SystematicsHelper::CalcCovariance(std::string label, int var, std::vector<s
 
 }
 // -----------------------------------------------------------------------------
+void SystematicsHelper::FillSysVector(std::string variation, int var, int type, TH1D *h_up, TH1D *h_dn){
+
+    // This is a Genie Unisim
+    if (variation == "RPA"              ||
+        variation == "CCMEC"            ||
+        variation == "AxFFCCQE"         ||
+        variation == "VecFFCCQE"        ||
+        variation == "DecayAngMEC"      ||
+        variation == "ThetaDelta2Npi"   ||
+        variation == "ThetaDelta2NRad"  ||
+        variation == "RPA_CCQE_Reduced" ||
+        variation == "NormCCCOH"        ||
+        variation == "NormNCCOH"){
+
+        // Loop over histogram bins
+        for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
+            
+            double max_err = 0;
+            // Get the max error in each bin, then add the square
+            if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
+            else max_err = h_dn->GetBinContent(bin+1);
+            v_genie_uni_total.at(var).at(type).at(bin) += max_err*max_err;
+            
+        }
+    }
+    // This is a beamline unisim
+    else if (
+        variation == "Horn_curr" ||
+        variation == "Horn1_x" ||
+        variation == "Horn1_y" ||
+        variation == "Beam_spot" ||
+        variation == "Horn2_x" ||
+        variation == "Horn2_y" ||
+        variation == "Horn_Water" ||
+        variation == "Beam_shift_x" ||
+        variation == "Beam_shift_y" ||
+        variation == "Target_z" ||
+        variation == "Horn1_refined_descr" ||
+        variation == "Decay_pipe_Bfield" ||
+        variation == "Old_Horn_Geometry"){
+
+        // Loop over histogram bins
+        for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
+            
+            double max_err = 0;
+            // Get the max error in each bin, then add the square
+            if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
+            else max_err = h_dn->GetBinContent(bin+1);
+            v_beamline_total.at(var).at(type).at(bin) += max_err*max_err;
+            
+        }
+    }
+    else if (variation == "weightsGenie"){
+        // Loop over histogram bins
+        for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
+            
+            double max_err = 0;
+            // Get the max error in each bin, then add the square
+            if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
+            else max_err = h_dn->GetBinContent(bin+1);
+            v_genie_multi_total.at(var).at(type).at(bin) += max_err*max_err;
+            
+        }
+
+    }
+    else if (variation == "weightsReint"){
+        // Loop over histogram bins
+        for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
+            
+            double max_err = 0;
+            // Get the max error in each bin, then add the square
+            if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
+            else max_err = h_dn->GetBinContent(bin+1);
+            v_reint_total.at(var).at(type).at(bin) += max_err*max_err;
+            
+        }
+
+    }
+    else if (variation == "weightsPPFX"){
+        // Loop over histogram bins
+        for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
+            
+            double max_err = 0;
+            // Get the max error in each bin, then add the square
+            if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
+            else max_err = h_dn->GetBinContent(bin+1);
+            v_hp_total.at(var).at(type).at(bin) += max_err*max_err;
+            
+        }
+
+    }
+    else {
+        std::cout << "Unknown variation specified: " << variation << std::endl;
+    }
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

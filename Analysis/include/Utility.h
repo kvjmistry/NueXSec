@@ -120,10 +120,10 @@ public:
     bool run_sys                   = false;
     bool run_uplot                 = false;
     bool print                     = false;
-    bool print_mc                 = false;
-    bool print_data               = false;
-    bool print_ext                = false;
-    bool print_dirt               = false;
+    bool print_mc                  = false;
+    bool print_data                = false;
+    bool print_ext                 = false;
+    bool print_dirt                = false;
 
     // inputs 
     char * mc_file_name          = (char *)"empty";

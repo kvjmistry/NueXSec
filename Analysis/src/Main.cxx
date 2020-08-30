@@ -84,22 +84,22 @@ int main(int argc, char *argv[]){
     // -------------------------------------------------------------------------
 
     // Initialise the selction script
-    if (_utility.run_selection) _selection_instance.Initialise(_utility);
+    if (_utility.run_selection)  _selection_instance.Initialise(_utility);
 
     // Print the selection results
-    if (_utility.print) _phelper.Initialise(_utility );
+    if (_utility.print)          _phelper.Initialise(_utility );
 
     // Run the make histogram function
-    if (_utility.make_histos) _hplot.MakeHistograms(_utility);
+    if (_utility.make_histos)    _hplot.MakeHistograms(_utility);
 
     // Run the calculate cross section function
     if (_utility.calc_cross_sec) _xsec.Initialise(_utility);
 
     // Run the systematics helper code
-    if (_utility.run_sys) _syshelper.Initialise(_utility);
+    if (_utility.run_sys)        _syshelper.Initialise(_utility);
 
     // Run the utility plotting code
-    if (_utility.run_uplot) _uplot.Initialise(_utility);
+    if (_utility.run_uplot)      _uplot.Initialise(_utility);
 
     // -------------------------------------------------------------------------
     // Finished!

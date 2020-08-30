@@ -75,6 +75,11 @@ class SystematicsHelper{
     // Calculate the covariance matrix for the multisims
     void CalcCovariance(std::string label, int var, std::vector<std::vector<TH1D*>> h_universe );
     // -------------------------------------------------------------------------
+    // Fill the total systematic vector with the square sum of the uncertainty
+    void FillSysVector(std::string variation, int var, int type, TH1D *h_up, TH1D *h_dn);
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
 
 
 
@@ -169,6 +174,14 @@ class SystematicsHelper{
     std::vector<std::vector<TH1D*>> cv_hist_vec; // reco elec e, <gen, sig, etc>
 
     enum updn {k_up, k_dn};
+
+    // Vectors to store the quadrature sum of the uncertainties
+    // We combine all of these to then get the total error and plot it
+    std::vector<std::vector<std::vector<double>>> v_genie_uni_total;   // differential variable, type, bin error [genie unisim]
+    std::vector<std::vector<std::vector<double>>> v_genie_multi_total; // differential variable, type, bin error [genie multisim]
+    std::vector<std::vector<std::vector<double>>> v_beamline_total;    // differential variable, type, bin error [beamline unisim]
+    std::vector<std::vector<std::vector<double>>> v_hp_total;          // differential variable, type, bin error [hadron production multisim]
+    std::vector<std::vector<std::vector<double>>> v_reint_total;       // differential variable, type, bin error [geant reinteraction multisim]
 
 
 }; // End Class SystematicsHelper
