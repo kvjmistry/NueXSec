@@ -77,7 +77,7 @@ void Selection::Initialise(Utility _utility){
         mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights, _util);
 
         // Initialise the Tree Helper
-        _thelper.at(_util.k_mc).Initialise(_util.k_mc, _util.mc_tree_file_name_out);
+        _thelper.at(_util.k_mc).Initialise(_util.k_mc, _util.mc_tree_file_name_out, _util);
 
         // Initialise the histogram helper
         if (!_util.slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, _util.mc_file_name_out, _util);
@@ -109,7 +109,7 @@ void Selection::Initialise(Utility _utility){
         if (!_util.slim) _hhelper.at(_util.k_data).InitHistograms();
         
         // Initialise the Tree Helper
-        _thelper.at(_util.k_data).Initialise(_util.k_data, "empty");
+        _thelper.at(_util.k_data).Initialise(_util.k_data, "empty", _util);
 
         data_tree_total_entries = data_tree->GetEntries();
         std::cout << "Total Data Events:         " << data_tree_total_entries << std::endl;
@@ -139,7 +139,7 @@ void Selection::Initialise(Utility _utility){
         if (!_util.slim) _hhelper.at(_util.k_ext).InitHistograms();
         
         // Initialise the Tree Helper
-        _thelper.at(_util.k_ext).Initialise(_util.k_ext, "empty");
+        _thelper.at(_util.k_ext).Initialise(_util.k_ext, "empty", _util);
 
         ext_tree_total_entries = ext_tree->GetEntries();
         std::cout << "Total EXT Events:        " << ext_tree_total_entries << std::endl;
@@ -169,7 +169,7 @@ void Selection::Initialise(Utility _utility){
         if (!_util.slim) _hhelper.at(_util.k_dirt).InitHistograms();
         
         // Initialise the Tree Helper
-        _thelper.at(_util.k_dirt).Initialise(_util.k_dirt, "empty");
+        _thelper.at(_util.k_dirt).Initialise(_util.k_dirt, "empty", _util);
 
         dirt_tree_total_entries = dirt_tree->GetEntries();
         std::cout << "Total Dirt Events:         " << dirt_tree_total_entries << std::endl;

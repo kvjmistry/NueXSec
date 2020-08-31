@@ -591,6 +591,9 @@ void SystematicsHelper::InitialiseReweightingMode(){
         // Dirt
         PlotReweightingModeUnisim("Dirt",        var, "Dirt" );
 
+        // POT Counting
+        PlotReweightingModeUnisim("POT",        var, "POT Count." );
+
         // Plot the beamline unisims
         PlotReweightingModeUnisim("Horn_curr",          var, "Horn Current" );
         PlotReweightingModeUnisim("Horn1_x",            var, "Horn 1 x" );
@@ -617,7 +620,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
     FillStatVector();
 
     // Add 2% POT counting uncertainty to the tot sys error vector
-    FillPOTCountingVector();
+    // FillPOTCountingVector();
 
     // Compare the MC and Data X-Section
     CompareCVXSec();
@@ -1210,7 +1213,7 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             // Rewrite the errors for data to sys
             if (error_type.at(err_lab) == "sys"){
                 for (int bin = 0; bin < h_dataxsec->GetNbinsX(); bin++){
-                    h_dataxsec->SetBinError(bin+1, 0.01*std::sqrt(v_sys_total.at(var).at(k_xsec_mcxsec).at(bin)) * h_dataxsec->GetBinContent(bin+1));
+                    h_dataxsec->SetBinError(bin+1, 0.01*std::sqrt(v_sys_total.at(var).at(k_xsec_mcxsec).at(bin)) * h_dataxsec->GetBinContent(bin+1)); // 0.01 is to convert back from a percentage
                 }
 
             }
@@ -1236,6 +1239,14 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             TH1D* h_mcxsec_clone = (TH1D *)h_mcxsec->Clone("h_mc_clone");
             h_mcxsec_clone->SetFillColorAlpha(12, 0.15);
             h_mcxsec_clone->Draw("E2,same");
+
+            // redraw the data so the data is on top of everything
+            h_dataxsec->Draw("E,X0,same");
+            if (error_type.at(err_lab) == "tot"){
+                h_dataxsec_tot->Draw("E1,same,X0,same");
+                h_dataxsec->Draw("E1,same,X0,same");
+
+            }
             
 
             TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
@@ -1666,6 +1677,20 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
             if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
             else max_err = h_dn->GetBinContent(bin+1);
             v_dirt_total.at(var).at(type).at(bin) += max_err*max_err;
+            v_sys_total.at(var).at(type).at(bin) += max_err*max_err;
+            
+        }
+
+    }
+    else if (variation == "POT"){
+        // Loop over histogram bins
+        for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
+            
+            double max_err = 0;
+            // Get the max error in each bin, then add the square
+            if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
+            else max_err = h_dn->GetBinContent(bin+1);
+            v_pot_total.at(var).at(type).at(bin) += max_err*max_err;
             v_sys_total.at(var).at(type).at(bin) += max_err*max_err;
             
         }

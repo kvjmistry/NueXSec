@@ -1,9 +1,11 @@
 #include "../include/TreeHelper.h"
 
 // -----------------------------------------------------------------------------
-void TreeHelper::Initialise(int type, const char* file_out ){
+void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
 
     std::cout << "Initalising Tree Helper..." << std::endl;
+
+    _util = _utility;
 
     std::string file_out_str = std::string(file_out);
 

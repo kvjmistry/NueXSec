@@ -107,7 +107,8 @@ void CrossSectionHelper::LoopEvents(){
 
         double cv_weight = weight;
 
-        double weight_dirt = cv_weight; // Use this for estimating dirt sys
+        double weight_dirt = weight; // Use this for estimating dirt and POT sys
+        double weight_ext  = weight;  // Use this for estimating pot sys
 
         // Loop over the reweighter labels
         for (unsigned int label = 0; label < reweighter_labels.size(); label++){
@@ -145,9 +146,15 @@ void CrossSectionHelper::LoopEvents(){
                     // std::cout << GetIntegratedFlux(0, "", "", reweighter_labels.at(label)) << std::endl;
                 }
                 // Dirt reweighting
-                else if ( (reweighter_labels.at(label) == "Dirtup" || reweighter_labels.at(label) == "Dirtdn") && *classification == "dirt"){
-                    if (reweighter_labels.at(label) == "Dirtup") weight_dirt*=2.0; // increase the dirt by 100%
-                    else weight_dirt*=0.0; // decrease the dirt by 100%
+                else if ( reweighter_labels.at(label) == "Dirtup" || reweighter_labels.at(label) == "Dirtdn"){
+                    if (reweighter_labels.at(label) == "Dirtup") weight_dirt = cv_weight*2.0; // increase the dirt by 100%
+                    else weight_dirt = cv_weight*0.0; // decrease the dirt by 100%
+                    weight_uni = cv_weight;
+                }
+                // POT Counting
+                else if ( reweighter_labels.at(label) == "POTup" || reweighter_labels.at(label) == "POTdn"){
+                    weight_uni  = cv_weight;
+                    weight_dirt = cv_weight;
                 }
                 // If we are using the genie systematics and unisim systematics then we want to undo the genie tune on them
                 else {
@@ -261,6 +268,13 @@ void CrossSectionHelper::LoopEvents(){
                     temp_integrated_flux = beamline_flux.at(var_index);
                 }
 
+                // We choose the POT counting uncertainty to be exactly 2% rather than just weighting the events
+                // To do this, multiply the flux with a 2% scale factor. Since the flux is divided in the x-sec calc,
+                // the scale factors are reverse
+                double weight_POT = 1.0;
+                if (reweighter_labels.at(label) == "POTup") weight_POT =1.0/1.02;
+                if (reweighter_labels.at(label) == "POTdn") weight_POT =1.0/0.98;
+
                 // Calculate the efficiency histogram -- this is incorrect, we need to smear the truth efficiency!
                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff)->Divide(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(var).at(k_xsec_gen));
 
@@ -269,20 +283,20 @@ void CrossSectionHelper::LoopEvents(){
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff),  // Eff
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),  // N Bkg
                                 _util.mc_scale_factor,
-                                temp_integrated_flux * mc_flux_scale_factor,           // Flux
+                                weight_POT * temp_integrated_flux * mc_flux_scale_factor, // Flux
                                 _util.ext_scale_factor,
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),  // N EXT
                                 _util.dirt_scale_factor,
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dirt), // N Dirt
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec),
-                                N_target_MC, "MC");
+                                 N_target_MC, "MC");
 
                 // Data Cross section -- currently using eventrate
                 CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_data), // N Sel
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff),   // Eff
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),   // N Bkg
                                 _util.mc_scale_factor,
-                                temp_integrated_flux * data_flux_scale_factor,          // Flux
+                                weight_POT * temp_integrated_flux * data_flux_scale_factor, // Flux
                                 _util.ext_scale_factor,
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),   // N EXT
                                 _util.dirt_scale_factor,

@@ -13,7 +13,7 @@ class TreeHelper{
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(int type, const char* file_out);
+    void Initialise(int type, const char* file_out, Utility _utility);
     // -------------------------------------------------------------------------
     // Function to fill the tree vars
     void FillVars(SliceContainer &SC, std::pair<std::string, int> _classification, bool _gen, double _weight, double _reco_energy);

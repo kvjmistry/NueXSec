@@ -191,7 +191,9 @@ class CrossSectionHelper{
         "NormNCCOHdn",
         "Dirtup",
         "Dirtdn",
-        "weightsGenie"
+        "POTup",
+        "POTdn"
+        // "weightsGenie"
         // "weightsReint"
         // "weightsPPFX"
     };
