@@ -1032,12 +1032,15 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_universe_2D.at(k)->GetXaxis()->SetTitle("");
         h_universe_2D.at(k)->GetXaxis()->SetLabelSize(0);
         h_universe_2D.at(k)->SetTitle(xsec_types_pretty.at(k).c_str());
+        h_universe_2D.at(k)->GetYaxis()->SetTitleSize(0.04);
+        h_universe_2D.at(k)->GetYaxis()->SetLabelSize(0.05);
 
 
 
         if (xsec_types.at(k) != "data_xsec") {
             cv_hist_vec_clone.at(k)->SetLineColor(kAzure+10);
-            cv_hist_vec_clone.at(k)->SetLineWidth(4);
+            cv_hist_vec_clone.at(k)->SetLineWidth(2);
+            cv_hist_vec_clone.at(k)->SetLineStyle(7);
             cv_hist_vec_clone.at(k)->SetFillStyle(0);
             cv_hist_vec_clone.at(k)->SetMarkerColor(kAzure+10);
             cv_hist_vec_clone.at(k)->Draw("E2,hist,same");
@@ -1052,10 +1055,12 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
             // h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, 0.5e-39);
         }
 
-        TLegend *leg = new TLegend(0.5, 0.65, 0.85, 0.8);
+        TLegend *leg;
+        if (xsec_types.at(k)!= "eff") leg = new TLegend(0.5, 0.65, 0.85, 0.8);
+        else leg = new TLegend(0.5, 0.1, 0.85, 0.35);
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
-        leg->AddEntry(h_universe_2D.at(k), Form("%s", label_pretty.c_str()), "f");
+        leg->AddEntry(h_universe_2D.at(k), Form("%s", label_pretty.c_str()), "");
         if (xsec_types.at(k) != "data_xsec") leg->AddEntry(cv_hist_vec_clone.at(k),           "CV (Sys Only)", "f");
         else                                 leg->AddEntry(cv_hist_vec_clone.at(k),           "CV (Sys Only)", "le");
         leg->Draw();
@@ -1084,15 +1089,20 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_err->GetYaxis()->SetTitleOffset(1.5);
         h_err->SetTitle(" ");
         h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+        h_err->SetMarkerColor(kBlack);
+        h_err->SetLineStyle(1);
+        h_err->SetLineColor(kBlack);
+
         
         h_err->GetYaxis()->SetTitle("\% Uncertainty");
         h_err->SetMarkerSize(4);
-        h_err->Draw("hist, text00");
+        if (k != k_xsec_dirt && k != k_xsec_ext) h_err->Draw("hist, text00");
         gStyle->SetPaintTextFormat("4.1f");
 
         FillSysVector(label, var, k, h_err, h_err);
 
         gStyle->SetPalette(56);
+        // gStyle->SetPalette(kBird);
         c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(),  _util.run_period, label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
         delete c;

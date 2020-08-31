@@ -142,6 +142,7 @@ public:
     char * run_period            = (char *)"empty";
     char * sysmode               = (char *)"default";
     char * xsecmode              = (char *)"default";
+    char * xsec_labels           = (char *)"all";
     char * uplotmode             = (char *)"default";
     int num_events{-1};
     int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]

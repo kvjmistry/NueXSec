@@ -169,6 +169,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         if (strcmp(arg, "--xsecmode") == 0){
             std::cout << "Using Cross-Section code with mode: " << argv[i+1] << std::endl;
             xsecmode = argv[i+1];
+            xsec_labels = argv[i+2];
         }
 
         // Utility Plotter

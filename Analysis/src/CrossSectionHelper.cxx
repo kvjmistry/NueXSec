@@ -739,6 +739,83 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
         reweighter_labels.push_back("CV");
     }
 
+    std::cout << "XSec Labels to run: " << _util.xsec_labels << std::endl;
+
+    // Run Unisims only
+    if (std::string(_util.xsec_labels) == "unisim"){
+        std::cout << "XSec reweighting mode set to unisim, so only running unisims" << std::endl;
+        reweighter_labels.clear();
+        reweighter_labels = {
+            "CV",    
+            "Horn_p2kA",
+            "Horn_m2kA",
+            "Horn1_x_p3mm",
+            "Horm1_x_m3mm",
+            "Horn1_y_p3mm",
+            "Horn1_y_m3mm",
+            "Beam_spot_1_1mm",
+            "Beam_spot_1_5mm",
+            "Horn2_x_p3mm",
+            "Horm2_x_m3mm",
+            "Horn2_y_p3mm",
+            "Horn2_y_m3mm",
+            "Horns_0mm_water",
+            "Horns_2mm_water",
+            "Beam_shift_x_p1mm",
+            "Beam_shift_x_m1mm",
+            "Beam_shift_y_p1mm",
+            "Beam_shift_y_m1mm",
+            "Target_z_p7mm",
+            "Target_z_m7mm",
+            "Horn1_refined_descr",
+            "Decay_pipe_Bfield",
+            "Old_Horn_Geometry",
+            "RPAup",
+            "CCMECup",
+            "AxFFCCQEup",
+            "VecFFCCQEup",
+            "DecayAngMECup",
+            "ThetaDelta2Npiup",
+            "ThetaDelta2NRadup",
+            "RPA_CCQE_Reducedup",
+            "NormCCCOHup",
+            "NormNCCOHup",
+            "RPAdn",
+            "CCMECdn",
+            "AxFFCCQEdn",
+            "VecFFCCQEdn",
+            "DecayAngMECdn",
+            "ThetaDelta2Npidn",
+            "ThetaDelta2NRaddn",
+            "RPA_CCQE_Reduceddn",
+            "NormCCCOHdn",
+            "NormNCCOHdn",
+            "Dirtup",
+            "Dirtdn",
+            "POTup",
+            "POTdn"
+        };
+    }
+    else if (std::string(_util.xsec_labels) == "ppfx"){
+        std::cout << "XSec reweighting mode set to ppfx" << std::endl;
+        reweighter_labels.clear();
+        reweighter_labels = {"CV", "weightsPPFX"};
+    }
+    else if (std::string(_util.xsec_labels) == "genie"){
+        std::cout << "XSec reweighting mode set to genie all" << std::endl;
+        reweighter_labels.clear();
+        reweighter_labels = {"CV", "weightsGenie"};
+    }
+    else if (std::string(_util.xsec_labels) == "reint"){
+        std::cout << "XSec reweighting mode set to reint" << std::endl;
+        reweighter_labels.clear();
+        reweighter_labels = {"CV", "weightsReint"};
+    }
+    else {
+        std::cout << "Unknown Cross section mode entered, exiting" << std::endl;
+        exit(1);
+    }
+
     // Set the bins here
     bins.resize(vars.size());
 

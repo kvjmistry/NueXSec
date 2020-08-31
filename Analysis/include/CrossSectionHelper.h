@@ -192,10 +192,10 @@ class CrossSectionHelper{
         "Dirtup",
         "Dirtdn",
         "POTup",
-        "POTdn"
-        // "weightsGenie"
-        // "weightsReint"
-        // "weightsPPFX"
+        "POTdn",
+        "weightsGenie",
+        "weightsReint",
+        "weightsPPFX"
     };
 
     std::vector<std::vector<TH2D*>> beamline_hists;
