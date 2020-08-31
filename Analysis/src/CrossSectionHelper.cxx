@@ -796,24 +796,32 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
             "POTdn"
         };
     }
+    // Only run PPFX
     else if (std::string(_util.xsec_labels) == "ppfx"){
         std::cout << "XSec reweighting mode set to ppfx" << std::endl;
         reweighter_labels.clear();
         reweighter_labels = {"CV", "weightsPPFX"};
     }
+    // Only run Genie All
     else if (std::string(_util.xsec_labels) == "genie"){
         std::cout << "XSec reweighting mode set to genie all" << std::endl;
         reweighter_labels.clear();
         reweighter_labels = {"CV", "weightsGenie"};
     }
+    // only run geant re-interactions
     else if (std::string(_util.xsec_labels) == "reint"){
         std::cout << "XSec reweighting mode set to reint" << std::endl;
         reweighter_labels.clear();
         reweighter_labels = {"CV", "weightsReint"};
     }
+    // Run EVERYTHING
+    else if (std::string(_util.xsec_labels) == "all"){
+        std::cout << "Running everything!" << std::endl;
+    }
+    // Just default to whatever is configured in the header
     else {
-        std::cout << "Unknown Cross section mode entered, exiting" << std::endl;
-        exit(1);
+        std::cout << "Unknown Cross section mode entered, running default mode" << std::endl;
+        reweighter_labels = {"CV"};
     }
 
     // Set the bins here

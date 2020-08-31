@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
     "\n\nTo run the cross section calculation code, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --xsec <input merged nuexsec tree file> [options (see below)]\033[0m \n\n"
     "The <input merged nuexsec ttree file> corresponds to merged ttree file of the mc, data, ext and dirt. See the bash script merge_uneaventrees.C for more details\n\n"
-    "\033[0;34m[--xsecmode <cross-section mode>]\033[0m                      \033[0;32mThe input mode of xsec code to run. Options are default or reweight \033[0m\n\n"
+    "\033[0;34m[--xsecmode <cross-section mode> [labels] ]\033[0m                      \033[0;32mThe input mode of xsec code to run. Options are default or reweight. Labels are optional, but can be all/unisim/ppfx/genie/reint \033[0m\n\n"
     "-------------------------------------------------------\n\n";
 
     std::string usage3 = "\n\nTo run the detector systematics code, run: \n\n"
