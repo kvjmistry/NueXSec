@@ -558,36 +558,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
     InitialsePlotCV();
 
     // Now lets initialse the vectors which will store the total uncertainties
-    // differential variable, type, bin error
-    v_genie_uni_total  .resize(vars.size());
-    v_genie_multi_total.resize(vars.size());
-    v_beamline_total   .resize(vars.size());
-    v_hp_total         .resize(vars.size());
-    v_reint_total      .resize(vars.size());
-    v_sys_total        .resize(vars.size());
-    v_stat_total        .resize(vars.size());
-
-    for (unsigned int var = 0; var < vars.size(); var++ ){
-        v_genie_uni_total.at(var)  .resize(xsec_types.size());
-        v_genie_multi_total.at(var).resize(xsec_types.size());
-        v_beamline_total.at(var)   .resize(xsec_types.size());
-        v_hp_total.at(var)         .resize(xsec_types.size());
-        v_reint_total.at(var)      .resize(xsec_types.size());
-        v_sys_total.at(var)        .resize(xsec_types.size());
-        v_stat_total.at(var)        .resize(xsec_types.size());
-    }
-
-    for (unsigned int var = 0; var < vars.size(); var++ ){
-        for (unsigned int type = 0; type < xsec_types.size(); type++ ){
-            v_genie_uni_total.at(var).at(type)  .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
-            v_genie_multi_total.at(var).at(type).resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
-            v_beamline_total.at(var).at(type)   .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
-            v_hp_total.at(var).at(type)         .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
-            v_reint_total.at(var).at(type)      .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
-            v_sys_total.at(var).at(type)        .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
-            v_stat_total.at(var).at(type)        .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
-        }
-    }
+    InitialiseUncertaintyVectors();
 
 
     // Loop over the cross-section variables
@@ -617,6 +588,9 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeUnisim("NormCCCOH",        var, "Norm CC COH" );
         PlotReweightingModeUnisim("NormNCCOH",        var, "Norm NC COH" );
 
+        // Dirt
+        PlotReweightingModeUnisim("Dirt",        var, "Dirt" );
+
         // Plot the beamline unisims
         PlotReweightingModeUnisim("Horn_curr",          var, "Horn Current" );
         PlotReweightingModeUnisim("Horn1_x",            var, "Horn 1 x" );
@@ -642,19 +616,14 @@ void SystematicsHelper::InitialiseReweightingMode(){
     // Get the statistical uncertainties
     FillStatVector();
 
-    
-    std::cout << "\n\nGENIE Unisim Tot MC X-Sec Sys:       " <<std::sqrt(v_genie_uni_total.at(k_var_integrated).at(k_xsec_mcxsec)  .at(0)) << " \%"<< std::endl;
-    std::cout << "GENIE Multisim Tot MC X-Sec Sys:     " <<std::sqrt(v_genie_multi_total.at(k_var_integrated).at(k_xsec_mcxsec).at(0)) << " \%"<< std::endl;
-    std::cout << "Beamline Tot MC X-Sec Sys:           " <<std::sqrt(v_beamline_total.at(k_var_integrated).at(k_xsec_mcxsec)   .at(0)) << " \%"<< std::endl;
-    std::cout << "Hadron Prod. Tot MC X-Sec Sys:       " <<std::sqrt(v_hp_total.at(k_var_integrated).at(k_xsec_mcxsec)         .at(0)) << " \%"<< std::endl;
-    std::cout << "Geant Rein. Tot MC X-Sec Sys:        " <<std::sqrt(v_reint_total.at(k_var_integrated).at(k_xsec_mcxsec)      .at(0)) << " \%"<< std::endl;
-    std::cout << "\nTot Data X-Sec Stat:                 " <<std::sqrt(v_stat_total.at(k_var_integrated).at(k_xsec_dataxsec)        .at(0)) << " \%"<< std::endl;
-    std::cout << "Tot MC X-Sec Sys:                    " <<std::sqrt(v_sys_total.at(k_var_integrated).at(k_xsec_mcxsec)        .at(0)) << " \%"<< std::endl;
-    
+    // Add 2% POT counting uncertainty to the tot sys error vector
+    FillPOTCountingVector();
+
     // Compare the MC and Data X-Section
     CompareCVXSec();
     CompareCVXSecNoRatio();
-    
+
+    PrintUncertaintySummary();
 
 }
 // -----------------------------------------------------------------------------
@@ -1154,7 +1123,7 @@ void SystematicsHelper::CompareCVXSec(){
             if (error_type.at(err_lab) == "stat")      leg->AddEntry(h_dataxsec, "Data (Stat)", "le");
             else if (error_type.at(err_lab) == "sys") leg->AddEntry(h_dataxsec, "Data (Sys)", "le");
             else                                      leg->AddEntry(h_dataxsec, "Data (Stat+Sys)", "le");
-            leg->AddEntry(h_mcxsec_clone,   "MC (Stat Only)", "lf");
+            leg->AddEntry(h_mcxsec_clone,   "MC (Stat)", "lf");
             leg->Draw();
 
 
@@ -1275,7 +1244,7 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             if (error_type.at(err_lab) == "stat")     leg->AddEntry(h_dataxsec, "Data (Stat)", "le");
             else if (error_type.at(err_lab) == "sys") leg->AddEntry(h_dataxsec, "Data (Sys)", "le");
             else                                      leg->AddEntry(h_dataxsec, "Data (Stat+Sys)", "le");
-            leg->AddEntry(h_mcxsec_clone,   "MC (Stat Only)", "lf");
+            leg->AddEntry(h_mcxsec_clone,   "MC (Stat)", "lf");
             leg->Draw();
 
             // Draw the run period on the plot
@@ -1688,6 +1657,20 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         }
 
     }
+    else if (variation == "Dirt"){
+        // Loop over histogram bins
+        for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
+            
+            double max_err = 0;
+            // Get the max error in each bin, then add the square
+            if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
+            else max_err = h_dn->GetBinContent(bin+1);
+            v_dirt_total.at(var).at(type).at(bin) += max_err*max_err;
+            v_sys_total.at(var).at(type).at(bin) += max_err*max_err;
+            
+        }
+
+    }
     else {
         std::cout << "Unknown variation specified: " << variation << std::endl;
     }
@@ -1715,6 +1698,93 @@ void SystematicsHelper::FillStatVector(){
 
 }
 // -----------------------------------------------------------------------------
+void SystematicsHelper::FillPOTCountingVector(){
+
+    // Loop over the differential variables
+    for (unsigned int var = 0; var < vars.size(); var++ ){
+        
+        // Loop over the types
+        for (unsigned int type = 0; type < xsec_types.size(); type++ ){
+            
+            // Get the uncertainty in each bin
+            for (int bin = 0; bin < cv_hist_vec.at(var).at(type)->GetNbinsX(); bin++){
+            
+                v_pot_total.at(var).at(type).at(bin) += 2.0*2.0;
+                v_sys_total.at(var).at(type).at(bin) += 2.0*2.0;
+
+            }
+        
+        }
+    }
+
+}
 // -----------------------------------------------------------------------------
+void SystematicsHelper::PrintUncertaintySummary(){
+
+    // Loop over the variables
+    for (unsigned int var = 0; var < vars.size(); var++ ){
+        if (vars.at(var) == "true_el_E") continue; // Skip the true var which doesnt make much sense
+
+        std::cout <<"----------------------------------------------" << std::endl;
+        std::cout <<"Differential Variable: " << vars.at(var) <<"\n"<< std::endl;
+        
+        // Loop over the bins
+        for (unsigned int bin = 0; bin < v_genie_uni_total.at(var).at(k_xsec_mcxsec).size(); bin++ ){
+            
+            std::cout << "Bin: " << bin+1 << " GENIE Unisim:       " <<std::sqrt(v_genie_uni_total.at(var).at(k_xsec_mcxsec)  .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " GENIE Multisim:     " <<std::sqrt(v_genie_multi_total.at(var).at(k_xsec_mcxsec).at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " Beamline:           " <<std::sqrt(v_beamline_total.at(var).at(k_xsec_mcxsec)   .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " Hadron Prod.:       " <<std::sqrt(v_hp_total.at(var).at(k_xsec_mcxsec)         .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " Geant Rein.:        " <<std::sqrt(v_reint_total.at(var).at(k_xsec_mcxsec)      .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " Dirt:               " <<std::sqrt(v_dirt_total.at(var).at(k_xsec_mcxsec)       .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " POT Counting:       " <<std::sqrt(v_pot_total.at(var).at(k_xsec_mcxsec)        .at(bin)) << " \%"<< std::endl;
+            std::cout << std::endl;
+            std::cout << "Bin: " << bin+1 << " Tot Data X-Sec Stat:                 " <<std::sqrt(v_stat_total.at(var).at(k_xsec_dataxsec)   .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Sys:                    " <<std::sqrt(v_sys_total.at(var).at(k_xsec_mcxsec)        .at(bin)) << " \%"<< std::endl;
+            std::cout <<"\n--" << std::endl;       
+        }
+    }
+    std::cout <<"----------------------------------------------" << std::endl;
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::InitialiseUncertaintyVectors(){
+
+    // differential variable, type, bin error
+    v_genie_uni_total  .resize(vars.size());
+    v_genie_multi_total.resize(vars.size());
+    v_beamline_total   .resize(vars.size());
+    v_hp_total         .resize(vars.size());
+    v_reint_total      .resize(vars.size());
+    v_sys_total        .resize(vars.size());
+    v_stat_total       .resize(vars.size());
+    v_dirt_total       .resize(vars.size());
+    v_pot_total        .resize(vars.size());
+
+    for (unsigned int var = 0; var < vars.size(); var++ ){
+        v_genie_uni_total.at(var)  .resize(xsec_types.size());
+        v_genie_multi_total.at(var).resize(xsec_types.size());
+        v_beamline_total.at(var)   .resize(xsec_types.size());
+        v_hp_total.at(var)         .resize(xsec_types.size());
+        v_reint_total.at(var)      .resize(xsec_types.size());
+        v_sys_total.at(var)        .resize(xsec_types.size());
+        v_stat_total.at(var)       .resize(xsec_types.size());
+        v_dirt_total.at(var)       .resize(xsec_types.size());
+        v_pot_total .at(var)       .resize(xsec_types.size());
+    }
+
+    for (unsigned int var = 0; var < vars.size(); var++ ){
+        for (unsigned int type = 0; type < xsec_types.size(); type++ ){
+            v_genie_uni_total.at(var).at(type)  .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+            v_genie_multi_total.at(var).at(type).resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+            v_beamline_total.at(var).at(type)   .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+            v_hp_total.at(var).at(type)         .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+            v_reint_total.at(var).at(type)      .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+            v_sys_total.at(var).at(type)        .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+            v_stat_total.at(var).at(type)       .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+            v_dirt_total.at(var).at(type)       .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+            v_pot_total .at(var).at(type)       .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+        }
+    }
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

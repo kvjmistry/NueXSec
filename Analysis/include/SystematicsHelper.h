@@ -87,6 +87,18 @@ class SystematicsHelper{
     // Fill vector with the statistical uncertainties
     void FillStatVector();
     // -------------------------------------------------------------------------
+    // Fill POT counting uncertainty vector
+    void FillPOTCountingVector();
+    // -------------------------------------------------------------------------
+    // Print Summary of uncertainties
+    void PrintUncertaintySummary();
+    // -------------------------------------------------------------------------
+    // Resize the containers for storing the final uncertainties
+    void InitialiseUncertaintyVectors();
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
 
 
 
@@ -192,6 +204,8 @@ class SystematicsHelper{
     std::vector<std::vector<std::vector<double>>> v_beamline_total;    // differential variable, type, bin error [beamline unisim]
     std::vector<std::vector<std::vector<double>>> v_hp_total;          // differential variable, type, bin error [hadron production multisim]
     std::vector<std::vector<std::vector<double>>> v_reint_total;       // differential variable, type, bin error [geant reinteraction multisim]
+    std::vector<std::vector<std::vector<double>>> v_dirt_total;        // differential variable, type, bin error [dirt shift by +/- 100%]
+    std::vector<std::vector<std::vector<double>>> v_pot_total;         // differential variable, type, bin error [Flat 2% for POT counting]
 
 
 }; // End Class SystematicsHelper

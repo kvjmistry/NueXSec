@@ -189,6 +189,8 @@ class CrossSectionHelper{
         "RPA_CCQE_Reduceddn",
         "NormCCCOHdn",
         "NormNCCOHdn",
+        "Dirtup",
+        "Dirtdn",
         "weightsGenie"
         // "weightsReint"
         // "weightsPPFX"

@@ -107,6 +107,8 @@ void CrossSectionHelper::LoopEvents(){
 
         double cv_weight = weight;
 
+        double weight_dirt = cv_weight; // Use this for estimating dirt sys
+
         // Loop over the reweighter labels
         for (unsigned int label = 0; label < reweighter_labels.size(); label++){
             
@@ -141,6 +143,11 @@ void CrossSectionHelper::LoopEvents(){
                 else if (CheckBeamline(reweighter_labels.at(label))){
                     weight_uni = cv_weight * GetIntegratedFlux(0, "", "", reweighter_labels.at(label));
                     // std::cout << GetIntegratedFlux(0, "", "", reweighter_labels.at(label)) << std::endl;
+                }
+                // Dirt reweighting
+                else if ( (reweighter_labels.at(label) == "Dirtup" || reweighter_labels.at(label) == "Dirtdn") && *classification == "dirt"){
+                    if (reweighter_labels.at(label) == "Dirtup") weight_dirt*=2.0; // increase the dirt by 100%
+                    else weight_dirt*=0.0; // decrease the dirt by 100%
                 }
                 // If we are using the genie systematics and unisim systematics then we want to undo the genie tune on them
                 else {
@@ -213,7 +220,7 @@ void CrossSectionHelper::LoopEvents(){
                 if (*classification == "dirt"){
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_dirt, cv_weight, shr_energy_cali, elec_e);
+                    FillHists(label, uni, k_xsec_dirt, weight_dirt, shr_energy_cali, elec_e);
                 }
             } // End loop over uni
 
