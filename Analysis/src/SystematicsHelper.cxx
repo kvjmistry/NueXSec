@@ -843,7 +843,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
             if (!single_var) text_dn->Draw();
         }
         
-        h_err->Draw("hist,same");
+        // h_err->Draw("hist,same");
 
         FillSysVector(label, var, k, h_err_up, h_err_dn);
 

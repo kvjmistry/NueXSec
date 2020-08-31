@@ -73,14 +73,6 @@ int main(int argc, char *argv[]){
     // that all classes will have access to
     _utility.Initalise(argc, argv, usage, usage2, usage3);
 
-
-    // Add catches for default input
-    if (std::string(_utility.run_period) == "empty" ){
-        std::cout << "\nError, must provide a run period as input!\n" << std::endl;
-        std::cout << "USAGE:" << usage << usage2 << usage3 << std::endl; 
-        exit(1);
-    }
-
     // -------------------------------------------------------------------------
 
     // Initialise the selction script

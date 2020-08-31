@@ -348,7 +348,8 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         ext_scale_factor = config_v.at(k_Run3_Data_trig) / config_v.at(k_Run3_EXT_trig);
     }
     else {
-        std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;
+        std::cout << "Error Krish... You havent specified the run period!" << std::endl;
+        std::cout << usage <<  usage2 << usage3 << std::endl;
         exit(1);
     }
 
