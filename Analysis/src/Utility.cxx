@@ -731,6 +731,24 @@ void Utility::Draw_Data_POT(TCanvas *c, double pot, double x1, double y1, double
     pt->Draw();
 }
 // -----------------------------------------------------------------------------
+void Utility::Draw_ubooneSim(TCanvas *c, double x1, double y1, double x2, double y2){
+    c->cd();
+
+    // 0.37, 0.92, 0.37, 0.92,
+
+    TPaveText *pt;
+
+    pt = new TPaveText(x1, y1, x2, y2,"NDC");
+    pt->AddText("MicroBooNE Simulation");
+    pt->SetTextColor(kBlack);
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.03);
+    pt->Draw();
+
+}
+// -----------------------------------------------------------------------------
 void Utility::SetTextProperties(TLatex* text){
     text->SetTextColor(kGray+2);
     text->SetNDC();

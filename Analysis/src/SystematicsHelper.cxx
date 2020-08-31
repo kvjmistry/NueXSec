@@ -1103,6 +1103,10 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
 
         gStyle->SetPalette(56);
         // gStyle->SetPalette(kBird);
+
+        if (xsec_types.at(k) != "data_xsec") _util.Draw_ubooneSim(c, 0.40, 0.915, 0.40, 0.915);
+        else _util.Draw_Data_POT(c, Data_POT, 0.50, 0.915, 0.50, 0.915);
+
         c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(),  _util.run_period, label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
         delete c;
@@ -1605,6 +1609,7 @@ void SystematicsHelper::CalcCovariance(std::string label, int var, std::vector<s
     cov->SetTitle("Covariance Matrix");
     cov->Draw("colz");
     _util.IncreaseLabelSize(cov, c);
+    _util.Draw_ubooneSim(c, 0.30, 0.915, 0.30, 0.915);
     c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_cov.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(),  _util.run_period, label.c_str(), vars.at(var).c_str()));
 
     TCanvas *c2 = new TCanvas("c2", "c2", 500, 500);
@@ -1617,6 +1622,7 @@ void SystematicsHelper::CalcCovariance(std::string label, int var, std::vector<s
     _util.IncreaseLabelSize(cor, c2);
     cor->SetMarkerSize(1.3);
     gStyle->SetPaintTextFormat("0.3f");
+    _util.Draw_ubooneSim(c2, 0.30, 0.915, 0.30, 0.915);
     c2->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_cor.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(),  _util.run_period, label.c_str(), vars.at(var).c_str()));
 
     TCanvas *c3 = new TCanvas("c3", "c3", 500, 500);
@@ -1627,6 +1633,7 @@ void SystematicsHelper::CalcCovariance(std::string label, int var, std::vector<s
     _util.IncreaseLabelSize(frac_cov, c3);
     frac_cov->SetMarkerSize(1.3);
     gStyle->SetPaintTextFormat("0.3f");
+    _util.Draw_ubooneSim(c3, 0.30, 0.915, 0.30, 0.915);
     c3->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_frac_cov.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(),  _util.run_period, label.c_str(), vars.at(var).c_str()));
 
     delete cov;

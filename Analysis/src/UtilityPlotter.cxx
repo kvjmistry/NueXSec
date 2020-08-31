@@ -597,16 +597,8 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     if (draw_averge)leg->AddEntry(summed_flux,        "NuMI #nu_{e} + #bar{#nu}_{e} Flux",       "f");
     if (!draw_averge)leg->Draw();
 
-    TPaveText *pt;
-
-    pt = new TPaveText(0.37, 0.92, 0.37, 0.92,"NDC");
-    pt->AddText("MicroBooNE Simulation");
-    pt->SetTextColor(kBlack);
-    pt->SetBorderSize(0);
-    pt->SetFillColor(0);
-    pt->SetFillStyle(0);
-    pt->SetTextSize(0.04);
-    pt->Draw();
+    // Draw MicroBooNE Simualtion
+    _util.Draw_ubooneSim(c, 0.37, 0.92, 0.37, 0.9);
 
     // Draw the run period on the plot
     _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
