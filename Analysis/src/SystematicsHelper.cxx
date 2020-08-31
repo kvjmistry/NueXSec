@@ -797,9 +797,6 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         h_err_dn->SetLineColor(kRed+2);
         h_err_dn->Scale(100);
 
-        TH1D* h_err = (TH1D *)cv_hist_vec.at(var).at(k)->Clone("h_ratio");
-        h_err->Divide(cv_hist_vec.at(var).at(k));
-
         SetRatioOptions(h_err_up);
         h_err_up->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
         h_err_up->GetYaxis()->SetTitle("\% change from CV");
@@ -843,7 +840,6 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
             if (!single_var) text_dn->Draw();
         }
         
-        // h_err->Draw("hist,same");
 
         FillSysVector(label, var, k, h_err_up, h_err_dn);
 
@@ -851,7 +847,6 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
 
         delete c;
         delete leg;
-        delete h_err;
         delete h_err_up;
         delete h_err_dn;
     }
@@ -865,7 +860,47 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
     std::vector<std::vector<TH1D*>> h_universe; // Universe, <gen/sig/xsec etc>
     std::vector<std::vector<TH1D*>> h_err;
 
+    // Set the X Bins
+    std::vector<double> bins;
+    if (vars.at(var) == "integrated") bins  = { 0.0, 1.1 };
+    else bins = _util.reco_shr_bins;
+    // Get the number of bins and the right vector
+    int const nbins = bins.size()-1;
+    double* edges = &bins[0]; // Cast to an array 
 
+    // Create the Fancier looking 2D histograms
+    std::vector<TH2D*> h_universe_2D;
+    h_universe_2D.resize(xsec_types.size());
+    // Set 2D bins for integrated bins
+    if (vars.at(var) == "integrated"){
+
+        h_universe_2D.at(k_xsec_sel)           = new TH2D("h_2D_sel",      "", nbins, edges, 100, 2000, 3000);
+        h_universe_2D.at(k_xsec_bkg)           = new TH2D("h_2D_bkg",      "", nbins, edges, 100, 200, 1000);
+        h_universe_2D.at(k_xsec_gen)           = new TH2D("h_2D_gen",      "", nbins, edges, 100, 4000, 12000);
+        h_universe_2D.at(k_xsec_sig)           = new TH2D("h_2D_sig",      "", nbins, edges, 100, 1000, 3000);
+        h_universe_2D.at(k_xsec_eff)           = new TH2D("h_2D_eff",      "", nbins, edges, 100, 0.15, 0.3);
+        h_universe_2D.at(k_xsec_ext)           = new TH2D("h_2D_ext",      "", nbins, edges, 10, 0, 10);
+        h_universe_2D.at(k_xsec_dirt)          = new TH2D("h_2D_dirt",     "", nbins, edges, 15, 0, 15);
+        h_universe_2D.at(k_xsec_data)          = new TH2D("h_2D_data",     "", nbins, edges, 80, 0, 140);
+        h_universe_2D.at(k_xsec_mcxsec)        = new TH2D("h_2D_mcxsec",   "", nbins, edges, 100, 0.5e-39, 3.0e-39);
+        h_universe_2D.at(k_xsec_dataxsec)      = new TH2D("h_2D_dataxsec", "", nbins, edges, 100, 0.5e-39, 3.0e-39);
+        
+    }
+    // Set 2D bins for other
+    else {
+        h_universe_2D.at(k_xsec_sel)           = new TH2D("h_2D_sel",      "", nbins, edges, 100, 0, 700);
+        h_universe_2D.at(k_xsec_bkg)           = new TH2D("h_2D_bkg",      "", nbins, edges, 100, 0, 250);
+        h_universe_2D.at(k_xsec_gen)           = new TH2D("h_2D_gen",      "", nbins, edges, 100, 0, 8000);
+        h_universe_2D.at(k_xsec_sig)           = new TH2D("h_2D_sig",      "", nbins, edges, 100, 0, 800);
+        h_universe_2D.at(k_xsec_eff)           = new TH2D("h_2D_eff",      "", nbins, edges, 100, 0, 0.5);
+        h_universe_2D.at(k_xsec_ext)           = new TH2D("h_2D_ext",      "", nbins, edges, 5, 0, 5);
+        h_universe_2D.at(k_xsec_dirt)          = new TH2D("h_2D_dirt",     "", nbins, edges, 10, 0, 10);
+        h_universe_2D.at(k_xsec_data)          = new TH2D("h_2D_data",     "", nbins, edges, 100, 0, 50);
+        h_universe_2D.at(k_xsec_mcxsec)        = new TH2D("h_2D_mcxsec",   "", nbins, edges, 100, 0, 0.5e-39);
+        h_universe_2D.at(k_xsec_dataxsec)      = new TH2D("h_2D_dataxsec", "", nbins, edges, 100, 0, 0.5e-39);
+    }
+    
+    
     // Clone the CV histograms so we can work with them without changing them
     std::vector<TH1D*> cv_hist_vec_clone;
     cv_hist_vec_clone.resize(xsec_types.size());
@@ -895,6 +930,11 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
             // Customise
             h_universe.at(uni).at(k)->SetLineWidth(1);
             h_universe.at(uni).at(k)->SetLineColor(kAzure+5);
+
+            // Loop over the bins and fill the 2D histogram
+            for (int bin = 0; bin < h_universe.at(uni).at(k)->GetNbinsX(); bin++){
+                h_universe_2D.at(k)->Fill( bins.at(bin), h_universe.at(uni).at(k)->GetBinContent(bin+1));
+            }
             
         }
     }
@@ -973,20 +1013,33 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         if (scale_val <  h_universe.at(k_dn).at(k)->GetMaximum()) scale_val =  h_universe.at(k_dn).at(k)->GetMaximum();
 
         // Loop over universes
-        for (unsigned int uni = 0; uni < h_universe.size(); uni++){
+        // for (unsigned int uni = 0; uni < h_universe.size(); uni++){
         
-            h_universe.at(uni).at(k)->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
-            h_universe.at(uni).at(k)->Draw("hist,same");
-            if (scale_val < h_universe.at(uni).at(k)->GetMaximum()) scale_val = h_universe.at(uni).at(k)->GetMaximum();
-            h_universe.at(uni).at(k)->GetXaxis()->SetTitle("");
-            h_universe.at(uni).at(k)->GetXaxis()->SetLabelSize(0);
+            // h_universe.at(uni).at(k)->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+            // h_universe.at(uni).at(k)->Draw("hist,same");
+            // if (scale_val < h_universe.at(uni).at(k)->GetMaximum()) scale_val = h_universe.at(uni).at(k)->GetMaximum();
+            // h_universe.at(uni).at(k)->GetXaxis()->SetTitle("");
+            // h_universe.at(uni).at(k)->GetXaxis()->SetLabelSize(0);
 
-        }
+        // }
+        
+        
+        // if (scale_val < h_universe.at(uni).at(k)->GetMaximum()) scale_val = h_universe.at(uni).at(k)->GetMaximum();
+        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec) h_universe_2D.at(k)->SetTitle(Form("%s", var_labels.at(var).c_str()));
+        else if (k == k_xsec_eff) h_universe_2D.at(k)->GetYaxis()->SetTitle("Efficiency");
+        else h_universe_2D.at(k)->GetYaxis()->SetTitle("Entries");
+        h_universe_2D.at(k)->Draw("colz,same");
+        h_universe_2D.at(k)->GetXaxis()->SetTitle("");
+        h_universe_2D.at(k)->GetXaxis()->SetLabelSize(0);
+        h_universe_2D.at(k)->SetTitle(xsec_types_pretty.at(k).c_str());
+
+
 
         if (xsec_types.at(k) != "data_xsec") {
-            cv_hist_vec_clone.at(k)->SetLineColor(kBlack);
+            cv_hist_vec_clone.at(k)->SetLineColor(kAzure+10);
+            cv_hist_vec_clone.at(k)->SetLineWidth(4);
             cv_hist_vec_clone.at(k)->SetFillStyle(0);
-            cv_hist_vec_clone.at(k)->SetMarkerColor(kBlack);
+            cv_hist_vec_clone.at(k)->SetMarkerColor(kAzure+10);
             cv_hist_vec_clone.at(k)->Draw("E2,hist,same");
         }
         else { 
@@ -1002,7 +1055,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         TLegend *leg = new TLegend(0.5, 0.65, 0.85, 0.8);
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
-        leg->AddEntry(h_universe.at(0).at(k), Form("%s", label_pretty.c_str()), "l");
+        leg->AddEntry(h_universe_2D.at(k), Form("%s", label_pretty.c_str()), "f");
         if (xsec_types.at(k) != "data_xsec") leg->AddEntry(cv_hist_vec_clone.at(k),           "CV (Sys Only)", "f");
         else                                 leg->AddEntry(cv_hist_vec_clone.at(k),           "CV (Sys Only)", "le");
         leg->Draw();
@@ -1039,10 +1092,12 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
 
         FillSysVector(label, var, k, h_err, h_err);
 
+        gStyle->SetPalette(56);
         c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(),  _util.run_period, label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
         delete c;
         delete leg;
+        delete h_universe_2D.at(k);
 
     }
 

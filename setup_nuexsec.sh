@@ -8,13 +8,7 @@ cd Analysis
 echo "make"
 make
 
-echo "cd Systematics"
-cd Systematics
-
-echo "source generate_flux_weight_hists.sh"
-source generate_flux_weight_hists.sh
-
-echo "cd ../.."
-cd ../..
+echo "cd .."
+cd ..
 
 echo "setup complete!"
