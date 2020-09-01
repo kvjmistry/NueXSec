@@ -560,6 +560,17 @@ void SystematicsHelper::InitialiseReweightingMode(){
     // Now lets initialse the vectors which will store the total uncertainties
     InitialiseUncertaintyVectors();
 
+    // Initialise the covariance matrices
+    int n_bins = cv_hist_vec.at(k_var_reco_el_E).at(0)->GetNbinsX();
+    h_cov_tot         = new TH2D("h_cov_tot",         "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
+    h_cov_genie_uni   = new TH2D("h_cov_genie_uni",   "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
+    h_cov_genie_multi = new TH2D("h_cov_genie_multi", "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
+    h_cov_hp          = new TH2D("h_cov_hp",          "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
+    h_cov_beamline    = new TH2D("h_cov_beamline",    "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
+    h_cov_dirt        = new TH2D("h_cov_dirt",        "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
+    h_cov_pot         = new TH2D("h_cov_pot",         "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
+    h_cov_reint       = new TH2D("h_cov_reint",       "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
+
 
     // Loop over the cross-section variables
     for (unsigned int var = 0; var <  vars.size(); var++){
@@ -627,6 +638,18 @@ void SystematicsHelper::InitialiseReweightingMode(){
     CompareCVXSecNoRatio();
 
     PrintUncertaintySummary();
+
+    // Save the total covariance matrices
+    _util.CreateDirectory("/Systematics/Covariance");
+    SaveCovMatrix(h_cov_tot,         Form("plots/run%s/Systematics/Covariance/run%s_tot_cov.pdf",         _util.run_period, _util.run_period));
+    SaveCovMatrix(h_cov_genie_uni,   Form("plots/run%s/Systematics/Covariance/run%s_genie_uni_cov.pdf",   _util.run_period, _util.run_period));
+    SaveCovMatrix(h_cov_genie_multi, Form("plots/run%s/Systematics/Covariance/run%s_genie_multi_cov.pdf", _util.run_period, _util.run_period));
+    SaveCovMatrix(h_cov_hp,          Form("plots/run%s/Systematics/Covariance/run%s_hp_cov.pdf",          _util.run_period, _util.run_period));
+    SaveCovMatrix(h_cov_beamline,    Form("plots/run%s/Systematics/Covariance/run%s_beamline_cov.pdf",    _util.run_period, _util.run_period));
+    SaveCovMatrix(h_cov_dirt,        Form("plots/run%s/Systematics/Covariance/run%s_dirt_cov.pdf",        _util.run_period, _util.run_period));
+    SaveCovMatrix(h_cov_pot,         Form("plots/run%s/Systematics/Covariance/run%s_pot_cov.pdf",         _util.run_period, _util.run_period));
+    SaveCovMatrix(h_cov_reint,       Form("plots/run%s/Systematics/Covariance/run%s_reint_cov.pdf",       _util.run_period, _util.run_period));
+
 
 }
 // -----------------------------------------------------------------------------
@@ -1640,7 +1663,64 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
     TColor::CreateGradientColorTable(NRGBs, stops, mainColour, otherColour, otherColour, NCont);
     gStyle->SetNumberContours(NCont);
 
+    // For now only saving the reco electron cov matrices
+    if (var == k_var_reco_el_E){
+        // Store the covariance matrices so we can add them and get the total
+        // This is a Genie Unisim
+        if (label == "RPA"              ||
+            label == "CCMEC"            ||
+            label == "AxFFCCQE"         ||
+            label == "VecFFCCQE"        ||
+            label == "DecayAngMEC"      ||
+            label == "ThetaDelta2Npi"   ||
+            label == "ThetaDelta2NRad"  ||
+            label == "RPA_CCQE_Reduced" ||
+            label == "NormCCCOH"        ||
+            label == "NormNCCOH"){
+                h_cov_genie_uni->Add(cov);
 
+        }
+        else if (label == "Horn_curr" ||
+                label == "Horn1_x" ||
+                label == "Horn1_y" ||
+                label == "Beam_spot" ||
+                label == "Horn2_x" ||
+                label == "Horn2_y" ||
+                label == "Horn_Water" ||
+                label == "Beam_shift_x" ||
+                label == "Beam_shift_y" ||
+                label == "Target_z" ||
+                label == "Horn1_refined_descr" ||
+                label == "Decay_pipe_Bfield" ||
+                label == "Old_Horn_Geometry"){
+                h_cov_beamline->Add(cov);
+        }
+        else if (label == "weightsGenie"){
+            h_cov_genie_multi->Add(cov);
+
+        }
+        else if (label == "weightsReint"){
+            h_cov_reint->Add(cov);
+
+        }
+        else if (label == "weightsPPFX"){
+            h_cov_hp->Add(cov);
+
+        }
+        else if (label == "Dirt"){
+            h_cov_dirt->Add(cov);
+
+        }
+        else if (label == "POT"){
+            h_cov_pot->Add(cov);
+
+        }
+        else {
+            std::cout << "Unknown variation specified: " << label << std::endl;
+        }
+
+        h_cov_tot->Add(cov);
+    }
 
     TCanvas *c = new TCanvas("c", "c", 500, 500);
     cov->GetXaxis()->CenterLabels(kTRUE);
@@ -1921,6 +2001,29 @@ void SystematicsHelper::InitialiseUncertaintyVectors(){
             v_pot_total .at(var).at(type)       .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
         }
     }
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::SaveCovMatrix(TH2D* cov, std::string print_name){
+
+    const Int_t NCont = 100;
+    const Int_t NRGBs = 5;
+    Double_t mainColour[NRGBs]   = { 1.00, 1.00, 1.00, 1.00, 1.00 };
+    Double_t otherColour[NRGBs]   = { 0.99,0.80, 0.60, 0.40, 0.20 };
+    Double_t stops[NRGBs] = { 0.00, 0.05, 0.1, 0.4, 1.00 };
+
+    TColor::CreateGradientColorTable(NRGBs, stops, mainColour, otherColour, otherColour, NCont);
+    gStyle->SetNumberContours(NCont);
+
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+    cov->GetXaxis()->CenterLabels(kTRUE);
+    cov->GetYaxis()->CenterLabels(kTRUE);
+    cov->SetTitle("Covariance Matrix");
+    cov->Draw("colz");
+    _util.IncreaseLabelSize(cov, c);
+    _util.Draw_ubooneSim(c, 0.30, 0.915, 0.30, 0.915);
+    c->Print(print_name.c_str());
+    delete c;
+
 }
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

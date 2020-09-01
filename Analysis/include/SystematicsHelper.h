@@ -96,6 +96,8 @@ class SystematicsHelper{
     // Resize the containers for storing the final uncertainties
     void InitialiseUncertaintyVectors();
     // -------------------------------------------------------------------------
+    // Save the covariance matrix
+    void SaveCovMatrix(TH2D* cov, std::string print_name);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 
@@ -206,6 +208,16 @@ class SystematicsHelper{
     std::vector<std::vector<std::vector<double>>> v_reint_total;       // differential variable, type, bin error [geant reinteraction multisim]
     std::vector<std::vector<std::vector<double>>> v_dirt_total;        // differential variable, type, bin error [dirt shift by +/- 100%]
     std::vector<std::vector<std::vector<double>>> v_pot_total;         // differential variable, type, bin error [Flat 2% for POT counting]
+
+    TH2D* h_cov_tot;         // Sum of all covariance matrices
+    TH2D* h_cov_genie_uni;   // Genie unisims
+    TH2D* h_cov_genie_multi; // Genie multisims
+    TH2D* h_cov_hp;          // PPFX HP
+    TH2D* h_cov_beamline;    // Beamline 
+    TH2D* h_cov_dirt;        // Dirt 
+    TH2D* h_cov_pot;         // POT counting
+    TH2D* h_cov_reint;       // Geant reinteractions
+
 
 
 }; // End Class SystematicsHelper
