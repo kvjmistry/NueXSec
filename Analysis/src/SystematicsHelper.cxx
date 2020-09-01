@@ -728,6 +728,41 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         h_universe.at(k_up).at(k)->SetLineColor(kGreen+2);
     }
 
+    // Get the covariance matrix
+    std::vector<std::vector<TH1D*>> h_universe_max; // histogram with the max in each bin
+    h_universe_max.resize(1);
+    h_universe_max.at(0).resize(h_universe.at(k_up).size());
+
+    // To make the covariance matrix, in the case of an up/dn variation, 
+    // we need to make a histogram which gives the largest difference in each bin
+    // this ensures we get the largest uncertainty per bin
+    
+    // Loop over the histogram types
+    for (unsigned int type = 0; type < h_universe.at(k_up).size(); type++ ){
+        TH1D* h_max = (TH1D*) h_universe.at(k_up).at(type)->Clone("h_max");
+
+        // Now loop over the bins
+        for (int bin = 0; bin < h_universe.at(k_up).at(type)->GetNbinsX(); bin++){
+            double h_up_diff = std::abs(h_universe.at(k_up).at(type)->GetBinContent(bin+1) - cv_hist_vec.at(var).at(type)->GetBinContent(bin+1));
+            double h_dn_diff = std::abs(h_universe.at(k_dn).at(type)->GetBinContent(bin+1) - cv_hist_vec.at(var).at(type)->GetBinContent(bin+1));
+            
+            // Largest difference was the up var bin content
+            if (h_up_diff > h_dn_diff) h_max->SetBinContent(bin+1, h_universe.at(k_up).at(type)->GetBinContent(bin+1));
+            
+            // Largest difference was the dn var bin content
+            else                       h_max->SetBinContent(bin+1, h_universe.at(k_dn).at(type)->GetBinContent(bin+1));
+
+            // if (type == k_xsec_mcxsec) std::cout << h_max->GetBinContent(bin+1) << std::endl;
+        }
+        
+        h_universe_max.at(0).at(type) = (TH1D*) h_max->Clone();
+
+    } 
+
+    // Now call the covariance matrix function
+    CalcMatrices(label, var, h_universe_max);
+
+
     TPad *topPad;
     TPad *bottomPad;
     TCanvas *c;
@@ -939,8 +974,8 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         }
     }
 
-    // Get the covariance matrix
-    CalcCovariance(label, var, h_universe );
+    // Get the covariance, correlation, fractional cov matrices
+    CalcMatrices(label, var, h_universe );
 
     // Create vector of systematic error for each histogram
     std::vector<std::vector<double>> sys_err;
@@ -1516,7 +1551,7 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
     delete c;
 }
 // -----------------------------------------------------------------------------
-void SystematicsHelper::CalcCovariance(std::string label, int var, std::vector<std::vector<TH1D*>> h_universe ){
+void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std::vector<TH1D*>> h_universe ){
 
     int n_bins = cv_hist_vec.at(var).at(0)->GetNbinsX();
 
@@ -1529,13 +1564,13 @@ void SystematicsHelper::CalcCovariance(std::string label, int var, std::vector<s
     for (unsigned int uni = 0; uni < h_universe.size(); uni++){
         
         // Loop over the rows
-        for (int row = 1; row < cv_hist_vec.at(var).at(0)->GetNbinsX()+1; row++){
+        for (int row = 1; row < cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetNbinsX()+1; row++){
             
             double uni_row = h_universe.at(uni).at(k_xsec_mcxsec)->GetBinContent(row);
             double cv_row  = cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(row);
 
             // Loop over the columns
-            for (int col = 1; col < cv_hist_vec.at(var).at(0)->GetNbinsX()+1; col++){
+            for (int col = 1; col < cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetNbinsX()+1; col++){
 
                 double uni_col = h_universe.at(uni).at(k_xsec_mcxsec)->GetBinContent(col);
                 double cv_col  = cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(col);
@@ -1555,19 +1590,22 @@ void SystematicsHelper::CalcCovariance(std::string label, int var, std::vector<s
     // ------------ Now calculate the correlation matrix ------------
     double cor_bini;
     // loop over rows
-    for (int i=1; i<cv_hist_vec.at(var).at(0)->GetNbinsX()+1; i++) {
-        double cii = cov->GetBinContent(i, i);
+    for (int row = 1; row < cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetNbinsX()+1; row++) {
+        
+        double cii = cov->GetBinContent(row, row);
 
         // Loop over columns
-        for (int j=1; j<cv_hist_vec.at(var).at(0)->GetNbinsX()+1; j++) {
-            double cjj = cov->GetBinContent(j, j);
+        for (int col = 1; col < cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetNbinsX()+1; col++) {
+            
+            double cjj = cov->GetBinContent(col, col);
+            
             double n = sqrt(cii * cjj);
 
             // Catch Zeros, set to arbitary 1.0
             if (n == 0) cor_bini = 0;
-            else cor_bini = cov->GetBinContent(i, j) / n;
+            else cor_bini = cov->GetBinContent(row, col) / n;
 
-            cor->SetBinContent(i, j, cor_bini );
+            cor->SetBinContent(row, col, cor_bini );
         }
     }
 
@@ -1576,19 +1614,20 @@ void SystematicsHelper::CalcCovariance(std::string label, int var, std::vector<s
     // ------------ Now calculate the fractional covariance matrix ------------
     double setbin;
     // loop over rows
-    for (int i=1; i<cv_hist_vec.at(var).at(0)->GetNbinsX()+1; i++) {
-        double cii = cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(i);
+    for (int row = 1; row < cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetNbinsX()+1; row++) {
+       
+       double cii = cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(row);
 
         // Loop over columns
-        for (int j=1; j<cv_hist_vec.at(var).at(0)->GetNbinsX()+1; j++) {
-            double cjj = cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(j);
+        for (int col = 1; col < cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetNbinsX()+1; col++) {
+            double cjj = cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(col);
             double n = cii * cjj;
 
             // Catch Zeros, set to arbitary 0
             if (n == 0) setbin = 0;
-            else setbin = frac_cov->GetBinContent(i, j) / n;
+            else setbin = frac_cov->GetBinContent(row, col) / n;
 
-            frac_cov->SetBinContent(i, j, setbin );
+            frac_cov->SetBinContent(row, col, setbin );
         }
     }
 

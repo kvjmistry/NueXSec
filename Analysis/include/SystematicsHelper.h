@@ -78,8 +78,8 @@ class SystematicsHelper{
     // Set the up down variation names
     void SetLabelName(std::string label, std::string &label_up, std::string &label_dn);
     // -------------------------------------------------------------------------
-    // Calculate the covariance matrix for the multisims
-    void CalcCovariance(std::string label, int var, std::vector<std::vector<TH1D*>> h_universe );
+    // Calculate the covariance, correlation and fractional covariance matrices
+    void CalcMatrices(std::string label, int var, std::vector<std::vector<TH1D*>> h_universe );
     // -------------------------------------------------------------------------
     // Fill the total systematic vector with the square sum of the uncertainty
     void FillSysVector(std::string variation, int var, int type, TH1D *h_up, TH1D *h_dn);
