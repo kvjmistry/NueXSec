@@ -1910,7 +1910,7 @@ void SystematicsHelper::FillStatVector(){
         for (int col = 1; col < h_cov_stat->GetNbinsY()+1; col++) {
             
             // Only set the bin content of the diagonals
-            double bin_diag = cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->GetBinContent(row);
+            double bin_diag = cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->GetBinContent(row); // We use the MC value to fill the cov matrix, but use the data stat err for now. 
 
             // 0.01 converts each percentage back to a number. We multiply this by the cv to get the deviate
             if (row == col) h_cov_stat->SetBinContent(row, col, 0.01*0.01*v_stat_total.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(row-1)*bin_diag*bin_diag);  
