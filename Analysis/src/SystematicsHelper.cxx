@@ -563,6 +563,8 @@ void SystematicsHelper::InitialiseReweightingMode(){
     // Initialise the covariance matrices
     int n_bins = cv_hist_vec.at(k_var_reco_el_E).at(0)->GetNbinsX();
     h_cov_tot         = new TH2D("h_cov_tot",         "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
+    h_cov_sys         = new TH2D("h_cov_sys",         "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
+    h_cov_stat        = new TH2D("h_cov_stat",        "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
     h_cov_genie_uni   = new TH2D("h_cov_genie_uni",   "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
     h_cov_genie_multi = new TH2D("h_cov_genie_multi", "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
     h_cov_hp          = new TH2D("h_cov_hp",          "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
@@ -642,6 +644,8 @@ void SystematicsHelper::InitialiseReweightingMode(){
     // Save the total covariance matrices
     _util.CreateDirectory("/Systematics/Covariance");
     SaveCovMatrix(h_cov_tot,         Form("plots/run%s/Systematics/Covariance/run%s_tot_cov.pdf",         _util.run_period, _util.run_period));
+    SaveCovMatrix(h_cov_sys,         Form("plots/run%s/Systematics/Covariance/run%s_tot_sys_cov.pdf",     _util.run_period, _util.run_period));
+    SaveCovMatrix(h_cov_stat,        Form("plots/run%s/Systematics/Covariance/run%s_tot_stat_cov.pdf",    _util.run_period, _util.run_period));
     SaveCovMatrix(h_cov_genie_uni,   Form("plots/run%s/Systematics/Covariance/run%s_genie_uni_cov.pdf",   _util.run_period, _util.run_period));
     SaveCovMatrix(h_cov_genie_multi, Form("plots/run%s/Systematics/Covariance/run%s_genie_multi_cov.pdf", _util.run_period, _util.run_period));
     SaveCovMatrix(h_cov_hp,          Form("plots/run%s/Systematics/Covariance/run%s_hp_cov.pdf",          _util.run_period, _util.run_period));
@@ -649,6 +653,22 @@ void SystematicsHelper::InitialiseReweightingMode(){
     SaveCovMatrix(h_cov_dirt,        Form("plots/run%s/Systematics/Covariance/run%s_dirt_cov.pdf",        _util.run_period, _util.run_period));
     SaveCovMatrix(h_cov_pot,         Form("plots/run%s/Systematics/Covariance/run%s_pot_cov.pdf",         _util.run_period, _util.run_period));
     SaveCovMatrix(h_cov_reint,       Form("plots/run%s/Systematics/Covariance/run%s_reint_cov.pdf",       _util.run_period, _util.run_period));
+
+
+    // Print the sqrt of the diagonals of the covariance matrix
+    // loop over rows
+    for (int row = 1; row < h_cov_sys->GetNbinsX()+1; row++) {
+        
+        // Loop over columns
+        for (int col = 1; col < h_cov_sys->GetNbinsY()+1; col++) {
+            
+            // Only set the bin content of the diagonals
+            double bin_diag = cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->GetBinContent(row);
+
+            // 0.01 converts each percentage back to a number. We multiply this by the cv to get the deviate
+            if (row == col) std::cout << 100 * std::sqrt(h_cov_sys->GetBinContent(row, col)) / bin_diag << std::endl;  
+        }
+    }
 
 
 }
@@ -751,40 +771,8 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         h_universe.at(k_up).at(k)->SetLineColor(kGreen+2);
     }
 
-    // Get the covariance matrix
-    std::vector<std::vector<TH1D*>> h_universe_max; // histogram with the max in each bin
-    h_universe_max.resize(1);
-    h_universe_max.at(0).resize(h_universe.at(k_up).size());
-
-    // To make the covariance matrix, in the case of an up/dn variation, 
-    // we need to make a histogram which gives the largest difference in each bin
-    // this ensures we get the largest uncertainty per bin
-    
-    // Loop over the histogram types
-    for (unsigned int type = 0; type < h_universe.at(k_up).size(); type++ ){
-        TH1D* h_max = (TH1D*) h_universe.at(k_up).at(type)->Clone("h_max");
-
-        // Now loop over the bins
-        for (int bin = 0; bin < h_universe.at(k_up).at(type)->GetNbinsX(); bin++){
-            double h_up_diff = std::abs(h_universe.at(k_up).at(type)->GetBinContent(bin+1) - cv_hist_vec.at(var).at(type)->GetBinContent(bin+1));
-            double h_dn_diff = std::abs(h_universe.at(k_dn).at(type)->GetBinContent(bin+1) - cv_hist_vec.at(var).at(type)->GetBinContent(bin+1));
-            
-            // Largest difference was the up var bin content
-            if (h_up_diff > h_dn_diff) h_max->SetBinContent(bin+1, h_universe.at(k_up).at(type)->GetBinContent(bin+1));
-            
-            // Largest difference was the dn var bin content
-            else                       h_max->SetBinContent(bin+1, h_universe.at(k_dn).at(type)->GetBinContent(bin+1));
-
-            // if (type == k_xsec_mcxsec) std::cout << h_max->GetBinContent(bin+1) << std::endl;
-        }
-        
-        h_universe_max.at(0).at(type) = (TH1D*) h_max->Clone();
-
-    } 
-
-    // Now call the covariance matrix function
-    CalcMatrices(label, var, h_universe_max);
-
+    // Get the covariance matrices
+    CalcMatrices(label, var, h_universe);
 
     TPad *topPad;
     TPad *bottomPad;
@@ -1070,18 +1058,6 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         
         if (scale_val <  h_universe.at(k_dn).at(k)->GetMaximum()) scale_val =  h_universe.at(k_dn).at(k)->GetMaximum();
 
-        // Loop over universes
-        // for (unsigned int uni = 0; uni < h_universe.size(); uni++){
-        
-            // h_universe.at(uni).at(k)->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
-            // h_universe.at(uni).at(k)->Draw("hist,same");
-            // if (scale_val < h_universe.at(uni).at(k)->GetMaximum()) scale_val = h_universe.at(uni).at(k)->GetMaximum();
-            // h_universe.at(uni).at(k)->GetXaxis()->SetTitle("");
-            // h_universe.at(uni).at(k)->GetXaxis()->SetLabelSize(0);
-
-        // }
-        
-        
         // if (scale_val < h_universe.at(uni).at(k)->GetMaximum()) scale_val = h_universe.at(uni).at(k)->GetMaximum();
         if (k == k_xsec_mcxsec || k == k_xsec_dataxsec) h_universe_2D.at(k)->SetTitle(Form("%s", var_labels.at(var).c_str()));
         else if (k == k_xsec_eff) h_universe_2D.at(k)->GetYaxis()->SetTitle("Efficiency");
@@ -1096,14 +1072,15 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
 
 
         if (xsec_types.at(k) != "data_xsec") {
-            cv_hist_vec_clone.at(k)->SetLineColor(kAzure+10);
+            cv_hist_vec_clone.at(k)->SetLineColor(kRed+1);
             cv_hist_vec_clone.at(k)->SetLineWidth(2);
             cv_hist_vec_clone.at(k)->SetLineStyle(7);
             cv_hist_vec_clone.at(k)->SetFillStyle(0);
-            cv_hist_vec_clone.at(k)->SetMarkerColor(kAzure+10);
+            cv_hist_vec_clone.at(k)->SetMarkerColor(kRed+1);
             cv_hist_vec_clone.at(k)->Draw("E2,hist,same");
         }
         else { 
+            cv_hist_vec_clone.at(k)->SetLineColor(kRed+1);
             cv_hist_vec_clone.at(k)->Draw("E,same");
         }
 
@@ -1133,7 +1110,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
             h_err->SetBinContent(g, 100 * h_err->GetBinError(g)/h_err->GetBinContent(g));
         }
         h_err->SetLineWidth(2);
-        h_err->SetLineColor(kAzure+5);
+        h_err->SetLineColor(kRed+1);
         h_err->GetYaxis()->SetRangeUser(0, 50);
 
         h_err->GetXaxis()->SetLabelSize(0.13);
@@ -1160,7 +1137,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         FillSysVector(label, var, k, h_err, h_err);
 
         gStyle->SetPalette(56);
-        // gStyle->SetPalette(kBird);
+        gStyle->SetPalette(kBlueGreenYellow);
 
         if (xsec_types.at(k) != "data_xsec") _util.Draw_ubooneSim(c, 0.40, 0.915, 0.40, 0.915);
         else _util.Draw_Data_POT(c, Data_POT, 0.50, 0.915, 0.50, 0.915);
@@ -1250,10 +1227,10 @@ void SystematicsHelper::CompareCVXSec(){
             TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
             leg->SetBorderSize(0);
             leg->SetFillStyle(0);
-            if (error_type.at(err_lab) == "stat")      leg->AddEntry(h_dataxsec, "Data (Stat)", "le");
-            else if (error_type.at(err_lab) == "sys") leg->AddEntry(h_dataxsec, "Data (Sys)", "le");
-            else                                      leg->AddEntry(h_dataxsec, "Data (Stat+Sys)", "le");
-            leg->AddEntry(h_mcxsec_clone,   "MC (Stat)", "lf");
+            if (error_type.at(err_lab) == "stat")      leg->AddEntry(h_dataxsec, "Data (Stat.)", "le");
+            else if (error_type.at(err_lab) == "sys") leg->AddEntry(h_dataxsec, "Data (Sys.)", "le");
+            else                                      leg->AddEntry(h_dataxsec, "Data (Stat.+Sys.)", "le");
+            leg->AddEntry(h_mcxsec_clone,   "MC (Stat.)", "lf");
             leg->Draw();
 
 
@@ -1654,14 +1631,7 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
         }
     }
 
-    const Int_t NCont = 100;
-    const Int_t NRGBs = 5;
-    Double_t mainColour[NRGBs]   = { 1.00, 1.00, 1.00, 1.00, 1.00 };
-    Double_t otherColour[NRGBs]   = { 0.99,0.80, 0.60, 0.40, 0.20 };
-    Double_t stops[NRGBs] = { 0.00, 0.05, 0.1, 0.4, 1.00 };
-
-    TColor::CreateGradientColorTable(NRGBs, stops, mainColour, otherColour, otherColour, NCont);
-    gStyle->SetNumberContours(NCont);
+    gStyle->SetPalette(kBlueGreenYellow);
 
     // For now only saving the reco electron cov matrices
     if (var == k_var_reco_el_E){
@@ -1720,12 +1690,16 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
         }
 
         h_cov_tot->Add(cov);
+        h_cov_sys->Add(cov);
     }
 
     TCanvas *c = new TCanvas("c", "c", 500, 500);
     cov->GetXaxis()->CenterLabels(kTRUE);
     cov->GetYaxis()->CenterLabels(kTRUE);
+    cov->GetZaxis()->CenterTitle();
     cov->SetTitle("Covariance Matrix");
+    cov->GetZaxis()->SetTitle("Covariance [cm^{4}GeV^{2}]");
+    cov->GetZaxis()->SetTitleOffset(1.45);
     cov->Draw("colz");
     _util.IncreaseLabelSize(cov, c);
     _util.Draw_ubooneSim(c, 0.30, 0.915, 0.30, 0.915);
@@ -1734,12 +1708,16 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
     TCanvas *c2 = new TCanvas("c2", "c2", 500, 500);
     cor->GetXaxis()->CenterLabels(kTRUE);
     cor->GetYaxis()->CenterLabels(kTRUE);
+    cor->GetZaxis()->CenterTitle();
+    cor->GetZaxis()->SetTitle("Correlation");
+    cor->GetZaxis()->SetTitleOffset(1.3);
     cor->SetTitle("Correlation Matrix");
     // cor->SetMaximum(1);
     // cor->SetMinimum(0);
     cor->Draw("colz, text00");
     _util.IncreaseLabelSize(cor, c2);
     cor->SetMarkerSize(1.3);
+    cor->SetMarkerColor(kRed+1);
     gStyle->SetPaintTextFormat("0.3f");
     _util.Draw_ubooneSim(c2, 0.30, 0.915, 0.30, 0.915);
     c2->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_cor.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(),  _util.run_period, label.c_str(), vars.at(var).c_str()));
@@ -1747,10 +1725,14 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
     TCanvas *c3 = new TCanvas("c3", "c3", 500, 500);
     frac_cov->GetXaxis()->CenterLabels(kTRUE);
     frac_cov->GetYaxis()->CenterLabels(kTRUE);
+    frac_cov->GetZaxis()->CenterTitle();
     frac_cov->Draw("colz, text00");
+    frac_cov->GetZaxis()->SetTitle("Frac. Covariance");
     frac_cov->SetTitle("Fractional Covariance Matrix");
+    frac_cov->GetZaxis()->SetTitleOffset(1.52);
     _util.IncreaseLabelSize(frac_cov, c3);
     frac_cov->SetMarkerSize(1.3);
+    frac_cov->SetMarkerColor(kRed+1);
     gStyle->SetPaintTextFormat("0.3f");
     _util.Draw_ubooneSim(c3, 0.30, 0.915, 0.30, 0.915);
     c3->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_frac_cov.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(),  _util.run_period, label.c_str(), vars.at(var).c_str()));
@@ -1781,11 +1763,13 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         // Loop over histogram bins
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
-            double max_err = 0;
-            // Get the max error in each bin, then add the square
-            if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
-            else max_err = h_dn->GetBinContent(bin+1);
-            v_genie_uni_total.at(var).at(type).at(bin) += max_err*max_err;
+            double av_err = 0;
+            // Get the average error in each bin, then add the square
+            av_err += std::abs(h_up->GetBinContent(bin+1));
+            av_err += std::abs(h_dn->GetBinContent(bin+1));
+            av_err /= 2.0;
+            v_genie_uni_total.at(var).at(type).at(bin) += av_err*av_err;
+            v_sys_total.at(var).at(type).at(bin)       += av_err*av_err;
             
         }
     }
@@ -1808,12 +1792,13 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         // Loop over histogram bins
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
-            double max_err = 0;
+            double av_err = 0;
             // Get the max error in each bin, then add the square
-            if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
-            else max_err = h_dn->GetBinContent(bin+1);
-            v_beamline_total.at(var).at(type).at(bin) += max_err*max_err;
-            v_sys_total.at(var).at(type).at(bin) += max_err*max_err;
+            av_err += std::abs(h_up->GetBinContent(bin+1));
+            av_err += std::abs(h_dn->GetBinContent(bin+1));
+            av_err /= 2.0;
+            v_beamline_total.at(var).at(type).at(bin) += av_err*av_err;
+            v_sys_total.at(var).at(type).at(bin)      += av_err*av_err;
             
         }
     }
@@ -1821,12 +1806,13 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         // Loop over histogram bins
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
-            double max_err = 0;
-            // Get the max error in each bin, then add the square
-            if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
-            else max_err = h_dn->GetBinContent(bin+1);
-            v_genie_multi_total.at(var).at(type).at(bin) += max_err*max_err;
-            v_sys_total.at(var).at(type).at(bin) += max_err*max_err;
+            double av_err = 0;
+            // Get the average error in each bin, then add the square
+            av_err += std::abs(h_up->GetBinContent(bin+1));
+            av_err += std::abs(h_dn->GetBinContent(bin+1));
+            av_err /= 2.0;
+            v_genie_multi_total.at(var).at(type).at(bin) += av_err*av_err;
+            v_sys_total.at(var).at(type).at(bin) += av_err*av_err;
             
         }
 
@@ -1835,12 +1821,13 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         // Loop over histogram bins
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
-            double max_err = 0;
-            // Get the max error in each bin, then add the square
-            if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
-            else max_err = h_dn->GetBinContent(bin+1);
-            v_reint_total.at(var).at(type).at(bin) += max_err*max_err;
-            v_sys_total.at(var).at(type).at(bin) += max_err*max_err;
+            double av_err = 0;
+            // Get the average error in each bin, then add the square
+            av_err += std::abs(h_up->GetBinContent(bin+1));
+            av_err += std::abs(h_dn->GetBinContent(bin+1));
+            av_err /= 2.0;
+            v_reint_total.at(var).at(type).at(bin) += av_err*av_err;
+            v_sys_total.at(var).at(type).at(bin) += av_err*av_err;
             
         }
 
@@ -1849,12 +1836,13 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         // Loop over histogram bins
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
-            double max_err = 0;
-            // Get the max error in each bin, then add the square
-            if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
-            else max_err = h_dn->GetBinContent(bin+1);
-            v_hp_total.at(var).at(type).at(bin) += max_err*max_err;
-            v_sys_total.at(var).at(type).at(bin) += max_err*max_err;
+            double av_err = 0;
+            // Get the average error in each bin, then add the square
+            av_err += std::abs(h_up->GetBinContent(bin+1));
+            av_err += std::abs(h_dn->GetBinContent(bin+1));
+            av_err /= 2.0;
+            v_hp_total.at(var).at(type).at(bin) += av_err*av_err;
+            v_sys_total.at(var).at(type).at(bin) += av_err*av_err;
             
         }
 
@@ -1863,12 +1851,13 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         // Loop over histogram bins
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
-            double max_err = 0;
-            // Get the max error in each bin, then add the square
-            if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
-            else max_err = h_dn->GetBinContent(bin+1);
-            v_dirt_total.at(var).at(type).at(bin) += max_err*max_err;
-            v_sys_total.at(var).at(type).at(bin) += max_err*max_err;
+            double av_err = 0;
+            // Get the average error in each bin, then add the square
+            av_err += std::abs(h_up->GetBinContent(bin+1));
+            av_err += std::abs(h_dn->GetBinContent(bin+1));
+            av_err /= 2.0;
+            v_dirt_total.at(var).at(type).at(bin) += av_err*av_err;
+            v_sys_total.at(var).at(type).at(bin)  += av_err*av_err;
             
         }
 
@@ -1877,12 +1866,13 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         // Loop over histogram bins
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
-            double max_err = 0;
-            // Get the max error in each bin, then add the square
-            if (h_up->GetBinContent(bin+1) > h_dn->GetBinContent(bin+1)) max_err = h_up->GetBinContent(bin+1);
-            else max_err = h_dn->GetBinContent(bin+1);
-            v_pot_total.at(var).at(type).at(bin) += max_err*max_err;
-            v_sys_total.at(var).at(type).at(bin) += max_err*max_err;
+            double av_err = 0;
+            // Get the average error in each bin, then add the square
+            av_err += std::abs(h_up->GetBinContent(bin+1));
+            av_err += std::abs(h_dn->GetBinContent(bin+1));
+            av_err /= 2.0;
+            v_pot_total.at(var).at(type).at(bin) += av_err*av_err;
+            v_sys_total.at(var).at(type).at(bin) += av_err*av_err;
             
         }
 
@@ -1911,6 +1901,25 @@ void SystematicsHelper::FillStatVector(){
         
         }
     }
+
+    // Lets also fill the diagonals of the statistical covariance matrix
+    // loop over rows
+    for (int row = 1; row < h_cov_stat->GetNbinsX()+1; row++) {
+        
+        // Loop over columns
+        for (int col = 1; col < h_cov_stat->GetNbinsY()+1; col++) {
+            
+            // Only set the bin content of the diagonals
+            double bin_diag = cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->GetBinContent(row);
+
+            // 0.01 converts each percentage back to a number. We multiply this by the cv to get the deviate
+            if (row == col) h_cov_stat->SetBinContent(row, col, 0.01*0.01*v_stat_total.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(row-1)*bin_diag*bin_diag);  
+        }
+    }
+
+    // Add the stat to the total
+    h_cov_tot->Add(h_cov_stat);
+
 
 }
 // -----------------------------------------------------------------------------
@@ -1955,8 +1964,10 @@ void SystematicsHelper::PrintUncertaintySummary(){
             std::cout << "Bin: " << bin+1 << " Dirt:               " <<std::sqrt(v_dirt_total.at(var).at(k_xsec_mcxsec)       .at(bin)) << " \%"<< std::endl;
             std::cout << "Bin: " << bin+1 << " POT Counting:       " <<std::sqrt(v_pot_total.at(var).at(k_xsec_mcxsec)        .at(bin)) << " \%"<< std::endl;
             std::cout << std::endl;
-            std::cout << "Bin: " << bin+1 << " Tot Data X-Sec Stat:                 " <<std::sqrt(v_stat_total.at(var).at(k_xsec_dataxsec)   .at(bin)) << " \%"<< std::endl;
-            std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Sys:                    " <<std::sqrt(v_sys_total.at(var).at(k_xsec_mcxsec)        .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " Tot Data X-Sec Stat:                 " <<std::sqrt(v_stat_total.at(var).at(k_xsec_dataxsec).at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Stat:                   " <<std::sqrt(v_stat_total.at(var).at(k_xsec_mcxsec).at(bin))   << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Sys:                    " <<std::sqrt(v_sys_total.at(var).at(k_xsec_mcxsec)   .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Uncertainty:            " <<std::sqrt(v_stat_total.at(var).at(k_xsec_dataxsec).at(bin) + v_sys_total.at(var).at(k_xsec_mcxsec)   .at(bin)) << " \%"<< std::endl;
             std::cout <<"\n--" << std::endl;       
         }
     }
@@ -2005,18 +2016,14 @@ void SystematicsHelper::InitialiseUncertaintyVectors(){
 // -----------------------------------------------------------------------------
 void SystematicsHelper::SaveCovMatrix(TH2D* cov, std::string print_name){
 
-    const Int_t NCont = 100;
-    const Int_t NRGBs = 5;
-    Double_t mainColour[NRGBs]   = { 1.00, 1.00, 1.00, 1.00, 1.00 };
-    Double_t otherColour[NRGBs]   = { 0.99,0.80, 0.60, 0.40, 0.20 };
-    Double_t stops[NRGBs] = { 0.00, 0.05, 0.1, 0.4, 1.00 };
-
-    TColor::CreateGradientColorTable(NRGBs, stops, mainColour, otherColour, otherColour, NCont);
-    gStyle->SetNumberContours(NCont);
+    gStyle->SetPalette(kBlueGreenYellow);
 
     TCanvas *c = new TCanvas("c", "c", 500, 500);
     cov->GetXaxis()->CenterLabels(kTRUE);
     cov->GetYaxis()->CenterLabels(kTRUE);
+    cov->GetZaxis()->CenterTitle();
+    cov->GetZaxis()->SetTitle("Covariance [cm^{4}GeV^{2}]");
+    cov->GetZaxis()->SetTitleOffset(1.45);
     cov->SetTitle("Covariance Matrix");
     cov->Draw("colz");
     _util.IncreaseLabelSize(cov, c);

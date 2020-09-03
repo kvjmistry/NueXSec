@@ -210,6 +210,8 @@ class SystematicsHelper{
     std::vector<std::vector<std::vector<double>>> v_pot_total;         // differential variable, type, bin error [Flat 2% for POT counting]
 
     TH2D* h_cov_tot;         // Sum of all covariance matrices
+    TH2D* h_cov_sys;         // Total Systematic covariance matrix
+    TH2D* h_cov_stat;        // Diagonal statistical covariance matrix
     TH2D* h_cov_genie_uni;   // Genie unisims
     TH2D* h_cov_genie_multi; // Genie multisims
     TH2D* h_cov_hp;          // PPFX HP
