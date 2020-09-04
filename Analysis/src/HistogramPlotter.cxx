@@ -81,8 +81,12 @@ void HistogramPlotter::MakeHistograms(Utility _utility)
         _util.CreateDirectory("Interaction");
 
         // Interaction Plot
-        MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction_unselected.pdf", _util.run_period), "unselected", true);
-        MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction_selected.pdf", _util.run_period), "selected", true);
+        MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_nuebar_e_interaction_unselected.pdf", _util.run_period), "unselected","nue_nuebar", true);
+        MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_nuebar_e_interaction_selected.pdf", _util.run_period), "selected","nue_nuebar", true);
+        MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction_unselected.pdf", _util.run_period), "unselected","nue", true);
+        MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction_selected.pdf", _util.run_period), "selected","nue", true);
+        MakeInteractionPlot(Form("plots/run%s/Interaction/True_nuebar_e_interaction_unselected.pdf", _util.run_period), "unselected","nuebar", true);
+        MakeInteractionPlot(Form("plots/run%s/Interaction/True_nuebar_e_interaction_selected.pdf", _util.run_period), "selected","nuebar", true);
         MakeInteractionEfficiency(Form("plots/run%s/Interaction/True_nue_e_interaction_efficiency.pdf", _util.run_period));
 
         // Create the 2D folder
@@ -1901,7 +1905,7 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
     }
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::MakeInteractionPlot(const char *print_name, std::string cut_type, bool scale){
+void HistogramPlotter::MakeInteractionPlot(const char *print_name, std::string cut_type, std::string flav, bool scale){
 
     std::vector<TH1D *> hist(_util.interaction_types.size());
 
@@ -1924,7 +1928,7 @@ void HistogramPlotter::MakeInteractionPlot(const char *print_name, std::string c
 
     for (unsigned int k = 0; k < hist.size(); k++) {
         
-        _util.GetHist(f_nuexsec, hist.at(k), Form("Interaction/h_true_nue_E_%s_%s", _util.interaction_types.at(k).c_str(), cut_type.c_str()));
+        _util.GetHist(f_nuexsec, hist.at(k), Form("Interaction/h_true_%s_E_%s_%s", flav.c_str(), _util.interaction_types.at(k).c_str(), cut_type.c_str()));
         
 
         if (hist.at(k) == NULL) {
@@ -1955,10 +1959,13 @@ void HistogramPlotter::MakeInteractionPlot(const char *print_name, std::string c
     gPad->SetLeftMargin(0.15);
     gPad->SetBottomMargin(0.12);
     c->Update();
-    h_stack->GetXaxis()->SetTitle("True #nu_{e} Energy");
+    if (flav == "nue_nuebar")h_stack->GetXaxis()->SetTitle("True #nu_{e} + #bar{#nu}_{e} Energy");
+    if (flav == "nue")h_stack->GetXaxis()->SetTitle("True #nu_{e} Energy");
+    if (flav == "nuebar")h_stack->GetXaxis()->SetTitle("True #bar{#nu}_{e} Energy");
     h_stack->GetYaxis()->SetTitle("Entries");
 
     if (scale) h_stack->SetMaximum(625);
+    if (flav == "nuebar") h_stack->SetMaximum(100);
 
     TH1D *h_sum = (TH1D *)hist.at(_util.k_plot_qe)->Clone("h_sum");
 
@@ -2003,8 +2010,8 @@ void HistogramPlotter::MakeInteractionEfficiency(const char *print_name){
 
     for (unsigned int k = 0; k < hist.at(0).size(); k++) {
         
-        _util.GetHist(f_nuexsec, hist.at(0).at(k), Form("Interaction/h_true_nue_E_%s_unselected", _util.interaction_types.at(k).c_str()));
-        _util.GetHist(f_nuexsec, hist.at(1).at(k), Form("Interaction/h_true_nue_E_%s_selected",   _util.interaction_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, hist.at(0).at(k), Form("Interaction/h_true_nue_nuebar_E_%s_unselected", _util.interaction_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, hist.at(1).at(k), Form("Interaction/h_true_nue_nuebar_E_%s_selected",   _util.interaction_types.at(k).c_str()));
         
         if (hist.at(0).at(k) == NULL || hist.at(1).at(k) == NULL) {
             std::cout << "Couldn't get all the interaction histograms so exiting function..." << std::endl;

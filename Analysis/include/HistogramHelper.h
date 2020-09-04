@@ -101,7 +101,7 @@ class HistogramHelper{
     std::vector<TH1D*> TH1D_flash_hists;
 
     // Interaction Histograms
-    std::vector<std::vector<TH1D*>> TH1D_interaction_hists; // unselected/selected -- interaction type
+    std::vector<std::vector<std::vector<TH1D*>>> TH1D_interaction_hists; // sum/nue/nubar -- unselected/selected -- interaction type
 
     // 2D histograms for Signal and Background Rejection
     std::vector<std::vector<TH2D*>> TH2D_hists;
