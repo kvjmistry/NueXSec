@@ -632,9 +632,6 @@ void SystematicsHelper::InitialiseReweightingMode(){
     // Get the statistical uncertainties
     FillStatVector();
 
-    // Add 2% POT counting uncertainty to the tot sys error vector
-    // FillPOTCountingVector();
-
     // Compare the MC and Data X-Section
     CompareCVXSec();
     CompareCVXSecNoRatio();
@@ -1356,10 +1353,10 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
             leg->SetBorderSize(0);
             leg->SetFillStyle(0);
-            if (error_type.at(err_lab) == "stat")     leg->AddEntry(h_dataxsec, "Data (Stat)", "le");
-            else if (error_type.at(err_lab) == "sys") leg->AddEntry(h_dataxsec, "Data (Sys)", "le");
-            else                                      leg->AddEntry(h_dataxsec, "Data (Stat+Sys)", "le");
-            leg->AddEntry(h_mcxsec_clone,   "MC (Stat)", "lf");
+            if (error_type.at(err_lab) == "stat")     leg->AddEntry(h_dataxsec, "Data (Stat.)", "le");
+            else if (error_type.at(err_lab) == "sys") leg->AddEntry(h_dataxsec, "Data (Sys.)", "le");
+            else                                      leg->AddEntry(h_dataxsec, "Data (Stat. + Sys.)", "le");
+            leg->AddEntry(h_mcxsec_clone,   "MC (Stat.)", "lf");
             leg->Draw();
 
             // Draw the run period on the plot

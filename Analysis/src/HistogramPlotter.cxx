@@ -1856,7 +1856,7 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
         h_clone->Divide(hist.at(_util.k_unselected));
         h_clone->SetStats(kFALSE);
         
-        if (var_string == "nu") h_clone->SetTitle(Form("%s;True #nu_{e} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
+        if (var_string == "nu") h_clone->SetTitle(Form("%s;True #nu_{e} + #bar{#nu}_{e} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
         if (var_string == "elec") h_clone->SetTitle(Form("%s;True Electron Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
 
         h_clone->GetYaxis()->SetRangeUser(0, 1);
@@ -1880,7 +1880,7 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
         c->Update();
 
         TGaxis *axis = new TGaxis(gPad->GetUxmax(), gPad->GetUymin(), gPad->GetUxmax(), gPad->GetUymax(), 0, rightmax, 510, "+L");
-        if (var_string == "nu")axis->SetTitle("True #nu_{e} Events in FV");
+        if (var_string == "nu")axis->SetTitle("True #nu_{e} + #bar{#nu}_{e} Events in FV");
         if (var_string == "elec")axis->SetTitle("True Electron Events in FV");
         axis->SetTitleOffset(1.8);
         axis->SetLineColor(kAzure - 6);
@@ -2176,7 +2176,7 @@ void HistogramPlotter::Save1DHists(const char *print_name, const char *histname,
 
     hist->SetLineColor(kAzure - 6);
     hist->SetLineWidth(2);
-    hist->Draw("hist_E");
+    hist->Draw("hist,E");
 
     // Draw the run period on the plot
     _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);

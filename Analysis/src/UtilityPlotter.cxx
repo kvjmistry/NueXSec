@@ -30,6 +30,12 @@ void UtilityPlotter::Initialise(Utility _utility){
         PlotIntegratedFluxwithThrehold();
         
     }
+    // Make the true variable plots
+    else if (std::string(_util.uplotmode) == "true"){
+        PlotTrueVar();
+        return;
+
+    }
     // This will call the code to optimise the bin widths
     else if (std::string(_util.uplotmode) == "bins"){
         OptimiseBins();
@@ -607,4 +613,275 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     if (draw_averge)c->Print("plots/Integrated_Flux_Average.pdf");
 
 }
+// -----------------------------------------------------------------------------
+void UtilityPlotter::PlotTrueVar(){
+
+    // Load in the root file
+    TFile * f_mc;
+    TTree * mc_tree;      // MC   Tree
+
+    // Get the TTree
+    _util.GetFile(f_mc, "../ntuples/neutrinoselection_filt_run1_overlay_weight.root"); // Get the run 1 MC file
+    _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
+
+    // These are the variables we need
+    float true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z;
+    float nu_purity_from_pfp;
+    int npi0;
+    int ccnc;
+    int   nu_pdg;
+    float nu_e;
+    float elec_e;
+    float pi0_e;
+    float weightSplineTimesTune;
+    float ppfx_cv;    // Weight from PPFX CV
+    int   n_showers;
+    int   nslice;
+
+    mc_tree->SetBranchAddress("true_nu_vtx_sce_x", &true_nu_vtx_sce_x);
+    mc_tree->SetBranchAddress("true_nu_vtx_sce_y", &true_nu_vtx_sce_y);
+    mc_tree->SetBranchAddress("true_nu_vtx_sce_z", &true_nu_vtx_sce_z);
+    mc_tree->SetBranchAddress("nu_purity_from_pfp", &nu_purity_from_pfp);
+    mc_tree->SetBranchAddress("npi0", &npi0);
+    mc_tree->SetBranchAddress("ccnc",   &ccnc);
+    mc_tree->SetBranchAddress("nu_pdg", &nu_pdg);
+    mc_tree->SetBranchAddress("nu_e", &nu_e);
+    mc_tree->SetBranchAddress("elec_e", &elec_e);
+    mc_tree->SetBranchAddress("pi0_e", &pi0_e);
+    mc_tree->SetBranchAddress("weightSplineTimesTune",      &weightSplineTimesTune);
+    mc_tree->SetBranchAddress("ppfx_cv",                    &ppfx_cv);
+    mc_tree->SetBranchAddress("n_showers", &n_showers);
+    mc_tree->SetBranchAddress("nslice", &nslice);
+
+    std::vector<std::string> vars = {"nu_e", "elec_e"};
+
+    // Create histograms for the hit purity
+    std::vector<std::vector<TH2D*>> h_hit_pur;
+    
+    // 1D pi0 momentum
+    TH1D *h_pi0_momentum = new TH1D("h_true_pi0_momentum", "; #pi^{0} Momentum [GeV/c]; Entries", 40, 0, 2.0);
+    
+    // 2D shower multiplicity vd nue/electron energy
+    TH2D *h_shr_multi_nue_E         = new TH2D("h_shr_multi_nue_E", "; Shower Multiplicty;#nu_{e} Energy [GeV] ", 6, 0, 6, 15, 0, 4.0);
+    TH2D *h_shr_multi_elec_e        = new TH2D("h_shr_multi_elec_e", "; Shower Multiplicty;Electron Energy [GeV] ", 6, 0, 6, 15, 0, 4.0);
+    TH2D *h_shr_multi_nuebar_E      = new TH2D("h_shr_multi_nuebar_E", "; Shower Multiplicty;#bar{#nu}_{e} Energy [GeV] ", 6, 0, 6, 15, 0, 4.0);
+    TH2D *h_shr_multi_elec_e_nuebar = new TH2D("h_shr_multi_elec_e_nuebar", "; Shower Multiplicty;Positron Energy [GeV] ", 6, 0, 6, 15, 0, 4.0);
+    
+    // Resize hit purity 
+    h_hit_pur.resize(vars.size());
+    for (unsigned int var = 0; var < h_hit_pur.size(); var++){
+        h_hit_pur.at(var).resize(_util.k_classifications_MAX);
+    }
+
+    // Create the histograms
+    for (unsigned int var = 0; var < h_hit_pur.size(); var++){
+        for (unsigned int h = 0; h < h_hit_pur.at(var).size(); h++){
+            h_hit_pur.at(var).at(h) = new TH2D(Form("h_hit_pur_%s_%s", vars.at(var).c_str() ,_util.classification_dirs.at(h).c_str()), "", 20, 0, 5.0, 50, 0, 1.1 );
+        }
+    }
+
+    int mc_tree_total_entries = mc_tree->GetEntries();
+    std::cout << "Total MC Events:         " << mc_tree_total_entries << std::endl;
+
+    // Event loop
+    for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
+
+        // See if we want to process all the events
+        if (_util.num_events > 0){
+            if (ievent >= _util.num_events) break;
+        }
+
+        // Alert the user
+        if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
+    
+        // Get the entry in the tree
+        mc_tree->GetEntry(ievent); 
+
+        double weight = 1.0;
+
+        // Get the tune weight
+        if (_util.weight_tune) weight = weightSplineTimesTune;
+        
+        // Catch infinate/nan/unreasonably large tune weights
+        _util.CheckWeight(weight);
+
+        // Get the PPFX CV flux correction weight
+        double weight_flux = 1.0;
+        if (_util.weight_ppfx) weight_flux = ppfx_cv;
+
+        _util.CheckWeight(weight_flux);
+
+        if (_util.weight_ppfx) weight = weight * weight_flux;
+
+        // Get the classification
+        std::pair<std::string, int> classification = Classify(true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z, nu_pdg, ccnc, nu_purity_from_pfp, npi0);      // Classification of the event
+        
+        // True nue energy
+        h_hit_pur.at(0).at(classification.second)->Fill(nu_e, nu_purity_from_pfp, weight);
+        
+        // True electron energy
+        h_hit_pur.at(1).at(classification.second)->Fill(elec_e, nu_purity_from_pfp, weight);
+
+        // Pi0 Momentum
+        bool is_in_fv = _util.in_fv(true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z);
+        if (is_in_fv) h_pi0_momentum->Fill(std::sqrt(pi0_e*pi0_e - 0.134*0.134), weight);
+
+        // Nue cc
+        if (nslice == 1 && nu_pdg == 12 && is_in_fv && nu_purity_from_pfp > 0.5 && ccnc == _util.k_CC){
+
+            h_shr_multi_nue_E->Fill(n_showers, nu_e, weight);
+            h_shr_multi_elec_e->Fill(n_showers, elec_e, weight);
+        }
+        // nuebar cc
+        if (nslice == 1 && nu_pdg == -12 && is_in_fv && nu_purity_from_pfp > 0.5 && ccnc == _util.k_CC){
+            h_shr_multi_nuebar_E->Fill(n_showers, nu_e, weight);
+            h_shr_multi_elec_e_nuebar->Fill(n_showers, elec_e, weight);
+        }
+
+        
+
+    }
+
+    // Create the resolutions directory for saving the plots to
+    _util.CreateDirectory("HitPurity");
+
+    // Now create the directory and save the histograms to file
+    // Create the histograms
+    for (unsigned int var = 0; var < h_hit_pur.size(); var++){
+        for (unsigned int h = 0; h < h_hit_pur.at(var).size(); h++){
+            
+            TCanvas * c = new TCanvas("c", "c", 500, 500);
+            c->SetTopMargin(0.11);
+
+            h_hit_pur.at(var).at(h)->SetStats(kFALSE);
+
+            _util.IncreaseLabelSize(h_hit_pur.at(var).at(h), c);
+
+            gStyle->SetPalette(kBlueGreenYellow);
+
+            if (vars.at(var) == "nu_e") h_hit_pur.at(var).at(h)->SetTitle(Form("%s; True #nu_{e} + #bar{#nu}_{e} Energy [GeV]; Slice Hit Purity", _util.classification_dirs.at(h).c_str()));
+            if (vars.at(var) == "elec_e") h_hit_pur.at(var).at(h)->SetTitle(Form("%s; True Electron Energy [GeV]; Slice Hit Purity", _util.classification_dirs.at(h).c_str()));
+
+            h_hit_pur.at(var).at(h)->Draw("colz");
+
+            c->Print(Form("plots/run%s/HitPurity/hit_purity_%s_%s.pdf", _util.run_period, vars.at(var).c_str() ,_util.classification_dirs.at(h).c_str()));
+            delete c;
+
+        }
+    }
+
+    // Now save the Pi0 Momentum plot
+    _util.CreateDirectory("Truth");
+    TCanvas * c = new TCanvas("c", "c", 500, 500);
+    c->SetTopMargin(0.11);
+
+    h_pi0_momentum->SetStats(kFALSE);
+
+    _util.IncreaseLabelSize(h_pi0_momentum, c);
+
+    h_pi0_momentum->SetLineColor(kAzure - 6);
+    h_pi0_momentum->SetLineWidth(2);
+    h_pi0_momentum->Draw("hist,E");
+
+    c->Print(Form("plots/run%s/Truth/h_pi0_momentum.pdf", _util.run_period));
+
+    delete c;
+
+
+    h_shr_multi_nue_E->GetXaxis()->CenterLabels();
+    h_shr_multi_elec_e->GetXaxis()->CenterLabels();
+    h_shr_multi_nuebar_E->GetXaxis()->CenterLabels();
+    h_shr_multi_elec_e_nuebar->GetXaxis()->CenterLabels();
+
+
+    // Save the 2D shower multiplicity vs nue/elec energy histograms
+    Save2DHists(Form("plots/run%s/Truth/h_shower_multiplicity_vs_nue_E.pdf", _util.run_period), h_shr_multi_nue_E);
+    Save2DHists(Form("plots/run%s/Truth/h_shower_multiplicity_vs_elec_E.pdf", _util.run_period), h_shr_multi_elec_e);
+    Save2DHists(Form("plots/run%s/Truth/h_shower_multiplicity_vs_nuebar_E.pdf", _util.run_period), h_shr_multi_nuebar_E);
+    Save2DHists(Form("plots/run%s/Truth/h_shower_multiplicity_vs_elec_E_nuebar.pdf", _util.run_period), h_shr_multi_elec_e_nuebar);
+    
+
+}
+// -----------------------------------------------------------------------------
+std::pair<std::string, int> UtilityPlotter::Classify(float true_nu_vtx_sce_x, float true_nu_vtx_sce_y, float true_nu_vtx_sce_z, int nu_pdg, int ccnc, float nu_purity_from_pfp, int npi0){
+   
+    bool is_in_fv = _util.in_fv(true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z);
+
+    // Out of Fiducial Volume Event
+    if (!is_in_fv) {
+        // std::cout << "Purity of out of FV event: "<< nu_purity_from_pfp << std::endl;
+        if (nu_purity_from_pfp < 0.0) return std::make_pair("unmatched",_util.k_unmatched);
+        else return std::make_pair("nu_out_fv",_util.k_nu_out_fv);
+    }
+    // In FV event
+    else {
+
+        // Charged Current 
+        if (ccnc == _util.k_CC){
+
+            // NuMu CC
+            if (nu_pdg == 14 || nu_pdg == -14){
+
+                // Purity is low so return cosmic
+                if (nu_purity_from_pfp < 0.0)return std::make_pair("unmatched",_util.k_unmatched);
+                
+                if (npi0 > 0) return std::make_pair("numu_cc_pi0", _util.k_numu_cc_pi0); // has a pi0
+                else return std::make_pair("numu_cc",_util.k_numu_cc);
+
+            }
+            // Nue CC
+            else if (nu_pdg == 12){
+                
+                if (nu_purity_from_pfp > 0.0)                                 return std::make_pair("nue_cc",       _util.k_nue_cc);    // purity > 0.5% so signal
+                else                                                          return std::make_pair("unmatched_nue",_util.k_unmatched_nue); // These events were not picked up by pandora at all
+
+            }
+            else if (nu_pdg == -12){
+                
+                if (nu_purity_from_pfp > 0.0)                                  return std::make_pair("nuebar_cc",       _util.k_nuebar_cc); // purity > 0.5% so signal
+                else                                                           return std::make_pair("unmatched_nuebar",_util.k_unmatched_nuebar); // These events were not picked up by pandora at all
+
+            }
+            // Unknown Neutrino Type
+            else {
+                std::cout << "Unknown Neutrino Type..., This will also mess up the efficecy if this occurs!" << std::endl;
+                return std::make_pair("unmatched",_util.k_unmatched);
+            }
+
+        }
+        // Neutral Current
+        else {
+
+            // Purity is low so return cosmic
+            if (nu_purity_from_pfp < 0) return std::make_pair("unmatched",_util.k_unmatched);
+
+            if (npi0 > 0) return std::make_pair("nc_pi0",_util.k_nc_pi0);
+            else return std::make_pair("nc",_util.k_nc);
+        }
+    
+    } // End if in FV
+
+
+}
+// -----------------------------------------------------------------------------
+void UtilityPlotter::Save2DHists(const char* printname, TH2D* hist){
+
+    TCanvas * c = new TCanvas("c", "c", 500, 500);
+    c->SetTopMargin(0.11);
+
+    hist->SetStats(kFALSE);
+
+    _util.IncreaseLabelSize(hist, c);
+
+    gStyle->SetPalette(kBlueGreenYellow);
+
+    hist->Draw("colz");
+
+    c->Print(printname);
+    delete c;
+
+}
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

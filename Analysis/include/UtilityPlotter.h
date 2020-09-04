@@ -79,9 +79,16 @@ class UtilityPlotter{
     // Get the integrated flux, draw threshold line for technote
     void PlotIntegratedFluxwithThrehold();
     // -------------------------------------------------------------------------
+    // Function to plot a number of true variables at the start of the selection
+    // e.g. the hit purity and pion mommentum
+    void PlotTrueVar();
     // -------------------------------------------------------------------------
+    // Similar function to the slice container classifier, just re-implement it here for easier use
+    std::pair<std::string, int> Classify(float true_nu_vtx_sce_x, float true_nu_vtx_sce_y, float true_nu_vtx_sce_z, int nu_pdg, int ccnc, float nu_purity_from_pfp, int npi0);
     // -------------------------------------------------------------------------
-
+    // Function to save a few 2D histograms
+    void Save2DHists(const char* printname, TH2D* hist);
+    // -------------------------------------------------------------------------
 
 
 }; // End Class UtilityPlotter

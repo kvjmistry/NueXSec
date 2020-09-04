@@ -22,12 +22,6 @@ class HistogramHelper{
     SelectionCuts _scuts;
     int _type{1};
 
-    // weight variable (will equal multiple of all weights)
-    double weight{1.0};
-
-    bool weight_tune = true; // Apply genie tune weight
-    bool weight_ppfx = true; // Apply ppfx cv weight
-
     // -------------------------------------------------------------------------
     // Initialiser function
     void Initialise(int type, const char * file_out, Utility util );
