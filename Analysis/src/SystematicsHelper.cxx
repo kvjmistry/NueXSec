@@ -651,6 +651,13 @@ void SystematicsHelper::InitialiseReweightingMode(){
     SaveCovMatrix(h_cov_pot,         Form("plots/run%s/Systematics/Covariance/run%s_pot_cov.pdf",         _util.run_period, _util.run_period));
     SaveCovMatrix(h_cov_reint,       Form("plots/run%s/Systematics/Covariance/run%s_reint_cov.pdf",       _util.run_period, _util.run_period));
 
+    // Create the directories
+    _util.CreateDirectory("/Systematics/Beamline");
+    _util.CreateDirectory("/Systematics/Genie_Unisim");
+    
+    // Plot the total beamline sys uncertainty
+    PlotTotUnisim("Beamline");
+    PlotTotUnisim("Genie_Unisim");
 
     // Print the sqrt of the diagonals of the covariance matrix
     // loop over rows
@@ -2031,4 +2038,105 @@ void SystematicsHelper::SaveCovMatrix(TH2D* cov, std::string print_name){
 
 }
 // -----------------------------------------------------------------------------
+void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
+
+    std::vector<std::vector<std::vector<double>>> v_unisim;
+
+    // Use the beamline errors
+    if (unisim_type == "Beamline")   v_unisim = v_beamline_total;
+    else if (unisim_type == "Genie_Unisim") v_unisim = v_genie_uni_total;
+    else {
+        std::cout << "Unknown unisim type specified" << std::endl;
+        return;
+    }
+
+    // Loop over the differential variables
+    for (unsigned int var = 0; var < cv_hist_vec.size(); var++ ){
+        if (vars.at(var) == "true_el_E") continue; // Skip the true var which doesnt make much sense
+        
+        // Loop over the types
+        for (unsigned int  type = 0; type < cv_hist_vec.at(var).size(); type++ ){
+
+            // Get the CV histogram
+            TH1D* h_CV_clone = (TH1D*)cv_hist_vec.at(var).at(type)->Clone("h_clone");
+
+            // Loop over the bins and set the error
+            for (int bin = 0; bin < h_CV_clone->GetNbinsX(); bin++ ){
+                h_CV_clone->SetBinError(bin+1,  0.01*std::sqrt(v_unisim.at(var).at(type).at(bin)) * h_CV_clone->GetBinContent(bin+1));
+            }
+
+            // Now plot the damn thing
+            TCanvas *c = new TCanvas("c", "c", 500, 500);
+            TPad *topPad = new TPad("topPad", "", 0, 0.3, 1, 1.0);
+            TPad *bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
+            _util.SetTPadOptions(topPad, bottomPad);
+            
+            h_CV_clone->SetTitle(Form("%s", unisim_type.c_str() ));
+
+            // if (scale_val < h_universe.at(uni).at(k)->GetMaximum()) scale_val = h_universe.at(uni).at(k)->GetMaximum();
+            if (type == k_xsec_mcxsec || type == k_xsec_dataxsec) h_CV_clone->SetTitle(Form("%s", var_labels.at(var).c_str()));
+            else if (type == k_xsec_eff) h_CV_clone->GetYaxis()->SetTitle("Efficiency");
+            else h_CV_clone->GetYaxis()->SetTitle("Entries");
+            h_CV_clone->Draw("hist,E");
+            h_CV_clone->GetXaxis()->SetTitle("");
+            h_CV_clone->GetXaxis()->SetLabelSize(0);
+            h_CV_clone->SetTitle(xsec_types_pretty.at(type).c_str());
+            h_CV_clone->GetYaxis()->SetTitleSize(0.04);
+            h_CV_clone->GetYaxis()->SetLabelSize(0.05);
+
+            bottomPad->cd();
+
+            // Up percent diff to CV
+            TH1D* h_err = (TH1D *)h_CV_clone->Clone("h_err");
+            
+            // Loop over the bins in the up error, and set the bin content to be the percent difference
+            for (int g = 1; g < h_err->GetNbinsX()+1; g++){
+                h_err->SetBinContent(g, std::sqrt(v_unisim.at(var).at(type).at(g-1)));
+            }
+            h_err->SetLineWidth(2);
+            h_err->SetLineColor(kRed+1);
+            h_err->GetYaxis()->SetRangeUser(0, 50);
+
+            h_err->GetXaxis()->SetLabelSize(0.13);
+            h_err->GetXaxis()->SetTitleOffset(0.9);
+            h_err->GetXaxis()->SetTitleSize(0.13);
+            h_err->GetYaxis()->SetLabelSize(0.13);
+            h_err->GetYaxis()->SetNdivisions(4, 0, 0, kTRUE);
+            h_err->GetYaxis()->SetTitleSize(12);
+            h_err->GetYaxis()->SetTitleFont(44);
+            h_err->GetYaxis()->CenterTitle();
+            h_err->GetYaxis()->SetTitleOffset(1.5);
+            h_err->SetTitle(" ");
+            h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+            h_err->SetMarkerColor(kBlack);
+            h_err->SetLineStyle(1);
+            h_err->SetLineColor(kBlack);
+
+            
+            h_err->GetYaxis()->SetTitle("\% Uncertainty");
+            h_err->SetMarkerSize(4);
+            if (type != k_xsec_dirt && type != k_xsec_ext) h_err->Draw("hist, text00");
+            gStyle->SetPaintTextFormat("4.1f");
+
+
+            if (xsec_types.at(type) != "data_xsec") _util.Draw_ubooneSim(c, 0.40, 0.915, 0.40, 0.915);
+            else _util.Draw_Data_POT(c, Data_POT, 0.50, 0.915, 0.50, 0.915);
+
+
+            c->Print(Form("plots/run%s/Systematics/%s/run%s_%s_%s_%s.pdf", _util.run_period, unisim_type.c_str(), _util.run_period, unisim_type.c_str(), vars.at(var).c_str(), xsec_types.at(type).c_str()));
+
+
+            delete c;
+            delete h_CV_clone;
+
+
+        }
+    
+    
+    }
+
+
+
+
+}
 // -----------------------------------------------------------------------------

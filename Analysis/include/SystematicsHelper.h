@@ -99,6 +99,8 @@ class SystematicsHelper{
     // Save the covariance matrix
     void SaveCovMatrix(TH2D* cov, std::string print_name);
     // -------------------------------------------------------------------------
+    // Make the total beamline sys error plots
+    void PlotTotUnisim(std::string unisim_type);
     // -------------------------------------------------------------------------
 
 
