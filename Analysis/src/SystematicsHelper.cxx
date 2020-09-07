@@ -608,8 +608,8 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeUnisim("POT",        var, "POT Count." );
 
         // Plot the beamline unisims
-        PlotReweightingModeUnisim("Horn_curr",          var, "Horn Current" );
         PlotReweightingModeUnisim("Horn1_x",            var, "Horn 1 x" );
+        PlotReweightingModeUnisim("Horn_curr",          var, "Horn Current" );
         PlotReweightingModeUnisim("Horn1_y",            var, "Horn 1 y" );
         PlotReweightingModeUnisim("Beam_spot",          var, "Beam Spot Size" );
         PlotReweightingModeUnisim("Horn2_x",            var, "Horn 2 x" );
@@ -618,9 +618,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeUnisim("Beam_shift_x",       var, "Beam shift x" );
         PlotReweightingModeUnisim("Beam_shift_y",       var, "Beam shift y" );
         PlotReweightingModeUnisim("Target_z",           var, "Target z" );
-        PlotReweightingModeUnisim("Horn1_refined_descr",var, "Horn 1 Refined Desc." );
         PlotReweightingModeUnisim("Decay_pipe_Bfield",  var, "Decay pipe Bfield" );
-        PlotReweightingModeUnisim("Old_Horn_Geometry",  var, "Old Horn Geometry" );
 
         // Plot the multisims
         PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 600);
@@ -2042,20 +2040,130 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
 
     std::vector<std::vector<std::vector<double>>> v_unisim;
 
+    std::vector<std::string> unisim_names;
+
     // Use the beamline errors
-    if (unisim_type == "Beamline")   v_unisim = v_beamline_total;
-    else if (unisim_type == "Genie_Unisim") v_unisim = v_genie_uni_total;
+    if (unisim_type == "Beamline")   {
+        v_unisim = v_beamline_total;
+        unisim_names = {
+                    "Horn1_x",
+                    "Horn_curr",
+                    "Horn1_y",
+                    "Beam_spot",
+                    "Horn2_x",
+                    "Horn2_y",
+                    "Horn_Water",
+                    "Beam_shift_x",
+                    "Beam_shift_y",
+                    "Target_z",
+                    "Decay_pipe_Bfield"
+                };
+    }
+    else if (unisim_type == "Genie_Unisim") {
+        v_unisim = v_genie_uni_total;
+
+        unisim_names = {
+                    "RPA",
+                    "CCMEC",
+                    "AxFFCCQE",
+                    "VecFFCCQE",
+                    "DecayAngMEC",
+                    "ThetaDelta2Npi",
+                    "ThetaDelta2NRad",
+                    "RPA_CCQE_Reduced",
+                    "NormCCCOH",
+                    "NormNCCOH"
+                };
+    }
     else {
         std::cout << "Unknown unisim type specified" << std::endl;
         return;
     }
 
+    // Get all the universes so we can draw them on
+    std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_universe; // var -- label -- Up/Dn -- Type
+    
+    h_universe.resize(vars.size());
+    
+    for (unsigned int var = 0; var < h_universe.size(); var++){
+        h_universe.at(var).resize(unisim_names.size());
+    }
+    
+    // Loop over the vars
+    for (unsigned int var = 0; var < h_universe.size(); var++){
+        
+        // Loop over and resize
+        for (unsigned int label = 0; label < h_universe.at(var).size(); label++){
+            
+            // Resize to the number of universes
+            h_universe.at(var).at(label).resize(2);
+
+            // And resize to each type
+            h_universe.at(var).at(label).at(k_up).resize(xsec_types.size());
+            h_universe.at(var).at(label).at(k_dn).resize(xsec_types.size());
+            
+        }
+    }
+
+    std::vector<std::string> labels_up_v;
+    std::vector<std::string> labels_dn_v;
+
+    for (unsigned int var = 0; var < h_universe.size(); var++){
+
+        // Loop over and resize
+        for (unsigned int label = 0; label < h_universe.at(var).size(); label++){
+        
+            // Now get the histograms
+            std::string label_up = unisim_names.at(label) + "up";
+            std::string label_dn = unisim_names.at(label) + "dn";
+
+            // Set the Unisim up down variation name
+            SetLabelName(unisim_names.at(label), label_up, label_dn);
+
+            if (var == 0) labels_up_v.push_back(label_up); // only push back once
+            if (var == 0) labels_dn_v.push_back(label_dn); // only push back once
+
+
+            // Check if its just a single on/off type variation
+            // This case we dont want to plot the up/dn, but just once
+            bool single_var = false;
+            if (label_up == label_dn) single_var = true;
+
+            // Get the histograms and customise a bit
+            for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
+
+                TH1D* htemp;
+                _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, label_up.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+
+                h_universe.at(var).at(label).at(k_up).at(k) = (TH1D*) htemp->Clone(Form("h_clone_%s_%s_up", vars.at(var).c_str(), labels_up_v.at(label).c_str()));
+
+                // Customise
+                h_universe.at(var).at(label).at(k_up).at(k)->SetLineWidth(2);
+                h_universe.at(var).at(label).at(k_up).at(k)->SetLineStyle(0);
+                h_universe.at(var).at(label).at(k_up).at(k)->SetLineColor(kGreen+2);
+                
+                _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, label_dn.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+
+                h_universe.at(var).at(label).at(k_dn).at(k) = (TH1D*) htemp->Clone(Form("h_clone_%s_%s_up", vars.at(var).c_str(), labels_dn_v.at(label).c_str()));
+
+                // Customise
+                h_universe.at(var).at(label).at(k_dn).at(k)->SetLineWidth(2);
+                h_universe.at(var).at(label).at(k_dn).at(k)->SetLineStyle(1);
+                h_universe.at(var).at(label).at(k_dn).at(k)->SetLineColor(kRed+2);
+                h_universe.at(var).at(label).at(k_up).at(k)->SetLineColor(kGreen+2);
+            }
+        }
+    }
+
+
     // Loop over the differential variables
     for (unsigned int var = 0; var < cv_hist_vec.size(); var++ ){
-        if (vars.at(var) == "true_el_E") continue; // Skip the true var which doesnt make much sense
+        
         
         // Loop over the types
         for (unsigned int  type = 0; type < cv_hist_vec.at(var).size(); type++ ){
+
+            if (vars.at(var) == "true_el_E" && type != k_xsec_eff) continue; // Skip the true var which doesnt make much sense
 
             // Get the CV histogram
             TH1D* h_CV_clone = (TH1D*)cv_hist_vec.at(var).at(type)->Clone("h_clone");
@@ -2077,12 +2185,38 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             if (type == k_xsec_mcxsec || type == k_xsec_dataxsec) h_CV_clone->SetTitle(Form("%s", var_labels.at(var).c_str()));
             else if (type == k_xsec_eff) h_CV_clone->GetYaxis()->SetTitle("Efficiency");
             else h_CV_clone->GetYaxis()->SetTitle("Entries");
-            h_CV_clone->Draw("hist,E");
+            h_CV_clone->SetFillColorAlpha(12, 0.15);
+            h_CV_clone->Draw("e2, same");
             h_CV_clone->GetXaxis()->SetTitle("");
             h_CV_clone->GetXaxis()->SetLabelSize(0);
             h_CV_clone->SetTitle(xsec_types_pretty.at(type).c_str());
             h_CV_clone->GetYaxis()->SetTitleSize(0.04);
             h_CV_clone->GetYaxis()->SetLabelSize(0.05);
+
+            TLegend *leg;
+            
+            if (type != k_xsec_eff) leg = new TLegend(0.41, 0.55, 0.91, 0.85);
+            else leg = new TLegend(0.4, 0.3, 0.9, 0.6);
+            leg->SetNColumns(2);
+            leg->SetBorderSize(0);
+            leg->SetFillStyle(0);
+
+            leg->AddEntry(h_CV_clone,"CV", "lf");
+
+            // Now draw all the universes
+            for (unsigned int label = 0; label < h_universe.at(var).size(); label ++ ){
+                SetUnisimColours(unisim_names.at(label), h_universe.at(var).at(label).at(k_up).at(type), h_universe.at(var).at(label).at(k_dn).at(type));
+                h_universe.at(var).at(label).at(k_up).at(type)->Draw("hist,same");
+                h_universe.at(var).at(label).at(k_dn).at(type)->Draw("hist,same");
+
+                leg->AddEntry(h_universe.at(var).at(label).at(k_up).at(type),Form("%s +1#sigma", unisim_names.at(label).c_str()), "l");
+                leg->AddEntry(h_universe.at(var).at(label).at(k_dn).at(type),Form("%s -1#sigma", unisim_names.at(label).c_str()), "l");
+            }
+
+            leg->Draw();
+
+            // Draw it again so its on top of everything
+            h_CV_clone->Draw("e2, same");
 
             bottomPad->cd();
 
@@ -2111,6 +2245,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             h_err->SetMarkerColor(kBlack);
             h_err->SetLineStyle(1);
             h_err->SetLineColor(kBlack);
+            h_err->SetFillColorAlpha(12, 0.0);
 
             
             h_err->GetYaxis()->SetTitle("\% Uncertainty");
@@ -2135,8 +2270,60 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
     
     }
 
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::SetUnisimColours(std::string label, TH1D* h_up, TH1D* h_dn){
 
+    if (label == "Horn1_x" || label == "RPA"){
+        h_up->SetLineColor(30);
+        h_dn->SetLineColor(30);
+    }
+    else if (label == "Horn_curr" || label == "CCMEC"){
+        h_up->SetLineColor(38);
+        h_dn->SetLineColor(38);
+    }
+    else if (label == "Horn1_y" || label == "AxFFCCQE"){
+        h_up->SetLineColor(28);
+        h_dn->SetLineColor(28);
+    }
+    else if (label == "Beam_spot" || label == "VecFFCCQE"){
+        h_up->SetLineColor(4);
+        h_dn->SetLineColor(4);
+    }
+    else if (label == "Horn2_x" || label == "DecayAngMEC"){
+        h_up->SetLineColor(36);
+        h_dn->SetLineColor(36);
+    }
+    else if (label == "Horn2_y" || label == "ThetaDelta2Npi"){
+        h_up->SetLineColor(1);
+        h_dn->SetLineColor(1);
+    }
+    else if (label == "Horn_Water" || label == "ThetaDelta2NRad"){
+        h_up->SetLineColor(46);
+        h_dn->SetLineColor(46);
+    }
+    else if (label == "Beam_shift_x" || label == "RPA_CCQE_Reduced"){
+        h_up->SetLineColor(12);
+        h_dn->SetLineColor(12);
+    }
+    else if (label == "Beam_shift_y" || label == "NormCCCOH"){
+        h_up->SetLineColor(kViolet - 7);
+        h_dn->SetLineColor(kViolet - 7);
+    }
+    else if (label == "Target_z" || label == "NormNCCOH"){
+        h_up->SetLineColor(kAzure-5);
+        h_dn->SetLineColor(kAzure-5);
+    }
+    else if (label == "Decay_pipe_Bfield"){
+        h_up->SetLineColor(kGreen+2);
+        h_dn->SetLineColor(kGreen+2);
+    }
+    else { 
+        std::cout << "Unknown label specified: " << label << std::endl;
+    }
+
+    h_up->SetLineStyle(1);
+    h_dn->SetLineStyle(2);
 
 
 }
-// -----------------------------------------------------------------------------

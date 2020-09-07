@@ -102,6 +102,9 @@ class SystematicsHelper{
     // Make the total beamline sys error plots
     void PlotTotUnisim(std::string unisim_type);
     // -------------------------------------------------------------------------
+    // Set the fill colours of the unisim variations
+    void SetUnisimColours(std::string label, TH1D* h_up, TH1D* h_dn);
+    // -------------------------------------------------------------------------
 
 
 
