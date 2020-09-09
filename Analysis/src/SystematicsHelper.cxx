@@ -634,8 +634,6 @@ void SystematicsHelper::InitialiseReweightingMode(){
     CompareCVXSec();
     CompareCVXSecNoRatio();
 
-    PrintUncertaintySummary();
-
     // Save the total covariance matrices
     _util.CreateDirectory("/Systematics/Covariance");
     SaveCovMatrix(h_cov_tot,         Form("plots/run%s/Systematics/Covariance/run%s_tot_cov.pdf",         _util.run_period, _util.run_period));
@@ -656,6 +654,9 @@ void SystematicsHelper::InitialiseReweightingMode(){
     // Plot the total beamline sys uncertainty
     PlotTotUnisim("Beamline");
     PlotTotUnisim("Genie_Unisim");
+
+    // Print a summary of the results
+    PrintUncertaintySummary();
 
     // Print the sqrt of the diagonals of the covariance matrix
     // loop over rows
@@ -1663,9 +1664,7 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
                 label == "Beam_shift_x" ||
                 label == "Beam_shift_y" ||
                 label == "Target_z" ||
-                label == "Horn1_refined_descr" ||
-                label == "Decay_pipe_Bfield" ||
-                label == "Old_Horn_Geometry"){
+                label == "Decay_pipe_Bfield"){
                 h_cov_beamline->Add(cov);
         }
         else if (label == "weightsGenie"){
@@ -1788,9 +1787,7 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         variation == "Beam_shift_x" ||
         variation == "Beam_shift_y" ||
         variation == "Target_z" ||
-        variation == "Horn1_refined_descr" ||
-        variation == "Decay_pipe_Bfield" ||
-        variation == "Old_Horn_Geometry"){
+        variation == "Decay_pipe_Bfield"){
 
         // Loop over histogram bins
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
@@ -2216,7 +2213,9 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             leg->Draw();
 
             // Draw it again so its on top of everything
-            h_CV_clone->Draw("e2, same");
+            TH1D* h_CV_clone_clone = (TH1D*)h_CV_clone->Clone("h_clone_clone");
+            h_CV_clone_clone->SetFillColorAlpha(12, 0.0);
+            h_CV_clone_clone->Draw("hist, same");
 
             bottomPad->cd();
 
@@ -2327,3 +2326,7 @@ void SystematicsHelper::SetUnisimColours(std::string label, TH1D* h_up, TH1D* h_
 
 
 }
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

@@ -105,7 +105,7 @@ void CrossSectionHelper::LoopEvents(){
 
         if (shr_energy_cali > 4.0 && *classification == "data" ) std::cout << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins" <<std::endl;
 
-        double cv_weight = weight;
+        double cv_weight = weight; // SplinetimesTune * PPFX CV * Pi0 Tune
 
         double weight_dirt = weight; // Use this for estimating dirt and POT sys
         double weight_ext  = weight;  // Use this for estimating pot sys
@@ -129,8 +129,6 @@ void CrossSectionHelper::LoopEvents(){
             for (unsigned int uni = 0; uni < h_cross_sec.at(label).size(); uni++){
                 
                 // Update the CV weight to CV * universe i
-                if (std::isnan(vec_universes.at(uni)) == 1)   vec_universes.at(uni)   = 1.0;
-                if (std::isinf(vec_universes.at(uni)))        vec_universes.at(uni)   = 1.0;
                 double weight_uni{1.0}; 
 
                 // Weight equal to universe weight times cv weight
@@ -156,7 +154,7 @@ void CrossSectionHelper::LoopEvents(){
                     weight_uni  = cv_weight;
                     weight_dirt = cv_weight;
                 }
-                // If we are using the genie systematics and unisim systematics then we want to undo the genie tune on them
+                // If we are using the genie systematics and unisim systematics then we want to undo the genie tune on them so we dont double count
                 else {
                     // Note we actually dont want to divide out by the spline, but since this is 1 in numi, it doesnt matter!
                     // We do this because the interaction systematics are shifted about the genie tune as the CV
