@@ -744,6 +744,9 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
 // -----------------------------------------------------------------------------
 void Selection::GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer &SC){
 
+    // Dont weight the nuecc events
+    if ( (SC.nu_pdg == 12 || SC.nu_pdg == -12) && SC.ccnc == _util.k_CC) return;
+
 
     // Fix the normalisation
     if (pizero_mode == 1){

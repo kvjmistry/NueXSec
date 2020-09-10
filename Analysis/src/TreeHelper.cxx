@@ -246,7 +246,7 @@ void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _class
     shrmoliereavg = SC.shrmoliereavg;
     shr_hits_max  = SC.shr_hits_max;
     elec_e   = SC.elec_e;
-    // weight_ppfx = SC.ppfx_cv;
+    ppfx_cv = SC.ppfx_cv;
     weightSplineTimesTune = SC.weightSplineTimesTune;
     nu_pdg = SC.nu_pdg;
     numi_ang = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "beam");
