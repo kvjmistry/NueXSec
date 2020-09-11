@@ -181,6 +181,7 @@ class HistogramHelper{
         k_reco_crtveto,                                                         // CRT veto
         k_reco_crthitpe,                                                        // CRT hit pe
         k_reco_shr_ang_numi,                                                    // Angle of the reconstructed leading shower relative to the numi beamline
+        k_reco_single_bin,                                                      // Just fill with weight. We need this to get the uncertainty on the purity
         k_TH1D_MAX
     };
 
@@ -196,6 +197,11 @@ class HistogramHelper{
         k_eff_nu_E,                  // True Electron-neutrino energy
         k_eff_elec_E,                // True Electron Energy
         k_eff_elec_E_rebin,          // True energy of electron with binning scheme
+        k_eff_nu_E_nue,              // True Electron-neutrino energy
+        k_eff_nu_E_nuebar,           // True anti Electron-neutrino energy
+        k_eff_nu_E_single_bin,       // True Electron-neutrino energy, single bin
+        k_eff_nu_E_nue_single_bin,   // True Electron-neutrino energy single bin
+        k_eff_nu_E_nuebar_single_bin,// True anti Electron-neutrino energy single bin
         k_TH1D_eff_MAX
     };
 
@@ -249,8 +255,8 @@ class HistogramHelper{
         k_true_nu_vtx_x_reco_nu_vtx_x,
         k_true_nu_vtx_y_reco_nu_vtx_y,
         k_true_nu_vtx_z_reco_nu_vtx_z,
-        k_true_shr_energy_purity,        // Actually purity as a function of reco shower
-        k_true_shr_energy_completeness,  // Actually completeness as a function of reco shower
+        k_true_shr_energy_purity,           // Actually purity as a function of reco shower
+        k_true_shr_energy_completeness,     // Actually completeness as a function of reco shower
         k_true_shr_energy_resolution_reco,  // Actually resolution normed to reco as a function of reco shower
         k_true_shr_energy_resolution_true,  // Actually resolution normed to true as a function of reco shower
         k_TH2D_true_MAX
@@ -263,23 +269,23 @@ class HistogramHelper{
         k_reco_shr_dEdx_max_shr_dist,        // Using max variable rather than just collection plane
         k_reco_shr_dEdx_max_shr_dist_post,   // after the cut
         k_reco_shr_dEdx_shr_dist_large_dedx, // for dedx values > 10 MeV/cm
-        k_reco_shr_dEdx_moliere,     // dedx y and moliere average
-        k_reco_shr_moliere_shr_dist, // moliere average and shr vertex distance
+        k_reco_shr_dEdx_moliere,             // dedx y and moliere average
+        k_reco_shr_moliere_shr_dist,         // moliere average and shr vertex distance
         k_TH2D_reco_MAX
     };
 
     enum TH1D_pi0_hist_vars {
-        k_pi0_mass,      // The pi0 mass peak no weighting 
-        k_pi0_mass_norm,      // The pi0 mass peak normalisation fix
+        k_pi0_mass,             // The pi0 mass peak no weighting 
+        k_pi0_mass_norm,        // The pi0 mass peak normalisation fix
         k_pi0_mass_EScale,      // The pi0 mass peak energy dependent scaling
         k_TH1D_pi0_MAX
     };
 
     enum TH1D_numu_hist_vars {
         k_track_theta,      // Longest track theta 
-        k_track_cos_theta,      // Longest track cos theta
-        k_track_phi,      // Longest track phi
-        k_muon_topo_score,      // Topological score (after muon selection)
+        k_track_cos_theta,  // Longest track cos theta
+        k_track_phi,        // Longest track phi
+        k_muon_topo_score,  // Topological score (after muon selection)
         k_TH1D_numu_MAX
     };
 

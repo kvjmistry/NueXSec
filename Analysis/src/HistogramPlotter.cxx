@@ -76,6 +76,11 @@ void HistogramPlotter::MakeHistograms(Utility _utility)
         MakeEfficiencyPlotByCut("h_true_nu_E", false);
         MakeEfficiencyPlotByCut("h_true_elec_E", false);
         MakeEfficiencyPlotByCut("h_true_elec_E_rebin", true);
+        MakeEfficiencyPlotByCut("h_true_nu_E_single_bin", true);
+        MakeEfficiencyPlotByCut("h_true_nu_E_nue", false);
+        MakeEfficiencyPlotByCut("h_true_nu_E_nuebar", false);
+        MakeEfficiencyPlotByCut("h_true_nu_E_nue_single_bin", true);
+        MakeEfficiencyPlotByCut("h_true_nu_E_nuebar_single_bin", true);
 
         // Create the interaction folder
         _util.CreateDirectory("Interaction");
@@ -1837,9 +1842,13 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
     // Helps determine what axes labels to draw 
     std::string var_string;
 
-    if (var == "h_true_nu_E")              var_string = "nu";
+    if (var == "h_true_nu_E" || var == "h_true_nu_E_single_bin")              var_string = "nu";
     else if (var == "h_true_elec_E")       var_string = "elec";
     else if (var == "h_true_elec_E_rebin") var_string = "elec";
+    else if (var == "h_true_nu_E_nue")     var_string = "nue";
+    else if (var == "h_true_nu_E_nuebar")  var_string = "nuebar";
+    else if (var == "h_true_nu_E_nue_single_bin")     var_string = "nue";
+    else if (var == "h_true_nu_E_nuebar_single_bin")  var_string = "nuebar";
     else return;
 
     // Loop over the classifications and get the histograms
@@ -1862,8 +1871,10 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
         h_clone->Divide(hist.at(_util.k_unselected));
         h_clone->SetStats(kFALSE);
         
-        if (var_string == "nu") h_clone->SetTitle(Form("%s;True #nu_{e} + #bar{#nu}_{e} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
-        if (var_string == "elec") h_clone->SetTitle(Form("%s;True Electron Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
+        if (var_string == "nu")     h_clone->SetTitle(Form("%s;True #nu_{e} + #bar{#nu}_{e} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
+        if (var_string == "elec")   h_clone->SetTitle(Form("%s;True Electron Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
+        if (var_string == "nue")    h_clone->SetTitle(Form("%s;True #nu_{e} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
+        if (var_string == "nuebar") h_clone->SetTitle(Form("%s;True #bar{#nu}_{e} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
 
         h_clone->GetYaxis()->SetRangeUser(0, 1);
         h_clone->SetLineColor(kBlack);
@@ -1888,6 +1899,8 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
         TGaxis *axis = new TGaxis(gPad->GetUxmax(), gPad->GetUymin(), gPad->GetUxmax(), gPad->GetUymax(), 0, rightmax, 510, "+L");
         if (var_string == "nu")axis->SetTitle("True #nu_{e} + #bar{#nu}_{e} Events in FV");
         if (var_string == "elec")axis->SetTitle("True Electron Events in FV");
+        if (var_string == "nue") axis->SetTitle("True #nu_{e} Events in FV");
+        if (var_string == "nuebar") axis->SetTitle("True #bar{#nu}_{e} Events in FV");
         axis->SetTitleOffset(1.8);
         axis->SetLineColor(kAzure - 6);
         axis->SetLabelColor(kAzure - 6);
@@ -1902,6 +1915,11 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
         if (var == "h_true_nu_E")         c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
         if (var == "h_true_elec_E")       c->Print(Form("plots/run%s/Efficiency/TEff_%s_elec_E.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
         if (var == "h_true_elec_E_rebin") c->Print(Form("plots/run%s/Efficiency/TEff_%s_elec_E_rebin.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
+        if (var == "h_true_nu_E_single_bin") c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E_single_bin.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
+        if (var == "h_true_nu_E_nue") c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E_nue.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
+        if (var == "h_true_nu_E_nuebar") c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E_nuebar.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
+        if (var == "h_true_nu_E_nue_single_bin") c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E_nue_single_bin.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
+        if (var == "h_true_nu_E_nuebar_single_bin") c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E_nuebar_single_bin.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
 
         delete c;
     }
