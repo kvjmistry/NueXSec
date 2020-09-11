@@ -278,6 +278,9 @@ class HistogramHelper{
         k_pi0_mass,             // The pi0 mass peak no weighting 
         k_pi0_mass_norm,        // The pi0 mass peak normalisation fix
         k_pi0_mass_EScale,      // The pi0 mass peak energy dependent scaling
+        k_pi0_energy,           // The pi0 energy dist no weighting 
+        k_pi0_energy_norm,      // The pi0 energy dist normalisation fix
+        k_pi0_energy_EScale,    // The pi0 energy dist energy dependent scaling
         k_TH1D_pi0_MAX
     };
 
