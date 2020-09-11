@@ -46,6 +46,7 @@ class UtilityPlotter{
     float shr_bkt_E{0.0}; // energy of truth matched particle to the leading shower
     std::vector<float> *all_shr_hits = NULL;
     std::vector<float> *all_shr_energies = NULL;
+    std::vector<unsigned short> *weightsPPFX = NULL ;
 
 
 
@@ -89,8 +90,8 @@ class UtilityPlotter{
     // Function to save a few 2D histograms
     void Save2DHists(const char* printname, TH2D* hist);
     // -------------------------------------------------------------------------
-    // Study the flash time distribution in Run 1 to see if 6+6 slip stacking changes anything
-    void StudySlipStackingFlashTime();
+    // Study the ppfx weights for each event classification
+    void StudyPPFXWeights();
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

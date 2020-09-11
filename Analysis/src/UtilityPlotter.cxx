@@ -17,6 +17,8 @@ void UtilityPlotter::Initialise(Utility _utility){
     // Standard variation mode
     if (std::string(_util.uplotmode) == "default")  {
 
+        StudyPPFXWeights();
+
         // Look to see if the shower with the most hits is the same as the shower with the most energy
         CompareHitstoEnergy();
 
@@ -68,6 +70,7 @@ void UtilityPlotter::InitTree(){
     tree->SetBranchAddress("shr_bkt_pdg", &shr_bkt_pdg);
     tree->SetBranchAddress("all_shr_hits" , &all_shr_hits);
     tree->SetBranchAddress("all_shr_energies",  &all_shr_energies);
+    tree->SetBranchAddress("weightsPPFX",           &weightsPPFX);
 }
 // -----------------------------------------------------------------------------
 void UtilityPlotter::CompareHitstoEnergy(){
@@ -882,254 +885,120 @@ void UtilityPlotter::Save2DHists(const char* printname, TH2D* hist){
 
 }
 // -----------------------------------------------------------------------------
-void UtilityPlotter::StudySlipStackingFlashTime(){
+void UtilityPlotter::StudyPPFXWeights(){
 
-    // Load in the TFiles for Run 1 MC, dirt, Data, EXT
-    std::vector<TFile*> f_v;
-    std::vector<TTree*> tree_v;
+    std::vector<TH1D*> v_hist;
+    v_hist.resize(_util.k_classifications_MAX);
 
-    f_v.resize(_util.k_type_MAX);
-    tree_v.resize(_util.k_type_MAX);
-
-    // Get the TFiles
-    _util.GetFile(f_v.at(_util.k_mc),   "../ntuples/neutrinoselection_filt_run1_overlay_weight.root");
-    _util.GetFile(f_v.at(_util.k_dirt), "../ntuples/neutrinoselection_filt_run1_dirt_overlay.root");
-    _util.GetFile(f_v.at(_util.k_data), "../ntuples/neutrinoselection_filt_run1_beamon_beamgood.root");
-    _util.GetFile(f_v.at(_util.k_ext),  "../ntuples/neutrinoselection_filt_run1_beamoff.root");
-    
-    // Now get the trees
-    for (unsigned int f = 0; f <  f_v.size(); f++){
-        f_v.at(f)->cd();
-        _util.GetTree(f_v.at(f), tree_v.at(f), "nuselection/NeutrinoSelectionFilter");
+    for (unsigned int c = 0; c < v_hist.size(); c++){
+        v_hist.at(c) = new TH1D(Form("h_ppfx_weight_%s", _util.classification_dirs.at(c).c_str()), "; PPFX Weights All Universes; Entries", 100, 0, 2.0);
     }
 
 
-    // Redefine the scale factors depending on what POT mode we want to plot
-    double Data_POT = 0.9e20;
-    // double Data_Trig = 1111111;
-    // double mc_scale_factor     = Data_POT  / _util.config_v.at(_util.k_Run1_MC_POT);
-    // double ext_scale_factor    = Data_POT  / _util.config_v.at(_util.k_Run1_Dirt_POT);
-    // double dirt_scale_factor   = Data_Trig / _util.config_v.at(_util.k_Run1_EXT_trig); 
+    // Loop over the entries in the TTree
+    for (unsigned int ievent = 0; ievent < tree->GetEntries(); ievent++){
 
-    
+        tree->GetEntry(ievent); 
 
-    // Now create the histograms to query
-    std::vector<TH1D*> hist;
-    hist.resize(_util.k_type_MAX);
+        std::vector<double> vec_universes;
 
-    for (unsigned int type = 0; type <  hist.size(); type++){
-        hist.at(type) = new TH1D( Form("h_flash_time_%s", _util.type_prefix.at(type).c_str()), "; Flash Time [us]; Entries", 50, 0, 25 );
+        // Convert from unsigned short to double and push back -- divide by 1000 to undo previous *1000
+        for (unsigned int j = 0; j < weightsPPFX->size(); j++){
+            vec_universes.push_back( (double) weightsPPFX->at(j)/1000.0);
+        }
+
+        // Now loop over the universes
+        for (unsigned int uni = 0; uni < vec_universes.size(); uni++){
+
+            // Background events
+            if ( *classification == "nu_out_fv"){
+                v_hist.at(_util.k_nu_out_fv)->Fill(vec_universes.at(uni));
+            }
+            if ( *classification == "cosmic"){
+                v_hist.at(_util.k_cosmic)->Fill(vec_universes.at(uni));
+            }
+            if ( *classification == "numu_cc"){
+                v_hist.at(_util.k_numu_cc)->Fill(vec_universes.at(uni));
+            }
+            if ( *classification == "numu_cc_pi0"){
+                v_hist.at(_util.k_numu_cc_pi0)->Fill(vec_universes.at(uni));
+            }
+            if ( *classification == "nc"){
+                v_hist.at(_util.k_nc)->Fill(vec_universes.at(uni));
+            }
+            if ( *classification == "nc_pi0"){
+                v_hist.at(_util.k_nc_pi0)->Fill(vec_universes.at(uni));
+            }
+        }
+            
+        // Generated event
+        // if ( (*classification == "nue_cc"|| *classification == "nuebar_cc" || *classification == "unmatched_nue" || *classification == "cosmic_nue" || *classification == "unmatched_nuebar" || *classification == "cosmic_nuebar") && gen == true) {}
+        // Signal event
+        // if ((*classification == "nue_cc" || *classification == "nuebar_cc" || *classification == "unmatched_nue" || *classification == "unmatched_nuebar") && gen == false) {}
+     
     }
-
-    TCut q_data = "flash_time > 0"; // choose query to get the relavent flash period
-    TCut q_other = "flash_time > 0 && flash_time < 20";
 
     TCanvas * c = new TCanvas("c", "c", 500, 500);
-    
-    TH1D* htemp = new TH1D("htemp", "; Flash Time [us]; Entries", 50, 0, 25 );
-    f_v.at(_util.k_data)->cd();
-    tree_v.at(_util.k_data)->Draw("flash_time >> htemp", q_data);
-    htemp = (TH1D*) gDirectory->Get("htemp");
-    hist.at(_util.k_data)= (TH1D*)htemp->Clone();
+    c->SetTopMargin(0.11);
 
-    TH1D* htemp_ext = new TH1D("htemp_ext", "; Flash Time [us]; Entries", 50, 0, 25 );
-    f_v.at(_util.k_ext)->cd();
-    tree_v.at(_util.k_ext)->Draw("(flash_time - 0.359) >> htemp_ext", q_other);
-    htemp_ext = (TH1D*) gDirectory->Get("htemp_ext");
-    hist.at(_util.k_ext)= (TH1D*)htemp_ext->Clone();
-    // hist.at(_util.k_ext)->Scale(_util.ext_scale_factor);
+     TLegend *leg = new TLegend(0.2, 0.55, 0.4, 0.85);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
 
-    TH1D* htemp_mc = new TH1D("htemp_mc", "; Flash Time [us]; Entries", 50, 0, 25 );
-    f_v.at(_util.k_mc)->cd();
-    tree_v.at(_util.k_mc)->Draw("(flash_time*ppfx_cv*weightSplineTimesTune + 0.055- 0.359) >> htemp_mc", q_other);
-    htemp_mc = (TH1D*) gDirectory->Get("htemp_mc");
-    hist.at(_util.k_mc)= (TH1D*)htemp_mc->Clone();
-    // hist.at(_util.k_mc)->Scale(_util.mc_scale_factor);
+    for (unsigned int h = 0; h < v_hist.size(); h++){
 
-     TH1D* htemp_dirt = new TH1D("htemp_dirt", "; Flash Time [us]; Entries", 50, 0, 25 );
-    f_v.at(_util.k_dirt)->cd();
-    tree_v.at(_util.k_dirt)->Draw("(flash_time*ppfx_cv*weightSplineTimesTune + 0.055 - 0.359) >> htemp_dirt", q_other);
-    htemp_dirt = (TH1D*) gDirectory->Get("htemp_dirt");
-    hist.at(_util.k_dirt)= (TH1D*)htemp_dirt->Clone();
-    // hist.at(_util.k_dirt)->Scale(_util.dirt_scale_factor);
-
-
-    std::vector<double> hist_integrals(_util.k_type_MAX, 0.0); // The integrals of all the histograms
-    double integral_mc_ext = 0.0;
-
-    TH1D *h_ratio;
-    TH1D *h_ratio_error;
-    TH1D *h_mc_ext_sum;
-
-    TPad *topPad;
-    TPad *bottomPad;
-    THStack *h_stack = new THStack();
-
-    topPad = new TPad("topPad", "", 0, 0.3, 1, 1.0);
-    bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
-
-    _util.SetTPadOptions(topPad, bottomPad);
-
-    for (unsigned int i = 0; i < hist.size(); i++)
-    {
-
-        if (i == _util.k_data)
-        {
-
-            hist.at(i)->SetStats(kFALSE);
-            hist.at(_util.k_data)->SetMarkerStyle(20);
-            hist.at(_util.k_data)->SetMarkerSize(0.5);
-            hist_integrals.at(_util.k_data) = hist.at(_util.k_data)->Integral();
+        if (h == _util.k_nue_cc || 
+            h == _util.k_nuebar_cc || 
+            h == _util.k_unmatched || 
+            h == _util.k_unmatched_nue || 
+            h == _util.k_cosmic_nue || 
+            h == _util.k_unmatched_nuebar || 
+            h == _util.k_cosmic_nuebar || 
+            h == _util.k_leg_ext || 
+            h == _util.k_leg_data || 
+            h == _util.k_leg_dirt) {
+                continue;
         }
 
-        // Scale EXT
-        else if (i == _util.k_ext)
-        {
+        v_hist.at(h)->Scale(1.0/v_hist.at(h)->Integral());
 
-            hist.at(i)->SetStats(kFALSE);
-            hist.at(i)->Scale(_util.ext_scale_factor);
-            hist.at(_util.k_ext)->SetFillColor(41);
-            hist.at(_util.k_ext)->SetFillStyle(3345);
-            hist_integrals.at(_util.k_ext) = hist.at(_util.k_ext)->Integral();
-            integral_mc_ext += hist_integrals.at(_util.k_ext);
+        v_hist.at(h)->SetStats(kFALSE);
+
+        _util.IncreaseLabelSize(v_hist.at(h), c);
+        v_hist.at(h)->SetMaximum(0.06);
+
+        v_hist.at(h)->GetYaxis()->SetTitleOffset(1.5);
+
+        leg->AddEntry(v_hist.at(h),Form("%s", _util.classification_dirs.at(h).c_str()), "l");
+
+        if ( h == _util.k_nu_out_fv ){
+            v_hist.at(h)->SetLineColor(30);
+        }
+        if ( h == _util.k_cosmic     ){
+            v_hist.at(h)->SetLineColor(38);
+        }
+        if ( h == _util.k_numu_cc    ){
+            v_hist.at(h)->SetLineColor(28);
+        }
+        if ( h == _util.k_numu_cc_pi0){
+            v_hist.at(h)->SetLineColor(4);
+        }
+        if ( h == _util.k_nc         ){
+            v_hist.at(h)->SetLineColor(36);
+        }
+        if ( h ==  _util.k_nc_pi0){
+            v_hist.at(h)->SetLineColor(1);
         }
 
-        // Scale Dirt
-        else if (i == _util.k_dirt)
-        {
+        v_hist.at(h)->SetLineWidth(2);
+        v_hist.at(h)->Draw("hist,same");
 
-            hist.at(i)->SetStats(kFALSE);
-            hist.at(i)->Scale(_util.dirt_scale_factor);
-            hist.at(_util.k_dirt)->SetFillColor(2);
-            hist.at(_util.k_dirt)->SetFillStyle(3354);
-            hist_integrals.at(_util.k_dirt) = hist.at(_util.k_dirt)->Integral();
-            integral_mc_ext += hist_integrals.at(_util.k_dirt);
-        }
-
-        // Scale MC
-        else
-        {
-            hist.at(i)->SetStats(kFALSE);
-            hist.at(i)->Scale(_util.mc_scale_factor);
-            hist.at(i)->SetFillColor(30);
-            hist_integrals.at(_util.k_mc) = hist.at(_util.k_mc)->Integral();
-            integral_mc_ext += hist_integrals.at(_util.k_mc);
-        }
     }
-
-    // Add the histograms to the stack
-    h_stack->Add(hist.at(_util.k_ext));
-    h_stack->Add(hist.at(_util.k_mc));
-    h_stack->Add(hist.at(_util.k_dirt));
-
-    h_stack->Draw("hist");
-    hist.at(_util.k_data)->Draw("same PE");
+    leg->Draw();
     
-    h_stack->GetYaxis()->SetTitle("Entries");
-
-    h_stack->GetYaxis()->SetTitleSize(0.05);
-    h_stack->GetYaxis()->SetLabelSize(0.05);
-    h_stack->GetXaxis()->SetLabelSize(0);
-    h_stack->GetXaxis()->SetRangeUser(0, 23);
-    // if (histname == "h_flash_time_single_bin") h_stack->GetXaxis()->SetRangeUser(5.6,15.4);
-
-    // MC error histogram ------------------------------------------------------
-    TH1D *h_error_hist = (TH1D *)hist.at(_util.k_mc)->Clone("h_error_hist");
-
-    for (unsigned int i = 0; i < hist.size(); i++)
-    {
-        if (i == _util.k_data)
-            continue; // Dont use the data
-        if (i == _util.k_mc)
-            continue; // Aleady got this histogram from the clone
-
-        h_error_hist->Add(hist.at(i), 1);
-    }
-
-    h_error_hist->SetFillColorAlpha(12, 0.15);
-    h_error_hist->Draw("e2, same");
-
-    TLegend *leg_stack;
-    // if (histname == "h_flash_time_single_bin") leg_stack = new TLegend(0.7, 0.2, 0.9, 0.45);
-    leg_stack = new TLegend(0.7, 0.6, 0.9, 0.85);
-    leg_stack->SetBorderSize(0);
-    // if (histname != "h_flash_time_single_bin")leg_stack->SetFillStyle(0);
-
-    leg_stack->AddEntry(hist.at(_util.k_data), "Beam-On Data", "lep");
-    leg_stack->AddEntry(hist.at(_util.k_dirt), "Out-of Cryo", "f");
-    leg_stack->AddEntry(hist.at(_util.k_mc),   "Overlay", "f");
-    leg_stack->AddEntry(hist.at(_util.k_ext),  "Beam-Off Data", "f");
-
-    leg_stack->Draw();
-
-    bottomPad->cd();
-
-    h_ratio = (TH1D *)hist.at(_util.k_data)->Clone("h_ratio");
-    h_mc_ext_sum = (TH1D *)hist.at(_util.k_mc)->Clone("h_mc_ext_sum");
-
-    for (unsigned int i = 0; i < hist.size(); i++)
-    {
-        if (i == _util.k_data || i == _util.k_mc)
-            continue; // Dont use the data and nue cc because already been cloned
-        h_mc_ext_sum->Add(hist.at(i), 1);
-    }
-
-    // h_ratio->Add(h_mc_ext_sum, -1);
-    h_ratio->Divide(h_mc_ext_sum);
-
-    h_ratio->GetXaxis()->SetLabelSize(0.13);
-    h_ratio->GetXaxis()->SetTitleOffset(0.9);
-    h_ratio->GetXaxis()->SetTitleSize(0.13);
-    h_ratio->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
-
-    // For percent difference
-    // h_ratio->GetYaxis()->SetTitle("(Data - MC) / MC ");
-    // h_ratio->GetYaxis()->SetRangeUser(-0.5,0.5);
-
-    // For ratio
-
-    h_ratio->GetYaxis()->SetRangeUser(0.80, 1.20);
-    h_ratio->GetXaxis()->SetRangeUser(0, 23);
-    // if (histname == "h_flash_time_single_bin") h_ratio->GetXaxis()->SetRangeUser(5.6,15.4);
-    h_ratio->GetYaxis()->SetTitle("#frac{Beam-On}{(Overlay + Beam-Off)}");
-
-    h_ratio->GetYaxis()->SetLabelSize(0.13);
-    h_ratio->GetYaxis()->SetTitleSize(0.07);
-    h_ratio->GetYaxis()->SetTitleOffset(0.5);
-    h_ratio->SetTitle(" ");
-    h_ratio->GetYaxis()->CenterTitle();
-    h_ratio->Draw("E");
-
-    // Draw the error hist
-    h_ratio_error = (TH1D *)h_error_hist->Clone("h_ratio_error");
-    h_ratio_error->Divide(h_ratio_error);
-    h_ratio_error->Draw("e2, same");
-
-    // Draw the run period on the plot
-    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
-
-    // Draw Data to MC ratio
-    _util.Draw_Data_MC_Ratio(c, double(hist_integrals.at(_util.k_data) * 1.0 / integral_mc_ext * 1.0), 0.34, 0.936, 0.34, 0.936);
-
-    // Draw other data specifc quantities
-    _util.Draw_Data_POT(c, Data_POT, 0.45, 0.915, 0.45, 0.915);
-
-    // Add the weight labels
-    // Draw_WeightLabels(c);
-
-    // if (area_norm)
-    //     Draw_Area_Norm(c);
-
-    // c->Print(print_name);
-
-    c->Print("plots/test.pdf");
-    
-
-
-
-
-
-
+    // Create the Bins directory for saving the plots to
+    _util.CreateDirectory("Systematics/Misc");
+    c->Print("plots/run1/Systematics/Misc/ppfx_weights_backgrounds.pdf");
 
 }
 // -----------------------------------------------------------------------------
