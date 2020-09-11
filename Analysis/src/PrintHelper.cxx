@@ -46,10 +46,19 @@ void PrintHelper::Initialise(Utility _utility ){
 
         // File not already open, open the file
         if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
-            f_data = new TFile(file_name.c_str(), "READ");
+            f_data = TFile::Open(file_name.c_str(), "READ");
             _util.GetTree(f_data, data_counter_tree, "data_counter_tree");
             tree_total_entries =  data_counter_tree->GetEntries();
         }
+
+        // Get the histogram files too
+        file_name = Form("files/nuexsec_data_run%s.root", _util.run_period);
+
+        // File not already open, open the file
+        if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
+            f_data_hist = TFile::Open(file_name.c_str(), "READ");
+        }
+
     }
 
     // EXT -----------------------
@@ -58,9 +67,17 @@ void PrintHelper::Initialise(Utility _utility ){
         
         // File not already open, open the file
         if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
-            f_ext = new TFile(file_name.c_str(), "READ");
+            f_ext = TFile::Open(file_name.c_str(), "READ");
             _util.GetTree(f_ext, ext_counter_tree, "ext_counter_tree");
             tree_total_entries =  ext_counter_tree->GetEntries();
+        }
+
+        // Get the histogram files too
+        file_name = Form("files/nuexsec_ext_run%s.root", _util.run_period);
+
+        // File not already open, open the file
+        if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
+            f_ext_hist = TFile::Open(file_name.c_str(), "READ");
         }
     }
 
@@ -70,9 +87,17 @@ void PrintHelper::Initialise(Utility _utility ){
 
         // File not already open, open the file
         if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
-            f_dirt = new TFile(file_name.c_str(), "READ");
+            f_dirt = TFile::Open(file_name.c_str(), "READ");
             _util.GetTree(f_dirt, dirt_counter_tree, "dirt_counter_tree");
             tree_total_entries =  dirt_counter_tree->GetEntries();
+        }
+
+        // Get the histogram files too
+        file_name = Form("files/nuexsec_dirt_run%s.root", _util.run_period);
+
+        // File not already open, open the file
+        if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
+            f_dirt_hist = TFile::Open(file_name.c_str(), "READ");
         }
     }
 
@@ -83,14 +108,23 @@ void PrintHelper::Initialise(Utility _utility ){
         
         // File not already open, open the file
         if (!gROOT->GetListOfFiles()->FindObject( file_name.c_str() ) ) {
-            f_mc = new TFile( file_name.c_str(), "UPDATE");
+            f_mc = TFile::Open( file_name.c_str(), "UPDATE");
             
             _util.GetTree(f_mc, mc_counter_tree, "mc_counter_tree");
             tree_total_entries =  mc_counter_tree->GetEntries();
 
             eff_tree  = new TTree("mc_eff_tree",     "mc_eff_tree");
+            eff_tree->SetDirectory(f_mc);
             eff_tree->Branch("efficiency", &efficiency, "efficiency/D");
             eff_tree->Branch("purity", &purity, "purity/D");
+        }
+
+        // Get the histogram files too
+        file_name = Form("files/nuexsec_mc_run%s.root", _util.run_period);
+
+        // File not already open, open the file
+        if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
+            f_mc_hist = TFile::Open(file_name.c_str(), "READ");
         }
     }
     
@@ -166,6 +200,10 @@ void PrintHelper::Initialise(Utility _utility ){
     if (_util.print_dirt){
         dirt_counter_tree->SetBranchAddress("count_dirt",         &count_dirt);
     }
+
+    // Lets get the histograms here
+    if (_util.print_mc) GetHists();
+
 
     PrintResults();
 
@@ -295,8 +333,11 @@ void PrintHelper::PrintResults(){
             std::cout << "------------------------------------------------" << std::endl;
             efficiency = double(count_nue_cc + count_nuebar_cc) / double(tot_true_infv_nues);
             purity     = double(count_nue_cc + count_nuebar_cc) / double(sum_mc_dirt_ext);
-            printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Purity", count_nue_cc + count_nuebar_cc, sum_mc_dirt_ext, 100 * purity);
-            printf (" %-15s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Efficiency", count_nue_cc + count_nuebar_cc, tot_true_infv_nues, 100 * efficiency);
+            printf (" %-20s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Purity", count_nue_cc + count_nuebar_cc, sum_mc_dirt_ext, 100 * purity);
+            std::cout << std::endl;
+            printf (" %-20s: ( %-6.1f / %-7.1f ) = %-3.2f +/- %-3.2f %% \n", "Efficiency", count_nue_cc + count_nuebar_cc, tot_true_infv_nues, 100 * efficiency, 100 * vec_err.at(k_eff_nu_E_single_bin).at(p) / (vec_n.at(k_eff_nu_E_single_bin).at(p) / vec_N.at(k_eff_nu_E_single_bin).at(p)));
+            printf (" %-20s: ( %-6.1f / %-7.1f ) = %-3.2f +/- %-3.2f %% \n", "Efficiency nue", vec_n.at(k_eff_nu_E_nue_single_bin).at(p), vec_N.at(k_eff_nu_E_nue_single_bin).at(p), 100 * (vec_n.at(k_eff_nu_E_nue_single_bin).at(p) / vec_N.at(k_eff_nu_E_nue_single_bin).at(p)),  100 * vec_err.at(k_eff_nu_E_nue_single_bin).at(p) / (vec_n.at(k_eff_nu_E_nue_single_bin).at(p) / vec_N.at(k_eff_nu_E_nue_single_bin).at(p)));
+            printf (" %-20s: ( %-6.1f / %-7.1f ) = %-3.2f +/- %-3.2f %% \n", "Efficiency nuebar", vec_n.at(k_eff_nu_E_nuebar_single_bin).at(p), vec_N.at(k_eff_nu_E_nuebar_single_bin).at(p), 100 * (vec_n.at(k_eff_nu_E_nuebar_single_bin).at(p) / vec_N.at(k_eff_nu_E_nuebar_single_bin).at(p)), 100 * vec_err.at(k_eff_nu_E_nuebar_single_bin).at(p) / (vec_n.at(k_eff_nu_E_nuebar_single_bin).at(p) / vec_N.at(k_eff_nu_E_nuebar_single_bin).at(p)));
             
             std::cout << std::endl;
             std::cout << " Purity Change     : " <<  100 * (purity - purity_last) << " \%" << std::endl;
@@ -352,3 +393,56 @@ void PrintHelper::PrintResults(){
     }
 
 }
+// -----------------------------------------------------------------------------
+void PrintHelper::GetHists(){
+
+    // First get the efficiency histograms
+    TEfficiency_hists.resize(k_TH1D_eff_MAX);
+    vec_n.resize(k_TH1D_eff_MAX);
+    vec_N.resize(k_TH1D_eff_MAX);
+    vec_err.resize(k_TH1D_eff_MAX);
+
+
+    for (unsigned int v = 0; v < TEfficiency_hists.size(); v++){
+        TEfficiency_hists.at(v).resize(_util.k_cuts_MAX);
+        vec_n.at(v).resize(_util.k_cuts_MAX);
+        vec_N.at(v).resize(_util.k_cuts_MAX);
+        vec_err.at(v).resize(_util.k_cuts_MAX);
+    }
+    
+    f_mc_hist->cd();
+    
+    for (unsigned int l = 0; l < _util.k_cuts_MAX; l++ ){
+        TEfficiency_hists.at(k_eff_nu_E_single_bin).at(l)        = new TH1D( Form("h_true_nu_E_single_bin_%s",_util.cut_dirs.at(l).c_str() ), "", 1, 0, 10);
+
+        // Get the efficiency histograms
+        _util.GetHist(f_mc_hist, TEfficiency_hists.at(k_eff_nu_E_single_bin).at(l),        Form("TEff/h_true_nu_E_single_bin_%s",_util.cut_dirs.at(l).c_str()));
+        _util.GetHist(f_mc_hist, TEfficiency_hists.at(k_eff_nu_E_nue_single_bin).at(l),    Form("TEff/h_true_nu_E_nue_single_bin_%s",_util.cut_dirs.at(l).c_str()));
+        _util.GetHist(f_mc_hist, TEfficiency_hists.at(k_eff_nu_E_nuebar_single_bin).at(l), Form("TEff/h_true_nu_E_nuebar_single_bin_%s",_util.cut_dirs.at(l).c_str()));
+
+        // nue + nuebar
+        double n, N;
+        vec_n.at(k_eff_nu_E_single_bin).at(l)   = TEfficiency_hists.at(k_eff_nu_E_single_bin).at(l)->GetBinContent(1); // total number of signal events for cut i
+        vec_N.at(k_eff_nu_E_single_bin).at(l)   = TEfficiency_hists.at(k_eff_nu_E_single_bin).at(0)->GetBinContent(1); // total number of generated events for cut i
+        n = vec_n.at(k_eff_nu_E_single_bin).at(l);
+        N = vec_N.at(k_eff_nu_E_single_bin).at(l);
+        vec_err.at(k_eff_nu_E_single_bin).at(l) = (1.0/std::sqrt(N))*( (n/N)*(1.0 - (n/N)));
+
+        // nue
+        vec_n.at(k_eff_nu_E_nue_single_bin).at(l)   = TEfficiency_hists.at(k_eff_nu_E_nue_single_bin).at(l)->GetBinContent(1);
+        vec_N.at(k_eff_nu_E_nue_single_bin).at(l)   = TEfficiency_hists.at(k_eff_nu_E_nue_single_bin).at(0)->GetBinContent(1);
+        n = vec_n.at(k_eff_nu_E_nue_single_bin).at(l);
+        N = vec_N.at(k_eff_nu_E_nue_single_bin).at(l);
+        vec_err.at(k_eff_nu_E_nue_single_bin).at(l) = (1.0/std::sqrt(N))*( (n/N)*(1.0 - (n/N)));
+
+        // nuebar
+        vec_n.at(k_eff_nu_E_nuebar_single_bin).at(l)   = TEfficiency_hists.at(k_eff_nu_E_nuebar_single_bin).at(l)->GetBinContent(1);
+        vec_N.at(k_eff_nu_E_nuebar_single_bin).at(l)   = TEfficiency_hists.at(k_eff_nu_E_nuebar_single_bin).at(0)->GetBinContent(1);
+        n = vec_n.at(k_eff_nu_E_nuebar_single_bin).at(l);
+        N = vec_N.at(k_eff_nu_E_nuebar_single_bin).at(l);
+        vec_err.at(k_eff_nu_E_nuebar_single_bin).at(l) = (1.0/std::sqrt(N))*( (n/N)*(1.0 - (n/N)));
+
+    }
+
+}
+// -----------------------------------------------------------------------------
