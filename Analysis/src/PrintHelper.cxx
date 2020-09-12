@@ -413,8 +413,6 @@ void PrintHelper::GetHists(){
     f_mc_hist->cd();
     
     for (unsigned int l = 0; l < _util.k_cuts_MAX; l++ ){
-        TEfficiency_hists.at(k_eff_nu_E_single_bin).at(l)        = new TH1D( Form("h_true_nu_E_single_bin_%s",_util.cut_dirs.at(l).c_str() ), "", 1, 0, 10);
-
         // Get the efficiency histograms
         _util.GetHist(f_mc_hist, TEfficiency_hists.at(k_eff_nu_E_single_bin).at(l),        Form("TEff/h_true_nu_E_single_bin_%s",_util.cut_dirs.at(l).c_str()));
         _util.GetHist(f_mc_hist, TEfficiency_hists.at(k_eff_nu_E_nue_single_bin).at(l),    Form("TEff/h_true_nu_E_nue_single_bin_%s",_util.cut_dirs.at(l).c_str()));
@@ -426,23 +424,99 @@ void PrintHelper::GetHists(){
         vec_N.at(k_eff_nu_E_single_bin).at(l)   = TEfficiency_hists.at(k_eff_nu_E_single_bin).at(0)->GetBinContent(1); // total number of generated events for cut i
         n = vec_n.at(k_eff_nu_E_single_bin).at(l);
         N = vec_N.at(k_eff_nu_E_single_bin).at(l);
-        vec_err.at(k_eff_nu_E_single_bin).at(l) = (1.0/std::sqrt(N))*( (n/N)*(1.0 - (n/N)));
+        vec_err.at(k_eff_nu_E_single_bin).at(l) = (1.0/std::sqrt(N))*std::sqrt( (n/N)*(1.0 - (n/N)));
 
         // nue
         vec_n.at(k_eff_nu_E_nue_single_bin).at(l)   = TEfficiency_hists.at(k_eff_nu_E_nue_single_bin).at(l)->GetBinContent(1);
         vec_N.at(k_eff_nu_E_nue_single_bin).at(l)   = TEfficiency_hists.at(k_eff_nu_E_nue_single_bin).at(0)->GetBinContent(1);
         n = vec_n.at(k_eff_nu_E_nue_single_bin).at(l);
         N = vec_N.at(k_eff_nu_E_nue_single_bin).at(l);
-        vec_err.at(k_eff_nu_E_nue_single_bin).at(l) = (1.0/std::sqrt(N))*( (n/N)*(1.0 - (n/N)));
+        vec_err.at(k_eff_nu_E_nue_single_bin).at(l) = (1.0/std::sqrt(N))*std::sqrt( (n/N)*(1.0 - (n/N)));
 
         // nuebar
         vec_n.at(k_eff_nu_E_nuebar_single_bin).at(l)   = TEfficiency_hists.at(k_eff_nu_E_nuebar_single_bin).at(l)->GetBinContent(1);
         vec_N.at(k_eff_nu_E_nuebar_single_bin).at(l)   = TEfficiency_hists.at(k_eff_nu_E_nuebar_single_bin).at(0)->GetBinContent(1);
         n = vec_n.at(k_eff_nu_E_nuebar_single_bin).at(l);
         N = vec_N.at(k_eff_nu_E_nuebar_single_bin).at(l);
-        vec_err.at(k_eff_nu_E_nuebar_single_bin).at(l) = (1.0/std::sqrt(N))*( (n/N)*(1.0 - (n/N)));
+        vec_err.at(k_eff_nu_E_nuebar_single_bin).at(l) = (1.0/std::sqrt(N))*std::sqrt( (n/N)*(1.0 - (n/N)));
 
     }
+
+    // Now lets get the purity uncertainty
+    TPurity_hists.resize(_util.k_classifications_MAX);
+
+    for (unsigned int v = 0; v < TPurity_hists.size(); v++){
+        TPurity_hists.at(v).resize(_util.k_cuts_MAX);
+    }
+
+    // Loop over the cuts
+    for (unsigned int cut = 0; cut < TPurity_hists.at(0).size(); cut++){
+        
+        // Loop over the classifications and get the histograms
+        for (unsigned int i = 0; i < _util.classification_dirs.size(); i++) {
+
+            // Data
+            if (i == _util.k_leg_data) {
+
+                _util.GetHist(f_data_hist, TPurity_hists.at(i).at(cut), Form("Stack/%s/%s/%s_%s_%s", _util.cut_dirs.at(cut).c_str(), _util.classification_dirs.at(i).c_str(), "h_reco_single_bin", _util.cut_dirs.at(cut).c_str(), _util.classification_dirs.at(i).c_str()));
+
+            }
+            // EXT
+            else if (i == _util.k_leg_ext){
+
+                _util.GetHist(f_ext_hist, TPurity_hists.at(i).at(cut), Form("Stack/%s/%s/%s_%s_%s", _util.cut_dirs.at(cut).c_str(), _util.classification_dirs.at(i).c_str(), "h_reco_single_bin", _util.cut_dirs.at(cut).c_str(), _util.classification_dirs.at(i).c_str()));
+                TPurity_hists.at(i).at(cut)->Scale(_util.ext_scale_factor);
+            }
+            // Dirt
+            else if (i == _util.k_leg_dirt){
+
+                _util.GetHist(f_dirt_hist, TPurity_hists.at(i).at(cut), Form("Stack/%s/%s/%s_%s_%s", _util.cut_dirs.at(cut).c_str(), _util.classification_dirs.at(i).c_str(), "h_reco_single_bin", _util.cut_dirs.at(cut).c_str(), _util.classification_dirs.at(i).c_str()));
+                TPurity_hists.at(i).at(cut)->Scale(_util.dirt_scale_factor);
+            }
+            // MC
+            else {
+
+                // MC
+                if (TPurity_hists.at(i).at(cut) != NULL && (i == _util.k_leg_data || i == _util.k_leg_ext || i == _util.k_leg_dirt))
+                    continue;
+
+                _util.GetHist(f_mc_hist, TPurity_hists.at(i).at(cut), Form("Stack/%s/%s/%s_%s_%s", _util.cut_dirs.at(cut).c_str(), _util.classification_dirs.at(i).c_str(), "h_reco_single_bin", _util.cut_dirs.at(cut).c_str(), _util.classification_dirs.at(i).c_str()));
+                TPurity_hists.at(i).at(cut)->Scale(_util.mc_scale_factor);
+            }
+        }
+    }
+
+    // Now calculate the purity error -- I think this is flawed because the nue_cc and nue_bar_cc categories are on the numerator and denominator, so their uncertainties are correlated
+    // How do we take this into account???
+    TPurity_hists_tot.resize(_util.k_cuts_MAX);
+
+    for (unsigned int v = 0; v < TPurity_hists_tot.size(); v++){
+        TPurity_hists_tot.at(v).resize(2);
+        TPurity_hists_tot.at(v).at(0) = new TH1D ( Form("h_reco_single_bin_%s_tot",_util.cut_dirs.at(v).c_str()) ,"", 1, 0, 40);
+        TPurity_hists_tot.at(v).at(1) = new TH1D ( Form("h_reco_single_bin_%s_tot",_util.cut_dirs.at(v).c_str()) ,"", 1, 0, 40);
+    }
+
+    // Loop over the cuts
+    for (unsigned int cut = 0; cut < TPurity_hists.at(0).size(); cut++){
+        
+        // Loop over the classifications and get the histograms
+        for (unsigned int c = 0; c < _util.classification_dirs.size(); c++) {
+            
+            if (c == _util.k_leg_data) continue; // dont care about the data for the puity
+
+            // Purity numberator
+            if (c == _util.k_nue_cc || c == _util.k_nuebar_cc ){
+                TPurity_hists_tot.at(cut).at(0)->Add(TPurity_hists.at(c).at(cut), 1);
+
+            }
+
+            // Purity denominator
+            TPurity_hists_tot.at(cut).at(1)->Add(TPurity_hists.at(c).at(cut), 1);
+        
+        }
+    }
+
+
 
 }
 // -----------------------------------------------------------------------------
