@@ -67,7 +67,7 @@ class PrintHelper{
     double ext_scale_factor    = 1.0;
     double dirt_scale_factor   = 1.0;
 
-    double efficiency{0.0}, purity{0.0};
+    double efficiency{0.0}, purity{0.0}, eff_err{0.0};
 
     double tot_true_infv_nues{1.0};
 

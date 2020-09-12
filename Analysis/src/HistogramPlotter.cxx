@@ -1694,12 +1694,14 @@ void HistogramPlotter::MakeEfficiencyPlot(const char *print_name) {
     f_mc = TFile::Open(Form("files/trees/nuexsec_selected_tree_mc_run%s.root", _util.run_period));
 
     std::vector<double> efficiency_v; // efficiency vector
+    std::vector<double> eff_err_v;    // efficiency error vector
     std::vector<double> purity_v;     // purity vector
 
-    double efficiency, purity;
+    double efficiency, purity, eff_err;
 
     _util.GetTree(f_mc, mc_tree, "mc_eff_tree");
     mc_tree->SetBranchAddress("efficiency", &efficiency);
+    mc_tree->SetBranchAddress("eff_err", &eff_err);
     mc_tree->SetBranchAddress("purity", &purity);
 
     int num_entries = mc_tree->GetEntries();
@@ -1708,6 +1710,7 @@ void HistogramPlotter::MakeEfficiencyPlot(const char *print_name) {
     for (int y = 0; y < num_entries; y++) {
         mc_tree->GetEntry(y);
         efficiency_v.push_back(efficiency);
+        eff_err_v.push_back(eff_err);
         purity_v.push_back(purity);
     }
 
@@ -1729,11 +1732,19 @@ void HistogramPlotter::MakeEfficiencyPlot(const char *print_name) {
         h_eff->SetBinError(k + 1, 0);
         h_pur->SetBinError(k + 1, 0);
     }
+    
+    TH1D* h_eff_clone = (TH1D*)h_eff->Clone();
 
-    leg_stack->AddEntry(h_eff, "Efficiency", "lp");
+    // Set the error bar on the efficiency histogram
+    for (int bin = 0; bin < h_eff->GetNbinsX(); bin++) {
+        std::cout <<eff_err_v.at(bin) << "  " << efficiency_v.at(bin) << std::endl;
+        h_eff_clone->SetBinError(bin+1, eff_err_v.at(bin));
+    }
+
+    leg_stack->AddEntry(h_eff, "Efficiency", "ELP");
     leg_stack->AddEntry(h_pur, "Purity", "lp");
 
-    h_eff->GetYaxis()->SetRangeUser(0, 1.1);
+    h_eff->GetYaxis()->SetRangeUser(0.0, 1.1);
     h_eff->SetStats(kFALSE);
     h_eff->SetMarkerStyle(20);
     h_eff->SetMarkerSize(0.5);
@@ -1764,6 +1775,8 @@ void HistogramPlotter::MakeEfficiencyPlot(const char *print_name) {
         line->SetLineStyle(kDotted);
         line->Draw();
     }
+
+    h_eff_clone->Draw("E,X0,same");
 
     h_eff->GetXaxis()->SetTickLength(0.00);
     h_pur->GetXaxis()->SetTickLength(0.00);
@@ -1812,7 +1825,25 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
         c->SetTopMargin(0.11);
 
         h_clone = (TH1D *)hist.at(p)->Clone("h_clone");
+        
+        std::vector<double> eff_err;
+        eff_err.resize(h_clone->GetNbinsX());
+        
+        // Get the bin errors based on binomial dist = sqrt(e/N*(1-e))) where e = n/N is the efficiency
+        for (int bin = 0; bin < h_clone->GetNbinsX(); bin++){
+            double n = h_clone->GetBinContent(bin+1); // selected = n
+            double N = hist.at(_util.k_unselected)->GetBinContent(bin+1); // generated = N
+            eff_err.at(bin) = (1.0/std::sqrt(N))*std::sqrt( (n/N)*(1.0 - (n/N)));
+        }
+        
         h_clone->Divide(hist.at(_util.k_unselected));
+        
+        // Now set the bin errors after the divide
+        for (int bin = 0; bin < h_clone->GetNbinsX(); bin++){
+            h_clone->SetBinError(bin+1, eff_err.at(bin));
+        }
+        
+        
         h_clone->SetStats(kFALSE);
         
         if (var_string == "nu")     h_clone->SetTitle(Form("%s;True #nu_{e} + #bar{#nu}_{e} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));

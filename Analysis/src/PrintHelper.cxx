@@ -116,6 +116,7 @@ void PrintHelper::Initialise(Utility _utility ){
             eff_tree  = new TTree("mc_eff_tree",     "mc_eff_tree");
             eff_tree->SetDirectory(f_mc);
             eff_tree->Branch("efficiency", &efficiency, "efficiency/D");
+            eff_tree->Branch("eff_err", &eff_err, "eff_err/D");
             eff_tree->Branch("purity", &purity, "purity/D");
         }
 
@@ -361,7 +362,10 @@ void PrintHelper::PrintResults(){
         }
 
         // Fill the efficiency tree
-        if (_util.print_mc && _util.print_data && _util.print_ext && _util.print_dirt) eff_tree->Fill();
+        if (_util.print_mc && _util.print_data && _util.print_ext && _util.print_dirt){
+            eff_err = vec_err.at(k_eff_nu_E_single_bin).at(p);
+            eff_tree->Fill();
+        }
 
         // Set counters for the previous cut
         prev_count_nue_cc       = count_nue_cc;
