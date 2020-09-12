@@ -1,15 +1,13 @@
 #include "../include/HistogramPlotter.h"
 
 // -----------------------------------------------------------------------------
-HistogramPlotter::~HistogramPlotter()
-{
+HistogramPlotter::~HistogramPlotter(){
 
     // Make sure the file is closed
     // f_nuexsec->Close();
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::MakeHistograms(Utility _utility)
-{
+void HistogramPlotter::MakeHistograms(Utility _utility) {
 
     std::cout << "Creating histograms and making plots" << std::endl;
 
@@ -32,14 +30,12 @@ void HistogramPlotter::MakeHistograms(Utility _utility)
     }
 
     // Set the variation mode
-    if (std::string(_util.variation) != "empty")
-        std::cout << "Using varmode for detector variation:\t " << _util.variation << std::endl;
+    if (std::string(_util.variation) != "empty") std::cout << "Using varmode for detector variation:\t " << _util.variation << std::endl;
 
     Initalise();
 
     // Only do this stuff for the CV -- unless we really want these plots for each detvar, then we need to change the file paths!!
-    if (std::string(_util.variation) == "empty")
-    {
+    if (std::string(_util.variation) == "empty") {
 
         // Create a set of strings for creating a dynamic directory
         // Directory structure that is created will take the form plots/<cut>/
@@ -224,8 +220,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility)
     }
 
     // Loop over the cuts and plot histograms by plot type
-    for (unsigned int i = 0; i < _util.k_cuts_MAX; i++)
-    {
+    for (unsigned int i = 0; i < _util.k_cuts_MAX; i++) {
 
         // Create the directories
         if (std::string(_util.variation) == "empty")
@@ -241,26 +236,22 @@ void HistogramPlotter::MakeHistograms(Utility _utility)
 
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::Initalise()
-{
+void HistogramPlotter::Initalise() {
 
     std::cout << "Initalising Histogram Plotter..." << std::endl;
 
     // File not already open, open the file
-    if (!gROOT->GetListOfFiles()->FindObject(_util.hist_file_name))
-    {
+    if (!gROOT->GetListOfFiles()->FindObject(_util.hist_file_name)) {
         f_nuexsec = TFile::Open(_util.hist_file_name);
     }
-    else
-    {
+    else {
         std::cout << "Can't find histogram file!! " << __PRETTY_FUNCTION__ << std::endl;
         exit(1);
     }
 
 }
 // -----------------------------------------------------------------------------
-std::vector<double> HistogramPlotter::Chi2Calc(TH1D *h_mc_ext, TH1D *h_data, const bool area_norm, const double return_norm)
-{
+std::vector<double> HistogramPlotter::Chi2Calc(TH1D *h_mc_ext, TH1D *h_data, const bool area_norm, const double return_norm) {
     const int n_bins = h_mc_ext->GetNbinsX();
 
     const double f_1 = h_mc_ext->Integral();
@@ -270,13 +261,11 @@ std::vector<double> HistogramPlotter::Chi2Calc(TH1D *h_mc_ext, TH1D *h_data, con
     TH1D *h_mc_ext_clone = (TH1D *)h_mc_ext->Clone("h_mc_ext_clone");
     TH1D *h_data_clone = (TH1D *)h_data->Clone("h_data_clone");
 
-    if (!area_norm)
-    {
+    if (!area_norm) {
         h_mc_ext_clone->Scale(f_2 / f_1);
     }
 
-    if (area_norm)
-    {
+    if (area_norm) {
         //this keeps them area normalised,
         //but at the original values, not 0->1
         //which messes with the chi2 and p calc
@@ -296,14 +285,12 @@ std::vector<double> HistogramPlotter::Chi2Calc(TH1D *h_mc_ext, TH1D *h_data, con
     double n_data_val = 0;
 
     // Loop over each bin
-    for (int i = 1; i < n_bins; i++)
-    {
+    for (int i = 1; i < n_bins; i++) {
         const double n_mc_ext = h_mc_ext_clone->GetBinContent(i);
         const double n_data = h_data_clone->GetBinContent(i);
 
         //don't calculate chi2 for bins where no comparison possible
-        if (n_data == 0 || n_mc_ext == 0)
-        {
+        if (n_data == 0 || n_mc_ext == 0) {
             continue;
         }
 
@@ -329,8 +316,7 @@ std::vector<double> HistogramPlotter::Chi2Calc(TH1D *h_mc_ext, TH1D *h_data, con
     return chi2;
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::Draw_WeightLabels(TCanvas *c)
-{
+void HistogramPlotter::Draw_WeightLabels(TCanvas *c) {
     c->cd();
 
     TPaveText *pt, *pt2;
@@ -341,6 +327,7 @@ void HistogramPlotter::Draw_WeightLabels(TCanvas *c)
     pt->SetFillColor(0);
     pt->SetFillStyle(0);
     pt->SetTextSize(0.03);
+    
     if (_util.weight_tune)
         pt->Draw();
 
@@ -350,12 +337,12 @@ void HistogramPlotter::Draw_WeightLabels(TCanvas *c)
     pt2->SetFillColor(0);
     pt2->SetFillStyle(0);
     pt2->SetTextSize(0.03);
+    
     if (_util.weight_ppfx)
         pt2->Draw();
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::Draw_VarMode(TCanvas *c )
-{
+void HistogramPlotter::Draw_VarMode(TCanvas *c ) {
     c->cd();
 
     TPaveText *pt;
@@ -367,12 +354,12 @@ void HistogramPlotter::Draw_VarMode(TCanvas *c )
     pt->SetFillStyle(0);
     pt->SetTextSize(0.03);
     pt->SetTextColor(kViolet + 2);
+    
     if (std::string(_util.variation) != "empty")
         pt->Draw();
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::Draw_Area_Norm(TCanvas *c)
-{
+void HistogramPlotter::Draw_Area_Norm(TCanvas *c) {
     c->cd();
 
     TPaveText *pt;
@@ -387,51 +374,43 @@ void HistogramPlotter::Draw_Area_Norm(TCanvas *c)
     pt->Draw();
 }
 // -----------------------------------------------------------------------------
-bool HistogramPlotter::GetHistograms(std::vector<TH1D *> &hist, std::string hist_name, std::string cut_name, std::string plotmode, bool &found_data, bool &found_ext, bool &found_dirt)
-{
+bool HistogramPlotter::GetHistograms(std::vector<TH1D *> &hist, std::string hist_name, std::string cut_name, std::string plotmode, bool &found_data, bool &found_ext, bool &found_dirt) {
 
     // Plots are by classification
-    if (plotmode == "classifications")
-    {
+    if (plotmode == "classifications") {
 
         // Loop over the classifications and get the histograms
-        for (unsigned int i = 0; i < _util.classification_dirs.size(); i++)
-        {
+        for (unsigned int i = 0; i < _util.classification_dirs.size(); i++) {
 
             // Data
-            if (i == _util.k_leg_data)
-            {
+            if (i == _util.k_leg_data) {
 
                 _util.GetHist(f_nuexsec, hist.at(i), Form("Stack/%s/%s/%s_%s_%s", cut_name.c_str(), _util.classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.classification_dirs.at(i).c_str()));
-                if (hist.at(i) == NULL)
-                {
+                
+                if (hist.at(i) == NULL) {
                     found_data = false;
                 }
             }
             // EXT
-            else if (i == _util.k_leg_ext)
-            {
+            else if (i == _util.k_leg_ext) {
 
                 _util.GetHist(f_nuexsec, hist.at(i), Form("Stack/%s/%s/%s_%s_%s", cut_name.c_str(), _util.classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.classification_dirs.at(i).c_str()));
-                if (hist.at(i) == NULL)
-                {
+                
+                if (hist.at(i) == NULL){
                     found_ext = false;
                 }
             }
             // Dirt
-            else if (i == _util.k_leg_dirt)
-            {
+            else if (i == _util.k_leg_dirt) {
 
                 _util.GetHist(f_nuexsec, hist.at(i), Form("Stack/%s/%s/%s_%s_%s", cut_name.c_str(), _util.classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.classification_dirs.at(i).c_str()));
 
-                if (hist.at(i) == NULL)
-                {
+                if (hist.at(i) == NULL) {
                     found_dirt = false;
                 }
             }
             // MC
-            else
-            {
+            else {
 
                 // MC
                 if (hist.at(i) != NULL && (i == _util.k_leg_data || i == _util.k_leg_ext || i == _util.k_leg_dirt))
@@ -446,47 +425,40 @@ bool HistogramPlotter::GetHistograms(std::vector<TH1D *> &hist, std::string hist
         }
     }
     // By particles type
-    else if (plotmode == "particle")
-    {
+    else if (plotmode == "particle") {
 
         // Loop over the classifications and get the histograms
-        for (unsigned int i = 0; i < _util.particle_types.size(); i++)
-        {
+        for (unsigned int i = 0; i < _util.particle_types.size(); i++) {
 
             // Data
-            if (i == _util.k_part_data)
-            {
+            if (i == _util.k_part_data) {
 
                 _util.GetHist(f_nuexsec, hist.at(i), Form("ParticleStack/%s/%s/%s_%s_%s", cut_name.c_str(), _util.particle_types.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.particle_types.at(i).c_str()));
-                if (hist.at(i) == NULL)
-                {
+                
+                if (hist.at(i) == NULL) {
                     found_data = false;
                 }
             }
             // EXT
-            else if (i == _util.k_part_ext)
-            {
+            else if (i == _util.k_part_ext) {
 
                 _util.GetHist(f_nuexsec, hist.at(i), Form("ParticleStack/%s/%s/%s_%s_%s", cut_name.c_str(), _util.particle_types.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.particle_types.at(i).c_str()));
-                if (hist.at(i) == NULL)
-                {
+                
+                if (hist.at(i) == NULL) {
                     found_ext = false;
                 }
             }
             // Dirt
-            else if (i == _util.k_part_dirt)
-            {
+            else if (i == _util.k_part_dirt) {
 
                 _util.GetHist(f_nuexsec, hist.at(i), Form("ParticleStack/%s/%s/%s_%s_%s", cut_name.c_str(), _util.particle_types.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.particle_types.at(i).c_str()));
 
-                if (hist.at(i) == NULL)
-                {
+                if (hist.at(i) == NULL) {
                     found_dirt = false;
                 }
             }
             // MC
-            else
-            {
+            else {
 
                 // MC
                 if (hist.at(i) != NULL && (i == _util.k_part_data || i == _util.k_part_ext || i == _util.k_part_dirt))
@@ -504,42 +476,36 @@ bool HistogramPlotter::GetHistograms(std::vector<TH1D *> &hist, std::string hist
     else if (plotmode == "classifications_pi0") {
 
         // Loop over the classifications and get the histograms
-        for (unsigned int i = 0; i < _util.classification_dirs.size(); i++)
-        {
+        for (unsigned int i = 0; i < _util.classification_dirs.size(); i++) {
             // Data
-            if (i == _util.k_leg_data)
-            {
+            if (i == _util.k_leg_data){
 
                 _util.GetHist(f_nuexsec, hist.at(i), Form("pizero/%s_%s", hist_name.c_str(), _util.classification_dirs.at(i).c_str()));
-                if (hist.at(i) == NULL)
-                {
+                
+                if (hist.at(i) == NULL){
                     found_data = false;
                 }
             }
             // EXT
-            else if (i == _util.k_leg_ext)
-            {
+            else if (i == _util.k_leg_ext) {
 
                 _util.GetHist(f_nuexsec, hist.at(i), Form("pizero/%s_%s", hist_name.c_str(), _util.classification_dirs.at(i).c_str()));
-                if (hist.at(i) == NULL)
-                {
+                
+                if (hist.at(i) == NULL) {
                     found_ext = false;
                 }
             }
             // Dirt
-            else if (i == _util.k_leg_dirt)
-            {
+            else if (i == _util.k_leg_dirt) {
 
                 _util.GetHist(f_nuexsec, hist.at(i), Form("pizero/%s_%s", hist_name.c_str(), _util.classification_dirs.at(i).c_str()));
 
-                if (hist.at(i) == NULL)
-                {
+                if (hist.at(i) == NULL) {
                     found_dirt = false;
                 }
             }
             // MC
-            else
-            {
+            else {
 
                 // MC
                 if (hist.at(i) != NULL && (i == _util.k_leg_data || i == _util.k_leg_ext || i == _util.k_leg_dirt))
@@ -559,42 +525,35 @@ bool HistogramPlotter::GetHistograms(std::vector<TH1D *> &hist, std::string hist
     else {
 
         // Loop over the classifications and get the histograms
-        for (unsigned int i = 0; i < _util.classification_dirs.size(); i++)
-        {
+        for (unsigned int i = 0; i < _util.classification_dirs.size(); i++) {
             // Data
-            if (i == _util.k_leg_data)
-            {
+            if (i == _util.k_leg_data) {
 
                 _util.GetHist(f_nuexsec, hist.at(i), Form("numu/%s_%s", hist_name.c_str(), _util.classification_dirs.at(i).c_str()));
-                if (hist.at(i) == NULL)
-                {
+                if (hist.at(i) == NULL) {
                     found_data = false;
                 }
             }
             // EXT
-            else if (i == _util.k_leg_ext)
-            {
+            else if (i == _util.k_leg_ext){
 
                 _util.GetHist(f_nuexsec, hist.at(i), Form("numu/%s_%s", hist_name.c_str(), _util.classification_dirs.at(i).c_str()));
-                if (hist.at(i) == NULL)
-                {
+                
+                if (hist.at(i) == NULL) {
                     found_ext = false;
                 }
             }
             // Dirt
-            else if (i == _util.k_leg_dirt)
-            {
+            else if (i == _util.k_leg_dirt) {
 
                 _util.GetHist(f_nuexsec, hist.at(i), Form("numu/%s_%s", hist_name.c_str(), _util.classification_dirs.at(i).c_str()));
 
-                if (hist.at(i) == NULL)
-                {
+                if (hist.at(i) == NULL) {
                     found_dirt = false;
                 }
             }
             // MC
-            else
-            {
+            else {
 
                 // MC
                 if (hist.at(i) != NULL && (i == _util.k_leg_data || i == _util.k_leg_ext || i == _util.k_leg_dirt))
@@ -614,11 +573,9 @@ bool HistogramPlotter::GetHistograms(std::vector<TH1D *> &hist, std::string hist
     return true;
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::SetFillColours(std::vector<TH1D *> &hist, std::string plotmode, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt)
-{
+void HistogramPlotter::SetFillColours(std::vector<TH1D *> &hist, std::string plotmode, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt) {
 
-    if (plotmode == "classifications" || plotmode == "classifications_pi0"|| plotmode == "classifications_numu")
-    {
+    if (plotmode == "classifications" || plotmode == "classifications_pi0"|| plotmode == "classifications_numu") {
         hist.at(_util.k_nue_cc)->SetFillColor(30);
         hist.at(_util.k_nuebar_cc)->SetFillColor(32);
         hist.at(_util.k_numu_cc)->SetFillColor(28);
@@ -630,8 +587,7 @@ void HistogramPlotter::SetFillColours(std::vector<TH1D *> &hist, std::string plo
         hist.at(_util.k_unmatched)->SetFillColor(12);
     }
     // By particle type
-    else
-    {
+    else {
 
         hist.at(_util.k_electron)->SetFillColor(30);
         hist.at(_util.k_neutron)->SetFillColor(38);
@@ -645,19 +601,16 @@ void HistogramPlotter::SetFillColours(std::vector<TH1D *> &hist, std::string plo
     }
 
     // This is generic
-    if (found_data)
-    {
+    if (found_data) {
         hist.at(k_plot_data)->SetMarkerStyle(20);
         hist.at(k_plot_data)->SetMarkerSize(0.5);
     }
-    if (found_ext)
-    {
+    if (found_ext) {
         hist.at(k_plot_ext)->SetFillColor(41);
         hist.at(k_plot_ext)->SetFillStyle(3345);
     }
 
-    if (found_dirt)
-    {
+    if (found_dirt) {
         hist.at(k_plot_dirt)->SetFillColor(2);
         hist.at(k_plot_dirt)->SetFillStyle(3354);
     }
@@ -796,8 +749,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
 
         // Scale Dirt
         else if (i == k_plot_dirt){
-            if (found_dirt)
-            {
+            if (found_dirt) {
 
                 hist.at(i)->SetStats(kFALSE);
                 if (scale) hist.at(i)->Scale(_util.dirt_scale_factor);
@@ -854,13 +806,13 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         y_maximum = h_stack->GetMaximum();
 
     // Set the axis in the case of a log plot
-    if (logy == true && found_data)
-    {
+    if (logy == true && found_data) {
 
         if (hist.at(0)->GetMinimum() != 0.0)
             hist.at(k_plot_data)->SetMinimum(hist.at(0)->GetMinimum() / 2.); // hist.at(0) is just checking the bounds of the first histogram
 
         h_stack->SetMinimum(2.5);
+        
         if (hist.at(0)->GetMinimum() == 0.0)
             hist.at(k_plot_data)->SetMinimum(hist.at(0)->GetMinimum() + 0.0001 / 2.);
 
@@ -868,14 +820,12 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
 
         h_stack->Draw("hist");
     }
-    else if (logy && !found_data)
-    {
+    else if (logy && !found_data) {
         h_stack->SetMinimum(1);
         c->SetLogy();
         h_stack->Draw("hist");
     }
-    else
-    { // Set the axis in the case of a non-log plot
+    else { // Set the axis in the case of a non-log plot
         h_stack->SetMinimum(0);
         h_stack->SetMaximum(y_maximum * y_scale_factor);
         h_stack->Draw("hist");
@@ -901,8 +851,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         h_stack->GetXaxis()->SetLabelSize(0);
 
     // Customise bin labels for pass and fail type of histograms (ones with 2 bins)
-    if (h_stack->GetXaxis()->GetNbins() == 2)
-    {
+    if (h_stack->GetXaxis()->GetNbins() == 2) {
         h_stack->GetXaxis()->SetNdivisions(2, 0, 0, kFALSE);
         h_stack->GetXaxis()->CenterLabels(kTRUE);
         h_stack->GetXaxis()->SetBinLabel(1, "Fail");
@@ -923,8 +872,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     // MC error histogram ------------------------------------------------------
     TH1D *h_error_hist = (TH1D *)hist.at(0)->Clone("h_error_hist");
 
-    for (unsigned int i = 0; i < hist.size(); i++)
-    {
+    for (unsigned int i = 0; i < hist.size(); i++) {
         if (i == k_plot_data || i == 0)
             continue; // Dont use the data
         if (i == k_plot_ext && !found_ext)
@@ -966,23 +914,20 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         topPad->SetLogy();
 
     // Calculate the chi2
-    if (found_data)
-    {
+    if (found_data) {
         TH1D *h_last = (TH1D *)h_stack->GetStack()->Last();
         chi2 = Chi2Calc(h_last, hist.at(k_plot_data), _area_norm, hist_integrals.at(k_plot_data));
     }
 
     // Now create the ratio of data to MC ----------------------------------
-    if (found_data)
-    {
+    if (found_data) {
 
         bottomPad->cd();
 
         h_ratio = (TH1D *)hist.at(k_plot_data)->Clone("h_ratio");
         h_mc_ext_sum = (TH1D *)hist.at(0)->Clone("h_mc_ext_sum");
 
-        for (unsigned int i = 0; i < hist.size(); i++)
-        {
+        for (unsigned int i = 0; i < hist.size(); i++) {
             if (i == k_plot_data || i == 0)
                 continue; // Dont use the data and nue cc because already been cloned
             h_mc_ext_sum->Add(hist.at(i), 1);
@@ -997,16 +942,14 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         h_ratio->GetXaxis()->SetTitleSize(0.13);
 
         // Customise bin labels for pass and fail type of histograms (ones with 2 bins)
-        if (h_ratio->GetXaxis()->GetNbins() == 2)
-        {
+        if (h_ratio->GetXaxis()->GetNbins() == 2) {
             h_ratio->GetXaxis()->SetNdivisions(2, 0, 0, kFALSE);
             h_ratio->GetXaxis()->CenterLabels(kTRUE);
             h_ratio->GetXaxis()->SetBinLabel(1, "Fail");
             h_ratio->GetXaxis()->SetBinLabel(2, "Pass");
 
             // Its a veto in this case so swap them
-            if (hist_name == "h_reco_crtveto")
-            {
+            if (hist_name == "h_reco_crtveto") {
                 h_ratio->GetXaxis()->SetBinLabel(1, "Pass");
                 h_ratio->GetXaxis()->SetBinLabel(2, "Fail");
             }
@@ -1043,8 +986,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         h_ratio_error->Draw("e2, same");
     
         // Choose whether to center the xaxis labels. Only makes sense for counting type of plots
-        if (centerxaxis)
-        {
+        if (centerxaxis) {
             h_ratio->GetXaxis()->CenterLabels(kTRUE);
         }
 
@@ -1076,8 +1018,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     Draw_VarMode(c);
 
     // Draw other data specifc quantities
-    if (found_data)
-    {
+    if (found_data) {
 
         // Turn this off for now until we understand this
         // _util.Draw_Data_MC_Ratio(c, hist_integrals.at(_util.k_leg_data)/integral_mc_ext, 0.34, 0.936, 0.34, 0.936 );
@@ -1104,8 +1045,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     // delete c;
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT)
-{
+void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, const char* x_axis_name, double y_scale_factor,
     //                             const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, const char* print_name, bool override_data_mc_comparison )
@@ -1422,11 +1362,10 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
     TCanvas * c = new TCanvas(Form("c_%s", histname.c_str()), "c", 500, 500);
     THStack *h_stack = new THStack();
 
-    for (unsigned int k = 0; k < _util.type_prefix.size(); k++)
-    {
+    for (unsigned int k = 0; k < _util.type_prefix.size(); k++) {
         _util.GetHist(f_nuexsec, hist.at(k), Form("Flash/%s_%s", histname.c_str(), _util.type_prefix.at(k).c_str()));
-        if (hist.at(k) == NULL)
-        {
+        
+        if (hist.at(k) == NULL) {
             std::cout << "Couldn't get all the flash histograms so exiting function..." << std::endl;
             return;
         }
@@ -1437,11 +1376,9 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
 
     _util.SetTPadOptions(topPad, bottomPad);
 
-    for (unsigned int i = 0; i < hist.size(); i++)
-    {
+    for (unsigned int i = 0; i < hist.size(); i++) {
 
-        if (i == _util.k_data)
-        {
+        if (i == _util.k_data) {
 
             hist.at(i)->SetStats(kFALSE);
             hist.at(_util.k_data)->SetMarkerStyle(20);
@@ -1450,8 +1387,7 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
         }
 
         // Scale EXT
-        else if (i == _util.k_ext)
-        {
+        else if (i == _util.k_ext) {
 
             hist.at(i)->SetStats(kFALSE);
             hist.at(i)->Scale(_util.ext_scale_factor);
@@ -1462,8 +1398,7 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
         }
 
         // Scale Dirt
-        else if (i == _util.k_dirt)
-        {
+        else if (i == _util.k_dirt) {
 
             hist.at(i)->SetStats(kFALSE);
             hist.at(i)->Scale(_util.dirt_scale_factor);
@@ -1474,8 +1409,7 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
         }
 
         // Scale MC
-        else
-        {
+        else {
             hist.at(i)->SetStats(kFALSE);
             hist.at(i)->Scale(_util.mc_scale_factor);
             hist.at(i)->SetFillColor(30);
@@ -1485,14 +1419,11 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
     }
 
     // Normalisation by area
-    if (area_norm)
-    {
+    if (area_norm) {
 
-        if (integral_mc_ext != 0)
-        {
+        if (integral_mc_ext != 0) {
 
-            for (unsigned int i = 0; i < hist.size(); i++)
-            {
+            for (unsigned int i = 0; i < hist.size(); i++) {
                 if (i == _util.k_data)
                     continue; // Dont scale the data
                 // if (i == 0) std::cout << "area norm scale factor: "  << hist_integrals.at(k_plot_data) / integral_mc_ext << std::endl;
@@ -1523,8 +1454,7 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
     // MC error histogram ------------------------------------------------------
     TH1D *h_error_hist = (TH1D *)hist.at(_util.k_mc)->Clone("h_error_hist");
 
-    for (unsigned int i = 0; i < hist.size(); i++)
-    {
+    for (unsigned int i = 0; i < hist.size(); i++) {
         if (i == _util.k_data)
             continue; // Dont use the data
         if (i == _util.k_mc)
@@ -1537,10 +1467,15 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
     h_error_hist->Draw("e2, same");
 
     TLegend *leg_stack;
-    if (histname == "h_flash_time_single_bin") leg_stack = new TLegend(0.7, 0.2, 0.9, 0.45);
-    else leg_stack = new TLegend(0.7, 0.6, 0.9, 0.85);
+    if (histname == "h_flash_time_single_bin")
+        leg_stack = new TLegend(0.7, 0.2, 0.9, 0.45);
+    else
+        leg_stack = new TLegend(0.7, 0.6, 0.9, 0.85);
+    
     leg_stack->SetBorderSize(0);
-    if (histname != "h_flash_time_single_bin")leg_stack->SetFillStyle(0);
+    
+    if (histname != "h_flash_time_single_bin")
+        leg_stack->SetFillStyle(0);
 
     leg_stack->AddEntry(hist.at(_util.k_data), "Beam-On Data", "lep");
     leg_stack->AddEntry(hist.at(_util.k_dirt), "Out-of Cryo", "f");
@@ -1554,10 +1489,11 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
     h_ratio = (TH1D *)hist.at(_util.k_data)->Clone("h_ratio");
     h_mc_ext_sum = (TH1D *)hist.at(_util.k_mc)->Clone("h_mc_ext_sum");
 
-    for (unsigned int i = 0; i < hist.size(); i++)
-    {
+    for (unsigned int i = 0; i < hist.size(); i++) {
+        
         if (i == _util.k_data || i == _util.k_mc)
             continue; // Dont use the data and nue cc because already been cloned
+        
         h_mc_ext_sum->Add(hist.at(i), 1);
     }
 
@@ -1610,8 +1546,7 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::MakeFlashPlotOMO(double Data_POT, const char *print_name, std::string histname)
-{
+void HistogramPlotter::MakeFlashPlotOMO(double Data_POT, const char *print_name, std::string histname) {
 
     std::vector<TH1D *> hist(_util.k_type_MAX);
     std::vector<double> hist_integrals(_util.k_type_MAX, 0.0); // The integrals of all the histograms
@@ -1625,11 +1560,10 @@ void HistogramPlotter::MakeFlashPlotOMO(double Data_POT, const char *print_name,
     TCanvas *c = new TCanvas();
     THStack *h_stack = new THStack();
 
-    for (unsigned int k = 0; k < _util.type_prefix.size(); k++)
-    {
+    for (unsigned int k = 0; k < _util.type_prefix.size(); k++) {
         _util.GetHist(f_nuexsec, hist.at(k), Form("Flash/%s_%s", histname.c_str(), _util.type_prefix.at(k).c_str()));
-        if (hist.at(k) == NULL)
-        {
+        
+        if (hist.at(k) == NULL) {
             std::cout << "Couldn't get all the flash histograms so exiting function..." << std::endl;
             return;
         }
@@ -1640,11 +1574,9 @@ void HistogramPlotter::MakeFlashPlotOMO(double Data_POT, const char *print_name,
 
     _util.SetTPadOptions(topPad, bottomPad);
 
-    for (unsigned int i = 0; i < hist.size(); i++)
-    {
+    for (unsigned int i = 0; i < hist.size(); i++) {
 
-        if (i == _util.k_data)
-        {
+        if (i == _util.k_data) {
 
             hist.at(i)->SetStats(kFALSE);
             hist.at(i)->SetMarkerStyle(20);
@@ -1652,16 +1584,14 @@ void HistogramPlotter::MakeFlashPlotOMO(double Data_POT, const char *print_name,
         }
 
         // Scale EXT
-        else if (i == _util.k_ext)
-        {
+        else if (i == _util.k_ext) {
 
             hist.at(i)->SetStats(kFALSE);
             // hist.at(i)->Scale(_util.ext_scale_factor);
         }
 
         // Scale Dirt
-        else if (i == _util.k_dirt)
-        {
+        else if (i == _util.k_dirt) {
 
             hist.at(i)->SetStats(kFALSE);
             // hist.at(i)->Scale(d_util.irt_scale_factor);
@@ -1672,8 +1602,7 @@ void HistogramPlotter::MakeFlashPlotOMO(double Data_POT, const char *print_name,
         }
 
         // Scale MC
-        else
-        {
+        else {
             hist.at(i)->SetStats(kFALSE);
             // hist.at(i)->Scale(_util.mc_scale_factor);
             hist.at(i)->SetFillColor(30);
