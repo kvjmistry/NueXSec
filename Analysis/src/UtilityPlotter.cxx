@@ -17,6 +17,7 @@ void UtilityPlotter::Initialise(Utility _utility){
     // Standard variation mode
     if (std::string(_util.uplotmode) == "default")  {
 
+        // Function that plots all the ppfx universe weights on one plot for the backgrounds
         StudyPPFXWeights();
 
         // Look to see if the shower with the most hits is the same as the shower with the most energy

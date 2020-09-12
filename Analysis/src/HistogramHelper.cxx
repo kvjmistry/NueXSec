@@ -576,9 +576,9 @@ void HistogramHelper::InitHistograms(){
         TH1D_pi0_hists.at(k_pi0_mass).at(j) = new TH1D(Form("h_pi0_mass_%s", _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 500);
         TH1D_pi0_hists.at(k_pi0_mass_norm).at(j) = new TH1D(Form("h_pi0_mass_norm_%s", _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 500);
         TH1D_pi0_hists.at(k_pi0_mass_EScale).at(j) = new TH1D(Form("h_pi0_mass_EScale_%s", _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 500);
-        TH1D_pi0_hists.at(k_pi0_energy).at(j) = new TH1D(Form("h_pi0_energy_%s", _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 600);
-        TH1D_pi0_hists.at(k_pi0_energy_norm).at(j) = new TH1D(Form("h_pi0_energy_norm_%s", _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 600);
-        TH1D_pi0_hists.at(k_pi0_energy_EScale).at(j) = new TH1D(Form("h_pi0_energy_EScale_%s", _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 600);
+        TH1D_pi0_hists.at(k_pi0_energy).at(j) = new TH1D(Form("h_pi0_energy_%s", _util.classification_dirs.at(j).c_str()) ,"", 9, 60, 660);
+        TH1D_pi0_hists.at(k_pi0_energy_norm).at(j) = new TH1D(Form("h_pi0_energy_norm_%s", _util.classification_dirs.at(j).c_str()) ,"", 9, 60, 660);
+        TH1D_pi0_hists.at(k_pi0_energy_EScale).at(j) = new TH1D(Form("h_pi0_energy_EScale_%s", _util.classification_dirs.at(j).c_str()) ,"", 9, 60, 660);
     }
 
     // ----------
@@ -1289,17 +1289,17 @@ void HistogramHelper::FillPiZeroHists(int classification_index, SliceContainer S
 
     if (pizero_mode == 0){
         TH1D_pi0_hists.at(k_pi0_mass).at(classification_index)->Fill(SC.pi0_mass_Y/0.83, weight);
-        TH1D_pi0_hists.at(k_pi0_energy).at(classification_index)->Fill(SC.pi0_energy1_Y + SC.pi0_energy2_Y, weight);
+        TH1D_pi0_hists.at(k_pi0_energy).at(classification_index)->Fill(SC.pi0_energy1_Y/0.83, weight);
     }
     // Norm fix
     else if (pizero_mode == 1){
         TH1D_pi0_hists.at(k_pi0_mass_norm).at(classification_index)->Fill(SC.pi0_mass_Y/0.83, weight);
-        TH1D_pi0_hists.at(k_pi0_energy_norm).at(classification_index)->Fill(SC.pi0_energy1_Y + SC.pi0_energy2_Y, weight);
+        TH1D_pi0_hists.at(k_pi0_energy_norm).at(classification_index)->Fill(SC.pi0_energy1_Y/0.83, weight);
     }
     // Energy dependent
     else {
         TH1D_pi0_hists.at(k_pi0_mass_EScale).at(classification_index)->Fill(SC.pi0_mass_Y/0.83, weight);
-        TH1D_pi0_hists.at(k_pi0_energy_EScale).at(classification_index)->Fill(SC.pi0_energy1_Y + SC.pi0_energy2_Y, weight);
+        TH1D_pi0_hists.at(k_pi0_energy_EScale).at(classification_index)->Fill(SC.pi0_energy1_Y/0.83, weight);
     }
     
 

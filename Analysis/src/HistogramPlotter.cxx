@@ -184,17 +184,17 @@ void HistogramPlotter::MakeHistograms(Utility _utility)
 
         // pi0 energy unweighted
         MakeStack("h_pi0_energy", " ",
-                area_norm, false, 1.0, "Energy [MeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                area_norm, false, 1.5, "#pi^{0} Energy [MeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
                 Form("plots/run%s/pi0/pi0_energy.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
 
         // pi0 energy normlaisation fixed
         MakeStack("h_pi0_energy_norm", " ",
-                area_norm, false, 1.0, "Energy [MeV] (Normalisation Fixed)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                area_norm, false, 1.5, "#pi^{0} Energy [MeV] (Normalisation Fixed)",  0.35, 0.85, 0.55, 0.85, Data_POT,
                 Form("plots/run%s/pi0/pi0_energy_norm.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
 
         // pi0 energy unweighted
         MakeStack("h_pi0_energy_EScale", " ",
-                area_norm, false, 1.0, "Energy [MeV] (E Dependent Scaling)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                area_norm, false, 1.5, "#pi^{0} Energy [MeV] (E Dependent Scaling)",  0.35, 0.85, 0.55, 0.85, Data_POT,
                 Form("plots/run%s/pi0/pi0_energy_EScale.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
 
         // Stacked histograms for numu
