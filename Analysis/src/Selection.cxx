@@ -667,7 +667,7 @@ double Selection::GetCVWeight(int type, SliceContainer SC){
 
     if (_util.weight_ppfx) weight = weight * weight_flux;
 
-    // For the dirt we correct it by 45%
+    // For the dirt we correct it by 65%
     if (type == _util.k_dirt && _util.weight_dirt) weight = weight*0.45;
 
     // Weight the below threshold events to zero. Current threhsold is 125 MeV

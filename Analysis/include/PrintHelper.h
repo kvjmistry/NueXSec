@@ -41,8 +41,6 @@ class PrintHelper{
 
     // Histograms for getting the efficiency along with its uncertainty
     std::vector<std::vector<TH1D*>> TEfficiency_hists; // nue/nuebar -- cut index
-    std::vector<std::vector<TH1D*>> TPurity_hists; // classification -- cut index
-    std::vector<std::vector<TH1D*>> TPurity_hists_tot; // cut index -- numerator/denominator
 
     // For storing the errors on the efficiency
     std::vector<std::vector<double>> vec_err;

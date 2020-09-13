@@ -1737,7 +1737,6 @@ void HistogramPlotter::MakeEfficiencyPlot(const char *print_name) {
 
     // Set the error bar on the efficiency histogram
     for (int bin = 0; bin < h_eff->GetNbinsX(); bin++) {
-        std::cout <<eff_err_v.at(bin) << "  " << efficiency_v.at(bin) << std::endl;
         h_eff_clone->SetBinError(bin+1, eff_err_v.at(bin));
     }
 
