@@ -87,7 +87,10 @@ class CrossSectionHelper{
     double mc_flux_scale_factor{1.0};
     double data_flux_scale_factor{1.0};
 
-    int uni_reint{1000}, uni_genie{600}, uni_ppfx{600}; // For resizing data, ext and dirt in multisims
+    int uni_reint{1000}, uni_genie{600}, uni_ppfx{600}, uni_mcstats{1000}; // For resizing data, ext and dirt in multisims
+
+    // Random number generator for generating MC stats uncertainty
+    TRandom3 *rand = new TRandom3(); 
 
     // Define the bins for each variable -- See InitialiseHistograms function to see the actual binning used
     std::vector<std::vector<double>> bins;
@@ -311,6 +314,12 @@ class CrossSectionHelper{
     // -------------------------------------------------------------------------
     // Get the index of the beamline variation so we can get the correct histogram to weight from
     int GetBeamlineIndex(std::string variation);
+    // -------------------------------------------------------------------------
+    // Generates a Poisson random number
+    double PoissonRandomNumber(int uni);
+    // -------------------------------------------------------------------------
+    // Concatenates the run subrun event number to a single number
+    int ConcatRunSubRunEvent(int run, int subrun, int event);
     // -------------------------------------------------------------------------
 
 

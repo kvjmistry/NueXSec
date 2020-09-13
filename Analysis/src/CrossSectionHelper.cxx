@@ -138,6 +138,18 @@ void CrossSectionHelper::LoopEvents(){
 
                     weight_uni = cv_weight * vec_universes.at(uni);
                 }
+                // This is a mc stats variation which studies the statisitcal uncertainty on the smearing matrix and efficiency by 
+                // varying the signal and generated events
+                // dont touch the cosmic contaiminated nues, dont know the expected behaviour for this
+                else if (reweighter_labels.at(label) == "MCStats"){
+                    
+                    // Weight the Signal events that factor into the smearing matrix
+                    if (*classification == "nue_cc" || *classification == "nuebar_cc" || *classification == "unmatched_nue" || *classification == "unmatched_nuebar"){
+                        weight_uni = cv_weight * PoissonRandomNumber(uni);
+                    }
+                    else weight_uni = cv_weight;
+                    
+                }
                 // This is a beamline variation
                 else if (CheckBeamline(reweighter_labels.at(label))){
                     weight_uni = cv_weight * GetIntegratedFlux(0, "", "", reweighter_labels.at(label));
@@ -660,6 +672,10 @@ void CrossSectionHelper::SwitchReweighterLabel(std::string label){
         }
 
     }
+    // MC Stats
+    else if (label == "MCStats"){
+        vec_universes.resize(uni_mcstats, 1.0);
+    }
     else if (label == "RPAup"){
         vec_universes.push_back(knobRPAup);
     }
@@ -813,6 +829,12 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
             reweighter_labels.clear();
             reweighter_labels = {"CV", "weightsReint"};
         }
+        // only run mc stats
+        else if (std::string(_util.xsec_labels) == "mcstats"){
+            std::cout << "XSec reweighting mode set to MCStats" << std::endl;
+            reweighter_labels.clear();
+            reweighter_labels = {"CV", "MCStats"};
+        }
         // Run EVERYTHING
         else if (std::string(_util.xsec_labels) == "all"){
             std::cout << "Running everything!" << std::endl;
@@ -862,6 +884,11 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
         else if ( reweighter_labels.at(j) == "weightsReint" ){
             std::cout << "Setting Geant Reinteractions Histogram universe vector to size: " << uni_reint << std::endl;
             h_cross_sec.at(j).resize(uni_reint);
+        }
+         // Specific resizing -- hardcoded and may break in the future
+        else if ( reweighter_labels.at(j) == "MCStats" ){
+            std::cout << "Setting MCStats Histogram universe vector to size: " << uni_mcstats << std::endl;
+            h_cross_sec.at(j).resize(uni_mcstats);
         }
         // Default size of 1
         else {
@@ -1139,3 +1166,48 @@ int CrossSectionHelper::GetBeamlineIndex(std::string variation){
     else return 0; 
 
 }
+// -----------------------------------------------------------------------------
+double CrossSectionHelper::PoissonRandomNumber(int uni){
+
+    // Concatenate the run, subrun, event to a single number so we have a seed
+    int seed = ConcatRunSubRunEvent(run, subrun, event);
+
+    // Set the seed of the TRandom 3 based on the run,subrun,event
+    // Only set if uni == 0, i.e. a new event
+    if (uni == 0) rand->SetSeed(seed);
+
+    // Generate the weight, using a poisson dist with mean 1
+    double weight = rand->Poisson(1);
+
+    // std::cout << weight << std::endl;
+
+    return weight;
+
+}
+// -----------------------------------------------------------------------------
+int CrossSectionHelper::ConcatRunSubRunEvent(int run, int subrun, int event){ 
+  
+    // Convert both the integers to string 
+    std::string srun    = std::to_string(run); 
+    std::string ssubrun = std::to_string(subrun);
+    std::string sevent  = std::to_string(event);
+
+    // Concatenate both strings 
+    std::string s =  ssubrun + sevent; 
+
+    // std::cout << srun << "  " << ssubrun << "  " << sevent<< std::endl;
+  
+    // Convert the concatenated string 
+    // to integer 
+    int c = stoi(s); 
+  
+    // return the formed integer 
+    return c; 
+} 
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
