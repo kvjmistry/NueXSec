@@ -250,8 +250,15 @@ void HistogramHelper::InitHistograms(){
             // Track shower angle
             TH1D_hists.at(k_reco_track_shower_angle).at(i).at(j) = new TH1D (Form("h_reco_track_shower_angle_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, -180, 180);
             
-            // Ratio hits from showers to slice
+            // Ratio hits from all showers to slice
             TH1D_hists.at(k_reco_hits_ratio).at(i).at(j) = new TH1D (Form("h_reco_hits_ratio_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 21, 0, 1.05);
+            TH1D_hists.at(k_reco_hits_ratio_th).at(i).at(j) = new TH1D (Form("h_reco_hits_ratio_th_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 21, 0, 1.05);
+
+            // Ratio hits from leading shower to slice
+            TH1D_hists.at(k_reco_hits_ratio_ldg).at(i).at(j) = new TH1D (Form("h_reco_hits_ratio_ldg_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 21, 0, 1.05);
+            
+            // Ratio of hits of leading shower to slice with threshold on hits
+            TH1D_hists.at(k_reco_hits_ratio_ldg_th).at(i).at(j) = new TH1D (Form("h_reco_hits_ratio_ldg_th_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 21, 0, 1.05);
             
             // Shower score
             TH1D_hists.at(k_reco_shower_score).at(i).at(j) = new TH1D (Form("h_reco_shower_score_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 0.5);
@@ -660,6 +667,12 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
     if (SC.n_tracks > 0) TH1D_hists.at(k_reco_track_shower_angle).at(cut_index).at(classification_index)->Fill(SC.tksh_angle*180/3.14159, weight);
 
     TH1D_hists.at(k_reco_hits_ratio).at(cut_index).at(classification_index)->Fill(SC.hits_ratio, weight);
+
+    if (SC.shr_hits_max > 50) TH1D_hists.at(k_reco_hits_ratio_th).at(cut_index).at(classification_index)->Fill(SC.hits_ratio, weight);
+
+    if (SC.slnhits > 0) TH1D_hists.at(k_reco_hits_ratio_ldg).at(cut_index).at(classification_index)->Fill(double(SC.shr_hits_max)/double(SC.slnhits), weight);
+    
+    if (SC.shr_hits_max > 50 && SC.slnhits > 0) TH1D_hists.at(k_reco_hits_ratio_ldg_th).at(cut_index).at(classification_index)->Fill(double(SC.shr_hits_max)/double(SC.slnhits), weight);
 
     TH1D_hists.at(k_reco_shower_score).at(cut_index).at(classification_index)->Fill(SC.shr_score, weight);
 

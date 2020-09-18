@@ -1131,6 +1131,21 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               area_norm, false, 1.0, "Hit Ratio",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_hits_ratio.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
+    // Ratio hits from showers to slice
+    MakeStack("h_reco_hits_ratio_th", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "Hit Rati (> 50 Hits)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_hits_ratio_th.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
+
+    // Ratio hits from leading shower to slice
+    MakeStack("h_reco_hits_ratio_ldg", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "Hit Ratio Leading Shower",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_hits_ratio_ldg.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
+
+    // Ratio hits from leading shower to slice with a threhsold
+    MakeStack("h_reco_hits_ratio_ldg_th", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "Hit Ratio Leading Shower (> 10 hits)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_hits_ratio_ldg_th.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
+
     // Shower score
     MakeStack("h_reco_shower_score", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Shower Score",  0.35, 0.85, 0.55, 0.85, Data_POT,

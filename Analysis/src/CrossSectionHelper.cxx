@@ -1192,7 +1192,7 @@ int CrossSectionHelper::ConcatRunSubRunEvent(int run, int subrun, int event){
     std::string ssubrun = std::to_string(subrun);
     std::string sevent  = std::to_string(event);
 
-    // Concatenate both strings 
+    // Concatenate the subrun and event. Dont add the run because it makes the number too long for storing as an int
     std::string s =  ssubrun + sevent; 
 
     // std::cout << srun << "  " << ssubrun << "  " << sevent<< std::endl;
