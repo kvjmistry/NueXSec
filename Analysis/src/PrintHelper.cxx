@@ -336,9 +336,9 @@ void PrintHelper::PrintResults(){
             purity     = double(count_nue_cc + count_nuebar_cc) / double(sum_mc_dirt_ext);
             printf (" %-20s: ( %-6.1f / %-7.1f ) = %-3.2f %% \n", "Purity", count_nue_cc + count_nuebar_cc, sum_mc_dirt_ext, 100 * purity);
             std::cout << std::endl;
-            printf (" %-20s: ( %-6.1f / %-7.1f ) = %-3.2f +/- %-3.2f %% \n", "Efficiency", count_nue_cc + count_nuebar_cc, tot_true_infv_nues, 100 * efficiency, 100 * vec_err.at(k_eff_nu_E_single_bin).at(p) / (vec_n.at(k_eff_nu_E_single_bin).at(p) / vec_N.at(k_eff_nu_E_single_bin).at(p)));
-            printf (" %-20s: ( %-6.1f / %-7.1f ) = %-3.2f +/- %-3.2f %% \n", "Efficiency nue", vec_n.at(k_eff_nu_E_nue_single_bin).at(p), vec_N.at(k_eff_nu_E_nue_single_bin).at(p), 100 * (vec_n.at(k_eff_nu_E_nue_single_bin).at(p) / vec_N.at(k_eff_nu_E_nue_single_bin).at(p)),  100 * vec_err.at(k_eff_nu_E_nue_single_bin).at(p) / (vec_n.at(k_eff_nu_E_nue_single_bin).at(p) / vec_N.at(k_eff_nu_E_nue_single_bin).at(p)));
-            printf (" %-20s: ( %-6.1f / %-7.1f ) = %-3.2f +/- %-3.2f %% \n", "Efficiency nuebar", vec_n.at(k_eff_nu_E_nuebar_single_bin).at(p), vec_N.at(k_eff_nu_E_nuebar_single_bin).at(p), 100 * (vec_n.at(k_eff_nu_E_nuebar_single_bin).at(p) / vec_N.at(k_eff_nu_E_nuebar_single_bin).at(p)), 100 * vec_err.at(k_eff_nu_E_nuebar_single_bin).at(p) / (vec_n.at(k_eff_nu_E_nuebar_single_bin).at(p) / vec_N.at(k_eff_nu_E_nuebar_single_bin).at(p)));
+            printf (" %-20s: ( %-6.1f / %-7.1f ) = %-3.2f +/- %-3.2f %% \n", "Efficiency", count_nue_cc + count_nuebar_cc, tot_true_infv_nues, 100 * efficiency, 100 * vec_err.at(k_eff_nu_E_single_bin).at(p));
+            printf (" %-20s: ( %-6.1f / %-7.1f ) = %-3.2f +/- %-3.2f %% \n", "Efficiency nue", vec_n.at(k_eff_nu_E_nue_single_bin).at(p), vec_N.at(k_eff_nu_E_nue_single_bin).at(p), 100 * (vec_n.at(k_eff_nu_E_nue_single_bin).at(p) / vec_N.at(k_eff_nu_E_nue_single_bin).at(p)),  100 * vec_err.at(k_eff_nu_E_nue_single_bin).at(p));
+            printf (" %-20s: ( %-6.1f / %-7.1f ) = %-3.2f +/- %-3.2f %% \n", "Efficiency nuebar", vec_n.at(k_eff_nu_E_nuebar_single_bin).at(p), vec_N.at(k_eff_nu_E_nuebar_single_bin).at(p), 100 * (vec_n.at(k_eff_nu_E_nuebar_single_bin).at(p) / vec_N.at(k_eff_nu_E_nuebar_single_bin).at(p)), 100 * vec_err.at(k_eff_nu_E_nuebar_single_bin).at(p));
             
             std::cout << std::endl;
             std::cout << " Purity Change     : " <<  100 * (purity - purity_last) << " \%" << std::endl;
