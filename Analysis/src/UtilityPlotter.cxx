@@ -17,6 +17,9 @@ void UtilityPlotter::Initialise(Utility _utility){
     // Standard variation mode
     if (std::string(_util.uplotmode) == "default")  {
 
+        // Compare the efficiency in run 1 and run 3
+        CompareEfficiency();
+
         // Function that plots all the ppfx universe weights on one plot for the backgrounds
         StudyPPFXWeights();
 
@@ -1003,5 +1006,262 @@ void UtilityPlotter::StudyPPFXWeights(){
 
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::CompareEfficiency(){
+
+    TH1D* h_eff_run1 = new TH1D("h_efficiency_run1", "", _util.k_cuts_MAX, 0, _util.k_cuts_MAX);
+    TH1D* h_pur_run1 = new TH1D("h_purity_run1",     "", _util.k_cuts_MAX, 0, _util.k_cuts_MAX);
+    TH1D* h_eff_clone_run1 = new TH1D("h_eff_err_run1",     "", _util.k_cuts_MAX, 0, _util.k_cuts_MAX);;
+
+    TH1D* h_eff_run3 = new TH1D("h_efficiency_run3", "", _util.k_cuts_MAX, 0, _util.k_cuts_MAX);
+    TH1D* h_pur_run3 = new TH1D("h_purity_run3",     "", _util.k_cuts_MAX, 0, _util.k_cuts_MAX);
+    TH1D* h_eff_clone_run3 = new TH1D("h_eff_err_run3",     "", _util.k_cuts_MAX, 0, _util.k_cuts_MAX);;
+
+    PopulateEff(h_eff_run1, h_pur_run1, h_eff_clone_run1,  "files/trees/nuexsec_selected_tree_mc_run1.root");
+    PopulateEff(h_eff_run3, h_pur_run3, h_eff_clone_run3, "files/trees/nuexsec_selected_tree_mc_run3.root");
+    
+    
+    TCanvas *c = new TCanvas("c", "c", 600, 500);
+    c->SetGridy();
+    c->SetBottomMargin(0.12);
+
+    TLegend *leg_stack = new TLegend(0.59, 0.89, 0.89, 0.69);
+    leg_stack->SetBorderSize(0);
+    // leg_stack->SetFillStyle(0);
+    leg_stack->AddEntry(h_eff_run1, "Efficiency Run1","ELP");
+    leg_stack->AddEntry(h_eff_run3, "Efficiency Run3","ELP");
+    leg_stack->AddEntry(h_pur_run1, "Purity Run1",    "lp");
+    leg_stack->AddEntry(h_pur_run3, "Purity Run3",    "lp");
+
+    h_eff_run1->Draw("LP");
+    h_pur_run1->Draw("LP,same");
+    
+
+    h_eff_run3->SetLineColor(kAzure+5);
+    h_eff_run3->Draw("LP,same");
+
+    h_eff_clone_run3->SetLineColor(kAzure+5);
+
+    h_pur_run3->SetLineColor(kViolet-5);
+    h_pur_run3->Draw("LP,same");
+    
+    // Draw vertical lines to help the eye
+    TLine *line;
+    for (unsigned int l=1; l < _util.k_cuts_MAX+1; l++){
+        line  = new TLine( h_eff_run1->GetBinCenter(l) ,   0 , h_eff_run1->GetBinCenter(l)  ,  1.1);
+        line->SetLineColor(12);
+        line->SetLineStyle(kDotted);
+        line->Draw();
+    }
+
+    leg_stack->Draw();
+
+    h_eff_clone_run1->Draw("E,X0,same");
+    h_eff_clone_run3->Draw("E,X0, same");
+
+    h_eff_run1->GetXaxis()->SetTickLength(0.00);
+    h_pur_run1->GetXaxis()->SetTickLength(0.00);
+
+    c->Print("plots/efficiency_run1_run3_comparison.pdf");
+
+
+    // Now lets plot the difference between the two runs
+
+    TH1D* h_eff_diff = (TH1D*) h_eff_run1->Clone("h_eff_diff");
+    h_eff_diff->Add(h_eff_run3, -1);
+    
+    // Set the bin error by adding in quadrature
+    for (int bin = 1; bin < h_eff_diff->GetNbinsX()+1; bin++){
+        double run1_err = h_eff_clone_run1->GetBinError(bin);
+        double run3_err = h_eff_clone_run3->GetBinError(bin);
+        double tot_err = std::sqrt(run1_err*run1_err + run3_err*run3_err);
+        h_eff_diff->SetBinError(bin, tot_err);
+    }
+
+    h_eff_diff->SetStats(kFALSE);
+    h_eff_diff->SetMarkerStyle(20);
+    h_eff_diff->SetMarkerSize(0.5);
+    h_eff_diff->SetLineWidth(2);
+    h_eff_diff->GetYaxis()->SetTitle("Difference \%");
+    h_eff_diff->Scale(100);
+    h_eff_diff->GetYaxis()->SetRangeUser(-8, 8);
+    h_eff_diff->GetXaxis()->SetLabelFont(62);
+    h_eff_diff->GetXaxis()->SetLabelSize(0.03);
+
+    TH1D* h_pur_diff = (TH1D*) h_pur_run1->Clone("h_pur_diff");
+    h_pur_diff->Add(h_pur_run3, -1);
+    h_pur_diff->SetLineColor(kRed+2);
+    h_pur_diff->SetStats(kFALSE);
+    h_pur_diff->SetMarkerStyle(20);
+    h_pur_diff->SetMarkerSize(0.5);
+    h_pur_diff->SetLineWidth(2);
+    h_pur_diff->Scale(100);
+
+    TH1D* h_eff_diff_clone = (TH1D*) h_eff_diff->Clone();
+
+    for (int bin = 1; bin < h_eff_diff->GetNbinsX()+1; bin++){
+        h_eff_diff->SetBinError(bin, 0.0);
+    }
+
+
+    TCanvas *c2 = new TCanvas("c2", "c2", 600, 500);
+    c2->SetGridy();
+    c2->SetBottomMargin(0.12);
+    h_eff_diff->Draw("LP");
+    h_eff_diff_clone->Draw("E,X0,same");
+    h_pur_diff->Draw("LP, same");
+
+    for (unsigned int l=1; l < _util.k_cuts_MAX+1; l++){
+        line  = new TLine( h_eff_run1->GetBinCenter(l) ,   -8 , h_eff_run1->GetBinCenter(l)  ,  8);
+        line->SetLineColor(12);
+        line->SetLineStyle(kDotted);
+        line->Draw();
+    }
+
+    TLegend *leg_stack2 = new TLegend(0.2, 0.89, 0.4, 0.69);
+    leg_stack2->SetBorderSize(0);
+    // leg_stack2->SetFillStyle(0);
+    leg_stack2->AddEntry(h_eff_diff, "Efficiency","ELP");
+    leg_stack2->AddEntry(h_pur_diff, "Purity","lp");
+    leg_stack2->Draw();
+
+    c2->Print("plots/efficiency_run1_run3_comparison_diff.pdf");
+
+
+    // Now lets make a relative differnce plot
+    TH1D* h_eff_diff_rel = new TH1D("h_efficiency_diff_rel", "", _util.k_cuts_MAX, 0, _util.k_cuts_MAX);
+    TH1D* h_pur_diff_rel = new TH1D("h_purity_diff_rel",     "", _util.k_cuts_MAX, 0, _util.k_cuts_MAX);
+
+    for (int k=0; k < h_eff_run1->GetNbinsX();k++){
+        if ( k == 0 ){
+            h_eff_diff_rel ->Fill(_util.cut_dirs_pretty.at(k).c_str(), 0);
+            h_pur_diff_rel ->Fill(_util.cut_dirs_pretty.at(k).c_str(), 0);
+        }
+        else {
+            h_eff_diff_rel ->Fill(_util.cut_dirs_pretty.at(k).c_str(), h_eff_diff->GetBinContent(k+1) - h_eff_diff->GetBinContent(k));
+            h_pur_diff_rel ->Fill(_util.cut_dirs_pretty.at(k).c_str(), h_pur_diff->GetBinContent(k+1) - h_pur_diff->GetBinContent(k));
+        }
+        
+        // Now set the bin error
+        double err1 = h_eff_diff_clone->GetBinError(k+1);
+        double err2 = h_eff_diff_clone->GetBinError(k);
+        double tot_err = std::sqrt(err1*err1 + err2*err2);
+        h_eff_diff_rel->SetBinError(k, tot_err);
+
+        h_pur_diff_rel->SetBinError(k+1, 0);
+    }
+
+    h_eff_diff_rel->SetStats(kFALSE);
+    h_eff_diff_rel->SetMarkerStyle(20);
+    h_eff_diff_rel->SetMarkerSize(0.5);
+    h_eff_diff_rel->SetLineWidth(2);
+    h_eff_diff_rel->GetYaxis()->SetTitle("Rel. Difference (Run 1 - Run 3) \%");
+    // h_eff_diff_rel->Scale(100);
+    h_eff_diff_rel->GetYaxis()->SetRangeUser(-3, 3);
+
+    h_eff_diff_rel->GetXaxis()->SetLabelFont(62);
+    h_eff_diff_rel->GetXaxis()->SetLabelSize(0.03);
+
+    h_pur_diff_rel->SetLineColor(kRed+2);
+    h_pur_diff_rel->SetStats(kFALSE);
+    h_pur_diff_rel->SetMarkerStyle(20);
+    h_pur_diff_rel->SetMarkerSize(0.5);
+    h_pur_diff_rel->SetLineWidth(2);
+    // h_pur_diff_rel->Scale(100);
+
+    TH1D* h_eff_diff_rel_clone = (TH1D*) h_eff_diff_rel->Clone();
+
+    for (int bin = 1; bin < h_eff_diff->GetNbinsX()+1; bin++){
+        h_eff_diff_rel->SetBinError(bin, 0.0);
+    }
+
+    TCanvas *c3 = new TCanvas("c3", "c3", 600, 500);
+    c3->SetGridy();
+    c3->SetBottomMargin(0.12);
+    h_eff_diff_rel->Draw("LP");
+    h_pur_diff_rel->Draw("LP, same");
+    h_eff_diff_rel_clone->Draw("E, X0, same");
+
+    // Draw vertical lines to help the eye
+    for (unsigned int l=1; l < _util.k_cuts_MAX+1; l++){
+        line  = new TLine( h_eff_run1->GetBinCenter(l) ,   -3 , h_eff_run1->GetBinCenter(l)  ,  3);
+        line->SetLineColor(12);
+        line->SetLineStyle(kDotted);
+        line->Draw();
+    }
+
+    leg_stack2->Draw();
+
+    c3->Print("plots/efficiency_run1_run3_comparison_reldiff.pdf");
+
+
+
+}
 // -----------------------------------------------------------------------------
+void UtilityPlotter::PopulateEff(TH1D* h_eff, TH1D *h_pur, TH1D* h_eff_clone, const char* input_file){
+
+    TTree *mc_tree;
+
+    TFile *f;
+
+    // The uglyest hardcoded monstosity known to the universe. SORT this out KRISH...
+    f = TFile::Open(input_file);
+
+    std::vector<double> efficiency_v; // efficiency vector
+    std::vector<double> eff_err_v; // efficiency error vector
+    std::vector<double> purity_v    ; // purity vector
+
+    double efficiency, purity, eff_err;
+
+    _util.GetTree(f, mc_tree, "mc_eff_tree");
+    mc_tree->SetBranchAddress("efficiency", &efficiency);
+    mc_tree->SetBranchAddress("purity",     &purity);
+    mc_tree->SetBranchAddress("eff_err",    &eff_err);
+
+    int num_entries = mc_tree->GetEntries();
+
+    // Fill the efficiency and purity vectors
+    for (int y=0; y < num_entries; y++){
+        mc_tree->GetEntry(y); 
+        efficiency_v.push_back(efficiency);
+        purity_v.push_back(purity);
+        eff_err_v.push_back(eff_err);
+    }
+
+    for (unsigned int k=0; k < efficiency_v.size();k++){
+        if (k == 0 || k == 1) {
+            h_eff ->Fill(_util.cut_dirs_pretty.at(k).c_str(), 1.0); // We need to put these back to 1 (becasue of the way we define things after slice id)
+            h_eff_clone->Fill(_util.cut_dirs_pretty.at(k).c_str(), 1.0);
+        }
+        else {
+            h_eff ->Fill(_util.cut_dirs_pretty.at(k).c_str(), efficiency_v.at(k));
+            h_eff_clone->Fill(_util.cut_dirs_pretty.at(k).c_str(), efficiency_v.at(k));
+        }
+        
+        h_pur ->Fill(_util.cut_dirs_pretty.at(k).c_str(), purity_v.at(k));
+        
+        h_eff->SetBinError(k+1, 0);
+        h_pur->SetBinError(k+1, 0);
+        h_eff_clone->SetBinError(k+1, eff_err_v.at(k));
+    }
+
+    h_eff->GetYaxis()->SetRangeUser(0, 1.1);
+    h_eff->SetStats(kFALSE);
+    h_eff->SetMarkerStyle(20);
+    h_eff->SetMarkerSize(0.5);
+    h_eff->SetLineWidth(2);
+    h_eff->GetXaxis()->SetTitleSize(0.05);
+    h_eff->GetYaxis()->SetLabelSize(0.05);
+    h_eff->GetYaxis()->SetTitleSize(0.05);
+    h_eff->GetXaxis()->SetLabelFont(62);
+    h_eff->GetXaxis()->SetLabelSize(0.03);
+    h_eff_clone->SetLineWidth(2);
+
+    h_pur->SetLineColor(kRed+2);
+    h_pur->SetStats(kFALSE);
+    h_pur->SetMarkerStyle(20);
+    h_pur->SetMarkerSize(0.5);
+    h_pur->SetLineWidth(2);
+
+
+}
 // -----------------------------------------------------------------------------
