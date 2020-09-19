@@ -90,6 +90,9 @@ class UtilityPlotter{
     // Function to save a few 2D histograms
     void Save2DHists(const char* printname, TH2D* hist);
     // -------------------------------------------------------------------------
+    // Column Normalise 2D histogram
+    void ColumnNorm(TH2D* hist);
+    // -------------------------------------------------------------------------
     // Study the ppfx weights for each event classification
     void StudyPPFXWeights();
     // -------------------------------------------------------------------------

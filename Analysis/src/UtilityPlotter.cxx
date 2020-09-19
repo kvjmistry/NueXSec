@@ -794,6 +794,11 @@ void UtilityPlotter::PlotTrueVar(){
 
     delete c;
 
+    ColumnNorm(h_shr_multi_nue_E);
+    ColumnNorm(h_shr_multi_elec_e);
+    ColumnNorm(h_shr_multi_nuebar_E);
+    ColumnNorm(h_shr_multi_elec_e_nuebar);
+
 
     h_shr_multi_nue_E->GetXaxis()->CenterLabels();
     h_shr_multi_elec_e->GetXaxis()->CenterLabels();
@@ -888,6 +893,27 @@ void UtilityPlotter::Save2DHists(const char* printname, TH2D* hist){
     delete c;
 
 }
+// -----------------------------------------------------------------------------
+void UtilityPlotter::ColumnNorm(TH2D* hist){
+
+    // Loop over rows
+    for (int row=1; row<hist->GetXaxis()->GetNbins()+1; row++) {
+        double integral = 0;
+
+        // Loop over columns and get the integral
+        for (int col=1; col<hist->GetYaxis()->GetNbins()+1; col++){
+            integral+=hist->GetBinContent(row, col);            
+        }
+
+        // Now normalise the column entries by the integral
+        for (int col=1; col<hist->GetYaxis()->GetNbins()+1; col++){
+            hist->SetBinContent(row,col, hist->GetBinContent(row, col)/ integral );
+            
+        }
+    } 
+
+}
+
 // -----------------------------------------------------------------------------
 void UtilityPlotter::StudyPPFXWeights(){
 
