@@ -593,7 +593,7 @@ void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
 
     // Try scaling the pi0 -- need to implement this as a configurable option
     // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
-    GetPiZeroWeight(weight, 1, SC);
+    GetPiZeroWeight(weight, _util.pi0_correction , SC);
     
     // *************************************************************************
     // Calculate the reconstructed neutrino energy

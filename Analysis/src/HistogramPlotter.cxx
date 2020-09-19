@@ -73,8 +73,8 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_true_elec_E", false);
         MakeEfficiencyPlotByCut("h_true_elec_E_rebin", true);
         MakeEfficiencyPlotByCut("h_true_nu_E_single_bin", true);
-        MakeEfficiencyPlotByCut("h_true_nu_E_nue", false);
-        MakeEfficiencyPlotByCut("h_true_nu_E_nuebar", false);
+        MakeEfficiencyPlotByCut("h_true_nu_E_nue", true);
+        MakeEfficiencyPlotByCut("h_true_nu_E_nuebar", true);
         MakeEfficiencyPlotByCut("h_true_nu_E_nue_single_bin", true);
         MakeEfficiencyPlotByCut("h_true_nu_E_nuebar_single_bin", true);
 

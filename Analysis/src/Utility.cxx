@@ -84,25 +84,25 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         // GENIE Tune Weight Settings
         if (strcmp(arg, "--weight_tune") == 0){
             std::cout << "Running with GENIE Tune mode: " << argv[i+1] << std::endl;
-            weight_tune = atoi(argv[i+1]);
+            _weight_tune = atoi(argv[i+1]);
         }
         
         // PPFX CV Weight Settings
         if (strcmp(arg, "--weight_ppfx") == 0){
             std::cout << "Running with PPFX CV mode: " << argv[i+1] << std::endl;
-            weight_ppfx = atoi(argv[i+1]);
+            _weight_ppfx = atoi(argv[i+1]);
         }
 
         // Dirt Weight Settings
         if (strcmp(arg, "--weight_dirt") == 0){
             std::cout << "Running with Dirt mode: " << argv[i+1] << std::endl;
-            weight_dirt = atoi(argv[i+1]);
+            _weight_dirt = atoi(argv[i+1]);
         }
 
         // EXT Weight Settings
         if (strcmp(arg, "--weight_ext") == 0){
             std::cout << "Running with EXT mode: " << argv[i+1] << std::endl;
-            weight_ext = atoi(argv[i+1]);
+            _weight_ext = atoi(argv[i+1]);
         }
 
         // pi0 Weight Settings

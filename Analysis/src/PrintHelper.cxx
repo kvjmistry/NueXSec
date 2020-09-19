@@ -304,6 +304,11 @@ void PrintHelper::PrintResults(){
         if (_util.print_mc){
             printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Candidate Nue", sum_mc_dirt_ext, double(sum_mc_dirt_ext         * mc_scale_factor  ));
         }
+
+        if (_util.print_mc){
+            double tot_MC = count_nue_cc + count_nuebar_cc + count_nu_out_fv + count_cosmic + count_numu_cc + count_numu_cc_pi0 + count_nc + count_nc_pi0 + count_cosmic_nue + count_cosmic_nuebar;
+            printf ("\n %-20s: %-10.2f %-10.2f\n", "Total MC Events", tot_MC , double(tot_MC         * mc_scale_factor  ));
+        }
   
         if (_util.print_mc){
             std::cout << "\n----------- Neutrinos in FV Truth -------------" << std::endl;
@@ -311,7 +316,7 @@ void PrintHelper::PrintResults(){
             printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC Res",   count_nue_cc_res*mc_scale_factor, "Nuebar CC Res",   count_nuebar_cc_res*mc_scale_factor);
             printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC DIS",   count_nue_cc_dis*mc_scale_factor, "Nuebar CC DIS",   count_nuebar_cc_dis*mc_scale_factor);
             printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC COH",   count_nue_cc_coh*mc_scale_factor, "Nuebar CC COH",   count_nuebar_cc_coh*mc_scale_factor);
-            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC MEC",   count_nue_cc_mec*mc_scale_factor, "Nuebar CC MEC",   count_nuebar_cc_mec);
+            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC MEC",   count_nue_cc_mec*mc_scale_factor, "Nuebar CC MEC",   count_nuebar_cc_mec*mc_scale_factor);
             std::cout << std::endl;
             printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Numu CC QE",    count_numu_cc_qe*mc_scale_factor,  "Numubar CC QE",    count_numubar_cc_qe*mc_scale_factor);
             printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Numu CC Res",   count_numu_cc_res*mc_scale_factor, "Numubar CC Res",   count_numubar_cc_res*mc_scale_factor);
