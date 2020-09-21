@@ -589,11 +589,11 @@ void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     // Get the CV weight
     // *************************************************************************
     double weight = 1.0;
-    weight = GetCVWeight(type, SC);
+    weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e);
 
     // Try scaling the pi0 -- need to implement this as a configurable option
     // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
-    GetPiZeroWeight(weight, _util.pi0_correction , SC);
+    _util.GetPiZeroWeight(weight, _util.pi0_correction, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
     
     // *************************************************************************
     // Calculate the reconstructed neutrino energy
@@ -636,44 +636,6 @@ void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     // *************************************************************************
     bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
     _util.Tabulate(is_in_fv, interaction, classification.first, pi0_classification, type, counter_v.at(cut_index), weight );
-
-}
-// -----------------------------------------------------------------------------
-double Selection::GetCVWeight(int type, SliceContainer SC){
-    
-
-    // Always give weights of 1 to the data
-    if (type == _util.k_data ) return 1.0;
-
-    // Run 1 and ext, correct by 2%
-    if (type == _util.k_ext && std::string(_util.run_period) == "1" && _util.weight_ext) return 0.98;
-
-    // Run 3 and ext, correct by 5%
-    if (type == _util.k_ext && std::string(_util.run_period) == "3" && _util.weight_ext) return 0.95;
-
-    double weight = 1.0;
-
-    // Get the tune weight
-    if (_util.weight_tune) weight = SC.weightSplineTimesTune;
-    
-    // Catch infinate/nan/unreasonably large tune weights
-    _util.CheckWeight(weight);
-
-    // Get the PPFX CV flux correction weight
-    double weight_flux = 1.0;
-    if (_util.weight_ppfx) weight_flux = SC.ppfx_cv;
-
-    _util.CheckWeight(weight_flux);
-
-    if (_util.weight_ppfx) weight = weight * weight_flux;
-
-    // For the dirt we correct it by 65%
-    if (type == _util.k_dirt && _util.weight_dirt) weight = weight*0.45;
-
-    // Weight the below threshold events to zero. Current threhsold is 125 MeV
-    if (type == _util.k_mc && SC.nu_e <= 0.125) weight = 0.0;
-
-    return weight;
 
 }
 // -----------------------------------------------------------------------------
@@ -723,57 +685,22 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
     if(!pass) return; // Failed the cut!
 
     // Get the Central Value weight
-    double weight = GetCVWeight(type, SC);
+    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e);
 
     double weight_norm = weight;
     double weight_Escale = weight;
 
     // Try scaling the pi0
     // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
-    GetPiZeroWeight(weight, 0, SC);
-    GetPiZeroWeight(weight_norm, 1, SC);
-    GetPiZeroWeight(weight_Escale, 2, SC);
+    _util.GetPiZeroWeight(weight,        0, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
+    _util.GetPiZeroWeight(weight_norm,   1, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
+    _util.GetPiZeroWeight(weight_Escale, 2, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
 
     // Now Fill the histograms
     if (!_util.slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight, 0);
     if (!_util.slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight_norm, 1);
     if (!_util.slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight_Escale, 2);
 
-
-}
-// -----------------------------------------------------------------------------
-void Selection::GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer &SC){
-
-    // Dont weight the nuecc events
-    if ( (SC.nu_pdg == 12 || SC.nu_pdg == -12) && SC.ccnc == _util.k_CC) return;
-
-
-    // Fix the normalisation
-    if (pizero_mode == 1){
-        
-        if (SC.npi0 > 0) {
-            weight = weight * 0.759;
-        }
-
-    }
-    // Try energy dependent scaling for pi0
-    else if (pizero_mode == 2){
-        
-        if (SC.npi0 > 0) {
-            double pi0emax = 0.6;
-            if (SC.pi0_e > 0.1 && SC.pi0_e < pi0emax){
-                weight = weight * (1 - 0.4 * SC.pi0_e);
-            }
-            else if (SC.pi0_e > 0.1 && SC.pi0_e >= pi0emax){
-                weight = weight * (1 - 0.4 * pi0emax);
-            }
-            
-        }
-    }
-    else {
-        // Dont touch the weight
-    }
-    
 
 }
 // -----------------------------------------------------------------------------
@@ -841,10 +768,10 @@ void Selection::ApplyNuMuSelection(int type, SliceContainer &SC){
     if(!pass) return; // Failed the cut!
 
     // Get the Central Value weight
-    double weight = GetCVWeight(type, SC);
+    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e);
     
     // Also apply the pi0 weight
-    GetPiZeroWeight(weight, 2, SC);
+    _util.GetPiZeroWeight(weight, _util.pi0_correction, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
 
     if (!_util.slim) _hhelper.at(type).FillNuMuHists(classification.second, SC, weight);
 

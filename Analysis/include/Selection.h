@@ -113,14 +113,8 @@ namespace xsecSelection {
             // Function to implement counters and fillings of histograms for each cut
             void SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, std::string pi0_classification, std::pair<std::string, int> par_type, int cut_index, std::vector<std::vector<double>> &counter_v);
             // -----------------------------------------------------------------
-            // Get the CV weights for histograms
-            double GetCVWeight(int type, SliceContainer SC);
-            // -----------------------------------------------------------------
             // Apply the pi0 selection cuts
             void ApplyPiZeroSelection(int type, SliceContainer &SC);
-            // -----------------------------------------------------------------
-            // Get the Pi) correction weight
-            void GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer &SC);
             // -----------------------------------------------------------------
             // Apply a NuMu Selection
             void ApplyNuMuSelection(int type, SliceContainer &SC);

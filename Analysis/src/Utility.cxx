@@ -170,6 +170,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             std::cout << "Using Cross-Section code with mode: " << argv[i+1] << std::endl;
             xsecmode = argv[i+1];
             xsec_labels = argv[i+2];
+            xsec_rw_mode = argv[i+3];
         }
 
         // Utility Plotter
@@ -452,6 +453,79 @@ void Utility::CheckWeight(float &weight){
 
 }
 // -----------------------------------------------------------------------------
+double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e){
+
+    // Always give weights of 1 to the data
+    if (type == k_data ) return 1.0;
+
+    // Run 1 and ext, correct by 2%
+    if (type == k_ext && std::string(run_period) == "1" && weight_ext) return 0.98;
+
+    // Run 3 and ext, correct by 5%
+    if (type == k_ext && std::string(run_period) == "3" && weight_ext) return 0.95;
+
+    double weight = 1.0;
+
+    // Get the tune weight
+    if (weight_tune) weight = weightSplineTimesTune;
+    
+    // Catch infinate/nan/unreasonably large tune weights
+    CheckWeight(weight);
+
+    // Get the PPFX CV flux correction weight
+    double weight_flux = 1.0;
+    if (weight_ppfx) weight_flux = ppfx_cv;
+
+    CheckWeight(weight_flux);
+
+    if (weight_ppfx) weight = weight * weight_flux;
+
+    // For the dirt we correct it by 65%
+    if (type == k_dirt && weight_dirt) weight = weight*0.45;
+
+    // Weight the below threshold events to zero. Current threhsold is 125 MeV
+    if (type == k_mc && nu_e <= 0.125) weight = 0.0;
+
+    return weight;
+
+}
+// -----------------------------------------------------------------------------
+void Utility::GetPiZeroWeight(double &weight, int pizero_mode, int nu_pdg, int ccnc, int npi0, double pi0_e){
+
+    // Dont weight the nuecc events
+    if ( (nu_pdg == 12 || nu_pdg == -12) && ccnc == k_CC) return;
+
+
+    // Fix the normalisation
+    if (pizero_mode == 1){
+        
+        if (npi0 > 0) {
+            weight = weight * 0.759;
+        }
+
+    }
+    // Try energy dependent scaling for pi0
+    else if (pizero_mode == 2){
+        
+        if (npi0 > 0) {
+            double pi0emax = 0.6;
+            if (pi0_e > 0.1 && pi0_e < pi0emax){
+                weight = weight * (1 - 0.4 * pi0_e);
+            }
+            else if (pi0_e > 0.1 && pi0_e >= pi0emax){
+                weight = weight * (1 - 0.4 * pi0emax);
+            }
+            
+        }
+    }
+    else {
+        // Dont touch the weight
+    }
+    
+
+}
+// -----------------------------------------------------------------------------
+
 bool Utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     d = (TDirectory*)f->Get(string);
     if (d == NULL) {

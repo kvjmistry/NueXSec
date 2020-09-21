@@ -72,6 +72,12 @@ public:
     // Check whether a weight has a suitable value
     void CheckWeight(float &weight);
     // -------------------------------------------------------------------------
+    // Get the CV weight correction
+    double GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e);
+    // -------------------------------------------------------------------------
+    // Get the pi0 weight correction
+    void GetPiZeroWeight(double &weight, int pizero_mode, int nu_pdg, int ccnc, int npi0, double pi0_e);
+    // -------------------------------------------------------------------------
     // Create another directory in the plots folder
     void CreateDirectory(std::string folder);
     // -------------------------------------------------------------------------
@@ -146,6 +152,7 @@ public:
     char * run_period            = (char *)"empty";
     char * sysmode               = (char *)"default";
     char * xsecmode              = (char *)"default";
+    char * xsec_rw_mode          = (char *)"default"; // choose whether to reweight by cut or the final selection
     char * xsec_labels           = (char *)"all";
     char * uplotmode             = (char *)"default";
     int num_events{-1};

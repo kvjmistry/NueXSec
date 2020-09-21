@@ -2,6 +2,8 @@
 #define CROSSSECTIONHELPER_H
 
 #include "Utility.h"
+#include "SliceContainer.h"
+#include "SelectionCuts.h"
 
 // Class for calculating the cross section and doing systematics
 class CrossSectionHelper{
@@ -276,6 +278,19 @@ class CrossSectionHelper{
     // Function to loop over events and calculate the cross section
     void LoopEvents(); 
     // -------------------------------------------------------------------------
+    // Loop over events from initial tree and reweight them to get the sys uncertainty
+    // by cut type for a number of variables
+    void LoopEventsbyCut();
+    // -------------------------------------------------------------------------
+    // Apply the selection cuts -- so we can reweight events at differnt points in the selection
+    bool ApplyCuts(int type, SliceContainer &SC, SelectionCuts _scuts);
+    // -------------------------------------------------------------------------
+    // Fill histograms for each variable for all universes
+    void FillHistos(int type, SliceContainer &SC, std::pair<std::string, int> classification, int cut_index);
+    // -------------------------------------------------------------------------
+    // Set the weight for universe i depending on the variation 
+    void SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double &weight_ext,  double _weightSplineTimesTune, std::string _classification, double cv_weight, int uni);
+    // -------------------------------------------------------------------------
     // Function to calculate the cross section
     double CalcCrossSec(double sel, double gen, double sig, double bkg, double flux, double ext, double dirt, double targ);
     // -------------------------------------------------------------------------
@@ -297,6 +312,9 @@ class CrossSectionHelper{
     // -------------------------------------------------------------------------
     // Function will set the reweight vector to the corresponding label per event
     void SwitchReweighterLabel(std::string label);
+    // -------------------------------------------------------------------------
+    // Override the above functio, but use the slice container class that has been initialised
+    void SwitchReweighterLabel(std::string label, SliceContainer &SC);
     // -------------------------------------------------------------------------
     // Initialise the histograms for this class
     void InitialiseHistograms(std::string run_mode);

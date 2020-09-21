@@ -85,6 +85,12 @@ void CrossSectionHelper::Initialise(Utility _utility){
     // Create and initialise vector of histograms
     InitialiseHistograms(std::string(_util.xsecmode));
 
+    // Reweight the events by cut to get the sys uncertainty for certain plots in the selection
+    // do this rather than reweight events at the end of the selection
+    if (std::string(_util.xsec_rw_mode) == "rw_cuts"){
+        LoopEventsbyCut();
+        return;
+    }
 
     // Now loop over events and caluclate the cross section
     LoopEvents();
@@ -131,64 +137,8 @@ void CrossSectionHelper::LoopEvents(){
                 // Update the CV weight to CV * universe i
                 double weight_uni{1.0}; 
 
-                // Weight equal to universe weight times cv weight
-                if (reweighter_labels.at(label) == "weightsReint" || reweighter_labels.at(label) == "weightsPPFX" || reweighter_labels.at(label) == "CV" ){
-                    
-                    _util.CheckWeight(vec_universes.at(uni));
-
-                    weight_uni = cv_weight * vec_universes.at(uni);
-                }
-                // This is a mc stats variation which studies the statisitcal uncertainty on the smearing matrix and efficiency by 
-                // varying the signal and generated events
-                // dont touch the cosmic contaiminated nues, dont know the expected behaviour for this
-                else if (reweighter_labels.at(label) == "MCStats"){
-                    
-                    // Weight the Signal events that factor into the smearing matrix
-                    if (*classification == "nue_cc" || *classification == "nuebar_cc" || *classification == "unmatched_nue" || *classification == "unmatched_nuebar"){
-                        weight_uni = cv_weight * PoissonRandomNumber(uni);
-                    }
-                    else weight_uni = cv_weight;
-                    
-                }
-                // This is a beamline variation
-                else if (CheckBeamline(reweighter_labels.at(label))){
-                    weight_uni = cv_weight * GetIntegratedFlux(0, "", "", reweighter_labels.at(label));
-                    // std::cout << GetIntegratedFlux(0, "", "", reweighter_labels.at(label)) << std::endl;
-                }
-                // Dirt reweighting
-                else if ( reweighter_labels.at(label) == "Dirtup" || reweighter_labels.at(label) == "Dirtdn"){
-                    if (reweighter_labels.at(label) == "Dirtup") weight_dirt = cv_weight*2.0; // increase the dirt by 100%
-                    else weight_dirt = cv_weight*0.0; // decrease the dirt by 100%
-                    weight_uni = cv_weight;
-                }
-                // POT Counting
-                else if ( reweighter_labels.at(label) == "POTup" || reweighter_labels.at(label) == "POTdn"){
-                    weight_uni  = cv_weight;
-                    weight_dirt = cv_weight;
-                }
-                // If we are using the genie systematics and unisim systematics then we want to undo the genie tune on them so we dont double count
-                else {
-                    // Note we actually dont want to divide out by the spline, but since this is 1 in numi, it doesnt matter!
-                    // We do this because the interaction systematics are shifted about the genie tune as the CV
-
-                    // Check the spline times tune weight
-                    _util.CheckWeight(weightSplineTimesTune);
-
-                    // Check the uiverse weight
-                    if (std::isnan(vec_universes.at(uni)) == 1 || std::isinf(vec_universes.at(uni)) || vec_universes.at(uni) < 0 || vec_universes.at(uni) > 30) {
-                        
-                        // We set the universe to be the spline times tune, so it cancels with the divide below to just return the CV weight
-                        // i.e. a universe weight of 1
-                        vec_universes.at(uni)   = weightSplineTimesTune;
-                    }
-
-                    if (weightSplineTimesTune == 0) weight_uni = 0.0; // Special case where the genie tune or we have thresholded events are zero
-                    else weight_uni = (cv_weight * vec_universes.at(uni)) / weightSplineTimesTune;
-
-                    // std::cout << vec_universes.at(uni) << " " << weight_uni << "   "<< weightSplineTimesTune<< std::endl;
-
-                }
-
+                // Set the weight for universe i
+                SetUniverseWeight(reweighter_labels.at(label), weight_uni, weight_dirt, weight_ext, weightSplineTimesTune, *classification, cv_weight, uni);
 
                 // Signal event
                 if ((*classification == "nue_cc" || *classification == "nuebar_cc" || *classification == "unmatched_nue" || *classification == "unmatched_nuebar") && gen == false) {
@@ -348,6 +298,269 @@ void CrossSectionHelper::LoopEvents(){
     // Write the histograms to file for inspection
     WriteHists();
 
+
+}
+// -----------------------------------------------------------------------------
+void CrossSectionHelper::LoopEventsbyCut(){
+
+    // Create the class instances we need
+    SelectionCuts  _scuts;
+    _scuts.Initalise(_util);
+    
+    SliceContainer SC;
+
+    // Load in the TFile
+    TFile *f_mc;
+    TFile *f_flux_weights = TFile::Open("Systematics/f_flux_CV_weights_fhc.root", "READ");
+    
+    _util.GetFile(f_mc, _util.mc_file_name); // We need the MC file as an input argument
+
+    // Initialise the TTree and Slice Container class
+    TTree *mc_tree;
+    _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
+    SC.Initialise(mc_tree, _util.k_mc, f_flux_weights, _util);
+
+    int mc_tree_total_entries = mc_tree->GetEntries();
+
+    // Event loop
+    for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
+
+        // See if we want to process all the events
+        if (_util.num_events > 0){
+            if (ievent >= _util.num_events) break;
+        }
+
+        // Alert the user
+        if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
+
+        // Get the entry in the tree
+        mc_tree->GetEntry(ievent); 
+
+        // Apply the selection cuts and fill histograms for each universe
+        ApplyCuts(_util.k_mc, SC, _scuts);
+
+    }
+
+    // Create the direcotry structure in the output file if it doesnt already exist and then write the histograms to file
+
+}
+// -----------------------------------------------------------------------------
+bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _scuts){
+
+    bool pass = true;
+
+    // Classify the event
+    std::pair<std::string, int> classification = SC.SliceClassifier(type);      // Classification of the event
+
+    // *************************************************************************
+    // Unselected---------------------------------------------------------------
+    // *************************************************************************
+    FillHistos(type, SC, classification, _util.k_unselected );
+    
+    // *************************************************************************
+    // Software Trigger -- MC Only  --------------------------------------------
+    // *************************************************************************
+    pass = _scuts.swtrig(SC, type);
+    if(!pass) return false; // Failed the cut!
+    
+    FillHistos(type, SC, classification, _util.k_swtrig );
+
+    // *************************************************************************
+    // Slice ID ----------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.slice_id(SC);
+    if(!pass) return false; // Failed the cut!
+    
+    FillHistos(type, SC, classification, _util.k_slice_id );
+    
+    // *************************************************************************
+    // Electron Candidate ------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.e_candidate(SC);
+    if(!pass) return false; // Failed the cut!
+    
+    FillHistos(type, SC, classification, _util.k_e_candidate );
+
+    // *************************************************************************
+    // In FV -------------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.in_fv(SC);
+    if(!pass) return false; // Failed the cut!
+    
+    FillHistos(type, SC, classification, _util.k_in_fv );
+    
+    // *************************************************************************
+    // Slice Contained Fraction ------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.contained_frac(SC);
+    if(!pass) return false; // Failed the cut!
+    
+    FillHistos(type, SC, classification, _util.k_contained_frac );
+
+    // *************************************************************************
+    // Topological Score -------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.topo_score(SC);
+    if(!pass) return false; // Failed the cut!
+    
+    FillHistos(type, SC, classification, _util.k_topo_score );
+
+    // *************************************************************************
+    // Cosmic Impact Parameter -------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.shr_cosmic_IP(SC);
+    if(!pass) return false; // Failed the cut!
+    
+    FillHistos(type, SC, classification, _util.k_cosmic_ip );
+
+    // *************************************************************************
+    // Shower Score ------------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.shower_score(SC);
+    if(!pass) return false; // Failed the cut!
+    
+    FillHistos(type, SC, classification, _util.k_shower_score );
+
+    // *************************************************************************
+    // Shower Hit Ratio  -------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.shr_hitratio(SC);
+    if(!pass) return false; // Failed the cut!
+    
+    FillHistos(type, SC, classification, _util.k_hit_ratio );
+
+    // *************************************************************************
+    // Shower Moliere Average --------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.shr_moliere_avg(SC);
+    if(!pass) return false; // Failed the cut!
+    
+    FillHistos(type, SC, classification, _util.k_shr_moliere_avg );
+
+    // *************************************************************************
+    // 2D cut for Shower to Vertex Distance and dEdx ---------------------------
+    // *************************************************************************
+    pass = _scuts.shr_dist_dEdx_max(SC);
+    if(!pass) return false; // Failed the cut!
+    
+    FillHistos(type, SC, classification, _util.k_vtx_dist_dedx );
+
+    // *************************************************************************
+    // dEdx in all planes for 0 track events -----------------------------------
+    // *************************************************************************
+    pass = _scuts.dEdx_max_no_tracks(SC);
+    if(!pass) return false; // Failed the cut!
+    
+    FillHistos(type, SC, classification, _util.k_dEdx_max_no_tracks );
+
+    // **************************************************************************
+    return true;
+
+}
+// -----------------------------------------------------------------------------
+void CrossSectionHelper::FillHistos(int type, SliceContainer &SC, std::pair<std::string, int> classification, int cut_index){
+
+    // Loop over the reweighter labels
+    for (unsigned int label = 0; label < reweighter_labels.size(); label++){
+
+        // Call switch function
+        SwitchReweighterLabel(reweighter_labels.at(label), SC);
+
+        // Get the CV weight
+        double cv_weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e);
+        _util.GetPiZeroWeight(cv_weight, _util.pi0_correction, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
+        
+        double weight_dirt = cv_weight;
+        double weight_ext = cv_weight;
+
+        // This bit of code wont work if the vector size is zero, put this here to catch the error
+        if (vec_universes.size() == 0) {
+            std::cout << "Vector size is zero" <<  std::endl;
+            exit(3);
+        }
+
+        // Now loop over the universes
+        for (unsigned int uni = 0; uni < vec_universes.size(); uni++){
+
+            // Update the CV weight to CV * universe i
+            double weight_uni{1.0}; 
+
+            SetUniverseWeight(reweighter_labels.at(label), weight_uni, weight_dirt, weight_ext, SC.weightSplineTimesTune, classification.first, cv_weight, uni);
+
+            // Now we got the weight for universe i, lets fill the histograms :D
+        
+        
+        
+        
+        }
+
+    }
+
+
+
+}
+// -----------------------------------------------------------------------------
+void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double &weight_ext,  double _weightSplineTimesTune, std::string _classification, double cv_weight, int uni ){
+
+    // Weight equal to universe weight times cv weight
+    if (label == "weightsReint" || label == "weightsPPFX" || label == "CV" ){
+        
+        _util.CheckWeight(vec_universes.at(uni));
+
+        weight_uni = cv_weight * vec_universes.at(uni);
+    }
+    // This is a mc stats variation which studies the statisitcal uncertainty on the smearing matrix and efficiency by 
+    // varying the signal and generated events
+    // dont touch the cosmic contaiminated nues, dont know the expected behaviour for this
+    else if (label == "MCStats"){
+        
+        // Weight the Signal events that factor into the smearing matrix
+        if (_classification == "nue_cc" || _classification == "nuebar_cc" || _classification == "unmatched_nue" || _classification == "unmatched_nuebar" || _classification == "cosmic_nue" || _classification == "cosmic_nuebar"){
+            
+            weight_uni = cv_weight * PoissonRandomNumber(uni);
+        
+        }
+        else weight_uni = cv_weight;
+        
+    }
+    // This is a beamline variation
+    else if (CheckBeamline(label)){
+        weight_uni = cv_weight * GetIntegratedFlux(0, "", "", label);
+        // std::cout << GetIntegratedFlux(0, "", "", label) << std::endl;
+    }
+    // Dirt reweighting
+    else if ( label == "Dirtup" || label == "Dirtdn"){
+        if (label == "Dirtup") weight_dirt = cv_weight*2.0; // increase the dirt by 100%
+        else weight_dirt = cv_weight*0.0; // decrease the dirt by 100%
+        weight_uni = cv_weight;
+    }
+    // POT Counting
+    else if ( label == "POTup" || label == "POTdn"){
+        weight_uni  = cv_weight;
+        weight_dirt = cv_weight;
+    }
+    // If we are using the genie systematics and unisim systematics then we want to undo the genie tune on them so we dont double count
+    else {
+        // Note we actually dont want to divide out by the spline, but since this is 1 in numi, it doesnt matter!
+        // We do this because the interaction systematics are shifted about the genie tune as the CV
+
+        // Check the spline times tune weight
+        _util.CheckWeight(_weightSplineTimesTune);
+
+        // Check the uiverse weight
+        if (std::isnan(vec_universes.at(uni)) == 1 || std::isinf(vec_universes.at(uni)) || vec_universes.at(uni) < 0 || vec_universes.at(uni) > 30) {
+            
+            // We set the universe to be the spline times tune, so it cancels with the divide below to just return the CV weight
+            // i.e. a universe weight of 1
+            vec_universes.at(uni)   = _weightSplineTimesTune;
+        }
+
+        if (_weightSplineTimesTune == 0) weight_uni = 0.0; // Special case where the genie tune or we have thresholded events are zero
+        else weight_uni = (cv_weight * vec_universes.at(uni)) / _weightSplineTimesTune;
+
+        // std::cout << vec_universes.at(uni) << " " << weight_uni << "   "<< weightSplineTimesTune<< std::endl;
+
+    }
 
 }
 // -----------------------------------------------------------------------------
@@ -735,6 +948,110 @@ void CrossSectionHelper::SwitchReweighterLabel(std::string label){
     }
     else if (label == "NormNCCOHdn"){
         vec_universes.push_back(knobNormNCCOHdn);
+    }
+    // This can be the CV or any beamline variation
+    else {
+        vec_universes.push_back(1.0);
+    }
+
+
+}
+// -----------------------------------------------------------------------------
+void CrossSectionHelper::SwitchReweighterLabel(std::string label, SliceContainer &SC){
+
+    // Clear it and go again
+    vec_universes.clear();
+
+    // Genie All
+    if (label == "weightsGenie"){
+        
+        // Convert from unsigned short to double and push back -- divide by 1000 to undo previous *1000
+        for (unsigned int j = 0; j < SC.weightsGenie->size(); j++){
+            vec_universes.push_back( (double) SC.weightsGenie->at(j)/1000.0 );
+        }
+
+    }
+    // Geant Reinteractions
+    else if (label == "weightsReint"){
+        
+        // Convert from unsigned short to double and push back -- divide by 1000 to undo previous *1000
+        for (unsigned int j = 0; j < SC.weightsReint->size(); j++){
+            vec_universes.push_back( (double) SC.weightsReint->at(j)/1000.0 );
+        }
+
+    }
+    // PPFX All
+    else if (label == "weightsPPFX"){
+        
+        // Convert from unsigned short to double and push back -- divide by 1000 to undo previous *1000
+        for (unsigned int j = 0; j < SC.weightsPPFX->size(); j++){
+            vec_universes.push_back( (double) SC.weightsPPFX->at(j)/1000.0);
+        }
+
+    }
+    // MC Stats
+    else if (label == "MCStats"){
+        vec_universes.resize(uni_mcstats, 1.0);
+    }
+    else if (label == "RPAup"){
+        vec_universes.push_back(SC.knobRPAup);
+    }
+    else if (label == "CCMECup"){
+        vec_universes.push_back(SC.knobCCMECup);
+    }
+    else if (label == "AxFFCCQEup"){
+        vec_universes.push_back(SC.knobAxFFCCQEup);
+    }
+    else if (label == "VecFFCCQEup"){
+        vec_universes.push_back(SC.knobVecFFCCQEup);
+    }
+    else if (label == "DecayAngMECup"){
+        vec_universes.push_back(SC.knobDecayAngMECup);
+    }
+    else if (label == "ThetaDelta2Npiup"){
+        vec_universes.push_back(SC.knobThetaDelta2Npiup);
+    }
+    else if (label == "ThetaDelta2NRadup"){
+        vec_universes.push_back(SC.knobThetaDelta2NRadup);
+    }
+    else if (label == "RPA_CCQE_Reducedup"){
+        vec_universes.push_back(SC.knobRPA_CCQE_Reducedup);
+    }
+    else if (label == "NormCCCOHup"){
+        vec_universes.push_back(SC.knobNormCCCOHup);
+    }
+    else if (label == "NormNCCOHup"){
+        vec_universes.push_back(SC.knobNormNCCOHup);
+    }
+    else if (label == "RPAdn"){
+        vec_universes.push_back(SC.knobRPAdn);
+    }
+    else if (label == "CCMECdn"){
+        vec_universes.push_back(SC.knobCCMECdn);
+    }
+    else if (label == "AxFFCCQEdn"){
+        vec_universes.push_back(SC.knobAxFFCCQEdn);
+    }
+    else if (label == "VecFFCCQEdn"){
+        vec_universes.push_back(SC.knobVecFFCCQEdn);
+    }
+    else if (label == "DecayAngMECdn"){
+        vec_universes.push_back(SC.knobDecayAngMECdn);
+    }
+    else if (label == "ThetaDelta2Npidn"){
+        vec_universes.push_back(SC.knobThetaDelta2Npidn);
+    }
+    else if (label == "ThetaDelta2NRaddn"){
+        vec_universes.push_back(SC.knobThetaDelta2NRaddn);
+    }
+    else if (label == "RPA_CCQE_Reduceddn"){
+        vec_universes.push_back(SC.knobRPA_CCQE_Reduceddn);
+    }
+    else if (label == "NormCCCOHdn"){
+        vec_universes.push_back(SC.knobNormCCCOHdn);
+    }
+    else if (label == "NormNCCOHdn"){
+        vec_universes.push_back(SC.knobNormNCCOHdn);
     }
     // This can be the CV or any beamline variation
     else {

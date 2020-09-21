@@ -61,8 +61,12 @@ if [ "$1" == "weight" ]; then
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_weight.root --var dummy weight --xsecmode reweight ppfx
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_weight.root --var dummy weight --xsecmode reweight genie
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_weight.root --var dummy weight --xsecmode reweight reint
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_weight.root --var dummy weight --xsecmode reweight mcstats
 
   ./nuexsec --run 1 --sys reweight
+
+  # for running reweighting by cut
+  #./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_weight.root --var dummy weight --xsecmode reweight unisim rw_cuts --mc ../ntuples/neutrinoselection_filt_run1_overlay_weight.root
 
 fi
 
