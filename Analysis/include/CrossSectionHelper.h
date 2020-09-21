@@ -100,6 +100,9 @@ class CrossSectionHelper{
     // Define histograms for the cross section calculation
     std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_cross_sec; // Label -- Universe -- variable -- xsec_type
 
+    // Define histograms for the reweighting by cut
+    std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_cut_v; // Label -- Cut -- variable -- Universe
+
     // enum for histogram vars
     enum TH1D_xsec_hist_vars {
         k_xsec_sel,     // Selected event histogram binned in energy
@@ -115,13 +118,59 @@ class CrossSectionHelper{
         k_TH1D_xsec_MAX
     };
 
+    // Variables to get the systematic uncertainty by cut for
+    enum TH1D_cut_vars {
+        k_cut_swtrig,
+        k_cut_nslice,
+        k_cut_n_showers,
+        k_cut_n_tracks,
+        k_cut_topological_score,
+        k_cut_reco_nu_vtx_sce_x,
+        k_cut_reco_nu_vtx_sce_y,
+        k_cut_reco_nu_vtx_sce_z,
+        k_cut_shr_score,
+        k_cut_shr_dedx_max_tracks,
+        k_cut_shr_dedx_max_no_tracks,
+        k_cut_shr_distance,
+        k_cut_hits_ratio,
+        k_cut_CosmicIPAll3D,
+        k_cut_contained_fraction,
+        k_cut_shrmoliereavg,
+        k_cut_shr_theta,
+        k_cut_shr_phi,
+        k_cut_shr_energy_cali,
+        k_cut_shr_energy_cali_rebin,
+        k_cut_vars_max
+    };
+
+    std::vector<std::string> cut_var_types = {
+        "swtrig",
+        "nslice",
+        "n_showers",
+        "n_tracks",
+        "topological_score",
+        "reco_nu_vtx_sce_x",
+        "reco_nu_vtx_sce_y",
+        "reco_nu_vtx_sce_z",
+        "shr_score",
+        "shr_dedx_max_tracks",
+        "shr_dedx_max_no_tracks",
+        "shr_distance",
+        "hits_ratio",
+        "CosmicIPAll3D",
+        "contained_fraction",
+        "shrmoliereavg",
+        "shr_theta",
+        "shr_phi",
+        "shr_energy_cali",
+        "shr_energy_cali_rebin"
+    };
+
     // enum for histogram vars
     enum TH1D_xsec_var_vars {
         k_var_integrated,     // Integrated X-Section
         k_var_reco_el_E,      // Reconstructed electron energy
         k_var_true_el_E,      // True electron energy
-        // k_var_true_nu_E,      // True neutrino energy
-        // k_var_reco_nu_E,      // Reconstructed neutrino energy
         k_TH1D_xsec_var_MAX
     };
 
@@ -136,16 +185,12 @@ class CrossSectionHelper{
     // std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Cross-Section [10^{-39} cm^{2}]",
     //                                     ";Reco Leading Shower Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
     //                                     ";True Electron Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]"
-    //                                     // ";True #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
-    //                                     // ";Reco #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]"
     //                                     };
     
     // Use these for when we do the flux normalised event rate
     std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",
                                         ";Reco. Leading Shower Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]",
                                         ";True Electron Energy [GeV]; #nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
-                                        // ";True #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
-                                        // ";Reco #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]"
                                         };
     
 
@@ -286,7 +331,7 @@ class CrossSectionHelper{
     bool ApplyCuts(int type, SliceContainer &SC, SelectionCuts _scuts);
     // -------------------------------------------------------------------------
     // Fill histograms for each variable for all universes
-    void FillHistos(int type, SliceContainer &SC, std::pair<std::string, int> classification, int cut_index);
+    void FillCutHists(int type, SliceContainer &SC, std::pair<std::string, int> classification, int cut_index);
     // -------------------------------------------------------------------------
     // Set the weight for universe i depending on the variation 
     void SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double &weight_ext,  double _weightSplineTimesTune, std::string _classification, double cv_weight, int uni);

@@ -342,6 +342,7 @@ void CrossSectionHelper::LoopEventsbyCut(){
     }
 
     // Create the direcotry structure in the output file if it doesnt already exist and then write the histograms to file
+    WriteHists();
 
 }
 // -----------------------------------------------------------------------------
@@ -355,7 +356,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     // *************************************************************************
     // Unselected---------------------------------------------------------------
     // *************************************************************************
-    FillHistos(type, SC, classification, _util.k_unselected );
+    FillCutHists(type, SC, classification, _util.k_unselected );
     
     // *************************************************************************
     // Software Trigger -- MC Only  --------------------------------------------
@@ -363,7 +364,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.swtrig(SC, type);
     if(!pass) return false; // Failed the cut!
     
-    FillHistos(type, SC, classification, _util.k_swtrig );
+    FillCutHists(type, SC, classification, _util.k_swtrig );
 
     // *************************************************************************
     // Slice ID ----------------------------------------------------------------
@@ -371,7 +372,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.slice_id(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillHistos(type, SC, classification, _util.k_slice_id );
+    FillCutHists(type, SC, classification, _util.k_slice_id );
     
     // *************************************************************************
     // Electron Candidate ------------------------------------------------------
@@ -379,7 +380,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.e_candidate(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillHistos(type, SC, classification, _util.k_e_candidate );
+    FillCutHists(type, SC, classification, _util.k_e_candidate );
 
     // *************************************************************************
     // In FV -------------------------------------------------------------------
@@ -387,7 +388,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.in_fv(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillHistos(type, SC, classification, _util.k_in_fv );
+    FillCutHists(type, SC, classification, _util.k_in_fv );
     
     // *************************************************************************
     // Slice Contained Fraction ------------------------------------------------
@@ -395,7 +396,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.contained_frac(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillHistos(type, SC, classification, _util.k_contained_frac );
+    FillCutHists(type, SC, classification, _util.k_contained_frac );
 
     // *************************************************************************
     // Topological Score -------------------------------------------------------
@@ -403,7 +404,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.topo_score(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillHistos(type, SC, classification, _util.k_topo_score );
+    FillCutHists(type, SC, classification, _util.k_topo_score );
 
     // *************************************************************************
     // Cosmic Impact Parameter -------------------------------------------------
@@ -411,7 +412,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.shr_cosmic_IP(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillHistos(type, SC, classification, _util.k_cosmic_ip );
+    FillCutHists(type, SC, classification, _util.k_cosmic_ip );
 
     // *************************************************************************
     // Shower Score ------------------------------------------------------------
@@ -419,7 +420,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.shower_score(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillHistos(type, SC, classification, _util.k_shower_score );
+    FillCutHists(type, SC, classification, _util.k_shower_score );
 
     // *************************************************************************
     // Shower Hit Ratio  -------------------------------------------------------
@@ -427,7 +428,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.shr_hitratio(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillHistos(type, SC, classification, _util.k_hit_ratio );
+    FillCutHists(type, SC, classification, _util.k_hit_ratio );
 
     // *************************************************************************
     // Shower Moliere Average --------------------------------------------------
@@ -435,7 +436,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.shr_moliere_avg(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillHistos(type, SC, classification, _util.k_shr_moliere_avg );
+    FillCutHists(type, SC, classification, _util.k_shr_moliere_avg );
 
     // *************************************************************************
     // 2D cut for Shower to Vertex Distance and dEdx ---------------------------
@@ -443,7 +444,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.shr_dist_dEdx_max(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillHistos(type, SC, classification, _util.k_vtx_dist_dedx );
+    FillCutHists(type, SC, classification, _util.k_vtx_dist_dedx );
 
     // *************************************************************************
     // dEdx in all planes for 0 track events -----------------------------------
@@ -451,14 +452,14 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.dEdx_max_no_tracks(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillHistos(type, SC, classification, _util.k_dEdx_max_no_tracks );
+    FillCutHists(type, SC, classification, _util.k_dEdx_max_no_tracks );
 
     // **************************************************************************
     return true;
 
 }
 // -----------------------------------------------------------------------------
-void CrossSectionHelper::FillHistos(int type, SliceContainer &SC, std::pair<std::string, int> classification, int cut_index){
+void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<std::string, int> classification, int cut_index){
 
     // Loop over the reweighter labels
     for (unsigned int label = 0; label < reweighter_labels.size(); label++){
@@ -487,10 +488,30 @@ void CrossSectionHelper::FillHistos(int type, SliceContainer &SC, std::pair<std:
 
             SetUniverseWeight(reweighter_labels.at(label), weight_uni, weight_dirt, weight_ext, SC.weightSplineTimesTune, classification.first, cv_weight, uni);
 
+
+            double dedx_max = SC.GetdEdxMax();
+
             // Now we got the weight for universe i, lets fill the histograms :D
-        
-        
-        
+            h_cut_v.at(label).at(cut_index).at(k_cut_swtrig).at(uni)                 ->Fill(SC.swtrig,                 weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_nslice).at(uni)                 ->Fill(SC.nslice,                 weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_n_showers).at(uni)              ->Fill(SC.n_showers,              weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_n_tracks).at(uni)               ->Fill(SC.n_tracks,               weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_topological_score).at(uni)      ->Fill(SC.topological_score,      weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_reco_nu_vtx_sce_x).at(uni)      ->Fill(SC.reco_nu_vtx_sce_x,      weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_reco_nu_vtx_sce_y).at(uni)      ->Fill(SC.reco_nu_vtx_sce_y,      weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_reco_nu_vtx_sce_z).at(uni)      ->Fill(SC.reco_nu_vtx_sce_z,      weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_shr_score).at(uni)              ->Fill(SC.shr_score,              weight_uni);
+            if (SC.n_tracks > 0)  h_cut_v.at(label).at(cut_index).at(k_cut_shr_dedx_max_tracks).at(uni)    ->Fill(dedx_max, weight_uni);
+            if (SC.n_tracks == 0) h_cut_v.at(label).at(cut_index).at(k_cut_shr_dedx_max_no_tracks).at(uni) ->Fill(dedx_max, weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_shr_distance).at(uni)           ->Fill(SC.shr_distance,           weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_hits_ratio).at(uni)             ->Fill(SC.hits_ratio,             weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_CosmicIPAll3D).at(uni)          ->Fill(SC.CosmicIPAll3D,          weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_contained_fraction).at(uni)     ->Fill(SC.contained_fraction,     weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_shrmoliereavg).at(uni)          ->Fill(SC.shrmoliereavg,          weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_shr_theta).at(uni)              ->Fill(SC.shr_theta,              weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_shr_phi).at(uni)                ->Fill(SC.shr_phi,                weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_shr_energy_cali).at(uni)        ->Fill(SC.shr_energy_cali,        weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_shr_energy_cali_rebin).at(uni)  ->Fill(SC.shr_energy_cali,        weight_uni);
         
         }
 
@@ -760,46 +781,75 @@ void CrossSectionHelper::WriteHists(){
     // Create subdirectory for each variable
     TDirectory *dir_labels_var[vars.size()];
 
-    // Loop over the labels
-    for (unsigned int label = 0; label < reweighter_labels.size(); label++) {
+    if (std::string(_util.xsec_rw_mode) != "rw_cuts"){
         
-        // See if the directory already exists
-        bool bool_dir = _util.GetDirectory(fnuexsec_out, dir_labels[label], reweighter_labels.at(label).c_str());
-
-        // If it doesnt exist then create it
-        if (!bool_dir) dir_labels[label] = fnuexsec_out->mkdir(reweighter_labels.at(label).c_str());
-
-        // Go into the directory
-        dir_labels[label]->cd();
-
-        // Loop over the universes
-        for (unsigned int uni = 0; uni < h_cross_sec.at(label).size(); uni++ ){
-
-            // Loop over the variables
-            for (unsigned int var = 0; var < h_cross_sec.at(label).at(uni).size(); var ++){
-
-                // See if the directory already exists
-                bool bool_dir = _util.GetDirectory(fnuexsec_out, dir_labels_var[var], Form("%s/%s", reweighter_labels.at(label).c_str(), vars.at(var).c_str()));
-
-                // If it doesnt exist then create it
-                if (!bool_dir) dir_labels_var[var] = dir_labels[label]->mkdir(vars.at(var).c_str());
-
-                // Go into the directory
-                dir_labels_var[var]->cd();
+        // Loop over the labels
+        for (unsigned int label = 0; label < reweighter_labels.size(); label++) {
             
-                // Now write the histograms, 
-                for (unsigned int p = 0; p < h_cross_sec.at(label).at(uni).at(var).size(); p++){
-                    h_cross_sec.at(label).at(uni).at(var).at(p)->SetOption("hist");
-                    h_cross_sec.at(label).at(uni).at(var).at(p)->Write("",TObject::kOverwrite);
-                }
+            // See if the directory already exists
+            bool bool_dir = _util.GetDirectory(fnuexsec_out, dir_labels[label], reweighter_labels.at(label).c_str());
+
+            // If it doesnt exist then create it
+            if (!bool_dir) dir_labels[label] = fnuexsec_out->mkdir(reweighter_labels.at(label).c_str());
+
+            // Go into the directory
+            dir_labels[label]->cd();
+
+            // Loop over the universes
+            for (unsigned int uni = 0; uni < h_cross_sec.at(label).size(); uni++ ){
+
+                // Loop over the variables
+                for (unsigned int var = 0; var < h_cross_sec.at(label).at(uni).size(); var ++){
+
+                    // See if the directory already exists
+                    bool bool_dir = _util.GetDirectory(fnuexsec_out, dir_labels_var[var], Form("%s/%s", reweighter_labels.at(label).c_str(), vars.at(var).c_str()));
+
+                    // If it doesnt exist then create it
+                    if (!bool_dir) dir_labels_var[var] = dir_labels[label]->mkdir(vars.at(var).c_str());
+
+                    // Go into the directory
+                    dir_labels_var[var]->cd();
+                
+                    // Now write the histograms, 
+                    for (unsigned int p = 0; p < h_cross_sec.at(label).at(uni).at(var).size(); p++){
+                        h_cross_sec.at(label).at(uni).at(var).at(p)->SetOption("hist");
+                        h_cross_sec.at(label).at(uni).at(var).at(p)->Write("",TObject::kOverwrite);
+                    }
+                
+                } // End loop over the variables
+
+                fnuexsec_out->cd();    // change current directory to top
             
-            } // End loop over the variables
+            } // End loop over universes
 
             fnuexsec_out->cd();    // change current directory to top
-        
-        } // End loop over universes
 
-        fnuexsec_out->cd();    // change current directory to top
+        }
+    }
+
+    // This is if we want to write the histograms by cut -- stole this cheeky bit of code stucture from Marina, thanks ;) !
+    for (unsigned int label = 0; label < reweighter_labels.size(); label++) {
+        
+        // Loop over the Cuts
+        for (unsigned int cut = 0; cut < h_cut_v.at(label).size(); cut++) {
+
+            // Loop over the variables
+            for (unsigned int var = 0; var < h_cut_v.at(label).at(cut).size(); var++) {
+
+                fnuexsec_out->cd();    // change current directory to top
+
+                if(!fnuexsec_out->GetDirectory(Form("%s/Cuts/%s/%s", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), cut_var_types.at(var).c_str() ))) 
+                    fnuexsec_out->mkdir(Form("%s/Cuts/%s/%s", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), cut_var_types.at(var).c_str() )); // if the directory does not exist, create it
+                
+                fnuexsec_out->cd(Form("%s/Cuts/%s/%s", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), cut_var_types.at(var).c_str() )); // open the directory
+
+                // loop over the universes
+                for (unsigned int uni = 0; uni < h_cut_v.at(label).at(cut).at(var).size(); uni++){
+                    h_cut_v.at(label).at(cut).at(var).at(uni)->SetOption("hist");
+                    h_cut_v.at(label).at(cut).at(var).at(uni)->Write("",TObject::kOverwrite);
+                }
+            }
+        }
 
     }
 
@@ -1175,15 +1225,9 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
     // True electron energy Bin definition
     bins.at(k_var_true_el_E) = _util.reco_shr_bins;
 
-    // True neutrino energy Bin definition
-    // bins.at(k_var_true_nu_E) = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
-
-    // Reconstructed neutrino energy Bin definition
-    // bins.at(k_var_reco_nu_E) = { 0.0, 0.25, 0.56, 0.89, 1.61, 3.37, 5.0};
-
     // Resize to the number of reweighters
     h_cross_sec.resize(reweighter_labels.size());
-
+    
     // Resize each reweighter to their number of universes
     for (unsigned int j=0; j < reweighter_labels.size(); j++){
 
@@ -1287,6 +1331,99 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
     
     } // End loop over the labels
 
+
+    // Now lets create the hostogram vector for the cuts
+
+    // Resize to the number of reweighters
+    h_cut_v.resize(reweighter_labels.size());
+
+    // Resize the cut vec to the number of cuts
+    for (unsigned int label = 0; label < h_cut_v.size(); label++){
+        h_cut_v.at(label).resize(_util.k_cuts_MAX);
+    }
+
+    // reszie to the numner of variables
+    for (unsigned int label = 0; label < h_cut_v.size(); label++){
+        for (unsigned int cut = 0; cut < h_cut_v.at(label).size(); cut++){
+            h_cut_v.at(label).at(cut).resize(k_cut_vars_max);
+        }
+    }
+
+    // Loop over the labels
+    for (unsigned int label = 0; label < h_cut_v.size(); label++){
+        
+        // Loop over the cuts
+        for (unsigned int cut = 0; cut < h_cut_v.at(label).size(); cut++){
+            
+            // Loop over the variables
+            for (unsigned int var=0; var < h_cut_v.at(label).at(cut).size(); var++){
+
+                // Now resize by the universes
+
+                // Specific resizing -- hardcoded and may break in the future
+                if ( reweighter_labels.at(label) == "weightsGenie"){
+                    h_cut_v.at(label).at(cut).at(var).resize(uni_genie);
+                }
+                // Specific resizing -- hardcoded and may break in the future
+                else if ( reweighter_labels.at(label) == "weightsPPFX"){
+                    h_cut_v.at(label).at(cut).at(var).resize(uni_ppfx);
+                }
+                // Specific resizing -- hardcoded and may break in the future
+                else if ( reweighter_labels.at(label) == "weightsReint" ){
+                    h_cut_v.at(label).at(cut).at(var).resize(uni_reint);
+                }
+                // Specific resizing -- hardcoded and may break in the future
+                else if ( reweighter_labels.at(label) == "MCStats" ){
+                    h_cut_v.at(label).at(cut).at(var).resize(uni_mcstats);
+                }
+                // Default size of 1
+                else {
+                    h_cut_v.at(label).at(cut).at(var).resize(1);
+                }
+
+            }
+        }
+    }
+
+
+    // Loop over the labels
+    for (unsigned int label = 0; label < h_cut_v.size(); label++){
+        
+        // Loop over the cuts
+        for (unsigned int cut = 0; cut < h_cut_v.at(label).size(); cut++){
+            
+            // Loop over the universes
+            for (unsigned int uni=0; uni < h_cut_v.at(label).at(cut).at(0).size(); uni++){
+
+                h_cut_v.at(label).at(cut).at(k_cut_swtrig).at(uni)                 = new TH1D(Form("h_cut_swtrig_%s_%s_%i",                 reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 2, 0, 2);
+                h_cut_v.at(label).at(cut).at(k_cut_nslice).at(uni)                 = new TH1D(Form("h_cut_nslice_%s_%s_%i",                 reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 2, 0, 2);
+                h_cut_v.at(label).at(cut).at(k_cut_n_showers).at(uni)              = new TH1D(Form("h_cut_n_showers_%s_%s_%i",              reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 6, 0, 6);
+                h_cut_v.at(label).at(cut).at(k_cut_n_tracks).at(uni)               = new TH1D(Form("h_cut_n_tracks_%s_%s_%i",               reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 6, 0, 6);
+                h_cut_v.at(label).at(cut).at(k_cut_topological_score).at(uni)      = new TH1D(Form("h_cut_topological_score_%s_%s_%i",      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, 0, 1);
+                h_cut_v.at(label).at(cut).at(k_cut_reco_nu_vtx_sce_x).at(uni)      = new TH1D(Form("h_cut_reco_nu_vtx_sce_x_%s_%s_%i",      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 15, -10, 270);
+                h_cut_v.at(label).at(cut).at(k_cut_reco_nu_vtx_sce_y).at(uni)      = new TH1D(Form("h_cut_reco_nu_vtx_sce_y_%s_%s_%i",      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -120, 120);
+                h_cut_v.at(label).at(cut).at(k_cut_reco_nu_vtx_sce_z).at(uni)      = new TH1D(Form("h_cut_reco_nu_vtx_sce_z_%s_%s_%i",      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -10, 1050);
+                h_cut_v.at(label).at(cut).at(k_cut_shr_score).at(uni)              = new TH1D(Form("h_cut_shr_score_%s_%s_%i",              reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 0.5);
+                h_cut_v.at(label).at(cut).at(k_cut_shr_dedx_max_tracks).at(uni)    = new TH1D(Form("h_cut_shr_dedx_max_tracks_%s_%s_%i",    reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
+                h_cut_v.at(label).at(cut).at(k_cut_shr_dedx_max_no_tracks).at(uni) = new TH1D(Form("h_cut_shr_dedx_max_no_tracks_%s_%s_%i", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
+                h_cut_v.at(label).at(cut).at(k_cut_shr_distance).at(uni)           = new TH1D(Form("h_cut_shr_distance_%s_%s_%i",           reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 20);
+                h_cut_v.at(label).at(cut).at(k_cut_hits_ratio).at(uni)             = new TH1D(Form("h_cut_hits_ratio_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 21, 0, 1.05);
+                h_cut_v.at(label).at(cut).at(k_cut_CosmicIPAll3D).at(uni)          = new TH1D(Form("h_cut_CosmicIPAll3D_%s_%s_%i",          reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 200);
+                h_cut_v.at(label).at(cut).at(k_cut_contained_fraction).at(uni)     = new TH1D(Form("h_cut_contained_fraction_%s_%s_%i",     reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 21, 0, 1.05);
+                h_cut_v.at(label).at(cut).at(k_cut_shrmoliereavg).at(uni)          = new TH1D(Form("h_cut_shrmoliereavg_%s_%s_%i",          reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, 0, 30);
+                h_cut_v.at(label).at(cut).at(k_cut_shr_theta).at(uni)              = new TH1D(Form("h_cut_shr_theta_%s_%s_%i",              reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 3, 0, 190);
+                h_cut_v.at(label).at(cut).at(k_cut_shr_phi).at(uni)                = new TH1D(Form("h_cut_shr_phi_%s_%s_%i",                reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 14, -190, 190);
+                h_cut_v.at(label).at(cut).at(k_cut_shr_energy_cali).at(uni)        = new TH1D(Form("h_cut_shr_energy_cali_%s_%s_%i",        reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 4);
+                
+                double* edges = &_util.reco_shr_bins[0]; // Cast to an array 
+                h_cut_v.at(label).at(cut).at(k_cut_shr_energy_cali_rebin).at(uni)  = new TH1D(Form("h_cut_shr_energy_cali_rebin_%s_%s_%i",  reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", _util.reco_shr_bins.size()-1, edges);
+
+            }
+        }
+    }
+
+
+
     std::cout << "Initialisation of cross-section histograms is complete!" << std::endl;
 
 
@@ -1302,12 +1439,6 @@ void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double wei
 
     // True Electron Energy
     h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(xsec_type)->Fill(elec_e, weight_uni);
-
-    // True Neutrino Energy
-    // h_cross_sec.at(label).at(uni).at(k_var_true_nu_E).at(xsec_type)->Fill(true_energy, weight_uni);
-
-    // Reconstructed Neutrino Energy
-    // h_cross_sec.at(label).at(uni).at(k_var_reco_nu_E).at(xsec_type)->Fill(reco_energy, weight_uni);
 
 }
 // -----------------------------------------------------------------------------
