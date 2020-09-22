@@ -29,6 +29,12 @@ void SystematicsHelper::Initialise(Utility _utility){
         return;
     }
 
+    // We want to get the systematic uncertainty for specific plots in each cut
+    if (std::string(_util.sysmode) == "reweightcuts"){
+        InitialiseReweightingModeCut();
+        return;
+    }
+
     // Get the POT of the variations from the file
     GetPOT();
 
@@ -2328,6 +2334,18 @@ void SystematicsHelper::SetUnisimColours(std::string label, TH1D* h_up, TH1D* h_
 
 }
 // -----------------------------------------------------------------------------
+void SystematicsHelper::InitialiseReweightingModeCut(){
+    gStyle->SetOptStat(0);
+
+    // Load in the input file
+    // Should we add more protection to this command??
+    f_nuexsec = TFile::Open( Form("files/crosssec_run%s.root", _util.run_period ), "READ");
+
+
+
+
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

@@ -85,9 +85,9 @@ public:
     float shr_tkfit_dedx_V;      // Shower: dE/dx of the leading shower on the V plane with the track fitting
     float shr_tkfit_dedx_U;      // Shower: dE/dx of the leading shower on the U plane with the track fitting
     
-    int   shr_tkfit_nhits_Y;     // Shower: Number of hits in the 1x4 cm box on the Y plane with the track fitting
-    int   shr_tkfit_nhits_V;     // Shower: Number of hits in the 1x4 cm box on the V plane with the track fitting
-    int   shr_tkfit_nhits_U;     // Shower: Number of hits in the 1x4 cm box on the U plane with the track fitting
+    unsigned int   shr_tkfit_nhits_Y;     // Shower: Number of hits in the 1x4 cm box on the Y plane with the track fitting
+    unsigned int   shr_tkfit_nhits_V;     // Shower: Number of hits in the 1x4 cm box on the V plane with the track fitting
+    unsigned int   shr_tkfit_nhits_U;     // Shower: Number of hits in the 1x4 cm box on the U plane with the track fitting
         
     int   shr_tkfit_npoints;     // Shower: TrackFit Number of Points
     float shr_trkfitmedangle;    // Shower: TrackFit Median Angle

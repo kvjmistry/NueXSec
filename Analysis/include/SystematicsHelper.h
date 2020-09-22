@@ -57,6 +57,10 @@ class SystematicsHelper{
     // format compared to the detector systematics
     void InitialiseReweightingMode();
     // -------------------------------------------------------------------------
+    // This function will get the reweighted plots by cut and save the uncertainties to a file
+    // so we can plot the total systematic uncertainty
+    void InitialiseReweightingModeCut();
+    // -------------------------------------------------------------------------
     // Draw Unisim histograms
     void PlotReweightingModeUnisim(std::string label, int var, std::string label_pretty);
     // -------------------------------------------------------------------------

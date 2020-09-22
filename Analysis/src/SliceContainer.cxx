@@ -34,9 +34,9 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, Ut
     tree->SetBranchAddress("shr_tkfit_dedx_Y", &shr_tkfit_dedx_Y);
     tree->SetBranchAddress("shr_tkfit_dedx_V", &shr_tkfit_dedx_V);
     tree->SetBranchAddress("shr_tkfit_dedx_U", &shr_tkfit_dedx_U);
-    // tree->SetBranchAddress("shr_tkfit_nhits_Y", &shr_tkfit_nhits_Y);
-    // tree->SetBranchAddress("shr_tkfit_nhits_V", &shr_tkfit_nhits_V);
-    // tree->SetBranchAddress("shr_tkfit_nhits_U", &shr_tkfit_nhits_U);
+    tree->SetBranchAddress("shr_tkfit_nhits_Y", &shr_tkfit_nhits_Y);
+    tree->SetBranchAddress("shr_tkfit_nhits_V", &shr_tkfit_nhits_V);
+    tree->SetBranchAddress("shr_tkfit_nhits_U", &shr_tkfit_nhits_U);
     tree->SetBranchAddress("shr_trkfitmedangle", &shr_trkfitmedangle);
     tree->SetBranchAddress("shrmoliereavg", &shrmoliereavg);
     tree->SetBranchAddress("shrmoliererms", &shrmoliererms);
@@ -757,6 +757,10 @@ double SliceContainer::GetdEdxMax(){
     int temp_shr_hits_u_tot = shr_hits_u_tot;
     int temp_shr_hits_v_tot = shr_hits_v_tot;
     int temp_shr_hits_y_tot = shr_hits_y_tot;
+
+    // int temp_shr_hits_u_tot = shr_tkfit_nhits_U; // These variables give a bigger difference in run 1 and run 3
+    // int temp_shr_hits_v_tot = shr_tkfit_nhits_V;
+    // int temp_shr_hits_y_tot = shr_tkfit_nhits_Y;
 
     // If the dedx is undefined, set the hits to zero
     if (shr_tkfit_dedx_U <= 0) temp_shr_hits_u_tot = 0;
