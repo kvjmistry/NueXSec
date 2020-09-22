@@ -508,10 +508,10 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
             h_cut_v.at(label).at(cut_index).at(k_cut_CosmicIPAll3D).at(uni)          ->Fill(SC.CosmicIPAll3D,          weight_uni);
             h_cut_v.at(label).at(cut_index).at(k_cut_contained_fraction).at(uni)     ->Fill(SC.contained_fraction,     weight_uni);
             h_cut_v.at(label).at(cut_index).at(k_cut_shrmoliereavg).at(uni)          ->Fill(SC.shrmoliereavg,          weight_uni);
-            h_cut_v.at(label).at(cut_index).at(k_cut_shr_theta).at(uni)              ->Fill(SC.shr_theta,              weight_uni);
-            h_cut_v.at(label).at(cut_index).at(k_cut_shr_phi).at(uni)                ->Fill(SC.shr_phi,                weight_uni);
-            h_cut_v.at(label).at(cut_index).at(k_cut_shr_energy_cali).at(uni)        ->Fill(SC.shr_energy_cali,        weight_uni);
-            h_cut_v.at(label).at(cut_index).at(k_cut_shr_energy_cali_rebin).at(uni)  ->Fill(SC.shr_energy_cali,        weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_shr_theta).at(uni)              ->Fill(SC.shr_theta * 180/3.14159,weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_shr_phi).at(uni)                ->Fill(SC.shr_phi * 180/3.14159,  weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_shr_energy_cali).at(uni)        ->Fill(SC.shr_energy_cali/0.83,   weight_uni);
+            h_cut_v.at(label).at(cut_index).at(k_cut_shr_energy_cali_rebin).at(uni)  ->Fill(SC.shr_energy_cali/0.83,   weight_uni);
         
         }
 
@@ -781,6 +781,7 @@ void CrossSectionHelper::WriteHists(){
     // Create subdirectory for each variable
     TDirectory *dir_labels_var[vars.size()];
 
+    // We dont want to overwrite these histograms with empty ones
     if (std::string(_util.xsec_rw_mode) != "rw_cuts"){
         
         // Loop over the labels
@@ -1411,7 +1412,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 h_cut_v.at(label).at(cut).at(k_cut_CosmicIPAll3D).at(uni)          = new TH1D(Form("h_cut_CosmicIPAll3D_%s_%s_%i",          reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 200);
                 h_cut_v.at(label).at(cut).at(k_cut_contained_fraction).at(uni)     = new TH1D(Form("h_cut_contained_fraction_%s_%s_%i",     reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 21, 0, 1.05);
                 h_cut_v.at(label).at(cut).at(k_cut_shrmoliereavg).at(uni)          = new TH1D(Form("h_cut_shrmoliereavg_%s_%s_%i",          reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, 0, 30);
-                h_cut_v.at(label).at(cut).at(k_cut_shr_theta).at(uni)              = new TH1D(Form("h_cut_shr_theta_%s_%s_%i",              reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 3, 0, 190);
+                h_cut_v.at(label).at(cut).at(k_cut_shr_theta).at(uni)              = new TH1D(Form("h_cut_shr_theta_%s_%s_%i",              reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 13, 0, 190);
                 h_cut_v.at(label).at(cut).at(k_cut_shr_phi).at(uni)                = new TH1D(Form("h_cut_shr_phi_%s_%s_%i",                reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 14, -190, 190);
                 h_cut_v.at(label).at(cut).at(k_cut_shr_energy_cali).at(uni)        = new TH1D(Form("h_cut_shr_energy_cali_%s_%s_%i",        reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 4);
                 
