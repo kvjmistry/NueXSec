@@ -208,6 +208,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility)
             _util.CreateDirectory("/cuts/" + _util.cut_dirs.at(i));
         else
             _util.CreateDirectory("/detvar/" + std::string(_util.variation) + "/cuts/" + _util.cut_dirs.at(i));
+	    _util.CreateDirectory("/systvar/" + std::string(_util.variation) + "/cuts/" + _util.cut_dirs.at(i));
 
         // Call the Make stack function for all the plots we want
         CallMakeStack( i, Data_POT);
@@ -914,6 +915,58 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         h_error_hist->Add(hist.at(i), 1);
     }
 
+
+	
+
+    // -----------------------------------------------------------------------
+    // if plot_sys=true, calculate and plot the sys uncertainty to the main plot
+
+    //if(plot_sys){
+    
+	std::vector<TH1D*> sys_hist;
+	sys_hist.resize(_util.vec_var_string.size());
+
+	TH1D *h_temp;
+
+    // --- detector sys uncertainty
+    TFile *file_sys = new TFile("./plots/run1/systvar/run1_sys_var.root", "READ"); // hard-coded path :(
+
+	// for each cut in the selection chain
+	for(unsigned int p = 0 ; p < _util.k_cuts_MAX ; p++){
+
+		// and for each kind of histogram
+		for(unsigned int f = 0 ; f < _util.vec_hist_name.size() ; f++){
+
+			// loop over the variations and take the histogram 
+			for(unsigned int d = 0 ; d < _util.vec_var_string.size(); d++){
+				
+				//h_temp = (TH1D*) file_sys->Get(Form("%s/%s/h_%s",_util.cut_dirs.at(p).c_str() ,_util.vec_var_string.at(d).c_str() ,_util.vec_hist_name.at(f).c_str() ));
+				//std::cout << _util.cut_dirs.at(p).c_str() << "/" << _util.vec_var_string.at(d).c_str() << "/h_" << _util.vec_hist_name.at(f).c_str() << std::endl;
+				//h_temp->Reset();
+                _util.GetHist(file_sys,h_temp,Form("%s/%s/%s",_util.cut_dirs.at(p).c_str() ,_util.vec_var_string.at(d).c_str() ,_util.vec_hist_name.at(f).c_str() ));
+
+			}
+
+		}		
+
+	}
+		
+
+	// --- flux sys uncertainty
+
+    //}
+    
+	//file_sys->Close(); 
+
+
+
+
+
+
+
+
+
+
     h_error_hist->SetFillColorAlpha(12, 0.15);
     h_error_hist->SetLineWidth(0);
     h_error_hist->Draw("e2, same");
@@ -1071,9 +1124,9 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     }
 
     if (std::string(_util.variation) == "empty")
-        c->Print(Form("plots/run%s/%s", _util.run_period, print_name));
+        c->Print(Form("plots/run%s/%s.pdf", _util.run_period, print_name));
     else
-        c->Print(Form("plots/run%s/detvar/%s/%s", _util.run_period, _util.variation, print_name));
+        c->Print(Form("plots/run%s/detvar/%s/%s.pdf", _util.run_period, _util.variation, print_name));
 
     // delete c;
 }
