@@ -36,10 +36,14 @@ class SystematicsHelper{
     // Function to loop over events and calculate the cross section
     void MakeHistograms(); 
     // -------------------------------------------------------------------------
-    void GetPOT();
+    void GetPOT(); 
     // -------------------------------------------------------------------------
     // Plots the variation comparisons
     void PlotVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name);
+    // -------------------------------------------------------------------------
+    // Plots the variation comparisons of detector systematics
+    void SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name, TFile *root_output );
+    // Calculates the 
     // -------------------------------------------------------------------------
     // Plots the variation comparisons
     void PlotVariationsEXT(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name);

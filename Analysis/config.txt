@@ -39,10 +39,10 @@ Run1_EXT_trig 4015961.990000 // v3 with michel veto updated
 Run1_MC_POT_weight 2.31956e+21
 -
 // Run 1 Det var CV
-Run1_MC_POT_CV 4.44874e+20
+Run1_MC_POT_CV 1.16215e+21
 -
 // Run 1 Det Var BNB diffusion
-Run1_MC_POT_BNB_Diffusion 4.19732e+20
+Run1_MC_POT_BNB_Diffusion 4.62283e+20
 -
 // Run 1 EXT NuMI sample number of triggers
 Run1_EXT_trig_NuMI 4015961.990000

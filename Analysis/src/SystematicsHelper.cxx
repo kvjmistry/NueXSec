@@ -32,7 +32,11 @@ void SystematicsHelper::Initialise(Utility _utility){
     // Get the POT of the variations from the file
     GetPOT();
 
-    
+    // check if current POT values match with the ones in the files
+    //if (strcmp(_util.check_pot) == 0){
+    //	_util.check_pot = true;
+    //}   
+ 
     // Resize the file vector
     f_vars.resize(k_vars_MAX);
 
@@ -60,6 +64,7 @@ void SystematicsHelper::Initialise(Utility _utility){
     MakeHistograms();
 
 }
+
 // -----------------------------------------------------------------------------
 void SystematicsHelper::GetPOT(){
 
@@ -169,13 +174,204 @@ void SystematicsHelper::SetRatioOptions(TH1D* hist ){
 }
 // -----------------------------------------------------------------------------
 void SystematicsHelper::MakeHistograms(){
-    
+
+    // ---- making histograms for the uncertainties
+    std::cout << "Making histograms for the detector systematics uncertainties:" << std::endl;
+
+    // Create the root file to save the variation plots
+    // this file will be used later to calculate the sys uncertainties
+    TFile *file_sys_var = new TFile(Form("plots/run%s/systvar/run%s_sys_var.root", _util.run_period, _util.run_period),"RECREATE");
+
+
+	/*
+
+    // name of the histogram in the ntuple file
+    // write it without the initial "h_"
+    // this name is going to be used to name the pdf file
+    std::vector<std::string> vec_hist_name = {"reco_vtx_x_sce",
+                                              "reco_vtx_y_sce",
+                                              "reco_vtx_z_sce",
+                                              "reco_flash_time",
+                                              "reco_leading_shower_phi",
+                                              "reco_leading_shower_theta",
+                                              "reco_shower_multiplicity",
+                                              "reco_track_multiplicity",
+                                              "reco_topological_score",
+                                              "reco_shr_tkfit_dedx_y",
+                                              "reco_nu_e",
+                                              "reco_shower_energy_tot_cali",
+                                              "reco_softwaretrig",
+                                              "reco_nslice",
+                                              "reco_shower_score",
+                                              "reco_shr_tkfit_dedx_max",
+                                              "reco_shr_tkfit_dedx_max_with_tracks",
+                                              "reco_shr_tkfit_dedx_max_no_tracks",
+                                              "reco_shower_to_vtx_dist",
+                                              "reco_hits_ratio",
+                                              "reco_CosmicIPAll3D",
+                                              "reco_contained_fraction",
+                                              "reco_shrmoliereavg",
+                                              "reco_shower_energy_cali",
+                                              "reco_flash_pe"};
+
+    // x axis label
+    std::vector<std::string> vec_axis_label = {"Reco Vertex X [cm]",
+                                               "Reco Vertex Y [cm]",
+                                               "Reco Vertex Z [cm]",
+                                               "Flash Time [#mus]",
+                                               "Leading Shower Phi [degrees]",
+                                               "Leading Shower Theta [degrees]",
+                                               "Shower Multiplicty",
+                                               "Track Multiplicity",
+                                               "Topological Score",
+                                               "Collection Plane dEdx (track fitter) [MeV/cm]",
+                                               "Reconstructed Neutrino Energy [GeV]",
+                                               "Reconstructed Leading Shower Energy [GeV]",
+                                               "Software Trigger",
+                                               "nslice",
+                                               "Shower Score",
+                                               "reco_shr_tkfit_dedx_max",
+                                               "reco_shr_tkfit_dedx_max_with_tracks",
+                                               "reco_shr_tkfit_dedx_max_no_tracks",
+                                               "reco_shower_to_vtx_dist",
+                                               "reco_hits_ratio",
+                                               "reco_CosmicIPAll3D",
+                                               "reco_contained_fraction",
+                                               "reco_shrmoliereavg",
+                                               "reco_shower_energy_cali",
+                                               "reco_flash_pe"};     */
+
+
     for (unsigned int i = 0 ; i < _util.k_cuts_MAX; i++){
+
+        if (mode == "default"){ // default detector systematics mode
+
+            // Create the directory for sysvar
+            _util.CreateDirectory("/systvar/comparisons/cuts/" + _util.cut_dirs.at(i));
+
+            // create the directory for detvar
+            _util.CreateDirectory("/detvar/comparisons/cuts/" + _util.cut_dirs.at(i));
+
+            for(unsigned int j=0; j < _util.vec_hist_name.size(); j++){
+
+                SysVariations(Form("h_%s", _util.vec_hist_name.at(j).c_str()), Form("plots/run%s/systvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()),
+                            _util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str(), _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str(), file_sys_var );
+
+                PlotVariations(Form("h_%s", _util.vec_hist_name.at(j).c_str()), Form("plots/run%s/detvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()),
+                            _util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str());
+
+            }
+
+
+            /*
+
+            // Space Charge Corrected X position comparision plot
+            SysVariations("h_reco_vtx_x_sce", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_vtx_x_sce.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Reco Vertex X [cm]", _util.cut_dirs.at(i).c_str(), "h_reco_vtx_x_sce", file_sys_var );
+    
+            // Space Charge Corrected Y position comparision plot
+            SysVariations("h_reco_vtx_y_sce", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_vtx_y_sce.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Reco Vertex Y [cm]",  _util.cut_dirs.at(i).c_str(), "h_reco_vtx_y_sce", file_sys_var);
+
+            // Space Charge Corrected X position comparision plot
+            SysVariations("h_reco_vtx_z_sce", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_vtx_z_sce.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Reco Vertex Z [cm]", _util.cut_dirs.at(i).c_str(), "h_reco_vtx_z_sce", file_sys_var);
         
-        // Default detector systematics mode
-        if (mode == "default"){
+            // Flash Time
+            SysVariations("h_reco_flash_time", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_flash_time.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Flash Time [#mus]", _util.cut_dirs.at(i).c_str(), "h_reco_flash_time", file_sys_var);
+
+            // Leading Shower Phi
+            SysVariations("h_reco_leading_shower_phi", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_leading_shower_phi.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Leading Shower Phi [degrees]", _util.cut_dirs.at(i).c_str(), "h_reco_leading_shower_phi", file_sys_var);
+
+            // Leading Shower Theta
+            SysVariations("h_reco_leading_shower_theta", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_leading_shower_theta.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Leading Shower Theta [degrees]", _util.cut_dirs.at(i).c_str(), "h_reco_leading_shower_theta", file_sys_var);
+
+            // Shower Multiplicty
+            SysVariations("h_reco_shower_multiplicity", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_shower_multiplicity.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Shower Multiplicty", _util.cut_dirs.at(i).c_str(), "h_reco_shower_multiplicity", file_sys_var);
+
+            // Track Multiplicty
+            SysVariations("h_reco_track_multiplicity", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_track_multiplicity.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Track Multiplicity", _util.cut_dirs.at(i).c_str(), "h_reco_track_multiplicity", file_sys_var);
+
+            // Topological Score
+            SysVariations("h_reco_topological_score", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_topological_score.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Topological Score", _util.cut_dirs.at(i).c_str(), "h_reco_topological_score", file_sys_var);
+            
+            // Shower Track Fitter dedx Y plane
+            SysVariations("h_reco_shr_tkfit_dedx_y", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_shr_tkfit_dedx_y.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Collection Plane dEdx (track fitter) [MeV/cm]", _util.cut_dirs.at(i).c_str(), "h_reco_shr_tkfit_dedx_y", file_sys_var);
+
+            // Reco Electron Neutrino E
+            SysVariations("h_reco_nu_e", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_nu_e.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Reconstructed Neutrino Energy [GeV]", _util.cut_dirs.at(i).c_str(), "h_reco_nu_e", file_sys_var);
+
+            // Leading Shower Energy
+            SysVariations("h_reco_shower_energy_tot_cali", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_shower_energy_tot_cali.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Reconstructed Leading Shower Energy [GeV]", _util.cut_dirs.at(i).c_str(), "h_reco_shower_energy_tot_cali", file_sys_var);
+    
+            // --------------------- new variables asked by Krish
+
+            // Software Trigger
+            SysVariations("h_reco_softwaretrig", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_softwaretrigger.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Software Trigger", _util.cut_dirs.at(i).c_str(), "h_reco_softwaretrig", file_sys_var);
+
+            // nslice
+            SysVariations("h_reco_nslice", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_slice.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "nslice", _util.cut_dirs.at(i).c_str(), "h_reco_nslice", file_sys_var);
+
+            // Shower Score
+            SysVariations("h_reco_shower_score", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_shower_score.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Shower Score", _util.cut_dirs.at(i).c_str(), "h_reco_shower_score", file_sys_var);
+
+            // dEdx max
+            SysVariations("h_reco_shr_tkfit_dedx_max", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_dedx_max.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "dE/dx max", _util.cut_dirs.at(i).c_str(), "h_reco_shr_tkfit_dedx_max", file_sys_var);
+    
+            // dEdx max with tracks
+            SysVariations("h_reco_shr_tkfit_dedx_max_with_tracks", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_dedx_max_with_track.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "dE/dx max with tracks", _util.cut_dirs.at(i).c_str(), "h_reco_shr_tkfit_dedx_max_with_tracks", file_sys_var);
+
+            // dEdx max no tracks
+            SysVariations("h_reco_shr_tkfit_dedx_max_no_tracks", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_dedx_max_no_tracks.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "dE/dx max no tracks", _util.cut_dirs.at(i).c_str(), "h_reco_shr_tkfit_dedx_max_no_tracks", file_sys_var);
+
+            // Shower Distance
+            SysVariations("h_reco_shower_to_vtx_dist", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_shower_to_vtx_dist.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Shower to Vertex Distance [cm]", _util.cut_dirs.at(i).c_str(), "h_reco_shower_to_vtx_dist", file_sys_var);
+
+            // Hits Ratio
+            SysVariations("h_reco_hits_ratio", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_hits_ratio.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Hits Ratio", _util.cut_dirs.at(i).c_str(), "h_reco_hits_ratio", file_sys_var);
+
+            // Cosmic IPAll 3D
+            SysVariations("h_reco_CosmicIPAll3D", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_CosmicIPAll3D.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Cosmic IPall 3D", _util.cut_dirs.at(i).c_str(), "h_reco_CosmicIPAll3D", file_sys_var);
+
+            // Contained Fraction
+            SysVariations("h_reco_contained_fraction", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_contained_fraction.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Contained Fraction", _util.cut_dirs.at(i).c_str(), "h_reco_contained_fraction", file_sys_var);
+
+            // Shower Molier Average
+            SysVariations("h_reco_shrmoliereavg", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_shrmoliereavg.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Shower Moliere Average", _util.cut_dirs.at(i).c_str(), "h_reco_shrmoliereavg", file_sys_var);
+
+            // Shower Energy Cali
+            SysVariations("h_reco_shower_energy_cali", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_shower_energy_cali.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Shower Energy Cali [GeV]", _util.cut_dirs.at(i).c_str(), "h_reco_shower_energy_cali", file_sys_var);
+
+            // Flash PE
+            SysVariations("h_reco_flash_pe", Form("plots/run%s/systvar/comparisons/cuts/%s/reco_flash_pe.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
+                            _util.cut_dirs.at(i), "Flash PE", _util.cut_dirs.at(i).c_str(), "h_reco_flash_pe", file_sys_var);
+				
+                        
             // Create the directory
             _util.CreateDirectory("/detvar/comparisons/cuts/" + _util.cut_dirs.at(i));
+
+	        std::cout << "Printing detvar" << std::endl;
 
             // Space Charge Corrected X position comparision plot
             PlotVariations("h_reco_vtx_x_sce", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_vtx_x_sce.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
@@ -228,6 +424,8 @@ void SystematicsHelper::MakeHistograms(){
             // Leading Shower Energy
             PlotVariations("h_reco_shower_energy_tot_cali", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_shower_energy_tot_cali.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
                             _util.cut_dirs.at(i), "Reconstructed Leading Shower Energy [GeV]");
+
+                            */
 
         }
         // Ext mode
@@ -419,6 +617,158 @@ void SystematicsHelper::PlotVariations(std::string hist_name, const char* print_
     c->Print(print_name);
 
 
+
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name, TFile *root_output){
+
+    // last updated on Sept 18 by Marina Reggiani-Guzzo
+
+    gStyle->SetOptStat(0);
+
+    std::vector<TH1D*> hist; // The vector of histograms from the file for the plot
+    std::vector<TH1D*> hist_diff; // The vector of histogram differentes between CV and the vatiation (variation-CV)
+    std::vector<TH1D*> hist_ratio; // The vector of histogram ratios from the file for the plot
+    TH1D * h_error_hist;
+    hist.resize(k_vars_MAX);
+    hist_diff.resize(k_vars_MAX);
+    hist_ratio.resize(k_vars_MAX);
+
+    TCanvas * c      = new TCanvas();
+    TPad * topPad    = new TPad("topPad", "", 0, 0.3, 1, 1.0);
+    TPad * bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
+
+    _util.SetTPadOptions(topPad, bottomPad );
+
+    // Loop over the variations and get the histograms
+    for (unsigned int k=0; k < f_vars.size(); k++){
+        
+        // Loop over the classifications and get the histograms
+        for (unsigned int i=0; i <_util.classification_dirs.size(); i++){
+
+            // Only want the MC piece -- may want to add in dirt too? -- will need to separately scale that hitogram though
+            if ( i == _util.k_leg_data || i == _util.k_leg_ext || i == _util.k_leg_dirt ) continue;
+
+            // Get all the MC histograms and add them together
+            TH1D *h_temp;
+
+            _util.GetHist(f_vars.at(k), h_temp, Form("Stack/%s/%s/%s_%s_%s", cut_name.c_str(), _util.classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.classification_dirs.at(i).c_str()));
+            
+            // First case so clone the histogram
+            if (i == 0) hist.at(k) = (TH1D*) h_temp->Clone("h_sum_hist");
+            else hist.at(k)->Add(h_temp, 1);
+        }
+        
+    }
+
+    // Now scale the histograms to POT
+    for (unsigned int y=0; y < hist.size(); y++ ){
+        double scale_fact = POT_v.at(k_CV) / POT_v.at(y);
+        // std::cout << "scale factor: " << scale_fact << std::endl;
+        hist.at(y)->Scale(scale_fact);
+
+        if (y == k_CV){
+            // Clone a histogram to plot the CV error as a grey band
+            h_error_hist = (TH1D*) hist.at(k_CV)->Clone("h_error_hist");
+            h_error_hist->SetFillColorAlpha(12, 0.15);
+            h_error_hist->SetLineWidth(2);
+            h_error_hist->SetLineColor(kBlack);
+            h_error_hist->GetYaxis()->SetTitle("Entries");
+            h_error_hist->GetYaxis()->SetTitleFont(46);
+            h_error_hist->GetYaxis()->SetTitleSize(13);
+            h_error_hist->Draw("E2");
+        }
+
+        // calculate difference between cv and the histogram with variation
+        hist_diff.at(y) = (TH1D*) hist.at(y)->Clone(Form("h_diff_%s", var_string.at(y).c_str()));
+        hist_diff.at(y)->Add(hist.at(k_CV),-1); 
+
+        // Save clones of the histograms for doing the ratios
+        hist_ratio.at(y) = (TH1D*) hist_diff.at(y)->Clone(Form("h_ratio_%s", var_string.at(y).c_str()));
+        hist_ratio.at(y)->Divide(hist.at(k_CV));
+
+        // Set the customisation of the histogram
+        SetVariationProperties(hist.at(y), y);
+
+        // Draw the histograms
+        if (y == k_CV) hist.at(y)->Draw("hist, same");
+        else hist.at(y)->Draw("hist,E, same");
+    }
+
+    // Legend
+    TLegend *leg = new TLegend(0.8, 0.91, 0.95, 0.32);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(h_error_hist, "CV",   "lf");
+    leg->AddEntry(hist.at(k_bnb_diffusion), "BNB Diffusion", "l");
+    leg->Draw();
+
+    // Now draw the ratio
+    bottomPad->cd();
+
+    for (unsigned int k =0; k < hist_ratio.size(); k++){
+
+        SetVariationProperties(hist_ratio.at(k), k);
+        hist_ratio.at(k)->SetLineWidth(1);
+
+
+        hist_ratio.at(k)->GetXaxis()->SetLabelSize(12);
+        hist_ratio.at(k)->GetXaxis()->SetLabelFont(43); 
+        hist_ratio.at(k)->GetYaxis()->SetLabelSize(11);
+        hist_ratio.at(k)->GetYaxis()->SetLabelFont(43);
+        hist_ratio.at(k)->GetXaxis()->SetTitleOffset(3.0);
+        hist_ratio.at(k)->GetXaxis()->SetTitleSize(17);
+        hist_ratio.at(k)->GetXaxis()->SetTitleFont(46);
+        hist_ratio.at(k)->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
+        hist_ratio.at(k)->GetYaxis()->SetRangeUser(-3.0, 3.0);
+        hist_ratio.at(k)->GetYaxis()->SetTitle("(Variation-CV) / CV");
+        hist_ratio.at(k)->GetYaxis()->SetTitleSize(13);
+        hist_ratio.at(k)->GetYaxis()->SetTitleFont(44);
+        hist_ratio.at(k)->GetYaxis()->SetTitleOffset(1.5);
+        hist_ratio.at(k)->SetTitle(" ");
+        hist_ratio.at(k)->GetXaxis()->SetTitle(x_axis_name);
+        
+        if (k == 0) hist_ratio.at(k)->Draw("hist,same");
+        else {
+
+		hist_ratio.at(k)->Draw("hist,E,same");
+
+	}
+
+   }
+
+	// loop over the variations and save them into different directories
+	// this root file is going to be used later on to calculate the sys uncertainty	
+	for (unsigned int k=0; k < f_vars.size(); k++){
+		
+		if(!root_output->GetDirectory(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str()))) {
+			root_output->mkdir(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // if the directory does not exist, create it
+		}
+
+		root_output->cd(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // open the directory
+	
+		hist_ratio.at(k)->SetDirectory(gDirectory); // set in which dir the hist_ratio.at(k) is going to be written
+		hist_ratio.at(k)->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite);  // write the histogram to the file
+	
+	}
+
+    
+
+    // Draw the error hist 
+    /*
+    TH1D* h_ratio_error = (TH1D*) h_error_hist->Clone("h_ratio_error");
+    h_ratio_error->Divide(h_ratio_error);
+    h_ratio_error->Draw("e2, same");
+    */
+
+
+    // Draw the run period on the plot
+    // _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
+
+    // Add the weight labels
+    // Draw_WeightLabels(c);
+    
+    c->Print(print_name);
 
 }
 // -----------------------------------------------------------------------------
