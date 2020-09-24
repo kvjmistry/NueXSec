@@ -22,11 +22,13 @@ class TreeHelper{
     void Fill_dedxVars(SliceContainer &SC, std::pair<std::string, int> _classification, std::string _cut, double _weight);
     // -------------------------------------------------------------------------
     // Writes the tree to file
-    void WriteTree();
+    void WriteTree(int type);
     // -------------------------------------------------------------------------
     // Fill the counter tree
     void Fill_counters(std::vector<double> counter_v, bool bool_use_mc, bool bool_use_ext, bool bool_use_data, bool bool_use_dirt);
     // -------------------------------------------------------------------------
+    // Set the branch address of some ttrees
+    void SetBranches(TTree * tree);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
@@ -100,6 +102,7 @@ class TreeHelper{
 
 
     TTree * tree;       // Main tree with the selected events
+    TTree * nue_tree;       // Main tree with the selected events for intrinsic nue sample
     TTree * dedx_tree;  // Tree for optimising the dedx cut
     TTree * counter_tree; // Tree for storing the selection results
     TTree * nue_counter_tree; // Tree for storing the nue selection results

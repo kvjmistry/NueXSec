@@ -24,6 +24,7 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
 
         // Create the TTree
         tree             = new TTree("mc_tree",                "mc_tree");
+        nue_tree         = new TTree("mc_nue_tree",            "mc_nue_tree");
         dedx_tree        = new TTree("mc_dedx_tree",           "mc_dedx_tree");
         counter_tree     = new TTree("mc_counter_tree",        "mc_counter_tree");
         nue_counter_tree = new TTree("mc_nue_counter_tree",    "mc_nue_counter_tree");
@@ -40,8 +41,8 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
         }
 
         // Create the TTree
-        tree      = new TTree("data_tree",     "data_tree");
-        dedx_tree = new TTree("data_dedx_tree","data_dedx_tree");
+        tree         = new TTree("data_tree",     "data_tree");
+        dedx_tree    = new TTree("data_dedx_tree","data_dedx_tree");
         counter_tree = new TTree("data_counter_tree",    "data_counter_tree");
 
     }
@@ -57,8 +58,8 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
         }
 
         // Create the TTree
-        tree      = new TTree("ext_tree",     "ext_tree");
-        dedx_tree = new TTree("ext_dedx_tree","ext_dedx_tree");
+        tree         = new TTree("ext_tree",     "ext_tree");
+        dedx_tree    = new TTree("ext_dedx_tree","ext_dedx_tree");
         counter_tree = new TTree("ext_counter_tree",    "ext_counter_tree");
 
     }
@@ -74,8 +75,8 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
         }
 
         // Create the TTree
-        tree      = new TTree("dirt_tree",     "dirt_tree");
-        dedx_tree = new TTree("dirt_dedx_tree","dirt_dedx_tree");
+        tree         = new TTree("dirt_tree",     "dirt_tree");
+        dedx_tree    = new TTree("dirt_dedx_tree","dirt_dedx_tree");
         counter_tree = new TTree("dirt_counter_tree",    "dirt_counter_tree");
 
     }
@@ -87,60 +88,10 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
     // Set the type
     _type = type;
     
-    // Set the tree branches
-    tree->Branch("run",              &run,    "run/I");
-    tree->Branch("subrun",           &subrun, "subrun/I");
-    tree->Branch("event",            &event,  "event/I");
-    tree->Branch("gen",              &gen,    "gen/O");
-    tree->Branch("weight",           &weight, "weight/D");
-    tree->Branch("true_energy",      &true_energy, "true_energy/D");
-    tree->Branch("reco_energy",      &reco_energy, "reco_energy/D");
-    tree->Branch("classification",    &classification);
-    tree->Branch("shr_tkfit_dedx_Y", &shr_tkfit_dedx_Y, "shr_tkfit_dedx_Y/F");
-    tree->Branch("n_showers",        &n_showers, "n_showers/F");
-    tree->Branch("n_tracks",         &n_tracks,  "n_tracks/F");
-    tree->Branch("shr_theta",        &shr_theta, "shr_theta/F");
-    tree->Branch("shr_phi",          &shr_phi,   "shr_phi/F");
-    tree->Branch("shr_energy_cali",  &shr_energy_cali, "shr_energy_cali/F");
-    tree->Branch("shrmoliereavg",    &shrmoliereavg, "shrmoliereavg/F");
-    tree->Branch("shr_hits_max",     &shr_hits_max,  "shr_hits_max/F");
-    tree->Branch("elec_e",           &elec_e,  "elec_e/F");
-    tree->Branch("ppfx_cv",          &ppfx_cv,  "ppfx_cv/F");
-    tree->Branch("weightSplineTimesTune",  &weightSplineTimesTune,  "weightSplineTimesTune/F");
-    tree->Branch("nu_pdg",                 &nu_pdg,  "nu_pdg/I");
-    tree->Branch("numi_ang",               &numi_ang,  "numi_ang/F");
-    tree->Branch("shr_bkt_pdg",            &shr_bkt_pdg,  "shr_bkt_pdg/I");
-    tree->Branch("shr_bkt_purity",         &shr_bkt_purity);
-    tree->Branch("shr_bkt_completeness",   &shr_bkt_completeness);
-    tree->Branch("shr_bkt_E",              &shr_bkt_E);
-    tree->Branch("all_shr_hits",     "std::vector<float>", &all_shr_hits);
-    tree->Branch("all_shr_energies", "std::vector<float>", &all_shr_energies);
-
-
-
-    tree->Branch("weightsGenie", "std::vector<unsigned short>", &weightsGenie);
-    tree->Branch("weightsReint", "std::vector<unsigned short>", &weightsReint);
-    tree->Branch("weightsPPFX",  "std::vector<unsigned short>", &weightsPPFX);
-    tree->Branch("knobRPAup",             &knobRPAup,             "knobRPAup/D");
-    tree->Branch("knobRPAdn",             &knobRPAdn,             "knobRPAdn/D");
-    tree->Branch("knobCCMECup",           &knobCCMECup,           "knobCCMECup/D");
-    tree->Branch("knobCCMECdn",           &knobCCMECdn,           "knobCCMECdn/D");
-    tree->Branch("knobAxFFCCQEup",        &knobAxFFCCQEup,        "knobAxFFCCQEup/D");
-    tree->Branch("knobAxFFCCQEdn",        &knobAxFFCCQEdn,        "knobAxFFCCQEdn/D");
-    tree->Branch("knobVecFFCCQEup",       &knobVecFFCCQEup,       "knobVecFFCCQEup/D");
-    tree->Branch("knobVecFFCCQEdn",       &knobVecFFCCQEdn,       "knobVecFFCCQEdn/D");
-    tree->Branch("knobDecayAngMECup",     &knobDecayAngMECup,     "knobDecayAngMECup/D");
-    tree->Branch("knobDecayAngMECdn",     &knobDecayAngMECdn,     "knobDecayAngMECdn/D");
-    tree->Branch("knobThetaDelta2Npiup",  &knobThetaDelta2Npiup,  "knobThetaDelta2Npiup/D");
-    tree->Branch("knobThetaDelta2Npidn",  &knobThetaDelta2Npidn,  "knobThetaDelta2Npidn/D");
-    tree->Branch("knobThetaDelta2NRadup", &knobThetaDelta2NRadup, "knobThetaDelta2NRadup/D");
-    tree->Branch("knobThetaDelta2NRaddn", &knobThetaDelta2NRaddn, "knobThetaDelta2NRaddn/D");
-    tree->Branch("knobRPA_CCQE_Reducedup",&knobRPA_CCQE_Reducedup,"knobRPA_CCQE_Reducedup/D");
-    tree->Branch("knobRPA_CCQE_Reduceddn",&knobRPA_CCQE_Reduceddn,"knobRPA_CCQE_Reduceddn/D");
-    tree->Branch("knobNormCCCOHup",       &knobNormCCCOHup,       "knobNormCCCOHup/D");
-    tree->Branch("knobNormCCCOHdn",       &knobNormCCCOHdn,       "knobNormCCCOHdn/D");
-    tree->Branch("knobNormNCCOHup",       &knobNormNCCOHup,       "knobNormNCCOHup/D");
-    tree->Branch("knobNormNCCOHdn",       &knobNormNCCOHdn,       "knobNormNCCOHdn/D");
+    if (std::string(_util.intrinsic_mode) == "intrinsic")
+        SetBranches(nue_tree);
+    else
+        SetBranches(tree);
 
     dedx_tree->Branch("shr_hits_u_tot", &shr_hits_u_tot, "shr_hits_u_tot/I");
     dedx_tree->Branch("shr_hits_v_tot", &shr_hits_v_tot, "shr_hits_v_tot/I");
@@ -284,8 +235,11 @@ void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _class
     knobNormCCCOHdn        = SC.knobNormCCCOHdn;
     knobNormNCCOHdn        = SC.knobNormNCCOHdn;
 
-
-    tree->Fill();
+    // Fill the nue tree
+    if (std::string(_util.intrinsic_mode) == "intrinsic")
+        nue_tree->Fill();
+    else
+        tree->Fill();
 
 }
 // -----------------------------------------------------------------------------
@@ -336,16 +290,23 @@ void TreeHelper::Fill_dedxVars(SliceContainer &SC, std::pair<std::string, int> _
 
 }
 // -----------------------------------------------------------------------------
-void TreeHelper::WriteTree(){
+void TreeHelper::WriteTree(int type){
 
     f_nuexsec->cd();
 
-    tree->Write("",TObject::kOverwrite);
+    if (std::string(_util.intrinsic_mode) == "intrinsic")
+        nue_tree->Write("",TObject::kOverwrite);
+    else
+        tree->Write("",TObject::kOverwrite);
+
+    if (type == _util.k_mc)
+        nue_counter_tree->Write("",TObject::kOverwrite);
+    
+    if (std::string(_util.intrinsic_mode) != "intrinsic")
+        counter_tree->Write("",TObject::kOverwrite);
+
 
     dedx_tree->Write("",TObject::kOverwrite);
-
-    if (std::string(_util.intrinsic_mode) == "intrinsic") nue_counter_tree->Write("",TObject::kOverwrite);
-    else counter_tree->Write("",TObject::kOverwrite);
 
 }
 // -----------------------------------------------------------------------------
@@ -424,3 +385,61 @@ void TreeHelper::Fill_counters(std::vector<double> counter_v, bool bool_use_mc, 
     nue_counter_tree->Fill();
 
 }
+// -----------------------------------------------------------------------------
+void TreeHelper::SetBranches(TTree * tree){
+    
+    // Set the tree branches
+    tree->Branch("run",              &run,    "run/I");
+    tree->Branch("subrun",           &subrun, "subrun/I");
+    tree->Branch("event",            &event,  "event/I");
+    tree->Branch("gen",              &gen,    "gen/O");
+    tree->Branch("weight",           &weight, "weight/D");
+    tree->Branch("true_energy",      &true_energy, "true_energy/D");
+    tree->Branch("reco_energy",      &reco_energy, "reco_energy/D");
+    tree->Branch("classification",    &classification);
+    tree->Branch("shr_tkfit_dedx_Y", &shr_tkfit_dedx_Y, "shr_tkfit_dedx_Y/F");
+    tree->Branch("n_showers",        &n_showers, "n_showers/F");
+    tree->Branch("n_tracks",         &n_tracks,  "n_tracks/F");
+    tree->Branch("shr_theta",        &shr_theta, "shr_theta/F");
+    tree->Branch("shr_phi",          &shr_phi,   "shr_phi/F");
+    tree->Branch("shr_energy_cali",  &shr_energy_cali, "shr_energy_cali/F");
+    tree->Branch("shrmoliereavg",    &shrmoliereavg, "shrmoliereavg/F");
+    tree->Branch("shr_hits_max",     &shr_hits_max,  "shr_hits_max/F");
+    tree->Branch("elec_e",           &elec_e,  "elec_e/F");
+    tree->Branch("ppfx_cv",          &ppfx_cv,  "ppfx_cv/F");
+    tree->Branch("weightSplineTimesTune",  &weightSplineTimesTune,  "weightSplineTimesTune/F");
+    tree->Branch("nu_pdg",                 &nu_pdg,  "nu_pdg/I");
+    tree->Branch("numi_ang",               &numi_ang,  "numi_ang/F");
+    tree->Branch("shr_bkt_pdg",            &shr_bkt_pdg,  "shr_bkt_pdg/I");
+    tree->Branch("shr_bkt_purity",         &shr_bkt_purity);
+    tree->Branch("shr_bkt_completeness",   &shr_bkt_completeness);
+    tree->Branch("shr_bkt_E",              &shr_bkt_E);
+    tree->Branch("all_shr_hits",     "std::vector<float>", &all_shr_hits);
+    tree->Branch("all_shr_energies", "std::vector<float>", &all_shr_energies);
+
+    tree->Branch("weightsGenie", "std::vector<unsigned short>", &weightsGenie);
+    tree->Branch("weightsReint", "std::vector<unsigned short>", &weightsReint);
+    tree->Branch("weightsPPFX",  "std::vector<unsigned short>", &weightsPPFX);
+    tree->Branch("knobRPAup",             &knobRPAup,             "knobRPAup/D");
+    tree->Branch("knobRPAdn",             &knobRPAdn,             "knobRPAdn/D");
+    tree->Branch("knobCCMECup",           &knobCCMECup,           "knobCCMECup/D");
+    tree->Branch("knobCCMECdn",           &knobCCMECdn,           "knobCCMECdn/D");
+    tree->Branch("knobAxFFCCQEup",        &knobAxFFCCQEup,        "knobAxFFCCQEup/D");
+    tree->Branch("knobAxFFCCQEdn",        &knobAxFFCCQEdn,        "knobAxFFCCQEdn/D");
+    tree->Branch("knobVecFFCCQEup",       &knobVecFFCCQEup,       "knobVecFFCCQEup/D");
+    tree->Branch("knobVecFFCCQEdn",       &knobVecFFCCQEdn,       "knobVecFFCCQEdn/D");
+    tree->Branch("knobDecayAngMECup",     &knobDecayAngMECup,     "knobDecayAngMECup/D");
+    tree->Branch("knobDecayAngMECdn",     &knobDecayAngMECdn,     "knobDecayAngMECdn/D");
+    tree->Branch("knobThetaDelta2Npiup",  &knobThetaDelta2Npiup,  "knobThetaDelta2Npiup/D");
+    tree->Branch("knobThetaDelta2Npidn",  &knobThetaDelta2Npidn,  "knobThetaDelta2Npidn/D");
+    tree->Branch("knobThetaDelta2NRadup", &knobThetaDelta2NRadup, "knobThetaDelta2NRadup/D");
+    tree->Branch("knobThetaDelta2NRaddn", &knobThetaDelta2NRaddn, "knobThetaDelta2NRaddn/D");
+    tree->Branch("knobRPA_CCQE_Reducedup",&knobRPA_CCQE_Reducedup,"knobRPA_CCQE_Reducedup/D");
+    tree->Branch("knobRPA_CCQE_Reduceddn",&knobRPA_CCQE_Reduceddn,"knobRPA_CCQE_Reduceddn/D");
+    tree->Branch("knobNormCCCOHup",       &knobNormCCCOHup,       "knobNormCCCOHup/D");
+    tree->Branch("knobNormCCCOHdn",       &knobNormCCCOHdn,       "knobNormCCCOHdn/D");
+    tree->Branch("knobNormNCCOHup",       &knobNormNCCOHup,       "knobNormNCCOHup/D");
+    tree->Branch("knobNormNCCOHdn",       &knobNormNCCOHdn,       "knobNormNCCOHdn/D");
+
+}
+// -----------------------------------------------------------------------------

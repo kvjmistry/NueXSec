@@ -102,7 +102,7 @@ void CrossSectionHelper::LoopEvents(){
     
     std::cout << "Total Tree Entries: "<< tree->GetEntries() << std::endl;
 
-    int n_gen = 0;
+    double n_gen = 0.0;
 
     // Loop over the tree entries and weight the events in each universe
     for (unsigned int ievent = 0; ievent < tree->GetEntries(); ievent++){
@@ -161,10 +161,14 @@ void CrossSectionHelper::LoopEvents(){
                 }
 
                 // Generated event
-                if ( (*classification == "nue_cc"|| *classification == "nuebar_cc" || *classification == "unmatched_nue" || *classification == "cosmic_nue" || *classification == "unmatched_nuebar" || *classification == "cosmic_nuebar") && gen == true) {
+                if ( (*classification == "nue_cc"           || *classification == "nuebar_cc" || 
+                      *classification == "unmatched_nue"    || *classification == "cosmic_nue" ||
+                      *classification == "unmatched_nuebar" || *classification == "cosmic_nuebar") && gen == true) {
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_gen, weight_uni, shr_energy_cali, elec_e);
+
+                    n_gen+=cv_weight;
                 }
                 
                 // Data event
@@ -196,6 +200,8 @@ void CrossSectionHelper::LoopEvents(){
     } // End loop over events
 
     std::cout << "\n\nFinished Event Loop, now calculating the cross-sections\n\n"<< std::endl;
+
+    std::cout << "Gen events" << n_gen << std::endl;
 
     // ----
 

@@ -505,7 +505,7 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
     if (std::string(intrinsic_mode) == "intrinsic" && type == k_mc && (nu_pdg == -12 || nu_pdg == 12)){
         
         // Kill off the out of fv events in the intrinsic nue sample (to avoid double counting)
-        if (!infv) weight = 0; 
+        if (!infv) weight = 0.0; 
         else weight = weight * intrinsic_weight;
         
     }

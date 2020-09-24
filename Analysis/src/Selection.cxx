@@ -550,7 +550,7 @@ void Selection::SavetoFile(){
             _hhelper.at(_util.k_mc).WriteNuMu(_util.k_mc);
         }
 
-        _thelper.at(_util.k_mc).WriteTree();
+        _thelper.at(_util.k_mc).WriteTree(_util.k_mc);
 
 
     }
@@ -561,7 +561,7 @@ void Selection::SavetoFile(){
         _hhelper.at(_util.k_data).WritePiZero(_util.k_data);
         _hhelper.at(_util.k_data).WriteNuMu(_util.k_data);
 
-        _thelper.at(_util.k_data).WriteTree();
+        _thelper.at(_util.k_data).WriteTree(_util.k_data);
 
     }
     if (bool_use_ext) {
@@ -572,7 +572,7 @@ void Selection::SavetoFile(){
         _hhelper.at(_util.k_ext).WritePiZero(_util.k_ext);
         _hhelper.at(_util.k_ext).WriteNuMu(_util.k_ext);
 
-        _thelper.at(_util.k_ext).WriteTree();
+        _thelper.at(_util.k_ext).WriteTree(_util.k_ext);
 
     }
     if (bool_use_dirt) {
@@ -584,7 +584,7 @@ void Selection::SavetoFile(){
         _hhelper.at(_util.k_dirt).WritePiZero(_util.k_dirt);
         _hhelper.at(_util.k_dirt).WriteNuMu(_util.k_dirt);
 
-        _thelper.at(_util.k_dirt).WriteTree();
+        _thelper.at(_util.k_dirt).WriteTree(_util.k_dirt);
 
     }
 
@@ -623,7 +623,11 @@ void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     if ( (cut_index == _util.k_cuts_MAX - 1) || (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc || classification.second == _util.k_unmatched_nue || classification.second == _util.k_cosmic_nue || classification.second == _util.k_unmatched_nuebar || classification.second == _util.k_cosmic_nuebar ) ) ){
 
         // This is a generated event, but unselected
-        if (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc || classification.second == _util.k_unmatched_nue || classification.second == _util.k_cosmic_nue || classification.second == _util.k_unmatched_nuebar || classification.second == _util.k_cosmic_nuebar ) ){
+        if (cut_index == _util.k_unselected && 
+            (classification.second == _util.k_nue_cc           || classification.second == _util.k_nuebar_cc ||
+             classification.second == _util.k_unmatched_nue    || classification.second == _util.k_cosmic_nue ||
+             classification.second == _util.k_unmatched_nuebar || classification.second == _util.k_cosmic_nuebar ) ){
+            
             _thelper.at(type).FillVars(SC, classification, true, weight, reco_nu_e);
         }
         // This is selected events
