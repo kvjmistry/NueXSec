@@ -219,6 +219,12 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             print = true;
             print_dirt = true;
         }
+
+        // Intrinsic nue Mode
+        if (strcmp(arg, "--intrinsic") == 0) {
+            std::cout << "Using Selection with intrinsic nue setting: " << argv[i+1] << std::endl;
+            intrinsic_mode = argv[i+1];
+        }
    
     }
 
@@ -342,12 +348,13 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     if (strcmp(run_period, "1") == 0){
         mc_scale_factor     = config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_MC_POT);
         dirt_scale_factor   = config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_Dirt_POT);
-        ext_scale_factor = config_v.at(k_Run1_Data_trig) / config_v.at(k_Run1_EXT_trig);
+        ext_scale_factor    = config_v.at(k_Run1_Data_trig) / config_v.at(k_Run1_EXT_trig);
+        intrinsic_weight    = config_v.at(k_Run1_MC_POT)    / config_v.at(k_Run1_Intrinsic_POT);
     }
     else if (strcmp(run_period, "3") == 0){
         mc_scale_factor     = config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_MC_POT);
         dirt_scale_factor   = config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_Dirt_POT);
-        ext_scale_factor = config_v.at(k_Run3_Data_trig) / config_v.at(k_Run3_EXT_trig);
+        ext_scale_factor    = config_v.at(k_Run3_Data_trig) / config_v.at(k_Run3_EXT_trig);
     }
     else {
         std::cout << "Error Krish... You havent specified the run period!" << std::endl;
@@ -361,6 +368,14 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     "Dirt Scale factor: "   << dirt_scale_factor   << "\n" <<
     "EXT Scale factor:  "   << ext_scale_factor << std::endl;
     std::cout << "-------------------------------\033[0m" << std::endl;
+
+    // Display the intrinsic nue scale factor
+    if (std::string(intrinsic_mode) == "intrinsic"){
+        std::cout << "\033[0;32m-------------------------------" << std::endl;
+        std::cout << "Intrinsic Factor:\n" << intrinsic_weight     << "\n" << std::endl;
+        std::cout << "-------------------------------\033[0m" << std::endl;
+    }
+    
     
 }
 // -----------------------------------------------------------------------------
@@ -453,7 +468,7 @@ void Utility::CheckWeight(float &weight){
 
 }
 // -----------------------------------------------------------------------------
-double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e){
+double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv){
 
     // Always give weights of 1 to the data
     if (type == k_data ) return 1.0;
@@ -484,7 +499,17 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
     if (type == k_dirt && weight_dirt) weight = weight*0.45;
 
     // Weight the below threshold events to zero. Current threhsold is 125 MeV
-    if (type == k_mc && nu_e <= 0.125) weight = 0.0;
+    if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12) && nu_e <= 0.125) weight = 0.0;
+
+    // This is the intrinsic nue weight that scales it to the standard overlay sample
+    if (std::string(intrinsic_mode) == "intrinsic" && type == k_mc && (nu_pdg == -12 || nu_pdg == 12)){
+        
+        // Kill off the out of fv events in the intrinsic nue sample (to avoid double counting)
+        if (!infv) weight = 0; 
+        else weight = weight * intrinsic_weight;
+        
+    }
+
 
     return weight;
 

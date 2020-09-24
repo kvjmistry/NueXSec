@@ -1101,6 +1101,11 @@ void HistogramHelper::WriteReco(int type){
                 
                 if (bool_dir) truth_dir->cd();
 
+                // Skip the write for the backgrounds
+                if (std::string(_util.intrinsic_mode) == "intrinsic" && j != _util.k_nue_cc && j != _util.k_nuebar_cc && j != _util.k_cosmic_nue && j != _util.k_cosmic_nuebar && j != _util.k_unmatched_nue && j != _util.k_unmatched_nuebar){
+                    continue;
+                }
+
                 // Now write the histograms
                 TH1D_hists.at(u).at(i).at(j)->SetOption("hist,E");
                 TH1D_hists.at(u).at(i).at(j)->Write("",TObject::kOverwrite);
@@ -1287,13 +1292,17 @@ void HistogramHelper::Write_2DSigBkgHists(){
     // TH2D
     for (unsigned int p = 0; p < TH2D_hists.size(); p++){
         
-        TH2D_hists.at(p).at(_util.k_signal)->SetOption("box");
-        TH2D_hists.at(p).at(_util.k_signal)->SetFillColor(30);
-        TH2D_hists.at(p).at(_util.k_signal)->Write("",TObject::kOverwrite);
+        if (std::string(_util.intrinsic_mode) == "default" || std::string(_util.intrinsic_mode) == "intrinsic"){
+            TH2D_hists.at(p).at(_util.k_signal)->SetOption("box");
+            TH2D_hists.at(p).at(_util.k_signal)->SetFillColor(30);
+            TH2D_hists.at(p).at(_util.k_signal)->Write("",TObject::kOverwrite);
+        }
 
-        TH2D_hists.at(p).at(_util.k_background)->SetOption("box");
-        TH2D_hists.at(p).at(_util.k_background)->SetFillColor(46);
-        TH2D_hists.at(p).at(_util.k_background)->Write("",TObject::kOverwrite);
+        if (std::string(_util.intrinsic_mode) == "default"){
+            TH2D_hists.at(p).at(_util.k_background)->SetOption("box");
+            TH2D_hists.at(p).at(_util.k_background)->SetFillColor(46);
+            TH2D_hists.at(p).at(_util.k_background)->Write("",TObject::kOverwrite);
+        }
     }
     
 }

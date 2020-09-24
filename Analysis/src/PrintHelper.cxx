@@ -111,6 +111,7 @@ void PrintHelper::Initialise(Utility _utility ){
             f_mc = TFile::Open( file_name.c_str(), "UPDATE");
             
             _util.GetTree(f_mc, mc_counter_tree, "mc_counter_tree");
+            _util.GetTree(f_mc, mc_nue_counter_tree, "mc_nue_counter_tree");
             tree_total_entries =  mc_counter_tree->GetEntries();
 
             eff_tree  = new TTree("mc_eff_tree",     "mc_eff_tree");
@@ -131,22 +132,22 @@ void PrintHelper::Initialise(Utility _utility ){
     
     // Counter Tree
     if (_util.print_mc){
-        mc_counter_tree->SetBranchAddress("count_nue_cc_qe",  &count_nue_cc_qe);
-        mc_counter_tree->SetBranchAddress("count_nue_cc_res", &count_nue_cc_res);
-        mc_counter_tree->SetBranchAddress("count_nue_cc_dis", &count_nue_cc_dis);
-        mc_counter_tree->SetBranchAddress("count_nue_cc_coh", &count_nue_cc_coh);
-        mc_counter_tree->SetBranchAddress("count_nue_cc_mec", &count_nue_cc_mec);
+        mc_nue_counter_tree->SetBranchAddress("count_nue_cc_qe",  &count_nue_cc_qe);
+        mc_nue_counter_tree->SetBranchAddress("count_nue_cc_res", &count_nue_cc_res);
+        mc_nue_counter_tree->SetBranchAddress("count_nue_cc_dis", &count_nue_cc_dis);
+        mc_nue_counter_tree->SetBranchAddress("count_nue_cc_coh", &count_nue_cc_coh);
+        mc_nue_counter_tree->SetBranchAddress("count_nue_cc_mec", &count_nue_cc_mec);
         
-        mc_counter_tree->SetBranchAddress("count_nuebar_cc_qe",  &count_nuebar_cc_qe);
-        mc_counter_tree->SetBranchAddress("count_nuebar_cc_res", &count_nuebar_cc_res);
-        mc_counter_tree->SetBranchAddress("count_nuebar_cc_dis", &count_nuebar_cc_dis);
-        mc_counter_tree->SetBranchAddress("count_nuebar_cc_coh", &count_nuebar_cc_coh);
-        mc_counter_tree->SetBranchAddress("count_nuebar_cc_mec", &count_nuebar_cc_mec);
+        mc_nue_counter_tree->SetBranchAddress("count_nuebar_cc_qe",  &count_nuebar_cc_qe);
+        mc_nue_counter_tree->SetBranchAddress("count_nuebar_cc_res", &count_nuebar_cc_res);
+        mc_nue_counter_tree->SetBranchAddress("count_nuebar_cc_dis", &count_nuebar_cc_dis);
+        mc_nue_counter_tree->SetBranchAddress("count_nuebar_cc_coh", &count_nuebar_cc_coh);
+        mc_nue_counter_tree->SetBranchAddress("count_nuebar_cc_mec", &count_nuebar_cc_mec);
         
-        mc_counter_tree->SetBranchAddress("count_nue_cc_infv",      &count_nue_cc_infv);
-        mc_counter_tree->SetBranchAddress("count_nuebar_cc_infv",   &count_nuebar_cc_infv);
-        mc_counter_tree->SetBranchAddress("count_nue_cc_incryo",    &count_nue_cc_incryo);
-        mc_counter_tree->SetBranchAddress("count_nuebar_cc_incryo", &count_nuebar_cc_incryo);
+        mc_nue_counter_tree->SetBranchAddress("count_nue_cc_infv",      &count_nue_cc_infv);
+        mc_nue_counter_tree->SetBranchAddress("count_nuebar_cc_infv",   &count_nuebar_cc_infv);
+        mc_nue_counter_tree->SetBranchAddress("count_nue_cc_incryo",    &count_nue_cc_incryo);
+        mc_nue_counter_tree->SetBranchAddress("count_nuebar_cc_incryo", &count_nuebar_cc_incryo);
         
         mc_counter_tree->SetBranchAddress("count_numu_cc_qe",  &count_numu_cc_qe);
         mc_counter_tree->SetBranchAddress("count_numu_cc_res", &count_numu_cc_res);
@@ -165,29 +166,29 @@ void PrintHelper::Initialise(Utility _utility ){
         mc_counter_tree->SetBranchAddress("count_numu_cc_incryo",    &count_numu_cc_incryo);
         mc_counter_tree->SetBranchAddress("count_numubar_cc_incryo", &count_numubar_cc_incryo);
 
-        mc_counter_tree->SetBranchAddress("count_pi0_nue_cc_nopi0",    &count_pi0_nue_cc_nopi0);
-        mc_counter_tree->SetBranchAddress("count_pi0_nue_cc_pi0",      &count_pi0_nue_cc_pi0);
-        mc_counter_tree->SetBranchAddress("count_pi0_nuebar_cc_nopi0", &count_pi0_nuebar_cc_nopi0);
-        mc_counter_tree->SetBranchAddress("count_pi0_nuebar_cc_pi0",   &count_pi0_nuebar_cc_pi0);
-        mc_counter_tree->SetBranchAddress("count_pi0_numu_cc_nopi0",   &count_pi0_numu_cc_nopi0);
-        mc_counter_tree->SetBranchAddress("count_pi0_numu_cc_pi0",     &count_pi0_numu_cc_pi0);
-        mc_counter_tree->SetBranchAddress("count_pi0_nc_nopi0",        &count_pi0_nc_nopi0);
-        mc_counter_tree->SetBranchAddress("count_pi0_nc_pi0",          &count_pi0_nc_pi0);
+        mc_nue_counter_tree->SetBranchAddress("count_pi0_nue_cc_nopi0",    &count_pi0_nue_cc_nopi0);
+        mc_nue_counter_tree->SetBranchAddress("count_pi0_nue_cc_pi0",      &count_pi0_nue_cc_pi0);
+        mc_nue_counter_tree->SetBranchAddress("count_pi0_nuebar_cc_nopi0", &count_pi0_nuebar_cc_nopi0);
+        mc_nue_counter_tree->SetBranchAddress("count_pi0_nuebar_cc_pi0",   &count_pi0_nuebar_cc_pi0);
+        mc_counter_tree    ->SetBranchAddress("count_pi0_numu_cc_nopi0",   &count_pi0_numu_cc_nopi0);
+        mc_counter_tree    ->SetBranchAddress("count_pi0_numu_cc_pi0",     &count_pi0_numu_cc_pi0);
+        mc_counter_tree    ->SetBranchAddress("count_pi0_nc_nopi0",        &count_pi0_nc_nopi0);
+        mc_counter_tree    ->SetBranchAddress("count_pi0_nc_pi0",          &count_pi0_nc_pi0);
         
-        mc_counter_tree->SetBranchAddress("count_nue_cc",          &count_nue_cc);
-        mc_counter_tree->SetBranchAddress("count_nuebar_cc",       &count_nuebar_cc);
-        mc_counter_tree->SetBranchAddress("count_nu_out_fv",       &count_nu_out_fv);
-        mc_counter_tree->SetBranchAddress("count_cosmic",          &count_cosmic);
-        mc_counter_tree->SetBranchAddress("count_numu_cc",         &count_numu_cc);
-        mc_counter_tree->SetBranchAddress("count_numu_cc_pi0",     &count_numu_cc_pi0);
-        mc_counter_tree->SetBranchAddress("count_nc",              &count_nc);
-        mc_counter_tree->SetBranchAddress("count_nc_pi0",          &count_nc_pi0);
-        mc_counter_tree->SetBranchAddress("count_unmatched",       &count_unmatched);
-        mc_counter_tree->SetBranchAddress("count_unmatched_nue",   &count_unmatched_nue);
-        mc_counter_tree->SetBranchAddress("count_cosmic_nue",      &count_cosmic_nue);
-        mc_counter_tree->SetBranchAddress("count_unmatched_nuebar",&count_unmatched_nuebar);
-        mc_counter_tree->SetBranchAddress("count_cosmic_nuebar",   &count_cosmic_nuebar);
-        mc_counter_tree->SetBranchAddress("count_total_mc",        &count_total_mc);
+        mc_nue_counter_tree->SetBranchAddress("count_nue_cc",          &count_nue_cc);
+        mc_nue_counter_tree->SetBranchAddress("count_nuebar_cc",       &count_nuebar_cc);
+        mc_counter_tree    ->SetBranchAddress("count_nu_out_fv",       &count_nu_out_fv);
+        mc_counter_tree    ->SetBranchAddress("count_cosmic",          &count_cosmic);
+        mc_counter_tree    ->SetBranchAddress("count_numu_cc",         &count_numu_cc);
+        mc_counter_tree    ->SetBranchAddress("count_numu_cc_pi0",     &count_numu_cc_pi0);
+        mc_counter_tree    ->SetBranchAddress("count_nc",              &count_nc);
+        mc_counter_tree    ->SetBranchAddress("count_nc_pi0",          &count_nc_pi0);
+        mc_counter_tree    ->SetBranchAddress("count_unmatched",       &count_unmatched);
+        mc_nue_counter_tree->SetBranchAddress("count_unmatched_nue",   &count_unmatched_nue);
+        mc_nue_counter_tree->SetBranchAddress("count_cosmic_nue",      &count_cosmic_nue);
+        mc_nue_counter_tree->SetBranchAddress("count_unmatched_nuebar",&count_unmatched_nuebar);
+        mc_nue_counter_tree->SetBranchAddress("count_cosmic_nuebar",   &count_cosmic_nuebar);
+        mc_counter_tree    ->SetBranchAddress("count_total_mc",        &count_total_mc);
     }
 
     if (_util.print_data){
@@ -216,6 +217,7 @@ void PrintHelper::PrintResults(){
     for (int p =0; p < tree_total_entries; p++){
 
         if (_util.print_mc)   mc_counter_tree->GetEntry(p);
+        if (_util.print_mc)   mc_nue_counter_tree->GetEntry(p);
         if (_util.print_data) data_counter_tree->GetEntry(p);
         if (_util.print_ext)  ext_counter_tree->GetEntry(p);
         if (_util.print_dirt) dirt_counter_tree->GetEntry(p);

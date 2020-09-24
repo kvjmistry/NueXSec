@@ -534,16 +534,21 @@ void Selection::SavetoFile(){
     // Now saving histograms to file
     std::cout << "Now Saving Histograms to file" << std::endl;
     if (bool_use_mc) {
-
-        _hhelper.at(_util.k_mc).WriteTrue();
-        _hhelper.at(_util.k_mc).WriteTEfficiency();
-        _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
-        _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_mc);
-        _hhelper.at(_util.k_mc).WriteFlash();
-        _hhelper.at(_util.k_mc).WriteInteractions();
-        _hhelper.at(_util.k_mc).Write_2DSigBkgHists();
-        _hhelper.at(_util.k_mc).WritePiZero(_util.k_mc);
-        _hhelper.at(_util.k_mc).WriteNuMu(_util.k_mc);
+    
+        if (std::string(_util.intrinsic_mode) == "default" || std::string(_util.intrinsic_mode) == "intrinsic"){
+            _hhelper.at(_util.k_mc).WriteTEfficiency();
+            _hhelper.at(_util.k_mc).WriteTrue();
+            _hhelper.at(_util.k_mc).WriteInteractions();
+            _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
+            _hhelper.at(_util.k_mc).Write_2DSigBkgHists();
+        }
+        
+        if (std::string(_util.intrinsic_mode) == "default") {
+            _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_mc);
+            _hhelper.at(_util.k_mc).WriteFlash();
+            _hhelper.at(_util.k_mc).WritePiZero(_util.k_mc);
+            _hhelper.at(_util.k_mc).WriteNuMu(_util.k_mc);
+        }
 
         _thelper.at(_util.k_mc).WriteTree();
 
@@ -591,7 +596,8 @@ void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     // Get the CV weight
     // *************************************************************************
     double weight = 1.0;
-    weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e);
+    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+    weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv);
 
     // Try scaling the pi0 -- need to implement this as a configurable option
     // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
@@ -636,7 +642,6 @@ void Selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::strin
     // *************************************************************************
     // Tabulate the selection i.e count everything
     // *************************************************************************
-    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
     _util.Tabulate(is_in_fv, interaction, classification.first, pi0_classification, type, counter_v.at(cut_index), weight );
 
 }
@@ -686,8 +691,10 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
     pass = _scuts.pi_zero_cuts(SC);
     if(!pass) return; // Failed the cut!
 
+    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+
     // Get the Central Value weight
-    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e);
+    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv);
 
     double weight_norm = weight;
     double weight_Escale = weight;
@@ -769,8 +776,10 @@ void Selection::ApplyNuMuSelection(int type, SliceContainer &SC){
     pass = _scuts.numu_cuts(SC);
     if(!pass) return; // Failed the cut!
 
+    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+
     // Get the Central Value weight
-    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e);
+    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv);
     
     // Also apply the pi0 weight
     _util.GetPiZeroWeight(weight, _util.pi0_correction, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);

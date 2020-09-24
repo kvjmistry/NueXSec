@@ -73,7 +73,7 @@ public:
     void CheckWeight(float &weight);
     // -------------------------------------------------------------------------
     // Get the CV weight correction
-    double GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e);
+    double GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv);
     // -------------------------------------------------------------------------
     // Get the pi0 weight correction
     void GetPiZeroWeight(double &weight, int pizero_mode, int nu_pdg, int ccnc, int npi0, double pi0_e);
@@ -155,6 +155,7 @@ public:
     char * xsec_rw_mode          = (char *)"default"; // choose whether to reweight by cut or the final selection
     char * xsec_labels           = (char *)"all";
     char * uplotmode             = (char *)"default";
+    char * intrinsic_mode        = (char *)"default"; // choose whether to override the nue component to accomodate the intrinsic nue sample
     int num_events{-1};
     int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
     int _weight_tune{1}; // Use the GENIE Tune
@@ -175,6 +176,7 @@ public:
     double mc_scale_factor     = 1.0;
     double ext_scale_factor    = 1.0;
     double dirt_scale_factor   = 1.0;
+    double intrinsic_weight    = 1.0;
 
     // POT 
     std::vector<double> config_v;
@@ -185,6 +187,7 @@ public:
         "Run1_Data_POT",
         "Run1_Data_trig",
         "Run1_EXT_trig",
+        "Run1_Intrinsic_POT",
         "Run3_MC_POT",
         "Run3_Dirt_POT",
         "Run3_Data_POT",
@@ -200,6 +203,7 @@ public:
                 k_Run1_Data_POT,
                 k_Run1_Data_trig,
                 k_Run1_EXT_trig,
+                k_Run1_Intrinsic_POT,
                 k_Run3_MC_POT,
                 k_Run3_Dirt_POT,
                 k_Run3_Data_POT,

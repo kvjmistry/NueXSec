@@ -35,6 +35,8 @@ Run1_Data_trig 2347745.0       // v3 with michel veto updated pawels tool
 // Run1_EXT_trig 3378479.250000
 Run1_EXT_trig 4015961.990000 // v3 with michel veto updated
 -
+Run1_Intrinsic_POT 1.85664e+22 // For Using Intrinsic nue sample
+-
 // ------- Additional Run 1 POT Definitions -----
 -
 // Run 1 with event weights

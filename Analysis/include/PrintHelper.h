@@ -33,6 +33,7 @@ class PrintHelper{
 
    
     TTree * mc_counter_tree; // MC Counter Tree
+    TTree * mc_nue_counter_tree; // MC Counter Tree for nues
     TTree * data_counter_tree; // Data Counter Tree
     TTree * ext_counter_tree; // EXT Counter Tree
     TTree * dirt_counter_tree; // Dirt Counter Tree

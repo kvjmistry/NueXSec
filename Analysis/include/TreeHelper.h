@@ -102,6 +102,7 @@ class TreeHelper{
     TTree * tree;       // Main tree with the selected events
     TTree * dedx_tree;  // Tree for optimising the dedx cut
     TTree * counter_tree; // Tree for storing the selection results
+    TTree * nue_counter_tree; // Tree for storing the nue selection results
 
 
     // vars for dedx

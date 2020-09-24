@@ -23,9 +23,10 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
         }
 
         // Create the TTree
-        tree      = new TTree("mc_tree",         "mc_tree");
-        dedx_tree = new TTree("mc_dedx_tree",    "mc_dedx_tree");
-        counter_tree = new TTree("mc_counter_tree",    "mc_counter_tree");
+        tree             = new TTree("mc_tree",                "mc_tree");
+        dedx_tree        = new TTree("mc_dedx_tree",           "mc_dedx_tree");
+        counter_tree     = new TTree("mc_counter_tree",        "mc_counter_tree");
+        nue_counter_tree = new TTree("mc_nue_counter_tree",    "mc_nue_counter_tree");
     }
     else if (type == _util.k_data){
         
@@ -150,7 +151,7 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
     dedx_tree->Branch("shr_tkfit_dedx_U", &shr_tkfit_dedx_U, "shr_tkfit_dedx_U/F");
     
     dedx_tree->Branch("weight",          &weight,       "weight/D");
-    dedx_tree->Branch("classification",   &classification);
+    dedx_tree->Branch("classification",  &classification);
     dedx_tree->Branch("shr_distance",    &shr_distance, "shr_distance/F");
     dedx_tree->Branch("shr_theta",       &shr_theta,    "shr_theta/F");
     dedx_tree->Branch("cut", &cut);
@@ -159,67 +160,67 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
 
 
     // Counter Tree
-    counter_tree->Branch("count_nue_cc_qe",  &count_nue_cc_qe);
-    counter_tree->Branch("count_nue_cc_res", &count_nue_cc_res);
-    counter_tree->Branch("count_nue_cc_dis", &count_nue_cc_dis);
-    counter_tree->Branch("count_nue_cc_coh", &count_nue_cc_coh);
-    counter_tree->Branch("count_nue_cc_mec", &count_nue_cc_mec);
+    nue_counter_tree->Branch("count_nue_cc_qe",  &count_nue_cc_qe);
+    nue_counter_tree->Branch("count_nue_cc_res", &count_nue_cc_res);
+    nue_counter_tree->Branch("count_nue_cc_dis", &count_nue_cc_dis);
+    nue_counter_tree->Branch("count_nue_cc_coh", &count_nue_cc_coh);
+    nue_counter_tree->Branch("count_nue_cc_mec", &count_nue_cc_mec);
     
-    counter_tree->Branch("count_nuebar_cc_qe",  &count_nuebar_cc_qe);
-    counter_tree->Branch("count_nuebar_cc_res", &count_nuebar_cc_res);
-    counter_tree->Branch("count_nuebar_cc_dis", &count_nuebar_cc_dis);
-    counter_tree->Branch("count_nuebar_cc_coh", &count_nuebar_cc_coh);
-    counter_tree->Branch("count_nuebar_cc_mec", &count_nuebar_cc_mec);
+    nue_counter_tree->Branch("count_nuebar_cc_qe",  &count_nuebar_cc_qe);
+    nue_counter_tree->Branch("count_nuebar_cc_res", &count_nuebar_cc_res);
+    nue_counter_tree->Branch("count_nuebar_cc_dis", &count_nuebar_cc_dis);
+    nue_counter_tree->Branch("count_nuebar_cc_coh", &count_nuebar_cc_coh);
+    nue_counter_tree->Branch("count_nuebar_cc_mec", &count_nuebar_cc_mec);
     
-    counter_tree->Branch("count_nue_cc_infv",      &count_nue_cc_infv);
-    counter_tree->Branch("count_nuebar_cc_infv",   &count_nuebar_cc_infv);
-    counter_tree->Branch("count_nue_cc_incryo",    &count_nue_cc_incryo);
-    counter_tree->Branch("count_nuebar_cc_incryo", &count_nuebar_cc_incryo);
+    nue_counter_tree->Branch("count_nue_cc_infv",      &count_nue_cc_infv);
+    nue_counter_tree->Branch("count_nuebar_cc_infv",   &count_nuebar_cc_infv);
+    nue_counter_tree->Branch("count_nue_cc_incryo",    &count_nue_cc_incryo);
+    nue_counter_tree->Branch("count_nuebar_cc_incryo", &count_nuebar_cc_incryo);
     
-    counter_tree->Branch("count_numu_cc_qe",  &count_numu_cc_qe);
-    counter_tree->Branch("count_numu_cc_res", &count_numu_cc_res);
-    counter_tree->Branch("count_numu_cc_dis", &count_numu_cc_dis);
-    counter_tree->Branch("count_numu_cc_coh", &count_numu_cc_coh);
-    counter_tree->Branch("count_numu_cc_mec", &count_numu_cc_mec);
+    counter_tree    ->Branch("count_numu_cc_qe",  &count_numu_cc_qe);
+    counter_tree    ->Branch("count_numu_cc_res", &count_numu_cc_res);
+    counter_tree    ->Branch("count_numu_cc_dis", &count_numu_cc_dis);
+    counter_tree    ->Branch("count_numu_cc_coh", &count_numu_cc_coh);
+    counter_tree    ->Branch("count_numu_cc_mec", &count_numu_cc_mec);
     
-    counter_tree->Branch("count_numubar_cc_qe",  &count_numubar_cc_qe);
-    counter_tree->Branch("count_numubar_cc_res", &count_numubar_cc_res);
-    counter_tree->Branch("count_numubar_cc_dis", &count_numubar_cc_dis);
-    counter_tree->Branch("count_numubar_cc_coh", &count_numubar_cc_coh);
-    counter_tree->Branch("count_numubar_cc_mec", &count_numubar_cc_mec);
+    counter_tree    ->Branch("count_numubar_cc_qe",  &count_numubar_cc_qe);
+    counter_tree    ->Branch("count_numubar_cc_res", &count_numubar_cc_res);
+    counter_tree    ->Branch("count_numubar_cc_dis", &count_numubar_cc_dis);
+    counter_tree    ->Branch("count_numubar_cc_coh", &count_numubar_cc_coh);
+    counter_tree    ->Branch("count_numubar_cc_mec", &count_numubar_cc_mec);
     
-    counter_tree->Branch("count_numu_cc_infv",      &count_numu_cc_infv);
-    counter_tree->Branch("count_numubar_cc_infv",   &count_numubar_cc_infv);
-    counter_tree->Branch("count_numu_cc_incryo",    &count_numu_cc_incryo);
-    counter_tree->Branch("count_numubar_cc_incryo", &count_numubar_cc_incryo);
+    counter_tree    ->Branch("count_numu_cc_infv",      &count_numu_cc_infv);
+    counter_tree    ->Branch("count_numubar_cc_infv",   &count_numubar_cc_infv);
+    counter_tree    ->Branch("count_numu_cc_incryo",    &count_numu_cc_incryo);
+    counter_tree    ->Branch("count_numubar_cc_incryo", &count_numubar_cc_incryo);
 
 
-    counter_tree->Branch("count_pi0_nue_cc_nopi0",    &count_pi0_nue_cc_nopi0);
-    counter_tree->Branch("count_pi0_nue_cc_pi0",      &count_pi0_nue_cc_pi0);
-    counter_tree->Branch("count_pi0_nuebar_cc_nopi0", &count_pi0_nuebar_cc_nopi0);
-    counter_tree->Branch("count_pi0_nuebar_cc_pi0",   &count_pi0_nuebar_cc_pi0);
-    counter_tree->Branch("count_pi0_numu_cc_nopi0",   &count_pi0_numu_cc_nopi0);
-    counter_tree->Branch("count_pi0_numu_cc_pi0",     &count_pi0_numu_cc_pi0);
-    counter_tree->Branch("count_pi0_nc_nopi0",        &count_pi0_nc_nopi0);
-    counter_tree->Branch("count_pi0_nc_pi0",          &count_pi0_nc_pi0);
+    nue_counter_tree->Branch("count_pi0_nue_cc_nopi0",    &count_pi0_nue_cc_nopi0);
+    nue_counter_tree->Branch("count_pi0_nue_cc_pi0",      &count_pi0_nue_cc_pi0);
+    nue_counter_tree->Branch("count_pi0_nuebar_cc_nopi0", &count_pi0_nuebar_cc_nopi0);
+    nue_counter_tree->Branch("count_pi0_nuebar_cc_pi0",   &count_pi0_nuebar_cc_pi0);
+    counter_tree    ->Branch("count_pi0_numu_cc_nopi0",   &count_pi0_numu_cc_nopi0);
+    counter_tree    ->Branch("count_pi0_numu_cc_pi0",     &count_pi0_numu_cc_pi0);
+    counter_tree    ->Branch("count_pi0_nc_nopi0",        &count_pi0_nc_nopi0);
+    counter_tree    ->Branch("count_pi0_nc_pi0",          &count_pi0_nc_pi0);
     
-    counter_tree->Branch("count_nue_cc",       &count_nue_cc);
-    counter_tree->Branch("count_nuebar_cc",    &count_nuebar_cc);
-    counter_tree->Branch("count_nu_out_fv",    &count_nu_out_fv);
-    counter_tree->Branch("count_cosmic",       &count_cosmic);
-    counter_tree->Branch("count_numu_cc",      &count_numu_cc);
-    counter_tree->Branch("count_numu_cc_pi0",  &count_numu_cc_pi0);
-    counter_tree->Branch("count_nc",           &count_nc);
-    counter_tree->Branch("count_nc_pi0",       &count_nc_pi0);
-    counter_tree->Branch("count_unmatched",    &count_unmatched);
-    counter_tree->Branch("count_unmatched_nue",   &count_unmatched_nue);
-    counter_tree->Branch("count_cosmic_nue",      &count_cosmic_nue);
-    counter_tree->Branch("count_unmatched_nuebar",&count_unmatched_nuebar);
-    counter_tree->Branch("count_cosmic_nuebar",   &count_cosmic_nuebar);
-    counter_tree->Branch("count_total_mc",     &count_total_mc);
-    counter_tree->Branch("count_data",         &count_data);
-    counter_tree->Branch("count_ext",          &count_ext);
-    counter_tree->Branch("count_dirt",         &count_dirt);
+    nue_counter_tree->Branch("count_nue_cc",       &count_nue_cc);
+    nue_counter_tree->Branch("count_nuebar_cc",    &count_nuebar_cc);
+    counter_tree    ->Branch("count_nu_out_fv",    &count_nu_out_fv);
+    counter_tree    ->Branch("count_cosmic",       &count_cosmic);
+    counter_tree    ->Branch("count_numu_cc",      &count_numu_cc);
+    counter_tree    ->Branch("count_numu_cc_pi0",  &count_numu_cc_pi0);
+    counter_tree    ->Branch("count_nc",           &count_nc);
+    counter_tree    ->Branch("count_nc_pi0",       &count_nc_pi0);
+    nue_counter_tree->Branch("count_unmatched",    &count_unmatched);
+    nue_counter_tree->Branch("count_unmatched_nue",   &count_unmatched_nue);
+    nue_counter_tree->Branch("count_cosmic_nue",      &count_cosmic_nue);
+    nue_counter_tree->Branch("count_unmatched_nuebar",&count_unmatched_nuebar);
+    nue_counter_tree->Branch("count_cosmic_nuebar",   &count_cosmic_nuebar);
+    counter_tree    ->Branch("count_total_mc",     &count_total_mc);
+    counter_tree    ->Branch("count_data",         &count_data);
+    counter_tree    ->Branch("count_ext",          &count_ext);
+    counter_tree    ->Branch("count_dirt",         &count_dirt);
 
     std::cout << "Finished Initalising the Tree Helper..."<< std::endl;
 
@@ -343,7 +344,8 @@ void TreeHelper::WriteTree(){
 
     dedx_tree->Write("",TObject::kOverwrite);
 
-    counter_tree->Write("",TObject::kOverwrite);
+    if (std::string(_util.intrinsic_mode) == "intrinsic") nue_counter_tree->Write("",TObject::kOverwrite);
+    else counter_tree->Write("",TObject::kOverwrite);
 
 }
 // -----------------------------------------------------------------------------
@@ -418,5 +420,7 @@ void TreeHelper::Fill_counters(std::vector<double> counter_v, bool bool_use_mc, 
     if (bool_use_dirt)  count_dirt         = counter_v.at(_util.k_count_dirt);
 
     counter_tree->Fill();
+
+    nue_counter_tree->Fill();
 
 }
