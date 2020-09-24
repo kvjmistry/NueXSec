@@ -114,7 +114,8 @@ public:
     // Initialise the TPad size for a ratio type of plot
     void SetTPadOptions(TPad *topPad, TPad *bottomPad);
     // -------------------------------------------------------------------------
-
+    // Check if POT from input file matches with the value in config.txt
+    void CheckPOT();
 
     // Variables
 
