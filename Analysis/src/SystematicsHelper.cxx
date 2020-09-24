@@ -685,7 +685,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
 // -----------------------------------------------------------------------------
 void SystematicsHelper::SetLabelName(std::string label, std::string &label_up, std::string &label_dn){
 
-    if       (label == "Horn_curr"          ){
+    if  (label == "Horn_curr"          ){
         label_up = "Horn_p2kA";
         label_dn = "Horn_m2kA";
     }
@@ -1776,7 +1776,7 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
             // Get the average error in each bin, then add the square
             av_err += std::abs(h_up->GetBinContent(bin+1));
             av_err += std::abs(h_dn->GetBinContent(bin+1));
-            av_err /= 2.0;
+            av_err /= std::sqrt(2.0); // sqrt 2 since we are using the covariance matrix formalism (cov matrix with 2 universes) -- error is sqrt diag
             v_genie_uni_total.at(var).at(type).at(bin) += av_err*av_err;
             v_sys_total.at(var).at(type).at(bin)       += av_err*av_err;
             
@@ -1803,7 +1803,7 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
             // Get the max error in each bin, then add the square
             av_err += std::abs(h_up->GetBinContent(bin+1));
             av_err += std::abs(h_dn->GetBinContent(bin+1));
-            av_err /= 2.0;
+            av_err /= std::sqrt(2.0); // sqrt 2 since we are using the covariance matrix formalism (cov matrix with 2 universes) -- error is sqrt diag
             v_beamline_total.at(var).at(type).at(bin) += av_err*av_err;
             v_sys_total.at(var).at(type).at(bin)      += av_err*av_err;
             
@@ -1816,8 +1816,8 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
             double av_err = 0;
             // Get the average error in each bin, then add the square
             av_err += std::abs(h_up->GetBinContent(bin+1));
-            av_err += std::abs(h_dn->GetBinContent(bin+1));
-            av_err /= 2.0;
+            // av_err += std::abs(h_dn->GetBinContent(bin+1));
+            // av_err /= 2.0;
             v_genie_multi_total.at(var).at(type).at(bin) += av_err*av_err;
             v_sys_total.at(var).at(type).at(bin) += av_err*av_err;
             
@@ -1831,8 +1831,8 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
             double av_err = 0;
             // Get the average error in each bin, then add the square
             av_err += std::abs(h_up->GetBinContent(bin+1));
-            av_err += std::abs(h_dn->GetBinContent(bin+1));
-            av_err /= 2.0;
+            // av_err += std::abs(h_dn->GetBinContent(bin+1));
+            // av_err /= 2.0;
             v_reint_total.at(var).at(type).at(bin) += av_err*av_err;
             v_sys_total.at(var).at(type).at(bin) += av_err*av_err;
             
@@ -1846,8 +1846,8 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
             double av_err = 0;
             // Get the average error in each bin, then add the square
             av_err += std::abs(h_up->GetBinContent(bin+1));
-            av_err += std::abs(h_dn->GetBinContent(bin+1));
-            av_err /= 2.0;
+            // av_err += std::abs(h_dn->GetBinContent(bin+1));
+            // av_err /= 2.0;
             v_hp_total.at(var).at(type).at(bin) += av_err*av_err;
             v_sys_total.at(var).at(type).at(bin) += av_err*av_err;
             
@@ -1861,8 +1861,8 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
             double av_err = 0;
             // Get the average error in each bin, then add the square
             av_err += std::abs(h_up->GetBinContent(bin+1));
-            av_err += std::abs(h_dn->GetBinContent(bin+1));
-            av_err /= 2.0;
+            // av_err += std::abs(h_dn->GetBinContent(bin+1));
+            // av_err /= 2.0;
             v_dirt_total.at(var).at(type).at(bin) += av_err*av_err;
             v_sys_total.at(var).at(type).at(bin)  += av_err*av_err;
             
@@ -1876,8 +1876,8 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
             double av_err = 0;
             // Get the average error in each bin, then add the square
             av_err += std::abs(h_up->GetBinContent(bin+1));
-            av_err += std::abs(h_dn->GetBinContent(bin+1));
-            av_err /= 2.0;
+            // av_err += std::abs(h_dn->GetBinContent(bin+1));
+            // av_err /= 2.0;
             v_pot_total.at(var).at(type).at(bin) += av_err*av_err;
             v_sys_total.at(var).at(type).at(bin) += av_err*av_err;
             
@@ -2341,11 +2341,70 @@ void SystematicsHelper::InitialiseReweightingModeCut(){
     // Should we add more protection to this command??
     f_nuexsec = TFile::Open( Form("files/crosssec_run%s.root", _util.run_period ), "READ");
 
+    TFile *f_out = new TFile( Form("files/run%s_sys_var.root", _util.run_period ), "UPDATE");
 
-
-
+    // Loop over cuts and get the sys uncertainty
 
 }
 // -----------------------------------------------------------------------------
+void SystematicsHelper::GetCutSysUncertainty(TFile *f_out, std::string histname, int cut_index, std::string label, int num_uni, std::string var_type){
+
+    // Declare the histogram vector for the cut
+    std::vector<TH1D*> h_universe;
+    TH1D *h_cv;
+
+    h_universe.resize(num_uni);
+
+    // Now get the histograms
+    std::string label_up = label + "up";
+    std::string label_dn = label + "dn";
+
+    // Set the Unisim up down variation name
+    SetLabelName(label, label_up, label_dn);
+
+    // Now get the histograms
+
+    // If its a unisim then we have up/dn type variation
+    if (var_type == "unisim"){
+        _util.GetHist(f_nuexsec, h_universe.at(k_up), Form( "%s/Cuts/%s/%s/h_cut_%s_%s_%s_0", label_up.c_str(), _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(), label_up.c_str(),_util.cut_dirs.at(cut_index).c_str()));
+        _util.GetHist(f_nuexsec, h_universe.at(k_dn), Form( "%s/Cuts/%s/%s/h_cut_%s_%s_%s_0", label_dn.c_str(), _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(), label_dn.c_str(),_util.cut_dirs.at(cut_index).c_str()));
+    }
+    // Multisim
+    else {
+        // Loop over the universes
+        for (int uni = 0; uni < num_uni; uni++){
+            _util.GetHist(f_nuexsec, h_universe.at(uni), Form( "%s/Cuts/%s/%s/h_cut_%s_%s_%s_%i", label.c_str(), _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(), label.c_str(),_util.cut_dirs.at(cut_index).c_str(), uni));
+        }
+    }
+
+    // Now get the CV
+    _util.GetHist(f_nuexsec, h_cv, Form( "CV/Cuts/%s/%s/h_cut_%s_CV_%s_0", _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(),_util.cut_dirs.at(cut_index).c_str()));
+
+    // Now we got the histograms, we loop over an get the uncertainties
+    TH1D* h_err = (TH1D*)h_universe.at(k_up)->Clone();
+
+    // Loop over the universes
+    for (unsigned int uni = 0 ; uni < h_universe.size(); uni ++){
+        
+        // Loop over the bins 
+        for (int bin = 1; bin < h_universe.at(k_up)->GetNbinsX()+1; bin++){
+            double deviate = h_cv->GetBinContent(bin) - h_universe.at(uni)->GetBinContent(bin); // CV - Uni in bin i
+            h_err->SetBinContent(bin, deviate*deviate); // differene squared
+        }
+        
+    }
+
+    // Sqrt all bins/N
+    for (int bin = 1; bin < h_universe.at(k_up)->GetNbinsX()+1; bin++){
+        double err = std::sqrt(h_err->GetBinContent(bin)/num_uni);
+        h_err->SetBinContent(bin, err); // differene squared
+    }
+
+
+    // Now write the historam to file
+    
+
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

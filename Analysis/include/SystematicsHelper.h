@@ -109,6 +109,9 @@ class SystematicsHelper{
     // Set the fill colours of the unisim variations
     void SetUnisimColours(std::string label, TH1D* h_up, TH1D* h_dn);
     // -------------------------------------------------------------------------
+    // Get the systematic uncertainty for each cut for a specific set of variables
+    void GetCutSysUncertainty(TFile *f_out, std::string histname, int cut_index, std::string label, int num_uni, std::string var_type);
+    // -------------------------------------------------------------------------
 
 
 

@@ -522,6 +522,8 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     
     SelectionFill(type, SC, classification, interaction, pi0_classification, particle_type, _util.k_dEdx_max_no_tracks, counter_v );
 
+    // if ((SC.nu_pdg == 12 || SC.nu_pdg == -12) && SC.nu_e < 0.3) std::cout<<"Low nu_e E!: " <<SC.nu_e << std::endl; 
+
     // **************************************************************************
     return true;
 
