@@ -16,7 +16,7 @@ class TreeHelper{
     void Initialise(int type, const char* file_out, Utility _utility);
     // -------------------------------------------------------------------------
     // Function to fill the tree vars
-    void FillVars(SliceContainer &SC);
+    void FillVars(SliceContainer &SC, bool passed_selection);
     // -------------------------------------------------------------------------
     // Fill the variables in the dedx tree
     void Fill_dedxVars(SliceContainer &SC, std::pair<std::string, int> _classification, std::string _cut, double _weight);
@@ -51,7 +51,8 @@ class TreeHelper{
     
     // Is the event a true signal event in the FV that was not selected?
     // We still need these for the efficiency
-    bool gen{false};           
+    bool gen{false};   
+    bool passed_selection{false};        
     
     double weight{0.0};        // This is not going to be integer if we already weight the CV
 

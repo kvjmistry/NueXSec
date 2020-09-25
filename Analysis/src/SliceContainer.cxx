@@ -463,7 +463,7 @@ void SliceContainer::SliceClassifier(int type){
                     }
                     // Most of the slice from pandora was unmatched hits -- probably a cosmic
                     else if (nu_purity_from_pfp >= 0 && nu_purity_from_pfp <= 0.5){
-                        classification = std::make_pair("cosmic_nue",   _util.k_cosmic);
+                        classification = std::make_pair("cosmic_nue",   _util.k_cosmic_nue);
                         return;
                     }
                     // These events were not picked up by pandora at all

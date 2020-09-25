@@ -229,7 +229,7 @@ void Selection::MakeSelection(){
             bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
 
             // Fill the output tree if the event passed or it was signal
-            if (pass || mc_SC.is_signal) _thelper.at(_util.k_mc).FillVars(mc_SC);
+            if (pass || mc_SC.is_signal) _thelper.at(_util.k_mc).FillVars(mc_SC, pass);
             
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_mc << mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt << '\n';
@@ -284,7 +284,7 @@ void Selection::MakeSelection(){
             bool pass = ApplyCuts(_util.k_data, ievent, counter_v, data_passed_v, data_SC);
 
             // Fill the output tree if the event passed the selection
-            if (pass) _thelper.at(_util.k_data).FillVars(data_SC);
+            if (pass) _thelper.at(_util.k_data).FillVars(data_SC, pass);
             
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_data << data_SC.run << " " << data_SC.sub << " " << data_SC.evt << '\n';
@@ -330,7 +330,7 @@ void Selection::MakeSelection(){
             bool pass = ApplyCuts(_util.k_ext, ievent, counter_v, ext_passed_v, ext_SC);
             
             // Fill the output tree if the event passed the selection
-            if (pass) _thelper.at(_util.k_ext).FillVars(ext_SC);
+            if (pass) _thelper.at(_util.k_ext).FillVars(ext_SC, pass);
 
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_ext << ext_SC.run << " " << ext_SC.sub << " " << ext_SC.evt << '\n';
@@ -372,7 +372,7 @@ void Selection::MakeSelection(){
             bool pass = ApplyCuts(_util.k_dirt, ievent, counter_v, dirt_passed_v, dirt_SC);
 
             // Fill the output tree if the event passed the selection
-            if (pass) _thelper.at(_util.k_dirt).FillVars(dirt_SC);
+            if (pass) _thelper.at(_util.k_dirt).FillVars(dirt_SC, pass);
             
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_dirt << dirt_SC.run << " " << dirt_SC.sub << " " << dirt_SC.evt << '\n';
@@ -611,12 +611,12 @@ void Selection::SelectionFill(int type, SliceContainer &SC, int cut_index, std::
     bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
     weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv);
 
-    // Set the CV weight variable in the slice container
-    SC.SetCVWeight(weight);
-
     // Try scaling the pi0 -- need to implement this as a configurable option
     // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
     _util.GetPiZeroWeight(weight, _util.pi0_correction, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
+
+    // Set the CV weight variable in the slice container
+    SC.SetCVWeight(weight);
     
     // *************************************************************************
     // Calculate the reconstructed neutrino energy
@@ -632,25 +632,6 @@ void Selection::SelectionFill(int type, SliceContainer &SC, int cut_index, std::
 
     // Fill Plots for Efficiency
     if (!_util.slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, SC.classification.first, SC, weight);
-
-    // We want to save a slimmed down version of the selection for calculating the cross section
-    // For the last cut we fill the tree or the first cut and nue_cc (generated and unselected events)
-    if ( (cut_index == _util.k_cuts_MAX - 1) || (cut_index == _util.k_unselected && (SC.classification.second == _util.k_nue_cc || SC.classification.second == _util.k_nuebar_cc || SC.classification.second == _util.k_unmatched_nue || SC.classification.second == _util.k_cosmic_nue || SC.classification.second == _util.k_unmatched_nuebar || SC.classification.second == _util.k_cosmic_nuebar ) ) ){
-
-        // This is a generated event, but unselected
-        if (cut_index == _util.k_unselected && 
-            (SC.classification.second == _util.k_nue_cc           || SC.classification.second == _util.k_nuebar_cc ||
-             SC.classification.second == _util.k_unmatched_nue    || SC.classification.second == _util.k_cosmic_nue ||
-             SC.classification.second == _util.k_unmatched_nuebar || SC.classification.second == _util.k_cosmic_nuebar ) ){
-            
-            // _thelper.at(type).FillVars(SC, SC.classification, true, weight, reco_nu_e);
-        }
-        // This is selected events
-        else {
-            // _thelper.at(type).FillVars(SC, SC.classification, false, weight, reco_nu_e);
-        }
-
-    }
 
     // Fill the dedx ttree before shr dist dedx cut and after cut dedx
     // We can use this tree to play around and optimise the dedx cut. Not essential for the analysis

@@ -183,7 +183,7 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
 
 }
 // -----------------------------------------------------------------------------
-void TreeHelper::FillVars(SliceContainer &SC){
+void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
 
     f_nuexsec->cd();
 
@@ -191,6 +191,7 @@ void TreeHelper::FillVars(SliceContainer &SC){
     subrun = SC.sub;
     event  = SC.evt;
     gen    = SC.is_signal;
+    passed_selection = _passed_selection;
     classification = SC.classification.first;
     weight = SC.cv_weight;
     true_energy = SC.nu_e;
@@ -400,6 +401,7 @@ void TreeHelper::SetBranches(TTree * tree){
     tree->Branch("subrun",           &subrun, "subrun/I");
     tree->Branch("event",            &event,  "event/I");
     tree->Branch("gen",              &gen,    "gen/O");
+    tree->Branch("passed_selection", &passed_selection,    "passed_selection/O");
     tree->Branch("weight",           &weight, "weight/D");
     tree->Branch("true_energy",      &true_energy, "true_energy/D");
     tree->Branch("reco_energy",      &reco_energy, "reco_energy/D");
