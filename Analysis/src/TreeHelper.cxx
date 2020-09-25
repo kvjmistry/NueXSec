@@ -183,18 +183,18 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
 
 }
 // -----------------------------------------------------------------------------
-void TreeHelper::FillVars(SliceContainer &SC, std::pair<std::string, int> _classification, bool _gen, double _weight, double _reco_energy){
+void TreeHelper::FillVars(SliceContainer &SC){
 
     f_nuexsec->cd();
 
     run    = SC.run;
     subrun = SC.sub;
     event  = SC.evt;
-    gen    = _gen;
-    classification = _classification.first;
-    weight = _weight;
+    gen    = SC.is_signal;
+    classification = SC.classification.first;
+    weight = SC.cv_weight;
     true_energy = SC.nu_e;
-    reco_energy = _reco_energy;
+    reco_energy = 0.0; // Leave unset for now, we arent using it!
     shr_tkfit_dedx_Y = SC.shr_tkfit_dedx_Y;
     n_showers = SC.n_showers;
     n_tracks  = SC.n_tracks;

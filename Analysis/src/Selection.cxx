@@ -227,6 +227,9 @@ void Selection::MakeSelection(){
             
             // Apply the Selection cuts 
             bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
+
+            // Fill the output tree if the event passed or it was signal
+            if (pass || mc_SC.is_signal) _thelper.at(_util.k_mc).FillVars(mc_SC);
             
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_mc << mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt << '\n';
@@ -279,6 +282,9 @@ void Selection::MakeSelection(){
             ApplyNuMuSelection(_util.k_data, data_SC);
 
             bool pass = ApplyCuts(_util.k_data, ievent, counter_v, data_passed_v, data_SC);
+
+            // Fill the output tree if the event passed the selection
+            if (pass) _thelper.at(_util.k_data).FillVars(data_SC);
             
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_data << data_SC.run << " " << data_SC.sub << " " << data_SC.evt << '\n';
@@ -323,6 +329,9 @@ void Selection::MakeSelection(){
 
             bool pass = ApplyCuts(_util.k_ext, ievent, counter_v, ext_passed_v, ext_SC);
             
+            // Fill the output tree if the event passed the selection
+            if (pass) _thelper.at(_util.k_ext).FillVars(ext_SC);
+
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_ext << ext_SC.run << " " << ext_SC.sub << " " << ext_SC.evt << '\n';
         }
@@ -361,6 +370,9 @@ void Selection::MakeSelection(){
             ApplyNuMuSelection(_util.k_dirt, dirt_SC);
 
             bool pass = ApplyCuts(_util.k_dirt, ievent, counter_v, dirt_passed_v, dirt_SC);
+
+            // Fill the output tree if the event passed the selection
+            if (pass) _thelper.at(_util.k_dirt).FillVars(dirt_SC);
             
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_dirt << dirt_SC.run << " " << dirt_SC.sub << " " << dirt_SC.evt << '\n';
@@ -403,6 +415,7 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SC.SliceInteractionType(type); // Genie interaction type
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
     SC.Pi0Classifier(type); 
+    SC.SetSignal();                // Set the event as either signal or other
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
@@ -598,6 +611,9 @@ void Selection::SelectionFill(int type, SliceContainer &SC, int cut_index, std::
     bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
     weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv);
 
+    // Set the CV weight variable in the slice container
+    SC.SetCVWeight(weight);
+
     // Try scaling the pi0 -- need to implement this as a configurable option
     // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
     _util.GetPiZeroWeight(weight, _util.pi0_correction, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
@@ -627,11 +643,11 @@ void Selection::SelectionFill(int type, SliceContainer &SC, int cut_index, std::
              SC.classification.second == _util.k_unmatched_nue    || SC.classification.second == _util.k_cosmic_nue ||
              SC.classification.second == _util.k_unmatched_nuebar || SC.classification.second == _util.k_cosmic_nuebar ) ){
             
-            _thelper.at(type).FillVars(SC, SC.classification, true, weight, reco_nu_e);
+            // _thelper.at(type).FillVars(SC, SC.classification, true, weight, reco_nu_e);
         }
         // This is selected events
         else {
-            _thelper.at(type).FillVars(SC, SC.classification, false, weight, reco_nu_e);
+            // _thelper.at(type).FillVars(SC, SC.classification, false, weight, reco_nu_e);
         }
 
     }

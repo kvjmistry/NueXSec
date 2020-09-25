@@ -895,3 +895,20 @@ double SliceContainer::GetdEdxMax(){
     return dedx_max;
     
 }
+// -----------------------------------------------------------------------------
+void SliceContainer::SetCVWeight(double weight){
+    cv_weight = weight;
+}
+// -----------------------------------------------------------------------------
+void SliceContainer::SetSignal(){
+
+    if (classification.second == _util.k_nue_cc           || classification.second == _util.k_nuebar_cc ||
+        classification.second == _util.k_unmatched_nue    || classification.second == _util.k_cosmic_nue ||
+        classification.second == _util.k_unmatched_nuebar || classification.second == _util.k_cosmic_nuebar ){
+            is_signal = true;
+    }
+    else 
+        is_signal = false;
+
+}
+// -----------------------------------------------------------------------------

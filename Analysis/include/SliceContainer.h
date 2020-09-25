@@ -43,6 +43,11 @@ public:
     // Determine if there is a truth pi0 in the event
     void Pi0Classifier(int type);
     // -------------------------------------------------------------------------
+    // Set the CV weight as member variable
+    void SetCVWeight(double weight);
+    // -------------------------------------------------------------------------
+    void SetSignal();
+    // -------------------------------------------------------------------------
 
 
     Utility _util;
@@ -56,6 +61,9 @@ public:
     std::pair<std::string, int> particle_type;  // The truth matched particle of the leading shower
     std::string pi0_classification;             // Stores whether the true interaction has a pi0 in or not e.g. nue cc pi0 or numu cc pi0
 
+    double cv_weight;
+
+    bool is_signal{false}; // bool to check if the event is signal or not
 
     // Shower Properties 
     float shr_energy_tot;        // Shower: the energy of the showers (in GeV)
