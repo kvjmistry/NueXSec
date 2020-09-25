@@ -33,7 +33,8 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
     // Tree variables
     int run{0}, subrun{0}, event{0}, _run{0}, _subrun{0}, _event{0};;
     std::string classification, *_classification = NULL;
-    bool gen{false},                  _gen{false};           
+    bool gen{false},                  _gen{false};
+    bool passed_selection{false},     _passed_selection{false};           
     double weight{0.0},               _weight{0.0}; 
     double true_energy,               _true_energy;
     double reco_energy,               _reco_energy;
@@ -110,6 +111,7 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
     outtree->Branch("subrun",           &subrun, "subrun/I");
     outtree->Branch("event",            &event,  "event/I");
     outtree->Branch("gen",              &gen,    "gen/O");
+    outtree->Branch("passed_selection", &passed_selection,    "passed_selection/O");
     outtree->Branch("weight",           &weight, "weight/D");
     outtree->Branch("true_energy",      &true_energy, "true_energy/D");
     outtree->Branch("reco_energy",      &reco_energy, "reco_energy/D");
@@ -176,6 +178,7 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
         trees.at(k)->SetBranchAddress("subrun",           &_subrun);
         trees.at(k)->SetBranchAddress("event",            &_event);
         trees.at(k)->SetBranchAddress("gen",              &_gen);
+        trees.at(k)->SetBranchAddress("passed_selection", &_passed_selection);
         trees.at(k)->SetBranchAddress("weight",           &_weight);
         trees.at(k)->SetBranchAddress("true_energy",      &_true_energy);
         trees.at(k)->SetBranchAddress("reco_energy",      &_reco_energy);
@@ -230,26 +233,16 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
         for (int ievent = 0; ievent < tree_entries; ievent++){
                 trees.at(k)->GetEntry(ievent); 
 
-
-                if (k == 0) {
-                    if (*_classification == "nue_cc"           || *_classification == "nuebar_cc" ||
-                        *_classification == "unmatched_nue"    || *_classification == "cosmic_nue" ||
-                        *_classification == "unmatched_nuebar" || *_classification == "cosmic_nuebar")num_gen+=_weight;
-                }
-
-                // If intrinsic mode is turned on and we are using the default mc, then skip the fill for nues which are already covered
-                if (intrinsic_mode && k == 1){
-                    if (*_classification == "nue_cc"           || *_classification == "nuebar_cc" ||
-                        *_classification == "unmatched_nue"    || *_classification == "cosmic_nue" ||
-                        *_classification == "unmatched_nuebar" || *_classification == "cosmic_nuebar"){
+                // If intrinsic mode is turned on and we are using the default mc, then skip the fill for generated events which are already covered
+                if (intrinsic_mode && k == 1 && _gen){
                             continue;
-                        }
                 }
 
                 run              = _run;
                 subrun           = _subrun;
                 event            = _event;
                 gen              = _gen;
+                passed_selection = _passed_selection;
                 classification   = *_classification;
                 weight           = _weight;
                 true_energy      = _true_energy;

@@ -27,10 +27,12 @@ class CrossSectionHelper{
     int run{0}, subrun{0}, event{0};
     std::string *classification = NULL; // The classification of the event
     
-    // Is the event a true signal event in the FV that was not selected?
-    // We still need these for the efficiency
-    bool gen{false};           
-    
+    // Is the event signal?
+    bool gen{false};
+
+    // Did the event pass the selection? (some signal events in the eff denominator wont)
+    bool passed_selection{false};
+
     double weight{0.0};        // This is not going to be integer if we already weight the CV
 
     double true_energy{0.0}, reco_energy{0.0};
