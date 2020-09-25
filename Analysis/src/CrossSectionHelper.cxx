@@ -357,12 +357,12 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     bool pass = true;
 
     // Classify the event
-    std::pair<std::string, int> classification = SC.SliceClassifier(type);      // Classification of the event
+    SC.SliceClassifier(type);      // Classification of the event
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
     // *************************************************************************
-    FillCutHists(type, SC, classification, _util.k_unselected );
+    FillCutHists(type, SC, SC.classification, _util.k_unselected );
     
     // *************************************************************************
     // Software Trigger -- MC Only  --------------------------------------------
@@ -370,7 +370,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.swtrig(SC, type);
     if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, classification, _util.k_swtrig );
+    FillCutHists(type, SC, SC.classification, _util.k_swtrig );
 
     // *************************************************************************
     // Slice ID ----------------------------------------------------------------
@@ -378,7 +378,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.slice_id(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, classification, _util.k_slice_id );
+    FillCutHists(type, SC, SC.classification, _util.k_slice_id );
     
     // *************************************************************************
     // Electron Candidate ------------------------------------------------------
@@ -386,7 +386,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.e_candidate(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, classification, _util.k_e_candidate );
+    FillCutHists(type, SC, SC.classification, _util.k_e_candidate );
 
     // *************************************************************************
     // In FV -------------------------------------------------------------------
@@ -394,7 +394,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.in_fv(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, classification, _util.k_in_fv );
+    FillCutHists(type, SC, SC.classification, _util.k_in_fv );
     
     // *************************************************************************
     // Slice Contained Fraction ------------------------------------------------
@@ -402,7 +402,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.contained_frac(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, classification, _util.k_contained_frac );
+    FillCutHists(type, SC, SC.classification, _util.k_contained_frac );
 
     // *************************************************************************
     // Topological Score -------------------------------------------------------
@@ -410,7 +410,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.topo_score(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, classification, _util.k_topo_score );
+    FillCutHists(type, SC, SC.classification, _util.k_topo_score );
 
     // *************************************************************************
     // Cosmic Impact Parameter -------------------------------------------------
@@ -418,7 +418,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.shr_cosmic_IP(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, classification, _util.k_cosmic_ip );
+    FillCutHists(type, SC, SC.classification, _util.k_cosmic_ip );
 
     // *************************************************************************
     // Shower Score ------------------------------------------------------------
@@ -426,7 +426,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.shower_score(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, classification, _util.k_shower_score );
+    FillCutHists(type, SC, SC.classification, _util.k_shower_score );
 
     // *************************************************************************
     // Shower Hit Ratio  -------------------------------------------------------
@@ -434,7 +434,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.shr_hitratio(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, classification, _util.k_hit_ratio );
+    FillCutHists(type, SC, SC.classification, _util.k_hit_ratio );
 
     // *************************************************************************
     // Shower Moliere Average --------------------------------------------------
@@ -442,7 +442,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.shr_moliere_avg(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, classification, _util.k_shr_moliere_avg );
+    FillCutHists(type, SC, SC.classification, _util.k_shr_moliere_avg );
 
     // *************************************************************************
     // 2D cut for Shower to Vertex Distance and dEdx ---------------------------
@@ -450,7 +450,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.shr_dist_dEdx_max(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, classification, _util.k_vtx_dist_dedx );
+    FillCutHists(type, SC, SC.classification, _util.k_vtx_dist_dedx );
 
     // *************************************************************************
     // dEdx in all planes for 0 track events -----------------------------------
@@ -458,7 +458,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     pass = _scuts.dEdx_max_no_tracks(SC);
     if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, classification, _util.k_dEdx_max_no_tracks );
+    FillCutHists(type, SC, SC.classification, _util.k_dEdx_max_no_tracks );
 
     // **************************************************************************
     return true;

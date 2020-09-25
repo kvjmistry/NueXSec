@@ -22,17 +22,17 @@ public:
     void Initialise(TTree* tree, int type, TFile *f_flux_weights, Utility util);
     // -------------------------------------------------------------------------
     // Function to classify the slice
-    std::pair<std::string, int>  SliceClassifier(int type);
+    void  SliceClassifier(int type);
     // -------------------------------------------------------------------------
     // Returns the Category defined by the pandora team 
     // (can be used as a cross check or making similar plots to them)
     std::string SliceCategory();
     // -------------------------------------------------------------------------
     // Function to return the genie interaction mode, e.g. ccqe, ccmec etc.
-    std::string SliceInteractionType(int type);
+    void SliceInteractionType(int type);
     // -------------------------------------------------------------------------
     // Function to classify the event by particle type of the leading shower
-    std::pair<std::string, int> ParticleClassifier(int type);
+    void ParticleClassifier(int type);
     // -------------------------------------------------------------------------
     // Function to Get the PPFX CV correction weight
     double GetPPFXCVWeight();
@@ -41,7 +41,7 @@ public:
     double GetdEdxMax();
     // -------------------------------------------------------------------------
     // Determine if there is a truth pi0 in the event
-    std::string Pi0Classifier(int type);
+    void Pi0Classifier(int type);
     // -------------------------------------------------------------------------
 
 
@@ -51,6 +51,12 @@ public:
     int   sub;                   // Subrun
     int   evt;                   // Event
     
+    std::pair<std::string, int> classification; // The event classification e.g nue cc
+    std::string genie_interaction;              // The interaction type e.g. nue cc qe
+    std::pair<std::string, int> particle_type;  // The truth matched particle of the leading shower
+    std::string pi0_classification;             // Stores whether the true interaction has a pi0 in or not e.g. nue cc pi0 or numu cc pi0
+
+
     // Shower Properties 
     float shr_energy_tot;        // Shower: the energy of the showers (in GeV)
     float shr_energy;            // Shower: Energy of the shower with the largest number of hits (in GeV)

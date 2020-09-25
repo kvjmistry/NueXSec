@@ -407,7 +407,7 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, Ut
 
 }
 // -----------------------------------------------------------------------------
-std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
+void SliceContainer::SliceClassifier(int type){
     
     // MC Specific classsifications
     if (type == _util.k_mc){
@@ -417,9 +417,16 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
 
         // Out of Fiducial Volume Event
         if (!is_in_fv) {
+            
             // std::cout << "Purity of out of FV event: "<< nu_purity_from_pfp << std::endl;
-            if (nu_purity_from_pfp <= 0.5) return std::make_pair("cosmic",_util.k_cosmic);
-            else return std::make_pair("nu_out_fv",_util.k_nu_out_fv);
+            if (nu_purity_from_pfp <= 0.5){
+                classification = std::make_pair("cosmic",_util.k_cosmic);
+                return;
+            }
+            else {
+                classification = std::make_pair("nu_out_fv",_util.k_nu_out_fv);
+                return;
+            }
         }
         // In FV event
         else {
@@ -431,31 +438,66 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
                 if (nu_pdg == 14 || nu_pdg == -14){
 
                     // Purity is low so return cosmic
-                    if (nu_purity_from_pfp <= 0.5) return std::make_pair("cosmic",_util.k_cosmic);
+                    if (nu_purity_from_pfp <= 0.5) {
+                        classification = std::make_pair("cosmic",_util.k_cosmic);
+                        return;
+                    }
                     
-                    if (npi0 > 0) return std::make_pair("numu_cc_pi0", _util.k_numu_cc_pi0); // has a pi0
-                    else return std::make_pair("numu_cc",_util.k_numu_cc);
+                    if (npi0 > 0) {
+                        classification = std::make_pair("numu_cc_pi0", _util.k_numu_cc_pi0); // has a pi0
+                        return;
+                    }
+                    else {
+                        classification = std::make_pair("numu_cc",_util.k_numu_cc);
+                        return;
+                    }
 
                 }
                 // Nue CC
                 else if (nu_pdg == 12){
                     
-                    if (nu_purity_from_pfp > 0.5)                                  return std::make_pair("nue_cc",       _util.k_nue_cc);    // purity > 0.5% so signal
-                    else if (nu_purity_from_pfp >= 0 && nu_purity_from_pfp <= 0.5) return std::make_pair("cosmic_nue",   _util.k_cosmic);    // Most of the slice from pandora was unmatched hits -- probably a cosmic
-                    else                                                           return std::make_pair("unmatched_nue",_util.k_unmatched_nue); // These events were not picked up by pandora at all
+                    // purity > 0.5% so signal
+                    if (nu_purity_from_pfp > 0.5){
+                        classification = std::make_pair("nue_cc",       _util.k_nue_cc);    
+                        return;
+                    }
+                    // Most of the slice from pandora was unmatched hits -- probably a cosmic
+                    else if (nu_purity_from_pfp >= 0 && nu_purity_from_pfp <= 0.5){
+                        classification = std::make_pair("cosmic_nue",   _util.k_cosmic);
+                        return;
+                    }
+                    // These events were not picked up by pandora at all
+                    else {
+                        classification = std::make_pair("unmatched_nue",_util.k_unmatched_nue); 
+                        return;
+                    }
 
                 }
                 else if (nu_pdg == -12){
                     
-                    if (nu_purity_from_pfp > 0.5)                                  return std::make_pair("nuebar_cc",       _util.k_nuebar_cc); // purity > 0.5% so signal
-                    else if (nu_purity_from_pfp >= 0 && nu_purity_from_pfp <= 0.5) return std::make_pair("cosmic_nuebar",   _util.k_cosmic_nuebar);    // Most of the slice from pandora was unmatched hits -- probably a cosmic
-                    else                                                           return std::make_pair("unmatched_nuebar",_util.k_unmatched_nuebar); // These events were not picked up by pandora at all
+                    // purity > 0.5% so signal
+                    if (nu_purity_from_pfp > 0.5) {
+                        classification = std::make_pair("nuebar_cc",       _util.k_nuebar_cc); 
+                        return;
+
+                    }
+                    // Most of the slice from pandora was unmatched hits -- probably a cosmic                               
+                    else if (nu_purity_from_pfp >= 0 && nu_purity_from_pfp <= 0.5) {
+                        classification = std::make_pair("cosmic_nuebar",   _util.k_cosmic_nuebar);    
+                        return;
+                    } 
+                    // These events were not picked up by pandora at all
+                    else {
+                        classification = std::make_pair("unmatched_nuebar",_util.k_unmatched_nuebar); 
+                        return;
+                    }
 
                 }
                 // Unknown Neutrino Type
                 else {
                     std::cout << "Unknown Neutrino Type..., This will also mess up the efficecy if this occurs!" << std::endl;
-                    return std::make_pair("unmatched",_util.k_unmatched);
+                    classification = std::make_pair("unmatched",_util.k_unmatched);
+                    return;
                 }
 
             }
@@ -463,10 +505,19 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
             else {
 
                 // Purity is low so return cosmic
-                if (nu_purity_from_pfp <= 0.5) return std::make_pair("cosmic",_util.k_cosmic);
+                if (nu_purity_from_pfp <= 0.5){
+                    classification = std::make_pair("cosmic",_util.k_cosmic);
+                    return;
+                }
 
-                if (npi0 > 0) return std::make_pair("nc_pi0",_util.k_nc_pi0);
-                else return std::make_pair("nc",_util.k_nc);
+                if (npi0 > 0) {
+                    classification = std::make_pair("nc_pi0",_util.k_nc_pi0);
+                    return;
+                }
+                else {
+                    classification = std::make_pair("nc",_util.k_nc);
+                    return;
+                }
             }
         
         } // End if in FV
@@ -474,21 +525,25 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
     }
     // Data
     else if (type == _util.k_data){
-        return std::make_pair("data",_util.k_leg_data);
+        classification = std::make_pair("data",_util.k_leg_data);
+        return;
     }
     // EXT
     else if (type == _util.k_ext){
-        return std::make_pair("ext",_util.k_leg_ext);
+        classification = std::make_pair("ext",_util.k_leg_ext);
+        return;
         
     }
     // Dirt
     else if (type == _util.k_dirt){
-        return std::make_pair("dirt",_util.k_leg_dirt);
+        classification = std::make_pair("dirt",_util.k_leg_dirt);
+        return;
     }
     // What is this type?
     else {
         std::cout << "Got a case we are calling unmatched, this is going to mess up the efficiency in the current way!" << std::endl;
-        return std::make_pair("unmatched",_util.k_unmatched);
+        classification = std::make_pair("unmatched",_util.k_unmatched);
+        return;
     }
     
 }
@@ -544,65 +599,79 @@ std::string SliceContainer::SliceCategory(){
     }
 }
 // -----------------------------------------------------------------------------
-std::pair<std::string, int> SliceContainer::ParticleClassifier(int type){
+void SliceContainer::ParticleClassifier(int type){
     
     // MC Specific classsifications
     if (type == _util.k_mc){
 
         // Electron
         if (shr_bkt_pdg == 11 || shr_bkt_pdg == -11){
-            return std::make_pair("e",_util.k_electron);
+            particle_type = std::make_pair("e",_util.k_electron);
+            return;
         }
         // Muon
         else if (shr_bkt_pdg == 13 || shr_bkt_pdg == -13){
-            return std::make_pair("muon",_util.k_muon);
+            particle_type = std::make_pair("muon",_util.k_muon);
+            return;
         }
         // Pion
         else if (shr_bkt_pdg == 211 || shr_bkt_pdg == -211){
-            return std::make_pair("e",_util.k_pion);
+            particle_type = std::make_pair("e",_util.k_pion);
+            return;
         }
         // Photon 
         else if (shr_bkt_pdg == 22 ){
-            return std::make_pair("photon",_util.k_photon);
+            particle_type = std::make_pair("photon",_util.k_photon);
+            return;
         }
         // Proton
         else if (shr_bkt_pdg == 2212){
-            return std::make_pair("p",_util.k_proton);
+            particle_type = std::make_pair("p",_util.k_proton);
+            return;
         }
         // Neutron
         else if (shr_bkt_pdg == 2112){
-            return std::make_pair("n",_util.k_neutron);
+            particle_type = std::make_pair("n",_util.k_neutron);
+            return;
         }
         // Kaon
         else if (shr_bkt_pdg == 321 || shr_bkt_pdg == -321 ){
-            return std::make_pair("K",_util.k_kaon);
+            particle_type = std::make_pair("K",_util.k_kaon);
+            return;
         }
         // Other stuff is assumed cosmic
         else {
-            return std::make_pair("cosmic",_util.k_part_cosmic);
+            particle_type = std::make_pair("cosmic",_util.k_part_cosmic);
+            return;
         }
 
 
     }
     // Data
     else if (type == _util.k_data){
-        return std::make_pair("data",_util.k_part_data);
+        particle_type = std::make_pair("data",_util.k_part_data);
+        return;
     }
     // EXT
     else if (type == _util.k_ext){
-        return std::make_pair("ext",_util.k_part_ext);
+        particle_type = std::make_pair("ext",_util.k_part_ext);
+        return;
         
     }
     // Dirt
     else if (type == _util.k_dirt){
-        return std::make_pair("dirt",_util.k_part_dirt);
+        particle_type = std::make_pair("dirt",_util.k_part_dirt);
+        return;
     }
     // What is this type?
-    else return std::make_pair("unmatched",_util.k_part_unmatched);
+    else {
+        particle_type = std::make_pair("unmatched",_util.k_part_unmatched);
+        return;
+    }
     
 }
 // -----------------------------------------------------------------------------
-std::string SliceContainer::SliceInteractionType(int type){
+void SliceContainer::SliceInteractionType(int type){
 
     // Only do this for mc, otherwise return data type
     if (type == _util.k_mc || type == _util.k_dirt){
@@ -634,36 +703,45 @@ std::string SliceContainer::SliceInteractionType(int type){
 
 
         if (interaction == _util.k_qe) {
-            return nu + CCNC + "qe";
+            genie_interaction = nu + CCNC + "qe";
+            return;
 
         }
         else if (interaction == _util.k_res ) {
-            return nu + CCNC + "res";
+            genie_interaction = nu + CCNC + "res";
+            return;
 
         }
         else if (interaction == _util.k_dis ) {
-            return nu + CCNC + "dis";
+            genie_interaction = nu + CCNC + "dis";
+            return;
 
         }
         else if (interaction == _util.k_coh) {
-            return nu + CCNC + "coh";
+            genie_interaction = nu + CCNC + "coh";
+            return;
 
         }
         else if (interaction == _util.k_mec) {
-            return nu + CCNC + "mec";
+            genie_interaction = nu + CCNC + "mec";
+            return;
 
         }
         else {
-            return nu + CCNC + "unknown";
+            genie_interaction = nu + CCNC + "unknown";
+            return;
         }
     }
-    else return "data";
+    else{
+        genie_interaction = "data";
+        return;
+    }
 
 
 
 }
 // -----------------------------------------------------------------------------
-std::string SliceContainer::Pi0Classifier(int type){
+void SliceContainer::Pi0Classifier(int type){
 
     // Only do this for mc, otherwise return data type
     if (type == _util.k_mc){
@@ -692,18 +770,24 @@ std::string SliceContainer::Pi0Classifier(int type){
         
 
         if (npi0 > 0){
-            return nu + CCNC + "_pi0";
+            pi0_classification = nu + CCNC + "_pi0";
+            return;
 
         }
         else if (npi0 == 0 ) {
-            return nu + CCNC + "";
+            pi0_classification = nu + CCNC + "";
+            return;
 
         }
         else {
-            return nu + CCNC + "unknown";
+            pi0_classification = nu + CCNC + "unknown";
+            return;
         }
     }
-    else return "data";
+    else {
+        pi0_classification = "data";
+        return;
+    }
 
 
 
