@@ -170,14 +170,35 @@ void SystematicsHelper::SetRatioOptions(TH1D* hist ){
 // -----------------------------------------------------------------------------
 void SystematicsHelper::MakeHistograms(){
     
+    TFile *file_sys_var = new TFile(Form("plots/run%s/systvar/run%s_sys_var.root", _util.run_period, _util.run_period),"RECREATE");
+
     for (unsigned int i = 0 ; i < _util.k_cuts_MAX; i++){
         
         // Default detector systematics mode
         if (mode == "default"){
-            // Create the directory
+  
+           // Create the directory
             _util.CreateDirectory("/detvar/comparisons/cuts/" + _util.cut_dirs.at(i));
 
-            // Space Charge Corrected X position comparision plot
+	  // Create the directory for sysvar
+            _util.CreateDirectory("/systvar/comparisons/cuts/" + _util.cut_dirs.at(i));
+
+            for(unsigned int j=0; j < _util.vec_hist_name.size(); j++){
+
+                SysVariations(Form("%s", _util.vec_hist_name.at(j).c_str()), Form("plots/run%s/systvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()),
+                            _util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str(), _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str(), file_sys_var );
+
+                PlotVariations(Form("%s", _util.vec_hist_name.at(j).c_str()), Form("plots/run%s/detvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()),
+                            _util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str());
+
+            }
+
+
+
+
+
+
+/*            // Space Charge Corrected X position comparision plot
             PlotVariations("h_reco_vtx_x_sce", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_vtx_x_sce.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
                             _util.cut_dirs.at(i), "Reco Vertex X [cm]");
 
@@ -228,8 +249,12 @@ void SystematicsHelper::MakeHistograms(){
             // Leading Shower Energy
             PlotVariations("h_reco_shower_energy_tot_cali", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_shower_energy_tot_cali.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
                             _util.cut_dirs.at(i), "Reconstructed Leading Shower Energy [GeV]");
-
+*/
         }
+
+
+
+
         // Ext mode
         else if (mode == "ext"){
 
@@ -421,7 +446,197 @@ void SystematicsHelper::PlotVariations(std::string hist_name, const char* print_
 
 
 }
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+void SystematicsHelper::SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name, TFile *root_output){
+
+    // last updated on Sept 18 by Marina Reggiani-Guzzo
+
+    gStyle->SetOptStat(0);
+
+    std::vector<TH1D*> hist; // The vector of histograms from the file for the plot
+    std::vector<TH1D*> hist_diff; // The vector of histogram differentes between CV and the vatiation (variation-CV)
+    std::vector<TH1D*> hist_ratio; // The vector of histogram ratios from the file for the plot
+    TH1D * h_error_hist;
+    hist.resize(k_vars_MAX);
+    hist_diff.resize(k_vars_MAX);
+    hist_ratio.resize(k_vars_MAX);
+
+    TCanvas * c      = new TCanvas();
+    TPad * topPad    = new TPad("topPad", "", 0, 0.3, 1, 1.0);
+    TPad * bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
+
+    _util.SetTPadOptions(topPad, bottomPad );
+
+    // Loop over the variations and get the histograms
+    for (unsigned int k=0; k < f_vars.size(); k++){
+        
+        // Loop over the classifications and get the histograms
+        for (unsigned int i=0; i <_util.classification_dirs.size(); i++){
+
+            // Only want the MC piece -- may want to add in dirt too? -- will need to separately scale that hitogram though
+            if ( i == _util.k_leg_data || i == _util.k_leg_ext || i == _util.k_leg_dirt ) continue;
+
+            // Get all the MC histograms and add them together
+            TH1D *h_temp;
+
+            _util.GetHist(f_vars.at(k), h_temp, Form("Stack/%s/%s/%s_%s_%s", cut_name.c_str(), _util.classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.classification_dirs.at(i).c_str()));
+            
+            // First case so clone the histogram
+            if (i == 0) hist.at(k) = (TH1D*) h_temp->Clone("h_sum_hist");
+            else hist.at(k)->Add(h_temp, 1);
+        }
+        
+    }
+
+    // Now scale the histograms to POT
+    for (unsigned int y=0; y < hist.size(); y++ ){
+        double scale_fact = POT_v.at(k_CV) / POT_v.at(y);
+        // std::cout << "scale factor: " << scale_fact << std::endl;
+        hist.at(y)->Scale(scale_fact);
+
+        if (y == k_CV){
+            // Clone a histogram to plot the CV error as a grey band
+            h_error_hist = (TH1D*) hist.at(k_CV)->Clone("h_error_hist");
+            h_error_hist->SetFillColorAlpha(12, 0.15);
+            h_error_hist->SetLineWidth(2);
+            h_error_hist->SetLineColor(kBlack);
+            h_error_hist->GetYaxis()->SetTitle("Entries");
+            h_error_hist->GetYaxis()->SetTitleFont(46);
+            h_error_hist->GetYaxis()->SetTitleSize(13);
+            h_error_hist->Draw("E2");
+        }
+
+        // calculate difference between cv and the histogram with variation
+        hist_diff.at(y) = (TH1D*) hist.at(y)->Clone(Form("h_diff_%s", var_string.at(y).c_str()));
+        hist_diff.at(y)->Add(hist.at(k_CV),-1); 
+
+        // Save clones of the histograms for doing the ratios
+        hist_ratio.at(y) = (TH1D*) hist_diff.at(y)->Clone(Form("h_ratio_%s", var_string.at(y).c_str()));
+        hist_ratio.at(y)->Divide(hist.at(k_CV));
+
+        // Set the customisation of the histogram
+        SetVariationProperties(hist.at(y), y);
+
+        // Draw the histograms
+        if (y == k_CV) hist.at(y)->Draw("hist, same");
+        else hist.at(y)->Draw("hist,E, same");
+    }
+
+    // Legend
+    TLegend *leg = new TLegend(0.8, 0.91, 0.95, 0.32);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(h_error_hist, "CV",   "lf");
+    leg->AddEntry(hist.at(k_bnb_diffusion), "BNB Diffusion", "l");
+    leg->Draw();
+
+    // Now draw the ratio
+    bottomPad->cd();
+
+    for (unsigned int k =0; k < hist_ratio.size(); k++){
+
+        SetVariationProperties(hist_ratio.at(k), k);
+        hist_ratio.at(k)->SetLineWidth(1);
+
+
+        hist_ratio.at(k)->GetXaxis()->SetLabelSize(12);
+        hist_ratio.at(k)->GetXaxis()->SetLabelFont(43); 
+        hist_ratio.at(k)->GetYaxis()->SetLabelSize(11);
+        hist_ratio.at(k)->GetYaxis()->SetLabelFont(43);
+        hist_ratio.at(k)->GetXaxis()->SetTitleOffset(3.0);
+        hist_ratio.at(k)->GetXaxis()->SetTitleSize(17);
+        hist_ratio.at(k)->GetXaxis()->SetTitleFont(46);
+        hist_ratio.at(k)->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
+        hist_ratio.at(k)->GetYaxis()->SetRangeUser(-3.0, 3.0);
+        hist_ratio.at(k)->GetYaxis()->SetTitle("(Variation-CV) / CV");
+        hist_ratio.at(k)->GetYaxis()->SetTitleSize(13);
+        hist_ratio.at(k)->GetYaxis()->SetTitleFont(44);
+        hist_ratio.at(k)->GetYaxis()->SetTitleOffset(1.5);
+        hist_ratio.at(k)->SetTitle(" ");
+        hist_ratio.at(k)->GetXaxis()->SetTitle(x_axis_name);
+        
+        if (k == 0) hist_ratio.at(k)->Draw("hist,same");
+        else {
+
+		hist_ratio.at(k)->Draw("hist,E,same");
+
+	}
+
+   }
+
+	// -----------------------------------------------------------------
+	// calculate and save the total detector systematics uncertainty 
+
+	// create a temporary histogram that will be used to calculate the total detector sys
+	TH1D *h_det_sys_tot;
+	
+	// loop over variations for a given variable
+	for (unsigned int k = 0; k < f_vars.size(); k++){
+		
+		// ---- save the histograms into different directories inside the root file
+
+		if(!root_output->GetDirectory(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str()))) {
+			root_output->mkdir(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // if the directory does not exist, create it
+		}
+
+		root_output->cd(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // open the directory
+	
+		hist_ratio.at(k)->SetDirectory(gDirectory); // set in which dir the hist_ratio.at(k) is going to be written
+		hist_ratio.at(k)->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite);  // write the histogram to the file
+	
+		// ---- on the same go, calculate the total detector sys uncertainty
+
+		if( k == 0 ){
+			// this is the first histogram, just square it and write it to file
+			h_det_sys_tot = (TH1D*) hist_ratio.at(k)->Clone();
+			h_det_sys_tot->Multiply(h_det_sys_tot); // square the histogram
+		}
+
+		else{
+			// this is not the first histogram
+			hist_ratio.at(k)->Multiply(hist_ratio.at(k)); // first square the histogram
+			h_det_sys_tot->Add(hist_ratio.at(k)); // add it to the existing histogram
+		}
+
+	}
+
+	// calculate the square root of the histogram before saving it to the file
+	for(int k = 1; k <= h_det_sys_tot->GetNbinsX(); k++){
+		h_det_sys_tot->SetBinContent( k , TMath::Sqrt(h_det_sys_tot->GetBinContent(k)) );
+	}
+
+	// save the total detector sys uncertainty in the file
+	
+	if(!root_output->GetDirectory(Form("%s/TotalDetectorSys", folder_name.c_str()))) {
+                root_output->mkdir(Form("%s/TotalDetectorSys", folder_name.c_str())); // if the directory does not exist, create it
+        }
+
+        root_output->cd(Form("%s/TotalDetectorSys", folder_name.c_str())); // open the directory
+        h_det_sys_tot->SetDirectory(gDirectory);
+	h_det_sys_tot->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite); 
+  
+	// -----------------------------------------------------------------
+
+
+  /*
+    TH1D* h_ratio_error = (TH1D*) h_error_hist->Clone("h_ratio_error");
+    h_ratio_error->Divide(h_ratio_error);
+    h_ratio_error->Draw("e2, same");
+    */
+
+
+    // Draw the run period on the plot
+    // _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
+
+    // Add the weight labels
+    // Draw_WeightLabels(c);
+    
+    c->Print(print_name);
+
+}
+
+
+// ----------------------------------------------------------------------------
 void SystematicsHelper::PlotVariationsEXT(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name ){
 
     gStyle->SetOptStat(0);

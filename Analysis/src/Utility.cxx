@@ -928,3 +928,17 @@ void Utility::CheckPOT(){
 	}
 
 }
+
+// -----------------------------------------------------------------------------
+bool Utility::CheckHistogram(std::vector<std::string> vector, TString hist_name){
+	
+	for(unsigned int i=0; i<vector.size(); i++){
+
+		if(vector.at(i).c_str() == hist_name) return true;
+
+	}
+
+}
+
+
+

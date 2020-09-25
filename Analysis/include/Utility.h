@@ -116,6 +116,9 @@ public:
     // -------------------------------------------------------------------------
     // Check if POT from input file matches with the value in config.txt
     void CheckPOT();
+    // -------------------------------------------------------------------------
+    // Check if a specific histogram exists in the given vector of strings
+    bool CheckHistogram(std::vector<std::string> vector, TString hist_name);
 
     // Variables
 
@@ -135,6 +138,7 @@ public:
     bool print_data                = false;
     bool print_ext                 = false;
     bool print_dirt                = false;
+    bool plot_sys_uncertainty      = true;
 
     // inputs 
     char * mc_file_name          = (char *)"empty";
@@ -485,6 +489,64 @@ public:
         k_part_dirt,
         k_particles_MAX
     };
+
+    // ------------------------------------------
+    // variables to plot PlotVariations and SysVariations
+       std::vector<std::string> vec_hist_name = {"h_reco_vtx_x_sce",
+                                              "h_reco_vtx_y_sce",
+                                              "h_reco_vtx_z_sce",
+                                              "h_reco_flash_time",
+                                              "h_reco_leading_shower_phi",
+                                              "h_reco_leading_shower_theta",
+                                              "h_reco_shower_multiplicity",
+                                              "h_reco_track_multiplicity",
+                                              "h_reco_topological_score",
+                                              "h_reco_shr_tkfit_dedx_y",
+                                              "h_reco_nu_e",
+                                              "h_reco_shower_energy_tot_cali",
+                                              "h_reco_softwaretrig",
+                                              "h_reco_nslice",
+                                              "h_reco_shower_score",
+                                              "h_reco_shr_tkfit_dedx_max",
+                                              "h_reco_shr_tkfit_dedx_max_with_tracks",
+                                              "h_reco_shr_tkfit_dedx_max_no_tracks",
+                                              "h_reco_shower_to_vtx_dist",
+                                              "h_reco_hits_ratio",
+                                              "h_reco_CosmicIPAll3D",
+                                              "h_reco_contained_fraction",
+                                              "h_reco_shrmoliereavg",
+                                              "h_reco_shower_energy_cali",
+                                              "h_reco_flash_pe"};
+
+     // x axis label for those plots
+        std::vector<std::string> vec_axis_label = {"Reco Vertex X [cm]",
+                                               "Reco Vertex Y [cm]",
+                                               "Reco Vertex Z [cm]",
+                                               "Flash Time [#mus]",
+                                               "Leading Shower Phi [degrees]",
+                                               "Leading Shower Theta [degrees]",
+                                               "Shower Multiplicty",
+                                               "Track Multiplicity",
+                                               "Topological Score",
+                                               "Collection Plane dEdx (track fitter) [MeV/cm]",
+                                               "Reconstructed Neutrino Energy [GeV]",
+                                               "Reconstructed Leading Shower Energy [GeV]",
+                                               "Software Trigger",
+                                               "nslice",
+                                               "Shower Score",
+                                               "reco_shr_tkfit_dedx_max",
+                                               "reco_shr_tkfit_dedx_max_with_tracks",
+                                               "reco_shr_tkfit_dedx_max_no_tracks",
+                                               "reco_shower_to_vtx_dist",
+                                               "reco_hits_ratio",
+                                               "reco_CosmicIPAll3D",
+                                               "reco_contained_fraction",
+                                               "reco_shrmoliereavg",
+                                               "reco_shower_energy_cali",
+                                               "reco_flash_pe"};
+
+	// list of detector variations
+	std::vector<std::string> vec_var_string = {"CV","BNB_Diffusion"};
 
 }; // End Class Utility
 
