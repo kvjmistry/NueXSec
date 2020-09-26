@@ -2494,13 +2494,11 @@ void SystematicsHelper::InitialiseReweightingModeCut(){
     // Should we add more protection to this command??
     f_nuexsec = TFile::Open( Form("files/crosssec_run%s.root", _util.run_period ), "READ");
 
-    TFile *f_out = new TFile( Form("files/run%s_sys_var.root", _util.run_period ), "UPDATE");
-
     // Loop over cuts and get the sys uncertainty
 
 }
 // -----------------------------------------------------------------------------
-void SystematicsHelper::GetCutSysUncertainty(TFile *f_out, std::string histname, int cut_index, std::string label, int num_uni, std::string var_type){
+void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index, std::string label, int num_uni, std::string var_type){
 
     // Declare the histogram vector for the cut
     std::vector<TH1D*> h_universe;
@@ -2519,19 +2517,19 @@ void SystematicsHelper::GetCutSysUncertainty(TFile *f_out, std::string histname,
 
     // If its a unisim then we have up/dn type variation
     if (var_type == "unisim"){
-        _util.GetHist(f_nuexsec, h_universe.at(k_up), Form( "%s/Cuts/%s/%s/h_reco_%s_%s_%s_0", label_up.c_str(), _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(), label_up.c_str(),_util.cut_dirs.at(cut_index).c_str()));
-        _util.GetHist(f_nuexsec, h_universe.at(k_dn), Form( "%s/Cuts/%s/%s/h_reco_%s_%s_%s_0", label_dn.c_str(), _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(), label_dn.c_str(),_util.cut_dirs.at(cut_index).c_str()));
+        _util.GetHist(f_nuexsec, h_universe.at(k_up), Form( "%s/Cuts/%s/%s/%s_%s_%s_0", label_up.c_str(), _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(), label_up.c_str(),_util.cut_dirs.at(cut_index).c_str()));
+        _util.GetHist(f_nuexsec, h_universe.at(k_dn), Form( "%s/Cuts/%s/%s/%s_%s_%s_0", label_dn.c_str(), _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(), label_dn.c_str(),_util.cut_dirs.at(cut_index).c_str()));
     }
     // Multisim
     else {
         // Loop over the universes
         for (int uni = 0; uni < num_uni; uni++){
-            _util.GetHist(f_nuexsec, h_universe.at(uni), Form( "%s/Cuts/%s/%s/h_reco_%s_%s_%s_%i", label.c_str(), _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(), label.c_str(),_util.cut_dirs.at(cut_index).c_str(), uni));
+            _util.GetHist(f_nuexsec, h_universe.at(uni), Form( "%s/Cuts/%s/%s/%s_%s_%s_%i", label.c_str(), _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(), label.c_str(),_util.cut_dirs.at(cut_index).c_str(), uni));
         }
     }
 
     // Now get the CV
-    _util.GetHist(f_nuexsec, h_cv, Form( "CV/Cuts/%s/%s/h_reco_%s_CV_%s_0", _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(),_util.cut_dirs.at(cut_index).c_str()));
+    _util.GetHist(f_nuexsec, h_cv, Form( "CV/Cuts/%s/%s/%s_CV_%s_0", _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(),_util.cut_dirs.at(cut_index).c_str()));
 
     // Now we got the histograms, we loop over an get the uncertainties
     TH1D* h_err = (TH1D*)h_universe.at(k_up)->Clone();
