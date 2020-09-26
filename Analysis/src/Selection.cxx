@@ -270,7 +270,7 @@ void Selection::MakeSelection(){
             }
 
             // Look at different regions of run 1
-            // if (std::string(_util.run_period) == "1" && data_SC.run >= 6450 ){
+            // if (std::string(_util.run_period) == "1" && data_SC.run >= 6748 ){
             // // if (std::string(_util.run_period) == "1" && data_SC.run < 6450 ){
             //     continue;
             // }

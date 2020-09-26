@@ -741,6 +741,8 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
             if (found_ext) {
 
                 hist.at(i)->SetStats(kFALSE);
+                hist.at(i)->SetLineWidth(1);
+                hist.at(i)->SetLineColor(kGray);
                 if (scale) hist.at(i)->Scale(_util.ext_scale_factor);
                 hist_integrals.at(i) = hist.at(i)->Integral();
                 integral_mc_ext += hist.at(i)->Integral();
@@ -752,6 +754,8 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
             if (found_dirt) {
 
                 hist.at(i)->SetStats(kFALSE);
+                hist.at(i)->SetLineWidth(1);
+                hist.at(i)->SetLineColor(kGray);
                 if (scale) hist.at(i)->Scale(_util.dirt_scale_factor);
                 hist_integrals.at(i) = hist.at(i)->Integral();
                 integral_mc_ext += hist.at(i)->Integral();
@@ -762,6 +766,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         else {
 
             hist.at(i)->SetStats(kFALSE);
+            hist.at(i)->SetLineWidth(0);
             if (scale) hist.at(i)->Scale(_util.mc_scale_factor);
             hist_integrals.at(i) = hist.at(i)->Integral();
             integral_mc_ext += hist.at(i)->Integral();

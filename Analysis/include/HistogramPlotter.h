@@ -89,7 +89,6 @@ class HistogramPlotter{
     void Save2DHistsNorm(const char *print_name, const char *histname, std::string cut_type, bool yex, std::string normtype);
     // -------------------------------------------------------------------------
 
-
     private:
 
 
