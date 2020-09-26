@@ -176,17 +176,17 @@ void SystematicsHelper::SetRatioOptions(TH1D* hist ){
 // -----------------------------------------------------------------------------
 void SystematicsHelper::MakeHistograms(){
     
-    TFile *file_sys_var = new TFile(Form("plots/run%s/systvar/run%s_sys_var.root", _util.run_period, _util.run_period),"RECREATE");
+    TFile *file_sys_var = new TFile(Form("files/run%s_sys_var.root", _util.run_period),"RECREATE");
 
     for (unsigned int i = 0 ; i < _util.k_cuts_MAX; i++){
         
         // Default detector systematics mode
         if (mode == "default"){
   
-           // Create the directory
+            // Create the directory
             _util.CreateDirectory("/detvar/comparisons/cuts/" + _util.cut_dirs.at(i));
 
-	  // Create the directory for sysvar
+            // Create the directory for sysvar
             _util.CreateDirectory("/systvar/comparisons/cuts/" + _util.cut_dirs.at(i));
 
             for(unsigned int j=0; j < _util.vec_hist_name.size(); j++){
@@ -197,70 +197,7 @@ void SystematicsHelper::MakeHistograms(){
                 PlotVariations(Form("%s", _util.vec_hist_name.at(j).c_str()), Form("plots/run%s/detvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()),
                             _util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str());
 
-            }
-
-
-
-
-
-
-/*            // Space Charge Corrected X position comparision plot
-            PlotVariations("h_reco_vtx_x_sce", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_vtx_x_sce.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
-                            _util.cut_dirs.at(i), "Reco Vertex X [cm]");
-
-            // Space Charge Corrected Y position comparision plot
-            PlotVariations("h_reco_vtx_y_sce", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_vtx_y_sce.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
-                            _util.cut_dirs.at(i), "Reco Vertex Y [cm]");
-
-
-            // Space Charge Corrected X position comparision plot
-            PlotVariations("h_reco_vtx_z_sce", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_vtx_z_sce.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
-                            _util.cut_dirs.at(i), "Reco Vertex Z [cm]");
-        
-            // Flash Time
-            PlotVariations("h_reco_flash_time", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_flash_time.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
-                            _util.cut_dirs.at(i), "Flash Time [#mus]");
-
-            // Leading Shower Phi
-            PlotVariations("h_reco_leading_shower_phi", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_leading_shower_phi.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
-                            _util.cut_dirs.at(i), "Leading Shower Phi [degrees]");
-
-            // Leading Shower Theta
-            PlotVariations("h_reco_leading_shower_theta", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_leading_shower_theta.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
-                            _util.cut_dirs.at(i), "Leading Shower Theta [degrees]");
-
-
-            // Shower Multiplicty
-            PlotVariations("h_reco_shower_multiplicity", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_shower_multiplicity.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
-                            _util.cut_dirs.at(i), "Shower Multiplicty");
-
-            // Track Multiplicty
-            PlotVariations("h_reco_track_multiplicity", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_track_multiplicity.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
-                            _util.cut_dirs.at(i), "Track Multiplicity");
-
-            
-            // Topological Score
-            PlotVariations("h_reco_topological_score", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_topological_score.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
-                            _util.cut_dirs.at(i), "Topological Score");
-
-            
-            // Shower Track Fitter dedx Y plane
-            PlotVariations("h_reco_shr_tkfit_dedx_y", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_shr_tkfit_dedx_y.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
-                            _util.cut_dirs.at(i), "Collection Plane dEdx (track fitter) [MeV/cm]");
-
-            // Reco Electron Neutrino E
-            PlotVariations("h_reco_nu_e", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_nu_e.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
-                            _util.cut_dirs.at(i), "Reconstructed Neutrino Energy [GeV]");
-
-            // Leading Shower Energy
-            PlotVariations("h_reco_shower_energy_tot_cali", Form("plots/run%s/detvar/comparisons/cuts/%s/reco_shower_energy_tot_cali.pdf", _util.run_period, _util.cut_dirs.at(i).c_str()),
-                            _util.cut_dirs.at(i), "Reconstructed Leading Shower Energy [GeV]");
-*/
         }
-
-
-
-
         // Ext mode
         else if (mode == "ext"){
 
@@ -564,64 +501,64 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
         if (k == 0) hist_ratio.at(k)->Draw("hist,same");
         else {
 
-		hist_ratio.at(k)->Draw("hist,E,same");
+        hist_ratio.at(k)->Draw("hist,E,same");
 
-	}
-
-   }
-
-	// -----------------------------------------------------------------
-	// calculate and save the total detector systematics uncertainty 
-
-	// create a temporary histogram that will be used to calculate the total detector sys
-	TH1D *h_det_sys_tot;
-	
-	// loop over variations for a given variable
-	for (unsigned int k = 0; k < f_vars.size(); k++){
-		
-		// ---- save the histograms into different directories inside the root file
-
-		if(!root_output->GetDirectory(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str()))) {
-			root_output->mkdir(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // if the directory does not exist, create it
-		}
-
-		root_output->cd(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // open the directory
-	
-		hist_ratio.at(k)->SetDirectory(gDirectory); // set in which dir the hist_ratio.at(k) is going to be written
-		hist_ratio.at(k)->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite);  // write the histogram to the file
-	
-		// ---- on the same go, calculate the total detector sys uncertainty
-
-		if( k == 0 ){
-			// this is the first histogram, just square it and write it to file
-			h_det_sys_tot = (TH1D*) hist_ratio.at(k)->Clone();
-			h_det_sys_tot->Multiply(h_det_sys_tot); // square the histogram
-		}
-
-		else{
-			// this is not the first histogram
-			hist_ratio.at(k)->Multiply(hist_ratio.at(k)); // first square the histogram
-			h_det_sys_tot->Add(hist_ratio.at(k)); // add it to the existing histogram
-		}
-
-	}
-
-	// calculate the square root of the histogram before saving it to the file
-	for(int k = 1; k <= h_det_sys_tot->GetNbinsX(); k++){
-		h_det_sys_tot->SetBinContent( k , TMath::Sqrt(h_det_sys_tot->GetBinContent(k)) );
-	}
-
-	// save the total detector sys uncertainty in the file
-	
-	if(!root_output->GetDirectory(Form("%s/TotalDetectorSys", folder_name.c_str()))) {
-                root_output->mkdir(Form("%s/TotalDetectorSys", folder_name.c_str())); // if the directory does not exist, create it
         }
 
-        root_output->cd(Form("%s/TotalDetectorSys", folder_name.c_str())); // open the directory
-        h_det_sys_tot->SetDirectory(gDirectory);
-	h_det_sys_tot->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite); 
+    }
+
+    // -----------------------------------------------------------------
+    // calculate and save the total detector systematics uncertainty 
+
+    // create a temporary histogram that will be used to calculate the total detector sys
+    TH1D *h_det_sys_tot;
+    
+    // loop over variations for a given variable
+    for (unsigned int k = 0; k < f_vars.size(); k++){
+        
+        // ---- save the histograms into different directories inside the root file
+
+        if(!root_output->GetDirectory(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str()))) {
+            root_output->mkdir(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // if the directory does not exist, create it
+        }
+
+        root_output->cd(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // open the directory
+    
+        hist_ratio.at(k)->SetDirectory(gDirectory); // set in which dir the hist_ratio.at(k) is going to be written
+        hist_ratio.at(k)->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite);  // write the histogram to the file
+    
+        // ---- on the same go, calculate the total detector sys uncertainty
+
+        if( k == 0 ){
+            // this is the first histogram, just square it and write it to file
+            h_det_sys_tot = (TH1D*) hist_ratio.at(k)->Clone();
+            h_det_sys_tot->Multiply(h_det_sys_tot); // square the histogram
+        }
+
+        else{
+            // this is not the first histogram
+            hist_ratio.at(k)->Multiply(hist_ratio.at(k)); // first square the histogram
+            h_det_sys_tot->Add(hist_ratio.at(k)); // add it to the existing histogram
+        }
+
+    }
+
+    // calculate the square root of the histogram before saving it to the file
+    for(int k = 1; k <= h_det_sys_tot->GetNbinsX(); k++){
+        h_det_sys_tot->SetBinContent( k , TMath::Sqrt(h_det_sys_tot->GetBinContent(k)) );
+    }
+
+    // save the total detector sys uncertainty in the file
+    
+    if(!root_output->GetDirectory(Form("%s/TotalDetectorSys", folder_name.c_str()))) {
+                root_output->mkdir(Form("%s/TotalDetectorSys", folder_name.c_str())); // if the directory does not exist, create it
+    }
+
+    root_output->cd(Form("%s/TotalDetectorSys", folder_name.c_str())); // open the directory
+    h_det_sys_tot->SetDirectory(gDirectory);
+    h_det_sys_tot->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite); 
   
-	// -----------------------------------------------------------------
+    // -----------------------------------------------------------------
 
 
   /*

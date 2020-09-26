@@ -15,6 +15,7 @@ class HistogramPlotter{
     ~HistogramPlotter(); 
 
     TFile *f_nuexsec;
+    TFile *file_sys_uncertainties; // File with the systematic uncertainties in
 
     Utility _util;
 

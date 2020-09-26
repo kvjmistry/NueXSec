@@ -902,66 +902,65 @@ void Utility::CheckPOT(){
 
         std::cout << "Total POT: " << pot_sum  << std::endl;
 
-	// ----- check if the POT number in config.txt matched with pot_sum
+    // ----- check if the POT number in config.txt matched with pot_sum
 
-	std::cout << std::endl;
-	std::cout << "Checking the POT value: " << std::endl;
+    std::cout << std::endl;
+    std::cout << "Checking the POT value: " << std::endl;
 
-	std::ifstream config_file("../Analysis/config.txt"); // file with the POT values
-	bool same_pot = false;
+    std::ifstream config_file("../Analysis/config.txt"); // file with the POT values
+    bool same_pot = false;
 
-	std::string line; // saves the each line from config.txt
-	
-	while(getline(config_file,line)){
-		
-		if(line[0]=='R'){ // skips comment lines
+    std::string line; // saves the each line from config.txt
+    
+    while(getline(config_file,line)){
+        
+        if(line[0]=='R'){ // skips comment lines
 
-			// splitting the line and taking the first arg as a TString and the second one as a float
-			TString line_split(line);
-			TObjArray *substrings = line_split.Tokenize(" ");
-			float val = ((TObjString*)substrings->At(1))->GetString().Atof();
-			TString label = ((TObjString*)substrings->At(0))->GetString();
+            // splitting the line and taking the first arg as a TString and the second one as a float
+            TString line_split(line);
+            TObjArray *substrings = line_split.Tokenize(" ");
+            float val = ((TObjString*)substrings->At(1))->GetString().Atof();
+            TString label = ((TObjString*)substrings->At(0))->GetString();
 
-			// calculate the ratio between new and old value, if =1 they are the same
-			double ratio_pot = pot_sum/val;
-			std::string ratio_pot_str = std::to_string(ratio_pot);
+            // calculate the ratio between new and old value, if =1 they are the same
+            double ratio_pot = pot_sum/val;
+            std::string ratio_pot_str = std::to_string(ratio_pot);
 
-			// checks the initial label and if the ratio is one
-			if(label == "Run1_MC_POT_CV" && ratio_pot_str == "1.000000") { // going back to string gives me a precision of 6 decimals
-				std::cout << "The POT value of your file match the one in config.txt, continue running the code!" << std::endl;
-				std::cout << std::endl;
-			}
+            // checks the initial label and if the ratio is one
+            if(label == "Run1_MC_POT_CV" && ratio_pot_str == "1.000000") { // going back to string gives me a precision of 6 decimals
+                std::cout << "The POT value of your file match the one in config.txt, continue running the code!" << std::endl;
+                std::cout << std::endl;
+            }
 
-			// if POT values don't match, stop the code
-			else if(label == "Run1_MC_POT_CV" && ratio_pot_str != "1.000000") {
-				std::cout << std::endl;
-				std::cout << "#################################################################" << std::endl;
-				std::cout << " o    o     oo     ooo    oo   o   o   oo   o    ooooo " << std::endl;
-				std::cout << " o    o    o  o    o  o   o o  o   o   o o  o   o      " << std::endl;
-				std::cout << " o oo o   oooooo   o o    o  o o   o   o  o o   o    o " << std::endl;
-				std::cout << " oo  oo   o    o   o  o   o   oo   o   o   oo    ooooo " << std::endl;
-				std::cout << std::endl;
-				std::cout << "POT value from your input file: " << pot_sum << std::endl;
-				std::cout << "POT value saved in config.txt:  " << val << std::endl;
-				std::cout << "The POT value of your file does not match the one in config.txt." << std::endl;
-				std::cout << "Are you sure you want to continue?" << std::endl;
-				std::cout << "#################################################################" << std::endl;
-				std::cout << std::endl;
-				//throw std::invalid_argument("The POT values don't match, please update config.txt");
-			}
-		}
-	}
+            // if POT values don't match, stop the code
+            else if(label == "Run1_MC_POT_CV" && ratio_pot_str != "1.000000") {
+                std::cout << std::endl;
+                std::cout << "#################################################################" << std::endl;
+                std::cout << " o    o     oo     ooo    oo   o   o   oo   o    ooooo " << std::endl;
+                std::cout << " o    o    o  o    o  o   o o  o   o   o o  o   o      " << std::endl;
+                std::cout << " o oo o   oooooo   o o    o  o o   o   o  o o   o    o " << std::endl;
+                std::cout << " oo  oo   o    o   o  o   o   oo   o   o   oo    ooooo " << std::endl;
+                std::cout << std::endl;
+                std::cout << "POT value from your input file: " << pot_sum << std::endl;
+                std::cout << "POT value saved in config.txt:  " << val << std::endl;
+                std::cout << "The POT value of your file does not match the one in config.txt." << std::endl;
+                std::cout << "Are you sure you want to continue?" << std::endl;
+                std::cout << "#################################################################" << std::endl;
+                std::cout << std::endl;
+                //throw std::invalid_argument("The POT values don't match, please update config.txt");
+            }
+        }
+    }
 
 }
-
 // -----------------------------------------------------------------------------
 bool Utility::CheckHistogram(std::vector<std::string> vector, TString hist_name){
-	
-	for(unsigned int i=0; i<vector.size(); i++){
+    
+    for(unsigned int i=0; i<vector.size(); i++){
 
-		if(vector.at(i).c_str() == hist_name) return true;
+        if(vector.at(i).c_str() == hist_name) return true;
 
-	}
+    }
 
 }
 
