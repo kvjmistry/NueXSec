@@ -1,25 +1,24 @@
-#ifndef PRINTHELPER_h
-#define PRINTHELPER_h
+#ifndef PRINTHELPER_H
+#define PRINTHELPER_H
 
-#include "utility.h"
+#include "Utility.h"
 
 // Class for printing the selection results
 class PrintHelper{
 
     public:
     // Default constructor
-    PrintHelper(){};
+    // PrintHelper(){};
 
     // -------------------------------------------------------------------------
     // Initialiser function
-    void Initialise(const char* run_period, const char * mc_file_in, bool _print_mc, bool _print_data, bool _print_ext, bool _print_dirt, utility _utility );
+    void Initialise(Utility _utility );
     // -------------------------------------------------------------------------
     // Function to print the selection
     void PrintResults();
     // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
+    // Get the histogram files we need to get the efficiency and purity uncertainties
+    void GetHists();
     // -------------------------------------------------------------------------
     
     // Destructor 
@@ -27,31 +26,47 @@ class PrintHelper{
 
     // The output file
     TFile* f_mc, *f_data, *f_ext, *f_dirt;
+    TFile* f_mc_hist, *f_data_hist, *f_ext_hist, *f_dirt_hist; // histogram files
 
     // Class instances
-    utility _util;
+    Utility _util;
 
    
     TTree * mc_counter_tree; // MC Counter Tree
+    TTree * mc_nue_counter_tree; // MC Counter Tree for nues
     TTree * data_counter_tree; // Data Counter Tree
     TTree * ext_counter_tree; // EXT Counter Tree
     TTree * dirt_counter_tree; // Dirt Counter Tree
 
     TTree * eff_tree;   // Efficiency and Purity tree
 
-    bool print_mc;
-    bool print_data;
-    bool print_ext;
-    bool print_dirt;
+    // Histograms for getting the efficiency along with its uncertainty
+    std::vector<std::vector<TH1D*>> TEfficiency_hists; // nue/nuebar -- cut index
+
+    // For storing the errors on the efficiency
+    std::vector<std::vector<double>> vec_err;
+
+    // Define vectors for selected and generated events
+    std::vector<std::vector<double>> vec_n;
+    std::vector<std::vector<double>> vec_N;
+
 
     int tree_total_entries{0}; // Should equal number of cuts
 
+    // enum for plots by efficiency, we only care about the single bin efficiencies
+    enum TH1D_eff_vars {
+        k_eff_nu_E_single_bin,       // True Electron-neutrino energy, single bin
+        k_eff_nu_E_nue_single_bin,   // True Electron-neutrino energy single bin
+        k_eff_nu_E_nuebar_single_bin,// True anti Electron-neutrino energy single bin
+        k_TH1D_eff_MAX
+    };
+
     // Scale factors (everything is scaled to data)
     double mc_scale_factor     = 1.0;
-    double intime_scale_factor = 1.0;
+    double ext_scale_factor    = 1.0;
     double dirt_scale_factor   = 1.0;
 
-    double efficiency{0.0}, purity{0.0};
+    double efficiency{0.0}, purity{0.0}, eff_err{0.0};
 
     double tot_true_infv_nues{1.0};
 
@@ -93,6 +108,15 @@ class PrintHelper{
     double count_numu_cc_incryo{0.0};
     double count_numubar_cc_incryo{0.0};
     
+    double count_pi0_nue_cc_nopi0{0.0};
+    double count_pi0_nue_cc_pi0{0.0};
+    double count_pi0_nuebar_cc_nopi0{0.0};
+    double count_pi0_nuebar_cc_pi0{0.0};
+    double count_pi0_numu_cc_nopi0{0.0};
+    double count_pi0_numu_cc_pi0{0.0};
+    double count_pi0_nc_nopi0{0.0};
+    double count_pi0_nc_pi0{0.0};
+
     double count_nue_cc{0.0};
     double count_nuebar_cc{0.0};
     double count_nu_out_fv{0.0};
@@ -102,6 +126,10 @@ class PrintHelper{
     double count_nc{0.0};
     double count_nc_pi0{0.0};
     double count_unmatched{0.0};
+    double count_unmatched_nue{0.0};
+    double count_cosmic_nue{0.0};
+    double count_unmatched_nuebar{0.0};
+    double count_cosmic_nuebar{0.0};
     double count_total_mc{0.0};
     double count_data{0.0};
     double count_ext{0.0};
@@ -117,8 +145,29 @@ class PrintHelper{
     double init_count_nc{0.0};
     double init_count_nc_pi0{0.0};
     double init_count_unmatched{0.0};
+    double init_count_unmatched_nue{0.0};
+    double init_count_cosmic_nue{0.0};
+    double init_count_unmatched_nuebar{0.0};
+    double init_count_cosmic_nuebar{0.0};
     double init_count_ext{0.0};
     double init_count_dirt{0.0};
+
+    // Counters for previous cut
+    double prev_count_nue_cc{1.0};
+    double prev_count_nuebar_cc{1.0};
+    double prev_count_nu_out_fv{1.0};
+    double prev_count_cosmic{1.0};
+    double prev_count_numu_cc{1.0};
+    double prev_count_numu_cc_pi0{1.0};
+    double prev_count_nc{1.0};
+    double prev_count_nc_pi0{1.0};
+    double prev_count_unmatched{1.0};
+    double prev_count_unmatched_nue{1.0};
+    double prev_count_cosmic_nue{1.0};
+    double prev_count_unmatched_nuebar{1.0};
+    double prev_count_cosmic_nuebar{1.0};
+    double prev_count_ext{1.0};
+    double prev_count_dirt{1.0};
 
     // The efficiency and purity from the previous cut
     double efficiency_last{0.0};

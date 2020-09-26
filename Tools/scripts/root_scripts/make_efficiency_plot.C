@@ -13,7 +13,7 @@ void make_efficiency_plot(){
     std::vector<double> efficiency_v = {1, 0.694, 0.451, 0.360, 0.299, 0.15, 0.091}; // efficiency vector -- with mixed as sig
     std::vector<double> purity_v = {0, 0.0092, 0.042, 0.047, 0.172, 0.331, 0.385}    ; // purity vector -- with mixec as sig
     std::vector<double> purity_nu_v = {0, 0.04, 0.130,  0.147, 0.316, 0.530, 0.621}    ; // purity nu Only vector -- with mixed as sig
-    std::vector<std::string> names = {"No Cuts (0)","Pre-selection (1)", "Flash Matching (2)", "Vertex Reco. Quality (3)", "Shower Hit Threshold (4)", "Electron-like Shower (5)", "Final Tuning (6)"};
+    std::vector<std::string> names = {"No Selection (0)","Pre-selection (1)", "Flash Matching (2)", "Vertex Reco. Quality (3)", "Shower Hit Threshold (4)", "Electron-like Shower (5)", "Final Tuning (6)"};
 
     double efficiency, purity;
 
@@ -43,6 +43,7 @@ void make_efficiency_plot(){
     leg_stack->AddEntry(h_pur, "Purity",    "lp");
     leg_stack->AddEntry(h_pur_nu, "Purity (Beam Only)",    "lp");
 
+    h_eff->GetYaxis()->SetLabelSize(0.05);
     h_eff->GetYaxis()->SetRangeUser(0,1.1);
     h_eff->GetXaxis()->SetLabelSize(0.05);
     h_eff->GetXaxis()->SetLabelOffset(0.01);
@@ -82,6 +83,18 @@ void make_efficiency_plot(){
 
     h_eff->GetXaxis()->SetTickLength(0.00);
     h_pur->GetXaxis()->SetTickLength(0.00);
+
+    TPaveText *pt = new TPaveText(0.3, 0.875, 0.3, 0.875,"NDC");
+    pt->AddText("MicroBooNE Simulation");
+    pt->SetTextColor(kBlack);
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.04);
+    pt->Draw();
+
+    leg_stack->Draw();
+
 
 
     leg_stack->Draw();

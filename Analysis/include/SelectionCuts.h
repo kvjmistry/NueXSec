@@ -1,21 +1,21 @@
-#ifndef SELECTION_CUTS_h
-#define SELECTION_CUTS_h
+#ifndef SELECTIONCUTS_H
+#define SELECTIONCUTS_H
 
-#include "utility.h"
+#include "Utility.h"
 #include "SliceContainer.h"
 
 // Class for applying the selection cuts. Cut classes will inherit
 // from this one and override function
-class selection_cuts{
+class SelectionCuts{
 
     private:
 
     public:
-    selection_cuts(){}; // Default constructor
+    SelectionCuts(){}; // Default constructor
 
-    utility _util;
+    Utility _util;
     // -------------------------------------------------------------------------
-    void Initalise(utility _utility);
+    void Initalise(Utility _utility);
     // -------------------------------------------------------------------------
     // Software Trigger -- MC Only
     bool swtrig(SliceContainer &SC, int type);
@@ -38,26 +38,11 @@ class selection_cuts{
     // Cut on the topological score
     bool topo_score(SliceContainer &SC);
     // -------------------------------------------------------------------------
-    // Cut on the cluster fraction in the slice
-    bool cluster_frac(SliceContainer &SC);
-    // -------------------------------------------------------------------------
     // Cut on the shower score
     bool shower_score(SliceContainer &SC);
     // -------------------------------------------------------------------------
     // Cut on the total shower energy to reject michels
-    bool michel_rej(SliceContainer &SC);
-    // -------------------------------------------------------------------------
-    // Cut on the dEdx y plane
-    bool dEdx_y(SliceContainer &SC);
-    // -------------------------------------------------------------------------
-    // Cut on the dEdx y plane
-    bool dEdx_v(SliceContainer &SC);
-    // -------------------------------------------------------------------------
-    // Cut on the dEdx y plane
-    bool dEdx_u(SliceContainer &SC);
-    // -------------------------------------------------------------------------
-    // Cut on the total hits for the leading shower
-    bool shr_hits(SliceContainer &SC);
+    bool michel_rej(SliceContainer &SC);   
     // -------------------------------------------------------------------------
     // Cut on the shower to nu vertex distance
     bool shr_distance(SliceContainer &SC);
@@ -75,10 +60,10 @@ class selection_cuts{
     bool shr_moliere_avg(SliceContainer &SC);
     // -------------------------------------------------------------------------
     // 2D cut in dEdx and shower vertex distance
-    bool shr_dist_dEdx_y(SliceContainer &SC);
+    bool shr_dist_dEdx_max(SliceContainer &SC);
     // -------------------------------------------------------------------------
     // dEdx cut in the case of no tracks
-    bool dEdx_y_no_tracks(SliceContainer &SC);
+    bool dEdx_max_no_tracks(SliceContainer &SC);
     // -------------------------------------------------------------------------
     // Pi0 Selection Cuts
     bool pi_zero_cuts(SliceContainer &SC);

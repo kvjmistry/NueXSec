@@ -1,12 +1,11 @@
 #include "../include/SliceContainer.h"
 
 // -----------------------------------------------------------------------------
-void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, const char * _run_period, utility util){
+void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, Utility util){
 
     std::cout << "Initalising Slice Container" << std::endl;
     _util = util;
 
-    tree->SetBranchAddress("selected", &selected);
     tree->SetBranchAddress("run", &run);
     tree->SetBranchAddress("sub", &sub);
     tree->SetBranchAddress("evt", &evt);
@@ -32,24 +31,12 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("shr_start_x", &shr_start_x);
     tree->SetBranchAddress("shr_start_y", &shr_start_y);
     tree->SetBranchAddress("shr_start_z", &shr_start_z);
-    tree->SetBranchAddress("shr_dedx_Y", &shr_dedx_Y);
-    tree->SetBranchAddress("shr_dedx_V", &shr_dedx_V);
-    tree->SetBranchAddress("shr_dedx_U", &shr_dedx_U);
-    tree->SetBranchAddress("shr_dedx_Y_cali", &shr_dedx_Y_cali);
-    tree->SetBranchAddress("shr_dedx_V_cali", &shr_dedx_V_cali);
-    tree->SetBranchAddress("shr_dedx_U_cali", &shr_dedx_U_cali);
     tree->SetBranchAddress("shr_tkfit_dedx_Y", &shr_tkfit_dedx_Y);
     tree->SetBranchAddress("shr_tkfit_dedx_V", &shr_tkfit_dedx_V);
     tree->SetBranchAddress("shr_tkfit_dedx_U", &shr_tkfit_dedx_U);
-    // tree->SetBranchAddress("shr_tkfit_nhits_Y", &shr_tkfit_nhits_Y);
-    // tree->SetBranchAddress("shr_tkfit_nhits_V", &shr_tkfit_nhits_V);
-    // tree->SetBranchAddress("shr_tkfit_nhits_U", &shr_tkfit_nhits_U);
-    tree->SetBranchAddress("shr_tkfit_dedx_Y_alt", &shr_tkfit_dedx_Y_alt);
-    tree->SetBranchAddress("shr_tkfit_dedx_V_alt", &shr_tkfit_dedx_V_alt);
-    tree->SetBranchAddress("shr_tkfit_dedx_U_alt", &shr_tkfit_dedx_U_alt);
-    // tree->SetBranchAddress("shr_tkfit_nhits_Y_alt", &shr_tkfit_nhits_Y_alt);
-    // tree->SetBranchAddress("shr_tkfit_nhits_V_alt", &shr_tkfit_nhits_V_alt);
-    // tree->SetBranchAddress("shr_tkfit_nhits_U_alt", &shr_tkfit_nhits_U_alt);
+    tree->SetBranchAddress("shr_tkfit_nhits_Y", &shr_tkfit_nhits_Y);
+    tree->SetBranchAddress("shr_tkfit_nhits_V", &shr_tkfit_nhits_V);
+    tree->SetBranchAddress("shr_tkfit_nhits_U", &shr_tkfit_nhits_U);
     tree->SetBranchAddress("shr_trkfitmedangle", &shr_trkfitmedangle);
     tree->SetBranchAddress("shrmoliereavg", &shrmoliereavg);
     tree->SetBranchAddress("shrmoliererms", &shrmoliererms);
@@ -81,31 +68,8 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("shr_tkfit_gap10_nhits_V", &shr_tkfit_gap10_nhits_V );
     tree->SetBranchAddress("shr_tkfit_gap10_nhits_U", &shr_tkfit_gap10_nhits_U );
 
-    tree->SetBranchAddress("CylFrac1h_1cm", &CylFrac1h_1cm );
-    tree->SetBranchAddress("CylFrac1h_2cm", &CylFrac1h_2cm );
-    tree->SetBranchAddress("CylFrac1h_3cm", &CylFrac1h_3cm );
-    tree->SetBranchAddress("CylFrac1h_4cm", &CylFrac1h_4cm );
-    tree->SetBranchAddress("CylFrac1h_5cm", &CylFrac1h_5cm );
-
-    tree->SetBranchAddress("CylFrac2h_1cm", &CylFrac2h_1cm );
-    tree->SetBranchAddress("CylFrac2h_2cm", &CylFrac2h_2cm );
-    tree->SetBranchAddress("CylFrac2h_3cm", &CylFrac2h_3cm );
-    tree->SetBranchAddress("CylFrac2h_4cm", &CylFrac2h_4cm );
-    tree->SetBranchAddress("CylFrac2h_5cm", &CylFrac2h_5cm );
-
-    tree->SetBranchAddress("CylFrac_1cm", &CylFrac_1cm );
-    tree->SetBranchAddress("CylFrac_2cm", &CylFrac_2cm );
-    tree->SetBranchAddress("CylFrac_3cm", &CylFrac_3cm );
-    tree->SetBranchAddress("CylFrac_4cm", &CylFrac_4cm );
-    tree->SetBranchAddress("CylFrac_5cm", &CylFrac_5cm );
-
-    tree->SetBranchAddress("DeltaMed",   &DeltaMed );
-    tree->SetBranchAddress("DeltaMed1h", &DeltaMed1h );
-    tree->SetBranchAddress("DeltaMed2h", &DeltaMed2h );
-
-    tree->SetBranchAddress("DeltaRMS",   &DeltaRMS );
-    tree->SetBranchAddress("DeltaRMS1h", &DeltaRMS1h );
-    tree->SetBranchAddress("DeltaRMS2h", &DeltaRMS2h );
+    tree->SetBranchAddress("all_shr_hits",     &all_shr_hits);
+    tree->SetBranchAddress("all_shr_energies", &all_shr_energies);
 
     tree->SetBranchAddress("shrPCA1CMed_5cm", &shrPCA1CMed_5cm );
 
@@ -181,12 +145,6 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("trk_hits_y_tot", &trk_hits_y_tot);
     tree->SetBranchAddress("trk_hits_u_tot", &trk_hits_u_tot);
     tree->SetBranchAddress("trk_hits_v_tot", &trk_hits_v_tot);
-    // tree->SetBranchAddress("elecclusters_U_charge", &elecclusters_U_charge);
-    // tree->SetBranchAddress("elecclusters_V_charge", &elecclusters_V_charge);
-    // tree->SetBranchAddress("elecclusters_Y_charge", &elecclusters_Y_charge);
-    // tree->SetBranchAddress("elecclusters_U_N", &elecclusters_U_N);
-    // tree->SetBranchAddress("elecclusters_V_N", &elecclusters_V_N);
-    // tree->SetBranchAddress("elecclusters_Y_N", &elecclusters_Y_N);
     tree->SetBranchAddress("n_tracks_contained",  &n_tracks_contained);
     tree->SetBranchAddress("n_showers_contained", &n_showers_contained);
     
@@ -293,11 +251,7 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("n_pfps", &n_pfps);
     tree->SetBranchAddress("n_tracks", &n_tracks);
     tree->SetBranchAddress("n_showers", &n_showers);
-    
-    // tree->SetBranchAddress("hits_u", &hits_u);
-    // tree->SetBranchAddress("hits_v", &hits_v);
-    // tree->SetBranchAddress("hits_y", &hits_y);
-    
+
     tree->SetBranchAddress("topological_score", &topological_score);
     tree->SetBranchAddress("slclustfrac", &slclustfrac);
     tree->SetBranchAddress("endmuonmichel", &endmuonmichel);
@@ -323,26 +277,7 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("nslnoise_pl1", &nslnoise_pl1);
     tree->SetBranchAddress("nhits_pl1", &nhits_pl1);
     tree->SetBranchAddress("frac_slnoise_pl1", &frac_slnoise_pl1);
-    
-    // tree->SetBranchAddress("secondshower_U_charge", &secondshower_U_charge);
-    // tree->SetBranchAddress("secondshower_U_nhit", &secondshower_U_nhit);
-    // tree->SetBranchAddress("secondshower_U_vtxdist", &secondshower_U_vtxdist);
-    // tree->SetBranchAddress("secondshower_U_eigenratio", &secondshower_U_eigenratio);
-    // tree->SetBranchAddress("secondshower_U_dot", &secondshower_U_dot);
-    // tree->SetBranchAddress("secondshower_U_dir", &secondshower_U_dir);
-    // tree->SetBranchAddress("secondshower_V_charge", &secondshower_V_charge);
-    // tree->SetBranchAddress("secondshower_V_nhit", &secondshower_V_nhit);
-    // tree->SetBranchAddress("secondshower_V_vtxdist", &secondshower_V_vtxdist);
-    // tree->SetBranchAddress("secondshower_V_eigenratio", &secondshower_V_eigenratio);
-    // tree->SetBranchAddress("secondshower_V_dot", &secondshower_V_dot);
-    // tree->SetBranchAddress("secondshower_V_dir", &secondshower_V_dir);
-    // tree->SetBranchAddress("secondshower_Y_charge", &secondshower_Y_charge);
-    // tree->SetBranchAddress("secondshower_Y_nhit", &secondshower_Y_nhit);
-    // tree->SetBranchAddress("secondshower_Y_vtxdist", &secondshower_Y_vtxdist);
-    // tree->SetBranchAddress("secondshower_Y_eigenratio", &secondshower_Y_eigenratio);
-    // tree->SetBranchAddress("secondshower_Y_dot", &secondshower_Y_dot);
-    // tree->SetBranchAddress("secondshower_Y_dir", &secondshower_Y_dir);
-    
+
     tree->SetBranchAddress("evnunhits", &evnunhits);
     tree->SetBranchAddress("evlepnhits", &evlepnhits);
     tree->SetBranchAddress("evpronhits", &evpronhits);
@@ -365,24 +300,8 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("nu_purity_from_pfp", &nu_purity_from_pfp);
     // tree->SetBranchAddress("n_tracks_pandora", &n_tracks_pandora);
     
-    tree->SetBranchAddress("_closestNuCosmicDist",&_closestNuCosmicDist);
+    if (std::string(_util.run_period) != "1") tree->SetBranchAddress("_closestNuCosmicDist",&_closestNuCosmicDist);
     
-    // tree->SetBranchAddress("vtx_fit_pandora_x", &vtx_fit_pandora_x);
-    // tree->SetBranchAddress("vtx_fit_pandora_y", &vtx_fit_pandora_y);
-    // tree->SetBranchAddress("vtx_fit_pandora_z", &vtx_fit_pandora_z);
-    
-    // tree->SetBranchAddress("n_tracks_tkfit", &n_tracks_tkfit);
-    // tree->SetBranchAddress("vtx_fit_tkfit_x", &vtx_fit_tkfit_x);
-    // tree->SetBranchAddress("vtx_fit_tkfit_y", &vtx_fit_tkfit_y);
-    // tree->SetBranchAddress("vtx_fit_tkfit_z", &vtx_fit_tkfit_z);
-    
-    tree->SetBranchAddress("bdt_nuNCpi0",   &bdt_nuNCpi0);
-    tree->SetBranchAddress("bdt_numuCCpi0", &bdt_numuCCpi0);
-    tree->SetBranchAddress("bdt_numuCC",    &bdt_numuCC);
-    tree->SetBranchAddress("bdt_ext",       &bdt_ext);
-    tree->SetBranchAddress("bdt_cosmic",    &bdt_cosmic);
-    tree->SetBranchAddress("bdt_global",    &bdt_global);
-
     tree->SetBranchAddress("pfp_generation_v",        &pfp_generation_v);
     tree->SetBranchAddress("pfp_trk_daughters_v",     &pfp_trk_daughters_v);
     tree->SetBranchAddress("pfp_shr_daughters_v",     &pfp_shr_daughters_v);
@@ -415,19 +334,42 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     
     // MC specific branches
     if (type == _util.k_mc || type == _util.k_dirt){
-        // tree->SetBranchAddress("weights",         &weights_v);
-        // tree->SetBranchAddress("weightsFlux",     &weightsFlux_v);
-        // tree->SetBranchAddress("weightsGenie",    &weightsGenie_v);
-        // tree->SetBranchAddress("weightsReint",    &weightsReint_v);
+
         tree->SetBranchAddress("weightSplineTimesTune",      &weightSplineTimesTune);
-        tree->SetBranchAddress("ppfx_cv",         &ppfx_cv);
+        tree->SetBranchAddress("ppfx_cv",                    &ppfx_cv);
+        
+        // weightstree->SetBranchAddress("weights", &_mapWeight);
+        // tree->SetBranchAddress("weights",         &weights_v);
+        
+        if (type == _util.k_mc){
+            tree->SetBranchAddress("weightsGenie",          &weightsGenie);
+            tree->SetBranchAddress("weightsReint",          &weightsReint);
+            tree->SetBranchAddress("weightsPPFX",           &weightsPPFX);
+            tree->SetBranchAddress("knobRPAup",             &knobRPAup);
+            tree->SetBranchAddress("knobRPAdn",             &knobRPAdn);
+            tree->SetBranchAddress("knobCCMECup",           &knobCCMECup);
+            tree->SetBranchAddress("knobCCMECdn",           &knobCCMECdn);
+            tree->SetBranchAddress("knobAxFFCCQEup",        &knobAxFFCCQEup);
+            tree->SetBranchAddress("knobAxFFCCQEdn",        &knobAxFFCCQEdn);
+            tree->SetBranchAddress("knobVecFFCCQEup",       &knobVecFFCCQEup);
+            tree->SetBranchAddress("knobVecFFCCQEdn",       &knobVecFFCCQEdn);
+            tree->SetBranchAddress("knobDecayAngMECup",     &knobDecayAngMECup);
+            tree->SetBranchAddress("knobDecayAngMECdn",     &knobDecayAngMECdn);
+            tree->SetBranchAddress("knobThetaDelta2Npiup",  &knobThetaDelta2Npiup);
+            tree->SetBranchAddress("knobThetaDelta2Npidn",  &knobThetaDelta2Npidn);
+            tree->SetBranchAddress("knobThetaDelta2NRadup", &knobThetaDelta2NRadup);
+            tree->SetBranchAddress("knobThetaDelta2NRaddn", &knobThetaDelta2NRaddn);
+            tree->SetBranchAddress("knobRPA_CCQE_Reducedup",&knobRPA_CCQE_Reducedup);
+            tree->SetBranchAddress("knobRPA_CCQE_Reduceddn",&knobRPA_CCQE_Reduceddn);
+            tree->SetBranchAddress("knobNormCCCOHup",       &knobNormCCCOHup);
+            tree->SetBranchAddress("knobNormCCCOHdn",       &knobNormCCCOHdn);
+            tree->SetBranchAddress("knobNormNCCOHup",       &knobNormNCCOHup);
+            tree->SetBranchAddress("knobNormNCCOHdn",       &knobNormNCCOHdn);
+        }
     }
     
     
     tree->SetBranchAddress("cosmic_flashmatch_score_v",&cosmic_flashmatch_score_v);
-    // tree->SetBranchAddress("peSpectrum",               &peSpectrum_v);
-    // tree->SetBranchAddress("peHypothesisNu",           &peHypothesisNu_v);
-    // tree->SetBranchAddress("peHypothesisCosmic",       &peHypothesisCosmic_v);
 
     tree->SetBranchAddress("pi0_shrscore1",  &pi0_shrscore1);
     tree->SetBranchAddress("pi0_shrscore2",  &pi0_shrscore2);
@@ -441,130 +383,17 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
     tree->SetBranchAddress("pi0_dedx1_fit_Y",&pi0_dedx1_fit_Y);
     tree->SetBranchAddress("pi0_mass_Y",     &pi0_mass_Y);
     
-    // tree->SetBranchAddress("shr_dedx_u_v",             &shr_dedx_u_v);
-    // tree->SetBranchAddress("shr_dedx_v_v",             &shr_dedx_v_v);
-    // tree->SetBranchAddress("shr_dedx_y_v",             &shr_dedx_y_v);
-    // tree->SetBranchAddress("shr_energy_u_v",           &shr_energy_u_v);
-    // tree->SetBranchAddress("shr_energy_v_v",           &shr_energy_v_v);
-    // tree->SetBranchAddress("shr_energy_y_v",           &shr_energy_y_v);
-    // tree->SetBranchAddress("shr_pfp_id_v",             &shr_pfp_id_v);
-    // tree->SetBranchAddress("shr_start_x_v",            &shr_start_x_v);
-    // tree->SetBranchAddress("shr_start_y_v",            &shr_start_y_v);
-    // tree->SetBranchAddress("shr_start_z_v",            &shr_start_z_v);
-    // tree->SetBranchAddress("shr_dist_v",               &shr_dist_v);
-    // tree->SetBranchAddress("shr_start_U_v",            &shr_start_U_v);
-    // tree->SetBranchAddress("shr_start_V_v",            &shr_start_V_v);
-    // tree->SetBranchAddress("shr_px_v",                 &shr_px_v);
-    // tree->SetBranchAddress("shr_py_v",                 &shr_py_v);
-    // tree->SetBranchAddress("shr_pz_v",                 &shr_pz_v);
-    // tree->SetBranchAddress("shr_openangle_v",          &shr_openangle_v);
-    // tree->SetBranchAddress("shr_theta_v",              &shr_theta_v);
-    // tree->SetBranchAddress("shr_phi_v",                &shr_phi_v);
-    // tree->SetBranchAddress("shr_pitch_u_v",            &shr_pitch_u_v);
-    // tree->SetBranchAddress("shr_pitch_v_v",            &shr_pitch_v_v);
-    // tree->SetBranchAddress("shr_pitch_y_v",            &shr_pitch_y_v);
-    // tree->SetBranchAddress("shr_tkfit_nhits_v",        &shr_tkfit_nhits_v);
-    // tree->SetBranchAddress("shr_tkfit_start_x_v",      &shr_tkfit_start_x_v);
-    // tree->SetBranchAddress("shr_tkfit_start_y_v",      &shr_tkfit_start_y_v);
-    // tree->SetBranchAddress("shr_tkfit_start_z_v",      &shr_tkfit_start_z_v);
-    // tree->SetBranchAddress("shr_tkfit_start_U_v",      &shr_tkfit_start_U_v);
-    // tree->SetBranchAddress("shr_tkfit_start_V_v",      &shr_tkfit_start_V_v);
-    // tree->SetBranchAddress("shr_tkfit_theta_v",        &shr_tkfit_theta_v);
-    // tree->SetBranchAddress("shr_tkfit_phi_v",          &shr_tkfit_phi_v);
-    // tree->SetBranchAddress("shr_tkfit_pitch_u_v",      &shr_tkfit_pitch_u_v);
-    // tree->SetBranchAddress("shr_tkfit_pitch_v_v",      &shr_tkfit_pitch_v_v);
-    // tree->SetBranchAddress("shr_tkfit_pitch_y_v",      &shr_tkfit_pitch_y_v);
-    // tree->SetBranchAddress("shr_tkfit_dedx_u_v",       &shr_tkfit_dedx_u_v);
-    // tree->SetBranchAddress("shr_tkfit_dedx_v_v",       &shr_tkfit_dedx_v_v);
-    // tree->SetBranchAddress("shr_tkfit_dedx_y_v",       &shr_tkfit_dedx_y_v);
-    // tree->SetBranchAddress("shr_tkfit_gap10_dedx_u_v", &shr_tkfit_gap10_dedx_u_v);
-    // tree->SetBranchAddress("shr_tkfit_gap10_dedx_v_v", &shr_tkfit_gap10_dedx_v_v);
-    // tree->SetBranchAddress("shr_tkfit_gap10_dedx_y_v", &shr_tkfit_gap10_dedx_y_v);
-    // tree->SetBranchAddress("shr_tkfit_dedx_nhits_u_v", &shr_tkfit_dedx_nhits_u_v);
-    // tree->SetBranchAddress("shr_tkfit_dedx_nhits_v_v", &shr_tkfit_dedx_nhits_v_v);
-    // tree->SetBranchAddress("shr_tkfit_dedx_nhits_y_v", &shr_tkfit_dedx_nhits_y_v);
-    // tree->SetBranchAddress("shr_llr_pid_u_v",          &shr_llr_pid_u_v);
-    // tree->SetBranchAddress("shr_llr_pid_v_v",          &shr_llr_pid_v_v);
-    // tree->SetBranchAddress("shr_llr_pid_y_v",          &shr_llr_pid_y_v);
-    // tree->SetBranchAddress("shr_llr_pid_v",            &shr_llr_pid_v);
-    // tree->SetBranchAddress("shr_llr_pid_score_v",      &shr_llr_pid_score_v);
-    // tree->SetBranchAddress("shr_moliere_avg_v",        &shr_moliere_avg_v);
-    // tree->SetBranchAddress("shr_moliere_rms_v",        &shr_moliere_rms_v);
-    
-    // // tree->SetBranchAddress("shr_spacepoint_start_x_v", &shr_spacepoint_start_x_v);
-    // // tree->SetBranchAddress("shr_spacepoint_start_y_v", &shr_spacepoint_start_y_v);
-    // // tree->SetBranchAddress("shr_spacepoint_start_z_v", &shr_spacepoint_start_z_v);
-    // // tree->SetBranchAddress("shr_spacepoint_start_U_v", &shr_spacepoint_start_U_v);
-    // // tree->SetBranchAddress("shr_spacepoint_start_V_v", &shr_spacepoint_start_V_v);
-    // // tree->SetBranchAddress("shr_hits_start_U_wire_v",  &shr_hits_start_U_wire_v);
-    // // tree->SetBranchAddress("shr_hits_start_U_x_v",     &shr_hits_start_U_x_v);
-    // // tree->SetBranchAddress("shr_hits_start_V_wire_v",  &shr_hits_start_V_wire_v);
-    // // tree->SetBranchAddress("shr_hits_start_V_x_v",     &shr_hits_start_V_x_v);
-    // // tree->SetBranchAddress("shr_hits_start_Y_wire_v",  &shr_hits_start_Y_wire_v);
-    // // tree->SetBranchAddress("shr_hits_start_Y_x_v",     &shr_hits_start_Y_x_v);
-    
-    // tree->SetBranchAddress("trk_bragg_p_v",            &trk_bragg_p_v);
-    // tree->SetBranchAddress("trk_bragg_mu_v",           &trk_bragg_mu_v);
-    // tree->SetBranchAddress("trk_bragg_mip_v",          &trk_bragg_mip_v);
-    // tree->SetBranchAddress("trk_pida_v",               &trk_pida_v);
-    
-    // tree->SetBranchAddress("trk_pid_chipr_v",          &trk_pid_chipr_v);
-    // tree->SetBranchAddress("trk_pid_chipi_v",          &trk_pid_chipi_v);
-    // tree->SetBranchAddress("trk_pid_chika_v",          &trk_pid_chika_v);
-    // tree->SetBranchAddress("trk_pid_chimu_v",          &trk_pid_chimu_v);
-    
-    // tree->SetBranchAddress("trk_bragg_p_u_v",          &trk_bragg_p_u_v);
-    // tree->SetBranchAddress("trk_bragg_mu_u_v",         &trk_bragg_mu_u_v);
-    // tree->SetBranchAddress("trk_bragg_mip_u_v",        &trk_bragg_mip_u_v);
-    // tree->SetBranchAddress("trk_pida_u_v",             &trk_pida_u_v);
-    // tree->SetBranchAddress("trk_pid_chipr_u_v",        &trk_pid_chipr_u_v);
-    // tree->SetBranchAddress("trk_pid_chipi_u_v",        &trk_pid_chipi_u_v);
-    // tree->SetBranchAddress("trk_pid_chika_u_v",        &trk_pid_chika_u_v);
-    // tree->SetBranchAddress("trk_pid_chimu_u_v",        &trk_pid_chimu_u_v);
-    // tree->SetBranchAddress("trk_bragg_p_v_v",          &trk_bragg_p_v_v);
-    // tree->SetBranchAddress("trk_bragg_mu_v_v",         &trk_bragg_mu_v_v);
-    // tree->SetBranchAddress("trk_bragg_mip_v_v",        &trk_bragg_mip_v_v);
-    // tree->SetBranchAddress("trk_pida_v_v",             &trk_pida_v_v);
-    // tree->SetBranchAddress("trk_pid_chipr_v_v",        &trk_pid_chipr_v_v);
-    // tree->SetBranchAddress("trk_pid_chipi_v_v",        &trk_pid_chipi_v_v);
-    // tree->SetBranchAddress("trk_pid_chika_v_v",        &trk_pid_chika_v_v);
-    // tree->SetBranchAddress("trk_pid_chimu_v_v",        &trk_pid_chimu_v_v);
-    // tree->SetBranchAddress("trk_pfp_id_v",             &trk_pfp_id_v);
-    // tree->SetBranchAddress("trk_dir_x_v",              &trk_dir_x_v);
-    // tree->SetBranchAddress("trk_dir_y_v",              &trk_dir_y_v);
-    // tree->SetBranchAddress("trk_dir_z_v",              &trk_dir_z_v);
-    // tree->SetBranchAddress("trk_start_x_v",            &trk_start_x_v);
-    // tree->SetBranchAddress("trk_start_y_v",            &trk_start_y_v);
-    // tree->SetBranchAddress("trk_start_z_v",            &trk_start_z_v);
     tree->SetBranchAddress("trk_sce_start_x_v",        &trk_sce_start_x_v);
     tree->SetBranchAddress("trk_sce_start_y_v",        &trk_sce_start_y_v);
     tree->SetBranchAddress("trk_sce_start_z_v",        &trk_sce_start_z_v);
-    // tree->SetBranchAddress("trk_end_x_v",              &trk_end_x_v);
-    // tree->SetBranchAddress("trk_end_y_v",              &trk_end_y_v);
-    // tree->SetBranchAddress("trk_end_z_v",              &trk_end_z_v);
     tree->SetBranchAddress("trk_sce_end_x_v",          &trk_sce_end_x_v);
     tree->SetBranchAddress("trk_sce_end_y_v",          &trk_sce_end_y_v);
     tree->SetBranchAddress("trk_sce_end_z_v",          &trk_sce_end_z_v);
     tree->SetBranchAddress("trk_distance_v",           &trk_distance_v);
-    // tree->SetBranchAddress("trk_theta_v",              &trk_theta_v);
-    // tree->SetBranchAddress("trk_phi_v",                &trk_phi_v);
     tree->SetBranchAddress("trk_len_v",                &trk_len_v);
     tree->SetBranchAddress("trk_mcs_muon_mom_v",       &trk_mcs_muon_mom_v);
     tree->SetBranchAddress("trk_range_muon_mom_v",     &trk_range_muon_mom_v);
-    // tree->SetBranchAddress("trk_energy_proton_v",      &trk_energy_proton_v);
-    // tree->SetBranchAddress("trk_energy_muon_v",        &trk_energy_muon_v);
-    // tree->SetBranchAddress("trk_calo_energy_u_v",      &trk_calo_energy_u_v);
-    // tree->SetBranchAddress("trk_calo_energy_v_v",      &trk_calo_energy_v_v);
-    // tree->SetBranchAddress("trk_calo_energy_y_v",      &trk_calo_energy_y_v);
-    
-    // tree->SetBranchAddress("trk_llr_pid_u_v",          &trk_llr_pid_u_v);
-    // tree->SetBranchAddress("trk_llr_pid_v_v",          &trk_llr_pid_v_v);
-    // tree->SetBranchAddress("trk_llr_pid_y_v",          &trk_llr_pid_y_v);
-    // tree->SetBranchAddress("trk_llr_pid_v",            &trk_llr_pid_v);
     tree->SetBranchAddress("trk_llr_pid_score_v",      &trk_llr_pid_score_v);
-
-
-    // weightstree->SetBranchAddress("weights", &_mapWeight);
 
     // Initalise the flux histograms if MC only
     if (type == _util.k_mc){
@@ -575,12 +404,10 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, co
         boolhist = _util.GetHist(f_flux_weights, h_2D_CV_UW_PPFX_ratio_numubar, "h_2D_CV_UW_PPFX_ratio_numubar"); if (boolhist == false) exit(2);
     }
 
-    run_period = std::string(_run_period);
-
 
 }
 // -----------------------------------------------------------------------------
-std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
+void SliceContainer::SliceClassifier(int type){
     
     // MC Specific classsifications
     if (type == _util.k_mc){
@@ -590,70 +417,134 @@ std::pair<std::string, int> SliceContainer::SliceClassifier(int type){
 
         // Out of Fiducial Volume Event
         if (!is_in_fv) {
+            
             // std::cout << "Purity of out of FV event: "<< nu_purity_from_pfp << std::endl;
-            if (nu_purity_from_pfp <= 0.05) return std::make_pair("cosmic",_util.k_cosmic);
-            else return std::make_pair("nu_out_fv",_util.k_nu_out_fv);
-        }
-
-        // Charged Current 
-        if (ccnc == _util.k_CC){
-
-            // NuMu CC
-            if (nu_pdg == 14 || nu_pdg == -14){
-
-                // Purity is low so return cosmic
-                if (nu_purity_from_pfp == 0) return std::make_pair("cosmic",_util.k_cosmic);
-                
-                if (npi0 > 0) return std::make_pair("numu_cc_pi0", _util.k_numu_cc_pi0); // has a pi0
-                else return std::make_pair("numu_cc",_util.k_numu_cc);
-
+            if (nu_purity_from_pfp <= 0.5){
+                classification = std::make_pair("cosmic",_util.k_cosmic);
+                return;
             }
-            // Nue CC
-            else if (nu_pdg == 12){
-                
-                if (nu_purity_from_pfp >= 0.05)                                 return std::make_pair("nue_cc",_util.k_nue_cc); // purity > 0.05% so signal
-                else return std::make_pair("cosmic",_util.k_cosmic); // Classify as a cosmic with very low purity
-
-            }
-            else if (nu_pdg == -12){
-                
-                if (nu_purity_from_pfp >= 0.05)                                 return std::make_pair("nuebar_cc",_util.k_nuebar_cc); // purity > 0.05% so signal
-                else return std::make_pair("cosmic",_util.k_cosmic); // Classify as a cosmic with very low purity
-
-            }
-            // Unknown Neutrino Type
             else {
-                std::cout << "Unknown Neutrino Type..." << std::endl;
-                return std::make_pair("unmatched",_util.k_unmatched);
+                classification = std::make_pair("nu_out_fv",_util.k_nu_out_fv);
+                return;
             }
-
         }
-        // Neutral Current
+        // In FV event
         else {
 
-            // Purity is low so return cosmic
-            if (nu_purity_from_pfp <= 0.05) return std::make_pair("cosmic",_util.k_cosmic);
+            // Charged Current 
+            if (ccnc == _util.k_CC){
 
-            if (npi0 > 0) return std::make_pair("nc_pi0",_util.k_nc_pi0);
-            else return std::make_pair("nc",_util.k_nc);
-        }
+                // NuMu CC
+                if (nu_pdg == 14 || nu_pdg == -14){
+
+                    // Purity is low so return cosmic
+                    if (nu_purity_from_pfp <= 0.5) {
+                        classification = std::make_pair("cosmic",_util.k_cosmic);
+                        return;
+                    }
+                    
+                    if (npi0 > 0) {
+                        classification = std::make_pair("numu_cc_pi0", _util.k_numu_cc_pi0); // has a pi0
+                        return;
+                    }
+                    else {
+                        classification = std::make_pair("numu_cc",_util.k_numu_cc);
+                        return;
+                    }
+
+                }
+                // Nue CC
+                else if (nu_pdg == 12){
+                    
+                    // purity > 0.5% so signal
+                    if (nu_purity_from_pfp > 0.5){
+                        classification = std::make_pair("nue_cc",       _util.k_nue_cc);    
+                        return;
+                    }
+                    // Most of the slice from pandora was unmatched hits -- probably a cosmic
+                    else if (nu_purity_from_pfp >= 0 && nu_purity_from_pfp <= 0.5){
+                        classification = std::make_pair("cosmic_nue",   _util.k_cosmic_nue);
+                        return;
+                    }
+                    // These events were not picked up by pandora at all
+                    else {
+                        classification = std::make_pair("unmatched_nue",_util.k_unmatched_nue); 
+                        return;
+                    }
+
+                }
+                else if (nu_pdg == -12){
+                    
+                    // purity > 0.5% so signal
+                    if (nu_purity_from_pfp > 0.5) {
+                        classification = std::make_pair("nuebar_cc",       _util.k_nuebar_cc); 
+                        return;
+
+                    }
+                    // Most of the slice from pandora was unmatched hits -- probably a cosmic                               
+                    else if (nu_purity_from_pfp >= 0 && nu_purity_from_pfp <= 0.5) {
+                        classification = std::make_pair("cosmic_nuebar",   _util.k_cosmic_nuebar);    
+                        return;
+                    } 
+                    // These events were not picked up by pandora at all
+                    else {
+                        classification = std::make_pair("unmatched_nuebar",_util.k_unmatched_nuebar); 
+                        return;
+                    }
+
+                }
+                // Unknown Neutrino Type
+                else {
+                    std::cout << "Unknown Neutrino Type..., This will also mess up the efficecy if this occurs!" << std::endl;
+                    classification = std::make_pair("unmatched",_util.k_unmatched);
+                    return;
+                }
+
+            }
+            // Neutral Current
+            else {
+
+                // Purity is low so return cosmic
+                if (nu_purity_from_pfp <= 0.5){
+                    classification = std::make_pair("cosmic",_util.k_cosmic);
+                    return;
+                }
+
+                if (npi0 > 0) {
+                    classification = std::make_pair("nc_pi0",_util.k_nc_pi0);
+                    return;
+                }
+                else {
+                    classification = std::make_pair("nc",_util.k_nc);
+                    return;
+                }
+            }
+        
+        } // End if in FV
 
     }
     // Data
     else if (type == _util.k_data){
-        return std::make_pair("data",_util.k_leg_data);
+        classification = std::make_pair("data",_util.k_leg_data);
+        return;
     }
     // EXT
     else if (type == _util.k_ext){
-        return std::make_pair("ext",_util.k_leg_ext);
+        classification = std::make_pair("ext",_util.k_leg_ext);
+        return;
         
     }
     // Dirt
     else if (type == _util.k_dirt){
-        return std::make_pair("dirt",_util.k_leg_dirt);
+        classification = std::make_pair("dirt",_util.k_leg_dirt);
+        return;
     }
     // What is this type?
-    else return std::make_pair("unmatched",_util.k_unmatched);
+    else {
+        std::cout << "Got a case we are calling unmatched, this is going to mess up the efficiency in the current way!" << std::endl;
+        classification = std::make_pair("unmatched",_util.k_unmatched);
+        return;
+    }
     
 }
 // -----------------------------------------------------------------------------
@@ -708,70 +599,84 @@ std::string SliceContainer::SliceCategory(){
     }
 }
 // -----------------------------------------------------------------------------
-std::pair<std::string, int> SliceContainer::ParticleClassifier(int type){
+void SliceContainer::ParticleClassifier(int type){
     
     // MC Specific classsifications
     if (type == _util.k_mc){
 
         // Electron
         if (shr_bkt_pdg == 11 || shr_bkt_pdg == -11){
-            return std::make_pair("e",_util.k_electron);
+            particle_type = std::make_pair("e",_util.k_electron);
+            return;
         }
         // Muon
         else if (shr_bkt_pdg == 13 || shr_bkt_pdg == -13){
-            return std::make_pair("muon",_util.k_muon);
+            particle_type = std::make_pair("muon",_util.k_muon);
+            return;
         }
         // Pion
         else if (shr_bkt_pdg == 211 || shr_bkt_pdg == -211){
-            return std::make_pair("e",_util.k_pion);
+            particle_type = std::make_pair("e",_util.k_pion);
+            return;
         }
         // Photon 
         else if (shr_bkt_pdg == 22 ){
-            return std::make_pair("photon",_util.k_photon);
+            particle_type = std::make_pair("photon",_util.k_photon);
+            return;
         }
         // Proton
         else if (shr_bkt_pdg == 2212){
-            return std::make_pair("p",_util.k_proton);
+            particle_type = std::make_pair("p",_util.k_proton);
+            return;
         }
         // Neutron
         else if (shr_bkt_pdg == 2112){
-            return std::make_pair("n",_util.k_neutron);
+            particle_type = std::make_pair("n",_util.k_neutron);
+            return;
         }
         // Kaon
         else if (shr_bkt_pdg == 321 || shr_bkt_pdg == -321 ){
-            return std::make_pair("K",_util.k_kaon);
+            particle_type = std::make_pair("K",_util.k_kaon);
+            return;
         }
         // Other stuff is assumed cosmic
         else {
-            return std::make_pair("cosmic",_util.k_part_cosmic);
+            particle_type = std::make_pair("cosmic",_util.k_part_cosmic);
+            return;
         }
 
 
     }
     // Data
     else if (type == _util.k_data){
-        return std::make_pair("data",_util.k_part_data);
+        particle_type = std::make_pair("data",_util.k_part_data);
+        return;
     }
     // EXT
     else if (type == _util.k_ext){
-        return std::make_pair("ext",_util.k_part_ext);
+        particle_type = std::make_pair("ext",_util.k_part_ext);
+        return;
         
     }
     // Dirt
     else if (type == _util.k_dirt){
-        return std::make_pair("dirt",_util.k_part_dirt);
+        particle_type = std::make_pair("dirt",_util.k_part_dirt);
+        return;
     }
     // What is this type?
-    else return std::make_pair("unmatched",_util.k_part_unmatched);
+    else {
+        particle_type = std::make_pair("unmatched",_util.k_part_unmatched);
+        return;
+    }
     
 }
 // -----------------------------------------------------------------------------
-std::string SliceContainer::SliceInteractionType(int type){
+void SliceContainer::SliceInteractionType(int type){
 
     // Only do this for mc, otherwise return data type
     if (type == _util.k_mc || type == _util.k_dirt){
-        std::string nu;
-        std::string CCNC;
+        std::string nu = "temp";
+        std::string CCNC = "temp";
 
         // Get the nu flavour
         if (nu_pdg == 14 ){
@@ -798,30 +703,92 @@ std::string SliceContainer::SliceInteractionType(int type){
 
 
         if (interaction == _util.k_qe) {
-            return nu + CCNC + "qe";
+            genie_interaction = nu + CCNC + "qe";
+            return;
 
         }
         else if (interaction == _util.k_res ) {
-            return nu + CCNC + "res";
+            genie_interaction = nu + CCNC + "res";
+            return;
 
         }
         else if (interaction == _util.k_dis ) {
-            return nu + CCNC + "dis";
+            genie_interaction = nu + CCNC + "dis";
+            return;
 
         }
         else if (interaction == _util.k_coh) {
-            return nu + CCNC + "coh";
+            genie_interaction = nu + CCNC + "coh";
+            return;
 
         }
         else if (interaction == _util.k_mec) {
-            return nu + CCNC + "mec";
+            genie_interaction = nu + CCNC + "mec";
+            return;
 
         }
         else {
-            return nu + CCNC + "unknown";
+            genie_interaction = nu + CCNC + "unknown";
+            return;
         }
     }
-    else return "data";
+    else{
+        genie_interaction = "data";
+        return;
+    }
+
+
+
+}
+// -----------------------------------------------------------------------------
+void SliceContainer::Pi0Classifier(int type){
+
+    // Only do this for mc, otherwise return data type
+    if (type == _util.k_mc){
+        std::string nu = "temp";
+        std::string CCNC = "temp";
+
+        // Get the nu flavour
+        if (nu_pdg == 14 ||  nu_pdg == -14){
+            nu = "numu_";
+        }
+        else if (nu_pdg == 12){
+            nu = "nue_";
+        }
+        else if (nu_pdg == -12){
+            nu = "nue_bar_";
+        }
+        else {
+            nu = "unknown_";
+        }
+
+        // The interaction type
+        if (ccnc == _util.k_CC){
+            CCNC = "cc";
+        }
+        else CCNC = "nc";
+        
+
+        if (npi0 > 0){
+            pi0_classification = nu + CCNC + "_pi0";
+            return;
+
+        }
+        else if (npi0 == 0 ) {
+            pi0_classification = nu + CCNC + "";
+            return;
+
+        }
+        else {
+            pi0_classification = nu + CCNC + "unknown";
+            return;
+        }
+    }
+    else {
+        pi0_classification = "data";
+        return;
+    }
+
 
 
 }
@@ -830,7 +797,7 @@ double SliceContainer::GetPPFXCVWeight(){
     
     double weight = 1.0;
 
-    double nu_theta = _util.GetTheta(true_nu_px, true_nu_py, true_nu_pz);
+    double nu_theta = _util.GetNuMIAngle(true_nu_px, true_nu_py, true_nu_pz, "beam");
 
     double xbin{1.0},ybin{1.0};
 
@@ -863,5 +830,85 @@ double SliceContainer::GetPPFXCVWeight(){
     // std::cout << nu_theta << "  " << nu_e <<  "  " << weight << std::endl;
 
     return weight;
+}
+// -----------------------------------------------------------------------------
+double SliceContainer::GetdEdxMax(){
+
+    double dedx_max = -1;
+
+    // We want to also use the dedx when it is defined properly. Sometimes, the plane can have hits but an undefined dedx
+    // use the dedx where we get the max number of hits and the dedx > 0
+    int temp_shr_hits_u_tot = shr_hits_u_tot;
+    int temp_shr_hits_v_tot = shr_hits_v_tot;
+    int temp_shr_hits_y_tot = shr_hits_y_tot;
+
+    // int temp_shr_hits_u_tot = shr_tkfit_nhits_U; // These variables give a bigger difference in run 1 and run 3
+    // int temp_shr_hits_v_tot = shr_tkfit_nhits_V;
+    // int temp_shr_hits_y_tot = shr_tkfit_nhits_Y;
+
+    // If the dedx is undefined, set the hits to zero
+    if (shr_tkfit_dedx_U <= 0) temp_shr_hits_u_tot = 0;
+    if (shr_tkfit_dedx_V <= 0) temp_shr_hits_v_tot = 0;
+    if (shr_tkfit_dedx_Y <= 0) temp_shr_hits_y_tot = 0;
+
+
+    // Collection plane is the largest
+    if (temp_shr_hits_y_tot > temp_shr_hits_u_tot && temp_shr_hits_y_tot > temp_shr_hits_v_tot ){
+        dedx_max = shr_tkfit_dedx_Y;
+    }
+    // V Plane is the largest
+    else if (temp_shr_hits_v_tot > temp_shr_hits_u_tot && temp_shr_hits_v_tot > temp_shr_hits_y_tot) {
+        dedx_max = shr_tkfit_dedx_V;
+        
+    }
+    // U Plane is the largest
+    else if (temp_shr_hits_u_tot > temp_shr_hits_v_tot && temp_shr_hits_u_tot > temp_shr_hits_y_tot){
+        dedx_max = shr_tkfit_dedx_U;
+        // std::cout << shr_tkfit_dedx_U << " " << shr_tkfit_dedx_V << " " << shr_tkfit_dedx_Y<< "  " << shr_theta*(180/3.14)<< "  " << npi0 <<  std::endl;
+        // std::cout << shr_hits_u_tot << " " << shr_hits_v_tot << " " << shr_hits_y_tot<<"\n" <<std::endl;
+    }
+    // Ok one plane was equal, so need to prioritise planes in preference of y, v, u
+    else {
+
+        // If y == any other plane, then y wins
+        if (temp_shr_hits_y_tot == temp_shr_hits_u_tot || temp_shr_hits_y_tot == temp_shr_hits_v_tot ){
+            dedx_max = shr_tkfit_dedx_Y;
+           
+        }
+        // U == V, ALL Y cases have been used up, so default to v
+        else if (temp_shr_hits_u_tot == temp_shr_hits_v_tot ){
+            dedx_max = shr_tkfit_dedx_V;
+            
+        }
+        else {
+            dedx_max = shr_tkfit_dedx_U;
+            
+            
+        }
+    }
+
+    if (dedx_max == -1) {
+        std::cout << shr_tkfit_dedx_U << " " << shr_tkfit_dedx_V << " " << shr_tkfit_dedx_Y<< std::endl;
+        std::cout << "edge case of dedx comparisons, your logic is flawed!" << std::endl;
+    }
+
+    return dedx_max;
+    
+}
+// -----------------------------------------------------------------------------
+void SliceContainer::SetCVWeight(double weight){
+    cv_weight = weight;
+}
+// -----------------------------------------------------------------------------
+void SliceContainer::SetSignal(){
+
+    if (classification.second == _util.k_nue_cc           || classification.second == _util.k_nuebar_cc ||
+        classification.second == _util.k_unmatched_nue    || classification.second == _util.k_cosmic_nue ||
+        classification.second == _util.k_unmatched_nuebar || classification.second == _util.k_cosmic_nuebar ){
+            is_signal = true;
+    }
+    else 
+        is_signal = false;
+
 }
 // -----------------------------------------------------------------------------

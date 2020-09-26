@@ -5,44 +5,38 @@
 
 // Cut directory names -- harcoded, so need to be updated
 std::vector<std::string> cut_dirs = {
-        "Unselected",     // Unselected
-        "SoftwareTrig",   // Software Trigger
-        "Slice_ID",       // Slice ID
-        "e_candidate",    // Electron Candidate
-        "In_FV",          // In FV
-        "Topo_Score",     // Topological Score
-        "Contained_Frac", // Slice Contained Fraction
-        "Shower_Score",   // Track Score
-        "Michel_Rej",     // Michel Rejection
-        "ShrHits",        // Shower Hits
-        "HitRatio",       // Ratio of shr hits and slice hits
-        "Moliere_Avg",    // Shower Moliere Average
-        "ShrVtxDist_dEdx_y",
-        "dEdx_y_no_tracks",  // dEdx y plane no tracks
-        // "ShrVtxDistance", // Shower to vertex distance
-        // "dEdx_y",         // dEdx y plane
-        };
+            "Input",                                      // Unselected
+            "Software Trigger",                           // Software Trigger
+            "Slice ID",                                   // Slice ID
+            "Electron Candidate",                         // Electron Candidate
+            "In Fiducial Volume",                         // In FV
+            "Contained Fraction",                         // Slice Contained Fraction
+            "Topological Score",                          // Topological Score
+            "Cosimc IP",                                  // Pandora Cosmic Impact Parameter
+            "Shower Score",                               // Track Score < 0.5
+            "Hit Ratio",                                  // Ratio of shr hits and slice hits
+            "Moliere Average",                            // Shower Moliere Average
+            "2D Shower Vtx Dist, dE/dx",                  // 2D cut for shower to vertex distance and dedx
+            "dE/dx, 0 Tracks"                             // dEdx all planes no tracks
+            };
 
 // enums for cut dirs
 enum enum_cut_dirs {
-            k_unselected,        // Unselected 
-            k_swtrig,            // Software Trigger
-            k_slice_id,          // Slice ID
-            k_e_candidate,       // Electron Candidate
-            k_in_fv,             // Reco Nu Vtx (SC Corr) In the FV 
-            k_topo_score,        // Topo Score
-            k_contained_frac,    // Slice Contained Fraction
-            k_shower_score,      // Shower Score
-            k_michel_rej,        // Michel Rejection
-            k_shr_hits,          // Shower Hits
-            k_hit_ratio,         // Ratio of shr hits and slice hits
-            k_shr_moliere_avg,   // Shower Moliere Average
-            k_vtx_dist_dedx,     //  2D cut for shower to vertex distance and dEdx. Only applied for > 1 track
-            k_dEdx_y_no_tracks,  // dEdx y plane when there is no tracks
-            // k_shr_distance,      // Shower to reco nu vertex distance
-            // k_dEdx_y,            // dEdx y plane
-            k_cuts_MAX
-            }; 
+                k_unselected,        // Unselected 
+                k_swtrig,            // Software Trigger
+                k_slice_id,          // Slice ID
+                k_e_candidate,       // Electron Candidate
+                k_in_fv,             // Reco Nu Vtx (SC Corr) In the FV 
+                k_contained_frac,    // Slice Contained Fraction
+                k_topo_score,        // Topo Score
+                k_cosmic_ip,         // Pandora Cosmic Impact Param 3D
+                k_shower_score,      // Shower Score
+                k_hit_ratio,         // Ratio of shr hits and slice hits
+                k_shr_moliere_avg,   // Shower Moliere Average
+                k_vtx_dist_dedx,     //  2D cut for shower to vertex distance and dEdx. Only applied for > 1 track
+                k_dEdx_max_no_tracks,// dEdx all planes when there is no tracks
+                k_cuts_MAX
+                }; 
 
 void populate_efficiency_vec(TH1D* h_eff, TH1D *h_pur, const char* input_file){
 
@@ -72,17 +66,23 @@ void populate_efficiency_vec(TH1D* h_eff, TH1D *h_pur, const char* input_file){
     }
 
     for (unsigned int k=0; k < efficiency_v.size();k++){
-        h_eff ->Fill(cut_dirs.at(k).c_str(), efficiency_v.at(k));
+        if (k == 0 || k == 1) h_eff ->Fill(cut_dirs.at(k).c_str(), 1.0); // We need to put these back to 1 (becasue of the way we define things after slice id)
+        else h_eff ->Fill(cut_dirs.at(k).c_str(), efficiency_v.at(k));
         h_pur ->Fill(cut_dirs.at(k).c_str(), purity_v.at(k));
         h_eff->SetBinError(k+1, 0);
         h_pur->SetBinError(k+1, 0);
     }
 
-    h_eff->GetYaxis()->SetRangeUser(0,1.1);
+    h_eff->GetYaxis()->SetRangeUser(0, 1.1);
     h_eff->SetStats(kFALSE);
     h_eff->SetMarkerStyle(20);
     h_eff->SetMarkerSize(0.5);
     h_eff->SetLineWidth(2);
+    h_eff->GetXaxis()->SetTitleSize(0.05);
+    h_eff->GetYaxis()->SetLabelSize(0.05);
+    h_eff->GetYaxis()->SetTitleSize(0.05);
+    h_eff->GetXaxis()->SetLabelFont(62);
+    h_eff->GetXaxis()->SetLabelSize(0.03);
 
     h_pur->SetLineColor(kRed+2);
     h_pur->SetStats(kFALSE);
@@ -106,10 +106,11 @@ void overlay_efficiency(){
     populate_efficiency_vec(h_eff_run3, h_pur_run3, "../../../Analysis/files/trees/nuexsec_selected_tree_mc_run3.root");
     
     
-    TCanvas *c = new TCanvas();
+    TCanvas *c = new TCanvas("c", "c", 600, 500);
     c->SetGridy();
+    c->SetBottomMargin(0.12);
 
-    TLegend *leg_stack = new TLegend(0.7, 0.9, 0.90, 0.7);
+    TLegend *leg_stack = new TLegend(0.6, 0.9, 0.90, 0.7);
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
     leg_stack->AddEntry(h_eff_run1, "Efficiency Run1","lp");
@@ -154,6 +155,8 @@ void overlay_efficiency(){
     h_eff_diff->GetYaxis()->SetTitle("Difference \%");
     h_eff_diff->Scale(100);
     h_eff_diff->GetYaxis()->SetRangeUser(-8, 8);
+    h_eff_diff->GetXaxis()->SetLabelFont(62);
+    h_eff_diff->GetXaxis()->SetLabelSize(0.03);
 
     TH1D* h_pur_diff = (TH1D*) h_pur_run1->Clone("h_pur_diff");
     h_pur_diff->Add(h_pur_run3, -1);
@@ -164,8 +167,9 @@ void overlay_efficiency(){
     h_pur_diff->SetLineWidth(2);
     h_pur_diff->Scale(100);
 
-    TCanvas *c2 = new TCanvas();
+    TCanvas *c2 = new TCanvas("c2", "c2", 600, 500);
     c2->SetGridy();
+    c2->SetBottomMargin(0.12);
     h_eff_diff->Draw("LP");
     h_pur_diff->Draw("LP, same");
 
@@ -208,9 +212,12 @@ void overlay_efficiency(){
     h_eff_diff_rel->SetMarkerStyle(20);
     h_eff_diff_rel->SetMarkerSize(0.5);
     h_eff_diff_rel->SetLineWidth(2);
-    h_eff_diff_rel->GetYaxis()->SetTitle("Rel. Difference \%");
+    h_eff_diff_rel->GetYaxis()->SetTitle("Rel. Difference (Run 1 - Run 3) \%");
     // h_eff_diff_rel->Scale(100);
     h_eff_diff_rel->GetYaxis()->SetRangeUser(-3, 3);
+
+    h_eff_diff_rel->GetXaxis()->SetLabelFont(62);
+    h_eff_diff_rel->GetXaxis()->SetLabelSize(0.03);
 
     h_pur_diff_rel->SetLineColor(kRed+2);
     h_pur_diff_rel->SetStats(kFALSE);
@@ -219,8 +226,9 @@ void overlay_efficiency(){
     h_pur_diff_rel->SetLineWidth(2);
     // h_pur_diff_rel->Scale(100);
 
-    TCanvas *c3 = new TCanvas();
+    TCanvas *c3 = new TCanvas("c3", "c3", 600, 500);
     c3->SetGridy();
+    c3->SetBottomMargin(0.12);
     h_eff_diff_rel->Draw("LP");
     h_pur_diff_rel->Draw("LP, same");
 

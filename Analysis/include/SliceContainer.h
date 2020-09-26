@@ -6,7 +6,7 @@
 #include <TTree.h>
 #include <iostream>
 
-#include "utility.h"
+#include "Utility.h"
 
 /* 
 Class to hold information for the eventslice in the pandora ntuples for ease of use
@@ -19,33 +19,52 @@ public:
 
     // -------------------------------------------------------------------------
     // Initialise the class
-    void Initialise(TTree* tree, int type, TFile *f_flux_weights, const char * _run_period, utility util);
+    void Initialise(TTree* tree, int type, TFile *f_flux_weights, Utility util);
     // -------------------------------------------------------------------------
     // Function to classify the slice
-    std::pair<std::string, int>  SliceClassifier(int type);
+    void  SliceClassifier(int type);
     // -------------------------------------------------------------------------
     // Returns the Category defined by the pandora team 
     // (can be used as a cross check or making similar plots to them)
     std::string SliceCategory();
     // -------------------------------------------------------------------------
     // Function to return the genie interaction mode, e.g. ccqe, ccmec etc.
-    std::string SliceInteractionType(int type);
+    void SliceInteractionType(int type);
     // -------------------------------------------------------------------------
     // Function to classify the event by particle type of the leading shower
-    std::pair<std::string, int> ParticleClassifier(int type);
+    void ParticleClassifier(int type);
     // -------------------------------------------------------------------------
     // Function to Get the PPFX CV correction weight
     double GetPPFXCVWeight();
     // -------------------------------------------------------------------------
+    // Get the dEdx on the plane with the most hits
+    double GetdEdxMax();
+    // -------------------------------------------------------------------------
+    // Determine if there is a truth pi0 in the event
+    void Pi0Classifier(int type);
+    // -------------------------------------------------------------------------
+    // Set the CV weight as member variable
+    void SetCVWeight(double weight);
+    // -------------------------------------------------------------------------
+    void SetSignal();
+    // -------------------------------------------------------------------------
 
-    utility _util;
 
-    int   selected;              // Adds at least 1 shower and containment????
+    Utility _util;
+
     int   run;                   // Run
     int   sub;                   // Subrun
     int   evt;                   // Event
-    std::string run_period;      // Run period 
     
+    std::pair<std::string, int> classification; // The event classification e.g nue cc
+    std::string genie_interaction;              // The interaction type e.g. nue cc qe
+    std::pair<std::string, int> particle_type;  // The truth matched particle of the leading shower
+    std::string pi0_classification;             // Stores whether the true interaction has a pi0 in or not e.g. nue cc pi0 or numu cc pi0
+
+    double cv_weight;
+
+    bool is_signal{false}; // bool to check if the event is signal or not
+
     // Shower Properties 
     float shr_energy_tot;        // Shower: the energy of the showers (in GeV)
     float shr_energy;            // Shower: Energy of the shower with the largest number of hits (in GeV)
@@ -76,30 +95,14 @@ public:
     float shr_start_y;           // Shower: Start y coordinate of the leading shower
     float shr_start_z;           // Shower: Start z coordinate of the leading shower
     
-    float shr_dedx_Y;            // Shower: dE/dx of the leading shower on the Y plane with the 1x4 cm box method| Plane 2
-    float shr_dedx_V;            // Shower: dE/dx of the leading shower on the V plane with the 1x4 cm box method| Plane 1
-    float shr_dedx_U;            // Shower: dE/dx of the leading shower on the U plane with the 1x4 cm box method| Plane 0
-    
-    float shr_dedx_Y_cali;       // Shower: Calibrated dE/dx of the leading shower on the Y plane with the 1x4 cm box method| Plane 2
-    float shr_dedx_V_cali;       // Shower: Calibrated dE/dx of the leading shower on the V plane with the 1x4 cm box method| Plane 1
-    float shr_dedx_U_cali;       // Shower: Calibrated dE/dx of the leading shower on the U plane with the 1x4 cm box method| Plane 0
-    
     float shr_tkfit_dedx_Y;      // Shower: dE/dx of the leading shower on the Y plane with the track fitting
     float shr_tkfit_dedx_V;      // Shower: dE/dx of the leading shower on the V plane with the track fitting
     float shr_tkfit_dedx_U;      // Shower: dE/dx of the leading shower on the U plane with the track fitting
     
-    int   shr_tkfit_nhits_Y;     // Shower: Number of hits in the 1x4 cm box on the Y plane with the track fitting
-    int   shr_tkfit_nhits_V;     // Shower: Number of hits in the 1x4 cm box on the V plane with the track fitting
-    int   shr_tkfit_nhits_U;     // Shower: Number of hits in the 1x4 cm box on the U plane with the track fitting
-    
-    float shr_tkfit_dedx_Y_alt;  // Shower: dE/dx of the leading shower on the Y plane with the track fitting  [calculated using XYZ instead of Residual Range]
-    float shr_tkfit_dedx_V_alt;  // Shower: dE/dx of the leading shower on the V plane with the track fitting  [calculated using XYZ instead of RR]
-    float shr_tkfit_dedx_U_alt;  // Shower: dE/dx of the leading shower on the U plane with the track fitting  [calculated using XYZ instead of RR]
-    
-    int   shr_tkfit_nhits_Y_alt; // Shower: Number of hits in the 1x4 cm box on the Y plane with the track fitting [calculated using XYZ instead of RR]
-    int   shr_tkfit_nhits_V_alt; // Shower: Number of hits in the 1x4 cm box on the V plane with the track fitting [calculated using XYZ instead of RR]
-    int   shr_tkfit_nhits_U_alt; // Shower: Number of hits in the 1x4 cm box on the U plane with the track fitting [calculated using XYZ instead of RR]
-    
+    unsigned int   shr_tkfit_nhits_Y;     // Shower: Number of hits in the 1x4 cm box on the Y plane with the track fitting
+    unsigned int   shr_tkfit_nhits_V;     // Shower: Number of hits in the 1x4 cm box on the V plane with the track fitting
+    unsigned int   shr_tkfit_nhits_U;     // Shower: Number of hits in the 1x4 cm box on the U plane with the track fitting
+        
     int   shr_tkfit_npoints;     // Shower: TrackFit Number of Points
     float shr_trkfitmedangle;    // Shower: TrackFit Median Angle
     float shrmoliereavg;         // Shower: Average angle between the shower’s direction and its 3D spacepoints.
@@ -136,33 +139,11 @@ public:
     unsigned int   shr_tkfit_gap10_nhits_Y; // Number of hits in the 1x4 cm box on the Y plane with the track fitting, skip first 10 mm
     unsigned int   shr_tkfit_gap10_nhits_V;
     unsigned int   shr_tkfit_gap10_nhits_U;
+
+
+    std::vector<float> *all_shr_hits     = nullptr; // Vector containing the shower hits
+    std::vector<float> *all_shr_energies = nullptr; // vector containing the shower energies (not calibrated)
     
-    float CylFrac1h_1cm;  // Frac of spacepoints of the leading shower within 1cm of the shower axis. Only in the first half of the shower
-    float CylFrac1h_2cm;  // Frac of spacepoints of the leading shower within 2cm of the shower axis. Only in the first half of the shower
-    float CylFrac1h_3cm;  // Frac of spacepoints of the leading shower within 3cm of the shower axis. Only in the first half of the shower
-    float CylFrac1h_4cm;  // Frac of spacepoints of the leading shower within 4cm of the shower axis. Only in the first half of the shower
-    float CylFrac1h_5cm;  // Frac of spacepoints of the leading shower within 5cm of the shower axis. Only in the first half of the shower
-
-    float CylFrac2h_1cm;  // Frac of spacepoints of the leading shower within 1cm of the shower axis. Only in the second half of the shower
-    float CylFrac2h_2cm;  // Frac of spacepoints of the leading shower within 2cm of the shower axis. Only in the second half of the shower
-    float CylFrac2h_3cm;  // Frac of spacepoints of the leading shower within 3cm of the shower axis. Only in the second half of the shower
-    float CylFrac2h_4cm;  // Frac of spacepoints of the leading shower within 4cm of the shower axis. Only in the second half of the shower
-    float CylFrac2h_5cm;  // Frac of spacepoints of the leading shower within 5cm of the shower axis. Only in the second half of the shower
-
-    float CylFrac_1cm;  // Frac of spacepoints of the leading shower within 1cm of the shower axis.
-    float CylFrac_2cm;  // Frac of spacepoints of the leading shower within 2cm of the shower axis.
-    float CylFrac_3cm;  // Frac of spacepoints of the leading shower within 3cm of the shower axis.
-    float CylFrac_4cm;  // Frac of spacepoints of the leading shower within 4cm of the shower axis.
-    float CylFrac_5cm;  // Frac of spacepoints of the leading shower within 5cm of the shower axis.
-
-    float DeltaMed;   // to set branch
-    float DeltaMed1h; // to set branch
-    float DeltaMed2h; // to set branch
-
-    float DeltaRMS;   // to set branch
-    float DeltaRMS1h; // to set branch
-    float DeltaRMS2h; // 0 to 20
-
     float shrPCA1CMed_5cm; // 0 to 1
 
     float shrMCSMom; // 0 to 200
@@ -183,8 +164,8 @@ public:
     float shr_score;            // Shower: Pandora track score for the leading shower
     
     int   shr_bkt_pdg;          // Shower: PDG code of the MCParticle matched to the leading shower
-    float shr_bkt_purity;       // Shower: Purity of the leading shower
-    float shr_bkt_completeness; // Shower: Completeness of the leading shower
+    float shr_bkt_purity;       // Shower: Purity of the leading shower -- e.g. how many hits came from particles that werent a true electron
+    float shr_bkt_completeness; // Shower: Completeness of the leading shower - e.g. how many hits from the true electron were missed
     float shr_bkt_E;            // Shower: Energy of the MCParticle matched to the leading shower
     
     float trk_len;              // Track: Length of the longest track
@@ -454,14 +435,6 @@ public:
     float vtx_fit_tkfit_y;
     float vtx_fit_tkfit_z;
     
-    float bdt_nuNCpi0;
-    float bdt_numuCCpi0;
-    float bdt_numuCC;
-    float bdt_ext;
-    float bdt_cosmic;
-    float bdt_global;
-
-
     float pi0_shrscore1, pi0_shrscore2;
     float pi0_dot1, pi0_dot2;
     float pi0_radlen1, pi0_radlen2;
@@ -503,9 +476,33 @@ public:
     std::vector<float> *mc_purity_v       = nullptr;
     
     std::map<std::string, std::vector<double>> *weights_v = nullptr;
-    std::vector<double> *weightsFlux_v   = nullptr;
-    std::vector<double> *weightsGenie_v  = nullptr;
-    std::vector<double> *weightsReint_v  = nullptr;
+    std::vector<unsigned short> *weightsGenie  = nullptr;
+    std::vector<unsigned short> *weightsReint  = nullptr;
+    std::vector<unsigned short> *weightsPPFX     = nullptr;
+
+
+    double knobRPAup{1.0};
+    double knobCCMECup{1.0};
+    double knobAxFFCCQEup{1.0};
+    double knobVecFFCCQEup{1.0};
+    double knobDecayAngMECup{1.0};
+    double knobThetaDelta2Npiup{1.0};
+    double knobThetaDelta2NRadup{1.0};
+    double knobRPA_CCQE_Reducedup{1.0};
+    double knobNormCCCOHup{1.0};
+    double knobNormNCCOHup{1.0};
+    double knobRPAdn{1.0};
+    double knobCCMECdn{1.0};
+    double knobAxFFCCQEdn{1.0};
+    double knobVecFFCCQEdn{1.0};
+    double knobDecayAngMECdn{1.0};
+    double knobThetaDelta2Npidn{1.0};
+    double knobThetaDelta2NRaddn{1.0};
+    double knobRPA_CCQE_Reduceddn{1.0};
+    double knobNormCCCOHdn{1.0};
+    double knobNormNCCOHdn{1.0};
+
+
     
     std::vector<float> *cosmic_flashmatch_score_v = nullptr;
     std::vector<float> *peSpectrum_v              = nullptr;

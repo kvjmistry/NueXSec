@@ -1,5 +1,5 @@
-#ifndef UTILITY_h
-#define UTILITY_h
+#ifndef UTILITY_H
+#define UTILITY_H
 
 // STD includes
 #include <iostream>
@@ -30,17 +30,26 @@
 #include "TEfficiency.h"
 #include "TGaxis.h"
 #include "TStyle.h"
+#include "TCut.h"
+#include "TF1.h"
+#include "TLatex.h"
+#include "TRandom3.h"
 
-// Class at the top level of the selection, so most classes will be including
-// from this class. Mainly provided useful functions.
+/*
+
+Class at the top level of the selection, so most classes will be including
+from this class. Mainly provided useful functions which are common to all classes.
+Main idea is that we dont repeat functions in multiple places
+
+*/
 
 
-class utility{
+class Utility{
 
 public:
     // -------------------------------------------------------------------------
     // Initalise variables
-    void Initalise(const char* variation, bool overwritePOT, const char* run_period);
+    void Initalise(int argc, char *argv[], std::string usage,std::string usage2, std::string usage3);
     // -------------------------------------------------------------------------
     // Get a TFile from a file
     bool GetFile(TFile* &f, TString string);
@@ -51,25 +60,124 @@ public:
     // Get a TDirectory from a file
     bool GetDirectory(TFile* f, TDirectory* &d, TString string);
     // -------------------------------------------------------------------------
-    // Get a histogram from a file
+    // Get a 1D histogram from a file
     bool GetHist(TFile* f, TH1D* &h, TString string);
+    // -------------------------------------------------------------------------
+    // Get a 2D histogram from a file
     bool GetHist(TFile* f, TH2D* &h, TString string);
     // -------------------------------------------------------------------------
-    // Function to tabulate all the nuetrino types and flavours
-    void Tabulate(bool inFV, std::string interaction, std::string classification, int type, std::vector<double> &counter_v, double weight);
+    // Check whether a weight has a suitable value
+    void CheckWeight(double &weight);
     // -------------------------------------------------------------------------
-    // Function to print the tabulated events
-    void PrintInfo(std::vector<double> counter_v, double intime_scale_factor, double mc_scale_factor, double dirt_scale_factor, std::string cut_name, double tot_true_infv_nues, double &efficiency, double &purity);
+    // Check whether a weight has a suitable value
+    void CheckWeight(float &weight);
+    // -------------------------------------------------------------------------
+    // Get the CV weight correction
+    double GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv);
+    // -------------------------------------------------------------------------
+    // Get the pi0 weight correction
+    void GetPiZeroWeight(double &weight, int pizero_mode, int nu_pdg, int ccnc, int npi0, double pi0_e);
+    // -------------------------------------------------------------------------
+    // Create another directory in the plots folder
+    void CreateDirectory(std::string folder);
+    // -------------------------------------------------------------------------
+    // Function to tabulate all the nuetrino types and flavours
+    void Tabulate(bool inFV, std::string interaction, std::string classification, std::string pi0_classification, int type, std::vector<double> &counter_v, double weight);
     // -------------------------------------------------------------------------
     // Function calculate theta
-    double GetTheta(double px, double py, double pz);
+    double GetNuMIAngle(double px, double py, double pz, std::string direction);
     // -------------------------------------------------------------------------
     // Check if vertex is in the FV
     bool in_fv(double x, double y, double z);
     // -------------------------------------------------------------------------
+    // Increase the label size of 1D histograms
+    void IncreaseLabelSize(TH1D *h, TCanvas *c);
+    // -------------------------------------------------------------------------
+    // Increase the label size of 2D histograms
+    void IncreaseLabelSize(TH2D *h, TCanvas *c);
+    // -------------------------------------------------------------------------
+    // Draw the run period on the plot
+    void Draw_Run_Period(TCanvas *c, double x1, double y1, double x2, double y2);
+    // -------------------------------------------------------------------------
+    // Draw the data to MC ratio on the plot
+    void Draw_Data_MC_Ratio(TCanvas *c, double ratio, double x1, double y1, double x2, double y2);
+    // -------------------------------------------------------------------------
+    // Draw the Data POT on the plot
+    void Draw_Data_POT(TCanvas *c, double pot, double x1, double y1, double x2, double y2);
+    // -------------------------------------------------------------------------
+    // Draw MicroBooNE Simulation on canvas
+    void Draw_ubooneSim(TCanvas *c, double x1, double y1, double x2, double y2);
+    // -------------------------------------------------------------------------
+    // Function to customise the TLatex
+    void SetTextProperties(TLatex* text);
+    // -------------------------------------------------------------------------
+    // Initialise the TPad size for a ratio type of plot
+    void SetTPadOptions(TPad *topPad, TPad *bottomPad);
+    // -------------------------------------------------------------------------
+
 
     // Variables
+
+    // Bins for the reconstructed shower energy
+    std::vector<double> reco_shr_bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 4.0};
     
+    bool slim                      = false;
+    bool make_histos               = false;
+    bool run_selection             = true;
+    bool area_norm                 = false;
+    bool calc_cross_sec            = false;
+    bool overwritePOT              = false; 
+    bool run_sys                   = false;
+    bool run_uplot                 = false;
+    bool print                     = false;
+    bool print_mc                  = false;
+    bool print_data                = false;
+    bool print_ext                 = false;
+    bool print_dirt                = false;
+
+    // inputs 
+    char * mc_file_name          = (char *)"empty";
+    char * ext_file_name         = (char *)"empty";
+    char * data_file_name        = (char *)"empty";
+    char * dirt_file_name        = (char *)"empty";
+    char * mc_file_name_out      = (char *)"empty";
+    char * ext_file_name_out     = (char *)"empty";
+    char * data_file_name_out    = (char *)"empty";
+    char * dirt_file_name_out    = (char *)"empty";
+    char * variation             = (char *)"empty";
+    char * variation_file_name   = (char *)"empty";
+    char * mc_tree_file_name_out = (char *)"empty";
+    char * hist_file_name        = (char *)"empty";
+    char * tree_file_name        = (char *)"empty";
+    char * run_period            = (char *)"empty";
+    char * sysmode               = (char *)"default";
+    char * xsecmode              = (char *)"default";
+    char * xsec_rw_mode          = (char *)"default"; // choose whether to reweight by cut or the final selection
+    char * xsec_labels           = (char *)"all";
+    char * uplotmode             = (char *)"default";
+    char * intrinsic_mode        = (char *)"default"; // choose whether to override the nue component to accomodate the intrinsic nue sample
+    int num_events{-1};
+    int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
+    int _weight_tune{1}; // Use the GENIE Tune
+    int _weight_ppfx{1}; // Use the PPFX CV Corr
+    int _weight_dirt{1}; // Weight the Dirt events
+    int _weight_ext{1};  // Weight the EXT events
+    int _pi0_correction{1};  // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
+
+
+    // Weight configurations
+    bool weight_tune{true}; // Use the GENIE Tune
+    bool weight_ppfx{true}; // Use the PPFX CV Corr
+    bool weight_dirt{true}; // Weight the Dirt events
+    bool weight_ext{true};  // Weight the EXT events
+    int  pi0_correction{1}; // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
+
+    // Scale factors to scale samples to data)
+    double mc_scale_factor     = 1.0;
+    double ext_scale_factor    = 1.0;
+    double dirt_scale_factor   = 1.0;
+    double intrinsic_weight    = 1.0;
+
     // POT 
     std::vector<double> config_v;
 
@@ -79,6 +187,7 @@ public:
         "Run1_Data_POT",
         "Run1_Data_trig",
         "Run1_EXT_trig",
+        "Run1_Intrinsic_POT",
         "Run3_MC_POT",
         "Run3_Dirt_POT",
         "Run3_Data_POT",
@@ -94,6 +203,7 @@ public:
                 k_Run1_Data_POT,
                 k_Run1_Data_trig,
                 k_Run1_EXT_trig,
+                k_Run1_Intrinsic_POT,
                 k_Run3_MC_POT,
                 k_Run3_Dirt_POT,
                 k_Run3_Data_POT,
@@ -108,10 +218,6 @@ public:
                 k_config_MAX
                 };
 
-
-    // Other definitions for code
-    bool verbose = false; // This should be set in the config file
-
     // For creating histogram names
     std::vector<std::string> type_prefix = {"MC", "Data", "EXT", "Dirt"};
 
@@ -124,17 +230,30 @@ public:
             "Slice_ID",       // Slice ID
             "e_candidate",    // Electron Candidate
             "In_FV",          // In FV
-            "Topo_Score",     // Topological Score
             "Contained_Frac", // Slice Contained Fraction
-            "Shower_Score",   // Track Score
-            "Michel_Rej",     // Michel Rejection
-            "ShrHits",        // Shower Hits
+            "Topo_Score",     // Topological Score
+            "Cosmic_IP",      // Pandora Cosmic Impact Parameter
+            "Shower_Score",   // Track Score < 0.5
             "HitRatio",       // Ratio of shr hits and slice hits
             "Moliere_Avg",    // Shower Moliere Average
-            "ShrVtxDist_dEdx_y", // 2D cut for shower to vertex distance and dedx
-            "dEdx_y_no_tracks",  // dEdx y plane no tracks
-            // "ShrVtxDistance", // Shower to vertex distance
-            // "dEdx_y",         // dEdx y plane
+            "ShrVtxDist_dEdx_max", // 2D cut for shower to vertex distance and dedx
+            "dEdx_max_no_tracks"  // dEdx all planes no tracks
+            };
+    
+    std::vector<std::string> cut_dirs_pretty = {
+            "Unselected",                                 // Unselected
+            "Software Trigger",                           // Software Trigger
+            "Slice ID",                                   // Slice ID
+            "Electron Candidate",                         // Electron Candidate
+            "In Fiducial Volume",                         // In FV
+            "Contained Fraction",                         // Slice Contained Fraction
+            "Topological Score",                          // Topological Score
+            "Cosimc IP",                                  // Pandora Cosmic Impact Parameter
+            "Shower Score",                               // Track Score < 0.5
+            "Hit Ratio",                                  // Ratio of shr hits and slice hits
+            "Moliere Average",                            // Shower Moliere Average
+            "2D Shower Vtx Dist, dE/dx",                  // 2D cut for shower to vertex distance and dedx
+            "dE/dx, 0 Tracks"                             // dEdx all planes no tracks
             };
 
 
@@ -162,6 +281,10 @@ public:
                 "nc",
                 "nc_pi0",
                 "unmatched",
+                "unmatched_nue", // This is a special category to count nue/nuebar cc interactions that occur inside the fv, but were not reconstructed at all (so purity ends up < 0!). We need these for the efficeicny denom. 
+                "cosmic_nue",    // Another special category to separate standard nues from other cosmics. This category contains mis-reco'd nues as cosmics. We separate these out so we can count the efficency denominator properly
+                "unmatched_nuebar",
+                "cosmic_nuebar",
                 "ext",
                 "data",
                 "dirt"
@@ -203,17 +326,14 @@ public:
                 k_slice_id,          // Slice ID
                 k_e_candidate,       // Electron Candidate
                 k_in_fv,             // Reco Nu Vtx (SC Corr) In the FV 
-                k_topo_score,        // Topo Score
                 k_contained_frac,    // Slice Contained Fraction
+                k_topo_score,        // Topo Score
+                k_cosmic_ip,         // Pandora Cosmic Impact Param 3D
                 k_shower_score,      // Shower Score
-                k_michel_rej,        // Michel Rejection
-                k_shr_hits,          // Shower Hits
                 k_hit_ratio,         // Ratio of shr hits and slice hits
                 k_shr_moliere_avg,   // Shower Moliere Average
                 k_vtx_dist_dedx,     //  2D cut for shower to vertex distance and dEdx. Only applied for > 1 track
-                k_dEdx_y_no_tracks,  // dEdx y plane when there is no tracks
-                // k_shr_distance,      // Shower to reco nu vertex distance
-                // k_dEdx_y,            // dEdx y plane
+                k_dEdx_max_no_tracks,// dEdx all planes when there is no tracks
                 k_cuts_MAX
                 }; 
 
@@ -248,6 +368,10 @@ public:
                 k_nc,
                 k_nc_pi0,
                 k_unmatched,
+                k_unmatched_nue,
+                k_cosmic_nue,
+                k_unmatched_nuebar,
+                k_cosmic_nuebar,
                 k_leg_ext,
                 k_leg_data,
                 k_leg_dirt,
@@ -310,6 +434,15 @@ public:
         k_count_numubar_cc_infv,
         k_count_numu_cc_incryo,
         k_count_numubar_cc_incryo,
+
+        k_count_pi0_nue_cc_nopi0,
+        k_count_pi0_nue_cc_pi0,
+        k_count_pi0_nuebar_cc_nopi0,
+        k_count_pi0_nuebar_cc_pi0,
+        k_count_pi0_numu_cc_nopi0,
+        k_count_pi0_numu_cc_pi0,
+        k_count_pi0_nc_nopi0,
+        k_count_pi0_nc_pi0,
         
         k_count_nue_cc,
         k_count_nuebar_cc,
@@ -320,6 +453,10 @@ public:
         k_count_nc,
         k_count_nc_pi0,
         k_count_unmatched,
+        k_count_unmatched_nue,
+        k_count_cosmic_nue,
+        k_count_unmatched_nuebar,
+        k_count_cosmic_nuebar,
         k_count_total_mc,
         
         k_count_data,

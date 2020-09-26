@@ -4,7 +4,7 @@ if [ -z "$1" ]; then
   #./nuexsec --run 3 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files/neutrinoselection_filt_run3b_overlay.root --data /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v2/neutrinoselection_filt_run3b_beamon_beamgood.root --ext /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v2/neutrinoselection_filt_run3b_beamoff.root --dirt /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files/neutrinoselection_filt_run3b_dirt_overlay.root 2> /dev/null | tee log/run3.log
 
   # Parallel processing version
-  mc="./nuexsec --run 3 --mc ../ntuples/neutrinoselection_filt_run3b_overlay.root"
+  mc="./nuexsec --run 3 --mc ../ntuples/neutrinoselection_filt_run3b_overlay_weight.root"
   data="./nuexsec --run 3 --data ../ntuples/neutrinoselection_filt_run3b_beamon_beamgood_set1.root"
   ext="./nuexsec --run 3 --ext ../ntuples/neutrinoselection_filt_run3b_beamoff_set1.root"
   dirt="./nuexsec --run 3 --dirt ../ntuples/neutrinoselection_filt_run3b_dirt_overlay.root"
@@ -36,7 +36,8 @@ if [ -z "$1" ]; then
   root -l -b -q 'merge/merge_uneaventrees.C("3","files/trees/nuexsec_selected_tree_mc_run3.root", "files/trees/nuexsec_selected_tree_data_run3.root", "files/trees/nuexsec_selected_tree_ext_run3.root","files/trees/nuexsec_selected_tree_dirt_run3.root", "")'
 
   # Now run the cross section calculator
-  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root | tee -a log/run3.log 
+  # Not running this until happy its working...
+  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode default | tee -a log/run3.log 
 
 fi
 

@@ -1,28 +1,29 @@
-#ifndef PASSED_CONTAINER_H
-#define PASSED_CONTAINER_H
+#ifndef PASSEDCONTAINER_H
+#define PASSEDCONTAINER_H
 
 #include <vector>
 #include <string>
 
-#include "utility.h"
+#include "Utility.h"
 
 /* 
 Class to hold information to whether a specific cut has passed the selection
 Main purpose is to be a container.
 
-Will also hold counters
+We basically use this container to write a filelist of passed events so we can look at them
+in the event display.
 
 Default is to set true and change to false when cut fails
 
 */
 
 // Passed Container Class
-class Passed_Container {
+class PassedContainer {
     public:
 
-        utility _util;
+        Utility _util;
 
-        Passed_Container();
+        PassedContainer();
         
         std::vector<bool> cut_v;
         

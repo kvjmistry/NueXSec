@@ -1,76 +1,28 @@
-#include "../include/selection.h"
+#include "../include/Selection.h"
 
 namespace xsecSelection {
 // -----------------------------------------------------------------------------
-void selection::Initialise( const char * mc_file,
-                            const char * ext_file,
-                            const char * data_file,
-                            const char * dirt_file,
-                            const char * mc_file_out,
-                            const char * ext_file_out,
-                            const char * data_file_out,
-                            const char * dirt_file_out,
-                            const char * mc_tree_file_name_out,
-                            utility _utility,
-                            bool _slim,
-                            int num_events,
-                            const char * run_period,
-                            int _verbose,
-                            int weight_cfg){
+void Selection::Initialise(Utility _utility){
     
     std::cout << "\nInitialising..." << std::endl;
 
-    _util = _utility;
+    _util = _utility; 
 
-    // Initialise the selection cuts class
-    _scuts.Initalise(_utility);
+    // Initialise the Selection cuts class
+    _scuts.Initalise(_util);
 
-    // Display slimmed selection
-    if (_slim){
+    // Display slimmed Selection
+    if (_util.slim){
         std::cout << "\033[0;32m-------------------------------" << std::endl;
         std::cout << "     Running in Slim Mode!" << std::endl;
         std::cout << "-------------------------------\033[0m" << std::endl;
-        slim = _slim;
     }
-
-    std::cout << "\nSetting verbose level to: " << _verbose << std::endl;
-    verbose = _verbose;
-
-    std::cout << "\nUsing a weight setting of: " << weight_cfg << std::endl;
-    std::cout << "If this is set to 1 (default) then we apply the Genie Tune and PPFX weights to the CV" << std::endl;
-    _weight_cfg = weight_cfg;
 
     // Create the file directory if it does not exist already
     gSystem->Exec("if [ ! -d \"files/trees/\" ]; then echo \"\nfiles folder does not exist... creating\"; mkdir -p files/trees; fi"); 
 
-    // Set the scale factors
-    if (strcmp(run_period, "1") == 0){
-        mc_scale_factor     = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_MC_POT);
-        dirt_scale_factor   = _util.config_v.at(_util.k_Run1_Data_POT)  / _util.config_v.at(_util.k_Run1_Dirt_POT);
-        intime_scale_factor = _util.config_v.at(_util.k_Run1_Data_trig) / _util.config_v.at(_util.k_Run1_EXT_trig);
-        _run_period = 1;
-    }
-    else if (strcmp(run_period, "3") == 0){
-        mc_scale_factor     = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_MC_POT);
-        dirt_scale_factor   = _util.config_v.at(_util.k_Run3_Data_POT)  / _util.config_v.at(_util.k_Run3_Dirt_POT);
-        intime_scale_factor = _util.config_v.at(_util.k_Run3_Data_trig) / _util.config_v.at(_util.k_Run3_EXT_trig);
-        _run_period = 3;
-    }
-    else {
-        std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;
-        exit(1);
-    }
-
-
-    std::cout << "\033[0;32m-------------------------------" << std::endl;
-    std::cout << "Scale Factors:\n" <<
-    "MC Scale factor:   "   << mc_scale_factor     << "\n" <<
-    "Dirt Scale factor: "   << dirt_scale_factor   << "\n" <<
-    "EXT Scale factor:  "   << intime_scale_factor << std::endl;
-    std::cout << "-------------------------------\033[0m" << std::endl;
-
     // Set the maximum number of events tp process
-    if (num_events > 0 ) max_events = num_events;
+    if (_util.num_events > 0 ) max_events = _util.num_events;
 
     // Resize the histogram helper instance vectors, one instance per type e.g MC, data, ..
     _hhelper.resize(_util.k_type_MAX);
@@ -80,23 +32,34 @@ void selection::Initialise( const char * mc_file,
 
     // Print the input files
     std::cout <<
-    "Run Period Configured: run" << run_period<<"\n" <<
-    "MC   File Path:      " << mc_file        <<"\n" <<
-    "Ext  File Path:      " << ext_file       <<"\n" <<
-    "Data File Path:      " << data_file      <<"\n" <<
-    "Dirt File Path:      " << dirt_file      <<"\n" <<
+    "Run Period Configured: run" << _util.run_period<<"\n" <<
+    "MC   File Path:      " << _util.mc_file_name        <<"\n" <<
+    "EXT  File Path:      " << _util.ext_file_name       <<"\n" <<
+    "Data File Path:      " << _util.data_file_name      <<"\n" <<
+    "Dirt File Path:      " << _util.dirt_file_name      <<"\n" <<
     std::endl;
 
     // Now get the files, if file isnt specified then set bool to skip
-    bool_use_mc        = _util.GetFile(f_mc,        mc_file);
-    bool_use_ext       = _util.GetFile(f_ext,       ext_file);
-    bool_use_data      = _util.GetFile(f_data,      data_file);
-    bool_use_dirt      = _util.GetFile(f_dirt,      dirt_file);
+    bool_use_mc        = _util.GetFile(f_mc,        _util.mc_file_name);
+    bool_use_ext       = _util.GetFile(f_ext,       _util.ext_file_name);
+    bool_use_data      = _util.GetFile(f_data,      _util.data_file_name);
+    bool_use_dirt      = _util.GetFile(f_dirt,      _util.dirt_file_name);
 
     // Load in the flux weights file
     std::cout << "Getting the CV flux file..."<< std::endl;
-    if (strcmp(run_period, "1") == 0) f_flux_weights = new TFile("../Systematics/f_flux_CV_weights_fhc.root", "READ");
-    if (strcmp(run_period, "3") == 0) f_flux_weights = new TFile("../Systematics/f_flux_CV_weights_rhc.root", "READ");
+    if (strcmp(_util.run_period, "1") == 0) {
+        f_flux_weights = new TFile("Systematics/f_flux_CV_weights_fhc.root", "READ");
+
+        // If its null then default to location on gpvm
+        if (f_flux_weights == NULL) f_flux_weights = new TFile("/uboone/data/users/kmistry/work/nuexsec_files/f_flux_CV_weights_fhc.root", "READ");
+
+    }
+    if (strcmp(_util.run_period, "3") == 0) {
+        f_flux_weights = new TFile("Systematics/f_flux_CV_weights_rhc.root", "READ");
+
+        // If its null then default to location on gpvm
+        if (f_flux_weights == NULL) f_flux_weights = new TFile("/uboone/data/users/kmistry/work/nuexsec_files/f_flux_CV_weights_rhc.root", "READ");
+    }
 
     // Resize the counter vector
     counter_v.resize(_util.k_cuts_MAX);
@@ -111,14 +74,14 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the mc slice container
-        mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights, run_period, _util);
+        mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights, _util);
 
         // Initialise the Tree Helper
-        _thelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_tree_file_name_out);
+        _thelper.at(_util.k_mc).Initialise(_util.k_mc, _util.mc_tree_file_name_out, _util);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, run_period, mc_file_out, weight_cfg, _util);
-        if (!_slim) _hhelper.at(_util.k_mc).InitHistograms();
+        if (!_util.slim) _hhelper.at(_util.k_mc).Initialise(_util.k_mc, _util.mc_file_name_out, _util);
+        if (!_util.slim) _hhelper.at(_util.k_mc).InitHistograms();
 
         mc_tree_total_entries = mc_tree->GetEntries();
         std::cout << "Total MC Events:         " << mc_tree_total_entries << std::endl;
@@ -139,14 +102,14 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_data, data_tree, "nuselection/NeutrinoSelectionFilter");
         
         // Initialise all the data slice container
-        data_SC.Initialise(data_tree, _util.k_data, f_flux_weights, run_period, _util);
+        data_SC.Initialise(data_tree, _util.k_data, f_flux_weights, _util);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, run_period, data_file_out, weight_cfg, _util);
-        if (!_slim) _hhelper.at(_util.k_data).InitHistograms();
+        if (!_util.slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, _util.data_file_name_out, _util);
+        if (!_util.slim) _hhelper.at(_util.k_data).InitHistograms();
         
         // Initialise the Tree Helper
-        _thelper.at(_util.k_data).Initialise(_util.k_data, run_period, "empty");
+        _thelper.at(_util.k_data).Initialise(_util.k_data, "empty", _util);
 
         data_tree_total_entries = data_tree->GetEntries();
         std::cout << "Total Data Events:         " << data_tree_total_entries << std::endl;
@@ -169,14 +132,14 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_ext, ext_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
-        ext_SC.Initialise(ext_tree, _util.k_ext, f_flux_weights, run_period, _util);
+        ext_SC.Initialise(ext_tree, _util.k_ext, f_flux_weights, _util);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, ext_file_out, weight_cfg, _util);
-        if (!_slim) _hhelper.at(_util.k_ext).InitHistograms();
+        if (!_util.slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, _util.ext_file_name_out, _util);
+        if (!_util.slim) _hhelper.at(_util.k_ext).InitHistograms();
         
         // Initialise the Tree Helper
-        _thelper.at(_util.k_ext).Initialise(_util.k_ext, run_period, "empty");
+        _thelper.at(_util.k_ext).Initialise(_util.k_ext, "empty", _util);
 
         ext_tree_total_entries = ext_tree->GetEntries();
         std::cout << "Total EXT Events:        " << ext_tree_total_entries << std::endl;
@@ -199,14 +162,14 @@ void selection::Initialise( const char * mc_file,
         _util.GetTree(f_dirt, dirt_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
-        dirt_SC.Initialise(dirt_tree, _util.k_dirt, f_flux_weights, run_period, _util);
+        dirt_SC.Initialise(dirt_tree, _util.k_dirt, f_flux_weights, _util);
 
         // Initialise the histogram helper
-        if (!_slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, dirt_file_out, weight_cfg, _util);
-        if (!_slim) _hhelper.at(_util.k_dirt).InitHistograms();
+        if (!_util.slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, _util.dirt_file_name_out ,_util);
+        if (!_util.slim) _hhelper.at(_util.k_dirt).InitHistograms();
         
         // Initialise the Tree Helper
-        _thelper.at(_util.k_dirt).Initialise(_util.k_dirt, run_period, "empty");
+        _thelper.at(_util.k_dirt).Initialise(_util.k_dirt, "empty", _util);
 
         dirt_tree_total_entries = dirt_tree->GetEntries();
         std::cout << "Total Dirt Events:         " << dirt_tree_total_entries << std::endl;
@@ -223,22 +186,22 @@ void selection::Initialise( const char * mc_file,
 
     } // End intialisation of dirt variables    
     
-    // Invoke main selection function
+    // Invoke main Selection function
     MakeSelection();
 
 } // END Initialise function
 // -----------------------------------------------------------------------------
-// Main function for selection
-void selection::MakeSelection(){
-    std::cout << "\n\033[0;32mNow Running the selection!\033[0m"<< std::endl;
+// Main function for Selection
+void Selection::MakeSelection(){
+    std::cout << "\n\033[0;32mNow Running the Selection!\033[0m"<< std::endl;
     
-    int counter = 0;
-
     // MC ----------------------------------------------------------------------
     if (bool_use_mc){
         std::cout << "\nStarting Selection over MC" << std::endl;
 
-        int numu_pi{0}, numubar_pi{0}, nue_pi{0}, nuebar_pi{0}; // Total number of 1pi events
+        // Create file for saving run, subrun event
+        std::ofstream run_subrun_file_mc;
+        run_subrun_file_mc.open(Form("files/run%s_run_subrun_list_mc.txt",_util.run_period));
 
         // Event loop
         for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
@@ -254,25 +217,6 @@ void selection::MakeSelection(){
             // Get the entry in the tree
             mc_tree->GetEntry(ievent); 
 
-            // Get the 1 pion events for kirsty
-            if (mc_SC.isVtxInFiducial){
-                if (mc_SC.nu_pdg == 14){
-                    if (mc_SC.npion == 1) numu_pi ++;
-                }
-                if (mc_SC.nu_pdg == -14){
-                    if (mc_SC.npion == 1) numubar_pi ++;
-                }
-
-                if (mc_SC.nu_pdg == 12){
-                    if (mc_SC.npion == 1) nue_pi ++;
-                }
-
-                if (mc_SC.nu_pdg == -12){
-                    if (mc_SC.npion == 1) nuebar_pi ++;
-                }
-            }
-            
-
             // std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
 
             // Apply Pi0 Selection
@@ -281,44 +225,30 @@ void selection::MakeSelection(){
             // Apply NuMu Selection
             ApplyNuMuSelection(_util.k_mc, mc_SC);
             
-            // Apply the selection cuts 
+            // Apply the Selection cuts 
             bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
-            if (!pass) continue;
+
+            // Fill the output tree if the event passed or it was signal
+            if (pass || mc_SC.is_signal) _thelper.at(_util.k_mc).FillVars(mc_SC, pass);
+            
+            // If the event passed the selection then save the run subrun event to file
+            if (pass) run_subrun_file_mc << mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt << '\n';
+
 
         } // End Event loop
 
+        run_subrun_file_mc.close();
+
         std::cout << "Ending Selection over MC" << std::endl;
-        std::cout << "numu_pi: " << numu_pi << std::endl;
-        std::cout << "numubar_pi: " << numubar_pi << std::endl;
-        std::cout << "nue_pi: "  << nue_pi  << std::endl;
-        std::cout << "nuebar_pi: "  << nuebar_pi  << std::endl;
-
-        // Loop again to look at background events that still pass
-        // Event loop
-        // for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
-            
-        //     if (mc_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true ){
-            
-        //         mc_tree->GetEntry(ievent); 
-
-        //         std::pair<std::string, int> classification = mc_SC.SliceClassifier(_util.k_mc);
-
-        //         // Background events
-        //         if (classification.second == _util.k_nue_cc){
-        //             if (mc_SC.shr_tkfit_dedx_Y > 6.8){
-        //                 std::cout <<  mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt <<  std::endl;
-        //             }
-
-        //         }
-        //     }
-
-        // } // End Event loop
-
 
     }
     // Data --------------------------------------------------------------------
     if (bool_use_data){
         std::cout << "\nStarting Selection over Data" << std::endl;
+
+        // Create file for saving run, subrun event
+        std::ofstream run_subrun_file_data;
+        run_subrun_file_data.open(Form("files/run%s_run_subrun_list_data.txt",_util.run_period));
 
         for (int ievent = 0; ievent < data_tree_total_entries; ievent++){
 
@@ -333,10 +263,17 @@ void selection::MakeSelection(){
             // Get the entry in the tree
             data_tree->GetEntry(ievent);
 
-            // Skip the RHC events contaminated in the FHC files
-            if (_run_period == 3 && data_SC.run < 16880 ){
-                //continue;
+            // Skip the events with different sw trigger configured
+            if (std::string(_util.run_period) == "3" && data_SC.run > 16880 ){
+            // if (_run_period == 3 && data_SC.run < 16880 ){
+                continue;
             }
+
+            // Look at different regions of run 1
+            // if (std::string(_util.run_period) == "1" && data_SC.run >= 6450 ){
+            // // if (std::string(_util.run_period) == "1" && data_SC.run < 6450 ){
+            //     continue;
+            // }
 
             // Apply Pi0 Selection
             ApplyPiZeroSelection(_util.k_data, data_SC);
@@ -345,50 +282,25 @@ void selection::MakeSelection(){
             ApplyNuMuSelection(_util.k_data, data_SC);
 
             bool pass = ApplyCuts(_util.k_data, ievent, counter_v, data_passed_v, data_SC);
-            if (!pass) continue;
-        }
 
-        // Make the run subrun event file list after the selection 
-        if (make_list){
-
-            std::cout << "Making the run subrun list for selected data events..." << std::endl;
-
-            int run, subrun, event;
-            std::ofstream run_subrun_file;
-            run_subrun_file.open(Form("files/run%i_run_subrun_list_data.txt",_run_period));
-
-            // Loop over the data events and make a run_subrun_event filelist
-            for (int ievent = 0; ievent < data_tree_total_entries; ievent++){
+            // Fill the output tree if the event passed the selection
+            if (pass) _thelper.at(_util.k_data).FillVars(data_SC, pass);
             
-                if (data_passed_v.at(ievent).cut_v.at(_util.k_cuts_MAX - 1 ) == true ){
-                    
-                    // Get the entry in the tree
-                    data_tree->GetEntry(ievent);
-
-                    run    = data_SC.run;
-                    subrun = data_SC.sub;
-                    event  = data_SC.evt;
-
-                    double INTERCEPT = 0.0;
-                    double SLOPE = 0.83;
-                    double reco_nu_e = (data_SC.shr_energy_tot_cali + INTERCEPT) / SLOPE + data_SC.trk_energy_tot;
-
-                    // std::cout << run << " " << subrun << " " << event << " " << reco_nu_e <<  '\n';
-
-                    run_subrun_file << run << " " << subrun << " " << event << '\n';
-
-                }
-                
-            }
-
-            run_subrun_file.close();
+            // If the event passed the selection then save the run subrun event to file
+            if (pass) run_subrun_file_data << data_SC.run << " " << data_SC.sub << " " << data_SC.evt << '\n';
         }
+
+        run_subrun_file_data.close();
         
         std::cout << "Ending Selection over Data" << std::endl;
     }
     // EXT ---------------------------------------------------------------------
     if (bool_use_ext){
         std::cout << "\nStarting Selection over EXT" << std::endl;
+
+        // Create file for saving run, subrun event
+        std::ofstream run_subrun_file_ext;
+        run_subrun_file_ext.open(Form("files/run%s_run_subrun_list_ext.txt",_util.run_period));
 
         for (int ievent = 0; ievent < ext_tree_total_entries; ievent++){
 
@@ -403,6 +315,12 @@ void selection::MakeSelection(){
             // Get the entry in the tree
             ext_tree->GetEntry(ievent); // TPC Objects
 
+            // Skip the RHC events contaminated in the FHC files
+            if (std::string(_util.run_period) == "3" && ext_SC.run > 16880 ){
+            // if (_run_period == 3 && ext_SC.run < 16880 ){
+                continue;
+            }
+
             // Apply Pi0 Selection
             ApplyPiZeroSelection(_util.k_ext, ext_SC);
 
@@ -410,15 +328,27 @@ void selection::MakeSelection(){
             ApplyNuMuSelection(_util.k_ext, ext_SC);
 
             bool pass = ApplyCuts(_util.k_ext, ievent, counter_v, ext_passed_v, ext_SC);
-            if (!pass) continue;
+            
+            // Fill the output tree if the event passed the selection
+            if (pass) _thelper.at(_util.k_ext).FillVars(ext_SC, pass);
+
+            // If the event passed the selection then save the run subrun event to file
+            if (pass) run_subrun_file_ext << ext_SC.run << " " << ext_SC.sub << " " << ext_SC.evt << '\n';
         }
          
+        run_subrun_file_ext.close();
+
         std::cout << "Ending Selection over EXT" << std::endl;
 
     }
     // Dirt --------------------------------------------------------------------
     if (bool_use_dirt){
+
         std::cout << "\nStarting Selection over Dirt" << std::endl;
+
+        // Create file for saving run, subrun event
+        std::ofstream run_subrun_file_dirt;
+        run_subrun_file_dirt.open(Form("files/run%s_run_subrun_list_dirt.txt",_util.run_period));
 
         for (int ievent = 0; ievent < dirt_tree_total_entries; ievent++){
 
@@ -440,16 +370,23 @@ void selection::MakeSelection(){
             ApplyNuMuSelection(_util.k_dirt, dirt_SC);
 
             bool pass = ApplyCuts(_util.k_dirt, ievent, counter_v, dirt_passed_v, dirt_SC);
-            if (!pass) continue;
+
+            // Fill the output tree if the event passed the selection
+            if (pass) _thelper.at(_util.k_dirt).FillVars(dirt_SC, pass);
+            
+            // If the event passed the selection then save the run subrun event to file
+            if (pass) run_subrun_file_dirt << dirt_SC.run << " " << dirt_SC.sub << " " << dirt_SC.evt << '\n';
         }
+
+        run_subrun_file_dirt.close();
          
         std::cout << "Ending Selection over Dirt" << std::endl;
 
     }
     // -------------------------------------------------------------------------
-    std::cout << "Finished running the selection!"<< std::endl;
+    std::cout << "Finished running the Selection!"<< std::endl;
 
-    // Print information from the selection, loop over the cuts
+    // Save information from the Selection so we can print
     for (unsigned int p=0; p < counter_v.size();p++){
 
         // Fill the counter trees
@@ -461,46 +398,39 @@ void selection::MakeSelection(){
     }
     
     // Now save all the outputs to file
-    if (!slim) SavetoFile();
+    if (!_util.slim) SavetoFile();
 
     return;
 } // End Selection
 // -----------------------------------------------------------------------------
-bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> &counter_v,
-                           std::vector<Passed_Container> &passed_v, SliceContainer &SC){
+bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> &counter_v,
+                           std::vector<PassedContainer> &passed_v, SliceContainer &SC){
 
-    // Here we apply the selection cuts ----------------------------------------
+    // Here we apply the Selection cuts ----------------------------------------
     bool pass; // A flag to see if an event passes an event
 
     
-    // Classify the event
-    std::pair<std::string, int> classification = SC.SliceClassifier(type);      // Classification of the event
-    std::string interaction                    = SC.SliceInteractionType(type); // Genie interaction type
-    //std::string interaction = "nue_cc_qe";
-    std::string category                       = SC.SliceCategory();            // The pandora group slice category
-    std::pair<std::string, int> particle_type  = SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
-
-
-
-    // Test code to isolate the low E nues in truth
-    // if (type == _util.k_mc && SC.nu_e > 0.5) return false;
-    // if (type == _util.k_mc && SC.shr_dedx_Y_cali > 7 && classification.second == _util.k_nue_cc){
-        // std::cout << SC.run << " " << SC.sub<<" " << SC.evt<<  std::endl;
-    // }
+    // Classify the event -- sets variable in the slice contianer
+    SC.SliceClassifier(type);      // Classification of the event
+    SC.SliceInteractionType(type); // Genie interaction type
+    SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
+    SC.Pi0Classifier(type); 
+    SC.SetSignal();                // Set the event as either signal or other
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
     // *************************************************************************
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_unselected, counter_v );
+    SelectionFill(type, SC, _util.k_unselected, counter_v );
     
     // *************************************************************************
     // Software Trigger -- MC Only  --------------------------------------------
     // *************************************************************************
     pass = _scuts.swtrig(SC, type);
     passed_v.at(ievent).cut_v.at(_util.k_swtrig) = pass;
+    // if (type == _util.k_mc && !pass && classification.first == "nu_out_fv") std::cout<< SC.run << " " << SC.sub << " " << SC.evt << std::endl; // Spit out the run subrun event numbers of failed events for an event display
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_swtrig, counter_v );
+    SelectionFill(type, SC, _util.k_swtrig, counter_v );
 
     // *************************************************************************
     // Slice ID ----------------------------------------------------------------
@@ -509,7 +439,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_slice_id) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_slice_id, counter_v );
+    SelectionFill(type, SC, _util.k_slice_id, counter_v );
     
     // *************************************************************************
     // Electron Candidate ------------------------------------------------------
@@ -518,7 +448,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_e_candidate) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_e_candidate, counter_v );
+    SelectionFill(type, SC, _util.k_e_candidate, counter_v );
 
     // *************************************************************************
     // In FV -------------------------------------------------------------------
@@ -527,17 +457,8 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_in_fv) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_in_fv, counter_v );
+    SelectionFill(type, SC, _util.k_in_fv, counter_v );
     
-    // *************************************************************************
-    // Topological Score -------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.topo_score(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_topo_score) = pass;
-    if(!pass) return false; // Failed the cut!
-    
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_topo_score, counter_v );
-
     // *************************************************************************
     // Slice Contained Fraction ------------------------------------------------
     // *************************************************************************
@@ -545,7 +466,25 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_contained_frac) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_contained_frac, counter_v );
+    SelectionFill(type, SC, _util.k_contained_frac, counter_v );
+
+    // *************************************************************************
+    // Topological Score -------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.topo_score(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_topo_score) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    SelectionFill(type, SC, _util.k_topo_score, counter_v );
+
+    // *************************************************************************
+    // Cosmic Impact Parameter -------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.shr_cosmic_IP(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_cosmic_ip) = pass;
+    if(!pass) return false; // Failed the cut!
+    
+    SelectionFill(type, SC, _util.k_cosmic_ip, counter_v );
 
     // *************************************************************************
     // Shower Score ------------------------------------------------------------
@@ -554,25 +493,7 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_shower_score) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shower_score, counter_v );
-
-    // *************************************************************************
-    // Michel Rejection --------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.michel_rej(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_michel_rej) = pass;
-    if(!pass) return false; // Failed the cut!
-    
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_michel_rej, counter_v );
-
-    // *************************************************************************
-    // Shower Hits -------------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.shr_hits(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_shr_hits) = pass;
-    if(!pass) return false; // Failed the cut!
-    
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_hits, counter_v );
+    SelectionFill(type, SC, _util.k_shower_score, counter_v );
 
     // *************************************************************************
     // Shower Hit Ratio  -------------------------------------------------------
@@ -581,76 +502,67 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     passed_v.at(ievent).cut_v.at(_util.k_hit_ratio) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_hit_ratio, counter_v );
+    SelectionFill(type, SC, _util.k_hit_ratio, counter_v );
 
     // *************************************************************************
     // Shower Moliere Average --------------------------------------------------
     // *************************************************************************
     pass = _scuts.shr_moliere_avg(SC);
     passed_v.at(ievent).cut_v.at(_util.k_shr_moliere_avg) = pass;
+
+    // if (!pass && SC.shrmoliereavg >= 7) std::cout << SC.run << " " << SC.sub << " " << SC.evt << std::endl;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_moliere_avg, counter_v );
+    SelectionFill(type, SC, _util.k_shr_moliere_avg, counter_v );
 
     // *************************************************************************
     // 2D cut for Shower to Vertex Distance and dEdx ---------------------------
     // *************************************************************************
-    pass = _scuts.shr_dist_dEdx_y(SC);
+    pass = _scuts.shr_dist_dEdx_max(SC);
     passed_v.at(ievent).cut_v.at(_util.k_vtx_dist_dedx) = pass;
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_vtx_dist_dedx, counter_v );
+    SelectionFill(type, SC, _util.k_vtx_dist_dedx, counter_v );
 
     // *************************************************************************
-    // dEdx in y plane for 0 track events --------------------------------------
+    // dEdx in all planes for 0 track events -----------------------------------
     // *************************************************************************
-    pass = _scuts.dEdx_y_no_tracks(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_dEdx_y_no_tracks) = pass;
+    pass = _scuts.dEdx_max_no_tracks(SC);
+    passed_v.at(ievent).cut_v.at(_util.k_dEdx_max_no_tracks) = pass;
+
     if(!pass) return false; // Failed the cut!
     
-    SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_y_no_tracks, counter_v );
+    SelectionFill(type, SC, _util.k_dEdx_max_no_tracks, counter_v );
 
+    // if ((SC.nu_pdg == 12 || SC.nu_pdg == -12) && SC.nu_e < 0.3) std::cout<<"Low nu_e E!: " <<SC.nu_e << std::endl; 
 
-    // // *************************************************************************
-    // // Shower to Vertex Distance --------------------------------------------
-    // // *************************************************************************
-    // pass = _scuts.shr_distance(SC);
-    // passed_v.at(ievent).cut_v.at(_util.k_shr_distance) = pass;
-    // if(!pass) return false; // Failed the cut!
-    
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_shr_distance, counter_v );
-
-    // // *************************************************************************
-    // // dEdx in y plane ---------------------------------------------------------
-    // // *************************************************************************
-    // pass = _scuts.dEdx_y(SC);
-    // passed_v.at(ievent).cut_v.at(_util.k_dEdx_y) = pass;
-    // // if(!pass) return false; // Failed the cut!
-    
-    // SelectionFill(type, SC, classification, interaction, particle_type, _util.k_dEdx_y, counter_v );
-
-    // ************************************************************************n*
+    // **************************************************************************
     return true;
 
 }
 // -----------------------------------------------------------------------------
-void selection::SavetoFile(){
+void Selection::SavetoFile(){
 
     // Now saving histograms to file
     std::cout << "Now Saving Histograms to file" << std::endl;
     if (bool_use_mc) {
+    
+        if (std::string(_util.intrinsic_mode) == "default" || std::string(_util.intrinsic_mode) == "intrinsic"){
+            _hhelper.at(_util.k_mc).WriteTEfficiency();
+            _hhelper.at(_util.k_mc).WriteTrue();
+            _hhelper.at(_util.k_mc).WriteInteractions();
+            _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
+            _hhelper.at(_util.k_mc).Write_2DSigBkgHists();
+        }
+        
+        if (std::string(_util.intrinsic_mode) == "default") {
+            _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_mc);
+            _hhelper.at(_util.k_mc).WriteFlash();
+            _hhelper.at(_util.k_mc).WritePiZero(_util.k_mc);
+            _hhelper.at(_util.k_mc).WriteNuMu(_util.k_mc);
+        }
 
-        _hhelper.at(_util.k_mc).WriteTrue();
-        _hhelper.at(_util.k_mc).WriteTEfficiency();
-        _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
-        _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_mc);
-        _hhelper.at(_util.k_mc).WriteFlash();
-        _hhelper.at(_util.k_mc).WriteInteractions();
-        _hhelper.at(_util.k_mc).Write_2DSigBkgHists();
-        _hhelper.at(_util.k_mc).WritePiZero(_util.k_mc);
-        _hhelper.at(_util.k_mc).WriteNuMu(_util.k_mc);
-
-        _thelper.at(_util.k_mc).WriteTree();
+        _thelper.at(_util.k_mc).WriteTree(_util.k_mc);
 
 
     }
@@ -661,7 +573,7 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_data).WritePiZero(_util.k_data);
         _hhelper.at(_util.k_data).WriteNuMu(_util.k_data);
 
-        _thelper.at(_util.k_data).WriteTree();
+        _thelper.at(_util.k_data).WriteTree(_util.k_data);
 
     }
     if (bool_use_ext) {
@@ -672,7 +584,7 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_ext).WritePiZero(_util.k_ext);
         _hhelper.at(_util.k_ext).WriteNuMu(_util.k_ext);
 
-        _thelper.at(_util.k_ext).WriteTree();
+        _thelper.at(_util.k_ext).WriteTree(_util.k_ext);
 
     }
     if (bool_use_dirt) {
@@ -684,125 +596,64 @@ void selection::SavetoFile(){
         _hhelper.at(_util.k_dirt).WritePiZero(_util.k_dirt);
         _hhelper.at(_util.k_dirt).WriteNuMu(_util.k_dirt);
 
-        _thelper.at(_util.k_dirt).WriteTree();
+        _thelper.at(_util.k_dirt).WriteTree(_util.k_dirt);
 
     }
 
 } // End save to file
 // -----------------------------------------------------------------------------
-void selection::SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, std::pair<std::string, int> par_type, int cut_index, std::vector<std::vector<double>> &counter_v){
+void Selection::SelectionFill(int type, SliceContainer &SC, int cut_index, std::vector<std::vector<double>> &counter_v){
     
+    // *************************************************************************
     // Get the CV weight
+    // *************************************************************************
     double weight = 1.0;
-    weight = GetCVWeight(type, SC);
+    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+    weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv);
 
-    // Try scaling the pi0
+    // Try scaling the pi0 -- need to implement this as a configurable option
     // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
-    GetPiZeroWeight(weight, 2, SC);
+    _util.GetPiZeroWeight(weight, _util.pi0_correction, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
 
+    // Set the CV weight variable in the slice container
+    SC.SetCVWeight(weight);
     
+    // *************************************************************************
+    // Calculate the reconstructed neutrino energy
     // This is in many places, need to have a way for setting this number by default
-    double INTERCEPT = 0.0;
-    double SLOPE = 0.83;
-    double reco_nu_e = (SC.shr_energy_tot_cali + INTERCEPT) / SLOPE + SC.trk_energy_tot;
+    // *************************************************************************
+    double reco_nu_e = SC.shr_energy_tot_cali / 0.83 + SC.trk_energy_tot;
 
+    // *************************************************************************
     // Fill Histograms
-    if (!slim) _hhelper.at(type).FillHists(type, classification.second, interaction, par_type.second, cut_index, SC, weight);
-
-    // Set counters for the cut
-    _util.Tabulate(SC.isVtxInFiducial, interaction, classification.first, type, counter_v.at(cut_index), weight );
+    // *************************************************************************
+    // Fill almost all the histograms with this function call
+    if (!_util.slim) _hhelper.at(type).FillHists(type, SC.classification.second, SC.genie_interaction, SC.particle_type.second, cut_index, SC, weight);
 
     // Fill Plots for Efficiency
-    if (!slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, classification.first, SC, weight);
+    if (!_util.slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, SC.classification.first, SC, weight);
 
-    // For the last cut we fill the tree  or the first cut and nue_cc (generated and unselected)
-    if ( (cut_index == _util.k_cuts_MAX - 1) || (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc) ) ){
-
-        // This is a generated event, but unselected
-        if (cut_index == _util.k_unselected && (classification.second == _util.k_nue_cc || classification.second == _util.k_nuebar_cc )){
-            _thelper.at(type).FillVars(SC, classification, true, weight, reco_nu_e);
-        }
-        else {
-            _thelper.at(type).FillVars(SC, classification, false, weight, reco_nu_e);
-        }
-
+    // Fill the dedx ttree before shr dist dedx cut and after cut dedx
+    // We can use this tree to play around and optimise the dedx cut. Not essential for the analysis
+    if (cut_index == _util.k_vtx_dist_dedx - 1 || cut_index == _util.k_vtx_dist_dedx){
+        _thelper.at(type).Fill_dedxVars(SC, SC.classification, _util.cut_dirs.at(cut_index), weight);
     }
-
-    // Fill the dedx ttree before shr dist cut and after cut dedx
-    // if (cut_index == _util.k_shr_distance - 1 || cut_index == _util.k_shr_distance || cut_index == _util.k_dEdx_y ){
-    //     _thelper.at(type).Fill_dedxVars(SC, classification, _util.cut_dirs.at(cut_index), weight);
-    // }
+    
+    // *************************************************************************
+    // Tabulate the selection i.e count everything
+    // *************************************************************************
+    _util.Tabulate(is_in_fv, SC.genie_interaction, SC.classification.first, SC.pi0_classification, type, counter_v.at(cut_index), weight );
 
 }
 // -----------------------------------------------------------------------------
-double selection::GetCVWeight(int type, SliceContainer SC){
-    
-
-    // Always give weights of 1 to the off beam and data
-    if (type == _util.k_data || type == _util.k_ext) return 1.0;
-
-    double weight = 1.0;
-    bool weight_tune{true}, weight_ppfx{true};
-
-    // Set the weight settings
-    if (_weight_cfg == 0){
-        weight_tune = false;
-        weight_ppfx = false;
-        return weight;
-    }
-    else if (_weight_cfg == 1){
-        weight_tune = true;
-        weight_ppfx = true;
-    }
-    else if (_weight_cfg == 2){
-        weight_tune = true;
-        weight_ppfx = false;
-    }
-    else if (_weight_cfg == 3){
-        weight_tune = false;
-        weight_ppfx = true;
-    }
-    else {
-        std::cout << "Unknown weight setting specified, using defaults" << std::endl;
-    }
-
-
-    // Get the tune weight
-    weight = SC.weightSplineTimesTune; // Here define the weight
-    
-    // Catch infinate/nan/unreasonably large tune weights
-    if (std::isinf(weight))      weight = 1.0; 
-    if (std::isnan(weight) == 1) weight = 1.0;
-    if (weight > 100)            weight = 1.0;
-    if (weight < 0)              weight = 1.0;
-
-    // If tune weight turned off, just set weight to 1.0
-    if (!weight_tune) weight = 1.0;
-
-    // Get the PPFX CV flux correction weight
-    double weight_flux = SC.ppfx_cv;
-
-    if (std::isinf(weight_flux))      weight_flux = 1.0; 
-    if (std::isnan(weight_flux) == 1) weight_flux = 1.0;
-    if (weight_flux > 100)            weight_flux = 1.0;
-    if (weight_flux < 0)              weight_flux = 1.0;
-
-    if (weight_ppfx) weight = weight * weight_flux;
-
-    // std::cout << SC.weightSplineTimesTune << "   "<< SC.ppfx_cv << std::endl;
-
-    return weight;
-
-}
-// -----------------------------------------------------------------------------
-void selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
+void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
 
     bool pass; // A flag to see if an event passes an event
 
     // Classify the event
-    std::pair<std::string, int> classification = SC.SliceClassifier(type);      // Classification of the event
-    std::string interaction                    = SC.SliceInteractionType(type); // Genie interaction type
-    std::pair<std::string, int> particle_type  = SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
+    SC.SliceClassifier(type);      // Classification of the event
+    SC.SliceInteractionType(type); // Genie interaction type
+    SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
     
     // *************************************************************************
     // Software Trigger -- MC Only  --------------------------------------------
@@ -840,65 +691,36 @@ void selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
     pass = _scuts.pi_zero_cuts(SC);
     if(!pass) return; // Failed the cut!
 
+    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+
     // Get the Central Value weight
-    double weight = GetCVWeight(type, SC);
+    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv);
 
     double weight_norm = weight;
     double weight_Escale = weight;
 
     // Try scaling the pi0
     // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
-    GetPiZeroWeight(weight, 0, SC);
-    GetPiZeroWeight(weight_norm, 1, SC);
-    GetPiZeroWeight(weight_Escale, 2, SC);
+    _util.GetPiZeroWeight(weight,        0, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
+    _util.GetPiZeroWeight(weight_norm,   1, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
+    _util.GetPiZeroWeight(weight_Escale, 2, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
 
     // Now Fill the histograms
-    if (!slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight, 0);
-    if (!slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight_norm, 1);
-    if (!slim) _hhelper.at(type).FillPiZeroHists(classification.second, SC, weight_Escale, 2);
+    if (!_util.slim) _hhelper.at(type).FillPiZeroHists(SC.classification.second, SC, weight, 0);
+    if (!_util.slim) _hhelper.at(type).FillPiZeroHists(SC.classification.second, SC, weight_norm, 1);
+    if (!_util.slim) _hhelper.at(type).FillPiZeroHists(SC.classification.second, SC, weight_Escale, 2);
 
 
 }
 // -----------------------------------------------------------------------------
-void selection::GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer &SC){
-
-    // Fix the normalisation
-    if (pizero_mode == 1){
-        
-        if (SC.npi0 > 0) {
-            weight = weight * 0.759;
-        }
-
-    }
-    // Try energy dependent scaling for pi0
-    else if (pizero_mode == 2){
-        
-        if (SC.npi0 > 0) {
-            double pi0emax = 0.6;
-            if (SC.pi0_e > 0.1 && SC.pi0_e < pi0emax){
-                weight = weight * (1 - 0.4 * SC.pi0_e);
-            }
-            else if (SC.pi0_e > 0.1 && SC.pi0_e >= pi0emax){
-                weight = weight * (1 - 0.4 * pi0emax);
-            }
-            
-        }
-    }
-    else {
-        // Dont touch the weight
-    }
-    
-
-}
-// -----------------------------------------------------------------------------
-void selection::ApplyNuMuSelection(int type, SliceContainer &SC){
+void Selection::ApplyNuMuSelection(int type, SliceContainer &SC){
 
     bool pass; // A flag to see if an event passes an event
 
     // Classify the event
-    std::pair<std::string, int> classification = SC.SliceClassifier(type);      // Classification of the event
-    std::string interaction                    = SC.SliceInteractionType(type); // Genie interaction type
-    std::pair<std::string, int> particle_type  = SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
+    SC.SliceClassifier(type);      // Classification of the event
+    SC.SliceInteractionType(type); // Genie interaction type
+    SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
     
     // *************************************************************************
     // Software Trigger -- MC Only  --------------------------------------------
@@ -954,13 +776,15 @@ void selection::ApplyNuMuSelection(int type, SliceContainer &SC){
     pass = _scuts.numu_cuts(SC);
     if(!pass) return; // Failed the cut!
 
+    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+
     // Get the Central Value weight
-    double weight = GetCVWeight(type, SC);
+    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv);
     
     // Also apply the pi0 weight
-    GetPiZeroWeight(weight, 2, SC);
+    _util.GetPiZeroWeight(weight, _util.pi0_correction, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
 
-    if (!slim) _hhelper.at(type).FillNuMuHists(classification.second, SC, weight);
+    if (!_util.slim) _hhelper.at(type).FillNuMuHists(SC.classification.second, SC, weight);
 
 }
 // -----------------------------------------------------------------------------
