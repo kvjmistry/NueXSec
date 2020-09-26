@@ -6,6 +6,9 @@ void SystematicsHelper::Initialise(Utility _utility){
     std::cout << "Initalising Systematics Helper..." << std::endl;
     _util = _utility;
 
+    // Open the outoput systematics file
+    file_sys_var = TFile::Open(Form("files/run%s_sys_var.root", _util.run_period),"UPDATE");
+
     // Set the scale factors
     if (strcmp(_util.run_period, "1") == 0){
         Data_POT = _util.config_v.at(_util.k_Run1_Data_POT); // Define this variable here for easier reading
@@ -176,8 +179,6 @@ void SystematicsHelper::SetRatioOptions(TH1D* hist ){
 // -----------------------------------------------------------------------------
 void SystematicsHelper::MakeHistograms(){
     
-    TFile *file_sys_var = new TFile(Form("files/run%s_sys_var.root", _util.run_period),"RECREATE");
-
     for (unsigned int i = 0 ; i < _util.k_cuts_MAX; i++){
         
         // Default detector systematics mode
@@ -192,11 +193,11 @@ void SystematicsHelper::MakeHistograms(){
             for(unsigned int j=0; j < _util.vec_hist_name.size(); j++){
 
                 SysVariations(Form("%s", _util.vec_hist_name.at(j).c_str()), Form("plots/run%s/systvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()),
-                            _util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str(), _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str(), file_sys_var );
+                            _util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str(), _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str());
 
                 PlotVariations(Form("%s", _util.vec_hist_name.at(j).c_str()), Form("plots/run%s/detvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()),
                             _util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str());
-
+            }
         }
         // Ext mode
         else if (mode == "ext"){
@@ -390,7 +391,7 @@ void SystematicsHelper::PlotVariations(std::string hist_name, const char* print_
 
 }
 // ----------------------------------------------------------------------------
-void SystematicsHelper::SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name, TFile *root_output){
+void SystematicsHelper::SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name){
 
     // last updated on Sept 18 by Marina Reggiani-Guzzo
 
@@ -512,17 +513,19 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
 
     // create a temporary histogram that will be used to calculate the total detector sys
     TH1D *h_det_sys_tot;
+
+    file_sys_var->cd();
     
     // loop over variations for a given variable
     for (unsigned int k = 0; k < f_vars.size(); k++){
         
         // ---- save the histograms into different directories inside the root file
 
-        if(!root_output->GetDirectory(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str()))) {
-            root_output->mkdir(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // if the directory does not exist, create it
+        if(!file_sys_var->GetDirectory(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str()))) {
+            file_sys_var->mkdir(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // if the directory does not exist, create it
         }
 
-        root_output->cd(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // open the directory
+        file_sys_var->cd(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // open the directory
     
         hist_ratio.at(k)->SetDirectory(gDirectory); // set in which dir the hist_ratio.at(k) is going to be written
         hist_ratio.at(k)->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite);  // write the histogram to the file
@@ -550,11 +553,11 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
 
     // save the total detector sys uncertainty in the file
     
-    if(!root_output->GetDirectory(Form("%s/TotalDetectorSys", folder_name.c_str()))) {
-                root_output->mkdir(Form("%s/TotalDetectorSys", folder_name.c_str())); // if the directory does not exist, create it
+    if(!file_sys_var->GetDirectory(Form("%s/TotalDetectorSys", folder_name.c_str()))) {
+                file_sys_var->mkdir(Form("%s/TotalDetectorSys", folder_name.c_str())); // if the directory does not exist, create it
     }
 
-    root_output->cd(Form("%s/TotalDetectorSys", folder_name.c_str())); // open the directory
+    file_sys_var->cd(Form("%s/TotalDetectorSys", folder_name.c_str())); // open the directory
     h_det_sys_tot->SetDirectory(gDirectory);
     h_det_sys_tot->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite); 
   
@@ -577,8 +580,6 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
     c->Print(print_name);
 
 }
-
-
 // ----------------------------------------------------------------------------
 void SystematicsHelper::PlotVariationsEXT(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name ){
 
@@ -2518,19 +2519,19 @@ void SystematicsHelper::GetCutSysUncertainty(TFile *f_out, std::string histname,
 
     // If its a unisim then we have up/dn type variation
     if (var_type == "unisim"){
-        _util.GetHist(f_nuexsec, h_universe.at(k_up), Form( "%s/Cuts/%s/%s/h_cut_%s_%s_%s_0", label_up.c_str(), _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(), label_up.c_str(),_util.cut_dirs.at(cut_index).c_str()));
-        _util.GetHist(f_nuexsec, h_universe.at(k_dn), Form( "%s/Cuts/%s/%s/h_cut_%s_%s_%s_0", label_dn.c_str(), _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(), label_dn.c_str(),_util.cut_dirs.at(cut_index).c_str()));
+        _util.GetHist(f_nuexsec, h_universe.at(k_up), Form( "%s/Cuts/%s/%s/h_reco_%s_%s_%s_0", label_up.c_str(), _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(), label_up.c_str(),_util.cut_dirs.at(cut_index).c_str()));
+        _util.GetHist(f_nuexsec, h_universe.at(k_dn), Form( "%s/Cuts/%s/%s/h_reco_%s_%s_%s_0", label_dn.c_str(), _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(), label_dn.c_str(),_util.cut_dirs.at(cut_index).c_str()));
     }
     // Multisim
     else {
         // Loop over the universes
         for (int uni = 0; uni < num_uni; uni++){
-            _util.GetHist(f_nuexsec, h_universe.at(uni), Form( "%s/Cuts/%s/%s/h_cut_%s_%s_%s_%i", label.c_str(), _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(), label.c_str(),_util.cut_dirs.at(cut_index).c_str(), uni));
+            _util.GetHist(f_nuexsec, h_universe.at(uni), Form( "%s/Cuts/%s/%s/h_reco_%s_%s_%s_%i", label.c_str(), _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(), label.c_str(),_util.cut_dirs.at(cut_index).c_str(), uni));
         }
     }
 
     // Now get the CV
-    _util.GetHist(f_nuexsec, h_cv, Form( "CV/Cuts/%s/%s/h_cut_%s_CV_%s_0", _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(),_util.cut_dirs.at(cut_index).c_str()));
+    _util.GetHist(f_nuexsec, h_cv, Form( "CV/Cuts/%s/%s/h_reco_%s_CV_%s_0", _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(),_util.cut_dirs.at(cut_index).c_str()));
 
     // Now we got the histograms, we loop over an get the uncertainties
     TH1D* h_err = (TH1D*)h_universe.at(k_up)->Clone();

@@ -291,7 +291,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     }
 
     // check if the POT from the input file and in config.txt match
-    CheckPOT();
+    // CheckPOT();
 
     // Now set the weight configurations
     
@@ -962,7 +962,11 @@ bool Utility::CheckHistogram(std::vector<std::string> vector, TString hist_name)
 
     }
 
+    return false;
+
 }
-
-
-
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

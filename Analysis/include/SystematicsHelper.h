@@ -16,6 +16,9 @@ class SystematicsHelper{
     // Input reweigted histogram file
     TFile *f_nuexsec;
 
+    // The output file with the systematic uncertainties
+    TFile *file_sys_var;
+
     // Class instances
     Utility _util;
 
@@ -45,7 +48,7 @@ class SystematicsHelper{
     void PlotVariationsEXT(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name);
     // -------------------------------------------------------------------------
     // Plots the Sys Variations
-    void SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name, TFile *root_output);
+    void SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name);
     // -------------------------------------------------------------------------
     void SetVariationProperties(TH1D* h, int index);
     // -------------------------------------------------------------------------

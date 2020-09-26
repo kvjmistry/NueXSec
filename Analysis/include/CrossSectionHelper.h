@@ -120,54 +120,6 @@ class CrossSectionHelper{
         k_TH1D_xsec_MAX
     };
 
-    // Variables to get the systematic uncertainty by cut for
-    enum TH1D_cut_vars {
-        k_cut_swtrig,
-        k_cut_nslice,
-        k_cut_n_showers,
-        k_cut_n_tracks,
-        k_cut_topological_score,
-        k_cut_reco_nu_vtx_sce_x,
-        k_cut_reco_nu_vtx_sce_y,
-        k_cut_reco_nu_vtx_sce_z,
-        k_cut_shr_score,
-        k_cut_shr_dedx_max_tracks,
-        k_cut_shr_dedx_max_no_tracks,
-        k_cut_shr_distance,
-        k_cut_hits_ratio,
-        k_cut_CosmicIPAll3D,
-        k_cut_contained_fraction,
-        k_cut_shrmoliereavg,
-        k_cut_shr_theta,
-        k_cut_shr_phi,
-        k_cut_shr_energy_cali,
-        k_cut_shr_energy_cali_rebin,
-        k_cut_vars_max
-    };
-
-    std::vector<std::string> cut_var_types = {
-        "swtrig",
-        "nslice",
-        "n_showers",
-        "n_tracks",
-        "topological_score",
-        "reco_nu_vtx_sce_x",
-        "reco_nu_vtx_sce_y",
-        "reco_nu_vtx_sce_z",
-        "shr_score",
-        "shr_dedx_max_tracks",
-        "shr_dedx_max_no_tracks",
-        "shr_distance",
-        "hits_ratio",
-        "CosmicIPAll3D",
-        "contained_fraction",
-        "shrmoliereavg",
-        "shr_theta",
-        "shr_phi",
-        "shr_energy_cali",
-        "shr_energy_cali_rebin"
-    };
-
     // enum for histogram vars
     enum TH1D_xsec_var_vars {
         k_var_integrated,     // Integrated X-Section
