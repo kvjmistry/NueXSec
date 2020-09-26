@@ -25,9 +25,9 @@ void make_efficiency_plot(){
     // c->SetGrid();
     c->SetGridy();
 
-    TLegend *leg_stack = new TLegend(0.55, 0.91, 0.85, 0.72);
+    TLegend *leg_stack = new TLegend(0.54, 0.89, 0.84, 0.70);
     leg_stack->SetBorderSize(0);
-    leg_stack->SetFillStyle(0);
+    //leg_stack->SetFillStyle(0);
 
 
     for (unsigned int k=0; k < efficiency_v.size();k++){
@@ -67,7 +67,6 @@ void make_efficiency_plot(){
     h_pur_nu->SetLineWidth(2);
     h_pur_nu->Draw("LP,same");
 
-    leg_stack->Draw();
 
     c->SetBottomMargin(0.15);
     c->SetRightMargin(0.15);
@@ -83,6 +82,19 @@ void make_efficiency_plot(){
 
     h_eff->GetXaxis()->SetTickLength(0.00);
     h_pur->GetXaxis()->SetTickLength(0.00);
+
+
+    leg_stack->Draw();
+   
+    TPaveText *pt;
+    pt = new TPaveText(0.21, 0.88, 0.21, 0.88,"NDC");
+    pt->AddText("MicroBooNE");
+    pt->SetTextColor(kBlack);
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.04);
+    pt->Draw();
 
 
     c->Print("efficiency_plot_mcc8.pdf");

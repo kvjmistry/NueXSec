@@ -4,7 +4,7 @@
 
 <!-- Production Project -->
 <!DOCTYPE project [
-<!ENTITY release "v08_00_00_33">
+<!ENTITY release "v08_00_00_46">
 <!ENTITY file_type "mc">
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
@@ -35,7 +35,7 @@
   <larsoft>
     <tag>&release;</tag>
     <qual>e17:prof</qual>
-    <local>/pnfs/uboone/resilient/users/kmistry/tars/uboonecode_mcc9_v08_00_00_33_sl7.tar</local>
+    <local>/pnfs/uboone/resilient/users/kmistry/tars/uboonecode_mcc9_v08_00_00_46_sl7.tar</local>
   </larsoft>
 
   <!-- Project stages -->

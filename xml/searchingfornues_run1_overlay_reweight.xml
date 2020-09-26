@@ -6,12 +6,10 @@
 <!ENTITY file_type "mc">
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
-<!ENTITY name "searchingfornues_run1_overlay">
-<!ENTITY version "v6">
+<!ENTITY name "searchingfornues_run1_overlay_reweight">
+<!ENTITY version "v1">
 
-<!-- v4 includes ppfx_cv weight in the ntuple tree  -->
-<!-- v5 includes all the swtrigger modes in the ntuple tree  -->
-<!-- v6 includes v46-->
+<!-- v1 inclused first attempt at reweighting events  -->
 ]>
 
 <job>
@@ -34,27 +32,30 @@
     <local>/pnfs/uboone/resilient/users/kmistry/tars/uboonecode_mcc9_v08_00_00_46_sl7.tar</local>
   </larsoft>
 
-  <!-- <check>1</check> -->
-  <!-- <copy>1</copy> -->
-  
   <!-- Project stages -->
   <stage name="ntuple">
     <fcl>run_redk2nu_fhc.fcl</fcl>
     <fcl>standard_overlay_optical_numi_uboone_updated.fcl</fcl>
-    <fcl>run_eventweight_microboone_mar18_numi_fhc_slim.fcl</fcl>
+    <fcl>run_eventweight_microboone_mar18_numi_fhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_mar18_extragenieall_1_numi_fhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_mar18_extragenieall_2_numi_fhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_mar18_extragenieall_3_numi_fhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_mar18_extragenieall_4_numi_fhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_mar18_extragenieall_5_numi_fhc.fcl</fcl>
     <fcl>run_neutrinoselectionfilter_run1_overlay_cc0pinp_numi.fcl</fcl>
     <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</outdir>
     <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</logdir>
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
-    <maxfilesperjob>5</maxfilesperjob>
-    <numjobs>20</numjobs>
+    <maxfilesperjob>1</maxfilesperjob>
+    <numjobs>4000</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <schema>root</schema>
+    <!-- <inputlist>/uboone/app/users/kmistry/MCC9_uboonecode_v08_00_00_46/srcs/ubana/ubana/NueXSec/xml/filelists/run1_overlay_selected_filtered.list</inputlist> -->
     <inputdef>prodgenie_numi_uboone_overlay_fhc_mcc9_run1_v28_all_snapshot</inputdef>
-    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/FHC/flux_cached_entries.root</jobsub>
-    <jobsub_start>  --expected-lifetime=short</jobsub_start>
+    <jobsub>--expected-lifetime=6h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/FHC/flux_cached_entries.root</jobsub>
+    <jobsub_start> --expected-lifetime=short</jobsub_start>
     <blacklist>Lancaster</blacklist>
   </stage>
   

@@ -2,16 +2,17 @@
 
 <!-- Production Project -->
 <!DOCTYPE project [
-<!ENTITY release "v08_00_00_33">
+<!ENTITY release "v08_00_00_46">
 <!ENTITY file_type "mc">
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
 <!ENTITY name "searchingfornues_run3b_beamon">
-<!ENTITY indef "numi_uboone_run3b_beamon_offset1_mcc9_reco2_v08_00_00_28_sample1_beam_good">
-<!ENTITY version "v2">
+<!ENTITY indef "numi_uboone_run3b_beamon_offset1_mcc9_reco2_v08_00_00_28_sample0_beam_good">
+<!ENTITY version "v3">
 ]>
 
 <!-- v2 includes sample 1 files  -->
+<!-- v3 re-runs sample 0 files so that it has the correct variables in the tree  -->
 
 <job>
 
@@ -30,7 +31,7 @@
   <larsoft>
     <tag>&release;</tag>
     <qual>e17:prof</qual>
-    <local>/pnfs/uboone/resilient/users/kmistry/tars/uboonecode_mcc9_v08_00_00_33_sl7.tar</local>
+    <local>/pnfs/uboone/resilient/users/kmistry/tars/uboonecode_mcc9_v08_00_00_46_sl7.tar</local>
   </larsoft>
 
   <!-- Project stages -->
@@ -44,7 +45,7 @@
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <inputdef>&indef;</inputdef>
     <maxfilesperjob>10</maxfilesperjob>
-    <numjobs>390</numjobs>
+    <numjobs>381</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <disk>25GB</disk>
