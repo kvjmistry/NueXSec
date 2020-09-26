@@ -886,16 +886,133 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
             continue; // skip dirt if not there
 
         if (i == 0)
-            continue; // Aleady got this histogram from the clone
+            continue; // Already got this histogram from the clone
 
         h_error_hist->Add(hist.at(i), 1);
+
+	
+
     }
+
+    // ---- including sys uncertainty
+    // first check if there is sys uncertainty for this variable in run1_sys_var.root
+    // and if you want to plot sys+stat
+    if ( _util.CheckHistogram(_util.vec_hist_name, hist_name) && _util.plot_sys_uncertainty ) {
+
+	//double stat_error = 0.;
+    	//double det_sys_error = 0.;
+
+	//std::vector<double> tot_error;
+	//tot_error.resize(h_error_hist->GetNbinsX());
+
+    	// open the file and histogram with the uncertainties saved
+    	TFile *file_sys_uncertainties = new TFile( "./plots/run1/systvar/run1_sys_var.root", "READ" );
+    	TH1D *h_sys;
+	_util.GetHist(file_sys_uncertainties, h_sys, Form("%s/TotalDetectorSys/%s", cut_name.c_str(), hist_name.c_str()) );
+	
+	// loop over the bins in h_error_hist
+	for (int i = 1; i <= h_error_hist->GetNbinsX() ; i++){
+
+		double stat_error = h_error_hist->GetBinError(i);
+
+		// Need to subtract the beam off and dirt
+		double bin_content = h_error_hist->GetBinContent(i) - hist.at(k_plot_ext)->GetBinContent(i) - hist.at(k_plot_dirt)->GetBinContent(i);
+
+		double det_sys_error = h_sys->GetBinContent(i) * bin_content;
+
+		double tot_error = std::sqrt( stat_error*stat_error + det_sys_error*det_sys_error );
+
+		h_error_hist->SetBinError(i,tot_error);
+
+	}		
+
+    }
+
+
+    // Plotting error ---------------------------------------------------------
 
     h_error_hist->SetFillColorAlpha(12, 0.15);
     h_error_hist->SetLineWidth(0);
     h_error_hist->Draw("e2, same");
     if (hist_name == "h_reco_track_multiplicity")h_error_hist->Draw("e2, same, TEXT00"); // for the track multiplicity plot draw the event count so we can get the % of 0 track events
 
+
+    // Detector sys uncertainty -----------------------------------------------
+
+    /*std::vector<TH1D*> sys_hist;
+    sys_hist.resize(_util.vec_var_string.size());
+    
+    TFile *file_sys = new TFile("./plots/run1/systvar/run1_sys_var.root", "READ"); // hard-coded path :(
+
+    // --- loop over the variations and take the histogram 
+    // first check if the histogram exists in run1_sys_var, _util.vec_hist_name saves the name of the histograms
+    if (_util.CheckHistogram(_util.vec_hist_name, hist_name)){
+	 
+	std::cout << "There is sys info for this histogram." << std::endl;
+
+	// then loop over the variations to take the hist_name for each variation and save it into sys_hist
+	for(unsigned int d = 0 ; d < _util.vec_var_string.size(); d++){
+
+		// get the histogram
+		_util.GetHist(file_sys,sys_hist.at(d),Form("%s/%s/%s",cut_name.c_str() ,_util.vec_var_string.at(d).c_str() ,hist_name.c_str() ));
+		//sys_hist.at(d)->SetDirectory(gDirectory);
+		//sys_hist.at(d) = (TH1D*) file_sys->Clone(Form("%s/%s/%s",cut_name.c_str() ,_util.vec_var_string.at(d).c_str() ,hist_name.c_str() ));	
+
+         }
+
+	// now loop over the histograms saved above and calculate the total detector systematics 
+	
+	// create a histogram that is going to storage the sum of the squares of the histograms for each variation
+	TH1D *h_sys_total;
+
+	for(unsigned int s = 0 ; s < _util.vec_var_string.size(); s++){
+
+		// clone the histogram for the first variable and square it
+		if( s == 0 ){
+			h_sys_total = (TH1D*)sys_hist.at(s)->Clone("h_sys_total");
+			h_sys_total->Multiply(h_sys_total);				
+		}
+		else {
+			sys_hist.at(s)->Multiply(sys_hist.at(s));
+			h_sys_total->Add(sys_hist.at(s));
+		}
+
+	}
+
+	// now that the histogram exists, save it into the file in the directory called TotalDetectorSys
+
+	// check if the directory does not exist, create it
+	if(!file_sys->GetDirectory(Form("%s/TotalDetectorSys", cut_name.c_str()))){
+		std::cout << "The folder does not exist. Create it. " << cut_name.c_str() << "/TotalDetectorSys" << std::endl;
+		file_sys->mkdir(Form("%s/TotalDetectorSys", cut_name.c_str()));
+	}
+	//file_sys->cd(Form("%s/TotalDetectorSys", cut_name.c_str()));
+
+	// save the histogram
+	//h_sys_total->SetDirectory(gDirectory);
+	//h_sys_total->Write(Form("%s",hist_name.c_str()), TObject::kOverwrite);
+
+
+    }*/	 
+
+/*	// save the histogram in run1_sys_var in a separate folder
+	
+	// check if the directory does not exist, create it
+	if(file_sys->GetDirectory(Form("%s/TotalDetectorSys", cut_name.c_str()))) file_sys->mkdir(Form("%s/TotalDetectorSys", cut_name.c_str()));
+
+	// open directory
+	file_sys->cd(Form("%s/TotalDetectorSys", cut_name.c_str()));
+
+	// write the histograms in run1_sys_var.root
+	for(unsigned int g = 0; g < _util.vec_var_string.size(); g++){
+		
+		// point the sys_hist to the directory where you want to save it
+		sys_hist.at(g)->SetDirectory(Form("%s/TotalDetectorSys", cut_name.c_str()));
+		sys_hist.at(g)->Write(Form("%s", 
+
+	}
+*/
+  //  }
 
     // Set the legend ----------------------------------------------------------
     TLegend *leg_stack;
