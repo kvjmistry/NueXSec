@@ -2495,6 +2495,36 @@ void SystematicsHelper::InitialiseReweightingModeCut(){
     f_nuexsec = TFile::Open( Form("files/crosssec_run%s.root", _util.run_period ), "READ");
 
     // Loop over cuts and get the sys uncertainty
+    
+    for (int cut = 0; cut < _util.k_cuts_MAX ; cut++){
+        for (int var = 0; var < _util.k_cut_vars_max; var++){
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "RPA",              2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "CCMEC",            2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "AxFFCCQE",         2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "VecFFCCQE",        2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "DecayAngMEC",      2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "ThetaDelta2Npi",   2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "ThetaDelta2NRad",  2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "RPA_CCQE_Reduced", 2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "NormCCCOH",        2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "NormNCCOH",        2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn1_x",          2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn_curr",        2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn1_y",          2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Beam_spot",        2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn2_x",          2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn2_y",          2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn_Water",       2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Beam_shift_x",     2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Beam_shift_y",     2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Target_z",         2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Decay_pipe_Bfield",2, "unisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsGenie",600,  "multisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsReint",1000,  "multisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsPPFX", 600, "multisim");
+        }
+    }
+        
 
 }
 // -----------------------------------------------------------------------------
@@ -2532,7 +2562,12 @@ void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index
     _util.GetHist(f_nuexsec, h_cv, Form( "CV/Cuts/%s/%s/%s_CV_%s_0", _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(),_util.cut_dirs.at(cut_index).c_str()));
 
     // Now we got the histograms, we loop over an get the uncertainties
-    TH1D* h_err = (TH1D*)h_universe.at(k_up)->Clone();
+    TH1D* h_err = (TH1D*)h_universe.at(k_up)->Clone(); // clone it to get the binning right
+
+    // Clear the bins
+    for (int bin = 1; bin < h_universe.at(k_up)->GetNbinsX()+1; bin++){
+        h_err->SetBinContent(bin, 0.0);
+    }
 
     // Loop over the universes
     for (unsigned int uni = 0 ; uni < h_universe.size(); uni ++){
@@ -2540,21 +2575,32 @@ void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index
         // Loop over the bins 
         for (int bin = 1; bin < h_universe.at(k_up)->GetNbinsX()+1; bin++){
             double deviate = h_cv->GetBinContent(bin) - h_universe.at(uni)->GetBinContent(bin); // CV - Uni in bin i
-            h_err->SetBinContent(bin, deviate*deviate); // differene squared
+            h_err->SetBinContent(bin, h_err->GetBinContent(bin) + deviate*deviate); // difference squared summed
         }
         
     }
 
     // Sqrt all bins/N
     for (int bin = 1; bin < h_universe.at(k_up)->GetNbinsX()+1; bin++){
-        double err = std::sqrt(h_err->GetBinContent(bin)/num_uni);
-        h_err->SetBinContent(bin, err); // differene squared
+        double err = std::sqrt(h_err->GetBinContent(bin)/num_uni) / h_cv->GetBinContent(bin);
+        if (h_cv->GetBinContent(bin) == 0) 
+            h_err->SetBinContent(bin, 0.0);
+        else 
+            h_err->SetBinContent(bin, err);
     }
 
 
-    // Now write the historam to file
-    
+    // ---- save the histograms into different directories inside the root file
+    file_sys_var->cd();
 
+    if(!file_sys_var->GetDirectory(Form("%s/%s", _util.cut_dirs.at(cut_index).c_str(), label.c_str()))) {
+        file_sys_var->mkdir(Form("%s/%s", _util.cut_dirs.at(cut_index).c_str(), label.c_str())); // if the directory does not exist, create it
+    }
+
+    file_sys_var->cd(Form("%s/%s", _util.cut_dirs.at(cut_index).c_str(), label.c_str())); // open the directory
+
+    h_err->SetDirectory(gDirectory); // set in which dir the hist_ratio.at(k) is going to be written
+    h_err->Write(histname.c_str(), TObject::kOverwrite);  // write the histogram to the file
 
 }
 // -----------------------------------------------------------------------------

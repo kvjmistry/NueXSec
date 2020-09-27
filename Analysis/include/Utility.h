@@ -164,6 +164,7 @@ public:
     char * xsec_labels           = (char *)"all";
     char * uplotmode             = (char *)"default";
     char * intrinsic_mode        = (char *)"default"; // choose whether to override the nue component to accomodate the intrinsic nue sample
+    char * sysplot               = (char *)"tot";     // what systematic uncertainty to plot on the CV histograms
     int num_events{-1};
     int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
     int _weight_tune{1}; // Use the GENIE Tune

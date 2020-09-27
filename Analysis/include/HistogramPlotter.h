@@ -89,6 +89,9 @@ class HistogramPlotter{
     // Plot a 2d histogram normalised by row or column
     void Save2DHistsNorm(const char *print_name, const char *histname, std::string cut_type, bool yex, std::string normtype);
     // -------------------------------------------------------------------------
+    // Add in the systematic uncertainty from file to the stacked histograms
+    void AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D* h_dirt, std::string histname, std::string cut_name, std::string label, std::string mode);
+    // -------------------------------------------------------------------------
 
     private:
 

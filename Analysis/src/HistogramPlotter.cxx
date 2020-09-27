@@ -199,12 +199,12 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
 
         // Track Theta
         MakeStack("h_track_theta", " ",
-                area_norm, false, 1.0, "Leading Track Theta [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                area_norm, false, 1.0, "Leading Track Theta [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
                 Form("plots/run%s/numu/track_theta.pdf", _util.run_period), false, "classifications_numu", false, false, true);
 
         // Track phi
         MakeStack("h_track_phi", " ",
-                area_norm, false, 1.0, "Leading Track Phi [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                area_norm, false, 1.0, "Leading Track Phi [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
                 Form("plots/run%s/numu/track_phi.pdf", _util.run_period), false, "classifications_numu", false, false, true);
 
         // Track Cos theta
@@ -242,7 +242,7 @@ void HistogramPlotter::Initalise() {
 
     // File not already open, open the file
     if (!gROOT->GetListOfFiles()->FindObject(_util.hist_file_name)) {
-        f_nuexsec = TFile::Open(_util.hist_file_name);
+        f_nuexsec = TFile::Open(_util.hist_file_name, "READ");
     }
     else {
         std::cout << "Can't find histogram file!! " << __PRETTY_FUNCTION__ << std::endl;
@@ -622,9 +622,9 @@ void HistogramPlotter::SetFillColours(std::vector<TH1D *> &hist, std::string plo
 void HistogramPlotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, std::vector<double> hist_integrals, bool found_data, bool found_dirt, bool found_ext, unsigned int k_plot_data, unsigned int k_plot_ext, unsigned int k_plot_dirt, std::string plotmode){
 
     if (plotmode == "classifications" || plotmode == "classifications_pi0" || plotmode == "classifications_numu") {
-        if (found_data) leg_stack->AddEntry(hist.at(k_plot_data), Form("Beam-On Data (%2.1f)", hist_integrals.at(_util.k_leg_data)), "lep");
+        if (found_data) leg_stack->AddEntry(hist.at(k_plot_data), Form("Beam-On (%2.1f)", hist_integrals.at(_util.k_leg_data)), "lep");
         if (found_dirt) leg_stack->AddEntry(hist.at(k_plot_dirt), Form("Out-of Cryo (%2.1f)", hist_integrals.at(_util.k_leg_dirt)), "f");
-        if (found_ext)  leg_stack->AddEntry(hist.at(k_plot_ext),  Form("Beam-Off Data (%2.1f)", hist_integrals.at(_util.k_leg_ext)), "f");
+        if (found_ext)  leg_stack->AddEntry(hist.at(k_plot_ext),  Form("Beam-Off (%2.1f)", hist_integrals.at(_util.k_leg_ext)), "f");
         // leg_stack->AddEntry(hist.at(_util.k_unmatched),       Form("Unmatched (%2.1f)",           hist_integrals.at(_util.k_unmatched)),    "f"); // This should be zero, so dont plot
         leg_stack->AddEntry(hist.at(_util.k_nc_pi0),      Form("NC #pi^{0} (%2.1f)", hist_integrals.at(_util.k_nc_pi0)), "f");
         leg_stack->AddEntry(hist.at(_util.k_nc),          Form("NC (%2.1f)", hist_integrals.at(_util.k_nc)), "f");
@@ -637,9 +637,9 @@ void HistogramPlotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, s
     }
 
     else {
-        if (found_data) leg_stack->AddEntry(hist.at(k_plot_data), Form("Beam-On Data (%2.1f)", hist_integrals.at(_util.k_part_data)), "lep");
+        if (found_data) leg_stack->AddEntry(hist.at(k_plot_data), Form("Beam-On (%2.1f)", hist_integrals.at(_util.k_part_data)), "lep");
         if (found_dirt) leg_stack->AddEntry(hist.at(k_plot_dirt), Form("Out-of Cryo (%2.1f)", hist_integrals.at(_util.k_part_dirt)), "f");
-        if (found_ext)  leg_stack->AddEntry(hist.at(k_plot_ext),  Form("Beam-Off Data (%2.1f)", hist_integrals.at(_util.k_part_ext)), "f");
+        if (found_ext)  leg_stack->AddEntry(hist.at(k_plot_ext),  Form("Beam-Off (%2.1f)", hist_integrals.at(_util.k_part_ext)), "f");
         // leg_stack->AddEntry(hist.at(_util.k_part_unmatched), Form("Unmatched (%2.1f)", hist_integrals.at(_util.k_part_unmatched)), "f");
         leg_stack->AddEntry(hist.at(_util.k_kaon),        Form("K (%2.1f)", hist_integrals.at(_util.k_kaon)), "f");
         leg_stack->AddEntry(hist.at(_util.k_proton),      Form("p (%2.1f)", hist_integrals.at(_util.k_proton)), "f");
@@ -700,7 +700,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     TPad *topPad;
     TPad *bottomPad;
     // TCanvas *c  = new TCanvas();
-    TCanvas * c = new TCanvas(Form("c_%s_%s", print_name, cut_name.c_str()), "c", 500, 500);
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
     THStack *h_stack = new THStack();
 
     // Get the histograms from the file
@@ -898,30 +898,15 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     }
 
     // ---- including sys uncertainty
-    TH1D  *h_sys;
-
+    
     // First check if there is sys uncertainty for this variable in run1_sys_var.root
     // and if you want to plot sys+stat
     if ( _util.CheckHistogram(_util.vec_hist_name, hist_name) && _util.plot_sys_uncertainty ) {
 
-        _util.GetHist(file_sys_uncertainties, h_sys, Form("%s/TotalDetectorSys/%s", cut_name.c_str(), hist_name.c_str()) );
-        
-        // loop over the bins in h_error_hist
-        for (int i = 1; i <= h_error_hist->GetNbinsX() ; i++){
-
-            double stat_error = h_error_hist->GetBinError(i);
-
-            // Need to subtract the beam off and dirt
-            double bin_content = h_error_hist->GetBinContent(i) - hist.at(k_plot_ext)->GetBinContent(i) - hist.at(k_plot_dirt)->GetBinContent(i);
-
-            double det_sys_error = h_sys->GetBinContent(i) * bin_content;
-
-            double tot_error = std::sqrt( stat_error*stat_error + det_sys_error*det_sys_error );
-
-            h_error_hist->SetBinError(i, tot_error);
-
-        }
-
+        // AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "TotalDetectorSys", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsPPFX", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsGenie", "MC");
+        // AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsReint", "MC");
     }
 
     // Plotting error ---------------------------------------------------------
@@ -930,7 +915,6 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     h_error_hist->SetLineWidth(0);
     h_error_hist->Draw("e2, same");
     if (hist_name == "h_reco_track_multiplicity")h_error_hist->Draw("e2, same, TEXT00"); // for the track multiplicity plot draw the event count so we can get the % of 0 track events
-
 
     // Set the legend ----------------------------------------------------------
     TLegend *leg_stack;
@@ -945,6 +929,12 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     leg_stack->SetFillStyle(0);
 
     SetLegend(hist, leg_stack, hist_integrals, found_data, found_dirt, found_ext, k_plot_data, k_plot_ext, k_plot_dirt, plotmode);
+
+    // Add the Error Histogram to the Legend
+    if (_util.CheckHistogram(_util.vec_hist_name, hist_name) && _util.plot_sys_uncertainty)
+        leg_stack->AddEntry(h_error_hist, "#lower[0.2]{#splitline{MC + Beam-Off}{Stat. + Sys. Uncertainty}}", "f");
+    else 
+        leg_stack->AddEntry(h_error_hist, "#lower[0.2]{#splitline{MC + Beam-Off}{Stat. Uncertainty}}", "f");
 
     leg_stack->Draw();
 
@@ -1008,7 +998,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         else
             h_ratio->GetYaxis()->SetRangeUser(0, 2.0);
 
-        h_ratio->GetYaxis()->SetTitle("#frac{Beam-On}{(Overlay + Beam-Off)}");
+        h_ratio->GetYaxis()->SetTitle("#frac{Beam-On}{(MC + Beam-Off)}");
 
         h_ratio->GetXaxis()->SetTitle(x_axis_name);
         h_ratio->GetYaxis()->SetTitleSize(10);
@@ -1072,8 +1062,11 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         // Draw_WeightLabels(c);
     }
 
+    // std::cout << print_name<< std::endl;
+
     if (plotmode == "classifications_pi0" || plotmode == "classifications_numu"){
         c->Print(print_name);
+        delete c;
         return;
     }
 
@@ -1082,7 +1075,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     else
         c->Print(Form("plots/run%s/detvar/%s/%s", _util.run_period, _util.variation, print_name));
 
-    // delete c;
+    delete c;
 }
 // -----------------------------------------------------------------------------
 void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
@@ -1330,7 +1323,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Shower Moliere Average
     MakeStack("h_reco_shrmoliereavg", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.6, "Leading Shower Moliere Average [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.6, "Leading Shower Moliere Average [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shrmoliereavg.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Median of 1st component of shr PCA (5cm window)
@@ -1532,10 +1525,10 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
     if (histname != "h_flash_time_single_bin")
         leg_stack->SetFillStyle(0);
 
-    leg_stack->AddEntry(hist.at(_util.k_data), "Beam-On Data", "lep");
-    leg_stack->AddEntry(hist.at(_util.k_dirt), "Out-of Cryo", "f");
-    leg_stack->AddEntry(hist.at(_util.k_mc),   "Overlay", "f");
-    leg_stack->AddEntry(hist.at(_util.k_ext),  "Beam-Off Data", "f");
+    leg_stack->AddEntry(hist.at(_util.k_data), "Beam-On", "lep");
+    leg_stack->AddEntry(hist.at(_util.k_dirt), "Out-of Cryo MC", "f");
+    leg_stack->AddEntry(hist.at(_util.k_mc),   "In Cryo MC", "f");
+    leg_stack->AddEntry(hist.at(_util.k_ext),  "Beam-Off", "f");
 
     leg_stack->Draw();
 
@@ -1569,7 +1562,7 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
     h_ratio->GetYaxis()->SetRangeUser(0.80, 1.20);
     h_ratio->GetXaxis()->SetRangeUser(0, 23);
     if (histname == "h_flash_time_single_bin") h_ratio->GetXaxis()->SetRangeUser(5.6,15.4);
-    h_ratio->GetYaxis()->SetTitle("#frac{Beam-On}{(Overlay + Beam-Off)}");
+    h_ratio->GetYaxis()->SetTitle("#frac{Beam-On}{(MC + Beam-Off)}");
 
     h_ratio->GetYaxis()->SetLabelSize(0.13);
     h_ratio->GetYaxis()->SetTitleSize(0.07);
@@ -1690,9 +1683,9 @@ void HistogramPlotter::MakeFlashPlotOMO(double Data_POT, const char *print_name,
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
 
-    leg_stack->AddEntry(hist.at(_util.k_data), "Beam-On - Beam-Off Data", "lep");
+    leg_stack->AddEntry(hist.at(_util.k_data), "Beam-On - Beam-Off", "lep");
     leg_stack->AddEntry(hist.at(_util.k_dirt), "Out-of Cryo", "f");
-    leg_stack->AddEntry(hist.at(_util.k_mc),   "Overlay", "f");
+    leg_stack->AddEntry(hist.at(_util.k_mc),   "MC", "f");
 
     leg_stack->Draw();
 
@@ -2372,6 +2365,95 @@ void HistogramPlotter::Save2DHistsNorm(const char *print_name, const char *histn
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
+void HistogramPlotter::AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D* h_dirt, std::string histname, std::string cut_name, std::string label, std::string mode){
+        
+    TH1D  *h_sys;
+
+    // Fix inconistent histogram names so the code doesnt break
+    std::string hist_name_temp = histname;
+    if (std::string(histname) == "h_reco_vtx_x_sce"){
+        hist_name_temp = "h_reco_nu_vtx_sce_x";
+    }
+    
+    if (std::string(histname) == "h_reco_vtx_y_sce"){
+        hist_name_temp = "h_reco_nu_vtx_sce_y";
+    }
+    if (std::string(histname) == "h_reco_vtx_z_sce"){
+        hist_name_temp = "h_reco_nu_vtx_sce_z";
+    }
+
+    // The error is on the MC events -- so comes from reweighting or detvar
+    if (mode == "MC"){
+
+        file_sys_uncertainties->cd();
+
+        // _util.GetHist(file_sys_uncertainties, h_sys, Form("%s/TotalDetectorSys/%s", cut_name.c_str(), hist_name.c_str()) );
+        _util.GetHist(file_sys_uncertainties, h_sys, Form("%s/%s/%s", cut_name.c_str(), label.c_str(), hist_name_temp.c_str()) );
+        
+        // loop over the bins in h_error_hist
+        for (int i = 1; i <= h_error_hist->GetNbinsX() ; i++){
+
+            double bin_error = h_error_hist->GetBinError(i);
+
+            // Need to subtract the beam off and dirt
+            double bin_content = h_error_hist->GetBinContent(i) - h_ext->GetBinContent(i) - h_dirt->GetBinContent(i);
+
+            double sys_error = h_sys->GetBinContent(i) * bin_content;
+
+            double tot_error = std::sqrt( bin_error*bin_error + sys_error*sys_error );
+
+            h_error_hist->SetBinError(i, tot_error);
+
+        }
+    }
+    // Just add the uncertainty on the dirt -- e.g. add 100% uncertainty on the dirt
+    else if (mode == "Dirt"){
+        
+        // loop over the bins in h_error_hist
+        for (int i = 1; i <= h_error_hist->GetNbinsX() ; i++){
+
+            double bin_error = h_error_hist->GetBinError(i);
+
+            // Need to subtract the beam off and dirt
+            double bin_content = h_dirt->GetBinContent(i);
+
+            double sys_error = 2.0 * bin_content; // 100 % err on the dirt
+
+            double tot_error = std::sqrt( bin_error*bin_error + sys_error*sys_error );
+
+            h_error_hist->SetBinError(i, tot_error);
+
+        }
+    }
+    // Add uncertainty on the total stack i.e. MC + dirt + EXT i.e.  in the case of POT counting
+    else if (mode == "Stack"){
+
+        // loop over the bins in h_error_hist
+        for (int i = 1; i <= h_error_hist->GetNbinsX() ; i++){
+
+            double bin_error = h_error_hist->GetBinError(i);
+
+            // Need to subtract the beam off and dirt
+            double bin_content = h_error_hist->GetBinContent(i);
+
+            double sys_error = 1.02 * bin_content; // 2 % err on the stack
+
+            double tot_error = std::sqrt( bin_error*bin_error + sys_error*sys_error );
+
+            h_error_hist->SetBinError(i, tot_error);
+
+        }
+
+    }
+    else {
+        std::cout << "Unknown systematics mode confugured!!" << std::endl;
+    }
+
+    delete h_sys;
+
+    f_nuexsec->cd();
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

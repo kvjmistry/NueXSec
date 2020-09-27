@@ -165,6 +165,13 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             sysmode = argv[i+1];
         }
 
+        // Plot systematics on the CV histograms
+        if (strcmp(arg, "--plotsys") == 0){
+            std::cout << "Plotting systematic uncertainties on the CV Histograms for: " << argv[i+1] << std::endl;
+            plot_sys_uncertainty = true;
+            sysplot = argv[i+1];
+        }
+
         // Cross-Section
         if (strcmp(arg, "--xsecmode") == 0){
             std::cout << "Using Cross-Section code with mode: " << argv[i+1] << std::endl;
@@ -398,6 +405,7 @@ bool Utility::GetFile(TFile* &f, TString string){
 }
 // -----------------------------------------------------------------------------
 bool Utility::GetTree(TFile* f, TTree* &T, TString string){
+    f->cd();
     T = (TTree*) f->Get(string);
     if (T == NULL) {
         std::cout << "\nfailed to get:\t" << string << "\tThis tree might not exist in the file\n" << std::endl;
@@ -410,6 +418,7 @@ bool Utility::GetTree(TFile* f, TTree* &T, TString string){
 }
 // -----------------------------------------------------------------------------
 bool Utility::GetHist(TFile* f, TH1D* &h, TString string){
+    f->cd();
     h = (TH1D*) f->Get(string);
     if (h == NULL) {
         std::cout << "\nfailed to get:\t" << string << "\tThis histogram might not exist in the file\n" << std::endl;
@@ -421,6 +430,7 @@ bool Utility::GetHist(TFile* f, TH1D* &h, TString string){
 }
 // -----------------------------------------------------------------------------
 bool Utility::GetHist(TFile* f, TH2D* &h, TString string){
+    f->cd();
     h = (TH2D*) f->Get(string);
     if (h == NULL) {
         std::cout << "\nfailed to get:\t" << string << "\tThis histogram might not exist in the file\n" << std::endl;
@@ -956,6 +966,11 @@ void Utility::CheckPOT(){
 // -----------------------------------------------------------------------------
 bool Utility::CheckHistogram(std::vector<std::string> vector, TString hist_name){
     
+    // Add a temporary fix for inconsistent names
+    if (std::string(hist_name) == "h_reco_vtx_x_sce" || std::string(hist_name) == "h_reco_vtx_y_sce" || std::string(hist_name) == "h_reco_vtx_z_sce")
+        return true;
+
+
     for(unsigned int i=0; i<vector.size(); i++){
 
         if(vector.at(i).c_str() == hist_name) return true;
