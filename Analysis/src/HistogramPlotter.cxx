@@ -906,7 +906,9 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         // AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "TotalDetectorSys", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsPPFX", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsGenie", "MC");
-        // AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsReint", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsReint", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "POT",  "Stack");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Dirt", "Dirt");
     }
 
     // Plotting error ---------------------------------------------------------
@@ -993,7 +995,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         // h_ratio->GetYaxis()->SetRangeUser(-0.2, 0.2);
 
         // For ratio
-        if (cut_name == "Unselected" || cut_name == "SoftwareTrig" || cut_name == "Slice_ID" || cut_name == "Topo_Score" || cut_name == "In_FV" || cut_name == "e_candidate")
+        if (cut_name == "Unselected" || cut_name == "SoftwareTrig" )
             h_ratio->GetYaxis()->SetRangeUser(0.8, 1.2);
         else
             h_ratio->GetYaxis()->SetRangeUser(0, 2.0);
@@ -1105,7 +1107,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // 2D distance shower vertex to reco nu vertex
     MakeStack("h_reco_shower_to_vtx_dist", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Shower to Vertex Distance [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.1, "Shower to Vertex Distance [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shower_to_vtx_dist.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Leading Shower hits in all planes
@@ -1161,7 +1163,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Ratio hits from showers to slice
     MakeStack("h_reco_hits_ratio", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Hit Ratio",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.1, "Hit Ratio",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_hits_ratio.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Ratio hits from showers to slice
@@ -1253,7 +1255,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               area_norm, false, 1.6, "Pandora Slice ID",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_nslice.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
     MakeStack("h_reco_nslice", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, true, 800, "Pandora Slice ID",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, true, 10000, "Pandora Slice ID",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_nslice_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, false);
 
     // Slice Cluster Fraction
@@ -1288,17 +1290,17 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Shower dEdx with the track fitter plane with the most hits
     MakeStack("h_reco_shr_tkfit_dedx_max", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Leading Shower dEdx (All Planes) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.1, "Leading Shower dEdx (All Planes) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_max.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Shower dEdx with the track fitter plane with the most hits for events with tracks only
     MakeStack("h_reco_shr_tkfit_dedx_max_with_tracks", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Leading Shower dEdx (All Planes) (with tracks) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.1, "Leading Shower dEdx (All Planes) (with tracks) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_max_with_tracks.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Shower dEdx with the track fitter y plane when there is no tracks
     MakeStack("h_reco_shr_tkfit_dedx_y_no_tracks", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Leading Shower dEdx (Collection Plane) (0 tracks) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.1, "Leading Shower dEdx (Collection Plane) (0 tracks) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_y_no_tracks.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Shower dEdx with the track fitter plane with most hits when there is no tracks
@@ -1351,7 +1353,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               area_norm, false, 1.0, "Contained Fraction (PFP hits in FV / hits in slice)",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_contained_fraction.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
     MakeStack("h_reco_contained_fraction", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, true, 1.0, "Contained Fraction (PFP hits in FV / hits in slice)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, true, 10, "Contained Fraction (PFP hits in FV / hits in slice)",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_contained_fraction_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, false);
 
     // Run number
@@ -2385,8 +2387,6 @@ void HistogramPlotter::AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D* 
     // The error is on the MC events -- so comes from reweighting or detvar
     if (mode == "MC"){
 
-        file_sys_uncertainties->cd();
-
         // _util.GetHist(file_sys_uncertainties, h_sys, Form("%s/TotalDetectorSys/%s", cut_name.c_str(), hist_name.c_str()) );
         _util.GetHist(file_sys_uncertainties, h_sys, Form("%s/%s/%s", cut_name.c_str(), label.c_str(), hist_name_temp.c_str()) );
         
@@ -2405,6 +2405,8 @@ void HistogramPlotter::AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D* 
             h_error_hist->SetBinError(i, tot_error);
 
         }
+
+        delete h_sys;
     }
     // Just add the uncertainty on the dirt -- e.g. add 100% uncertainty on the dirt
     else if (mode == "Dirt"){
@@ -2417,7 +2419,7 @@ void HistogramPlotter::AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D* 
             // Need to subtract the beam off and dirt
             double bin_content = h_dirt->GetBinContent(i);
 
-            double sys_error = 2.0 * bin_content; // 100 % err on the dirt
+            double sys_error = bin_content; // 100 % err on the dirt
 
             double tot_error = std::sqrt( bin_error*bin_error + sys_error*sys_error );
 
@@ -2431,12 +2433,14 @@ void HistogramPlotter::AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D* 
         // loop over the bins in h_error_hist
         for (int i = 1; i <= h_error_hist->GetNbinsX() ; i++){
 
+            // std::cout <<histname  <<"  " << cut_name<< std::endl;
+
             double bin_error = h_error_hist->GetBinError(i);
 
-            // Need to subtract the beam off and dirt
+            // Get the bin content
             double bin_content = h_error_hist->GetBinContent(i);
 
-            double sys_error = 1.02 * bin_content; // 2 % err on the stack
+            double sys_error = 0.02 * bin_content; // 2 % err on the stack
 
             double tot_error = std::sqrt( bin_error*bin_error + sys_error*sys_error );
 
@@ -2449,7 +2453,7 @@ void HistogramPlotter::AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D* 
         std::cout << "Unknown systematics mode confugured!!" << std::endl;
     }
 
-    delete h_sys;
+    
 
     f_nuexsec->cd();
 
