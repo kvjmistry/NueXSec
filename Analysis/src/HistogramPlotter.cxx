@@ -795,6 +795,10 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         }
     }
 
+    // for flash time plot add the ext first so the plot llooks better
+    if (hist_name == "h_reco_flash_time" && found_ext)
+        h_stack->Add(hist.at(k_plot_ext));
+
     // Add the histograms to the stack
     for (unsigned int i = 0; i < hist.size(); i++) {
         if (i == k_plot_data)
@@ -803,6 +807,9 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
             continue; // Skip ext if not there
         if (i == k_plot_dirt && !found_dirt)
             continue; // skip dirt if not there
+
+        if (hist_name == "h_reco_flash_time" && i == k_plot_ext)
+            continue;
 
         h_stack->Add(hist.at(i));
     }
@@ -1310,7 +1317,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Shower Flash Time
     MakeStack("h_reco_flash_time", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Flash Time [#mus]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.6, "Flash Time [#mus]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_flash_time.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Shower Flash PE
