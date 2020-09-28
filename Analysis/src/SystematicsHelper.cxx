@@ -20,6 +20,9 @@ void SystematicsHelper::Initialise(Utility _utility){
         std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;
         exit(1);
     }
+    
+    // Get the POT of the variations from the file
+    GetPOT();
 
     // Off beam mode to compare bnb and numi off beam samples
     if (std::string(_util.sysmode) == "ext"){
@@ -38,10 +41,6 @@ void SystematicsHelper::Initialise(Utility _utility){
         return;
     }
 
-    // Get the POT of the variations from the file
-    GetPOT();
-
-    
     // Resize the file vector
     f_vars.resize(k_vars_MAX);
 
@@ -1812,6 +1811,8 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
             label == "NormCCCOH"        ||
             label == "NormNCCOH"){
                 h_cov_genie_uni->Add(cov);
+                h_cov_tot->Add(cov);
+                h_cov_sys->Add(cov);
 
         }
         else if (label == "Horn_curr" ||
@@ -1826,33 +1827,44 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
                 label == "Target_z" ||
                 label == "Decay_pipe_Bfield"){
                 h_cov_beamline->Add(cov);
+                h_cov_tot->Add(cov);
+                h_cov_sys->Add(cov);
         }
         else if (label == "weightsGenie"){
             h_cov_genie_multi->Add(cov);
+            h_cov_tot->Add(cov);
+            h_cov_sys->Add(cov);
 
         }
         else if (label == "weightsReint"){
             h_cov_reint->Add(cov);
+            h_cov_tot->Add(cov);
+            h_cov_sys->Add(cov);
 
         }
         else if (label == "weightsPPFX"){
             h_cov_hp->Add(cov);
+            h_cov_tot->Add(cov);
+            h_cov_sys->Add(cov);
 
         }
         else if (label == "Dirt"){
             h_cov_dirt->Add(cov);
+            h_cov_tot->Add(cov);
+            h_cov_sys->Add(cov);
 
         }
         else if (label == "POT"){
             h_cov_pot->Add(cov);
+            h_cov_tot->Add(cov);
+            h_cov_sys->Add(cov);
 
         }
         else {
             std::cout << "Unknown variation specified: " << label << std::endl;
+            return;
         }
 
-        h_cov_tot->Add(cov);
-        h_cov_sys->Add(cov);
     }
 
     TCanvas *c = new TCanvas("c", "c", 500, 500);

@@ -51,6 +51,9 @@ Run1_MC_POT_LYAttenuation 3.67755e+20
 // Run 1 Det var LYRayleigh
 Run1_MC_POT_LYRayleigh 3.60847e+20
 -
+// Run 1 Det var SCE
+Run1_MC_POT_SCE 3.66636e+20
+-
 // Run 1 Det var Recomb2
 Run1_MC_POT_Recomb2 3.72107e+20
 -
@@ -68,6 +71,9 @@ Run1_MC_POT_WireModThetaYZ_withSigmaSplines 3.67869e+20
 -
 // Run 1 Det var WireModThetaYZ_withoutSigmaSplines
 Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 3.69423e+20
+-
+// Run 1 Det var WireModdEdX
+Run1_MC_POT_WireModdEdX 3.6318e+20
 -
 // Run 1 Det Var BNB diffusion -- unused now
 Run1_MC_POT_BNB_Diffusion 4.19732e+20
