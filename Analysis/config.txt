@@ -43,7 +43,13 @@ Run1_Intrinsic_POT 1.85664e+22 // For Using Intrinsic nue sample
 Run1_MC_POT_weight 2.31956e+21
 -
 // Run 1 Det var CV
-Run1_MC_POT_CV 4.44874e+20
+Run1_MC_POT_CV 3.65214e+20
+-
+// Run 1 Det var LYAttenuation
+Run1_MC_POT_LYAttenuation 3.67755e+20
+-
+// Run 1 Det var Recomb2
+Run1_MC_POT_Recomb2 3.72107e+20
 -
 // Run 1 Det Var BNB diffusion
 Run1_MC_POT_BNB_Diffusion 4.19732e+20

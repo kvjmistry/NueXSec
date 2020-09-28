@@ -1089,8 +1089,10 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
 // -----------------------------------------------------------------------------
 void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
-    // MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, const char* x_axis_name, double y_scale_factor,
-    //                             const double leg_x1, const double leg_x2, const double leg_y1, const double leg_y2, const char* print_name, bool override_data_mc_comparison )
+    // MakeStack(std::string hist_name, std::string cut_name, bool area_norm, bool logy, double y_scale_factor, const char* x_axis_name,
+    //                                 const double leg_x1, const double leg_x2, const double leg_y1, double Data_POT, const double leg_y2,
+    //                                 const char* print_name, bool override_data_mc_comparison, std::string plotmode, bool plotvar,
+    //                                 bool centerxaxis, bool scale );
 
     // Reco X SCE
     MakeStack("h_reco_vtx_x_sce", _util.cut_dirs.at(cut_index).c_str(),
@@ -1219,7 +1221,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
     // Calibrated energy of all the showers with uneaven bins
     MakeStack("h_reco_shower_energy_cali_rebin", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.6, "Reco Energy Leading Shower [GeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shower_energy_cali_rebin.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
+              Form("cuts/%s/reco_shower_energy_cali_rebin.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
 
     // Total number of hits for all showers

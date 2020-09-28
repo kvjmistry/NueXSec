@@ -79,34 +79,22 @@ fi
 
 # Running detector variation samples
 
-# CV
-if [ "$1" == "CV" ]; then
-  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_CV.root CV
+# To run the det var samples now do source run_selection_mcc9_run1.sh var <variation name>
+# The variation are:
+# CV, BNB_Diffusion, LYAttenuation, Recomb2
 
-  source merge/merge_run1_files.sh files/nuexsec_mc_run1_CV.root files/nuexsec_run1_CV_merged.root
+# Could loop these to make it easier to run them all!
 
-  ./nuexsec --run 1 --hist files/nuexsec_run1_CV_merged.root --var dummy CV
+if [ "$1" == "var" ]; then
+  ./nuexsec --run 1 --var ../ntuples/detvar/run1/neutrinoselection_filt_run1_overlay_$2.root $2
 
-  root -l -b -q 'merge/merge_uneaventrees.C("1", false, "files/trees/nuexsec_selected_tree_mc_run1_CV.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "CV")'
+  source merge/merge_run1_files.sh files/nuexsec_mc_run1_$2.root files/nuexsec_run1_$2_merged.root
 
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_CV.root --var dummy CV --xsecmode default
+  ./nuexsec --run 1 --hist files/nuexsec_run1_$2_merged.root --var dummy $2
 
-fi
+  root -l -b -q 'merge/merge_uneaventrees.C("1", false, "files/trees/nuexsec_selected_tree_mc_run1_'"$2"'.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "'"$2"'")'
 
-# ----------------------
-
-
-# BNB_Diffusion
-if [ "$1" == "BNB_Diffusion" ]; then
-  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_diffusion.root BNB_Diffusion
-
-  source merge/merge_run1_files.sh files/nuexsec_mc_run1_BNB_Diffusion.root files/nuexsec_run1_BNB_Diffusion_merged.root
-
-  ./nuexsec --run 1 --hist files/nuexsec_run1_BNB_Diffusion_merged.root --var dummy BNB_Diffusion
-
-  root -l -b -q 'merge/merge_uneaventrees.C("1", false, "files/trees/nuexsec_selected_tree_mc_run1_BNB_Diffusion.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "BNB_Diffusion")'
-
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_BNB_Diffusion.root --var dummy BNB_Diffusion --xsecmode default
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$2.root --var dummy $2 --xsecmode default
 
 fi
 

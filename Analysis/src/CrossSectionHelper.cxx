@@ -781,6 +781,18 @@ void CrossSectionHelper::WriteHists(){
 
     fnuexsec_out->cd();
 
+    // If the variation flag has been set then cheekily change the reeighter label name to use a different folder
+    if (std::string(_util.variation) != "empty"){
+        if ( std::string(_util.variation) == "CV"){
+            std::cout << "Doing a cheeky swap of the CV name to: " << "detvar_CV" << std::endl;
+            reweighter_labels = { "detvar_CV" };
+        }
+        else {
+            std::cout << "Doing a cheeky swap of the CV name to: " << std::string(_util.variation) << std::endl;
+            reweighter_labels = { std::string(_util.variation)};
+        }
+    }
+
     // Create subdirectory for each reweighter
     TDirectory *dir_labels[reweighter_labels.size()];
 
