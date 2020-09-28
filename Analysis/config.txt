@@ -48,10 +48,28 @@ Run1_MC_POT_CV 3.65214e+20
 // Run 1 Det var LYAttenuation
 Run1_MC_POT_LYAttenuation 3.67755e+20
 -
+// Run 1 Det var LYRayleigh
+Run1_MC_POT_LYRayleigh 3.60847e+20
+-
 // Run 1 Det var Recomb2
 Run1_MC_POT_Recomb2 3.72107e+20
 -
-// Run 1 Det Var BNB diffusion
+// Run 1 Det var WireModX
+Run1_MC_POT_WireModX 3.67495e+20
+-
+// Run 1 Det var WireModYZ
+Run1_MC_POT_WireModYZ 3.68494e+20
+-
+// Run 1 Det var WireModThetaXZ
+Run1_MC_POT_WireModThetaXZ 3.64542e+20
+-
+// Run 1 Det var WireModThetaYZ_withSigmaSplines
+Run1_MC_POT_WireModThetaYZ_withSigmaSplines 3.67869e+20
+-
+// Run 1 Det var WireModThetaYZ_withoutSigmaSplines
+Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 3.69423e+20
+-
+// Run 1 Det Var BNB diffusion -- unused now
 Run1_MC_POT_BNB_Diffusion 4.19732e+20
 -
 // Run 1 EXT NuMI sample number of triggers

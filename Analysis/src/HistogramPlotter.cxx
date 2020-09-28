@@ -350,7 +350,7 @@ void HistogramPlotter::Draw_VarMode(TCanvas *c ) {
 
     TPaveText *pt;
 
-    pt = new TPaveText(0.46, 0.88, 0.7, 0.95, "NDC");
+    pt = new TPaveText(0.3215, 0.936, 0.3215, 0.936, "NDC");
     pt->AddText(_util.variation);
     pt->SetBorderSize(0);
     pt->SetFillColor(0);

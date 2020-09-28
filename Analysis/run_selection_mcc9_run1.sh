@@ -81,7 +81,7 @@ fi
 
 # To run the det var samples now do source run_selection_mcc9_run1.sh var <variation name>
 # The variation are:
-# CV, BNB_Diffusion, LYAttenuation, Recomb2
+# CV, BNB_Diffusion, LYAttenuation, LYRayleigh, Recomb2, WireModX, WireModYZ, WireModThetaXZ, WireModThetaYZ_withSigmaSplines, WireModThetaYZ_withoutSigmaSplines, 
 
 # Could loop these to make it easier to run them all!
 
