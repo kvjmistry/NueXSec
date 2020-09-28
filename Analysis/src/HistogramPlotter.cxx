@@ -1124,12 +1124,12 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Leading shower phi
     MakeStack("h_reco_leading_shower_phi", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Leading Shower Phi [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.8, "Leading Shower Phi [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_leading_shower_phi.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Leading shower theta
     MakeStack("h_reco_leading_shower_theta", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Leading Shower Theta [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.5, "Leading Shower Theta [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_leading_shower_theta.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Leading shower cos theta
