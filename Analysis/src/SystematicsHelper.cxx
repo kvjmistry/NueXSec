@@ -778,6 +778,18 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeUnisim("Target_z",           var, "Target z" );
         PlotReweightingModeUnisim("Decay_pipe_Bfield",  var, "Decay pipe Bfield" );
 
+        // Detector Variations
+        PlotReweightingModeDetVar("LYRayleigh",                         var, k_LYRayleigh,                         var_string_pretty.at(k_LYRayleigh));
+        PlotReweightingModeDetVar("SCE",                                var, k_SCE,                                var_string_pretty.at(k_SCE));
+        PlotReweightingModeDetVar("LYAttenuation",                      var, k_LYAttenuation,                      var_string_pretty.at(k_LYAttenuation));
+        PlotReweightingModeDetVar("Recomb2",                            var, k_Recomb2,                            var_string_pretty.at(k_Recomb2));
+        PlotReweightingModeDetVar("WireModX",                           var, k_WireModX,                           var_string_pretty.at(k_WireModX));
+        PlotReweightingModeDetVar("WireModYZ",                          var, k_WireModYZ,                          var_string_pretty.at(k_WireModYZ));
+        PlotReweightingModeDetVar("WireModThetaXZ",                     var, k_WireModThetaXZ,                     var_string_pretty.at(k_WireModThetaXZ));
+        PlotReweightingModeDetVar("WireModThetaYZ_withSigmaSplines",    var, k_WireModThetaYZ_withSigmaSplines,    var_string_pretty.at(k_WireModThetaYZ_withSigmaSplines));
+        PlotReweightingModeDetVar("WireModThetaYZ_withoutSigmaSplines", var, k_WireModThetaYZ_withoutSigmaSplines, var_string_pretty.at(k_WireModThetaYZ_withoutSigmaSplines));
+        PlotReweightingModeDetVar("WireModdEdX",                        var, k_WireModdEdX,                        var_string_pretty.at(k_WireModdEdX));
+
         // Plot the multisims
         PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 600);
         PlotReweightingModeMultisim("weightsReint", var,  "Geant Reinteractions", 1000);
@@ -1058,6 +1070,136 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         delete leg;
         delete h_err_up;
         delete h_err_dn;
+    }
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, int detvar_index, std::string label_pretty){
+
+    // Create the directory
+    _util.CreateDirectory("/Systematics/" + label + "/" + vars.at(var));
+
+    std::vector<TH1D*> h_universe;
+    std::vector<TH1D*> h_CV;
+    
+    // Resize to the number cross section types e.g. bkg,eff etc.
+    h_universe.resize(xsec_types.size());
+    h_CV.resize(xsec_types.size());
+
+
+    TH1D* h_temp;
+
+    // Get the histograms and customise a bit
+    for (unsigned int k = 0; k < h_universe.size(); k++){
+        
+        // Get the universe histograms
+        _util.GetHist(f_nuexsec, h_temp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label.c_str(), vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
+        h_universe.at(k) = (TH1D*)h_temp->Clone();
+
+        double scale_fact = POT_v.at(k_CV) / POT_v.at(detvar_index);
+        h_universe.at(k)->Scale(scale_fact);
+
+        // Get the CV histograms
+        _util.GetHist(f_nuexsec, h_CV.at(k), Form( "detvar_CV/%s/h_run%s_CV_0_%s_%s", vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
+
+        // Customise
+        h_universe.at(k)->SetLineWidth(2);
+        h_universe.at(k)->SetLineColor(kGreen+2);
+        h_universe.at(k)->GetYaxis()->SetLabelSize(0.04);
+        h_universe.at(k)->GetYaxis()->SetTitleSize(14);
+        h_universe.at(k)->GetYaxis()->SetTitleFont(44);
+        h_universe.at(k)->GetYaxis()->SetTitleOffset(1.5);
+        
+        // Customise
+        h_CV.at(k)->SetLineWidth(2);
+        h_CV.at(k)->SetLineColor(kBlack);
+        h_universe.at(k)->SetLineColor(kGreen+2);
+    }
+
+    // Get the covariance matrices
+    // CalcMatrices(label, var, h_universe);
+
+    TPad *topPad;
+    TPad *bottomPad;
+    TCanvas *c;
+    
+    // Now we want to draw them
+    for (unsigned int k = 0; k < h_universe.size(); k++){
+        c = new TCanvas("c", "c", 500, 500);
+        topPad = new TPad("topPad", "", 0, 0.3, 1, 1.0);
+        bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
+        _util.SetTPadOptions(topPad, bottomPad);
+        
+        h_universe.at(k)->SetTitle(Form("%s", xsec_types_pretty.at(k).c_str() ));
+        h_universe.at(k)->GetXaxis()->SetTitle("");
+        h_universe.at(k)->GetXaxis()->SetLabelSize(0);
+
+        h_universe.at(k)->Draw("hist");
+        h_CV.at(k)->Draw("hist,same");
+
+        c->Update();
+
+        double scale_val = h_universe.at(k)->GetMaximum();
+        if (scale_val < h_CV.at(k)->GetMaximum()) scale_val = h_CV.at(k)->GetMaximum();
+
+        h_universe.at(k)->GetYaxis()->SetRangeUser(0, scale_val*1.2);
+
+        // FIxed scaling for differential cross section
+        if (vars.at(var) != "integrated"){
+            // h_universe.at(k)->GetYaxis()->SetRangeUser(0, 0.5e-39);
+        }
+
+        TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
+        leg->SetBorderSize(0);
+        leg->SetFillStyle(0);
+        leg->AddEntry(h_universe.at(k), label_pretty.c_str(), "l");
+        leg->AddEntry(h_CV.at(k), "CV", "l");
+        leg->Draw();
+
+        bottomPad->cd();
+        
+        // Up ratio to CV
+        TH1D* h_err = (TH1D *)h_universe.at(k)->Clone("h_ratio");
+        h_err->Add(h_CV.at(k), -1);
+        h_err->Divide(h_CV.at(k));
+        h_err->SetLineWidth(2);
+        h_err->SetLineColor(kGreen+2);
+        h_err->Scale(100);
+        h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+        
+
+        SetRatioOptions(h_err);
+        h_err->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
+        h_err->GetYaxis()->SetTitle("\% change from CV");
+        h_err->Draw("hist,same");
+
+        bottomPad->Update();
+
+        // Draw on the percentage errors manually so they dont overlap
+        TLatex* text_up, *text_dn;
+        for (int bin = 1; bin < h_err->GetNbinsX()+1; bin++){
+            
+            double bin_up_max = h_err->GetBinContent(bin);
+
+            double shift_up = 0;
+            if (bin_up_max >= 0) shift_up = 6;
+            else shift_up = -10;
+            
+            text_up = new TLatex(h_err->GetXaxis()->GetBinCenter(bin), bin_up_max+shift_up, Form("%4.1f", h_err->GetBinContent(bin)));
+            text_up->SetTextAlign(21);
+            text_up->SetTextColor(kGreen+2);
+            text_up->SetTextFont(gStyle->GetTextFont());
+            text_up->SetTextSize(0.07);
+            text_up->Draw();
+        }
+        
+
+        // FillSysVector(label, var, k, h_err_up, h_err_dn);
+
+        c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(), _util.run_period, label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+
+        delete c;
+        delete leg;
+        delete h_err;
     }
 }
 // -----------------------------------------------------------------------------

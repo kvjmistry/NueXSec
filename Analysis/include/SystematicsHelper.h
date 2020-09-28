@@ -118,7 +118,9 @@ class SystematicsHelper{
     // Get the systematic uncertainty for each cut for a specific set of variables
     void GetCutSysUncertainty(std::string histname, int cut_index, std::string label, int num_uni, std::string var_type);
     // -------------------------------------------------------------------------
-
+    // Plot detector variation histograms for the cross section variables
+    void PlotReweightingModeDetVar(std::string label, int var, int detvar_index, std::string label_pretty);
+    // -------------------------------------------------------------------------
 
 
 
@@ -130,6 +132,16 @@ class SystematicsHelper{
     enum enum_variations {
         k_CV,
         k_bnb_diffusion,
+        k_LYRayleigh,
+        k_LYAttenuation,
+        k_SCE,
+        k_Recomb2,
+        k_WireModX,
+        k_WireModYZ,
+        k_WireModThetaXZ,
+        k_WireModThetaYZ_withSigmaSplines,
+        k_WireModThetaYZ_withoutSigmaSplines,
+        k_WireModdEdX,
         k_vars_MAX
     };
 
@@ -141,12 +153,32 @@ class SystematicsHelper{
 
     std::vector<std::string> var_string = {
         "CV",
-        "BNB_Diffusion"
+        "BNB_Diffusion",
+        "LYRayleigh",
+        "LYAttenuation",
+        "SCE",
+        "Recomb2",
+        "WireModX",
+        "WireModYZ",
+        "WireModThetaXZ",
+        "WireModThetaYZ_withSigmaSplines",
+        "WireModThetaYZ_withoutSigmaSplines",
+        "WireModdEdX"
     };
 
     std::vector<std::string> var_string_pretty = {
         "CV",
-        "BNB Diffusion"
+        "BNB Diffusion",
+        "Light Yield Rayleigh",
+        "Light Yield Attenuation",
+        "SCE",
+        "Recombination",
+        "Wire Mod X",
+        "Wire Mod YZ",
+        "Wire Mod ThetaXZ",
+        "Wire Mod Theta YZ w/ Spl.",
+        "Wire Mod Theta YZ w/o Spl.",
+        "Wire Mod dE/dX" 
     };
 
     // enum for histogram vars
