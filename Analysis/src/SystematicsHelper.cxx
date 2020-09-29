@@ -1101,7 +1101,9 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
         h_universe.at(k) = (TH1D*)h_temp->Clone();
 
         double scale_fact = POT_v.at(k_CV) / POT_v.at(detvar_index);
-        h_universe.at(k)->Scale(scale_fact);
+        
+        // Scale the histograms, but only in the case of MC variables
+        if (xsec_types.at(k) != "ext" && xsec_types.at(k) != "dirt" && xsec_types.at(k) != "data") h_universe.at(k)->Scale(scale_fact);
 
         // Get the CV histograms
         _util.GetHist(f_nuexsec, h_CV.at(k), Form( "detvar_CV/%s/h_run%s_CV_0_%s_%s", vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
@@ -2135,7 +2137,8 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         variation == "WireModThetaXZ" ||
         variation == "WireModThetaYZ_withSigmaSplines" ||
         variation == "WireModThetaYZ_withoutSigmaSplines" ||
-        variation == "WireModdEdX"){
+        variation == "WireModdEdX"
+        ){
 
         // Loop over histogram bins
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
@@ -2386,8 +2389,7 @@ void SystematicsHelper::SaveCovMatrix(TH2D* cov, std::string print_name){
 void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
 
     std::vector<std::vector<std::vector<double>>> v_unisim;
-    bool is_beamline = false;
-    bool single_var = false;
+    bool is_detvar = false;
 
     std::vector<std::string> unisim_names;
 
@@ -2427,7 +2429,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
     else if (unisim_type == "DetVar") {
         v_unisim = v_detvar_total;
         unisim_names = var_string;
-        is_beamline = true;
+        is_detvar = true;
     }
     else {
         std::cout << "Unknown unisim type specified" << std::endl;
@@ -2461,6 +2463,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
 
     std::vector<std::string> labels_up_v;
     std::vector<std::string> labels_dn_v;
+    std::vector<bool> single_var;
 
     for (unsigned int var = 0; var < h_universe.size(); var++){
 
@@ -2478,13 +2481,17 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             if (var == 0) labels_dn_v.push_back(label_dn); // only push back once
 
             // Skip the beamline variations we dont want
-            if (is_beamline && (unisim_names.at(label) == "CV" || unisim_names.at(label) == "BNB_Diffusion") )
+            if (is_detvar && (unisim_names.at(label) == "CV" || unisim_names.at(label) == "BNB_Diffusion") )
                 continue;
 
 
             // Check if its just a single on/off type variation
             // This case we dont want to plot the up/dn, but just once
-            if (label_up == label_dn) single_var = true;
+            if (label_up == label_dn){
+                single_var.push_back(true);
+            }
+            else
+                single_var.push_back(false);
 
             // Get the histograms and customise a bit
             for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
@@ -2492,7 +2499,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                 TH1D* htemp;
                 
                 // Beamline have CV in the name because of the way the cross section helper works
-                if (!is_beamline){
+                if (!is_detvar){
                     _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, label_up.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
                 }
                 else {
@@ -2500,7 +2507,9 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                 
                     // Also need to Scale the beamline histograms to the right POT
                     double scale_fact = POT_v.at(k_CV) / POT_v.at(label);
-                    htemp->Scale(scale_fact);
+                    
+                    // Scale the histograms, but only in the case of MC variables
+                    if (xsec_types.at(k) != "ext" && xsec_types.at(k) != "dirt" && xsec_types.at(k) != "data") htemp->Scale(scale_fact);
                 }
 
                 h_universe.at(var).at(label).at(k_up).at(k) = (TH1D*) htemp->Clone(Form("h_clone_%s_%s_up", vars.at(var).c_str(), labels_up_v.at(label).c_str()));
@@ -2511,7 +2520,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                 h_universe.at(var).at(label).at(k_up).at(k)->SetLineColor(kGreen+2);
                 
                 // Beamline have CV in the name because of the way the cross section helper works
-                if (!is_beamline){
+                if (!is_detvar){
                     _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, label_dn.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
                 }
                 else {
@@ -2519,7 +2528,9 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                     
                     // Also need to Scale the beamline histograms to the right POT
                     double scale_fact = POT_v.at(k_CV) / POT_v.at(label);
-                    htemp->Scale(scale_fact);
+                    
+                    // Scale the histograms, but only in the case of MC variables
+                    if (xsec_types.at(k) != "ext" && xsec_types.at(k) != "dirt" && xsec_types.at(k) != "data") htemp->Scale(scale_fact);
                 }
 
                 h_universe.at(var).at(label).at(k_dn).at(k) = (TH1D*) htemp->Clone(Form("h_clone_%s_%s_up", vars.at(var).c_str(), labels_dn_v.at(label).c_str()));
@@ -2546,7 +2557,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             TH1D* h_CV_clone;
             
             // Use the standard CV histogram
-            if (!is_beamline){
+            if (!is_detvar){
                 h_CV_clone = (TH1D*)cv_hist_vec.at(var).at(type)->Clone("h_clone");
             }
             // For the beamline variations, we have a different CV
@@ -2586,7 +2597,14 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             TLegend *leg;
             
             if (type != k_xsec_eff) leg = new TLegend(0.41, 0.55, 0.91, 0.85);
-            else leg = new TLegend(0.4, 0.3, 0.9, 0.6);
+            else {
+                
+                if (is_detvar)
+                    leg = new TLegend(0.2, 0.5, 0.7, 0.8);
+                else
+                    leg = new TLegend(0.4, 0.3, 0.9, 0.6);
+
+            }
             leg->SetNColumns(2);
             leg->SetBorderSize(0);
             leg->SetFillStyle(0);
@@ -2597,13 +2615,13 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             for (unsigned int label = 0; label < h_universe.at(var).size(); label ++ ){
                 
                 // Skip the beamline variations we dont want
-                if (is_beamline && (unisim_names.at(label) == "CV" || unisim_names.at(label) == "BNB_Diffusion") )
+                if (is_detvar && (unisim_names.at(label) == "CV" || unisim_names.at(label) == "BNB_Diffusion") )
                     continue;
 
                 SetUnisimColours(unisim_names.at(label), h_universe.at(var).at(label).at(k_up).at(type), h_universe.at(var).at(label).at(k_dn).at(type));
                 
 
-                if (single_var){
+                if (single_var.at(label)){
                     leg->AddEntry(h_universe.at(var).at(label).at(k_up).at(type),Form("%s", unisim_names.at(label).c_str()), "l");
                     h_universe.at(var).at(label).at(k_up).at(type)->Draw("hist,same");
                 }
