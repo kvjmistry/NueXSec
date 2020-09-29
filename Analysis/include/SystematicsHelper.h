@@ -175,7 +175,7 @@ class SystematicsHelper{
         "Recombination",
         "Wire Mod X",
         "Wire Mod YZ",
-        "Wire Mod ThetaXZ",
+        "Wire Mod Theta XZ",
         "Wire Mod Theta YZ w/ Spl.",
         "Wire Mod Theta YZ w/o Spl.",
         "Wire Mod dE/dX" 
@@ -258,6 +258,7 @@ class SystematicsHelper{
     std::vector<std::vector<std::vector<double>>> v_reint_total;       // differential variable, type, bin error [geant reinteraction multisim]
     std::vector<std::vector<std::vector<double>>> v_dirt_total;        // differential variable, type, bin error [dirt shift by +/- 100%]
     std::vector<std::vector<std::vector<double>>> v_pot_total;         // differential variable, type, bin error [Flat 2% for POT counting]
+    std::vector<std::vector<std::vector<double>>> v_detvar_total;      // differential variable, type, bin error [Total detector variation err]
 
     TH2D* h_cov_tot;         // Sum of all covariance matrices
     TH2D* h_cov_sys;         // Total Systematic covariance matrix
@@ -269,6 +270,7 @@ class SystematicsHelper{
     TH2D* h_cov_dirt;        // Dirt 
     TH2D* h_cov_pot;         // POT counting
     TH2D* h_cov_reint;       // Geant reinteractions
+    TH2D* h_cov_detvar;      // Detector Variations
 
 
 

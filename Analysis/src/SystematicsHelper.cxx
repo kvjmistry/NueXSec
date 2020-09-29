@@ -821,10 +821,12 @@ void SystematicsHelper::InitialiseReweightingMode(){
     // Create the directories
     _util.CreateDirectory("/Systematics/Beamline");
     _util.CreateDirectory("/Systematics/Genie_Unisim");
+    _util.CreateDirectory("/Systematics/DetVar");
     
     // Plot the total beamline sys uncertainty
     PlotTotUnisim("Beamline");
     PlotTotUnisim("Genie_Unisim");
+    PlotTotUnisim("DetVar");
 
     // Print a summary of the results
     PrintUncertaintySummary();
@@ -889,7 +891,10 @@ void SystematicsHelper::SetLabelName(std::string label, std::string &label_up, s
         label_up = label + "_p7mm";
         label_dn = label + "_m7mm";
     }
-    else if  (label == "Horn1_refined_descr" || label == "Decay_pipe_Bfield" || label == "Old_Horn_Geometry"){
+    else if  (label == "Horn1_refined_descr" || label == "Decay_pipe_Bfield" || label == "Old_Horn_Geometry" ||
+              label == "LYRayleigh" || label == "LYAttenuation" || label == "SCE" || label == "Recomb2" || 
+              label == "WireModX" || label == "WireModYZ" || label == "WireModThetaXZ" || label == "WireModThetaYZ_withSigmaSplines" || 
+              label == "WireModThetaYZ_withoutSigmaSplines" || label == "WireModdEdX"){
         label_up = label;
         label_dn = label;
     }
@@ -1193,7 +1198,7 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
         }
         
 
-        // FillSysVector(label, var, k, h_err_up, h_err_dn);
+        FillSysVector(label, var, k, h_err, h_err);
 
         c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(), _util.run_period, label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
@@ -2004,6 +2009,9 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
         }
         else {
             std::cout << "Unknown variation specified: " << label << std::endl;
+            delete cov;
+            delete cor;
+            delete frac_cov;
             return;
         }
 
@@ -2112,6 +2120,30 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
             av_err += std::abs(h_dn->GetBinContent(bin+1));
             av_err /= std::sqrt(2.0); // sqrt 2 since we are using the covariance matrix formalism (cov matrix with 2 universes) -- error is sqrt diag
             v_beamline_total.at(var).at(type).at(bin) += av_err*av_err;
+            v_sys_total.at(var).at(type).at(bin)      += av_err*av_err;
+            
+        }
+    }
+    // This is a detector variation
+    else if (
+        variation == "LYRayleigh" ||
+        variation == "LYAttenuation" ||
+        variation == "SCE" ||
+        variation == "Recomb2" ||
+        variation == "WireModX" ||
+        variation == "WireModYZ" ||
+        variation == "WireModThetaXZ" ||
+        variation == "WireModThetaYZ_withSigmaSplines" ||
+        variation == "WireModThetaYZ_withoutSigmaSplines" ||
+        variation == "WireModdEdX"){
+
+        // Loop over histogram bins
+        for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
+            
+            double av_err = 0;
+            // Get the max error in each bin, then add the square
+            av_err += std::abs(h_up->GetBinContent(bin+1));
+            v_detvar_total.at(var).at(type).at(bin)   += av_err*av_err;
             v_sys_total.at(var).at(type).at(bin)      += av_err*av_err;
             
         }
@@ -2275,6 +2307,7 @@ void SystematicsHelper::PrintUncertaintySummary(){
             std::cout << "Bin: " << bin+1 << " Beamline:           " <<std::sqrt(v_beamline_total.at(var).at(k_xsec_mcxsec)   .at(bin)) << " \%"<< std::endl;
             std::cout << "Bin: " << bin+1 << " Hadron Prod.:       " <<std::sqrt(v_hp_total.at(var).at(k_xsec_mcxsec)         .at(bin)) << " \%"<< std::endl;
             std::cout << "Bin: " << bin+1 << " Geant Rein.:        " <<std::sqrt(v_reint_total.at(var).at(k_xsec_mcxsec)      .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " Detector:           " <<std::sqrt(v_detvar_total.at(var).at(k_xsec_mcxsec)     .at(bin)) << " \%"<< std::endl;
             std::cout << "Bin: " << bin+1 << " Dirt:               " <<std::sqrt(v_dirt_total.at(var).at(k_xsec_mcxsec)       .at(bin)) << " \%"<< std::endl;
             std::cout << "Bin: " << bin+1 << " POT Counting:       " <<std::sqrt(v_pot_total.at(var).at(k_xsec_mcxsec)        .at(bin)) << " \%"<< std::endl;
             std::cout << std::endl;
@@ -2300,6 +2333,7 @@ void SystematicsHelper::InitialiseUncertaintyVectors(){
     v_stat_total       .resize(vars.size());
     v_dirt_total       .resize(vars.size());
     v_pot_total        .resize(vars.size());
+    v_detvar_total     .resize(vars.size());
 
     for (unsigned int var = 0; var < vars.size(); var++ ){
         v_genie_uni_total.at(var)  .resize(xsec_types.size());
@@ -2311,6 +2345,7 @@ void SystematicsHelper::InitialiseUncertaintyVectors(){
         v_stat_total.at(var)       .resize(xsec_types.size());
         v_dirt_total.at(var)       .resize(xsec_types.size());
         v_pot_total .at(var)       .resize(xsec_types.size());
+        v_detvar_total.at(var)     .resize(xsec_types.size());
     }
 
     for (unsigned int var = 0; var < vars.size(); var++ ){
@@ -2324,6 +2359,7 @@ void SystematicsHelper::InitialiseUncertaintyVectors(){
             v_stat_total.at(var).at(type)       .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
             v_dirt_total.at(var).at(type)       .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
             v_pot_total .at(var).at(type)       .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
+            v_detvar_total .at(var).at(type)    .resize(cv_hist_vec.at(var).at(type)->GetNbinsX(), 0.0);
         }
     }
 }
@@ -2350,6 +2386,8 @@ void SystematicsHelper::SaveCovMatrix(TH2D* cov, std::string print_name){
 void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
 
     std::vector<std::vector<std::vector<double>>> v_unisim;
+    bool is_beamline = false;
+    bool single_var = false;
 
     std::vector<std::string> unisim_names;
 
@@ -2385,6 +2423,11 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                     "NormCCCOH",
                     "NormNCCOH"
                 };
+    }
+    else if (unisim_type == "DetVar") {
+        v_unisim = v_detvar_total;
+        unisim_names = var_string;
+        is_beamline = true;
     }
     else {
         std::cout << "Unknown unisim type specified" << std::endl;
@@ -2423,7 +2466,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
 
         // Loop over and resize
         for (unsigned int label = 0; label < h_universe.at(var).size(); label++){
-        
+
             // Now get the histograms
             std::string label_up = unisim_names.at(label) + "up";
             std::string label_dn = unisim_names.at(label) + "dn";
@@ -2434,17 +2477,31 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             if (var == 0) labels_up_v.push_back(label_up); // only push back once
             if (var == 0) labels_dn_v.push_back(label_dn); // only push back once
 
+            // Skip the beamline variations we dont want
+            if (is_beamline && (unisim_names.at(label) == "CV" || unisim_names.at(label) == "BNB_Diffusion") )
+                continue;
+
 
             // Check if its just a single on/off type variation
             // This case we dont want to plot the up/dn, but just once
-            bool single_var = false;
             if (label_up == label_dn) single_var = true;
 
             // Get the histograms and customise a bit
             for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
 
                 TH1D* htemp;
-                _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, label_up.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+                
+                // Beamline have CV in the name because of the way the cross section helper works
+                if (!is_beamline){
+                    _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, label_up.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+                }
+                else {
+                    _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
+                
+                    // Also need to Scale the beamline histograms to the right POT
+                    double scale_fact = POT_v.at(k_CV) / POT_v.at(label);
+                    htemp->Scale(scale_fact);
+                }
 
                 h_universe.at(var).at(label).at(k_up).at(k) = (TH1D*) htemp->Clone(Form("h_clone_%s_%s_up", vars.at(var).c_str(), labels_up_v.at(label).c_str()));
 
@@ -2453,7 +2510,17 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                 h_universe.at(var).at(label).at(k_up).at(k)->SetLineStyle(0);
                 h_universe.at(var).at(label).at(k_up).at(k)->SetLineColor(kGreen+2);
                 
-                _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, label_dn.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+                // Beamline have CV in the name because of the way the cross section helper works
+                if (!is_beamline){
+                    _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, label_dn.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+                }
+                else {
+                    _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
+                    
+                    // Also need to Scale the beamline histograms to the right POT
+                    double scale_fact = POT_v.at(k_CV) / POT_v.at(label);
+                    htemp->Scale(scale_fact);
+                }
 
                 h_universe.at(var).at(label).at(k_dn).at(k) = (TH1D*) htemp->Clone(Form("h_clone_%s_%s_up", vars.at(var).c_str(), labels_dn_v.at(label).c_str()));
 
@@ -2466,7 +2533,6 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
         }
     }
 
-
     // Loop over the differential variables
     for (unsigned int var = 0; var < cv_hist_vec.size(); var++ ){
         
@@ -2477,7 +2543,20 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             if (vars.at(var) == "true_el_E" && type != k_xsec_eff) continue; // Skip the true var which doesnt make much sense
 
             // Get the CV histogram
-            TH1D* h_CV_clone = (TH1D*)cv_hist_vec.at(var).at(type)->Clone("h_clone");
+            TH1D* h_CV_clone;
+            
+            // Use the standard CV histogram
+            if (!is_beamline){
+                h_CV_clone = (TH1D*)cv_hist_vec.at(var).at(type)->Clone("h_clone");
+            }
+            // For the beamline variations, we have a different CV
+            else {
+                _util.GetHist(f_nuexsec, h_CV_clone, Form( "detvar_CV/%s/h_run%s_CV_0_%s_%s", vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(type).c_str()));
+                h_CV_clone->SetLineWidth(2);
+                h_CV_clone->SetLineColor(kBlack);
+                h_CV_clone->SetMinimum(0);
+            }
+
 
             // Loop over the bins and set the error
             for (int bin = 0; bin < h_CV_clone->GetNbinsX(); bin++ ){
@@ -2516,12 +2595,24 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
 
             // Now draw all the universes
             for (unsigned int label = 0; label < h_universe.at(var).size(); label ++ ){
-                SetUnisimColours(unisim_names.at(label), h_universe.at(var).at(label).at(k_up).at(type), h_universe.at(var).at(label).at(k_dn).at(type));
-                h_universe.at(var).at(label).at(k_up).at(type)->Draw("hist,same");
-                h_universe.at(var).at(label).at(k_dn).at(type)->Draw("hist,same");
+                
+                // Skip the beamline variations we dont want
+                if (is_beamline && (unisim_names.at(label) == "CV" || unisim_names.at(label) == "BNB_Diffusion") )
+                    continue;
 
-                leg->AddEntry(h_universe.at(var).at(label).at(k_up).at(type),Form("%s +1#sigma", unisim_names.at(label).c_str()), "l");
-                leg->AddEntry(h_universe.at(var).at(label).at(k_dn).at(type),Form("%s -1#sigma", unisim_names.at(label).c_str()), "l");
+                SetUnisimColours(unisim_names.at(label), h_universe.at(var).at(label).at(k_up).at(type), h_universe.at(var).at(label).at(k_dn).at(type));
+                
+
+                if (single_var){
+                    leg->AddEntry(h_universe.at(var).at(label).at(k_up).at(type),Form("%s", unisim_names.at(label).c_str()), "l");
+                    h_universe.at(var).at(label).at(k_up).at(type)->Draw("hist,same");
+                }
+                else {
+                    leg->AddEntry(h_universe.at(var).at(label).at(k_up).at(type),Form("%s +1#sigma", unisim_names.at(label).c_str()), "l");
+                    leg->AddEntry(h_universe.at(var).at(label).at(k_dn).at(type),Form("%s -1#sigma", unisim_names.at(label).c_str()), "l");
+                    h_universe.at(var).at(label).at(k_up).at(type)->Draw("hist,same");
+                    h_universe.at(var).at(label).at(k_dn).at(type)->Draw("hist,same");
+                }
             }
 
             leg->Draw();
@@ -2587,45 +2678,45 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
 // -----------------------------------------------------------------------------
 void SystematicsHelper::SetUnisimColours(std::string label, TH1D* h_up, TH1D* h_dn){
 
-    if (label == "Horn1_x" || label == "RPA"){
+    if (label == "Horn1_x" || label == "RPA"  || label == "LYRayleigh"){
         h_up->SetLineColor(30);
         h_dn->SetLineColor(30);
     }
-    else if (label == "Horn_curr" || label == "CCMEC"){
+    else if (label == "Horn_curr" || label == "CCMEC"  || label == "LYAttenuation"){
         h_up->SetLineColor(38);
         h_dn->SetLineColor(38);
     }
-    else if (label == "Horn1_y" || label == "AxFFCCQE"){
+    else if (label == "Horn1_y" || label == "AxFFCCQE"  || label == "SCE"){
         h_up->SetLineColor(28);
         h_dn->SetLineColor(28);
     }
-    else if (label == "Beam_spot" || label == "VecFFCCQE"){
+    else if (label == "Beam_spot" || label == "VecFFCCQE"  || label == "Recomb2"){
         h_up->SetLineColor(4);
         h_dn->SetLineColor(4);
     }
-    else if (label == "Horn2_x" || label == "DecayAngMEC"){
+    else if (label == "Horn2_x" || label == "DecayAngMEC"  || label == "WireModX"){
         h_up->SetLineColor(36);
         h_dn->SetLineColor(36);
     }
-    else if (label == "Horn2_y" || label == "ThetaDelta2Npi"){
-        h_up->SetLineColor(1);
-        h_dn->SetLineColor(1);
+    else if (label == "Horn2_y" || label == "ThetaDelta2Npi"  || label == "WireModYZ"){
+        h_up->SetLineColor(32);
+        h_dn->SetLineColor(32);
     }
-    else if (label == "Horn_Water" || label == "ThetaDelta2NRad"){
+    else if (label == "Horn_Water" || label == "ThetaDelta2NRad"  || label == "WireModThetaXZ"){
         h_up->SetLineColor(46);
         h_dn->SetLineColor(46);
     }
-    else if (label == "Beam_shift_x" || label == "RPA_CCQE_Reduced"){
+    else if (label == "Beam_shift_x" || label == "RPA_CCQE_Reduced"  || label == "WireModThetaYZ_withSigmaSplines"){
         h_up->SetLineColor(12);
         h_dn->SetLineColor(12);
     }
-    else if (label == "Beam_shift_y" || label == "NormCCCOH"){
+    else if (label == "Beam_shift_y" || label == "NormCCCOH"  || label == "WireModThetaYZ_withoutSigmaSplines"){
         h_up->SetLineColor(kViolet - 7);
         h_dn->SetLineColor(kViolet - 7);
     }
-    else if (label == "Target_z" || label == "NormNCCOH"){
-        h_up->SetLineColor(kAzure-5);
-        h_dn->SetLineColor(kAzure-5);
+    else if (label == "Target_z" || label == "NormNCCOH"  || label == "WireModdEdX"){
+        h_up->SetLineColor(42);
+        h_dn->SetLineColor(42);
     }
     else if (label == "Decay_pipe_Bfield"){
         h_up->SetLineColor(kGreen+2);

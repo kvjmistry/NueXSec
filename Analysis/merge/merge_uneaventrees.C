@@ -160,8 +160,6 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
     outtree->Branch("knobNormNCCOHup",       &knobNormNCCOHup);
     outtree->Branch("knobNormNCCOHdn",       &knobNormNCCOHdn);
 
-    double num_gen = 0.0;
-
     // Loop over the flles
     for (unsigned int k = 0; k < files.size(); k++){
 
@@ -301,6 +299,6 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
     outtree->Write("", TObject::kOverwrite);
     outfile->Close();
 
-    std::cout << "\nMerged output ttree woo!!\n" << num_gen<< std::endl;
+    std::cout << "\nMerged output ttree woo!!\n" << std::endl;
 
 }

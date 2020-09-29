@@ -65,6 +65,35 @@ for i in ${!vars[*]}; do
     cp $file_path${vars[$i]}/true_el_E/*eff* $copy_path
 done
 
+copy_path=/Users/kvjmistry/Documents/work/NueXSec/Analysis/plots/run1/Systematics/DetVar
+
+# Make the directory
+mkdir -p $copy_path
+
+# list of cuts minus the last one
+vars=(
+  LYRayleigh
+  LYAttenuation
+  SCE
+  Recomb2
+  WireModX
+  WireModYZ
+  WireModThetaXZ
+  WireModThetaYZ_withSigmaSplines
+  WireModThetaYZ_withoutSigmaSplines
+  WireModdEdX
+)
+
+# Do the copy
+for i in ${!vars[*]}; do 
+    echo "cp $file_path${vars[$i]}/reco_el_E/*bkg* $copy_path"
+    cp $file_path${vars[$i]}/reco_el_E/*bkg* $copy_path
+    echo "cp $file_path${vars[$i]}/reco_el_E/*mc_xsec* $copy_path"
+    cp $file_path${vars[$i]}/reco_el_E/*mc_xsec* $copy_path
+    echo "cp $file_path${vars[$i]}/true_el_E/*eff* $copy_path"
+    cp $file_path${vars[$i]}/true_el_E/*eff* $copy_path
+done
+
 
 
 
