@@ -49,7 +49,7 @@ void SystematicsHelper::Initialise(Utility _utility){
         
         // Standard variation mode
         if (std::string(_util.sysmode) == "default")  {
-            f_vars.at(l) = new TFile( Form("files/nuexsec_run%s_%s_merged.root", _util.run_period, var_string.at(l).c_str() ), "READ");
+            f_vars.at(l) = TFile::Open( Form("files/nuexsec_run%s_%s_merged.root", _util.run_period, var_string.at(l).c_str() ), "READ");
         }
         // Off beam mode
         else if (std::string(_util.sysmode) == "ext") {
@@ -126,9 +126,9 @@ void SystematicsHelper::SetVariationProperties(TH1D* h, int index){
         if (index == k_CV){
             h->SetLineColor(kBlack);
         }
-        else if (index == k_bnb_diffusion){
-            h->SetLineColor(kAzure-5);
-        }
+        // else if (index == k_bnb_diffusion){
+        //     h->SetLineColor(kAzure-5);
+        // }
     }
     else {
         
@@ -190,6 +190,9 @@ void SystematicsHelper::MakeHistograms(){
             _util.CreateDirectory("/systvar/comparisons/cuts/" + _util.cut_dirs.at(i));
 
             for(unsigned int j=0; j < _util.vec_hist_name.size(); j++){
+
+                if (_util.vec_hist_name.at(j) == "h_reco_nu_vtx_sce_x" || _util.vec_hist_name.at(j) == "h_reco_nu_vtx_sce_y" || _util.vec_hist_name.at(j) == "h_reco_nu_vtx_sce_z")
+                    continue;
 
                 SysVariations(Form("%s", _util.vec_hist_name.at(j).c_str()), Form("plots/run%s/systvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()),
                             _util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str(), _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str());
@@ -269,6 +272,8 @@ void SystematicsHelper::MakeHistograms(){
 // -----------------------------------------------------------------------------
 void SystematicsHelper::PlotVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name ){
 
+    std::string print_name_str = std::string(print_name);
+
     gStyle->SetOptStat(0);
 
     std::vector<TH1D*> hist; // The vector of histograms from the file for the plot
@@ -292,20 +297,21 @@ void SystematicsHelper::PlotVariations(std::string hist_name, const char* print_
             // Only want the MC piece -- may want to add in dirt too? -- will need to separately scale that hitogram though
             if ( i == _util.k_leg_data || i == _util.k_leg_ext || i == _util.k_leg_dirt ) continue;
 
-            // Get all the MC histograms and add them together
+            // Get all the MC histograms and add them together    
             TH1D *h_temp;
-
             _util.GetHist(f_vars.at(k), h_temp, Form("Stack/%s/%s/%s_%s_%s", cut_name.c_str(), _util.classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.classification_dirs.at(i).c_str()));
             
             // First case so clone the histogram
             if (i == 0) hist.at(k) = (TH1D*) h_temp->Clone("h_sum_hist");
             else hist.at(k)->Add(h_temp, 1);
+        
         }
         
     }
 
     // Now scale the histograms to POT
     for (unsigned int y=0; y < hist.size(); y++ ){
+
         double scale_fact = POT_v.at(k_CV) / POT_v.at(y);
         // std::cout << "scale factor: " << scale_fact << std::endl;
         hist.at(y)->Scale(scale_fact);
@@ -340,7 +346,7 @@ void SystematicsHelper::PlotVariations(std::string hist_name, const char* print_
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(h_error_hist, "CV",   "lf");
-    leg->AddEntry(hist.at(k_bnb_diffusion), "BNB Diffusion", "l");
+    // leg->AddEntry(hist.at(k_bnb_diffusion), "BNB Diffusion", "l");
     leg->Draw();
 
     // Now draw the ratio
@@ -384,7 +390,7 @@ void SystematicsHelper::PlotVariations(std::string hist_name, const char* print_
     // Add the weight labels
     // Draw_WeightLabels(c);
     
-    c->Print(print_name);
+    c->Print(print_name_str.c_str());
 
 
 
@@ -393,6 +399,9 @@ void SystematicsHelper::PlotVariations(std::string hist_name, const char* print_
 void SystematicsHelper::SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name){
 
     // last updated on Sept 18 by Marina Reggiani-Guzzo
+
+    // For some reason the print name keeps changing, this fixes it somewhat
+    std::string print_name_str = std::string(print_name);
 
     gStyle->SetOptStat(0);
 
@@ -470,7 +479,7 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(h_error_hist, "CV",   "lf");
-    leg->AddEntry(hist.at(k_bnb_diffusion), "BNB Diffusion", "l");
+    // leg->AddEntry(hist.at(k_bnb_diffusion), "BNB Diffusion", "l");
     leg->Draw();
 
     // Now draw the ratio
@@ -576,7 +585,7 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
     // Add the weight labels
     // Draw_WeightLabels(c);
     
-    c->Print(print_name);
+    c->Print(print_name_str.c_str());
 
 }
 // ----------------------------------------------------------------------------
@@ -2564,9 +2573,10 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             else {
                 _util.GetHist(f_nuexsec, h_CV_clone, Form( "detvar_CV/%s/h_run%s_CV_0_%s_%s", vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(type).c_str()));
                 h_CV_clone->SetLineWidth(2);
-                h_CV_clone->SetLineColor(kBlack);
-                h_CV_clone->SetMinimum(0);
+                h_CV_clone->SetLineColor(kBlack); 
             }
+
+            h_CV_clone->SetMinimum(0);
 
 
             // Loop over the bins and set the error

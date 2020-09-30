@@ -131,7 +131,7 @@ class SystematicsHelper{
 
     enum enum_variations {
         k_CV,
-        k_bnb_diffusion,
+        // k_bnb_diffusion,
         k_LYRayleigh,
         k_LYAttenuation,
         k_SCE,
@@ -153,7 +153,7 @@ class SystematicsHelper{
 
     std::vector<std::string> var_string = {
         "CV",
-        "BNB_Diffusion",
+        // "BNB_Diffusion",
         "LYRayleigh",
         "LYAttenuation",
         "SCE",
