@@ -660,6 +660,9 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     // Check if we want this plot for variations
     if (!plotvar && std::string(_util.variation) != "empty") return;
 
+    // For some reason the print name keeps changing, this fixes it somewhat
+    std::string print_name_str = std::string(print_name);
+
     std::vector<TH1D *> hist;           // The vector of histograms from the file for the plot
     std::vector<double> hist_integrals; // The integrals of all the histograms
 
@@ -910,7 +913,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     // and if you want to plot sys+stat
     if ( _util.CheckHistogram(_util.vec_hist_name, hist_name) && _util.plot_sys_uncertainty ) {
 
-        // AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "TotalDetectorSys", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "TotalDetectorSys", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsPPFX", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsGenie", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsReint", "MC");
@@ -1080,9 +1083,9 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     }
 
     if (std::string(_util.variation) == "empty")
-        c->Print(Form("plots/run%s/%s", _util.run_period, print_name));
+        c->Print(Form("plots/run%s/%s", _util.run_period, print_name_str.c_str()));
     else
-        c->Print(Form("plots/run%s/detvar/%s/%s", _util.run_period, _util.variation, print_name));
+        c->Print(Form("plots/run%s/detvar/%s/%s", _util.run_period, _util.variation, print_name_str.c_str()));
 
     delete c;
 }
@@ -1095,19 +1098,19 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
     //                                 bool centerxaxis, bool scale );
 
     // Reco X SCE
-    MakeStack("h_reco_vtx_x_sce", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.3, "Reco Vertex X (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_vtx_x_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
+    // MakeStack("h_reco_vtx_x_sce", _util.cut_dirs.at(cut_index).c_str(),
+    //           area_norm, false, 1.3, "Reco Vertex X (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+    //           Form("cuts/%s/reco_vtx_x_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
-    // Reco Y SCE
-    MakeStack("h_reco_vtx_y_sce", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Reco Vertex Y (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_vtx_y_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
+    // // Reco Y SCE
+    // MakeStack("h_reco_vtx_y_sce", _util.cut_dirs.at(cut_index).c_str(),
+    //           area_norm, false, 1.0, "Reco Vertex Y (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+    //           Form("cuts/%s/reco_vtx_y_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
-    // Reco Z SCE
-    MakeStack("h_reco_vtx_z_sce", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.2, "Reco Vertex Z (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_vtx_z_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
+    // // Reco Z SCE
+    // MakeStack("h_reco_vtx_z_sce", _util.cut_dirs.at(cut_index).c_str(),
+    //           area_norm, false, 1.2, "Reco Vertex Z (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+    //           Form("cuts/%s/reco_vtx_z_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Leading Shower Momentum
     MakeStack("h_reco_leading_mom", _util.cut_dirs.at(cut_index).c_str(),

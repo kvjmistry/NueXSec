@@ -1101,7 +1101,8 @@ void HistogramHelper::WriteReco(int type){
                 
                 if (bool_dir) truth_dir->cd();
 
-                // Skip the write for the backgrounds
+                // Skip the write for the backgrounds in intrinsic nue mode
+                // This overwrites the signal histograms
                 if (std::string(_util.intrinsic_mode) == "intrinsic" && j != _util.k_nue_cc && j != _util.k_nuebar_cc && j != _util.k_cosmic_nue && j != _util.k_cosmic_nuebar && j != _util.k_unmatched_nue && j != _util.k_unmatched_nuebar){
                     continue;
                 }
