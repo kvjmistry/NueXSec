@@ -583,7 +583,9 @@ void HistogramPlotter::SetFillColours(std::vector<TH1D *> &hist, std::string plo
         hist.at(_util.k_nuebar_cc)->SetFillColor(32);
         hist.at(_util.k_numu_cc)->SetFillColor(28);
         hist.at(_util.k_nc_pi0)->SetFillColor(36);
-        hist.at(_util.k_cosmic)->SetFillColor(1);
+        hist.at(_util.k_cosmic)->SetFillColor(38);
+        hist.at(_util.k_cosmic_nue)->SetFillColor(38);
+        hist.at(_util.k_cosmic_nuebar)->SetFillColor(38);
         hist.at(_util.k_nc)->SetFillColor(46);
         hist.at(_util.k_nu_out_fv)->SetFillColor(kViolet - 7);
         hist.at(_util.k_numu_cc_pi0)->SetFillColor(42);
@@ -630,7 +632,7 @@ void HistogramPlotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, s
         leg_stack->AddEntry(hist.at(_util.k_nc),          Form("NC (%2.1f)", hist_integrals.at(_util.k_nc)), "f");
         leg_stack->AddEntry(hist.at(_util.k_numu_cc_pi0), Form("#nu_{#mu} CC #pi^{0} (%2.1f)", hist_integrals.at(_util.k_numu_cc_pi0)), "f");
         leg_stack->AddEntry(hist.at(_util.k_numu_cc),     Form("#nu_{#mu} CC (%2.1f)", hist_integrals.at(_util.k_numu_cc)), "f");
-        leg_stack->AddEntry(hist.at(_util.k_cosmic),      Form("Cosmic (%2.1f)", hist_integrals.at(_util.k_cosmic)), "f");
+        leg_stack->AddEntry(hist.at(_util.k_cosmic),      Form("Cosmic (%2.1f)", hist_integrals.at(_util.k_cosmic) + hist_integrals.at(_util.k_cosmic_nue) + hist_integrals.at(_util.k_cosmic_nuebar)), "f");
         leg_stack->AddEntry(hist.at(_util.k_nu_out_fv),   Form("#nu OutFV (%2.1f)", hist_integrals.at(_util.k_nu_out_fv)), "f");
         leg_stack->AddEntry(hist.at(_util.k_nuebar_cc),   Form("#bar{#nu}_{e} CC (%2.1f)", hist_integrals.at(_util.k_nuebar_cc)), "f");
         leg_stack->AddEntry(hist.at(_util.k_nue_cc),      Form("#nu_{e} CC (%2.1f)", hist_integrals.at(_util.k_nue_cc)), "f");
@@ -1180,7 +1182,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Ratio hits from showers to slice
     MakeStack("h_reco_hits_ratio_th", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Hit Rati (> 50 Hits)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.0, "Hit Ratio (> 50 Hits)",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_hits_ratio_th.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Ratio hits from leading shower to slice

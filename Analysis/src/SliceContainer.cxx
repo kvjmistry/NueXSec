@@ -418,11 +418,18 @@ void SliceContainer::SliceClassifier(int type){
         // Out of Fiducial Volume Event
         if (!is_in_fv) {
             
-            // std::cout << "Purity of out of FV event: "<< nu_purity_from_pfp << std::endl;
-            if (nu_purity_from_pfp <= 0.5){
+            // Cosmic events including mixed
+            if (nu_purity_from_pfp >= 0 && nu_purity_from_pfp < 0.5){
+                
                 classification = std::make_pair("cosmic",_util.k_cosmic);
                 return;
             }
+            // Not recontructed
+            else if (nu_purity_from_pfp < 0){
+                classification = std::make_pair("unmatched",_util.k_unmatched);
+                return;
+            }
+            // Out of Fv events
             else {
                 classification = std::make_pair("nu_out_fv",_util.k_nu_out_fv);
                 return;

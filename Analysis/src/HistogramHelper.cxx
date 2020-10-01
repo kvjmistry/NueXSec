@@ -627,7 +627,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
     double dedx_max = SC.GetdEdxMax();
 
     // For filling histograms, we lump the cosmic nue and cosmic nuebar into the generic cosmic category (so the plots can be normalised properly)
-    if (classification_index == _util.k_cosmic_nue || classification_index == _util.k_cosmic_nuebar) classification_index = _util.k_cosmic;
+    // if (classification_index == _util.k_cosmic_nue || classification_index == _util.k_cosmic_nuebar) classification_index = _util.k_cosmic;
     
     // Now fill the histograms!
     TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x, weight);
