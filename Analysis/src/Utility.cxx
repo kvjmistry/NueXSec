@@ -515,7 +515,7 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
     if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12) && nu_e <= 0.125) weight = 0.0;
 
     // This is the intrinsic nue weight that scales it to the standard overlay sample
-    if (std::string(intrinsic_mode) == "intrinsic" && type == k_mc && (nu_pdg == -12 || nu_pdg == 12)){
+    if (std::string(intrinsic_mode) == "intrinsic" && type == k_mc){
         
         // Kill off the out of fv events in the intrinsic nue sample (to avoid double counting)
         if (!infv) weight = 0.0; 
