@@ -500,9 +500,9 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
             h_cut_v.at(label).at(cut_index).at(_util.k_cut_shower_multiplicity).at(uni)      ->Fill(SC.n_showers,              weight_uni);
             h_cut_v.at(label).at(cut_index).at(_util.k_cut_track_multiplicity).at(uni)       ->Fill(SC.n_tracks,               weight_uni);
             h_cut_v.at(label).at(cut_index).at(_util.k_cut_topological_score).at(uni)        ->Fill(SC.topological_score,      weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_nu_vtx_sce_x).at(uni)             ->Fill(SC.reco_nu_vtx_sce_x,      weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_nu_vtx_sce_y).at(uni)             ->Fill(SC.reco_nu_vtx_sce_y,      weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_nu_vtx_sce_z).at(uni)             ->Fill(SC.reco_nu_vtx_sce_z,      weight_uni);
+            h_cut_v.at(label).at(cut_index).at(_util.k_cut_vtx_x_sce).at(uni)                ->Fill(SC.reco_nu_vtx_sce_x,      weight_uni);
+            h_cut_v.at(label).at(cut_index).at(_util.k_cut_vtx_y_sce).at(uni)                ->Fill(SC.reco_nu_vtx_sce_y,      weight_uni);
+            h_cut_v.at(label).at(cut_index).at(_util.k_cut_vtx_z_sce).at(uni)                ->Fill(SC.reco_nu_vtx_sce_z,      weight_uni);
             h_cut_v.at(label).at(cut_index).at(_util.k_cut_shower_score).at(uni)             ->Fill(SC.shr_score,              weight_uni);
             h_cut_v.at(label).at(cut_index).at(_util.k_cut_shr_tkfit_dedx_max).at(uni)       ->Fill(dedx_max, weight_uni);
             if (SC.n_tracks > 0)  h_cut_v.at(label).at(cut_index).at(_util.k_cut_shr_tkfit_dedx_max_with_tracks).at(uni)    ->Fill(dedx_max, weight_uni);
@@ -1420,9 +1420,9 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 h_cut_v.at(label).at(cut).at(_util.k_cut_shower_multiplicity).at(uni)            = new TH1D(Form("h_reco_shower_multiplicity_%s_%s_%i",            reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 6, 0, 6);
                 h_cut_v.at(label).at(cut).at(_util.k_cut_track_multiplicity).at(uni)             = new TH1D(Form("h_reco_track_multiplicity_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 6, 0, 6);
                 h_cut_v.at(label).at(cut).at(_util.k_cut_topological_score).at(uni)              = new TH1D(Form("h_reco_topological_score_%s_%s_%i",              reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, 0, 1);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_nu_vtx_sce_x).at(uni)                   = new TH1D(Form("h_reco_nu_vtx_sce_x_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 15, -10, 270);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_nu_vtx_sce_y).at(uni)                   = new TH1D(Form("h_reco_nu_vtx_sce_y_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -120, 120);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_nu_vtx_sce_z).at(uni)                   = new TH1D(Form("h_reco_nu_vtx_sce_z_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -10, 1050);
+                h_cut_v.at(label).at(cut).at(_util.k_cut_vtx_x_sce).at(uni)                      = new TH1D(Form("h_reco_vtx_x_sce_%s_%s_%i",                      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 15, -10, 270);
+                h_cut_v.at(label).at(cut).at(_util.k_cut_vtx_y_sce).at(uni)                      = new TH1D(Form("h_reco_vtx_y_sce_%s_%s_%i",                      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -120, 120);
+                h_cut_v.at(label).at(cut).at(_util.k_cut_vtx_z_sce).at(uni)                      = new TH1D(Form("h_reco_vtx_z_sce_%s_%s_%i",                      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -10, 1050);
                 h_cut_v.at(label).at(cut).at(_util.k_cut_shower_score).at(uni)                   = new TH1D(Form("h_reco_shower_score_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 0.5);
                 h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max).at(uni)             = new TH1D(Form("h_reco_shr_tkfit_dedx_max_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
                 h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max_with_tracks).at(uni) = new TH1D(Form("h_reco_shr_tkfit_dedx_max_with_tracks_%s_%s_%i", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);

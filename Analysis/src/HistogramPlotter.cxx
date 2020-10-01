@@ -1100,19 +1100,19 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
     //                                 bool centerxaxis, bool scale );
 
     // Reco X SCE
-    // MakeStack("h_reco_vtx_x_sce", _util.cut_dirs.at(cut_index).c_str(),
-    //           area_norm, false, 1.3, "Reco Vertex X (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-    //           Form("cuts/%s/reco_vtx_x_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
+    MakeStack("h_reco_vtx_x_sce", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.3, "Reco Vertex X (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_vtx_x_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
-    // // Reco Y SCE
-    // MakeStack("h_reco_vtx_y_sce", _util.cut_dirs.at(cut_index).c_str(),
-    //           area_norm, false, 1.0, "Reco Vertex Y (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-    //           Form("cuts/%s/reco_vtx_y_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
+    // Reco Y SCE
+    MakeStack("h_reco_vtx_y_sce", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "Reco Vertex Y (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_vtx_y_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
-    // // Reco Z SCE
-    // MakeStack("h_reco_vtx_z_sce", _util.cut_dirs.at(cut_index).c_str(),
-    //           area_norm, false, 1.2, "Reco Vertex Z (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-    //           Form("cuts/%s/reco_vtx_z_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
+    // Reco Z SCE
+    MakeStack("h_reco_vtx_z_sce", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.2, "Reco Vertex Z (Space Charge Corr) [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_vtx_z_sce.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Leading Shower Momentum
     MakeStack("h_reco_leading_mom", _util.cut_dirs.at(cut_index).c_str(),
@@ -2385,24 +2385,10 @@ void HistogramPlotter::AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D* 
         
     TH1D  *h_sys;
 
-    // Fix inconistent histogram names so the code doesnt break
-    std::string hist_name_temp = histname;
-    if (std::string(histname) == "h_reco_vtx_x_sce"){
-        hist_name_temp = "h_reco_nu_vtx_sce_x";
-    }
-    
-    if (std::string(histname) == "h_reco_vtx_y_sce"){
-        hist_name_temp = "h_reco_nu_vtx_sce_y";
-    }
-    if (std::string(histname) == "h_reco_vtx_z_sce"){
-        hist_name_temp = "h_reco_nu_vtx_sce_z";
-    }
-
     // The error is on the MC events -- so comes from reweighting or detvar
     if (mode == "MC"){
 
-        // _util.GetHist(file_sys_uncertainties, h_sys, Form("%s/TotalDetectorSys/%s", cut_name.c_str(), hist_name.c_str()) );
-        _util.GetHist(file_sys_uncertainties, h_sys, Form("%s/%s/%s", cut_name.c_str(), label.c_str(), hist_name_temp.c_str()) );
+        _util.GetHist(file_sys_uncertainties, h_sys, Form("%s/%s/%s", cut_name.c_str(), label.c_str(), histname.c_str()) );
         
         // loop over the bins in h_error_hist
         for (int i = 1; i <= h_error_hist->GetNbinsX() ; i++){

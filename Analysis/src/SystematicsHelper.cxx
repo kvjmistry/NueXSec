@@ -191,9 +191,6 @@ void SystematicsHelper::MakeHistograms(){
 
             for(unsigned int j=0; j < _util.vec_hist_name.size(); j++){
 
-                if (_util.vec_hist_name.at(j) == "h_reco_nu_vtx_sce_x" || _util.vec_hist_name.at(j) == "h_reco_nu_vtx_sce_y" || _util.vec_hist_name.at(j) == "h_reco_nu_vtx_sce_z")
-                    continue;
-
                 SysVariations(Form("%s", _util.vec_hist_name.at(j).c_str()), Form("plots/run%s/systvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()),
                             _util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str(), _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str());
 
