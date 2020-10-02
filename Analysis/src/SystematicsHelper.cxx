@@ -2608,7 +2608,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             else {
                 
                 if (is_detvar)
-                    leg = new TLegend(0.2, 0.5, 0.7, 0.8);
+                    leg = new TLegend(0.4, 0.2, 0.9, 0.5);
                 else
                     leg = new TLegend(0.4, 0.3, 0.9, 0.6);
 
