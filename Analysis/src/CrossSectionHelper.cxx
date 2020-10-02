@@ -44,13 +44,28 @@ void CrossSectionHelper::Initialise(Utility _utility){
 
     // Initialise the Flux file
     if (std::string(_util.run_period) == "1"){
-        std::cout << "Using Flux file name: \033[0;31m" << "Systematics/output_fhc_uboone_run0.root" << "\033[0m" <<  std::endl;
-        bool boolfile = _util.GetFile(f_flux, "Systematics/output_fhc_uboone_run0.root");
+        
+        // Switch the file path depending on whether we are on the gpvm or not
+        if (!_util.use_gpvm)
+            flux_file_name = "Systematics/output_fhc_uboone_run0.root";
+        else
+            flux_file_name = "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold_v46/FHC/output_uboone_fhc_run0_merged.root";
+
+
+        std::cout << "Using Flux file name: \033[0;31m" << flux_file_name << "\033[0m" <<  std::endl;
+        bool boolfile = _util.GetFile(f_flux, flux_file_name);
         if (boolfile == false) gSystem->Exit(0); 
     }
     else if (std::string(_util.run_period) == "3") {
-        std::cout << "Using Flux file name: \033[0;31m" << "Systematics/output_rhc_uboone_run0.root" << "\033[0m" <<  std::endl;
-        bool boolfile = _util.GetFile(f_flux, "Systematics/output_rhc_uboone_run0.root" );
+        
+        if (!_util.use_gpvm)
+            flux_file_name = "Systematics/output_rhc_uboone_run0.root";
+        else
+            flux_file_name = "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold_v46/RHC/output_uboone_rhc_run0_merged.root";
+        
+        
+        std::cout << "Using Flux file name: \033[0;31m" << flux_file_name << "\033[0m" <<  std::endl;
+        bool boolfile = _util.GetFile(f_flux, flux_file_name );
         if (boolfile == false) gSystem->Exit(0); 
     }
     else{
@@ -312,14 +327,13 @@ void CrossSectionHelper::LoopEventsbyCut(){
 
     // Load in the TFile
     TFile *f_mc;
-    TFile *f_flux_weights = TFile::Open("Systematics/f_flux_CV_weights_fhc.root", "READ");
     
     _util.GetFile(f_mc, _util.mc_file_name); // We need the MC file as an input argument
 
     // Initialise the TTree and Slice Container class
     TTree *mc_tree;
     _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
-    SC.Initialise(mc_tree, _util.k_mc, f_flux_weights, _util);
+    SC.Initialise(mc_tree, _util.k_mc, f_flux, _util);
 
     int mc_tree_total_entries = mc_tree->GetEntries();
 
@@ -500,9 +514,9 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
             h_cut_v.at(label).at(cut_index).at(_util.k_cut_shower_multiplicity).at(uni)      ->Fill(SC.n_showers,              weight_uni);
             h_cut_v.at(label).at(cut_index).at(_util.k_cut_track_multiplicity).at(uni)       ->Fill(SC.n_tracks,               weight_uni);
             h_cut_v.at(label).at(cut_index).at(_util.k_cut_topological_score).at(uni)        ->Fill(SC.topological_score,      weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_nu_vtx_sce_x).at(uni)             ->Fill(SC.reco_nu_vtx_sce_x,      weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_nu_vtx_sce_y).at(uni)             ->Fill(SC.reco_nu_vtx_sce_y,      weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_nu_vtx_sce_z).at(uni)             ->Fill(SC.reco_nu_vtx_sce_z,      weight_uni);
+            h_cut_v.at(label).at(cut_index).at(_util.k_cut_vtx_x_sce).at(uni)                ->Fill(SC.reco_nu_vtx_sce_x,      weight_uni);
+            h_cut_v.at(label).at(cut_index).at(_util.k_cut_vtx_y_sce).at(uni)                ->Fill(SC.reco_nu_vtx_sce_y,      weight_uni);
+            h_cut_v.at(label).at(cut_index).at(_util.k_cut_vtx_z_sce).at(uni)                ->Fill(SC.reco_nu_vtx_sce_z,      weight_uni);
             h_cut_v.at(label).at(cut_index).at(_util.k_cut_shower_score).at(uni)             ->Fill(SC.shr_score,              weight_uni);
             h_cut_v.at(label).at(cut_index).at(_util.k_cut_shr_tkfit_dedx_max).at(uni)       ->Fill(dedx_max, weight_uni);
             if (SC.n_tracks > 0)  h_cut_v.at(label).at(cut_index).at(_util.k_cut_shr_tkfit_dedx_max_with_tracks).at(uni)    ->Fill(dedx_max, weight_uni);
@@ -782,7 +796,7 @@ void CrossSectionHelper::WriteHists(){
     fnuexsec_out->cd();
 
     // If the variation flag has been set then cheekily change the reeighter label name to use a different folder
-    if (std::string(_util.variation) != "empty"){
+    if (std::string(_util.variation) != "empty" && std::string(_util.variation) != "weight"){
         if ( std::string(_util.variation) == "CV"){
             std::cout << "Doing a cheeky swap of the CV name to: " << "detvar_CV" << std::endl;
             reweighter_labels = { "detvar_CV" };
@@ -1420,9 +1434,9 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 h_cut_v.at(label).at(cut).at(_util.k_cut_shower_multiplicity).at(uni)            = new TH1D(Form("h_reco_shower_multiplicity_%s_%s_%i",            reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 6, 0, 6);
                 h_cut_v.at(label).at(cut).at(_util.k_cut_track_multiplicity).at(uni)             = new TH1D(Form("h_reco_track_multiplicity_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 6, 0, 6);
                 h_cut_v.at(label).at(cut).at(_util.k_cut_topological_score).at(uni)              = new TH1D(Form("h_reco_topological_score_%s_%s_%i",              reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, 0, 1);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_nu_vtx_sce_x).at(uni)                   = new TH1D(Form("h_reco_nu_vtx_sce_x_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 15, -10, 270);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_nu_vtx_sce_y).at(uni)                   = new TH1D(Form("h_reco_nu_vtx_sce_y_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -120, 120);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_nu_vtx_sce_z).at(uni)                   = new TH1D(Form("h_reco_nu_vtx_sce_z_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -10, 1050);
+                h_cut_v.at(label).at(cut).at(_util.k_cut_vtx_x_sce).at(uni)                      = new TH1D(Form("h_reco_vtx_x_sce_%s_%s_%i",                      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 15, -10, 270);
+                h_cut_v.at(label).at(cut).at(_util.k_cut_vtx_y_sce).at(uni)                      = new TH1D(Form("h_reco_vtx_y_sce_%s_%s_%i",                      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -120, 120);
+                h_cut_v.at(label).at(cut).at(_util.k_cut_vtx_z_sce).at(uni)                      = new TH1D(Form("h_reco_vtx_z_sce_%s_%s_%i",                      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -10, 1050);
                 h_cut_v.at(label).at(cut).at(_util.k_cut_shower_score).at(uni)                   = new TH1D(Form("h_reco_shower_score_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 0.5);
                 h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max).at(uni)             = new TH1D(Form("h_reco_shr_tkfit_dedx_max_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
                 h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max_with_tracks).at(uni) = new TH1D(Form("h_reco_shr_tkfit_dedx_max_with_tracks_%s_%s_%i", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
@@ -1487,10 +1501,22 @@ void CrossSectionHelper::GetBeamlineHists(){
 
         // Get the beamline file
         if (std::string(_util.run_period) == "1"){
-            f_temp = TFile::Open(Form("Systematics/beamline/FHC/output_uboone_fhc_run%i.root", beamline_map.at(f).second));
+            
+            // Select the file depending on whether we are on the gpvm or not
+            if (!_util.use_gpvm)
+                f_temp = TFile::Open(Form("Systematics/beamline/FHC/output_uboone_fhc_run%i.root", beamline_map.at(f).second));
+            else
+                f_temp = TFile::Open(Form("/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold_v46/FHC/output_uboone_fhc_run%i.root", beamline_map.at(f).second));
+        
         }
         else if(std::string(_util.run_period) == "3") {
-            f_temp = TFile::Open(Form("Systematics/beamline/RHC/output_uboone_rhc_run%i.root", beamline_map.at(f).second));
+            
+            // Select the file depending on whether we are on the gpvm or not
+            if (!_util.use_gpvm)
+                f_temp = TFile::Open(Form("Systematics/beamline/RHC/output_uboone_rhc_run%i.root", beamline_map.at(f).second));
+            else
+                f_temp = TFile::Open(Form("/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold_v46/RHC/output_uboone_rhc_run%i.root", beamline_map.at(f).second));
+        
         }
         else {
             std::cout << "Unknown run period, exiting...."<< std::endl;

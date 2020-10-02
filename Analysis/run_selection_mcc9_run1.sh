@@ -86,18 +86,53 @@ fi
 # Could loop these to make it easier to run them all!
 
 if [ "$1" == "var" ]; then
-  ./nuexsec --run 1 --var ../ntuples/detvar/run1/neutrinoselection_filt_run1_overlay_$2.root $2
+  # ./nuexsec --run 1 --var ../ntuples/detvar/run1/neutrinoselection_filt_run1_overlay_$2.root $2
+  
+  # Overwrite the true nue information
+  # ./nuexsec --run 1 --var ../ntuples/detvar/run1/intrinsic/neutrinoselection_filt_run1_overlay_$2_intrinsic.root $2 --intrinsic intrinsic
 
-  source merge/merge_run1_files.sh files/nuexsec_mc_run1_$2.root files/nuexsec_run1_$2_merged.root
+  # source merge/merge_run1_files.sh files/nuexsec_mc_run1_$2.root files/nuexsec_run1_$2_merged.root
 
-  ./nuexsec --run 1 --hist files/nuexsec_run1_$2_merged.root --var dummy $2
+  #./nuexsec --run 1 --hist files/nuexsec_run1_$2_merged.root --var dummy $2
 
-  root -l -b -q 'merge/merge_uneaventrees.C("1", false, "files/trees/nuexsec_selected_tree_mc_run1_'"$2"'.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "'"$2"'")'
+  # root -l -b -q 'merge/merge_uneaventrees.C("1", true, "files/trees/nuexsec_selected_tree_mc_run1_'"$2"'.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "'"$2"'")'
 
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$2.root --var dummy $2 --xsecmode default
 
 fi
 
+
+#----------------------------------------------------------------------------------------------
+# Running the detector systematics
+
+# To run the det sys plotter now do source run_selection_mcc9_run1.sh allvar
+# This is just running the piece of code above, but for all the det variations at once, so you do not have to do it manually
+
+# This bit of code will run the piece of code above for all the detector variations, calculate deviation
+# the detector variations below are going to be taken into account, please make sure this list matches the _util.vec_var_string in Utility.h
+
+declare -a var=(
+  CV
+  LYRayleigh
+  LYAttenuation
+  SCE
+  Recomb2
+  WireModX
+  WireModYZ
+  WireModThetaXZ
+  WireModThetaYZ_withSigmaSplines
+  WireModThetaYZ_withoutSigmaSplines
+  WireModdEdX
+)
+if [ "$1" == "allvar" ]; then
+
+  # run the above script for every det variation 
+  for i in "${var[@]}"
+  do
+    source run_selection_mcc9_run1.sh var "$i"
+  done
+
+fi
 
 
 

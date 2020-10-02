@@ -124,6 +124,13 @@ public:
     // -------------------------------------------------------------------------
 
     // Variables
+    std::string red     = "\033[0;31m";
+    std::string green   = "\033[0;32m";
+    std::string yellow  = "\033[0;33m";
+    std::string blue    = "\033[0;34m";
+    std::string magenta = "\033[0;35m";
+    std::string cyan    = "\033[0;36m";
+    std::string reset   = "\033[0m";
 
     // Bins for the reconstructed shower energy
     std::vector<double> reco_shr_bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 4.0};
@@ -142,6 +149,7 @@ public:
     bool print_ext                 = false;
     bool print_dirt                = false;
     bool plot_sys_uncertainty      = false;
+    bool use_gpvm                  = false; // choose whether you are on the gpvm or Krish's personal laptop
 
     // inputs 
     char * mc_file_name          = (char *)"empty";
@@ -285,15 +293,15 @@ public:
                 "nuebar_cc",
                 "nu_out_fv",
                 "cosmic",
+                "cosmic_nue",    // Another special category to separate standard nues from other cosmics. This category contains mis-reco'd nues as cosmics. We separate these out so we can count the efficency denominator properly
+                "cosmic_nuebar",
                 "numu_cc",
                 "numu_cc_pi0",
                 "nc",
                 "nc_pi0",
                 "unmatched",
                 "unmatched_nue", // This is a special category to count nue/nuebar cc interactions that occur inside the fv, but were not reconstructed at all (so purity ends up < 0!). We need these for the efficeicny denom. 
-                "cosmic_nue",    // Another special category to separate standard nues from other cosmics. This category contains mis-reco'd nues as cosmics. We separate these out so we can count the efficency denominator properly
                 "unmatched_nuebar",
-                "cosmic_nuebar",
                 "ext",
                 "data",
                 "dirt"
@@ -372,15 +380,15 @@ public:
                 k_nuebar_cc,
                 k_nu_out_fv,
                 k_cosmic,
+                k_cosmic_nue,
+                k_cosmic_nuebar,
                 k_numu_cc,
                 k_numu_cc_pi0,
                 k_nc,
                 k_nc_pi0,
                 k_unmatched,
                 k_unmatched_nue,
-                k_cosmic_nue,
                 k_unmatched_nuebar,
-                k_cosmic_nuebar,
                 k_leg_ext,
                 k_leg_data,
                 k_leg_dirt,
@@ -505,9 +513,9 @@ public:
         k_cut_shower_multiplicity,
         k_cut_track_multiplicity,
         k_cut_topological_score,
-        k_cut_nu_vtx_sce_x,
-        k_cut_nu_vtx_sce_y,
-        k_cut_nu_vtx_sce_z,
+        k_cut_vtx_x_sce,
+        k_cut_vtx_y_sce,
+        k_cut_vtx_z_sce,
         k_cut_shower_score,
         k_cut_shr_tkfit_dedx_max,
         k_cut_shr_tkfit_dedx_max_with_tracks,
@@ -534,9 +542,9 @@ public:
         "h_reco_shower_multiplicity",
         "h_reco_track_multiplicity",
         "h_reco_topological_score",
-        "h_reco_nu_vtx_sce_x",
-        "h_reco_nu_vtx_sce_y",
-        "h_reco_nu_vtx_sce_z",
+        "h_reco_vtx_x_sce",
+        "h_reco_vtx_y_sce",
+        "h_reco_vtx_z_sce",
         "h_reco_shower_score",
         "h_reco_shr_tkfit_dedx_max",
         "h_reco_shr_tkfit_dedx_max_with_tracks",
@@ -582,7 +590,20 @@ public:
     };
 
     // list of detector variations
-    std::vector<std::string> vec_var_string = {"CV","BNB_Diffusion"};
+    std::vector<std::string> vec_var_string = {
+        "CV",
+        "BNB_Diffusion",
+        "LYRayleigh",
+        "LYAttenuation",
+        "SCE",
+        "Recomb2",
+        "WireModX",
+        "WireModYZ",
+        "WireModThetaXZ",
+        "WireModThetaYZ_withSigmaSplines",
+        "WireModThetaYZ_withoutSigmaSplines",
+        "WireModdEdX"
+   };
 
 }; // End Class Utility
 

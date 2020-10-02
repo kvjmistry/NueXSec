@@ -191,9 +191,6 @@ void SystematicsHelper::MakeHistograms(){
 
             for(unsigned int j=0; j < _util.vec_hist_name.size(); j++){
 
-                if (_util.vec_hist_name.at(j) == "h_reco_nu_vtx_sce_x" || _util.vec_hist_name.at(j) == "h_reco_nu_vtx_sce_y" || _util.vec_hist_name.at(j) == "h_reco_nu_vtx_sce_z")
-                    continue;
-
                 SysVariations(Form("%s", _util.vec_hist_name.at(j).c_str()), Form("plots/run%s/systvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()),
                             _util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str(), _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str());
 
@@ -516,13 +513,14 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
 
     }
 
+    c->Print(print_name_str.c_str());
+
     // -----------------------------------------------------------------
     // calculate and save the total detector systematics uncertainty 
 
     // create a temporary histogram that will be used to calculate the total detector sys
-    TH1D *h_det_sys_tot;
-
     file_sys_var->cd();
+    TH1D *h_det_sys_tot;
     
     // loop over variations for a given variable
     for (unsigned int k = 0; k < f_vars.size(); k++){
@@ -585,7 +583,7 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
     // Add the weight labels
     // Draw_WeightLabels(c);
     
-    c->Print(print_name_str.c_str());
+    
 
 }
 // ----------------------------------------------------------------------------
@@ -2606,11 +2604,11 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
 
             TLegend *leg;
             
-            if (type != k_xsec_eff) leg = new TLegend(0.41, 0.55, 0.91, 0.85);
+            if (type != k_xsec_eff && vars.at(var) != "integrated") leg = new TLegend(0.41, 0.55, 0.91, 0.85);
             else {
                 
                 if (is_detvar)
-                    leg = new TLegend(0.2, 0.5, 0.7, 0.8);
+                    leg = new TLegend(0.4, 0.2, 0.9, 0.5);
                 else
                     leg = new TLegend(0.4, 0.3, 0.9, 0.6);
 
@@ -2761,15 +2759,18 @@ void SystematicsHelper::SetUnisimColours(std::string label, TH1D* h_up, TH1D* h_
 }
 // -----------------------------------------------------------------------------
 void SystematicsHelper::InitialiseReweightingModeCut(){
+    
+    std::cout << "Running code to get the reweightable variations by cut" << std::endl;
     gStyle->SetOptStat(0);
 
     // Load in the input file
     // Should we add more protection to this command??
     f_nuexsec = TFile::Open( Form("files/crosssec_run%s.root", _util.run_period ), "READ");
 
-    // Loop over cuts and get the sys uncertainty
-    
+    // Loop over cuts
     for (int cut = 0; cut < _util.k_cuts_MAX ; cut++){
+        
+        // Loop over the variables
         for (int var = 0; var < _util.k_cut_vars_max; var++){
             GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "RPA",              2, "unisim");
             GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "CCMEC",            2, "unisim");
@@ -2798,10 +2799,16 @@ void SystematicsHelper::InitialiseReweightingModeCut(){
         }
     }
         
+    std::cout <<  "Now closing file and exiting" << std::endl; 
+    // file_sys_var->cd();
+    // file_sys_var->Close();
 
 }
 // -----------------------------------------------------------------------------
 void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index, std::string label, int num_uni, std::string var_type){
+
+    if (cut_index == _util.k_cuts_MAX-1)
+        std::cout << "Saving uncertainties for: " << label  << "  " << histname << std::endl;
 
     // Declare the histogram vector for the cut
     std::vector<TH1D*> h_universe;
@@ -2817,7 +2824,6 @@ void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index
     SetLabelName(label, label_up, label_dn);
 
     // Now get the histograms
-
     // If its a unisim then we have up/dn type variation
     if (var_type == "unisim"){
         _util.GetHist(f_nuexsec, h_universe.at(k_up), Form( "%s/Cuts/%s/%s/%s_%s_%s_0", label_up.c_str(), _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(), label_up.c_str(),_util.cut_dirs.at(cut_index).c_str()));
@@ -2861,7 +2867,6 @@ void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index
         else 
             h_err->SetBinContent(bin, err);
     }
-
 
     // ---- save the histograms into different directories inside the root file
     file_sys_var->cd();

@@ -627,7 +627,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
     double dedx_max = SC.GetdEdxMax();
 
     // For filling histograms, we lump the cosmic nue and cosmic nuebar into the generic cosmic category (so the plots can be normalised properly)
-    if (classification_index == _util.k_cosmic_nue || classification_index == _util.k_cosmic_nuebar) classification_index = _util.k_cosmic;
+    // if (classification_index == _util.k_cosmic_nue || classification_index == _util.k_cosmic_nuebar) classification_index = _util.k_cosmic;
     
     // Now fill the histograms!
     TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x, weight);
@@ -1101,7 +1101,8 @@ void HistogramHelper::WriteReco(int type){
                 
                 if (bool_dir) truth_dir->cd();
 
-                // Skip the write for the backgrounds
+                // Skip the write for the backgrounds in intrinsic nue mode
+                // This overwrites the signal histograms
                 if (std::string(_util.intrinsic_mode) == "intrinsic" && j != _util.k_nue_cc && j != _util.k_nuebar_cc && j != _util.k_cosmic_nue && j != _util.k_cosmic_nuebar && j != _util.k_unmatched_nue && j != _util.k_unmatched_nuebar){
                     continue;
                 }

@@ -583,7 +583,9 @@ void HistogramPlotter::SetFillColours(std::vector<TH1D *> &hist, std::string plo
         hist.at(_util.k_nuebar_cc)->SetFillColor(32);
         hist.at(_util.k_numu_cc)->SetFillColor(28);
         hist.at(_util.k_nc_pi0)->SetFillColor(36);
-        hist.at(_util.k_cosmic)->SetFillColor(1);
+        hist.at(_util.k_cosmic)->SetFillColor(38);
+        hist.at(_util.k_cosmic_nue)->SetFillColor(38);
+        hist.at(_util.k_cosmic_nuebar)->SetFillColor(38);
         hist.at(_util.k_nc)->SetFillColor(46);
         hist.at(_util.k_nu_out_fv)->SetFillColor(kViolet - 7);
         hist.at(_util.k_numu_cc_pi0)->SetFillColor(42);
@@ -630,7 +632,7 @@ void HistogramPlotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, s
         leg_stack->AddEntry(hist.at(_util.k_nc),          Form("NC (%2.1f)", hist_integrals.at(_util.k_nc)), "f");
         leg_stack->AddEntry(hist.at(_util.k_numu_cc_pi0), Form("#nu_{#mu} CC #pi^{0} (%2.1f)", hist_integrals.at(_util.k_numu_cc_pi0)), "f");
         leg_stack->AddEntry(hist.at(_util.k_numu_cc),     Form("#nu_{#mu} CC (%2.1f)", hist_integrals.at(_util.k_numu_cc)), "f");
-        leg_stack->AddEntry(hist.at(_util.k_cosmic),      Form("Cosmic (%2.1f)", hist_integrals.at(_util.k_cosmic)), "f");
+        leg_stack->AddEntry(hist.at(_util.k_cosmic),      Form("Cosmic (%2.1f)", hist_integrals.at(_util.k_cosmic) + hist_integrals.at(_util.k_cosmic_nue) + hist_integrals.at(_util.k_cosmic_nuebar)), "f");
         leg_stack->AddEntry(hist.at(_util.k_nu_out_fv),   Form("#nu OutFV (%2.1f)", hist_integrals.at(_util.k_nu_out_fv)), "f");
         leg_stack->AddEntry(hist.at(_util.k_nuebar_cc),   Form("#bar{#nu}_{e} CC (%2.1f)", hist_integrals.at(_util.k_nuebar_cc)), "f");
         leg_stack->AddEntry(hist.at(_util.k_nue_cc),      Form("#nu_{e} CC (%2.1f)", hist_integrals.at(_util.k_nue_cc)), "f");
@@ -659,6 +661,9 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
 
     // Check if we want this plot for variations
     if (!plotvar && std::string(_util.variation) != "empty") return;
+
+    // For some reason the print name keeps changing, this fixes it somewhat
+    std::string print_name_str = std::string(print_name);
 
     std::vector<TH1D *> hist;           // The vector of histograms from the file for the plot
     std::vector<double> hist_integrals; // The integrals of all the histograms
@@ -910,7 +915,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     // and if you want to plot sys+stat
     if ( _util.CheckHistogram(_util.vec_hist_name, hist_name) && _util.plot_sys_uncertainty ) {
 
-        // AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "TotalDetectorSys", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "TotalDetectorSys", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsPPFX", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsGenie", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsReint", "MC");
@@ -1080,9 +1085,9 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     }
 
     if (std::string(_util.variation) == "empty")
-        c->Print(Form("plots/run%s/%s", _util.run_period, print_name));
+        c->Print(Form("plots/run%s/%s", _util.run_period, print_name_str.c_str()));
     else
-        c->Print(Form("plots/run%s/detvar/%s/%s", _util.run_period, _util.variation, print_name));
+        c->Print(Form("plots/run%s/detvar/%s/%s", _util.run_period, _util.variation, print_name_str.c_str()));
 
     delete c;
 }
@@ -1177,7 +1182,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Ratio hits from showers to slice
     MakeStack("h_reco_hits_ratio_th", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Hit Rati (> 50 Hits)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.0, "Hit Ratio (> 50 Hits)",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_hits_ratio_th.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Ratio hits from leading shower to slice
@@ -1325,7 +1330,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
     // Shower Flash PE
     MakeStack("h_reco_flash_pe", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Largest Flash Intensity [PE]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_flash_pe.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
+              Form("cuts/%s/reco_flash_pe.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Shower Subcluster All Planes
     MakeStack("h_reco_shrsubclusters", _util.cut_dirs.at(cut_index).c_str(),
@@ -2380,24 +2385,10 @@ void HistogramPlotter::AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D* 
         
     TH1D  *h_sys;
 
-    // Fix inconistent histogram names so the code doesnt break
-    std::string hist_name_temp = histname;
-    if (std::string(histname) == "h_reco_vtx_x_sce"){
-        hist_name_temp = "h_reco_nu_vtx_sce_x";
-    }
-    
-    if (std::string(histname) == "h_reco_vtx_y_sce"){
-        hist_name_temp = "h_reco_nu_vtx_sce_y";
-    }
-    if (std::string(histname) == "h_reco_vtx_z_sce"){
-        hist_name_temp = "h_reco_nu_vtx_sce_z";
-    }
-
     // The error is on the MC events -- so comes from reweighting or detvar
     if (mode == "MC"){
 
-        // _util.GetHist(file_sys_uncertainties, h_sys, Form("%s/TotalDetectorSys/%s", cut_name.c_str(), hist_name.c_str()) );
-        _util.GetHist(file_sys_uncertainties, h_sys, Form("%s/%s/%s", cut_name.c_str(), label.c_str(), hist_name_temp.c_str()) );
+        _util.GetHist(file_sys_uncertainties, h_sys, Form("%s/%s/%s", cut_name.c_str(), label.c_str(), histname.c_str()) );
         
         // loop over the bins in h_error_hist
         for (int i = 1; i <= h_error_hist->GetNbinsX() ; i++){
