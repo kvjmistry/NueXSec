@@ -15,6 +15,9 @@ class CrossSectionHelper{
     // The input and output files
     TFile* f_nuexsec, *fnuexsec_out, *f_flux;
 
+    // Name of the merged flux file
+    std::string flux_file_name = "";
+
     // Class instances
     Utility _util;
 

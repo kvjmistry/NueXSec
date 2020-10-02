@@ -44,13 +44,28 @@ void CrossSectionHelper::Initialise(Utility _utility){
 
     // Initialise the Flux file
     if (std::string(_util.run_period) == "1"){
-        std::cout << "Using Flux file name: \033[0;31m" << "Systematics/output_fhc_uboone_run0.root" << "\033[0m" <<  std::endl;
-        bool boolfile = _util.GetFile(f_flux, "Systematics/output_fhc_uboone_run0.root");
+        
+        // Switch the file path depending on whether we are on the gpvm or not
+        if (!_util.use_gpvm)
+            flux_file_name = "Systematics/output_fhc_uboone_run0.root";
+        else
+            flux_file_name = "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold_v46/FHC/output_uboone_fhc_run0_merged.root";
+
+
+        std::cout << "Using Flux file name: \033[0;31m" << flux_file_name << "\033[0m" <<  std::endl;
+        bool boolfile = _util.GetFile(f_flux, flux_file_name);
         if (boolfile == false) gSystem->Exit(0); 
     }
     else if (std::string(_util.run_period) == "3") {
-        std::cout << "Using Flux file name: \033[0;31m" << "Systematics/output_rhc_uboone_run0.root" << "\033[0m" <<  std::endl;
-        bool boolfile = _util.GetFile(f_flux, "Systematics/output_rhc_uboone_run0.root" );
+        
+        if (!_util.use_gpvm)
+            flux_file_name = "Systematics/output_rhc_uboone_run0.root";
+        else
+            flux_file_name = "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold_v46/RHC/output_uboone_rhc_run0_merged.root";
+        
+        
+        std::cout << "Using Flux file name: \033[0;31m" << flux_file_name << "\033[0m" <<  std::endl;
+        bool boolfile = _util.GetFile(f_flux, flux_file_name );
         if (boolfile == false) gSystem->Exit(0); 
     }
     else{
@@ -312,14 +327,13 @@ void CrossSectionHelper::LoopEventsbyCut(){
 
     // Load in the TFile
     TFile *f_mc;
-    TFile *f_flux_weights = TFile::Open("Systematics/f_flux_CV_weights_fhc.root", "READ");
     
     _util.GetFile(f_mc, _util.mc_file_name); // We need the MC file as an input argument
 
     // Initialise the TTree and Slice Container class
     TTree *mc_tree;
     _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
-    SC.Initialise(mc_tree, _util.k_mc, f_flux_weights, _util);
+    SC.Initialise(mc_tree, _util.k_mc, f_flux, _util);
 
     int mc_tree_total_entries = mc_tree->GetEntries();
 
@@ -1487,10 +1501,22 @@ void CrossSectionHelper::GetBeamlineHists(){
 
         // Get the beamline file
         if (std::string(_util.run_period) == "1"){
-            f_temp = TFile::Open(Form("Systematics/beamline/FHC/output_uboone_fhc_run%i.root", beamline_map.at(f).second));
+            
+            // Select the file depending on whether we are on the gpvm or not
+            if (!_util.use_gpvm)
+                f_temp = TFile::Open(Form("Systematics/beamline/FHC/output_uboone_fhc_run%i.root", beamline_map.at(f).second));
+            else
+                f_temp = TFile::Open(Form("/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold_v46/FHC/output_uboone_fhc_run%i.root", beamline_map.at(f).second));
+        
         }
         else if(std::string(_util.run_period) == "3") {
-            f_temp = TFile::Open(Form("Systematics/beamline/RHC/output_uboone_rhc_run%i.root", beamline_map.at(f).second));
+            
+            // Select the file depending on whether we are on the gpvm or not
+            if (!_util.use_gpvm)
+                f_temp = TFile::Open(Form("Systematics/beamline/RHC/output_uboone_rhc_run%i.root", beamline_map.at(f).second));
+            else
+                f_temp = TFile::Open(Form("/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold_v46/RHC/output_uboone_rhc_run%i.root", beamline_map.at(f).second));
+        
         }
         else {
             std::cout << "Unknown run period, exiting...."<< std::endl;

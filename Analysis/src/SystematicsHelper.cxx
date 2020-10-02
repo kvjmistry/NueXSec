@@ -2604,7 +2604,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
 
             TLegend *leg;
             
-            if (type != k_xsec_eff) leg = new TLegend(0.41, 0.55, 0.91, 0.85);
+            if (type != k_xsec_eff && vars.at(var) != "integrated") leg = new TLegend(0.41, 0.55, 0.91, 0.85);
             else {
                 
                 if (is_detvar)

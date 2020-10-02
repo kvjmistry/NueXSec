@@ -463,7 +463,35 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     double flux_scale_factor{1.0e-4}; // unit conversion of flux from m2 to cm2
 
     // Get the flux File
-    _util.GetFile(f, "Systematics/output_fhc_uboone_run0.root");
+    // Switch the file path depending on whether we are on the gpvm or not
+    // Initialise the Flux file
+    
+    std::string flux_file_name;
+    if (std::string(_util.run_period) == "1"){
+        
+        // Switch the file path depending on whether we are on the gpvm or not
+        if (!_util.use_gpvm)
+            flux_file_name = "Systematics/output_fhc_uboone_run0.root";
+        else
+            flux_file_name = "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold_v46/FHC/output_uboone_fhc_run0_merged.root";
+
+
+        std::cout << "Using Flux file name: \033[0;31m" << flux_file_name << "\033[0m" <<  std::endl;
+        bool boolfile = _util.GetFile(f, flux_file_name);
+        if (boolfile == false) gSystem->Exit(0); 
+    }
+    else if (std::string(_util.run_period) == "3") {
+        
+        if (!_util.use_gpvm)
+            flux_file_name = "Systematics/output_rhc_uboone_run0.root";
+        else
+            flux_file_name = "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold_v46/RHC/output_uboone_rhc_run0_merged.root";
+        
+        
+        std::cout << "Using Flux file name: \033[0;31m" << flux_file_name << "\033[0m" <<  std::endl;
+        bool boolfile = _util.GetFile(f, flux_file_name );
+        if (boolfile == false) gSystem->Exit(0); 
+    }
     
     // Get the Flux Histograms
     _util.GetHist(f, h_nue,    "nue/Detsmear/nue_CV_AV_TPC_5MeV_bin");

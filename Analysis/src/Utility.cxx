@@ -232,6 +232,11 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             std::cout << magenta << "Using Selection with intrinsic nue setting: " << argv[i+1] << reset <<std::endl;
             intrinsic_mode = argv[i+1];
         }
+
+        // Use the gpvm file paths
+        if (strcmp(arg, "--gpvm") == 0) {
+            use_gpvm = true;
+        }
    
     }
 
