@@ -8,7 +8,7 @@
 <!ENTITY file_type "mc">
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
-<!ENTITY name "searchingfornues_run1_overlay_detvar_CV_intrinsic">
+<!ENTITY name "searchingfornues_run1_overlay_detvar_CV_intrinsic_slim">
 <!ENTITY version "v1">
 ]>
 
@@ -48,7 +48,7 @@
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <maxfilesperjob>5</maxfilesperjob>
-    <numjobs>933</numjobs> <!-- 933 -->
+    <numjobs>188</numjobs> <!-- 933 -->
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <disk>25GB</disk>
