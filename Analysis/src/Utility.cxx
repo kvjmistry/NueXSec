@@ -404,6 +404,11 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         std::cout << blue << "Intrinsic Factor:\n" << intrinsic_weight << std::endl;
         std::cout << "-------------------------------" << reset << std::endl;
     }
+
+    if (use_gpvm)
+        std::cout << red << "Using gpvm environment, all paths will be set compatible with running on a gpvm"<< reset << std::endl;
+    else 
+        std::cout << red << "Using local environment, all paths will be set compatible with running on Krish's computer"<< reset << std::endl;
     
     
 }
