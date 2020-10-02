@@ -75,6 +75,39 @@ Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 3.69423e+20
 // Run 1 Det var WireModdEdX
 Run1_MC_POT_WireModdEdX 3.6318e+20
 -
+// Run 1 Det var CV intrinsic nue sample
+Run1_Intrinsic_POT_CV 2.68294e+22
+-
+// Run 1 Det var LYAttenuation intrinsic nue sample
+Run1_Intrinsic_POT_LYAttenuation 2.64165e+22
+-
+// Run 1 Det var LYRayleigh intrinsic nue sample
+Run1_Intrinsic_POT_LYRayleigh 2.67655e+22
+-
+// Run 1 Det var SCE intrinsic nue sample
+Run1_Intrinsic_POT_SCE 2.60685e+22
+-
+// Run 1 Det var Recomb2 intrinsic nue sample
+Run1_Intrinsic_POT_Recomb2 2.60657e+22
+-
+// Run 1 Det var WireModX intrinsic nue sample
+Run1_Intrinsic_POT_WireModX 2.66184e+22
+-
+// Run 1 Det var WireModYZ intrinsic nue sample
+Run1_Intrinsic_POT_WireModYZ 2.62256e+22
+-
+// Run 1 Det var WireModThetaXZ intrinsic nue sample
+Run1_Intrinsic_POT_WireModThetaXZ 2.65175e+22
+-
+// Run 1 Det var WireModThetaYZ_withSigmaSplines intrinsic nue sample
+Run1_Intrinsic_POT_WireModThetaYZ_withSigmaSplines 2.63394e+22
+-
+// Run 1 Det var WireModThetaYZ_withoutSigmaSplines intrinsic nue sample
+Run1_Intrinsic_POT_WireModThetaYZ_withoutSigmaSplines 2.66734e+22
+-
+// Run 1 Det var WireModdEdX intrinsic nue sample
+Run1_Intrinsic_POT_WireModdEdX 2.66806e+22
+-
 // Run 1 Det Var BNB diffusion -- unused now
 Run1_MC_POT_BNB_Diffusion 4.19732e+20
 -

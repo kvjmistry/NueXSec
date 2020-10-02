@@ -87,6 +87,7 @@ fi
 
 if [ "$1" == "var" ]; then
   ./nuexsec --run 1 --var ../ntuples/detvar/run1/neutrinoselection_filt_run1_overlay_$2.root $2
+  ./nuexsec --run 1 --var ../ntuples/detvar/run1/intrinsic/neutrinoselection_filt_run1_overlay_$2_intrinsic.root $2 --intrinsic intrinsic
 
   source merge/merge_run1_files.sh files/nuexsec_mc_run1_$2.root files/nuexsec_run1_$2_merged.root
 
