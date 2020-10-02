@@ -589,7 +589,20 @@ public:
     };
 
     // list of detector variations
-    std::vector<std::string> vec_var_string = {"CV","BNB_Diffusion"};
+    std::vector<std::string> vec_var_string = {
+        "CV",
+        "BNB_Diffusion",
+        "LYRayleigh",
+        "LYAttenuation",
+        "SCE",
+        "Recomb2",
+        "WireModX",
+        "WireModYZ",
+        "WireModThetaXZ",
+        "WireModThetaYZ_withSigmaSplines",
+        "WireModThetaYZ_withoutSigmaSplines",
+        "WireModdEdX"
+   };
 
 }; // End Class Utility
 
