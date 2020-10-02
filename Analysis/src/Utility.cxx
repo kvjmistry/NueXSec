@@ -14,12 +14,12 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         if (strcmp(arg, "--slim") == 0) {
             std::cout << "Running with slim mode"<< std::endl;
             slim = true;
-            std::cout << " *** \t Running with Slimmed Selection (no histograms will be made)\t *** " << std::endl;
+            std::cout << red << " *** \t Running with Slimmed Selection (no histograms will be made)\t *** " << reset << std::endl;
         }
 
         // Histogram Mode
         if (strcmp(arg, "--hist") == 0) {
-            std::cout << "Making Histograms, file to make histograms with: "<< argv[i+1] << std::endl;
+            std::cout << yellow << "Making Histograms, file to make histograms with: "<< argv[i+1] << yellow <<std::endl;
             make_histos = true;
             run_selection = false; // switch this bool out
             hist_file_name = argv[i+1];
@@ -27,7 +27,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
 
         // XSec mode
         if (strcmp(arg, "--xsec") == 0) {
-            std::cout << "Calculating the Cross Section with input file name: " << argv[i+1] << std::endl;
+            std::cout << yellow << "Calculating the Cross Section with input file name: " << argv[i+1] << yellow << std::endl;
             calc_cross_sec = true;
             run_selection = false; // switch this bool out
             tree_file_name = argv[i+1];
@@ -119,7 +119,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
 
         // Max number of events specified?
         if (strcmp(arg, "-n") == 0 || strcmp(arg, "--n") == 0){
-            std::cout << "Running with a maximum of : " << argv[i+1] << " events" <<std::endl;
+            std::cout << red << "Running with a maximum of : " << argv[i+1] << " events" << reset <<std::endl;
             num_events = atoi(argv[i+1]);
         }
 
@@ -143,7 +143,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
 
         // Variation file
         if (strcmp(arg, "--var") == 0){
-            std::cout << "Using Variation: " << argv[i+2] << std::endl;
+            std::cout << magenta << "Using Variation: " << argv[i+2] << reset << std::endl;
             
             variation = argv[i+2];
             mc_file_name = argv[i+1];
@@ -151,8 +151,8 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             mc_file_name_out      = Form("nuexsec_mc_run%s_%s.root", run_period, variation);
             mc_tree_file_name_out = Form("nuexsec_selected_tree_mc_run%s_%s.root", run_period, variation);
             
-            std::cout  << "Output filename will be overwritten with name: "      << mc_file_name_out << std::endl;
-            std::cout << "Output tree filename will be overwritten with name: " << mc_tree_file_name_out << std::endl;
+            std::cout  <<yellow << "Output filename will be overwritten with name: "      << mc_file_name_out << reset <<  std::endl;
+            std::cout <<yellow << "Output tree filename will be overwritten with name: " << mc_tree_file_name_out << reset <<  std::endl;
             
             overwritePOT = true;
         }
@@ -229,7 +229,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
 
         // Intrinsic nue Mode
         if (strcmp(arg, "--intrinsic") == 0) {
-            std::cout << "Using Selection with intrinsic nue setting: " << argv[i+1] << std::endl;
+            std::cout << magenta << "Using Selection with intrinsic nue setting: " << argv[i+1] << reset <<std::endl;
             intrinsic_mode = argv[i+1];
         }
    
@@ -252,10 +252,25 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             // If matched then overwrite the POT config for the MC to the variation
             if (confignames.at(p) == match_name){
                 confignames[p] = match_name + "_" + variation_str;
-                std::cout << "New MC POT config to search for is: " << confignames.at(p) << std::endl;
+                std::cout << red  <<"New MC POT config to search for is: " << confignames.at(p) << reset << std::endl;
             }
-
         }
+
+        // We also want to set the intrinsic nue POT so the weighting is done correctly
+        // Loop over the POT config names and overwrite the name of the CV MC POT
+        for (unsigned int p = 0; p < confignames.size(); p++){
+            
+            std::string match_name = Form("Run%s_Intrinsic_POT", run_period);
+            // std::string match_name = "Run1_Intrinsic_POT";
+            
+            // If matched then overwrite the POT config for the MC to the variation
+            if (confignames.at(p) == match_name){
+                confignames[p] = match_name + "_" + variation_str;
+                std::cout << red << "New MC POT config to search for is: " << confignames.at(p) << reset <<std::endl;
+            }
+        }
+    
+    
     }
 
     // Get the congigureation parameters
@@ -345,13 +360,13 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     // Pi0 correction
     pi0_correction = _pi0_correction;
     if (pi0_correction == 0){
-        std::cout << "pi0 Correction is turned off" << std::endl;
+        std::cout << blue << "pi0 Correction is turned off" << reset << std::endl;
     }
     else if (pi0_correction == 1){
-         std::cout << "Using normalisation factor to correct pi0" << std::endl;
+         std::cout << "Using "<< blue << "normalisation factor" << reset<< " to correct pi0" << std::endl;
     }
     else {
-        std::cout << "Using energy dependent scaling to correct pi0" << std::endl;
+        std::cout << "Using :"<< blue << "energy dependent scaling" << reset << "to correct pi0" << std::endl;
     }
 
     // Set the scale factors
@@ -373,7 +388,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     }
 
     std::cout << "\033[0;32m-------------------------------" << std::endl;
-    std::cout << "Scale Factors:\n" <<
+    std::cout << red << "Scale Factors:\n" << green <<
     "MC Scale factor:   "   << mc_scale_factor     << "\n" <<
     "Dirt Scale factor: "   << dirt_scale_factor   << "\n" <<
     "EXT Scale factor:  "   << ext_scale_factor << std::endl;
@@ -381,9 +396,8 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
 
     // Display the intrinsic nue scale factor
     if (std::string(intrinsic_mode) == "intrinsic"){
-        std::cout << "\033[0;32m-------------------------------" << std::endl;
-        std::cout << "Intrinsic Factor:\n" << intrinsic_weight     << "\n" << std::endl;
-        std::cout << "-------------------------------\033[0m" << std::endl;
+        std::cout << blue << "Intrinsic Factor:\n" << intrinsic_weight << std::endl;
+        std::cout << "-------------------------------" << reset << std::endl;
     }
     
     

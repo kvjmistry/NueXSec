@@ -124,6 +124,13 @@ public:
     // -------------------------------------------------------------------------
 
     // Variables
+    std::string red     = "\033[0;31m";
+    std::string green   = "\033[0;32m";
+    std::string yellow  = "\033[0;33m";
+    std::string blue    = "\033[0;34m";
+    std::string magenta = "\033[0;35m";
+    std::string cyan    = "\033[0;36m";
+    std::string reset   = "\033[0m";
 
     // Bins for the reconstructed shower energy
     std::vector<double> reco_shr_bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 4.0};
