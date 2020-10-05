@@ -9,14 +9,14 @@
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
 <!ENTITY name "searchingfornues_run1_beamon">
-<!ENTITY indef "numi_uboone_run1_beamon_offset1_mcc9_reco2_v08_00_00_28_beam_good_beam_bad">
-<!ENTITY version "v5">
+<!ENTITY version "v6">
 ]>
 
 <!--v2 is sample 0 run 1 beam good beam bad -->
 <!--v3 is all run 1 beam good -->
 <!-- v4 is with fix to common optical filter michel veto times-->
 <!-- v5 has beam good and beam bad files processed-->
+<!-- v6 using production teams processing of beam on data-->
 
 <job>
 
@@ -39,17 +39,17 @@
   </larsoft>
 
   <!-- Project stages -->
-  <stage name="ntuple">
+  <stage name="ntuple0">
     <fcl>reco_uboone_mcc9_8_driver_data_numi_optical_updated.fcl</fcl>
     <fcl>run_neutrinoselectionfilter_run1_data_cc0pinp.fcl</fcl>
     <datafiletypes>root,pndr</datafiletypes>
-    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</outdir>
-    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</logdir>
-    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
-    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
-    <inputdef>&indef;</inputdef>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple0/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple0/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple0/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple0/&version;</bookdir>
+    <inputdef>kmistry_prod_mcc9_v08_00_00_45_numi_reco2_run1_beam_good_reco2_goodruns_fhc_set0</inputdef>
     <maxfilesperjob>10</maxfilesperjob>
-    <numjobs>1</numjobs>
+    <numjobs>51</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <disk>25GB</disk>
@@ -58,6 +58,134 @@
     <jobsub_start> --expected-lifetime=short</jobsub_start>
     <blacklist>Lancaster</blacklist>
   </stage>
+
+  <!-- Project stages -->
+  <stage name="ntuple1">
+    <fcl>reco_uboone_mcc9_8_driver_data_numi_optical_updated.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run1_data_cc0pinp.fcl</fcl>
+    <datafiletypes>root,pndr</datafiletypes>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple1/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple1/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple1/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple1/&version;</bookdir>
+    <inputdef>kmistry_prod_mcc9_v08_00_00_45_numi_reco2_run1_beam_good_reco2_goodruns_fhc_set1</inputdef>
+    <maxfilesperjob>10</maxfilesperjob>
+    <numjobs>24</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <disk>25GB</disk>
+    <schema>root</schema>
+    <jobsub>--expected-lifetime=6h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub_start> --expected-lifetime=short</jobsub_start>
+    <blacklist>Lancaster</blacklist>
+  </stage>
+
+  <!-- Project stages -->
+  <stage name="ntuple2">
+    <fcl>reco_uboone_mcc9_8_driver_data_numi_optical_updated.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run1_data_cc0pinp.fcl</fcl>
+    <datafiletypes>root,pndr</datafiletypes>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple2/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple2/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple2/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple2/&version;</bookdir>
+    <inputdef>kmistry_prod_mcc9_v08_00_00_45_numi_reco2_run1_beam_good_reco2_goodruns_fhc_set2</inputdef>
+    <maxfilesperjob>10</maxfilesperjob>
+    <numjobs>43</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <disk>25GB</disk>
+    <schema>root</schema>
+    <jobsub>--expected-lifetime=6h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub_start> --expected-lifetime=short</jobsub_start>
+    <blacklist>Lancaster</blacklist>
+  </stage>
+
+  <!-- Project stages -->
+  <stage name="ntuple3">
+    <fcl>reco_uboone_mcc9_8_driver_data_numi_optical_updated.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run1_data_cc0pinp.fcl</fcl>
+    <datafiletypes>root,pndr</datafiletypes>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple3/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple3/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple3/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple3/&version;</bookdir>
+    <inputdef>kmistry_prod_mcc9_v08_00_00_45_numi_reco2_run1_beam_good_reco2_goodruns_fhc_set3</inputdef>
+    <maxfilesperjob>10</maxfilesperjob>
+    <numjobs>34</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <disk>25GB</disk>
+    <schema>root</schema>
+    <jobsub>--expected-lifetime=6h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub_start> --expected-lifetime=short</jobsub_start>
+    <blacklist>Lancaster</blacklist>
+  </stage>
+
+  <!-- Project stages -->
+  <stage name="ntuple4">
+    <fcl>reco_uboone_mcc9_8_driver_data_numi_optical_updated.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run1_data_cc0pinp.fcl</fcl>
+    <datafiletypes>root,pndr</datafiletypes>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple4/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple4/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple4/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple4/&version;</bookdir>
+    <inputdef>kmistry_prod_mcc9_v08_00_00_45_numi_reco2_run1_beam_good_reco2_goodruns_fhc_set4</inputdef>
+    <maxfilesperjob>10</maxfilesperjob>
+    <numjobs>49</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <disk>25GB</disk>
+    <schema>root</schema>
+    <jobsub>--expected-lifetime=6h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub_start> --expected-lifetime=short</jobsub_start>
+    <blacklist>Lancaster</blacklist>
+  </stage>
+
+  <!-- Project stages -->
+  <stage name="ntuple5">
+    <fcl>reco_uboone_mcc9_8_driver_data_numi_optical_updated.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run1_data_cc0pinp.fcl</fcl>
+    <datafiletypes>root,pndr</datafiletypes>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple5/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple5/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple5/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple5/&version;</bookdir>
+    <inputdef>kmistry_prod_mcc9_v08_00_00_45_numi_reco2_run1_beam_good_reco2_goodruns_fhc_set5</inputdef>
+    <maxfilesperjob>10</maxfilesperjob>
+    <numjobs>87</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <disk>25GB</disk>
+    <schema>root</schema>
+    <jobsub>--expected-lifetime=6h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub_start> --expected-lifetime=short</jobsub_start>
+    <blacklist>Lancaster</blacklist>
+  </stage>
+
+  <!-- Project stages -->
+  <stage name="ntuple6">
+    <fcl>reco_uboone_mcc9_8_driver_data_numi_optical_updated.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run1_data_cc0pinp.fcl</fcl>
+    <datafiletypes>root,pndr</datafiletypes>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple6/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple6/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple6/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple6/&version;</bookdir>
+    <inputdef>kmistry_prod_mcc9_v08_00_00_45_numi_reco2_run1_beam_good_reco2_goodruns_fhc_set6</inputdef>
+    <maxfilesperjob>10</maxfilesperjob>
+    <numjobs>14</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <disk>25GB</disk>
+    <schema>root</schema>
+    <jobsub>--expected-lifetime=6h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub_start> --expected-lifetime=short</jobsub_start>
+    <blacklist>Lancaster</blacklist>
+  </stage>
+
+
 
   <!-- file type -->
   <filetype>&file_type;</filetype>

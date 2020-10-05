@@ -2,15 +2,16 @@
 
 <!-- Production Project -->
 <!DOCTYPE project [
-<!ENTITY release "v08_00_00_33">
+<!ENTITY release "v08_00_00_46">
 <!ENTITY file_type "data">
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
 <!ENTITY name "searchingfornues_run1_beamoff">
-<!ENTITY version "v2">
+<!ENTITY version "v3">
 ]>
 
 <!--v2 includes fix to common optical filter michel veto times -->
+<!--v3 includes processing of all run 1 ext made by production -->
 
 <job>
 
@@ -23,37 +24,147 @@
   <os>SL7</os>
 
   <!-- Batch resources -->
-  <resource>DEDICATED,OPPORTUNISTIC,OFFSITE</resource>
+  <resource>DEDICATED</resource>
 
   <!-- Larsoft information -->
   <larsoft>
     <tag>&release;</tag>
     <qual>e17:prof</qual>
-    <local>/pnfs/uboone/resilient/users/kmistry/tars/uboonecode_mcc9_v08_00_00_33_sl7.tar</local>
+    <local>/pnfs/uboone/resilient/users/kmistry/tars/uboonecode_mcc9_v08_00_00_46_sl7.tar</local>
   </larsoft>
 
   <!-- <check>1</check> -->
   <!-- <copy>1</copy> -->
   
   <!-- Project stages -->
-  <stage name="ntuple">
+  <stage name="ntuple0">
     <fcl>reco_uboone_mcc9_8_driver_data_ext_numi_optical_updated.fcl</fcl>
     <fcl>run_neutrinoselectionfilter_run1_data_cc0pinp.fcl</fcl>
-    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</outdir>
-    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</logdir>
-    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
-    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple0/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple0/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple0/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple0/&version;</bookdir>
     <maxfilesperjob>10</maxfilesperjob>
-    <numjobs>143</numjobs>
+    <numjobs>400</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <schema>root</schema>
-    <inputdef>numi_uboone_run1_beamoff_offset1_mcc9_reco2_v08_00_00_28_all_snapshot</inputdef>
-    <jobsub>--expected-lifetime=12h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <inputdef>kmistry_prod_mcc9_v08_00_00_45_extnumi_reco2_run1_all_reco2_good_runs_set0</inputdef>
+    <jobsub>--expected-lifetime=6h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
     <jobsub_start>  --expected-lifetime=short</jobsub_start>
     <blacklist>Lancaster</blacklist>
   </stage>
-  
+ 
+  <stage name="ntuple1">
+    <fcl>reco_uboone_mcc9_8_driver_data_ext_numi_optical_updated.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run1_data_cc0pinp.fcl</fcl>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple1/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple1/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple1/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple1/&version;</bookdir>
+    <maxfilesperjob>10</maxfilesperjob>
+    <numjobs>400</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <schema>root</schema>
+    <inputdef>kmistry_prod_mcc9_v08_00_00_45_extnumi_reco2_run1_all_reco2_good_runs_set1</inputdef>
+    <jobsub>--expected-lifetime=6h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub_start>  --expected-lifetime=short</jobsub_start>
+    <blacklist>Lancaster</blacklist>
+  </stage>
+
+  <stage name="ntuple2">
+    <fcl>reco_uboone_mcc9_8_driver_data_ext_numi_optical_updated.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run1_data_cc0pinp.fcl</fcl>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple2/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple2/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple2/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple2/&version;</bookdir>
+    <maxfilesperjob>10</maxfilesperjob>
+    <numjobs>400</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <schema>root</schema>
+    <inputdef>kmistry_prod_mcc9_v08_00_00_45_extnumi_reco2_run1_all_reco2_good_runs_set2</inputdef>
+    <jobsub>--expected-lifetime=6h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub_start>  --expected-lifetime=short</jobsub_start>
+    <blacklist>Lancaster</blacklist>
+  </stage>
+
+  <stage name="ntuple3">
+    <fcl>reco_uboone_mcc9_8_driver_data_ext_numi_optical_updated.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run1_data_cc0pinp.fcl</fcl>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple3/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple3/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple3/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple3/&version;</bookdir>
+    <maxfilesperjob>10</maxfilesperjob>
+    <numjobs>400</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <schema>root</schema>
+    <inputdef>kmistry_prod_mcc9_v08_00_00_45_extnumi_reco2_run1_all_reco2_good_runs_set3</inputdef>
+    <jobsub>--expected-lifetime=6h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub_start>  --expected-lifetime=short</jobsub_start>
+    <blacklist>Lancaster</blacklist>
+  </stage>
+
+  <stage name="ntuple4">
+    <fcl>reco_uboone_mcc9_8_driver_data_ext_numi_optical_updated.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run1_data_cc0pinp.fcl</fcl>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple4/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple4/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple4/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple4/&version;</bookdir>
+    <maxfilesperjob>10</maxfilesperjob>
+    <numjobs>400</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <schema>root</schema>
+    <inputdef>kmistry_prod_mcc9_v08_00_00_45_extnumi_reco2_run1_all_reco2_good_runs_set4</inputdef>
+    <jobsub>--expected-lifetime=6h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub_start>  --expected-lifetime=short</jobsub_start>
+    <blacklist>Lancaster</blacklist>
+  </stage>
+
+  <stage name="ntuple5">
+    <fcl>reco_uboone_mcc9_8_driver_data_ext_numi_optical_updated.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run1_data_cc0pinp.fcl</fcl>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple5/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple5/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple5/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple5/&version;</bookdir>
+    <maxfilesperjob>10</maxfilesperjob>
+    <numjobs>400</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <schema>root</schema>
+    <inputdef>kmistry_prod_mcc9_v08_00_00_45_extnumi_reco2_run1_all_reco2_good_runs_set5</inputdef>
+    <jobsub>--expected-lifetime=6h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub_start>  --expected-lifetime=short</jobsub_start>
+    <blacklist>Lancaster</blacklist>
+  </stage>
+
+  <stage name="ntuple6">
+    <fcl>reco_uboone_mcc9_8_driver_data_ext_numi_optical_updated.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run1_data_cc0pinp.fcl</fcl>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple6/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple6/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple6/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple6/&version;</bookdir>
+    <maxfilesperjob>10</maxfilesperjob>
+    <numjobs>400</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <schema>root</schema>
+    <inputdef>kmistry_prod_mcc9_v08_00_00_45_extnumi_reco2_run1_all_reco2_good_runs_set6</inputdef>
+    <jobsub>--expected-lifetime=6h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub_start>  --expected-lifetime=short</jobsub_start>
+    <blacklist>Lancaster</blacklist>
+  </stage>
+
+
+ 
   <!-- file type -->
   <filetype>&file_type;</filetype>
 
