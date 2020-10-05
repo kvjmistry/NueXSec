@@ -102,5 +102,37 @@ if [ "$1" == "var" ]; then
 fi
 
 
+#----------------------------------------------------------------------------------------------
+# Running the detector systematics
+
+# To run the det sys plotter now do source run_selection_mcc9_run1.sh allvar
+# This is just running the piece of code above, but for all the det variations at once, so you do not have to do it manually
+
+# This bit of code will run the piece of code above for all the detector variations, calculate deviation
+# the detector variations below are going to be taken into account, please make sure this list matches the _util.vec_var_string in Utility.h
+
+declare -a var=(
+  CV
+  LYRayleigh
+  LYAttenuation
+  SCE
+  Recomb2
+  WireModX
+  WireModYZ
+  WireModThetaXZ
+  WireModThetaYZ_withSigmaSplines
+  WireModThetaYZ_withoutSigmaSplines
+  WireModdEdX
+)
+if [ "$1" == "allvar" ]; then
+
+  # run the above script for every det variation 
+  for i in "${var[@]}"
+  do
+    source run_selection_mcc9_run1.sh var "$i"
+  done
+
+fi
+
 
 

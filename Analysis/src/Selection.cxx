@@ -49,16 +49,10 @@ void Selection::Initialise(Utility _utility){
     std::cout << "Getting the CV flux file..."<< std::endl;
     if (strcmp(_util.run_period, "1") == 0) {
         f_flux_weights = new TFile("Systematics/f_flux_CV_weights_fhc.root", "READ");
-
-        // If its null then default to location on gpvm
-        if (f_flux_weights == NULL) f_flux_weights = new TFile("/uboone/data/users/kmistry/work/nuexsec_files/f_flux_CV_weights_fhc.root", "READ");
-
     }
     if (strcmp(_util.run_period, "3") == 0) {
         f_flux_weights = new TFile("Systematics/f_flux_CV_weights_rhc.root", "READ");
-
-        // If its null then default to location on gpvm
-        if (f_flux_weights == NULL) f_flux_weights = new TFile("/uboone/data/users/kmistry/work/nuexsec_files/f_flux_CV_weights_rhc.root", "READ");
+       
     }
 
     // Resize the counter vector

@@ -102,6 +102,9 @@ int main(int argc, char *argv[]){
     std::cout << "Time taken by function: " << duration_sec.count() << " seconds" << std::endl; 
     std::cout << "Time taken by function: " << duration_min.count() << " minutes" << std::endl; 
     
+    if (_utility.use_gpvm)
+        std::cout << _utility.red << "If your terminal is not returned to you after 20 seconds of seeing this message then hit crtl c" << _utility.reset << std::endl; 
+    
     // exit(0);
     return 0;
 }

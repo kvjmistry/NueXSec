@@ -168,7 +168,7 @@ class SystematicsHelper{
 
     std::vector<std::string> var_string_pretty = {
         "CV",
-        "BNB Diffusion",
+        // "BNB Diffusion",
         "Light Yield Rayleigh",
         "Light Yield Attenuation",
         "SCE",

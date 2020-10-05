@@ -149,6 +149,7 @@ public:
     bool print_ext                 = false;
     bool print_dirt                = false;
     bool plot_sys_uncertainty      = false;
+    bool use_gpvm                  = false; // choose whether you are on the gpvm or Krish's personal laptop
 
     // inputs 
     char * mc_file_name          = (char *)"empty";
