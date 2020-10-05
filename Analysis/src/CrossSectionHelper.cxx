@@ -859,31 +859,33 @@ void CrossSectionHelper::WriteHists(){
 
         }
     }
+    else {
 
-    // This is if we want to write the histograms by cut -- stole this cheeky bit of code stucture from Marina, thanks ;) !
-    for (unsigned int label = 0; label < reweighter_labels.size(); label++) {
-        
-        // Loop over the Cuts
-        for (unsigned int cut = 0; cut < h_cut_v.at(label).size(); cut++) {
+        // This is if we want to write the histograms by cut -- stole this cheeky bit of code stucture from Marina, thanks ;) !
+        for (unsigned int label = 0; label < reweighter_labels.size(); label++) {
+            
+            // Loop over the Cuts
+            for (unsigned int cut = 0; cut < h_cut_v.at(label).size(); cut++) {
 
-            // Loop over the variables
-            for (unsigned int var = 0; var < h_cut_v.at(label).at(cut).size(); var++) {
+                // Loop over the variables
+                for (unsigned int var = 0; var < h_cut_v.at(label).at(cut).size(); var++) {
 
-                fnuexsec_out->cd();    // change current directory to top
+                    fnuexsec_out->cd();    // change current directory to top
 
-                if(!fnuexsec_out->GetDirectory(Form("%s/Cuts/%s/%s", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), _util.vec_hist_name.at(var).c_str() ))) 
-                    fnuexsec_out->mkdir(Form("%s/Cuts/%s/%s", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), _util.vec_hist_name.at(var).c_str() )); // if the directory does not exist, create it
-                
-                fnuexsec_out->cd(Form("%s/Cuts/%s/%s", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), _util.vec_hist_name.at(var).c_str() )); // open the directory
+                    if(!fnuexsec_out->GetDirectory(Form("%s/Cuts/%s/%s", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), _util.vec_hist_name.at(var).c_str() ))) 
+                        fnuexsec_out->mkdir(Form("%s/Cuts/%s/%s", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), _util.vec_hist_name.at(var).c_str() )); // if the directory does not exist, create it
+                    
+                    fnuexsec_out->cd(Form("%s/Cuts/%s/%s", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), _util.vec_hist_name.at(var).c_str() )); // open the directory
 
-                // loop over the universes
-                for (unsigned int uni = 0; uni < h_cut_v.at(label).at(cut).at(var).size(); uni++){
-                    h_cut_v.at(label).at(cut).at(var).at(uni)->SetOption("hist");
-                    h_cut_v.at(label).at(cut).at(var).at(uni)->Write("",TObject::kOverwrite);
+                    // loop over the universes
+                    for (unsigned int uni = 0; uni < h_cut_v.at(label).at(cut).at(var).size(); uni++){
+                        h_cut_v.at(label).at(cut).at(var).at(uni)->SetOption("hist");
+                        h_cut_v.at(label).at(cut).at(var).at(uni)->Write("",TObject::kOverwrite);
+                    }
                 }
             }
-        }
 
+        }
     }
 
     fnuexsec_out->cd();    // change current directory to top
@@ -1428,33 +1430,35 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
             
             // Loop over the universes
             for (unsigned int uni=0; uni < h_cut_v.at(label).at(cut).at(0).size(); uni++){
+                
+                // Only initialise if this mode to stop loading too much into memory
+                if (std::string(_util.xsec_rw_mode) != "rw_cuts"){
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_softwaretrig).at(uni)                   = new TH1D(Form("h_reco_softwaretrig_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 2, 0, 2);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_nslice).at(uni)                         = new TH1D(Form("h_reco_nslice_%s_%s_%i",                         reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 2, 0, 2);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_shower_multiplicity).at(uni)            = new TH1D(Form("h_reco_shower_multiplicity_%s_%s_%i",            reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 6, 0, 6);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_track_multiplicity).at(uni)             = new TH1D(Form("h_reco_track_multiplicity_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 6, 0, 6);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_topological_score).at(uni)              = new TH1D(Form("h_reco_topological_score_%s_%s_%i",              reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, 0, 1);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_vtx_x_sce).at(uni)                      = new TH1D(Form("h_reco_vtx_x_sce_%s_%s_%i",                      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 15, -10, 270);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_vtx_y_sce).at(uni)                      = new TH1D(Form("h_reco_vtx_y_sce_%s_%s_%i",                      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -120, 120);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_vtx_z_sce).at(uni)                      = new TH1D(Form("h_reco_vtx_z_sce_%s_%s_%i",                      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -10, 1050);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_shower_score).at(uni)                   = new TH1D(Form("h_reco_shower_score_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 0.5);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max).at(uni)             = new TH1D(Form("h_reco_shr_tkfit_dedx_max_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max_with_tracks).at(uni) = new TH1D(Form("h_reco_shr_tkfit_dedx_max_with_tracks_%s_%s_%i", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max_no_tracks).at(uni)   = new TH1D(Form("h_reco_shr_tkfit_dedx_max_no_tracks_%s_%s_%i",   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_shower_to_vtx_dist).at(uni)             = new TH1D(Form("h_reco_shower_to_vtx_dist_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 20);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_hits_ratio).at(uni)                     = new TH1D(Form("h_reco_hits_ratio_%s_%s_%i",                     reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 21, 0, 1.05);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_CosmicIPAll3D).at(uni)                  = new TH1D(Form("h_reco_CosmicIPAll3D_%s_%s_%i",                  reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 200);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_contained_fraction).at(uni)             = new TH1D(Form("h_reco_contained_fraction_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 21, 0, 1.05);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_shrmoliereavg).at(uni)                  = new TH1D(Form("h_reco_shrmoliereavg_%s_%s_%i",                  reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, 0, 30);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_leading_shower_theta).at(uni)           = new TH1D(Form("h_reco_leading_shower_theta_%s_%s_%i",           reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 13, 0, 190);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_leading_shower_phi).at(uni)             = new TH1D(Form("h_reco_leading_shower_phi_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 14, -190, 190);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_shower_energy_cali).at(uni)             = new TH1D(Form("h_reco_shower_energy_cali_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 4);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_flash_time).at(uni)                     = new TH1D(Form("h_reco_flash_time_%s_%s_%i",                     reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 50, 0, 25);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_flash_pe).at(uni)                       = new TH1D(Form("h_reco_flash_pe_%s_%s_%i",                       reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 25, 0, 5000);
 
-                h_cut_v.at(label).at(cut).at(_util.k_cut_softwaretrig).at(uni)                   = new TH1D(Form("h_reco_softwaretrig_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 2, 0, 2);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_nslice).at(uni)                         = new TH1D(Form("h_reco_nslice_%s_%s_%i",                         reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 2, 0, 2);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_shower_multiplicity).at(uni)            = new TH1D(Form("h_reco_shower_multiplicity_%s_%s_%i",            reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 6, 0, 6);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_track_multiplicity).at(uni)             = new TH1D(Form("h_reco_track_multiplicity_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 6, 0, 6);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_topological_score).at(uni)              = new TH1D(Form("h_reco_topological_score_%s_%s_%i",              reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, 0, 1);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_vtx_x_sce).at(uni)                      = new TH1D(Form("h_reco_vtx_x_sce_%s_%s_%i",                      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 15, -10, 270);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_vtx_y_sce).at(uni)                      = new TH1D(Form("h_reco_vtx_y_sce_%s_%s_%i",                      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -120, 120);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_vtx_z_sce).at(uni)                      = new TH1D(Form("h_reco_vtx_z_sce_%s_%s_%i",                      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -10, 1050);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_shower_score).at(uni)                   = new TH1D(Form("h_reco_shower_score_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 0.5);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max).at(uni)             = new TH1D(Form("h_reco_shr_tkfit_dedx_max_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max_with_tracks).at(uni) = new TH1D(Form("h_reco_shr_tkfit_dedx_max_with_tracks_%s_%s_%i", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max_no_tracks).at(uni)   = new TH1D(Form("h_reco_shr_tkfit_dedx_max_no_tracks_%s_%s_%i",   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_shower_to_vtx_dist).at(uni)             = new TH1D(Form("h_reco_shower_to_vtx_dist_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 20);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_hits_ratio).at(uni)                     = new TH1D(Form("h_reco_hits_ratio_%s_%s_%i",                     reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 21, 0, 1.05);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_CosmicIPAll3D).at(uni)                  = new TH1D(Form("h_reco_CosmicIPAll3D_%s_%s_%i",                  reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 200);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_contained_fraction).at(uni)             = new TH1D(Form("h_reco_contained_fraction_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 21, 0, 1.05);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_shrmoliereavg).at(uni)                  = new TH1D(Form("h_reco_shrmoliereavg_%s_%s_%i",                  reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, 0, 30);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_leading_shower_theta).at(uni)           = new TH1D(Form("h_reco_leading_shower_theta_%s_%s_%i",           reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 13, 0, 190);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_leading_shower_phi).at(uni)             = new TH1D(Form("h_reco_leading_shower_phi_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 14, -190, 190);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_shower_energy_cali).at(uni)             = new TH1D(Form("h_reco_shower_energy_cali_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 4);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_flash_time).at(uni)                     = new TH1D(Form("h_reco_flash_time_%s_%s_%i",                     reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 50, 0, 25);
-                h_cut_v.at(label).at(cut).at(_util.k_cut_flash_pe).at(uni)                       = new TH1D(Form("h_reco_flash_pe_%s_%s_%i",                       reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 25, 0, 5000);
-
-                double* edges = &_util.reco_shr_bins[0]; // Cast to an array 
-                h_cut_v.at(label).at(cut).at(_util.k_cut_shower_energy_cali_rebin).at(uni)  = new TH1D(Form("h_reco_shower_energy_cali_rebin_%s_%s_%i",  reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", _util.reco_shr_bins.size()-1, edges);
-
+                    double* edges = &_util.reco_shr_bins[0]; // Cast to an array 
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_shower_energy_cali_rebin).at(uni)  = new TH1D(Form("h_reco_shower_energy_cali_rebin_%s_%s_%i",  reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", _util.reco_shr_bins.size()-1, edges);
+                }
             }
         }
     }

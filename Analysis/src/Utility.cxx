@@ -377,14 +377,14 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     // Set the scale factors
     if (strcmp(run_period, "1") == 0){
         mc_scale_factor     = config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_MC_POT);
-        dirt_scale_factor   = config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_Dirt_POT);
+        dirt_scale_factor   = 0.45*config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_Dirt_POT);
         ext_scale_factor    = config_v.at(k_Run1_Data_trig) / config_v.at(k_Run1_EXT_trig);
         intrinsic_weight    = config_v.at(k_Run1_MC_POT)    / config_v.at(k_Run1_Intrinsic_POT);
     }
     else if (strcmp(run_period, "3") == 0){
         mc_scale_factor     = config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_MC_POT);
-        dirt_scale_factor   = config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_Dirt_POT);
-        ext_scale_factor    = config_v.at(k_Run3_Data_trig) / config_v.at(k_Run3_EXT_trig);
+        dirt_scale_factor   = 0.45*config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_Dirt_POT);
+        ext_scale_factor    = 0.95*config_v.at(k_Run3_Data_trig) / config_v.at(k_Run3_EXT_trig);
     }
     else {
         std::cout << "Error Krish... You havent specified the run period!" << std::endl;
@@ -404,6 +404,11 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         std::cout << blue << "Intrinsic Factor:\n" << intrinsic_weight << std::endl;
         std::cout << "-------------------------------" << reset << std::endl;
     }
+
+    if (use_gpvm)
+        std::cout << red << "Using gpvm environment, all paths will be set compatible with running on a gpvm"<< reset << std::endl;
+    else 
+        std::cout << red << "Using local environment, all paths will be set compatible with running on Krish's computer"<< reset << std::endl;
     
     
 }
@@ -503,13 +508,7 @@ void Utility::CheckWeight(float &weight){
 double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv){
 
     // Always give weights of 1 to the data
-    if (type == k_data ) return 1.0;
-
-    // Run 1 and ext, correct by 2%
-    if (type == k_ext && std::string(run_period) == "1" && weight_ext) return 0.98;
-
-    // Run 3 and ext, correct by 5%
-    if (type == k_ext && std::string(run_period) == "3" && weight_ext) return 0.95;
+    if (type == k_data || type == k_ext) return 1.0;
 
     double weight = 1.0;
 
@@ -526,9 +525,6 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
     CheckWeight(weight_flux);
 
     if (weight_ppfx) weight = weight * weight_flux;
-
-    // For the dirt we correct it by 65%
-    if (type == k_dirt && weight_dirt) weight = weight*0.45;
 
     // Weight the below threshold events to zero. Current threhsold is 125 MeV
     if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12) && nu_e <= 0.125) weight = 0.0;
