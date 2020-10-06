@@ -74,7 +74,7 @@ void CrossSectionHelper::Initialise(Utility _utility){
     }
     
     // Get the integrated flux for the CV
-    integrated_flux = GetIntegratedFlux(0, "CV", "", "");
+    integrated_flux = GetIntegratedFlux(0, "CV", "", "", 0, 0.0, 0.0);
 
 
     // Now lets open the beamline variation files
@@ -151,7 +151,7 @@ void CrossSectionHelper::LoopEvents(){
                 double weight_uni{1.0}; 
 
                 // Set the weight for universe i
-                SetUniverseWeight(reweighter_labels.at(label), weight_uni, weight_dirt, weight_ext, weightSplineTimesTune, *classification, cv_weight, uni);
+                SetUniverseWeight(reweighter_labels.at(label), weight_uni, weight_dirt, weight_ext, weightSplineTimesTune, *classification, cv_weight, uni, nu_pdg, true_energy, numi_ang);
 
                 // Signal event
                 if ((*classification == "nue_cc" || *classification == "nuebar_cc" || *classification == "unmatched_nue" || *classification == "unmatched_nuebar") && passed_selection) {
@@ -236,7 +236,7 @@ void CrossSectionHelper::LoopEvents(){
                 double temp_integrated_flux = integrated_flux;
 
                 // If we are reweighting by the PPFX Multisims, we need to change the integrated flux too
-                if (reweighter_labels.at(label) == "weightsPPFX") temp_integrated_flux = GetIntegratedFlux(uni, "HP", "ppfx_ms_UBPPFX", reweighter_labels.at(label));
+                if (reweighter_labels.at(label) == "weightsPPFX") temp_integrated_flux = GetIntegratedFlux(uni, "HP", "ppfx_ms_UBPPFX", reweighter_labels.at(label), nu_pdg, true_energy, numi_ang);
 
                 // If this is a beamline variation then we use the corresponding beamline flux
                 if (CheckBeamline(reweighter_labels.at(label))) {
@@ -503,8 +503,8 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
             // Update the CV weight to CV * universe i
             double weight_uni{1.0}; 
 
-            SetUniverseWeight(reweighter_labels.at(label), weight_uni, weight_dirt, weight_ext, SC.weightSplineTimesTune, classification.first, cv_weight, uni);
-
+            double _numi_ang = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "beam");
+            SetUniverseWeight(reweighter_labels.at(label), weight_uni, weight_dirt, weight_ext, SC.weightSplineTimesTune, classification.first, cv_weight, uni, SC.nu_pdg, SC.nu_e, _numi_ang);
 
             double dedx_max = SC.GetdEdxMax();
 
@@ -541,7 +541,7 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
 
 }
 // -----------------------------------------------------------------------------
-void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double &weight_ext,  double _weightSplineTimesTune, std::string _classification, double cv_weight, int uni ){
+void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double &weight_ext,  double _weightSplineTimesTune, std::string _classification, double cv_weight, int uni, int _nu_pdg, double _true_energy, double _numi_ang ){
 
     // Weight equal to universe weight times cv weight
     if (label == "weightsReint" || label == "weightsPPFX" || label == "CV" ){
@@ -566,8 +566,8 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
     }
     // This is a beamline variation
     else if (CheckBeamline(label)){
-        weight_uni = cv_weight * GetIntegratedFlux(0, "", "", label);
-        // std::cout << GetIntegratedFlux(0, "", "", label) << std::endl;
+        weight_uni = cv_weight * GetIntegratedFlux(0, "", "", label, _nu_pdg, _true_energy, _numi_ang);
+        // std::cout << GetIntegratedFlux(0, "", "", label, _nu_pdg, _true_energy, _numi_ang) << std::endl;
     }
     // Dirt reweighting
     else if ( label == "Dirtup" || label == "Dirtdn"){
@@ -661,7 +661,7 @@ void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg,
 
 }
 // -----------------------------------------------------------------------------
-double CrossSectionHelper::GetIntegratedFlux(int uni, std::string value, std::string label, std::string variation){
+double CrossSectionHelper::GetIntegratedFlux(int uni, std::string value, std::string label, std::string variation, int _nu_pdg, double _true_energy, double _numi_ang){
 
     f_flux->cd();
 
@@ -741,27 +741,27 @@ double CrossSectionHelper::GetIntegratedFlux(int uni, std::string value, std::st
         // std::cout <<true_energy << "  " <<  numi_ang << "  " << nu_pdg<< std::endl;
 
         // Nue
-        if (nu_pdg == 12){
-            xbin = beamline_hists.at(var_index).at(k_nue)->GetXaxis()->FindBin(true_energy);
-            ybin = beamline_hists.at(var_index).at(k_nue)->GetYaxis()->FindBin(numi_ang);
+        if (_nu_pdg == 12){
+            xbin = beamline_hists.at(var_index).at(k_nue)->GetXaxis()->FindBin(_true_energy);
+            ybin = beamline_hists.at(var_index).at(k_nue)->GetYaxis()->FindBin(_numi_ang);
             return ( beamline_hists.at(var_index).at(k_nue)->GetBinContent(xbin, ybin));
         }
         // Nuebar
-        else if (nu_pdg == -12){
-            xbin = beamline_hists.at(var_index).at(k_nuebar)->GetXaxis()->FindBin(true_energy);
-            ybin = beamline_hists.at(var_index).at(k_nuebar)->GetYaxis()->FindBin(numi_ang);
+        else if (_nu_pdg == -12){
+            xbin = beamline_hists.at(var_index).at(k_nuebar)->GetXaxis()->FindBin(_true_energy);
+            ybin = beamline_hists.at(var_index).at(k_nuebar)->GetYaxis()->FindBin(_numi_ang);
             return ( beamline_hists.at(var_index).at(k_nuebar)->GetBinContent(xbin, ybin));
         }
         // Numu
-        else if (nu_pdg == 14){
-            xbin = beamline_hists.at(var_index).at(k_numu)->GetXaxis()->FindBin(true_energy);
-            ybin = beamline_hists.at(var_index).at(k_numu)->GetYaxis()->FindBin(numi_ang);
+        else if (_nu_pdg == 14){
+            xbin = beamline_hists.at(var_index).at(k_numu)->GetXaxis()->FindBin(_true_energy);
+            ybin = beamline_hists.at(var_index).at(k_numu)->GetYaxis()->FindBin(_numi_ang);
             return ( beamline_hists.at(var_index).at(k_numu)->GetBinContent(xbin, ybin));
         }
         // NumuBar
-        else if (nu_pdg == -14){
-            xbin = beamline_hists.at(var_index).at(k_numubar)->GetXaxis()->FindBin(true_energy);
-            ybin = beamline_hists.at(var_index).at(k_numubar)->GetYaxis()->FindBin(numi_ang);
+        else if (_nu_pdg == -14){
+            xbin = beamline_hists.at(var_index).at(k_numubar)->GetXaxis()->FindBin(_true_energy);
+            ybin = beamline_hists.at(var_index).at(k_numubar)->GetYaxis()->FindBin(_numi_ang);
             return ( beamline_hists.at(var_index).at(k_numubar)->GetBinContent(xbin, ybin));
         }
         else return 1.0;
@@ -1432,7 +1432,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
             for (unsigned int uni=0; uni < h_cut_v.at(label).at(cut).at(0).size(); uni++){
                 
                 // Only initialise if this mode to stop loading too much into memory
-                if (std::string(_util.xsec_rw_mode) != "rw_cuts"){
+                if (std::string(_util.xsec_rw_mode) == "rw_cuts"){
                     h_cut_v.at(label).at(cut).at(_util.k_cut_softwaretrig).at(uni)                   = new TH1D(Form("h_reco_softwaretrig_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 2, 0, 2);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_nslice).at(uni)                         = new TH1D(Form("h_reco_nslice_%s_%s_%i",                         reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 2, 0, 2);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_shower_multiplicity).at(uni)            = new TH1D(Form("h_reco_shower_multiplicity_%s_%s_%i",            reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 6, 0, 6);
@@ -1484,6 +1484,8 @@ void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double wei
 }
 // -----------------------------------------------------------------------------
 void CrossSectionHelper::GetBeamlineHists(){
+
+    std::cout  << "Initialising Beamline Histograms" << std::endl;
 
     // Resize the vector
     beamline_hists.resize(beamline_map.size());
