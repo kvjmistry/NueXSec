@@ -48,7 +48,7 @@ class SystematicsHelper{
     void PlotVariationsEXT(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name);
     // -------------------------------------------------------------------------
     // Plots the Sys Variations
-    void SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name);
+    void SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name, std::string cut_name_pretty);
     // -------------------------------------------------------------------------
     void SetVariationProperties(TH1D* h, int index);
     // -------------------------------------------------------------------------
@@ -166,19 +166,36 @@ class SystematicsHelper{
         "WireModdEdX"
     };
 
+    // strings used for the legend of the plots of the detector variations
     std::vector<std::string> var_string_pretty = {
         "CV",
         // "BNB Diffusion",
-        "Light Yield Rayleigh",
-        "Light Yield Attenuation",
+        "LY Rayleigh",
+        "LY Attenuation",
         "SCE",
         "Recombination",
-        "Wire Mod X",
-        "Wire Mod YZ",
-        "Wire Mod Theta XZ",
-        "Wire Mod Theta YZ w/ Spl.",
-        "Wire Mod Theta YZ w/o Spl.",
-        "Wire Mod dE/dX" 
+        "WM X",
+        "WM YZ",
+        "WM Theta XZ",
+        "WM Theta YZ w/ Spl.",
+        "WM Theta YZ w/o Spl.",
+        "WM dE/dX" 
+    };
+
+    // colors used for the plots of the detector variations
+    std::vector<int> var_string_pretty_color = {
+         1, // CV
+         //2, // BNB Diffusion
+         2, // LYRayleigh
+         6, // LYAttenuation
+         3, // SCE
+         9, // Recombination
+         30, // WM X
+         4, // WM YZ
+         53, // WM Theta XZ
+         8, // WM Theta YZ w/ Spl.
+         95, // WM Theta YZ w/o Spl.
+         7 // WM dE/dX
     };
 
     // enum for histogram vars

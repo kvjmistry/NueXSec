@@ -187,15 +187,15 @@ void SystematicsHelper::MakeHistograms(){
             _util.CreateDirectory("/detvar/comparisons/cuts/" + _util.cut_dirs.at(i));
 
             // Create the directory for sysvar
-            _util.CreateDirectory("/systvar/comparisons/cuts/" + _util.cut_dirs.at(i));
+            //_util.CreateDirectory("/systvar/comparisons/cuts/" + _util.cut_dirs.at(i));
 
             for(unsigned int j=0; j < _util.vec_hist_name.size(); j++){
 
-                SysVariations(Form("%s", _util.vec_hist_name.at(j).c_str()), Form("plots/run%s/systvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()),
-                            _util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str(), _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str());
+                SysVariations(Form("%s", _util.vec_hist_name.at(j).c_str()), Form("plots/run%s/detvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()),
+                            _util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str(), _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str(), _util.cut_dirs_pretty.at(i).c_str());
 
-                PlotVariations(Form("%s", _util.vec_hist_name.at(j).c_str()), Form("plots/run%s/detvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()),
-                            _util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str());
+                //PlotVariations(Form("%s", _util.vec_hist_name.at(j).c_str()), Form("plots/run%s/detvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()),
+                            //_util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str());
             }
         }
         // Ext mode
@@ -393,10 +393,11 @@ void SystematicsHelper::PlotVariations(std::string hist_name, const char* print_
 
 }
 // ----------------------------------------------------------------------------
-void SystematicsHelper::SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name){
+void SystematicsHelper::SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name, std::string cut_name_pretty){
 
-    // last updated on Sept 18 by Marina Reggiani-Guzzo
-
+    // ------------------------------------------------------------
+    // Some initial configurations and work around fixes
+    
     // For some reason the print name keeps changing, this fixes it somewhat
     std::string print_name_str = std::string(print_name);
 
@@ -410,13 +411,14 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
     hist_diff.resize(k_vars_MAX);
     hist_ratio.resize(k_vars_MAX);
 
-    TCanvas * c      = new TCanvas();
+    TCanvas * c      = new TCanvas("","",500,500);
     TPad * topPad    = new TPad("topPad", "", 0, 0.3, 1, 1.0);
     TPad * bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
-
     _util.SetTPadOptions(topPad, bottomPad );
 
+    // ------------------------------------------------------------
     // Loop over the variations and get the histograms
+    
     for (unsigned int k=0; k < f_vars.size(); k++){
         
         // Loop over the classifications and get the histograms
@@ -437,7 +439,20 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
         
     }
 
+    // Legend
+    // on top of the topCanvs to avoid overlaping the plot
+    TLegend *leg = new TLegend(0.1686747,0.7233083,0.8795181,0.8406015,NULL,"brNDC");
+    leg->SetNColumns(4);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+
+    // ------------------------------------------------------------
     // Now scale the histograms to POT
+    // and draw the histograms on the top pad
+
+    // variable used to track the max bin content to later scale the plot to avoid cutting information
+    Double_t max_bin = 0.; 
+
     for (unsigned int y=0; y < hist.size(); y++ ){
         double scale_fact = POT_v.at(k_CV) / POT_v.at(y);
         // std::cout << "scale factor: " << scale_fact << std::endl;
@@ -449,10 +464,6 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
             h_error_hist->SetFillColorAlpha(12, 0.15);
             h_error_hist->SetLineWidth(2);
             h_error_hist->SetLineColor(kBlack);
-            h_error_hist->GetYaxis()->SetTitle("Entries");
-            h_error_hist->GetYaxis()->SetTitleFont(46);
-            h_error_hist->GetYaxis()->SetTitleSize(13);
-            h_error_hist->Draw("E2");
         }
 
         // calculate difference between cv and the histogram with variation
@@ -467,53 +478,39 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
         SetVariationProperties(hist.at(y), y);
 
         // Draw the histograms
-        if (y == k_CV) hist.at(y)->Draw("hist, same");
-        else hist.at(y)->Draw("hist,E, same");
-    }
-
-    // Legend
-    TLegend *leg = new TLegend(0.8, 0.91, 0.95, 0.32);
-    leg->SetBorderSize(0);
-    leg->SetFillStyle(0);
-    leg->AddEntry(h_error_hist, "CV",   "lf");
-    // leg->AddEntry(hist.at(k_bnb_diffusion), "BNB Diffusion", "l");
-    leg->Draw();
-
-    // Now draw the ratio
-    bottomPad->cd();
-
-    for (unsigned int k =0; k < hist_ratio.size(); k++){
-
-        SetVariationProperties(hist_ratio.at(k), k);
-        hist_ratio.at(k)->SetLineWidth(1);
-
-
-        hist_ratio.at(k)->GetXaxis()->SetLabelSize(12);
-        hist_ratio.at(k)->GetXaxis()->SetLabelFont(43); 
-        hist_ratio.at(k)->GetYaxis()->SetLabelSize(11);
-        hist_ratio.at(k)->GetYaxis()->SetLabelFont(43);
-        hist_ratio.at(k)->GetXaxis()->SetTitleOffset(3.0);
-        hist_ratio.at(k)->GetXaxis()->SetTitleSize(17);
-        hist_ratio.at(k)->GetXaxis()->SetTitleFont(46);
-        hist_ratio.at(k)->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
-        hist_ratio.at(k)->GetYaxis()->SetRangeUser(-3.0, 3.0);
-        hist_ratio.at(k)->GetYaxis()->SetTitle("(Variation-CV) / CV");
-        hist_ratio.at(k)->GetYaxis()->SetTitleSize(13);
-        hist_ratio.at(k)->GetYaxis()->SetTitleFont(44);
-        hist_ratio.at(k)->GetYaxis()->SetTitleOffset(1.5);
-        hist_ratio.at(k)->SetTitle(" ");
-        hist_ratio.at(k)->GetXaxis()->SetTitle(x_axis_name);
-        
-        if (k == 0) hist_ratio.at(k)->Draw("hist,same");
-        else {
-
-        hist_ratio.at(k)->Draw("hist,E,same");
-
+        if (y == k_CV) {
+	    leg->AddEntry(h_error_hist, "CV", "lf");
+	    if(hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()) > max_bin) max_bin = hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()); // for scale purposes
         }
-
+        else {
+            hist.at(y)->SetLineColor(var_string_pretty_color.at(y));  // change color of the histogram
+            leg->AddEntry(hist.at(y), var_string_pretty.at(y).c_str(), "l"); // add histogram to legend
+            if(hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()) > max_bin) max_bin = hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()); // for scale purposes
+        }
     }
 
-    c->Print(print_name_str.c_str());
+    // -----------------------------------------------------------------
+    // Drawing histograms on top pad
+
+    // setting hist config to the first one that we drawn
+    hist.at(0)->GetYaxis()->SetRangeUser(0,max_bin*1.2);
+    hist.at(0)->GetYaxis()->SetTitle("Entries / bin");
+    hist.at(0)->GetXaxis()->SetLabelSize(0);
+    hist.at(0)->GetYaxis()->SetTitleSize(0.05);
+    hist.at(0)->GetYaxis()->SetLabelSize(0.05);
+
+    // drawing histograms
+    for (unsigned int y=0; y < hist.size(); y++ ) {
+	if (y == 0) hist.at(y)->Draw("hist"); // distinction made so the RangeUser is taken into account, it does not work with "same"
+	else hist.at(y)->Draw("hist, same");
+        //if (y == k_CV) h_error_hist->Draw("E2, same");
+    }
+    // drawing CV again to make sure it is on top of everything else
+    h_error_hist->Draw("E2, same");
+    hist.at(k_CV)->Draw("hist, same");
+
+    // drawing legend
+    leg->Draw();
 
     // -----------------------------------------------------------------
     // calculate and save the total detector systematics uncertainty 
@@ -566,24 +563,55 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
     file_sys_var->cd(Form("%s/TotalDetectorSys", folder_name.c_str())); // open the directory
     h_det_sys_tot->SetDirectory(gDirectory);
     h_det_sys_tot->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite); 
-  
+
     // -----------------------------------------------------------------
+    // Drawing the total detector systematic uncertainty on the bottom pad
+
+    bottomPad->cd();
+
+    h_det_sys_tot->GetYaxis()->SetMaxDigits(2);
+    h_det_sys_tot->SetLineWidth(2);
+    h_det_sys_tot->SetLineColor(1);
+    h_det_sys_tot->GetXaxis()->SetLabelSize(15); // 12
+    h_det_sys_tot->GetXaxis()->SetLabelFont(43); 
+    h_det_sys_tot->GetYaxis()->SetLabelSize(11);
+    h_det_sys_tot->GetYaxis()->SetLabelFont(43);
+    h_det_sys_tot->GetXaxis()->SetTitleOffset(3.2); // 3
+    h_det_sys_tot->GetXaxis()->SetTitleSize(17); // 17
+    h_det_sys_tot->GetXaxis()->SetTitleFont(46);
+    h_det_sys_tot->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
+    h_det_sys_tot->GetYaxis()->SetRangeUser(0, h_det_sys_tot->GetBinContent(h_det_sys_tot->GetMaximumBin())*1.1);
+    h_det_sys_tot->GetYaxis()->SetTitle("Tot Det Sys Uncert");
+    h_det_sys_tot->GetYaxis()->SetTitleSize(13); // 13
+    h_det_sys_tot->GetYaxis()->SetTitleFont(44);
+    h_det_sys_tot->GetYaxis()->SetLabelSize(15); // new
+    h_det_sys_tot->GetYaxis()->SetTitleOffset(2);
+    h_det_sys_tot->SetTitle(" ");
+    h_det_sys_tot->GetXaxis()->SetTitle(x_axis_name);
 
 
-  /*
-    TH1D* h_ratio_error = (TH1D*) h_error_hist->Clone("h_ratio_error");
-    h_ratio_error->Divide(h_ratio_error);
-    h_ratio_error->Draw("e2, same");
-    */
+    h_det_sys_tot->Draw("hist");
 
+    // do you want to print the selection cut stage on your canvas?
+    c->cd();
+    TLatex *lat = new TLatex(0.15, 0.91, Form("Selection stage: %s", cut_name_pretty.c_str()));
+    lat->SetTextSize(0.03);
+    lat->Draw();
+    c->Modified();
 
     // Draw the run period on the plot
-    // _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
-
+    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
+      
     // Add the weight labels
     // Draw_WeightLabels(c);
-    
-    
+ 
+    //---------------------------------------------------------------
+    // draw final canvas as pdf
+
+    c->Print(print_name_str.c_str()); 
+
+    // close the canvas to avoid warning messages on the terminal
+    c->Close();  
 
 }
 // ----------------------------------------------------------------------------
