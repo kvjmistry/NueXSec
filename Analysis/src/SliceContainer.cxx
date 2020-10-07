@@ -1,7 +1,7 @@
 #include "../include/SliceContainer.h"
 
 // -----------------------------------------------------------------------------
-void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, Utility util){
+void SliceContainer::Initialise(TTree *tree, int type, Utility util){
 
     std::cout << "Initalising Slice Container" << std::endl;
     _util = util;
@@ -394,16 +394,6 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, Ut
     tree->SetBranchAddress("trk_mcs_muon_mom_v",       &trk_mcs_muon_mom_v);
     tree->SetBranchAddress("trk_range_muon_mom_v",     &trk_range_muon_mom_v);
     tree->SetBranchAddress("trk_llr_pid_score_v",      &trk_llr_pid_score_v);
-
-    // Initalise the flux histograms if MC only
-    if (type == _util.k_mc){
-        bool boolhist;
-        boolhist = _util.GetHist(f_flux_weights, h_2D_CV_UW_PPFX_ratio_nue,     "h_2D_CV_UW_PPFX_ratio_nue");     if (boolhist == false) exit(2); 
-        boolhist = _util.GetHist(f_flux_weights, h_2D_CV_UW_PPFX_ratio_nuebar,  "h_2D_CV_UW_PPFX_ratio_nuebar");  if (boolhist == false) exit(2);
-        boolhist = _util.GetHist(f_flux_weights, h_2D_CV_UW_PPFX_ratio_numu,    "h_2D_CV_UW_PPFX_ratio_numu");    if (boolhist == false) exit(2);
-        boolhist = _util.GetHist(f_flux_weights, h_2D_CV_UW_PPFX_ratio_numubar, "h_2D_CV_UW_PPFX_ratio_numubar"); if (boolhist == false) exit(2);
-    }
-
 
 }
 // -----------------------------------------------------------------------------

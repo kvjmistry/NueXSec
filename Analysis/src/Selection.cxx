@@ -45,16 +45,6 @@ void Selection::Initialise(Utility _utility){
     bool_use_data      = _util.GetFile(f_data,      _util.data_file_name);
     bool_use_dirt      = _util.GetFile(f_dirt,      _util.dirt_file_name);
 
-    // Load in the flux weights file
-    std::cout << "Getting the CV flux file..."<< std::endl;
-    if (strcmp(_util.run_period, "1") == 0) {
-        f_flux_weights = new TFile("Systematics/f_flux_CV_weights_fhc.root", "READ");
-    }
-    if (strcmp(_util.run_period, "3") == 0) {
-        f_flux_weights = new TFile("Systematics/f_flux_CV_weights_rhc.root", "READ");
-       
-    }
-
     // Resize the counter vector
     counter_v.resize(_util.k_cuts_MAX);
 
@@ -68,7 +58,7 @@ void Selection::Initialise(Utility _utility){
         _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the mc slice container
-        mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights, _util);
+        mc_SC.Initialise(mc_tree, _util.k_mc, _util);
 
         // Initialise the Tree Helper
         _thelper.at(_util.k_mc).Initialise(_util.k_mc, _util.mc_tree_file_name_out, _util);
@@ -96,7 +86,7 @@ void Selection::Initialise(Utility _utility){
         _util.GetTree(f_data, data_tree, "nuselection/NeutrinoSelectionFilter");
         
         // Initialise all the data slice container
-        data_SC.Initialise(data_tree, _util.k_data, f_flux_weights, _util);
+        data_SC.Initialise(data_tree, _util.k_data, _util);
 
         // Initialise the histogram helper
         if (!_util.slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, _util.data_file_name_out, _util);
@@ -126,7 +116,7 @@ void Selection::Initialise(Utility _utility){
         _util.GetTree(f_ext, ext_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
-        ext_SC.Initialise(ext_tree, _util.k_ext, f_flux_weights, _util);
+        ext_SC.Initialise(ext_tree, _util.k_ext, _util);
 
         // Initialise the histogram helper
         if (!_util.slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, _util.ext_file_name_out, _util);
@@ -156,7 +146,7 @@ void Selection::Initialise(Utility _utility){
         _util.GetTree(f_dirt, dirt_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
-        dirt_SC.Initialise(dirt_tree, _util.k_dirt, f_flux_weights, _util);
+        dirt_SC.Initialise(dirt_tree, _util.k_dirt, _util);
 
         // Initialise the histogram helper
         if (!_util.slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, _util.dirt_file_name_out ,_util);

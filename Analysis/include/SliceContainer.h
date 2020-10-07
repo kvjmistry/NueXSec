@@ -19,7 +19,7 @@ public:
 
     // -------------------------------------------------------------------------
     // Initialise the class
-    void Initialise(TTree* tree, int type, TFile *f_flux_weights, Utility util);
+    void Initialise(TTree* tree, int type, Utility util);
     // -------------------------------------------------------------------------
     // Function to classify the slice
     void  SliceClassifier(int type);

@@ -2854,7 +2854,7 @@ void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index
         // Loop over the bins 
         for (int bin = 1; bin < h_universe.at(k_up)->GetNbinsX()+1; bin++){
             double deviate = h_cv->GetBinContent(bin) - h_universe.at(uni)->GetBinContent(bin); // CV - Uni in bin i
-            h_err->SetBinContent(bin, h_err->GetBinContent(bin) + deviate*deviate); // difference squared summed
+            h_err->SetBinContent(bin, h_err->GetBinContent(bin) + deviate*deviate); // difference squared summed    
         }
         
     }
@@ -2865,7 +2865,7 @@ void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index
         if (h_cv->GetBinContent(bin) == 0) 
             h_err->SetBinContent(bin, 0.0);
         else 
-            h_err->SetBinContent(bin, err);
+            h_err->SetBinContent(bin, err);        
     }
 
     // ---- save the histograms into different directories inside the root file

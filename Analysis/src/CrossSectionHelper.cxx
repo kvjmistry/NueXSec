@@ -333,7 +333,7 @@ void CrossSectionHelper::LoopEventsbyCut(){
     // Initialise the TTree and Slice Container class
     TTree *mc_tree;
     _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
-    SC.Initialise(mc_tree, _util.k_mc, f_flux, _util);
+    SC.Initialise(mc_tree, _util.k_mc, _util);
 
     int mc_tree_total_entries = mc_tree->GetEntries();
 
