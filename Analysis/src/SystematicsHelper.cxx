@@ -178,8 +178,8 @@ void SystematicsHelper::SetRatioOptions(TH1D* hist ){
 // -----------------------------------------------------------------------------
 void SystematicsHelper::MakeHistograms(){
     
-    for (unsigned int i = 0 ; i < _util.k_cuts_MAX; i++){
-        
+    for (unsigned int i = 0 ; i < _util.k_cuts_MAX; i++){        
+       
         // Default detector systematics mode
         if (mode == "default"){
   
@@ -351,13 +351,18 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
 
         // Draw the histograms
         if (y == k_CV) {
-	    leg->AddEntry(h_error_hist, "CV", "lf");
-	    if(hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()) > max_bin) max_bin = hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()); // for scale purposes
+            leg->AddEntry(h_error_hist, "CV", "lf");
+            
+            if (hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()) > max_bin)
+                max_bin = hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()); // for scale purposes
+        
         }
         else {
             hist.at(y)->SetLineColor(var_string_pretty_color.at(y));  // change color of the histogram
             leg->AddEntry(hist.at(y), var_string_pretty.at(y).c_str(), "l"); // add histogram to legend
-            if(hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()) > max_bin) max_bin = hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()); // for scale purposes
+            
+            if (hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()) > max_bin)
+                max_bin = hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()); // for scale purposes
         }
     }
 
@@ -373,17 +378,14 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
 
     // drawing histograms
     for (unsigned int y=0; y < hist.size(); y++ ) {
-	if (y == 0) hist.at(y)->Draw("hist"); // distinction made so the RangeUser is taken into account, it does not work with "same"
-	else hist.at(y)->Draw("hist, same");
-        //if (y == k_CV) h_error_hist->Draw("E2, same");
+    
+        if (y == 0)
+            hist.at(y)->Draw("hist"); // distinction made so the RangeUser is taken into account, it does not work with "same"
+        else
+            hist.at(y)->Draw("hist, same");
+            //if (y == k_CV) h_error_hist->Draw("E2, same");
     }
-    // drawing CV again to make sure it is on top of everything else
-    h_error_hist->Draw("E2, same");
-    hist.at(k_CV)->Draw("hist, same");
-
-    // drawing legend
-    leg->Draw();
-
+    
     // -----------------------------------------------------------------
     // calculate and save the total detector systematics uncertainty 
 
@@ -437,11 +439,32 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
     h_det_sys_tot->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite); 
 
     // -----------------------------------------------------------------
+    
+    // Setting the systematic error
+    for(int k = 1; k <= h_error_hist->GetNbinsX(); k++){
+        
+        // Set the systematic error to be the total det sys error * the bin content
+        double sys_err = h_det_sys_tot->GetBinContent(k) * h_error_hist->GetBinContent(k);
+        h_error_hist->SetBinError(k, sys_err);
+    }
+
+    h_error_hist->Draw("E2, same");
+    
+    // drawing CV again to make sure it is on top of everything else
+    hist.at(k_CV)->Draw("hist, same");
+
+    // drawing legend
+    leg->Draw();
+
+
+
+
+    // -----------------------------------------------------------------
     // Drawing the total detector systematic uncertainty on the bottom pad
 
     bottomPad->cd();
 
-    h_det_sys_tot->GetYaxis()->SetMaxDigits(2);
+    // h_det_sys_tot->GetYaxis()->SetMaxDigits(2);
     h_det_sys_tot->SetLineWidth(2);
     h_det_sys_tot->SetLineColor(1);
     h_det_sys_tot->GetXaxis()->SetLabelSize(15); // 12
@@ -452,7 +475,7 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
     h_det_sys_tot->GetXaxis()->SetTitleSize(17); // 17
     h_det_sys_tot->GetXaxis()->SetTitleFont(46);
     h_det_sys_tot->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
-    h_det_sys_tot->GetYaxis()->SetRangeUser(0, h_det_sys_tot->GetBinContent(h_det_sys_tot->GetMaximumBin())*1.1);
+    h_det_sys_tot->GetYaxis()->SetRangeUser(0, 1.0);
     h_det_sys_tot->GetYaxis()->SetTitle("Tot Det Sys Uncert");
     h_det_sys_tot->GetYaxis()->SetTitleSize(13); // 13
     h_det_sys_tot->GetYaxis()->SetTitleFont(44);
@@ -473,9 +496,6 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
 
     // Draw the run period on the plot
     _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
-      
-    // Add the weight labels
-    // Draw_WeightLabels(c);
  
     //---------------------------------------------------------------
     // draw final canvas as pdf
