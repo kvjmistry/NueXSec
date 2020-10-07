@@ -48,7 +48,7 @@ class SystematicsHelper{
     void PlotVariationsEXT(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name);
     // -------------------------------------------------------------------------
     // Plots the Sys Variations
-    void SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name);
+    void SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name, std::string cut_name_pretty);
     // -------------------------------------------------------------------------
     void SetVariationProperties(TH1D* h, int index);
     // -------------------------------------------------------------------------
