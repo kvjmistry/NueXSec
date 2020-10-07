@@ -264,10 +264,11 @@ void Selection::MakeSelection(){
             }
 
             // Look at different regions of run 1
-            // if (std::string(_util.run_period) == "1" && data_SC.run >= 6748 ){
-            // // if (std::string(_util.run_period) == "1" && data_SC.run < 6450 ){
-            //     continue;
-            // }
+            if (std::string(_util.run_period) == "1" ){
+
+                // if (data_SC.run < 6600)
+                //     continue;
+            }
 
             // Apply Pi0 Selection
             ApplyPiZeroSelection(_util.k_data, data_SC);
