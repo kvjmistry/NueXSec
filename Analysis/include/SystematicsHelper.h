@@ -42,9 +42,6 @@ class SystematicsHelper{
     void GetPOT();
     // -------------------------------------------------------------------------
     // Plots the variation comparisons
-    void PlotVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name);
-    // -------------------------------------------------------------------------
-    // Plots the variation comparisons
     void PlotVariationsEXT(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name);
     // -------------------------------------------------------------------------
     // Plots the Sys Variations
