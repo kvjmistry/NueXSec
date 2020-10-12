@@ -670,7 +670,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
         CompareVariationXSec("DecayAngMEC",      var, "Decay Ang MEC" );
         CompareVariationXSec("ThetaDelta2Npi",   var, "Theta Delta 2N #pi" );
         CompareVariationXSec("ThetaDelta2NRad",  var, "Theta Delta 2N Rad" );
-        CompareVariationXSec("RPA_CCQE_Reduced", var, "RPA CCQE Reduced" );
+        // CompareVariationXSec("RPA_CCQE_Reduced", var, "RPA CCQE Reduced" );
         CompareVariationXSec("NormCCCOH",        var, "Norm CC COH" );
         CompareVariationXSec("NormNCCOH",        var, "Norm NC COH" );
 
@@ -682,7 +682,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeUnisim("DecayAngMEC",      var, "Decay Ang MEC" );
         PlotReweightingModeUnisim("ThetaDelta2Npi",   var, "Theta Delta 2N #pi" );
         PlotReweightingModeUnisim("ThetaDelta2NRad",  var, "Theta Delta 2N Rad" );
-        PlotReweightingModeUnisim("RPA_CCQE_Reduced", var, "RPA CCQE Reduced" );
+        // PlotReweightingModeUnisim("RPA_CCQE_Reduced", var, "RPA CCQE Reduced" );
         PlotReweightingModeUnisim("NormCCCOH",        var, "Norm CC COH" );
         PlotReweightingModeUnisim("NormNCCOH",        var, "Norm NC COH" );
 
@@ -1430,6 +1430,8 @@ void SystematicsHelper::CompareCVXSec(){
             h_dataxsec->GetXaxis()->SetLabelSize(0);
             h_dataxsec->SetMarkerStyle(20);
             h_dataxsec->SetMarkerSize(0.5);
+            h_dataxsec_tot->SetMarkerStyle(20);
+            h_dataxsec_tot->SetMarkerSize(0.5);
             h_dataxsec->SetMinimum(0);
             
             // Rewrite the errors for data to sys
@@ -1466,9 +1468,9 @@ void SystematicsHelper::CompareCVXSec(){
             TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
             leg->SetBorderSize(0);
             leg->SetFillStyle(0);
-            if (error_type.at(err_lab) == "stat")      leg->AddEntry(h_dataxsec, "Data (Stat.)", "le");
-            else if (error_type.at(err_lab) == "sys") leg->AddEntry(h_dataxsec, "Data (Sys.)", "le");
-            else                                      leg->AddEntry(h_dataxsec, "Data (Stat.+Sys.)", "le");
+            if (error_type.at(err_lab) == "stat")      leg->AddEntry(h_dataxsec_tot, "Data (Stat.)", "ep");
+            else if (error_type.at(err_lab) == "sys") leg->AddEntry(h_dataxsec_tot, "Data (Sys.)", "ep");
+            else                                      leg->AddEntry(h_dataxsec_tot, "Data (Stat.+Sys.)", "ep");
             leg->AddEntry(h_mcxsec_clone,   "MC (Stat.)", "lf");
             leg->Draw();
 
@@ -1551,6 +1553,8 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             h_dataxsec->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
             h_dataxsec->SetMarkerStyle(20);
             h_dataxsec->SetMarkerSize(0.5);
+            h_dataxsec_tot->SetMarkerStyle(20);
+            h_dataxsec_tot->SetMarkerSize(0.5);
             h_dataxsec->SetMinimum(0);
             
             // Rewrite the errors for data to sys
@@ -1595,9 +1599,9 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
             leg->SetBorderSize(0);
             leg->SetFillStyle(0);
-            if (error_type.at(err_lab) == "stat")     leg->AddEntry(h_dataxsec, "Data (Stat.)", "le");
-            else if (error_type.at(err_lab) == "sys") leg->AddEntry(h_dataxsec, "Data (Sys.)", "le");
-            else                                      leg->AddEntry(h_dataxsec, "Data (Stat. + Sys.)", "le");
+            if (error_type.at(err_lab) == "stat")     leg->AddEntry(h_dataxsec_tot, "Data (Stat.)", "ep");
+            else if (error_type.at(err_lab) == "sys") leg->AddEntry(h_dataxsec_tot, "Data (Sys.)", "ep");
+            else                                      leg->AddEntry(h_dataxsec_tot, "Data (Stat. + Sys.)", "ep");
             leg->AddEntry(h_mcxsec_clone,   "MC (Stat.)", "lf");
             leg->Draw();
 

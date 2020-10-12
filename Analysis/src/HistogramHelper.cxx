@@ -430,6 +430,8 @@ void HistogramHelper::InitHistograms(){
                 TEfficiency_hists.at(k_eff_nu_E).at(l)            = new TH1D( Form("h_true_nu_E_%s",_util.cut_dirs.at(l).c_str() ), "", 15, 0, 5 );
                 TEfficiency_hists.at(k_eff_elec_E).at(l)          = new TH1D( Form("h_true_elec_E_%s",_util.cut_dirs.at(l).c_str() ), "", 15, 0, 5 );
                 TEfficiency_hists.at(k_eff_elec_E_rebin).at(l)    = new TH1D( Form("h_true_elec_E_rebin_%s", _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins.size()-1, edges);
+                TEfficiency_hists.at(k_eff_elec_E_rebin_nue).at(l)        = new TH1D( Form("h_true_elec_E_rebin_nue_%s", _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins.size()-1, edges);
+                TEfficiency_hists.at(k_eff_elec_E_rebin_nuebar).at(l)     = new TH1D( Form("h_true_elec_E_rebin_nuebar_%s", _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins.size()-1, edges);
                 TEfficiency_hists.at(k_eff_nu_E_nue).at(l)        = new TH1D( Form("h_true_nu_E_nue_%s",_util.cut_dirs.at(l).c_str() ), "", 8, 0, 5 );
                 TEfficiency_hists.at(k_eff_nu_E_nuebar).at(l)     = new TH1D( Form("h_true_nu_E_nuebar_%s",_util.cut_dirs.at(l).c_str() ), "", 8, 0, 5 );
                 TEfficiency_hists.at(k_eff_nu_E_single_bin).at(l) = new TH1D( Form("h_true_nu_E_single_bin_%s",_util.cut_dirs.at(l).c_str() ), "", 1, 0, 10);
@@ -1177,28 +1179,54 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
 
     // If start of selection, efficiency denominator includes everything
     if (cut_index == _util.k_unselected){
-        if (classification == "nue_cc" || classification == "nuebar_cc" || classification == "unmatched_nue" || classification == "unmatched_nuebar" || classification == "cosmic_nue" || classification == "cosmic_nuebar") TEfficiency_hists.at(k_eff_nu_E).at(cut_index)->Fill(SC.nu_e, weight);
-        if (classification == "nue_cc" || classification == "nuebar_cc" || classification == "unmatched_nue" || classification == "unmatched_nuebar" || classification == "cosmic_nue" || classification == "cosmic_nuebar") TEfficiency_hists.at(k_eff_elec_E).at(cut_index)->Fill(SC.elec_e, weight);
-        if (classification == "nue_cc" || classification == "nuebar_cc" || classification == "unmatched_nue" || classification == "unmatched_nuebar" || classification == "cosmic_nue" || classification == "cosmic_nuebar") TEfficiency_hists.at(k_eff_elec_E_rebin).at(cut_index)->Fill(SC.elec_e, weight);
+        if (classification == "nue_cc"        || classification == "nuebar_cc" ||
+            classification == "unmatched_nue" || classification == "unmatched_nuebar" ||
+            classification == "cosmic_nue"    || classification == "cosmic_nuebar"){
+            TEfficiency_hists.at(k_eff_nu_E).at(cut_index)           ->Fill(SC.nu_e, weight);
+            TEfficiency_hists.at(k_eff_elec_E).at(cut_index)         ->Fill(SC.elec_e, weight);
+            TEfficiency_hists.at(k_eff_elec_E_rebin).at(cut_index)   ->Fill(SC.elec_e, weight);
+            TEfficiency_hists.at(k_eff_nu_E_single_bin).at(cut_index)->Fill(SC.nu_e, weight);
+        }
         
-        if (classification == "nue_cc" || classification == "nuebar_cc" || classification == "unmatched_nue" || classification == "unmatched_nuebar" || classification == "cosmic_nue" || classification == "cosmic_nuebar") TEfficiency_hists.at(k_eff_nu_E_single_bin).at(cut_index)->Fill(SC.nu_e, weight);
-        if (classification == "nue_cc" || classification == "unmatched_nue" || classification == "cosmic_nue")          TEfficiency_hists.at(k_eff_nu_E_nue).at(cut_index)   ->Fill(SC.nu_e, weight);
-        if (classification == "nuebar_cc" || classification == "unmatched_nuebar" || classification == "cosmic_nuebar") TEfficiency_hists.at(k_eff_nu_E_nuebar).at(cut_index)->Fill(SC.nu_e, weight);
-        if (classification == "nue_cc" || classification == "unmatched_nue" || classification == "cosmic_nue")          TEfficiency_hists.at(k_eff_nu_E_nue_single_bin).at(cut_index)   ->Fill(SC.nu_e, weight);
-        if (classification == "nuebar_cc" || classification == "unmatched_nuebar" || classification == "cosmic_nuebar") TEfficiency_hists.at(k_eff_nu_E_nuebar_single_bin).at(cut_index)->Fill(SC.nu_e, weight);
+        // Nue only
+        if (classification == "nue_cc" || classification == "unmatched_nue" || classification == "cosmic_nue") {
+            TEfficiency_hists.at(k_eff_nu_E_nue).at(cut_index)              ->Fill(SC.nu_e, weight);
+            TEfficiency_hists.at(k_eff_nu_E_nue_single_bin).at(cut_index)   ->Fill(SC.nu_e, weight);
+            TEfficiency_hists.at(k_eff_elec_E_rebin_nue).at(cut_index)      ->Fill(SC.elec_e, weight);
+        }
+        
+        // Nuebar only
+        if (classification == "nuebar_cc" || classification == "unmatched_nuebar" || classification == "cosmic_nuebar"){
+            TEfficiency_hists.at(k_eff_nu_E_nuebar).at(cut_index)           ->Fill(SC.nu_e, weight);
+            TEfficiency_hists.at(k_eff_nu_E_nuebar_single_bin).at(cut_index)->Fill(SC.nu_e, weight);
+            TEfficiency_hists.at(k_eff_elec_E_rebin_nuebar).at(cut_index)   ->Fill(SC.elec_e, weight);
+        }
+        
     
     }
     // After this, we consider the low purity (cosmics) interactions background -- keep the unreconstructed stuff, but this shouldnt affect the plots all that much
     else {
-        if (classification == "nue_cc" || classification == "nuebar_cc" || classification == "unmatched_nue" || classification == "unmatched_nuebar") TEfficiency_hists.at(k_eff_nu_E).at(cut_index)->Fill(SC.nu_e, weight);
-        if (classification == "nue_cc" || classification == "nuebar_cc" || classification == "unmatched_nue" || classification == "unmatched_nuebar") TEfficiency_hists.at(k_eff_elec_E).at(cut_index)->Fill(SC.elec_e, weight);
-        if (classification == "nue_cc" || classification == "nuebar_cc" || classification == "unmatched_nue" || classification == "unmatched_nuebar") TEfficiency_hists.at(k_eff_elec_E_rebin).at(cut_index)->Fill(SC.elec_e, weight);
+        if (classification == "nue_cc" || classification == "nuebar_cc" || classification == "unmatched_nue" || classification == "unmatched_nuebar"){
+            TEfficiency_hists.at(k_eff_nu_E).at(cut_index)           ->Fill(SC.nu_e, weight);
+            TEfficiency_hists.at(k_eff_elec_E).at(cut_index)         ->Fill(SC.elec_e, weight);
+            TEfficiency_hists.at(k_eff_elec_E_rebin).at(cut_index)   ->Fill(SC.elec_e, weight);
+            TEfficiency_hists.at(k_eff_nu_E_single_bin).at(cut_index)->Fill(SC.nu_e, weight);
+        }
     
-        if (classification == "nue_cc" || classification == "nuebar_cc" || classification == "unmatched_nue" || classification == "unmatched_nuebar") TEfficiency_hists.at(k_eff_nu_E_single_bin).at(cut_index)->Fill(SC.nu_e, weight);
-        if (classification == "nue_cc" || classification == "unmatched_nue")       TEfficiency_hists.at(k_eff_nu_E_nue).at(cut_index)->Fill(SC.nu_e, weight);
-        if (classification == "nuebar_cc" || classification == "unmatched_nuebar") TEfficiency_hists.at(k_eff_nu_E_nuebar).at(cut_index)->Fill(SC.nu_e, weight);
-        if (classification == "nue_cc" || classification == "unmatched_nue")       TEfficiency_hists.at(k_eff_nu_E_nue_single_bin).at(cut_index)->Fill(SC.nu_e, weight);
-        if (classification == "nuebar_cc" || classification == "unmatched_nuebar") TEfficiency_hists.at(k_eff_nu_E_nuebar_single_bin).at(cut_index)->Fill(SC.nu_e, weight);
+        // Nue only
+        if (classification == "nue_cc" || classification == "unmatched_nue")       {
+            TEfficiency_hists.at(k_eff_nu_E_nue).at(cut_index)           ->Fill(SC.nu_e, weight);
+            TEfficiency_hists.at(k_eff_nu_E_nue_single_bin).at(cut_index)->Fill(SC.nu_e, weight);
+            TEfficiency_hists.at(k_eff_elec_E_rebin_nue).at(cut_index)   ->Fill(SC.elec_e, weight);
+        }
+        
+        // Nuebar only
+        if (classification == "nuebar_cc" || classification == "unmatched_nuebar") {
+            TEfficiency_hists.at(k_eff_nu_E_nuebar).at(cut_index)           ->Fill(SC.nu_e, weight);
+            TEfficiency_hists.at(k_eff_nu_E_nuebar_single_bin).at(cut_index)->Fill(SC.nu_e, weight);
+            TEfficiency_hists.at(k_eff_elec_E_rebin_nuebar).at(cut_index)   ->Fill(SC.elec_e, weight);
+        }
+        
     }
     
     

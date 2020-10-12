@@ -72,6 +72,8 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_true_nu_E", false);
         MakeEfficiencyPlotByCut("h_true_elec_E", false);
         MakeEfficiencyPlotByCut("h_true_elec_E_rebin", true);
+        MakeEfficiencyPlotByCut("h_true_elec_E_rebin_nue", true);
+        MakeEfficiencyPlotByCut("h_true_elec_E_rebin_nuebar", true);
         MakeEfficiencyPlotByCut("h_true_nu_E_single_bin", true);
         MakeEfficiencyPlotByCut("h_true_nu_E_nue", true);
         MakeEfficiencyPlotByCut("h_true_nu_E_nuebar", true);
@@ -916,6 +918,8 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     if ( _util.CheckHistogram(_util.vec_hist_name, hist_name) && _util.plot_sys_uncertainty ) {
 
         // Couldnt get the unsim plots to save without nuclear destiction of root so this is what you get...
+        
+        // Genie Unisim
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "RPA", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "CCMEC", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "AxFFCCQE", "MC");
@@ -926,6 +930,8 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         // AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "RPA_CCQE_Reduced", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "NormCCCOH", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "NormNCCOH", "MC");
+       
+        // Beamline
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Horn1_x", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Horn_curr", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Horn1_y", "MC");
@@ -937,7 +943,27 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Beam_shift_y", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Target_z", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Decay_pipe_Bfield", "MC");
-        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "TotalDetectorSys", "MC");
+        
+        // Total Detector Systematics
+        // AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "TotalDetectorSys", "MC");
+        
+        // Individual detector systematics
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "LYRayleigh", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "SCE", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Recomb2", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "WireModX", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "WireModYZ", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "WireModThetaXZ", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "WireModThetaYZ_withSigmaSplines", "MC");
+        // AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "WireModThetaYZ_withoutSigmaSplines", "MC");
+        // AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "WireModdEdX" "MC");
+        
+        if (std::string(_util.run_period) == "3")
+            AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "LYAttenuation", "MC");
+
+
+        
+        // Other
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsPPFX", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsGenie", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsReint", "MC");
@@ -1886,7 +1912,7 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
 
     if (var == "h_true_nu_E" || var == "h_true_nu_E_single_bin")              var_string = "nu";
     else if (var == "h_true_elec_E")       var_string = "elec";
-    else if (var == "h_true_elec_E_rebin") var_string = "elec";
+    else if (var == "h_true_elec_E_rebin" || var == "h_true_elec_E_rebin_nue" || var == "h_true_elec_E_rebin_nuebar") var_string = "elec";
     else if (var == "h_true_nu_E_nue")     var_string = "nue";
     else if (var == "h_true_nu_E_nuebar")  var_string = "nuebar";
     else if (var == "h_true_nu_E_nue_single_bin")     var_string = "nue";
@@ -1932,7 +1958,9 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
         h_clone->SetStats(kFALSE);
         
         if (var_string == "nu")     h_clone->SetTitle(Form("%s;True #nu_{e} + #bar{#nu}_{e} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
-        if (var_string == "elec")   h_clone->SetTitle(Form("%s;True Electron Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
+        if (var == "h_true_elec_E_rebin")       h_clone->SetTitle(Form("%s;True e^{-} + e^{+} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
+        if (var == "h_true_elec_E_rebin_nue")   h_clone->SetTitle(Form("%s;True e^{-} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
+        if (var == "h_true_elec_E_rebin_nuebar")h_clone->SetTitle(Form("%s;True e^{+} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
         if (var_string == "nue")    h_clone->SetTitle(Form("%s;True #nu_{e} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
         if (var_string == "nuebar") h_clone->SetTitle(Form("%s;True #bar{#nu}_{e} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
 
@@ -1958,7 +1986,9 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
 
         TGaxis *axis = new TGaxis(gPad->GetUxmax(), gPad->GetUymin(), gPad->GetUxmax(), gPad->GetUymax(), 0, rightmax, 510, "+L");
         if (var_string == "nu")axis->SetTitle("True #nu_{e} + #bar{#nu}_{e} Events in FV");
-        if (var_string == "elec")axis->SetTitle("True Electron Events in FV");
+        if (var == "h_true_elec_E_rebin") axis->SetTitle("True e^{-} + e^{+} Events in FV");
+        if (var == "h_true_elec_E_rebin_nue") axis->SetTitle("True e^{-} Events in FV");
+        if (var == "h_true_elec_E_rebin_nuebar") axis->SetTitle("True e^{+} Events in FV");
         if (var_string == "nue") axis->SetTitle("True #nu_{e} Events in FV");
         if (var_string == "nuebar") axis->SetTitle("True #bar{#nu}_{e} Events in FV");
         axis->SetTitleOffset(1.8);
@@ -1975,6 +2005,8 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
         if (var == "h_true_nu_E")         c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
         if (var == "h_true_elec_E")       c->Print(Form("plots/run%s/Efficiency/TEff_%s_elec_E.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
         if (var == "h_true_elec_E_rebin") c->Print(Form("plots/run%s/Efficiency/TEff_%s_elec_E_rebin.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
+        if (var == "h_true_elec_E_rebin_nue")    c->Print(Form("plots/run%s/Efficiency/TEff_%s_elec_E_rebin_nue.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
+        if (var == "h_true_elec_E_rebin_nuebar") c->Print(Form("plots/run%s/Efficiency/TEff_%s_elec_E_rebin_nuebar.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
         if (var == "h_true_nu_E_single_bin") c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E_single_bin.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
         if (var == "h_true_nu_E_nue") c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E_nue.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
         if (var == "h_true_nu_E_nuebar") c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E_nuebar.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
