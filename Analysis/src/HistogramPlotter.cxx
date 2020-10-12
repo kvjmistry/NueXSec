@@ -1988,6 +1988,8 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
 void HistogramPlotter::MakeInteractionPlot(const char *print_name, std::string cut_type, std::string flav, bool scale){
 
     std::vector<TH1D *> hist(_util.interaction_types.size());
+    std::vector<double> hist_integrals(_util.interaction_types.size()); // The integrals of all the histograms
+    double sum_integrals{0.0};
 
     TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
     THStack *h_stack = new THStack();
@@ -2017,6 +2019,10 @@ void HistogramPlotter::MakeInteractionPlot(const char *print_name, std::string c
         }
 
         hist.at(k)->Scale(scale_factor);
+        hist_integrals.at(k) = hist.at(k)->Integral();
+        sum_integrals += hist.at(k)->Integral();
+        hist.at(k)->SetLineWidth(0);
+
     }
 
     hist.at(_util.k_plot_qe) ->SetFillColor(30);
@@ -2040,8 +2046,8 @@ void HistogramPlotter::MakeInteractionPlot(const char *print_name, std::string c
     gPad->SetBottomMargin(0.12);
     c->Update();
     if (flav == "nue_nuebar")h_stack->GetXaxis()->SetTitle("True #nu_{e} + #bar{#nu}_{e} Energy");
-    if (flav == "nue")h_stack->GetXaxis()->SetTitle("True #nu_{e} Energy");
-    if (flav == "nuebar")h_stack->GetXaxis()->SetTitle("True #bar{#nu}_{e} Energy");
+    if (flav == "nue")       h_stack->GetXaxis()->SetTitle("True #nu_{e} Energy");
+    if (flav == "nuebar")    h_stack->GetXaxis()->SetTitle("True #bar{#nu}_{e} Energy");
     h_stack->GetYaxis()->SetTitle("Entries");
 
     if (scale) h_stack->SetMaximum(625);
@@ -2060,11 +2066,11 @@ void HistogramPlotter::MakeInteractionPlot(const char *print_name, std::string c
     leg_stack->SetFillStyle(0);
 
     // leg_stack->AddEntry(hist.at(_util.k_plot_nc), "NC", "f");
-    leg_stack->AddEntry(hist.at(_util.k_plot_mec), "CC MEC", "f");
-    leg_stack->AddEntry(hist.at(_util.k_plot_coh), "CC Coh", "f");
-    leg_stack->AddEntry(hist.at(_util.k_plot_dis), "CC DIS", "f");
-    leg_stack->AddEntry(hist.at(_util.k_plot_res), "CC Res", "f");
-    leg_stack->AddEntry(hist.at(_util.k_plot_qe),  "CC QE", "f");
+    leg_stack->AddEntry(hist.at(_util.k_plot_mec), Form("CC MEC (%2.1f%%)", 100 * hist_integrals.at(_util.k_plot_mec) / sum_integrals), "f");
+    leg_stack->AddEntry(hist.at(_util.k_plot_coh), Form("CC Coh (%2.1f%%)", 100 * hist_integrals.at(_util.k_plot_coh) / sum_integrals), "f");
+    leg_stack->AddEntry(hist.at(_util.k_plot_dis), Form("CC DIS (%2.1f%%)", 100 * hist_integrals.at(_util.k_plot_dis) / sum_integrals), "f");
+    leg_stack->AddEntry(hist.at(_util.k_plot_res), Form("CC Res (%2.1f%%)", 100 * hist_integrals.at(_util.k_plot_res) / sum_integrals), "f");
+    leg_stack->AddEntry(hist.at(_util.k_plot_qe),  Form("CC QE (%2.1f%%) ", 100 * hist_integrals.at(_util.k_plot_qe) / sum_integrals), "f");
 
     leg_stack->Draw();
 
