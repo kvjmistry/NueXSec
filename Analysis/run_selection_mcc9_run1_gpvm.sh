@@ -13,7 +13,7 @@ if [ -z "$1" ]; then
   # Run the selection
   mc="./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v5/neutrinoselection_filt_run1_overlay.root --gpvm"
   data="./nuexsec --run 1 --data /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v5/neutrinoselection_filt_run1_beamon_beamgood.root --gpvm"
-  ext="./nuexsec --run 1 --ext /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v3/neutrinoselection_filt_run1_beamoff.root --gpvm"
+  ext="./nuexsec --run 1 --ext /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v5/neutrinoselection_filt_run1_beamoff.root --gpvm"
   dirt="./nuexsec --run 1 --dirt /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v3/neutrinoselection_filt_run1_dirt_overlay.root --gpvm"
 
   # This runs each of the strings above in parallel to maximise cpu usage

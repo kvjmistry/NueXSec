@@ -1055,7 +1055,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         // h_ratio->GetYaxis()->SetRangeUser(-0.2, 0.2);
 
         // For ratio
-        if (cut_name == "Unselected" || cut_name == "SoftwareTrig" )
+        if (cut_name == "Unselected" || cut_name == "SoftwareTrig"  || cut_name == "Slice_ID")
             h_ratio->GetYaxis()->SetRangeUser(0.8, 1.2);
         else
             h_ratio->GetYaxis()->SetRangeUser(0, 2.0);
