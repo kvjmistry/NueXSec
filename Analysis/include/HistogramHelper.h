@@ -81,6 +81,9 @@ class HistogramHelper{
     // vector of histograms to make, indexed by enums
     std::vector<std::vector<std::vector<TH1D*>>> TH1D_hists; 
 
+    // vector of 2D histograms to make, indexed by enums
+    std::vector<std::vector<std::vector<TH2D*>>> TH2D_hists_cuts; 
+
     // vector of histograms to make, indexed by enums -- for particle type
     std::vector<std::vector<std::vector<TH1D*>>> TH1D_hists_particle; 
 
@@ -295,6 +298,12 @@ class HistogramHelper{
         k_track_phi,        // Longest track phi
         k_muon_topo_score,  // Topological score (after muon selection)
         k_TH1D_numu_MAX
+    };
+
+    // Define the enums for 2D histograms broken down by cuts and classifications
+    enum TH2D_cut_vars {
+        k_2D_dedx_shower_energy,      // 2D plot of dedx and reconstrcted shower energy
+        k_TH2D_cut_MAX
     };
 
 }; // End Class Histogram Helper 

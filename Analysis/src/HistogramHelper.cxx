@@ -607,6 +607,32 @@ void HistogramHelper::InitHistograms(){
         TH1D_numu_hists.at(k_muon_topo_score).at(j) = new TH1D(Form("h_muon_topo_score_%s", _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 1);
         
     }
+
+    // ----------
+    // For 2D histograms broken down by plot var, cut, classification
+
+    // Resize the histogram vector. plot var, cuts, classifications
+    TH2D_hists_cuts.resize(k_TH2D_cut_MAX);
+
+    for (unsigned int u = 0; u < k_TH2D_cut_MAX; u++){
+        TH2D_hists_cuts.at(u).resize(_util.k_cuts_MAX);
+
+        for (unsigned int i=0; i < _util.cut_dirs.size();i++){
+            TH2D_hists_cuts.at(u).at(i).resize(_util.k_classifications_MAX);
+        }
+    }
+
+    // loop over and create the histograms
+    for (unsigned int i=0; i < _util.cut_dirs.size();i++){
+    
+        for (unsigned int j=0; j < _util.classification_dirs.size();j++){
+        
+            // Shower dEdx vs Shower energy
+            TH2D_hists_cuts.at(k_2D_dedx_shower_energy).at(i).at(j) = new TH2D ( Form("h_2D_dedx_shower_energy_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10, 10, 0, 4);
+
+        }
+        
+    }
     
 
 }
@@ -775,6 +801,13 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
 
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
+
+    // 2D Histograms
+    TH2D_hists_cuts.at(k_2D_dedx_shower_energy).at(cut_index).at(classification_index)->Fill(dedx_max, SC.shr_energy_cali/0.83, weight);
+
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
 
     // Flash histograms
     if (type == _util.k_mc || type == _util.k_dirt){
@@ -1121,6 +1154,59 @@ void HistogramHelper::WriteReco(int type){
 
         }
     }
+
+    // -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+
+    // Do the same again for the 2D histograms
+
+    // Loop over the histogram variables
+    for (unsigned int u = 0 ; u < TH2D_hists_cuts.size(); u++){
+        
+        // loop over the cut directories
+        for (unsigned int i = 0; i < _util.cut_dirs.size(); i++){
+
+            // loop over the classification directories
+            for (unsigned int j = 0; j < _util.classification_dirs.size(); j++){
+
+                // Choose which folder to fill in based on the type (a re-mapping of enums)
+                if (type == _util.k_mc && ( j == _util.k_leg_data || j == _util.k_leg_ext || j == _util.k_leg_dirt)){ 
+                    break;
+                }
+                if (type == _util.k_data){ 
+                    j = _util.k_leg_data;
+                    break_early = true;
+                }
+                if (type == _util.k_ext){ 
+                    j = _util.k_leg_ext;
+                    break_early = true;
+                }
+                if (type == _util.k_dirt){ 
+                    j= _util.k_leg_dirt;
+                    break_early = true;
+                }
+
+                // Get the classification directory and cd
+                bool_dir = _util.GetDirectory(f_nuexsec, truth_dir ,Form("%s/%s/%s", "Stack", _util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str() ) );
+                
+                if (bool_dir) truth_dir->cd();
+
+                // Skip the write for the backgrounds in intrinsic nue mode
+                // This overwrites the signal histograms
+                if (std::string(_util.intrinsic_mode) == "intrinsic" && j != _util.k_nue_cc && j != _util.k_nuebar_cc && j != _util.k_cosmic_nue && j != _util.k_cosmic_nuebar && j != _util.k_unmatched_nue && j != _util.k_unmatched_nuebar){
+                    continue;
+                }
+
+                // Now write the histograms
+                TH2D_hists_cuts.at(u).at(i).at(j)->SetOption("colz");
+                TH2D_hists_cuts.at(u).at(i).at(j)->Write("",TObject::kOverwrite);
+
+                if (break_early) break;
+            }
+
+        }
+    }
+
 }
 // -----------------------------------------------------------------------------
 void HistogramHelper::WriteRecoPar(int type){
