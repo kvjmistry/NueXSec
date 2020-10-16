@@ -378,7 +378,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     if (strcmp(run_period, "1") == 0){
         mc_scale_factor     = config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_MC_POT);
         dirt_scale_factor   = 0.45*config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_Dirt_POT);
-        ext_scale_factor    = config_v.at(k_Run1_Data_trig) / config_v.at(k_Run1_EXT_trig);
+        ext_scale_factor    = 0.98*config_v.at(k_Run1_Data_trig) / config_v.at(k_Run1_EXT_trig);
         intrinsic_weight    = config_v.at(k_Run1_MC_POT)    / config_v.at(k_Run1_Intrinsic_POT);
     }
     else if (strcmp(run_period, "3") == 0){

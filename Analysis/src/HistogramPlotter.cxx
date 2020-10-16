@@ -167,17 +167,17 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
 
         // pi0 mass peak unweighted
         MakeStack("h_pi0_mass", " ",
-                area_norm, false, 1.0, "Mass [MeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                area_norm, false, 1.6, "Mass [MeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
                 Form("plots/run%s/pi0/pi0_mass.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
 
         // pi0 mass normlaisation fixed
         MakeStack("h_pi0_mass_norm", " ",
-                area_norm, false, 1.0, "Mass [MeV] (Normalisation Fixed)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                area_norm, false, 1.6, "Mass [MeV] (Normalisation Fixed)",  0.35, 0.85, 0.55, 0.85, Data_POT,
                 Form("plots/run%s/pi0/pi0_mass_norm.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
 
         // pi0 mass peak unweighted
         MakeStack("h_pi0_mass_EScale", " ",
-                area_norm, false, 1.0, "Mass [MeV] (E Dependent Scaling)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                area_norm, false, 1.6, "Mass [MeV] (E Dependent Scaling)",  0.35, 0.85, 0.55, 0.85, Data_POT,
                 Form("plots/run%s/pi0/pi0_mass_EScale.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
 
         // pi0 energy unweighted
@@ -1562,6 +1562,7 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
     h_stack->GetXaxis()->SetLabelSize(0);
     h_stack->GetXaxis()->SetRangeUser(0, 23);
     if (histname == "h_flash_time_single_bin") h_stack->GetXaxis()->SetRangeUser(5.6,15.4);
+    h_stack->SetMaximum(1.1*hist.at(_util.k_data)->GetMaximum());
 
     // MC error histogram ------------------------------------------------------
     TH1D *h_error_hist = (TH1D *)hist.at(_util.k_mc)->Clone("h_error_hist");
@@ -1821,7 +1822,8 @@ void HistogramPlotter::MakeEfficiencyPlot(const char *print_name) {
     // Fill the efficiency and purity vectors
     for (int y = 0; y < num_entries; y++) {
         mc_tree->GetEntry(y);
-        efficiency_v.push_back(efficiency);
+        if (y ==0 || y == 1) efficiency_v.push_back(1.0);
+        else efficiency_v.push_back(efficiency);
         eff_err_v.push_back(eff_err);
         purity_v.push_back(purity);
     }

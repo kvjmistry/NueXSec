@@ -256,8 +256,11 @@ void Selection::MakeSelection(){
             // Look at different regions of run 1
             if (std::string(_util.run_period) == "1" ){
 
-                // if (data_SC.run < 6600)
-                //     continue;
+                // 4p6
+                // if (data_SC.run > 5900) continue;
+
+                // 6p6
+                // if (data_SC.run < 6600) continue;
             }
 
             // Apply Pi0 Selection
@@ -304,6 +307,19 @@ void Selection::MakeSelection(){
             if (std::string(_util.run_period) == "3" && ext_SC.run > 16880 ){
             // if (_run_period == 3 && ext_SC.run < 16880 ){
                 continue;
+            }
+
+            // Look at different regions of run 1
+            if (std::string(_util.run_period) == "1" ){
+
+                // Set 1
+                // if (ext_SC.run >= 6550) continue;
+
+                // Set2
+                // if (ext_SC.run < 6550 || ext_SC.run > 7013) continue;
+
+                // Set 3
+                // if (ext_SC.run < 7013) continue;
             }
 
             // Apply Pi0 Selection

@@ -30,6 +30,9 @@ Run1_Data_trig 5268051.0       // v5 pawels tool
 // Run 1 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
 // Run1_EXT_trig 4015961.990000 // v3 with michel veto updated
 Run1_EXT_trig 9199232.740000 // v5
+// Run1_EXT_trig 3065881.29 // v5 Set 1 run < 6550
+// Run1_EXT_trig 3043363.1 // v5 Set 2 6550 <= run < 7103
+// Run1_EXT_trig 3089988.35 // v5 Set 3 run >= 7103
 -
 Run1_Intrinsic_POT 1.85664e+22 // For Using Intrinsic nue sample
 -
