@@ -384,7 +384,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     else if (strcmp(run_period, "3") == 0){
         mc_scale_factor     = config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_MC_POT);
         dirt_scale_factor   = 0.45*config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_Dirt_POT);
-        ext_scale_factor    = 0.95*config_v.at(k_Run3_Data_trig) / config_v.at(k_Run3_EXT_trig);
+        ext_scale_factor    = config_v.at(k_Run3_Data_trig) / config_v.at(k_Run3_EXT_trig);
     }
     else {
         std::cout << "Error Krish... You havent specified the run period!" << std::endl;

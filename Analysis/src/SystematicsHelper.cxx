@@ -708,14 +708,14 @@ void SystematicsHelper::InitialiseReweightingMode(){
         // Detector Variations
         PlotReweightingModeDetVar("LYRayleigh",                         var, k_LYRayleigh,                         var_string_pretty.at(k_LYRayleigh));
         PlotReweightingModeDetVar("SCE",                                var, k_SCE,                                var_string_pretty.at(k_SCE));
-        PlotReweightingModeDetVar("LYAttenuation",                      var, k_LYAttenuation,                      var_string_pretty.at(k_LYAttenuation));
+        // PlotReweightingModeDetVar("LYAttenuation",                      var, k_LYAttenuation,                      var_string_pretty.at(k_LYAttenuation));
         PlotReweightingModeDetVar("Recomb2",                            var, k_Recomb2,                            var_string_pretty.at(k_Recomb2));
         PlotReweightingModeDetVar("WireModX",                           var, k_WireModX,                           var_string_pretty.at(k_WireModX));
         PlotReweightingModeDetVar("WireModYZ",                          var, k_WireModYZ,                          var_string_pretty.at(k_WireModYZ));
         PlotReweightingModeDetVar("WireModThetaXZ",                     var, k_WireModThetaXZ,                     var_string_pretty.at(k_WireModThetaXZ));
         PlotReweightingModeDetVar("WireModThetaYZ_withSigmaSplines",    var, k_WireModThetaYZ_withSigmaSplines,    var_string_pretty.at(k_WireModThetaYZ_withSigmaSplines));
-        PlotReweightingModeDetVar("WireModThetaYZ_withoutSigmaSplines", var, k_WireModThetaYZ_withoutSigmaSplines, var_string_pretty.at(k_WireModThetaYZ_withoutSigmaSplines));
-        PlotReweightingModeDetVar("WireModdEdX",                        var, k_WireModdEdX,                        var_string_pretty.at(k_WireModdEdX));
+        // PlotReweightingModeDetVar("WireModThetaYZ_withoutSigmaSplines", var, k_WireModThetaYZ_withoutSigmaSplines, var_string_pretty.at(k_WireModThetaYZ_withoutSigmaSplines));
+        // PlotReweightingModeDetVar("WireModdEdX",                        var, k_WireModdEdX,                        var_string_pretty.at(k_WireModdEdX));
 
         // Plot the multisims
         PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 600);
@@ -757,6 +757,9 @@ void SystematicsHelper::InitialiseReweightingMode(){
 
     // Print a summary of the results
     PrintUncertaintySummary();
+
+    // Plot the systematic uncertainty
+    MakeTotUncertaintyPlot();
 
     // Print the sqrt of the diagonals of the covariance matrix
     // loop over rows
@@ -2352,7 +2355,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                     "DecayAngMEC",
                     "ThetaDelta2Npi",
                     "ThetaDelta2NRad",
-                    "RPA_CCQE_Reduced",
+                    // "RPA_CCQE_Reduced",
                     "NormCCCOH",
                     "NormNCCOH"
                 };
@@ -2541,7 +2544,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             leg->SetBorderSize(0);
             leg->SetFillStyle(0);
 
-            leg->AddEntry(h_CV_clone,"CV", "lf");
+            leg->AddEntry(h_CV_clone,"CV (Sys.)", "lf");
 
             // Now draw all the universes
             for (unsigned int label = 0; label < h_universe.at(var).size(); label ++ ){
@@ -2629,8 +2632,8 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
 void SystematicsHelper::SetUnisimColours(std::string label, TH1D* h_up, TH1D* h_dn){
 
     if (label == "Horn1_x" || label == "RPA"  || label == "LYRayleigh"){
-        h_up->SetLineColor(30);
-        h_dn->SetLineColor(30);
+        h_up->SetLineColor(95);
+        h_dn->SetLineColor(95);
     }
     else if (label == "Horn_curr" || label == "CCMEC"  || label == "LYAttenuation"){
         h_up->SetLineColor(38);
@@ -2645,8 +2648,8 @@ void SystematicsHelper::SetUnisimColours(std::string label, TH1D* h_up, TH1D* h_
         h_dn->SetLineColor(4);
     }
     else if (label == "Horn2_x" || label == "DecayAngMEC"  || label == "WireModX"){
-        h_up->SetLineColor(36);
-        h_dn->SetLineColor(36);
+        h_up->SetLineColor(kPink+1);
+        h_dn->SetLineColor(kPink+1);
     }
     else if (label == "Horn2_y" || label == "ThetaDelta2Npi"  || label == "WireModYZ"){
         h_up->SetLineColor(32);
@@ -2806,4 +2809,113 @@ void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index
 
 }
 // -----------------------------------------------------------------------------
+void SystematicsHelper::MakeTotUncertaintyPlot(){
+
+    // Loop over the variables
+    for (unsigned int var = 0; var < vars.size(); var++ ){
+        
+        // Loop over the types
+        for (unsigned int type = 0; type < xsec_types.size(); type++){
+            
+            // Only look at the true efficeincy or the reco x-section
+            if ( (vars.at(var) == "true_el_E" && xsec_types.at(type) == "eff") || (vars.at(var) == "reco_el_E" && xsec_types.at(type) == "mc_xsec")   ){
+
+                TH1D* hist_tot         = (TH1D*)cv_hist_vec.at(var).at(type)->Clone("h_clone_tot");
+                TH1D* hist_genie_uni   = (TH1D*)cv_hist_vec.at(var).at(type)->Clone("h_clone_genie_uni");
+                TH1D* hist_genie_multi = (TH1D*)cv_hist_vec.at(var).at(type)->Clone("h_clone_genie_multi");
+                TH1D* hist_beamline    = (TH1D*)cv_hist_vec.at(var).at(type)->Clone("h_clone_beamline");
+                TH1D* hist_hp          = (TH1D*)cv_hist_vec.at(var).at(type)->Clone("h_clone_hp");
+                TH1D* hist_reint       = (TH1D*)cv_hist_vec.at(var).at(type)->Clone("h_clone_reint");
+                TH1D* hist_detector    = (TH1D*)cv_hist_vec.at(var).at(type)->Clone("h_clone_detector");
+                TH1D* hist_dirt        = (TH1D*)cv_hist_vec.at(var).at(type)->Clone("h_clone_dirt");
+                TH1D* hist_pot         = (TH1D*)cv_hist_vec.at(var).at(type)->Clone("h_clone_pot");
+
+                // Loop over the bins
+                for (unsigned int bin = 0; bin < v_genie_uni_total.at(var).at(type).size(); bin++ ){
+                    
+                    hist_tot        ->SetBinContent(bin+1, std::sqrt(v_sys_total.at(var).at(type)         .at(bin)) );
+                    hist_genie_uni  ->SetBinContent(bin+1, std::sqrt(v_genie_uni_total.at(var).at(type)   .at(bin)) );
+                    hist_genie_multi->SetBinContent(bin+1, std::sqrt(v_genie_multi_total.at(var).at(type) .at(bin)) );
+                    hist_beamline   ->SetBinContent(bin+1, std::sqrt(v_beamline_total.at(var).at(type)    .at(bin)) );
+                    hist_hp         ->SetBinContent(bin+1, std::sqrt(v_hp_total.at(var).at(type)          .at(bin)) );
+                    hist_reint      ->SetBinContent(bin+1, std::sqrt(v_reint_total.at(var).at(type)       .at(bin)) );
+                    hist_detector   ->SetBinContent(bin+1, std::sqrt(v_detvar_total.at(var).at(type)      .at(bin)) );
+                    hist_dirt       ->SetBinContent(bin+1, std::sqrt(v_dirt_total.at(var).at(type)        .at(bin)) );
+                    hist_pot        ->SetBinContent(bin+1, std::sqrt(v_pot_total.at(var).at(type)         .at(bin)) );
+                }
+
+                hist_tot->SetLineWidth(2);
+                hist_genie_uni->SetLineWidth(2);
+                hist_genie_multi->SetLineWidth(2);
+                hist_beamline->SetLineWidth(2);
+                hist_hp->SetLineWidth(2);
+                hist_reint->SetLineWidth(2);
+                hist_detector->SetLineWidth(2);
+                hist_dirt->SetLineWidth(2);
+                hist_pot->SetLineWidth(2);
+
+                hist_tot->SetLineColor(kBlack);
+                hist_genie_uni->SetLineColor(95);
+                hist_genie_multi->SetLineColor(kPink+1);
+                hist_beamline->SetLineColor(28);
+                hist_hp->SetLineColor(4);
+                hist_reint->SetLineColor(kViolet-1);
+                hist_detector->SetLineColor(32);
+                hist_dirt->SetLineColor(46);
+                hist_pot->SetLineColor(42);
+
+                TCanvas *c = new TCanvas("c", "c", 500, 500);
+                c->SetLeftMargin(0.13);
+                c->SetBottomMargin(0.13);
+                hist_tot->GetYaxis()->SetTitle("Uncertainty [%]");
+                hist_tot->GetYaxis()->SetRangeUser(0, 60);
+
+                hist_tot->Draw("hist,same, text00");
+                hist_genie_uni->Draw("hist,same");
+                hist_genie_multi->Draw("hist,same");
+                hist_beamline->Draw("hist,same");
+                hist_hp->Draw("hist,same");
+                hist_reint->Draw("hist,same");
+                hist_detector->Draw("hist,same");
+                hist_dirt->Draw("hist,same");
+                hist_pot->Draw("hist,same");
+
+                TLegend *leg = new TLegend(0.18, 0.55, 0.88, 0.85);
+                leg->SetNColumns(2);
+                leg->SetBorderSize(0);
+                leg->SetFillStyle(0);
+                leg->AddEntry(hist_tot,         "Total Sys.", "l");
+                leg->AddEntry(hist_hp,          "Hadron Production", "l");
+                leg->AddEntry(hist_detector,    "Detector", "l");
+                leg->AddEntry(hist_genie_multi, "GENIE Multisim", "l");
+                leg->AddEntry(hist_genie_uni,   "GENIE Unisim", "l");
+                leg->AddEntry(hist_beamline,    "Beamline Geometry", "l");
+                leg->AddEntry(hist_reint,       "Geant4 Reinteractions", "l");
+                leg->AddEntry(hist_pot,         "POT Counting", "l");
+                leg->AddEntry(hist_dirt,        "Dirt", "l");
+
+                leg->Draw();
+
+
+                c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_%s_%s_tot_uncertainty.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(type).c_str()));
+
+                delete hist_tot;
+                delete hist_genie_uni;
+                delete hist_genie_multi;
+                delete hist_beamline;
+                delete hist_hp;
+                delete hist_reint;
+                delete hist_detector;
+                delete hist_dirt;
+                delete hist_pot;
+                delete c;
+
+            }
+
+        }
+        
+        
+    }
+
+}
 // -----------------------------------------------------------------------------

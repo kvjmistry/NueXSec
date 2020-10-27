@@ -124,24 +124,25 @@ Run3_MC_POT 1.57761e+21
 Run3_Dirt_POT 4.32295e+20
 -
 // Run 3 Data POT (tortgt) beam good, bad runs removed
-// Run3_Data_POT 3.991e+19
+Run3_Data_POT 5e20
 // Run3_Data_POT 2.996e+19 // Set 0 with runs > 16880 (post)
-Run3_Data_POT 6.077e+19 // Set 1 < with runs < 16880 (pre)
+// Run3_Data_POT 6.077e+19 // Set 1 < with runs < 16880 (pre)
 // Run3_Data_POT 2.996e19 // Set 0 and Set 1 combined > 16880 (post)
 // Run3_Data_POT 7.072e19 // Set 0 and Set 1 combined < 16880 (pre)
 -
 // Run 3 data HW Triggers (EA9CNT) beam good, bad runs removed
-// Run3_Data_trig  815631.0
+Run3_Data_trig  10363728.0
 // Run3_Data_trig  611581.0 // Set 0
-Run3_Data_trig 1257598.0 // Set 1 data triggers with runs < 16880 (pre)
+// Run3_Data_trig 1257598.0 // Set 1 data triggers with runs < 16880 (pre)
 // Run3_Data_trig 611581.0 // Set 0 and Set 1 combined > 16880 (post)
 // Run3_Data_trig 1461648.0 // Set 0 and Set 1 combined < 16880 (pre)
 -
 // Run 3 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
+Run3_EXT_trig 32878305.25 // v5 
 // Run3_EXT_trig 1550231.025000 // Set 0
 // Run3_EXT_trig 1677886.350000 // Set 1
 // Run3_EXT_trig 2424501.800000 // Set 0 and Set 1 > 16880
-Run3_EXT_trig 803615.575 // Set 0 and Set 1 < 16880 (pre)
+// Run3_EXT_trig 803615.575 // Set 0 and Set 1 < 16880 (pre)
 // ------- Additional Run 3 POT Definitions -----
 -
 // Run 3 with event weights

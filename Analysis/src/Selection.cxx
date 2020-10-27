@@ -250,7 +250,7 @@ void Selection::MakeSelection(){
             // Skip the events with different sw trigger configured
             if (std::string(_util.run_period) == "3" && data_SC.run > 16880 ){
             // if (_run_period == 3 && data_SC.run < 16880 ){
-                continue;
+                // continue;
             }
 
             // Look at different regions of run 1
@@ -306,7 +306,7 @@ void Selection::MakeSelection(){
             // Skip the RHC events contaminated in the FHC files
             if (std::string(_util.run_period) == "3" && ext_SC.run > 16880 ){
             // if (_run_period == 3 && ext_SC.run < 16880 ){
-                continue;
+                // continue;
             }
 
             // Look at different regions of run 1

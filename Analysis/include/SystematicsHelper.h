@@ -118,6 +118,9 @@ class SystematicsHelper{
     // Plot detector variation histograms for the cross section variables
     void PlotReweightingModeDetVar(std::string label, int var, int detvar_index, std::string label_pretty);
     // -------------------------------------------------------------------------
+    // Make a plot of the systematics in one plot
+    void MakeTotUncertaintyPlot();
+    // -------------------------------------------------------------------------
 
 
 
@@ -130,15 +133,15 @@ class SystematicsHelper{
         k_CV,
         // k_bnb_diffusion,
         k_LYRayleigh,
-        k_LYAttenuation,
+        // k_LYAttenuation,
         k_SCE,
         k_Recomb2,
         k_WireModX,
         k_WireModYZ,
         k_WireModThetaXZ,
         k_WireModThetaYZ_withSigmaSplines,
-        k_WireModThetaYZ_withoutSigmaSplines,
-        k_WireModdEdX,
+        // k_WireModThetaYZ_withoutSigmaSplines,
+        // k_WireModdEdX,
         k_vars_MAX
     };
 
@@ -152,15 +155,15 @@ class SystematicsHelper{
         "CV",
         // "BNB_Diffusion",
         "LYRayleigh",
-        "LYAttenuation",
+        // "LYAttenuation",
         "SCE",
         "Recomb2",
         "WireModX",
         "WireModYZ",
         "WireModThetaXZ",
         "WireModThetaYZ_withSigmaSplines",
-        "WireModThetaYZ_withoutSigmaSplines",
-        "WireModdEdX"
+        // "WireModThetaYZ_withoutSigmaSplines",
+        // "WireModdEdX"
     };
 
     // strings used for the legend of the plots of the detector variations
@@ -168,15 +171,15 @@ class SystematicsHelper{
         "CV",
         // "BNB Diffusion",
         "LY Rayleigh",
-        "LY Attenuation",
+        // "LY Attenuation",
         "SCE",
         "Recombination",
         "WM X",
         "WM YZ",
         "WM Theta XZ",
         "WM Theta YZ w/ Spl.",
-        "WM Theta YZ w/o Spl.",
-        "WM dE/dX" 
+        // "WM Theta YZ w/o Spl.",
+        // "WM dE/dX" 
     };
 
     // colors used for the plots of the detector variations
@@ -191,8 +194,8 @@ class SystematicsHelper{
          4, // WM YZ
          53, // WM Theta XZ
          8, // WM Theta YZ w/ Spl.
-         95, // WM Theta YZ w/o Spl.
-         7 // WM dE/dX
+        //  95, // WM Theta YZ w/o Spl.
+        //  7 // WM dE/dX
     };
 
     // enum for histogram vars
@@ -243,7 +246,7 @@ class SystematicsHelper{
     // Use these for when we do the flux normalised event rate
     std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",
                                         ";Reco. Leading Shower Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]",
-                                        ";True Electron Energy [GeV]; #nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
+                                        ";True e^{-} + e^{+} Energy [GeV]; #nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
                                         // ";True #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
                                         // ";Reco #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]"
                                         };
@@ -251,7 +254,7 @@ class SystematicsHelper{
 
     std::vector<std::string> var_labels_x = {"",
                                         "Reco. Leading Shower Energy [GeV]",
-                                        "True Electron Energy [GeV]"
+                                        "True e^{-} + e^{+} Energy [GeV]"
                                         // "True #nu_{e} Energy [GeV]",
                                         // "Reco #nu_{e} Energy [GeV]"
                                         };
