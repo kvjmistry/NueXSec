@@ -909,3 +909,11 @@ void SliceContainer::SetSignal(){
 
 }
 // -----------------------------------------------------------------------------
+void SliceContainer::SetTrueElectronThetaPhi(){
+
+    TVector3 vec(elec_px, elec_py, elec_pz);
+
+    elec_theta = vec.Theta() * 180.0/3.14159;
+    elec_phi   = vec.Phi()   * 180.0/3.14159;
+
+}

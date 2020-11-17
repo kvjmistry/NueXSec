@@ -33,7 +33,7 @@ if [ -z "$1" ]; then
   done
 
   # Overwrite the Nue cc events with a higher stats version
-  # ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic.root --intrinsic intrinsic
+  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic.root --intrinsic intrinsic
 
   # Print the selection
   ./nuexsec --run 1 --printonly --printall | tee -a log/run1.log 

@@ -187,6 +187,21 @@ void Selection::MakeSelection(){
         std::ofstream run_subrun_file_mc;
         run_subrun_file_mc.open(Form("files/run%s_run_subrun_list_mc.txt",_util.run_period));
 
+        // Create a file for the selected events and their properties
+        std::ofstream evt_dist_sig;
+        evt_dist_sig.open(Form("files/run%s_evt_dist_sig.txt",_util.run_period));
+        evt_dist_sig << "true_E," << "true_theta," << "true_phi,"<< "reco_E," << "w" << "\n";
+
+        // Create a file for the generated events and their properties
+        std::ofstream evt_dist_gen;
+        evt_dist_gen.open(Form("files/run%s_evt_dist_gen.txt",_util.run_period));
+        evt_dist_gen << "true_E," << "true_theta," << "true_phi,"<< "w" << "\n";
+
+        // Create a file for the generated events and their properties
+        std::ofstream evt_dist_bkg;
+        evt_dist_bkg.open(Form("files/run%s_evt_dist_bkg.txt",_util.run_period));
+        evt_dist_bkg << "reco_E," << "w" << "\n";
+
         // Event loop
         for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
 
@@ -218,10 +233,30 @@ void Selection::MakeSelection(){
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_mc << mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt << '\n';
 
+            // if passed ans is a signal the write events to the file
+            if (pass && mc_SC.is_signal && mc_SC.cv_weight != 0.0) {
+                // evt_dist_sig << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.shr_energy_cali/0.83 << "," << mc_SC.cv_weight*_util.mc_scale_factor << "\n";
+                evt_dist_sig << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.shr_energy_cali/0.83 << "," << mc_SC.cv_weight<< "\n";
+            }
+
+            // Generated events
+            if (mc_SC.is_signal && mc_SC.cv_weight != 0.0) {
+                // evt_dist_gen << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.cv_weight*_util.mc_scale_factor << "\n";
+                evt_dist_gen << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.cv_weight << "\n";
+            }
+
+            // if passed and is a background the write events to the file
+            if (pass && !mc_SC.is_signal && mc_SC.cv_weight != 0.0) {
+                evt_dist_bkg << mc_SC.shr_energy_cali/0.83 << "," << mc_SC.cv_weight*_util.mc_scale_factor << "\n";
+            }
+
 
         } // End Event loop
 
         run_subrun_file_mc.close();
+        evt_dist_sig.close();
+        evt_dist_gen.close();
+        evt_dist_bkg.close();
 
         std::cout << "Ending Selection over MC" << std::endl;
 
@@ -233,6 +268,12 @@ void Selection::MakeSelection(){
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_data;
         run_subrun_file_data.open(Form("files/run%s_run_subrun_list_data.txt",_util.run_period));
+
+        // Create a file for the selected events
+        std::ofstream evt_dist_data;
+        evt_dist_data.open(Form("files/run%s_evt_dist_data.txt",_util.run_period));
+        evt_dist_data << "reco_E" << "\n";
+
 
         for (int ievent = 0; ievent < data_tree_total_entries; ievent++){
 
@@ -276,9 +317,12 @@ void Selection::MakeSelection(){
             
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_data << data_SC.run << " " << data_SC.sub << " " << data_SC.evt << '\n';
+
+            if (pass) evt_dist_data << data_SC.shr_energy_cali/0.83 << "\n";
         }
 
         run_subrun_file_data.close();
+        evt_dist_data.close();
         
         std::cout << "Ending Selection over Data" << std::endl;
     }
@@ -289,6 +333,10 @@ void Selection::MakeSelection(){
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_ext;
         run_subrun_file_ext.open(Form("files/run%s_run_subrun_list_ext.txt",_util.run_period));
+
+        // Create a file for the bkg events and their properties
+        std::ofstream evt_dist_ext;
+        evt_dist_ext.open(Form("files/run%s_evt_dist_ext.txt",_util.run_period));
 
         for (int ievent = 0; ievent < ext_tree_total_entries; ievent++){
 
@@ -335,9 +383,15 @@ void Selection::MakeSelection(){
 
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_ext << ext_SC.run << " " << ext_SC.sub << " " << ext_SC.evt << '\n';
+
+            // if passed and is a background the write events to the file
+            if (pass) {
+                evt_dist_ext << ext_SC.shr_energy_cali/0.83 << "," << ext_SC.cv_weight*_util.ext_scale_factor << "\n";
+            }
         }
          
         run_subrun_file_ext.close();
+        evt_dist_ext.close();
 
         std::cout << "Ending Selection over EXT" << std::endl;
 
@@ -350,6 +404,10 @@ void Selection::MakeSelection(){
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_dirt;
         run_subrun_file_dirt.open(Form("files/run%s_run_subrun_list_dirt.txt",_util.run_period));
+
+        // Create a file for the bkg events and their properties
+        std::ofstream evt_dist_dirt;
+        evt_dist_dirt.open(Form("files/run%s_evt_dist_dirt.txt",_util.run_period));
 
         for (int ievent = 0; ievent < dirt_tree_total_entries; ievent++){
 
@@ -377,9 +435,15 @@ void Selection::MakeSelection(){
             
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_dirt << dirt_SC.run << " " << dirt_SC.sub << " " << dirt_SC.evt << '\n';
+
+            // if passed and is a background the write events to the file
+            if (pass) {
+                evt_dist_dirt << dirt_SC.shr_energy_cali/0.83 << "," << dirt_SC.cv_weight*_util.dirt_scale_factor << "\n";
+            }
         }
 
         run_subrun_file_dirt.close();
+        evt_dist_dirt.close();
          
         std::cout << "Ending Selection over Dirt" << std::endl;
 
@@ -417,6 +481,7 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
     SC.Pi0Classifier(type); 
     SC.SetSignal();                // Set the event as either signal or other
+    SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------

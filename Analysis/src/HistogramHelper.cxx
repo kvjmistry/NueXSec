@@ -479,7 +479,7 @@ void HistogramHelper::InitHistograms(){
 
             TH1D_true_hists.at(i).at(k_true_elec_E)      = new TH1D( Form("h_true_elec_E_%s_%s",      _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True electron energy [GeV]; Entries",                15, 0, 5 );
             TH1D_true_hists.at(i).at(k_true_elec_theta)  = new TH1D( Form("h_true_elec_theta_%s_%s",  _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True electron BNB #theta [degrees]; Entries",            14, 0, 180 );
-            TH1D_true_hists.at(i).at(k_true_elec_phi)    = new TH1D( Form("h_true_elec_phi_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True electron BNB #phi [degrees]; Entries",              14, 0, 40);
+            TH1D_true_hists.at(i).at(k_true_elec_phi)    = new TH1D( Form("h_true_elec_phi_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True electron BNB #phi [degrees]; Entries",              25, -180, 180);
 
 
             TH2D_true_hists.at(i).at(k_true_nue_phi_theta)    = new TH2D( Form("h_true_nue_phi_theta_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),   ";True #nu_{e} Phi [degrees];True #nu_{e} Theta [degrees]",     14, 0, 80, 16, 20, 140 );
@@ -855,10 +855,10 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
         double nu_phi = atan2(SC.true_nu_py, SC.true_nu_px) * 180 / 3.1415;
 
         // True nue theta in BNB coordinates (up from beam dir)
-        double elec_theta = acos(SC.elec_pz/p_elec) * 180 / 3.1415;
+        // double elec_theta = acos(SC.elec_pz/p_elec) * 180 / 3.1415;
         
         // True nue phi in BNB coordinates (around beam dir)
-        double elec_phi = atan2(SC.elec_py, SC.elec_px) * 180 / 3.1415;
+        // double elec_phi = atan2(SC.elec_py, SC.elec_px) * 180 / 3.1415;
         
         // True nue angle from numi beamline 
         double nu_angle = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "beam"); 
@@ -898,14 +898,18 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
             TH1D_true_hists.at(index).at(k_true_nu_ang_targ)     ->Fill(nu_angle_targ, weight);
             TH1D_true_hists.at(index).at(k_true_elec_ang_targ)   ->Fill(elec_ang_targ, weight);
             TH1D_true_hists.at(index).at(k_true_elec_E)          ->Fill(SC.elec_e, weight);
-            TH1D_true_hists.at(index).at(k_true_elec_theta)      ->Fill(elec_theta, weight);
-            TH1D_true_hists.at(index).at(k_true_elec_phi)        ->Fill(elec_phi, weight);
+            TH1D_true_hists.at(index).at(k_true_elec_theta)      ->Fill(SC.elec_theta, weight);
+            TH1D_true_hists.at(index).at(k_true_elec_phi)        ->Fill(SC.elec_phi, weight);
             TH2D_true_hists.at(index).at(k_true_nue_phi_theta)   ->Fill(nu_phi, nu_theta, weight);
             TH2D_true_hists.at(index).at(k_true_nue_energy_theta)->Fill(SC.nu_e, nu_theta, weight);
             TH2D_true_hists.at(index).at(k_true_nue_energy_phi)  ->Fill(SC.nu_e, nu_phi, weight);
             TH2D_true_hists.at(index).at(k_true_nue_energy_angle)->Fill(SC.nu_e, nu_angle, weight);
             TH2D_true_hists.at(index).at(k_true_nue_vtx_z_y)     ->Fill(SC.true_nu_vtx_z,  SC.true_nu_vtx_y, weight);
             TH2D_true_hists.at(index).at(k_true_nue_vtx_z_y_sce) ->Fill(SC.true_nu_vtx_sce_z,  SC.true_nu_vtx_sce_y, weight);
+
+
+            // Bug in saving the truth nuebar information causing weird values of theta
+            // if (SC.elec_theta >= 125.0 && SC.elec_theta <=126.0) std::cout << SC.elec_px << " " << SC.elec_py << "  " << SC.elec_pz << "  " << SC.nu_pdg << "  " << SC.elec_theta << std::endl;
             
             // True vs reco histograms
             TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E)           ->Fill(SC.elec_e,  SC.shr_energy_cali/0.83, weight);

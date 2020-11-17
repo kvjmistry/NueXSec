@@ -48,6 +48,10 @@ public:
     // -------------------------------------------------------------------------
     void SetSignal();
     // -------------------------------------------------------------------------
+    // Set the theta and Phi angles for the electron
+    void SetTrueElectronThetaPhi();
+    // -------------------------------------------------------------------------
+
 
 
     Utility _util;
@@ -318,6 +322,8 @@ public:
     float elec_px;   // Truth Electron Px
     float elec_py;   // Truth Electron Py
     float elec_pz;   // Truth Electron Pz
+    float elec_theta; // True electron theta
+    float elec_phi;  // True electron phi
 
     int   npi0;     // Truth Number of Pi0
     float pi0_e;    // Truth Pi0 Energy
