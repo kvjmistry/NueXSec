@@ -2311,9 +2311,12 @@ void HistogramPlotter::Save1DHists(const char *print_name, const char *histname,
 
     hist->SetStats(kFALSE);
 
+    hist->SetLineColor(kBlack);
+    hist->SetFillColorAlpha(kAzure - 6, 0.3);
+
     _util.IncreaseLabelSize(hist, c);
 
-    hist->SetLineColor(kAzure - 6);
+    // hist->SetLineColor(kAzure - 6);
     hist->SetLineWidth(2);
     hist->Draw("hist,E");
 

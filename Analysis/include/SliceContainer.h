@@ -292,8 +292,8 @@ public:
     double nu_p;
     double nu_theta;
     double nu_phi;
-    double nu_angle;
-    double nu_angle_targ;
+    double nu_angle;         // True nue angle from numi beamline 
+    double nu_angle_targ;    // True nue angle wrt numi target to uboone vector
     double reco_true_nu_ang; // Angle between the effectve neutrino direction and the true neutrino direction
     
     // Is the truth information contained? 
