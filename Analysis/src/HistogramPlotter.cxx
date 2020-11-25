@@ -200,12 +200,12 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
 
         // Track Theta
         MakeStack("h_track_theta", " ",
-                area_norm, false, 1.0, "Leading Track Theta [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                area_norm, false, 1.0, "Leading Track Theta [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
                 Form("plots/run%s/numu/track_theta.pdf", _util.run_period), false, "classifications_numu", false, false, true);
 
         // Track phi
         MakeStack("h_track_phi", " ",
-                area_norm, false, 1.0, "Leading Track Phi [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                area_norm, false, 1.0, "Leading Track Phi [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
                 Form("plots/run%s/numu/track_phi.pdf", _util.run_period), false, "classifications_numu", false, false, true);
 
         // Track Cos theta
@@ -1178,12 +1178,12 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Leading shower phi
     MakeStack("h_reco_leading_shower_phi", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.8, "Leading Shower Phi [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.8, "Leading Shower Phi [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_leading_shower_phi.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Leading shower theta
     MakeStack("h_reco_leading_shower_theta", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.5, "Leading Shower Theta [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.5, "Leading Shower Theta [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_leading_shower_theta.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Leading shower cos theta
@@ -1219,7 +1219,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Track shower angle
     MakeStack("h_reco_track_shower_angle", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.5, "Longest Track Leading Shower Angle [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.5, "Longest Track Leading Shower Angle [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_track_shower_angle.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Ratio hits from showers to slice
@@ -1386,7 +1386,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Shower Moliere Average
     MakeStack("h_reco_shrmoliereavg", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.6, "Leading Shower Moliere Average [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.6, "Leading Shower Moliere Average [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shrmoliereavg.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Median of 1st component of shr PCA (5cm window)
