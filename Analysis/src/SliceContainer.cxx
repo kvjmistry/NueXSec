@@ -184,6 +184,7 @@ void SliceContainer::Initialise(TTree *tree, int type, Utility util){
     tree->SetBranchAddress("theta",  &theta);
     tree->SetBranchAddress("isVtxInFiducial",  &isVtxInFiducial);
     tree->SetBranchAddress("truthFiducial",    &truthFiducial);
+    tree->SetBranchAddress("reco_e",           &reco_e);
     
     tree->SetBranchAddress("true_nu_vtx_t", &true_nu_vtx_t);
     tree->SetBranchAddress("true_nu_vtx_x", &true_nu_vtx_x);
@@ -937,6 +938,9 @@ void SliceContainer::SetNuMIAngularVariables(){
 
     // Momentum of neutrino
     nu_p = std::sqrt(true_nu_px*true_nu_px + true_nu_py*true_nu_py + true_nu_pz*true_nu_pz);
+
+    // Reconstructed Shower momentum
+    shr_p = std::sqrt(shr_px*shr_px + shr_py*shr_py + shr_pz*shr_pz);
     
     // Momentum of electron
     elec_mom = std::sqrt(elec_px*elec_px + elec_py*elec_py + elec_pz*elec_pz);
@@ -968,10 +972,13 @@ void SliceContainer::SetNuMIAngularVariables(){
     reco_true_nu_ang = nu_dir.Angle(v_targ_to_vtx) * 180/3.14159;
     // ---
 
+    // The angle of the reconstructed shower relative to the NuMI target to detector direction
+    shr_ang_numi = _util.GetNuMIAngle(SC.shr_px, SC.shr_py, SC.shr_pz, "target");
+
 }
 // -----------------------------------------------------------------------------
 void SliceContainer::CalibrateShowerEnergy(){
-    
+
     // Divide the shower energy by 0.83 to calibrate it properly. 
     shr_energy_cali= shr_energy_cali/0.83;
 

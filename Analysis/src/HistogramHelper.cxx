@@ -647,23 +647,11 @@ void HistogramHelper::InitHistograms(){
 // -----------------------------------------------------------------------------
 void HistogramHelper::FillHists(int type, int classification_index, std::string interaction, int _par_type, int cut_index, SliceContainer SC, double weight){
 
-    // Calculate some variables
-    double reco_shr_p = std::sqrt(SC.shr_px*SC.shr_px + SC.shr_py*SC.shr_py + SC.shr_pz*SC.shr_pz);
-
-    // Reconstructed Energy of neutrino
-    double reco_nu_e = SC.shr_energy_tot_cali + SC.trk_energy_tot;
-
     // Check if the interaction was in the FV
     bool true_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z);
 
-    // The angle of the reconstructed shower relative to the NuMI target to detector direction
-    double shr_ang_numi = _util.GetNuMIAngle(SC.shr_px, SC.shr_py, SC.shr_pz, "target");
-
     // Get the trkfit dedx max variable
     double dedx_max = SC.GetdEdxMax();
-
-    // For filling histograms, we lump the cosmic nue and cosmic nuebar into the generic cosmic category (so the plots can be normalised properly)
-    // if (classification_index == _util.k_cosmic_nue || classification_index == _util.k_cosmic_nuebar) classification_index = _util.k_cosmic;
     
     // Now fill the histograms!
     TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x, weight);
@@ -784,7 +772,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
 
     if (SC.n_tracks > 0) TH1D_hists.at(k_reco_trk_len).at(cut_index).at(classification_index)->Fill(SC.trk_len, weight);
 
-    TH1D_hists.at(k_reco_nu_e).at(cut_index).at(classification_index)->Fill(reco_nu_e, weight);
+    TH1D_hists.at(k_reco_nu_e).at(cut_index).at(classification_index)->Fill(SC.reco_e, weight);
 
     TH1D_hists.at(k_reco_contained_fraction).at(cut_index).at(classification_index)->Fill(SC.contained_fraction, weight);
 
@@ -796,7 +784,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
 
     TH1D_hists.at(k_reco_crthitpe).at(cut_index).at(classification_index)->Fill(SC.crthitpe, weight);
 
-    TH1D_hists.at(k_reco_shr_ang_numi).at(cut_index).at(classification_index)->Fill(shr_ang_numi, weight);
+    TH1D_hists.at(k_reco_shr_ang_numi).at(cut_index).at(classification_index)->Fill(SC.shr_ang_numi, weight);
 
     TH1D_hists.at(k_reco_single_bin).at(cut_index).at(classification_index)->Fill(weight);
 
@@ -888,9 +876,9 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
             
             // True vs reco histograms
             TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E)           ->Fill(SC.elec_e,  SC.shr_energy_cali, weight);
-            TH2D_true_hists.at(index).at(k_true_nu_E_reco_nu_E)               ->Fill(SC.nu_e,  reco_nu_e, weight);
+            TH2D_true_hists.at(index).at(k_true_nu_E_reco_nu_E)               ->Fill(SC.nu_e,    SC.reco_e, weight);
             TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E_extra_bins)->Fill(SC.elec_e,  SC.shr_energy_cali, weight);
-            TH2D_true_hists.at(index).at(k_true_nu_E_reco_nu_E_extra_bins)    ->Fill(SC.nu_e,  reco_nu_e, weight);
+            TH2D_true_hists.at(index).at(k_true_nu_E_reco_nu_E_extra_bins)    ->Fill(SC.nu_e,    SC.reco_e, weight);
             TH2D_true_hists.at(index).at(k_true_nu_vtx_x_reco_nu_vtx_x)       ->Fill(SC.true_nu_vtx_sce_x,  SC.reco_nu_vtx_sce_x, weight);
             TH2D_true_hists.at(index).at(k_true_nu_vtx_y_reco_nu_vtx_y)       ->Fill(SC.true_nu_vtx_sce_y,  SC.reco_nu_vtx_sce_y, weight);
             TH2D_true_hists.at(index).at(k_true_nu_vtx_z_reco_nu_vtx_z)       ->Fill(SC.true_nu_vtx_sce_z,  SC.reco_nu_vtx_sce_z, weight);

@@ -89,6 +89,7 @@ public:
     
     float shr_theta;             // Shower: Reconstructed theta angle for the leading shower
     float shr_phi;               // Shower: Reconstructed phi angle for the leading shower
+    double shr_ang_numi;         // Shower: angle of the reconstructed shower relative to the NuMI target to detector vector
     
     float shr_pca_0;             // Shower: First eigenvalue of the PCAxis of the leading shower
     float shr_pca_1;             // Shower: Second eigenvalue of the PCAxis of the leading shower
@@ -97,6 +98,7 @@ public:
     float shr_px;                // Shower: X component of the reconstructed momentum of the leading shower (in GeV/c)
     float shr_py;                // Shower: Y component of the reconstructed momentum of the leading shower (in GeV/c)
     float shr_pz;                // Shower: Z component of the reconstructed momentum of the leading shower (in GeV/c)
+    double shr_p;                // Shower: reconstructed momentum of the leading shower (in GeV/c)
     
     float shr_openangle;         // Shower: Opening angle of the shower -- variable does not work...
     
@@ -300,6 +302,7 @@ public:
     double nu_angle;         // True nue angle from numi beamline 
     double nu_angle_targ;    // True nue angle wrt numi target to uboone vector
     double reco_true_nu_ang; // Angle between the effectve neutrino direction and the true neutrino direction
+    float reco_e;            // Reconstructed Neutrino energy 
     
     // Is the truth information contained? 
     // Require all track start/end point in FV and showers deposit > 60% of energy

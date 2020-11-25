@@ -195,7 +195,7 @@ void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
     classification = SC.classification.first;
     weight = SC.cv_weight;
     true_energy = SC.nu_e;
-    reco_energy = 0.0; // Leave unset for now, we arent using it!
+    reco_energy = SC.reco_e;
     shr_tkfit_dedx_Y = SC.shr_tkfit_dedx_Y;
     n_showers = SC.n_showers;
     n_tracks  = SC.n_tracks;

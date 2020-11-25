@@ -365,12 +365,14 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
 
     bool pass = true;
 
-    // Classify the event
-    SC.SliceClassifier(type);      // Classification of the event
+    // Set derived variables in the slice container
     SC.SetSignal();                // Set the event as either signal or other
     SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
     SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
     SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
+
+    // Classify the event
+    SC.SliceClassifier(type);      // Classification of the event
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
