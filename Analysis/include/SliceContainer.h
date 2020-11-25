@@ -54,6 +54,11 @@ public:
     // Calculate and set the effective angle variable
     void SetNuMIAngularVariables();
     // -------------------------------------------------------------------------
+    // Apply the 0.83 calibration factor to the shower energy so it is applied universally
+    void CalibrateShowerEnergy();
+    // -------------------------------------------------------------------------
+
+
 
 
 

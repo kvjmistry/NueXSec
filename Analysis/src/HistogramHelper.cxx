@@ -651,7 +651,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
     double reco_shr_p = std::sqrt(SC.shr_px*SC.shr_px + SC.shr_py*SC.shr_py + SC.shr_pz*SC.shr_pz);
 
     // Reconstructed Energy of neutrino
-    double reco_nu_e = SC.shr_energy_tot_cali / 0.83 + SC.trk_energy_tot;
+    double reco_nu_e = SC.shr_energy_tot_cali + SC.trk_energy_tot;
 
     // Check if the interaction was in the FV
     bool true_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z);
@@ -714,10 +714,10 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
 
     TH1D_hists.at(k_reco_track_score).at(cut_index).at(classification_index)->Fill(SC.trk_score, weight);
 
-    TH1D_hists.at(k_reco_shower_energy_tot_cali).at(cut_index).at(classification_index)->Fill(SC.shr_energy_tot_cali/0.83, weight);
-    TH1D_hists.at(k_reco_shower_energy_tot_cali_rebin).at(cut_index).at(classification_index)->Fill(SC.shr_energy_tot_cali/0.83, weight);
-    TH1D_hists.at(k_reco_shower_energy_cali).at(cut_index).at(classification_index)->Fill(SC.shr_energy_cali/0.83, weight);
-    TH1D_hists.at(k_reco_shower_energy_cali_rebin).at(cut_index).at(classification_index)->Fill(SC.shr_energy_cali/0.83, weight);
+    TH1D_hists.at(k_reco_shower_energy_tot_cali).at(cut_index).at(classification_index)->Fill(SC.shr_energy_tot_cali, weight);
+    TH1D_hists.at(k_reco_shower_energy_tot_cali_rebin).at(cut_index).at(classification_index)->Fill(SC.shr_energy_tot_cali, weight);
+    TH1D_hists.at(k_reco_shower_energy_cali).at(cut_index).at(classification_index)->Fill(SC.shr_energy_cali, weight);
+    TH1D_hists.at(k_reco_shower_energy_cali_rebin).at(cut_index).at(classification_index)->Fill(SC.shr_energy_cali, weight);
 
     TH1D_hists.at(k_reco_shr_hits_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_tot, weight);
 
@@ -816,7 +816,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
     // -------------------------------------------------------------------------
 
     // 2D Histograms
-    TH2D_hists_cuts.at(k_2D_dedx_shower_energy).at(cut_index).at(classification_index)->Fill(dedx_max, SC.shr_energy_cali/0.83, weight);
+    TH2D_hists_cuts.at(k_2D_dedx_shower_energy).at(cut_index).at(classification_index)->Fill(dedx_max, SC.shr_energy_cali, weight);
 
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
@@ -887,19 +887,19 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
             // if (SC.elec_theta >= 125.0 && SC.elec_theta <=126.0) std::cout << SC.elec_px << " " << SC.elec_py << "  " << SC.elec_pz << "  " << SC.nu_pdg << "  " << SC.elec_theta << std::endl;
             
             // True vs reco histograms
-            TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E)           ->Fill(SC.elec_e,  SC.shr_energy_cali/0.83, weight);
+            TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E)           ->Fill(SC.elec_e,  SC.shr_energy_cali, weight);
             TH2D_true_hists.at(index).at(k_true_nu_E_reco_nu_E)               ->Fill(SC.nu_e,  reco_nu_e, weight);
-            TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E_extra_bins)->Fill(SC.elec_e,  SC.shr_energy_cali/0.83, weight);
+            TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E_extra_bins)->Fill(SC.elec_e,  SC.shr_energy_cali, weight);
             TH2D_true_hists.at(index).at(k_true_nu_E_reco_nu_E_extra_bins)    ->Fill(SC.nu_e,  reco_nu_e, weight);
             TH2D_true_hists.at(index).at(k_true_nu_vtx_x_reco_nu_vtx_x)       ->Fill(SC.true_nu_vtx_sce_x,  SC.reco_nu_vtx_sce_x, weight);
             TH2D_true_hists.at(index).at(k_true_nu_vtx_y_reco_nu_vtx_y)       ->Fill(SC.true_nu_vtx_sce_y,  SC.reco_nu_vtx_sce_y, weight);
             TH2D_true_hists.at(index).at(k_true_nu_vtx_z_reco_nu_vtx_z)       ->Fill(SC.true_nu_vtx_sce_z,  SC.reco_nu_vtx_sce_z, weight);
 
-            TH2D_true_hists.at(index).at(k_true_shr_energy_purity)            ->Fill(SC.shr_energy_cali/0.83,  SC.shr_bkt_purity, weight);
-            TH2D_true_hists.at(index).at(k_true_shr_energy_completeness)      ->Fill(SC.shr_energy_cali/0.83,  SC.shr_bkt_completeness, weight);
+            TH2D_true_hists.at(index).at(k_true_shr_energy_purity)            ->Fill(SC.shr_energy_cali,  SC.shr_bkt_purity, weight);
+            TH2D_true_hists.at(index).at(k_true_shr_energy_completeness)      ->Fill(SC.shr_energy_cali,  SC.shr_bkt_completeness, weight);
 
-            TH2D_true_hists.at(index).at(k_true_shr_energy_resolution_reco)      ->Fill( SC.shr_energy_cali/0.83, (SC.shr_energy_cali/0.83 - SC.elec_e) / SC.shr_energy_cali/0.83, weight);
-            TH2D_true_hists.at(index).at(k_true_shr_energy_resolution_true)      ->Fill( SC.shr_energy_cali/0.83, (SC.shr_energy_cali/0.83 - SC.elec_e) / SC.elec_e, weight);
+            TH2D_true_hists.at(index).at(k_true_shr_energy_resolution_reco)      ->Fill( SC.shr_energy_cali, (SC.shr_energy_cali - SC.elec_e) / SC.shr_energy_cali, weight);
+            TH2D_true_hists.at(index).at(k_true_shr_energy_resolution_true)      ->Fill( SC.shr_energy_cali, (SC.shr_energy_cali - SC.elec_e) / SC.elec_e, weight);
 
             // True nue interaction histograms
             if (interaction == "nue_cc_qe" || interaction == "nue_bar_cc_qe"){
@@ -1415,18 +1415,18 @@ void HistogramHelper::Write_2DSigBkgHists(){
 void HistogramHelper::FillPiZeroHists(int classification_index, SliceContainer SC, double weight, int pizero_mode){
 
     if (pizero_mode == 0){
-        TH1D_pi0_hists.at(k_pi0_mass).at(classification_index)->Fill(SC.pi0_mass_Y/0.83, weight);
-        TH1D_pi0_hists.at(k_pi0_energy).at(classification_index)->Fill(SC.pi0_energy1_Y/0.83, weight);
+        TH1D_pi0_hists.at(k_pi0_mass).at(classification_index)->Fill(SC.pi0_mass_Y, weight);
+        TH1D_pi0_hists.at(k_pi0_energy).at(classification_index)->Fill(SC.pi0_energy1_Y, weight);
     }
     // Norm fix
     else if (pizero_mode == 1){
-        TH1D_pi0_hists.at(k_pi0_mass_norm).at(classification_index)->Fill(SC.pi0_mass_Y/0.83, weight);
-        TH1D_pi0_hists.at(k_pi0_energy_norm).at(classification_index)->Fill(SC.pi0_energy1_Y/0.83, weight);
+        TH1D_pi0_hists.at(k_pi0_mass_norm).at(classification_index)->Fill(SC.pi0_mass_Y, weight);
+        TH1D_pi0_hists.at(k_pi0_energy_norm).at(classification_index)->Fill(SC.pi0_energy1_Y, weight);
     }
     // Energy dependent
     else {
-        TH1D_pi0_hists.at(k_pi0_mass_EScale).at(classification_index)->Fill(SC.pi0_mass_Y/0.83, weight);
-        TH1D_pi0_hists.at(k_pi0_energy_EScale).at(classification_index)->Fill(SC.pi0_energy1_Y/0.83, weight);
+        TH1D_pi0_hists.at(k_pi0_mass_EScale).at(classification_index)->Fill(SC.pi0_mass_Y, weight);
+        TH1D_pi0_hists.at(k_pi0_energy_EScale).at(classification_index)->Fill(SC.pi0_energy1_Y, weight);
     }
     
 

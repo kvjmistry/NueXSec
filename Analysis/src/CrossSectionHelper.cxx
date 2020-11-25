@@ -370,6 +370,7 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     SC.SetSignal();                // Set the event as either signal or other
     SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
     SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
+    SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
@@ -531,8 +532,8 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
             h_cut_v.at(label).at(cut_index).at(_util.k_cut_shrmoliereavg).at(uni)            ->Fill(SC.shrmoliereavg,          weight_uni);
             h_cut_v.at(label).at(cut_index).at(_util.k_cut_leading_shower_theta).at(uni)     ->Fill(SC.shr_theta * 180/3.14159,weight_uni);
             h_cut_v.at(label).at(cut_index).at(_util.k_cut_leading_shower_phi).at(uni)       ->Fill(SC.shr_phi * 180/3.14159,  weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_shower_energy_cali).at(uni)       ->Fill(SC.shr_energy_cali/0.83,   weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_shower_energy_cali_rebin).at(uni) ->Fill(SC.shr_energy_cali/0.83,   weight_uni);
+            h_cut_v.at(label).at(cut_index).at(_util.k_cut_shower_energy_cali).at(uni)       ->Fill(SC.shr_energy_cali,   weight_uni);
+            h_cut_v.at(label).at(cut_index).at(_util.k_cut_shower_energy_cali_rebin).at(uni) ->Fill(SC.shr_energy_cali,   weight_uni);
             h_cut_v.at(label).at(cut_index).at(_util.k_cut_flash_time).at(uni)               ->Fill(SC.flash_time,   weight_uni);
             h_cut_v.at(label).at(cut_index).at(_util.k_cut_flash_pe).at(uni)                 ->Fill(SC.flash_pe,   weight_uni);
         

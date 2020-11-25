@@ -970,3 +970,9 @@ void SliceContainer::SetNuMIAngularVariables(){
 
 }
 // -----------------------------------------------------------------------------
+void SliceContainer::CalibrateShowerEnergy(){
+    
+    // Divide the shower energy by 0.83 to calibrate it properly. 
+    shr_energy_cali= shr_energy_cali/0.83;
+
+}

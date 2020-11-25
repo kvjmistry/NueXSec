@@ -235,8 +235,8 @@ void Selection::MakeSelection(){
 
             // if passed ans is a signal the write events to the file
             if (pass && mc_SC.is_signal && mc_SC.cv_weight != 0.0) {
-                // evt_dist_sig << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.shr_energy_cali/0.83 << "," << mc_SC.cv_weight*_util.mc_scale_factor << "\n";
-                evt_dist_sig << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.shr_energy_cali/0.83 << "," << mc_SC.cv_weight<< "\n";
+                // evt_dist_sig << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.shr_energy_cali << "," << mc_SC.cv_weight*_util.mc_scale_factor << "\n";
+                evt_dist_sig << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.shr_energy_cali << "," << mc_SC.cv_weight<< "\n";
             }
 
             // Generated events
@@ -247,7 +247,7 @@ void Selection::MakeSelection(){
 
             // if passed and is a background the write events to the file
             if (pass && !mc_SC.is_signal && mc_SC.cv_weight != 0.0) {
-                evt_dist_bkg << mc_SC.shr_energy_cali/0.83 << "," << mc_SC.cv_weight*_util.mc_scale_factor << "\n";
+                evt_dist_bkg << mc_SC.shr_energy_cali << "," << mc_SC.cv_weight*_util.mc_scale_factor << "\n";
             }
 
 
@@ -318,7 +318,7 @@ void Selection::MakeSelection(){
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_data << data_SC.run << " " << data_SC.sub << " " << data_SC.evt << '\n';
 
-            if (pass) evt_dist_data << data_SC.shr_energy_cali/0.83 << "\n";
+            if (pass) evt_dist_data << data_SC.shr_energy_cali << "\n";
         }
 
         run_subrun_file_data.close();
@@ -386,7 +386,7 @@ void Selection::MakeSelection(){
 
             // if passed and is a background the write events to the file
             if (pass) {
-                evt_dist_ext << ext_SC.shr_energy_cali/0.83 << "," << ext_SC.cv_weight*_util.ext_scale_factor << "\n";
+                evt_dist_ext << ext_SC.shr_energy_cali << "," << ext_SC.cv_weight*_util.ext_scale_factor << "\n";
             }
         }
          
@@ -438,7 +438,7 @@ void Selection::MakeSelection(){
 
             // if passed and is a background the write events to the file
             if (pass) {
-                evt_dist_dirt << dirt_SC.shr_energy_cali/0.83 << "," << dirt_SC.cv_weight*_util.dirt_scale_factor << "\n";
+                evt_dist_dirt << dirt_SC.shr_energy_cali << "," << dirt_SC.cv_weight*_util.dirt_scale_factor << "\n";
             }
         }
 
@@ -483,6 +483,7 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SC.SetSignal();                // Set the event as either signal or other
     SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
     SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
+    SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
@@ -689,7 +690,7 @@ void Selection::SelectionFill(int type, SliceContainer &SC, int cut_index, std::
     // Calculate the reconstructed neutrino energy
     // This is in many places, need to have a way for setting this number by default
     // *************************************************************************
-    double reco_nu_e = SC.shr_energy_tot_cali / 0.83 + SC.trk_energy_tot;
+    double reco_nu_e = SC.shr_energy_tot_cali + SC.trk_energy_tot;
 
     // *************************************************************************
     // Fill Histograms
