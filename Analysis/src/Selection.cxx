@@ -482,6 +482,7 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     SC.Pi0Classifier(type); 
     SC.SetSignal();                // Set the event as either signal or other
     SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
+    SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------

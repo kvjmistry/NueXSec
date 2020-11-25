@@ -115,8 +115,6 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
 
             Save1DHists(Form("plots/run%s/Truth/true_nue_theta_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_nue_theta", cut_type, true);
             Save1DHists(Form("plots/run%s/Truth/true_nue_phi_%s.pdf",   _util.run_period, cut_type.c_str()), "h_true_nue_phi", cut_type, true);
-            Save1DHists(Form("plots/run%s/Truth/true_nue_theta_numi_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_nue_theta_numi", cut_type, true);
-            Save1DHists(Form("plots/run%s/Truth/true_nue_phi_numi_%s.pdf",   _util.run_period, cut_type.c_str()), "h_true_nue_phi_numi", cut_type, true);
             Save1DHists(Form("plots/run%s/Truth/true_nue_angle_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_nue_angle", cut_type, true);
             Save1DHists(Form("plots/run%s/Truth/true_nue_px_%s.pdf",    _util.run_period, cut_type.c_str()), "h_true_nue_px", cut_type, true);
             Save1DHists(Form("plots/run%s/Truth/true_nue_py_%s.pdf",    _util.run_period, cut_type.c_str()), "h_true_nue_py", cut_type, true);
@@ -134,6 +132,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
             Save1DHists(Form("plots/run%s/Truth/true_elec_E_%s.pdf",     _util.run_period, cut_type.c_str()),     "h_true_elec_E", cut_type, true);
             Save1DHists(Form("plots/run%s/Truth/true_elec_phi_%s.pdf",   _util.run_period, cut_type.c_str()),     "h_true_elec_phi", cut_type, true);
             Save1DHists(Form("plots/run%s/Truth/true_elec_theta_%s.pdf", _util.run_period, cut_type.c_str()),     "h_true_elec_theta", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/reco_true_nu_ang_%s.pdf", _util.run_period, cut_type.c_str()),     "h_reco_true_ang", cut_type, true);
 
             // Make the 2D histograms
             Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta_%s.pdf",          _util.run_period, cut_type.c_str()), "h_true_nue_phi_theta", cut_type, false);
@@ -1443,6 +1442,19 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
     MakeStack("h_reco_crthitpe", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, true, 1.0, "CRT Hit Intensity [PE]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_crthitpe_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, false);
+
+
+    // Angle between vector from NuMI targ to shower direction
+    MakeStack("h_reco_effective_angle", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "Effective Angle [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_effective_angle.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
+
+    // Cosine of the Angle between vector from NuMI targ to shower direction
+    MakeStack("h_reco_effective_cosangle", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "Cosine Effective Angle",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_effective_cosangle.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
+
+    
 
     // Stacked Histograms by particle type
 

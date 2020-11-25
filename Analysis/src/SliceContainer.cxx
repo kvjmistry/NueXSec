@@ -917,3 +917,56 @@ void SliceContainer::SetTrueElectronThetaPhi(){
     elec_phi   = vec.Phi()   * 180.0/3.14159;
 
 }
+// -----------------------------------------------------------------------------
+void SliceContainer::SetNuMIAngularVariables(){
+
+
+    // --- Effective Angle -- //
+    // Calculate the angle between the shower direction and the vector from the target to the nu vtx
+    TVector3 shr_dir(shr_px, shr_py, shr_pz); // Shower direction
+    shr_dir.Unit();
+    
+    TVector3 v_targ_uboone(-31387.58422, -3316.402543, -60100.2414);
+    TVector3 v_nu_vtx(reco_nu_vtx_sce_x, reco_nu_vtx_sce_y, reco_nu_vtx_sce_z);
+    TVector3 v_targ_to_vtx = (-1*v_targ_uboone + v_nu_vtx).Unit(); // -1 because the vector points from uboone to tgt, we need the other way around
+
+    // Set the values
+    effective_angle = shr_dir.Angle(v_targ_to_vtx) * 180 / 3.14159;
+    cos_effective_angle = std::cos(shr_dir.Angle(v_targ_to_vtx));
+    // --
+
+    // Momentum of neutrino
+    nu_p = std::sqrt(true_nu_px*true_nu_px + true_nu_py*true_nu_py + true_nu_pz*true_nu_pz);
+    
+    // Momentum of electron
+    elec_mom = std::sqrt(elec_px*elec_px + elec_py*elec_py + elec_pz*elec_pz);
+
+    // --
+
+    TVector3 nu_p_vec(true_nu_px, true_nu_py, true_nu_pz);
+
+    // True nue theta in BNB coordinates (up from beam dir)
+    nu_theta = nu_p_vec.Theta() * 180.0/3.14159;
+    
+    // True nue phi in BNB coordinates (around beam dir)
+    nu_phi = nu_p_vec.Phi()   * 180.0/3.14159;
+    
+    // True nue angle from numi beamline 
+    nu_angle = _util.GetNuMIAngle(true_nu_px, true_nu_py, true_nu_pz, "beam"); 
+
+    // True nue angle wrt numi target to uboone vector
+    nu_angle_targ = _util.GetNuMIAngle(true_nu_px, true_nu_py, true_nu_pz, "target"); 
+
+    // True electron angle wrt numi target to uboone vector
+    elec_ang_targ = _util.GetNuMIAngle(elec_px, elec_py, elec_pz, "target");
+
+    // --- Calculate the dot-product of the proxy for neutrino direction --- //
+    // (the vector from the target to the reco nu vtx) and the true nu angle
+    TVector3 nu_dir(true_nu_px, true_nu_py, true_nu_pz); 
+    nu_dir.Unit();
+
+    reco_true_nu_ang = nu_dir.Angle(v_targ_to_vtx) * 180/3.14159;
+    // ---
+
+}
+// -----------------------------------------------------------------------------

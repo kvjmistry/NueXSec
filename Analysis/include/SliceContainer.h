@@ -51,6 +51,10 @@ public:
     // Set the theta and Phi angles for the electron
     void SetTrueElectronThetaPhi();
     // -------------------------------------------------------------------------
+    // Calculate and set the effective angle variable
+    void SetNuMIAngularVariables();
+    // -------------------------------------------------------------------------
+
 
 
 
@@ -66,6 +70,9 @@ public:
     std::string pi0_classification;             // Stores whether the true interaction has a pi0 in or not e.g. nue cc pi0 or numu cc pi0
 
     double cv_weight;
+
+    double effective_angle;     // The angle between the vector from the target to nu vtx compared to the reconstructed shower direction.
+    double cos_effective_angle; // The cosine of the angle between the vector from the target to nu vtx compared to the reconstructed shower direction.
 
     bool is_signal{false}; // bool to check if the event is signal or not
 
@@ -282,6 +289,12 @@ public:
     float nu_pt;       // True Neutrino Transverse Energy of Interaction
     float theta;       // True Neutrino Theta
     bool  isVtxInFiducial; // True Neutrino Vertex in FV
+    double nu_p;
+    double nu_theta;
+    double nu_phi;
+    double nu_angle;
+    double nu_angle_targ;
+    double reco_true_nu_ang; // Angle between the effectve neutrino direction and the true neutrino direction
     
     // Is the truth information contained? 
     // Require all track start/end point in FV and showers deposit > 60% of energy
@@ -322,8 +335,10 @@ public:
     float elec_px;   // Truth Electron Px
     float elec_py;   // Truth Electron Py
     float elec_pz;   // Truth Electron Pz
+    double elec_mom; // Truth Electron P
     float elec_theta; // True electron theta
     float elec_phi;  // True electron phi
+    double elec_ang_targ; // True electron angle wrt numi target to uboone vector
 
     int   npi0;     // Truth Number of Pi0
     float pi0_e;    // Truth Pi0 Energy

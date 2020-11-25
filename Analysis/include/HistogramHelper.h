@@ -188,6 +188,8 @@ class HistogramHelper{
         k_reco_crthitpe,                                                        // CRT hit pe
         k_reco_shr_ang_numi,                                                    // Angle of the reconstructed leading shower relative to the numi beamline
         k_reco_single_bin,                                                      // Just fill with weight. We need this to get the uncertainty on the purity
+        k_reco_effective_angle,                                                 // Angle between vector from target to vertex and shower direction.
+        k_reco_effective_cosangle,                                              // Cosine of the Angle between vector from target to vertex and shower direction.
         k_TH1D_MAX
     };
 
@@ -210,14 +212,13 @@ class HistogramHelper{
         k_eff_nu_E_single_bin,       // True Electron-neutrino energy, single bin
         k_eff_nu_E_nue_single_bin,   // True Electron-neutrino energy single bin
         k_eff_nu_E_nuebar_single_bin,// True anti Electron-neutrino energy single bin
+        k_eff_nu_flash_time,         // Efficiency as a function of flash time
         k_TH1D_eff_MAX
     };
 
     enum TH1D_true_hist_vars {
         k_true_nue_theta,     // True nue theta in BNB coordinates (up from beam dir)
         k_true_nue_phi,       // True nue phi in BNB coordinates (around beam dir)
-        k_true_nue_theta_numi,// True nue theta in NuMI coordinates (up from beam dir)
-        k_true_nue_phi_numi,  // True nue phi in NuMI coordinates (around beam dir)
         k_true_nue_angle,     // True nue angle from numi beamline 
         k_true_nue_px,        // True nue px
         k_true_nue_py,        // True nue py
@@ -235,6 +236,7 @@ class HistogramHelper{
         k_true_elec_theta,    // True theta of electron in BNB coordinates
         k_true_elec_phi,      // True phi of electron in BNB coordinates
         k_true_nu_ang_targ,   // True angle of electron shower wrt target
+        k_reco_true_ang,      // Angle between the reco and true neutrino angle
         k_TH1D_true_MAX
     };
 

@@ -732,19 +732,11 @@ double Utility::GetNuMIAngle(double px, double py, double pz, std::string direct
         beamdir = {5502, 7259, 67270};
         beamdir = beamdir.Unit(); // Get the direction
     }
-    // NuMI acos(Pz/P)
-    else if (direction == "numi_theta"){
-        double p = std::sqrt(BeamCoords.X()*BeamCoords.X() +BeamCoords.Y()*BeamCoords.Y() +  BeamCoords.Z()*BeamCoords.Z() );
-        return acos(BeamCoords.Z()/p) * (180 / 3.1415);
-    }
-    else if (direction == "numi_phi"){
-        return atan2(BeamCoords.Y(), BeamCoords.X()) * 180 / 3.1415;
-    } 
     else {
         std::cout << "Warning unknown angle type specified, you should check this" << std::endl;
     }
     
-    double theta = BeamCoords.Angle(beamdir) * 180 / 3.1415926;
+    double angle = BeamCoords.Angle(beamdir) * 180 / 3.1415926;
 
 
     // Create vectors to get the angle in the yz and xz planes
@@ -755,7 +747,7 @@ double Utility::GetNuMIAngle(double px, double py, double pz, std::string direct
 
     // std::cout << theta << std::endl;
 
-    return theta;
+    return angle;
 }
 // -----------------------------------------------------------------------------
 bool Utility::in_fv(double x, double y, double z){

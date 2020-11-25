@@ -380,6 +380,11 @@ void HistogramHelper::InitHistograms(){
             // Single Bin
             TH1D_hists.at(k_reco_single_bin).at(i).at(j) = new TH1D ( Form("h_reco_single_bin_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 1, 0, 40);
 
+            // Angle between the vector from target to nu vtx and the shower direction
+            TH1D_hists.at(k_reco_effective_angle).at(i).at(j) = new TH1D ( Form("h_reco_effective_angle_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 13, 0, 190);
+
+            TH1D_hists.at(k_reco_effective_cosangle).at(i).at(j) = new TH1D ( Form("h_reco_effective_cosangle_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 16, -1, 1);
+
         }
         
     }
@@ -437,6 +442,7 @@ void HistogramHelper::InitHistograms(){
                 TEfficiency_hists.at(k_eff_nu_E_single_bin).at(l) = new TH1D( Form("h_true_nu_E_single_bin_%s",_util.cut_dirs.at(l).c_str() ), "", 1, 0, 10);
                 TEfficiency_hists.at(k_eff_nu_E_nue_single_bin).at(l)    = new TH1D( Form("h_true_nu_E_nue_single_bin_%s",_util.cut_dirs.at(l).c_str() ), "", 1, 0, 10 );
                 TEfficiency_hists.at(k_eff_nu_E_nuebar_single_bin).at(l) = new TH1D( Form("h_true_nu_E_nuebar_single_bin_%s",_util.cut_dirs.at(l).c_str() ), "", 1, 0, 10 );
+                TEfficiency_hists.at(k_eff_nu_flash_time).at(l)          = new TH1D( Form("h_eff_nu_flash_time_%s",_util.cut_dirs.at(l).c_str() ), "", 5, 6.0, 15.0);
             }
             
         }
@@ -458,9 +464,6 @@ void HistogramHelper::InitHistograms(){
             
             TH1D_true_hists.at(i).at(k_true_nue_theta) = new TH1D( Form("h_true_nue_theta_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True #nu_{e} BNB #theta [degrees]; Entries",           14, 0, 180 );
             TH1D_true_hists.at(i).at(k_true_nue_phi)   = new TH1D( Form("h_true_nue_phi_%s_%s",   _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True #nu_{e} BNB #phi [degrees]; Entries",              14, 0, 40);
-
-            TH1D_true_hists.at(i).at(k_true_nue_theta_numi) = new TH1D( Form("h_true_nue_theta_numi_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True #nu_{e} NuMI #theta [degrees]; Entries",           14, 0, 140 );
-            TH1D_true_hists.at(i).at(k_true_nue_phi_numi)   = new TH1D( Form("h_true_nue_phi_numi_%s_%s",   _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True #nu_{e} NuMI #phi [degrees]; Entries",             25, -180, 180 );
             
             TH1D_true_hists.at(i).at(k_true_nue_angle) = new TH1D( Form("h_true_nue_angle_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True #nu_{e} Angle from NuMI [degrees]; Entries", 120, 0, 120 );
             TH1D_true_hists.at(i).at(k_true_nue_px)    = new TH1D( Form("h_true_nue_px_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True #nu_{e} Px [GeV/c]; Entries", 14, 0, 5);
@@ -481,6 +484,7 @@ void HistogramHelper::InitHistograms(){
             TH1D_true_hists.at(i).at(k_true_elec_theta)  = new TH1D( Form("h_true_elec_theta_%s_%s",  _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True electron BNB #theta [degrees]; Entries",            14, 0, 180 );
             TH1D_true_hists.at(i).at(k_true_elec_phi)    = new TH1D( Form("h_true_elec_phi_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True electron BNB #phi [degrees]; Entries",              25, -180, 180);
 
+            TH1D_true_hists.at(i).at(k_reco_true_ang)    = new TH1D( Form("h_reco_true_ang_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), "; Angle (Reco to True) Nu Dir [deg]; Entries",              25, -2, 20);
 
             TH2D_true_hists.at(i).at(k_true_nue_phi_theta)    = new TH2D( Form("h_true_nue_phi_theta_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),   ";True #nu_{e} Phi [degrees];True #nu_{e} Theta [degrees]",     14, 0, 80, 16, 20, 140 );
             TH2D_true_hists.at(i).at(k_true_nue_energy_theta) = new TH2D( Form("h_true_nue_energy_theta_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),";True #nu_{e} E [GeV];True #nu_{e} Theta [degrees]",           25, 0, 5, 16, 0, 140);
@@ -791,6 +795,11 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
     TH1D_hists.at(k_reco_shr_ang_numi).at(cut_index).at(classification_index)->Fill(shr_ang_numi, weight);
 
     TH1D_hists.at(k_reco_single_bin).at(cut_index).at(classification_index)->Fill(weight);
+
+    TH1D_hists.at(k_reco_effective_angle).at(cut_index).at(classification_index)->Fill(SC.effective_angle, weight);
+    
+    TH1D_hists.at(k_reco_effective_cosangle).at(cut_index).at(classification_index)->Fill(SC.cos_effective_angle, weight);
+    
     
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
@@ -840,70 +849,35 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
 
         int index = 0;
         if (cut_index == _util.k_cuts_MAX-1) index = 1; // If its the last cut index then we want to fill the second lot of histograms
-
-        // Momentum of neutrino
-        double p = std::sqrt(SC.true_nu_px*SC.true_nu_px + SC.true_nu_py*SC.true_nu_py + SC.true_nu_pz*SC.true_nu_pz);
         
-        // Momentum of electron
-        double p_elec = std::sqrt(SC.elec_px*SC.elec_px + SC.elec_py*SC.elec_py + SC.elec_pz*SC.elec_pz);
-        
-        // True nue theta in BNB coordinates (up from beam dir)
-        double nu_theta = acos(SC.true_nu_pz/p) * 180 / 3.1415;
-        // std::cout << SC.true_nu_px<< "  "  << SC.true_nu_py <<"  " << SC.true_nu_pz<< "  "  << nu_theta<<   std::endl;
-        
-        // True nue phi in BNB coordinates (around beam dir)
-        double nu_phi = atan2(SC.true_nu_py, SC.true_nu_px) * 180 / 3.1415;
-
-        // True nue theta in BNB coordinates (up from beam dir)
-        // double elec_theta = acos(SC.elec_pz/p_elec) * 180 / 3.1415;
-        
-        // True nue phi in BNB coordinates (around beam dir)
-        // double elec_phi = atan2(SC.elec_py, SC.elec_px) * 180 / 3.1415;
-        
-        // True nue angle from numi beamline 
-        double nu_angle = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "beam"); 
-
-        // True nue angle from numi target
-        double nu_angle_targ = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "target"); 
-
-        // True electron angle wrt numi beamline
-        double elec_ang_targ = _util.GetNuMIAngle(SC.elec_px, SC.elec_py, SC.elec_pz, "target");
-
-        // True nue theta in NuMI coordinates (up from beam dir)
-        double nu_theta_numi = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "numi_theta");
-        
-        // True nue phi in NuMI coordinates (around beam dir)
-        double nu_phi_numi = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "numi_phi");
-
         // Also require in FV
         if ( (classification_index == _util.k_nue_cc || classification_index == _util.k_nuebar_cc || classification_index == _util.k_unmatched_nue || classification_index == _util.k_cosmic_nue || classification_index == _util.k_unmatched_nuebar || classification_index == _util.k_cosmic_nuebar) && true_in_fv ){
             
             // Just True histograms
-            TH1D_true_hists.at(index).at(k_true_nue_theta)       ->Fill(nu_theta, weight);
-            TH1D_true_hists.at(index).at(k_true_nue_phi_numi)    ->Fill(nu_phi_numi, weight);
-            TH1D_true_hists.at(index).at(k_true_nue_theta_numi)  ->Fill(nu_theta_numi, weight);
-            TH1D_true_hists.at(index).at(k_true_nue_phi)         ->Fill(nu_phi, weight);
-            TH1D_true_hists.at(index).at(k_true_nue_angle)       ->Fill(nu_angle, weight);
+            TH1D_true_hists.at(index).at(k_true_nue_theta)       ->Fill(SC.nu_theta, weight);
+            TH1D_true_hists.at(index).at(k_true_nue_phi)         ->Fill(SC.nu_phi, weight);
+            TH1D_true_hists.at(index).at(k_true_nue_angle)       ->Fill(SC.nu_angle, weight);
             TH1D_true_hists.at(index).at(k_true_nue_px)          ->Fill(SC.true_nu_px, weight);
             TH1D_true_hists.at(index).at(k_true_nue_py)          ->Fill(SC.true_nu_py, weight);
             TH1D_true_hists.at(index).at(k_true_nue_pz)          ->Fill(SC.true_nu_pz, weight);
             TH1D_true_hists.at(index).at(k_true_nue_e)           ->Fill(SC.nu_e, weight);
-            TH1D_true_hists.at(index).at(k_true_nue_p)           ->Fill(p, weight);
+            TH1D_true_hists.at(index).at(k_true_nue_p)           ->Fill(SC.nu_p, weight);
             TH1D_true_hists.at(index).at(k_true_vtx_x)           ->Fill(SC.true_nu_vtx_x, weight);
             TH1D_true_hists.at(index).at(k_true_vtx_y)           ->Fill(SC.true_nu_vtx_y, weight);
             TH1D_true_hists.at(index).at(k_true_vtx_z)           ->Fill(SC.true_nu_vtx_z, weight);
             TH1D_true_hists.at(index).at(k_true_vtx_x_sce)       ->Fill(SC.true_nu_vtx_sce_x, weight);
             TH1D_true_hists.at(index).at(k_true_vtx_y_sce)       ->Fill(SC.true_nu_vtx_sce_y, weight);
             TH1D_true_hists.at(index).at(k_true_vtx_z_sce)       ->Fill(SC.true_nu_vtx_sce_z, weight);
-            TH1D_true_hists.at(index).at(k_true_nu_ang_targ)     ->Fill(nu_angle_targ, weight);
-            TH1D_true_hists.at(index).at(k_true_elec_ang_targ)   ->Fill(elec_ang_targ, weight);
+            TH1D_true_hists.at(index).at(k_true_nu_ang_targ)     ->Fill(SC.nu_angle_targ, weight);
+            TH1D_true_hists.at(index).at(k_true_elec_ang_targ)   ->Fill(SC.elec_ang_targ, weight);
             TH1D_true_hists.at(index).at(k_true_elec_E)          ->Fill(SC.elec_e, weight);
             TH1D_true_hists.at(index).at(k_true_elec_theta)      ->Fill(SC.elec_theta, weight);
             TH1D_true_hists.at(index).at(k_true_elec_phi)        ->Fill(SC.elec_phi, weight);
-            TH2D_true_hists.at(index).at(k_true_nue_phi_theta)   ->Fill(nu_phi, nu_theta, weight);
-            TH2D_true_hists.at(index).at(k_true_nue_energy_theta)->Fill(SC.nu_e, nu_theta, weight);
-            TH2D_true_hists.at(index).at(k_true_nue_energy_phi)  ->Fill(SC.nu_e, nu_phi, weight);
-            TH2D_true_hists.at(index).at(k_true_nue_energy_angle)->Fill(SC.nu_e, nu_angle, weight);
+            TH1D_true_hists.at(index).at(k_reco_true_ang)        ->Fill(SC.reco_true_nu_ang, weight);
+            TH2D_true_hists.at(index).at(k_true_nue_phi_theta)   ->Fill(SC.nu_phi, SC.nu_theta, weight);
+            TH2D_true_hists.at(index).at(k_true_nue_energy_theta)->Fill(SC.nu_e, SC.nu_theta, weight);
+            TH2D_true_hists.at(index).at(k_true_nue_energy_phi)  ->Fill(SC.nu_e, SC.nu_phi, weight);
+            TH2D_true_hists.at(index).at(k_true_nue_energy_angle)->Fill(SC.nu_e, SC.nu_angle, weight);
             TH2D_true_hists.at(index).at(k_true_nue_vtx_z_y)     ->Fill(SC.true_nu_vtx_z,  SC.true_nu_vtx_y, weight);
             TH2D_true_hists.at(index).at(k_true_nue_vtx_z_y_sce) ->Fill(SC.true_nu_vtx_sce_z,  SC.true_nu_vtx_sce_y, weight);
 
@@ -1276,6 +1250,7 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
             TEfficiency_hists.at(k_eff_elec_E).at(cut_index)         ->Fill(SC.elec_e, weight);
             TEfficiency_hists.at(k_eff_elec_E_rebin).at(cut_index)   ->Fill(SC.elec_e, weight);
             TEfficiency_hists.at(k_eff_nu_E_single_bin).at(cut_index)->Fill(SC.nu_e, weight);
+            TEfficiency_hists.at(k_eff_nu_flash_time).at(cut_index)  ->Fill(SC.flash_time + 0.055 -0.359, weight);
         }
         
         // Nue only
@@ -1301,6 +1276,7 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
             TEfficiency_hists.at(k_eff_elec_E).at(cut_index)         ->Fill(SC.elec_e, weight);
             TEfficiency_hists.at(k_eff_elec_E_rebin).at(cut_index)   ->Fill(SC.elec_e, weight);
             TEfficiency_hists.at(k_eff_nu_E_single_bin).at(cut_index)->Fill(SC.nu_e, weight);
+            TEfficiency_hists.at(k_eff_nu_flash_time).at(cut_index)  ->Fill(SC.flash_time+ 0.055 -0.359, weight);
         }
     
         // Nue only
