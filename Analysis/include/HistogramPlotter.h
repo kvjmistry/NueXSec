@@ -69,7 +69,7 @@ class HistogramPlotter{
     void MakeEfficiencyPlot(const char* print_name);
     // -------------------------------------------------------------------------
     // The efficiency made by each cut
-    void MakeEfficiencyPlotByCut(std::string var, bool mask_title);
+    void MakeEfficiencyPlotByCut(std::string var, bool mask_title, bool mask_ax_label , const char* pri_ax_name, const char* sec_ax_name, const char* printname);
     // -------------------------------------------------------------------------
     // True Neutino energy for nues broken down by genie interaction type
     void MakeInteractionPlot(const char* print_name, std::string cut_type, std::string flav, bool scale);

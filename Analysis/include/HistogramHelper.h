@@ -213,6 +213,10 @@ class HistogramHelper{
         k_eff_nu_E_nue_single_bin,   // True Electron-neutrino energy single bin
         k_eff_nu_E_nuebar_single_bin,// True anti Electron-neutrino energy single bin
         k_eff_nu_flash_time,         // Efficiency as a function of flash time
+        k_eff_nu_theta,              // Efficiency as a function of nu theta
+        k_eff_nu_phi,                // Efficiency as a function of nu phi
+        k_eff_elec_theta,            // Efficiency as a function of electron theta
+        k_eff_elec_phi,              // Efficiency as a function of electron phi
         k_TH1D_eff_MAX
     };
 
