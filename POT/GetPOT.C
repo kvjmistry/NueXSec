@@ -84,7 +84,10 @@ void GetPOT(const char *_file1, std::string type){
 
             //if (run < 16880) continue;
             //if (run > 16880) continue;
-            if (run >6748.22) continue;
+            //if (run >6748.22) continue;
+            //
+            //if (run < 7013) continue;
+            if (run == 16228) continue;
 
             run_subrun_file << run << " " << subrun << '\n';
         }
@@ -97,7 +100,7 @@ void GetPOT(const char *_file1, std::string type){
         }
         // Use Pawels updated version for on beam, use  --slip for slipstacking info
         else {
-            std::cout << "/uboone/app/users/guzowski/slip_stacking/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt" << std::endl;
+            std::cout << "/uboone/app/users/guzowski/slip_stacking/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt --slip" << std::endl;
             gSystem->Exec("/uboone/app/users/guzowski/slip_stacking/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt --slip"); 
 
         } 
