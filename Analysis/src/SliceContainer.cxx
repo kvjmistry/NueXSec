@@ -384,6 +384,7 @@ void SliceContainer::Initialise(TTree *tree, int type, Utility util){
     tree->SetBranchAddress("pi0_dedx1_fit_Y",&pi0_dedx1_fit_Y);
     tree->SetBranchAddress("pi0_mass_Y",     &pi0_mass_Y);
     
+    tree->SetBranchAddress("trk_pfp_id_v",        &trk_pfp_id_v);
     tree->SetBranchAddress("trk_sce_start_x_v",        &trk_sce_start_x_v);
     tree->SetBranchAddress("trk_sce_start_y_v",        &trk_sce_start_y_v);
     tree->SetBranchAddress("trk_sce_start_z_v",        &trk_sce_start_z_v);
@@ -973,7 +974,7 @@ void SliceContainer::SetNuMIAngularVariables(){
     // ---
 
     // The angle of the reconstructed shower relative to the NuMI target to detector direction
-    shr_ang_numi = _util.GetNuMIAngle(SC.shr_px, SC.shr_py, SC.shr_pz, "target");
+    shr_ang_numi = _util.GetNuMIAngle(shr_px, shr_py, shr_pz, "target");
 
 }
 // -----------------------------------------------------------------------------
