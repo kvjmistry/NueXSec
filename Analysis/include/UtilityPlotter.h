@@ -102,6 +102,8 @@ class UtilityPlotter{
     // Get the efficiency from the ttree and set the errors
     void PopulateEff(TH1D* h_eff, TH1D *h_pur, TH1D* h_eff_clone, const char* input_file);
     // -------------------------------------------------------------------------
+    // Compare the efficiency in the standard det var CV and intrinsic nue det var sample
+    void CompareDetVarEfficiency();
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 

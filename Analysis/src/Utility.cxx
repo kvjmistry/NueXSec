@@ -378,13 +378,13 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     if (strcmp(run_period, "1") == 0){
         mc_scale_factor     = config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_MC_POT);
         dirt_scale_factor   = 0.45*config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_Dirt_POT);
-        ext_scale_factor    = config_v.at(k_Run1_Data_trig) / config_v.at(k_Run1_EXT_trig);
+        ext_scale_factor    = 0.98*config_v.at(k_Run1_Data_trig) / config_v.at(k_Run1_EXT_trig);
         intrinsic_weight    = config_v.at(k_Run1_MC_POT)    / config_v.at(k_Run1_Intrinsic_POT);
     }
     else if (strcmp(run_period, "3") == 0){
         mc_scale_factor     = config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_MC_POT);
         dirt_scale_factor   = 0.45*config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_Dirt_POT);
-        ext_scale_factor    = 0.95*config_v.at(k_Run3_Data_trig) / config_v.at(k_Run3_EXT_trig);
+        ext_scale_factor    = config_v.at(k_Run3_Data_trig) / config_v.at(k_Run3_EXT_trig);
     }
     else {
         std::cout << "Error Krish... You havent specified the run period!" << std::endl;
@@ -537,6 +537,9 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
         else weight = weight * intrinsic_weight;
         
     }
+
+    // Create a random energy dependent nue weight for testing model dependence
+    // if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12)) weight *= (1.0 + (nu_e * nu_e * nu_e)/6.0);
 
 
     return weight;
@@ -729,19 +732,11 @@ double Utility::GetNuMIAngle(double px, double py, double pz, std::string direct
         beamdir = {5502, 7259, 67270};
         beamdir = beamdir.Unit(); // Get the direction
     }
-    // NuMI acos(Pz/P)
-    else if (direction == "numi_theta"){
-        double p = std::sqrt(BeamCoords.X()*BeamCoords.X() +BeamCoords.Y()*BeamCoords.Y() +  BeamCoords.Z()*BeamCoords.Z() );
-        return acos(BeamCoords.Z()/p) * (180 / 3.1415);
-    }
-    else if (direction == "numi_phi"){
-        return atan2(BeamCoords.Y(), BeamCoords.X()) * 180 / 3.1415;
-    } 
     else {
         std::cout << "Warning unknown angle type specified, you should check this" << std::endl;
     }
     
-    double theta = BeamCoords.Angle(beamdir) * 180 / 3.1415926;
+    double angle = BeamCoords.Angle(beamdir) * 180 / 3.1415926;
 
 
     // Create vectors to get the angle in the yz and xz planes
@@ -752,7 +747,7 @@ double Utility::GetNuMIAngle(double px, double py, double pz, std::string direct
 
     // std::cout << theta << std::endl;
 
-    return theta;
+    return angle;
 }
 // -----------------------------------------------------------------------------
 bool Utility::in_fv(double x, double y, double z){

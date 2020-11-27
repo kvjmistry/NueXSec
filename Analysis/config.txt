@@ -18,19 +18,21 @@ Run1_Dirt_POT 1.42143e+21 // v3 includes ppfx cv correction
 -
 // Run1_Data_POT 8.885e+19       // v3 with michel veto updated pawels tool
 Run1_Data_POT 2.0e+20       // v5 pawels tool
-// Run1_Data_POT 6.786e19  // Run 1 Only 4+6
-// Run1_Data_POT 2.099e19  // Run 1 Only 6+6
+// Run1_Data_POT 6.913e+19 // Run 1 Only 4+6 (< 5900)
+// Run1_Data_POT 2.32e19 // Run 1 Only 6+6 (> 6600)
 -
 // Run 1 data HW Triggers (EA9CNT) 
 // Run1_Data_trig 2347745.0       // v3 with michel veto updated pawels tool
 Run1_Data_trig 5268051.0       // v5 pawels tool
-// Run1_Data_trig 1833711.0  // Run 1 Only 4+6
-// Run1_Data_trig 514034.0  // Run 1 Only 6+6
+// Run1_Data_trig 1779971.0  // Run 1 Only 4+6 (< 5900)
+// Run1_Data_trig 550567.0  // Run 1 Only 6+6 (> 6600)
 -
 // Run 1 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
-// Run1_EXT_trig 33580525.000000 // **BNB** sample triggers
-// Run1_EXT_trig 3378479.250000
-Run1_EXT_trig 4015961.990000 // v3 with michel veto updated
+// Run1_EXT_trig 4015961.990000 // v3 with michel veto updated
+Run1_EXT_trig 9199232.740000 // v5
+// Run1_EXT_trig 3065881.29 // v5 Set 1 run < 6550
+// Run1_EXT_trig 3043363.1 // v5 Set 2 6550 <= run < 7103
+// Run1_EXT_trig 3089988.35 // v5 Set 3 run >= 7103
 -
 Run1_Intrinsic_POT 1.85664e+22 // For Using Intrinsic nue sample
 -
@@ -72,6 +74,9 @@ Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 3.69423e+20
 // Run 1 Det var WireModdEdX
 Run1_MC_POT_WireModdEdX 3.6318e+20
 -
+// Run 1 Det Var for flugg -- this is actually dk2nu for now
+Run1_MC_POT_FLUGG 3.65214e+20
+-
 // Run 1 Det var CV intrinsic nue sample
 Run1_Intrinsic_POT_CV 2.68294e+22
 -
@@ -105,6 +110,9 @@ Run1_Intrinsic_POT_WireModThetaYZ_withoutSigmaSplines 2.66734e+22
 // Run 1 Det var WireModdEdX intrinsic nue sample
 Run1_Intrinsic_POT_WireModdEdX 2.66806e+22
 -
+// Run 1 Det var CV intrinsic nue sample FLUGG flux
+Run1_Intrinsic_POT_FLUGG 2.87356e+22
+-
 // Run 1 Det Var BNB diffusion -- unused now
 Run1_MC_POT_BNB_Diffusion 4.19732e+20
 -
@@ -122,24 +130,25 @@ Run3_MC_POT 1.57761e+21
 Run3_Dirt_POT 4.32295e+20
 -
 // Run 3 Data POT (tortgt) beam good, bad runs removed
-// Run3_Data_POT 3.991e+19
+Run3_Data_POT 5e20
 // Run3_Data_POT 2.996e+19 // Set 0 with runs > 16880 (post)
-Run3_Data_POT 6.077e+19 // Set 1 < with runs < 16880 (pre)
+// Run3_Data_POT 6.077e+19 // Set 1 < with runs < 16880 (pre)
 // Run3_Data_POT 2.996e19 // Set 0 and Set 1 combined > 16880 (post)
 // Run3_Data_POT 7.072e19 // Set 0 and Set 1 combined < 16880 (pre)
 -
 // Run 3 data HW Triggers (EA9CNT) beam good, bad runs removed
-// Run3_Data_trig  815631.0
+Run3_Data_trig  10363728.0
 // Run3_Data_trig  611581.0 // Set 0
-Run3_Data_trig 1257598.0 // Set 1 data triggers with runs < 16880 (pre)
+// Run3_Data_trig 1257598.0 // Set 1 data triggers with runs < 16880 (pre)
 // Run3_Data_trig 611581.0 // Set 0 and Set 1 combined > 16880 (post)
 // Run3_Data_trig 1461648.0 // Set 0 and Set 1 combined < 16880 (pre)
 -
 // Run 3 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
+Run3_EXT_trig 32878305.25 // v5 
 // Run3_EXT_trig 1550231.025000 // Set 0
 // Run3_EXT_trig 1677886.350000 // Set 1
 // Run3_EXT_trig 2424501.800000 // Set 0 and Set 1 > 16880
-Run3_EXT_trig 803615.575 // Set 0 and Set 1 < 16880 (pre)
+// Run3_EXT_trig 803615.575 // Set 0 and Set 1 < 16880 (pre)
 // ------- Additional Run 3 POT Definitions -----
 -
 // Run 3 with event weights

@@ -45,7 +45,6 @@ namespace xsecSelection {
             TFile * f_data;      // The data file
             TFile * f_ext;       // The ext file
             TFile * f_dirt;      // The dirt file
-            TFile * f_flux_weights; // The file with the flux weights
 
             // TTrees
             TTree * mc_tree;      // MC   Tree

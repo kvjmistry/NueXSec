@@ -291,7 +291,7 @@ class CrossSectionHelper{
     void FillCutHists(int type, SliceContainer &SC, std::pair<std::string, int> classification, int cut_index);
     // -------------------------------------------------------------------------
     // Set the weight for universe i depending on the variation 
-    void SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double &weight_ext,  double _weightSplineTimesTune, std::string _classification, double cv_weight, int uni);
+    void SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double &weight_ext,  double _weightSplineTimesTune, std::string _classification, double cv_weight, int uni, int _nu_pdg, double _true_energy, double _numi_ang);
     // -------------------------------------------------------------------------
     // Function to calculate the cross section
     double CalcCrossSec(double sel, double gen, double sig, double bkg, double flux, double ext, double dirt, double targ);
@@ -300,7 +300,7 @@ class CrossSectionHelper{
     void CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double ext_scale_factor, TH1D* h_ext, double dirt_scale_factor, TH1D* h_dirt, TH1D* h_xsec, double targ, std::string mcdata);
     // -------------------------------------------------------------------------
     // Function to get the integrated flux OR a weight
-    double GetIntegratedFlux(int uni, std::string value, std::string label, std::string variation);
+    double GetIntegratedFlux(int uni, std::string value, std::string label, std::string variation, int _nu_pdg, double _true_energy, double _numi_ang);
     // -------------------------------------------------------------------------
     // Function to get the POT from the flux file
     double GetPOT(TFile* f);

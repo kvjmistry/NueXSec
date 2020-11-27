@@ -195,13 +195,13 @@ void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
     classification = SC.classification.first;
     weight = SC.cv_weight;
     true_energy = SC.nu_e;
-    reco_energy = 0.0; // Leave unset for now, we arent using it!
+    reco_energy = SC.reco_e;
     shr_tkfit_dedx_Y = SC.shr_tkfit_dedx_Y;
     n_showers = SC.n_showers;
     n_tracks  = SC.n_tracks;
     shr_theta = SC.shr_theta;
     shr_phi   = SC.shr_phi;
-    shr_energy_cali = SC.shr_energy_cali/0.83; // Might be dangerous to apply this calibration factor and forget about it downstream
+    shr_energy_cali = SC.shr_energy_cali; // Might be dangerous to apply this calibration factor and forget about it downstream
     shrmoliereavg = SC.shrmoliereavg;
     shr_hits_max  = SC.shr_hits_max;
     elec_e   = SC.elec_e;
