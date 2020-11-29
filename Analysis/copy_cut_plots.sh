@@ -15,10 +15,12 @@ cuts=(
   e_candidate
   In_FV
   Contained_Frac
+  Contained_Frac
   Topo_Score
   Cosmic_IP
   Shower_Score
   HitRatio
+  Moliere_Avg
   Moliere_Avg
   Moliere_Avg
   ShrVtxDist_dEdx_max
@@ -34,12 +36,14 @@ reco_vtx_y_sce.pdf
 reco_vtx_z_sce.pdf
 reco_contained_fraction_logy.pdf
 reco_topological_score.pdf
+reco_topological_score_logy.pdf
 reco_CosmicIPAll3D.pdf
 reco_shower_score.pdf
 reco_hits_ratio.pdf
 reco_shrmoliereavg.pdf
 reco_shower_to_vtx_dist.pdf
 reco_shr_tkfit_dedx_max.pdf
+reco_shr_tkfit_dedx_max_with_tracks.pdf
 reco_shr_tkfit_dedx_max_no_tracks.pdf
 )
 

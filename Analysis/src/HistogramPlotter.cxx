@@ -69,14 +69,20 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
 
         MakeEfficiencyPlot(Form("plots/run%s/Efficiency/Integrated_Efficiency_Purity.pdf", _util.run_period));
 
-        MakeEfficiencyPlotByCut("h_true_nu_E", false);
-        MakeEfficiencyPlotByCut("h_true_elec_E", false);
-        MakeEfficiencyPlotByCut("h_true_elec_E_rebin", true);
-        MakeEfficiencyPlotByCut("h_true_nu_E_single_bin", true);
-        MakeEfficiencyPlotByCut("h_true_nu_E_nue", true);
-        MakeEfficiencyPlotByCut("h_true_nu_E_nuebar", true);
-        MakeEfficiencyPlotByCut("h_true_nu_E_nue_single_bin", true);
-        MakeEfficiencyPlotByCut("h_true_nu_E_nuebar_single_bin", true);
+        MakeEfficiencyPlotByCut("h_true_nu_E",                   false, false, "True #nu_{e} + #bar{#nu}_{e} Energy [GeV]; Efficiency", "True #nu_{e} + #bar{#nu}_{e} Events in FV", "nu_E" );        
+        MakeEfficiencyPlotByCut("h_true_elec_E",                 false, false, "True e^{-} + e^{+} Energy [GeV]; Efficiency",           "True e^{-} + e^{+} Events in FV",           "elec_E");
+        MakeEfficiencyPlotByCut("h_true_elec_E_rebin",           true,  false, "True e^{-} + e^{+} Energy [GeV]; Efficiency",           "True e^{-} + e^{+} Events in FV",           "elec_E_rebin");
+        MakeEfficiencyPlotByCut("h_true_elec_E_rebin_nue",       true,  false, "True e^{-} Energy [GeV]; Efficiency",                   "True e^{-} Events in FV",                   "elec_E_rebin_nue");
+        MakeEfficiencyPlotByCut("h_true_elec_E_rebin_nuebar",    true,  false, "True e^{+} Energy [GeV]; Efficiency",                   "True e^{+} Events in FV",                   "elec_E_rebin_nuebar");
+        MakeEfficiencyPlotByCut("h_true_nu_E_single_bin",        true,  true,  "True #nu_{e} + #bar{#nu}_{e}; Efficiency",              "True #nu_{e} + #bar{#nu}_{e} Events in FV", "nu_E_single_bin");
+        MakeEfficiencyPlotByCut("h_true_nu_E_nue",               true,  false, "True #nu_{e} Energy [GeV]; Efficiency",                 "True #nu_{e} Events in FV",                 "nu_E_nue");
+        MakeEfficiencyPlotByCut("h_true_nu_E_nuebar",            true,  false, "True #bar{#nu}_{e} Energy [GeV]; Efficiency",           "True #bar{#nu}_{e} Events in FV",           "nu_E_nuebar");
+        MakeEfficiencyPlotByCut("h_true_nu_E_nue_single_bin",    true,  true,  "True #nu_{e}; Efficiency",                              "True #nu_{e} Events in FV",                 "nu_E_nue_single_bin");
+        MakeEfficiencyPlotByCut("h_true_nu_E_nuebar_single_bin", true,  true,  "True #bar{#nu}_{e}; Efficiency",                        "True #bar{#nu}_{e} Events in FV",           "nu_E_nuebar_single_bin");
+        MakeEfficiencyPlotByCut("h_eff_nu_theta",                false, false, "True #nu_{e} + #bar{#nu}_{e} #theta [deg]; Efficiency", "True #nu_{e} + #bar{#nu}_{e} Events in FV", "nu_theta" );
+        MakeEfficiencyPlotByCut("h_eff_nu_phi",                  false, false, "True #nu_{e} + #bar{#nu}_{e} #phi [deg]; Efficiency",   "True #nu_{e} + #bar{#nu}_{e} Events in FV", "nu_phi" );
+        MakeEfficiencyPlotByCut("h_eff_elec_theta",              false, false, "True e^{-} + e^{+} #theta [deg]; Efficiency",           "True e^{-} + e^{+} Events in FV", "elec_theta" );
+        MakeEfficiencyPlotByCut("h_eff_elec_phi",                false, false, "True e^{-} + e^{+} #phi [deg]; Efficiency",             "True e^{-} + e^{+} Events in FV", "elec_phi" );
 
         // Create the interaction folder
         _util.CreateDirectory("Interaction");
@@ -113,8 +119,6 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
 
             Save1DHists(Form("plots/run%s/Truth/true_nue_theta_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_nue_theta", cut_type, true);
             Save1DHists(Form("plots/run%s/Truth/true_nue_phi_%s.pdf",   _util.run_period, cut_type.c_str()), "h_true_nue_phi", cut_type, true);
-            Save1DHists(Form("plots/run%s/Truth/true_nue_theta_numi_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_nue_theta_numi", cut_type, true);
-            Save1DHists(Form("plots/run%s/Truth/true_nue_phi_numi_%s.pdf",   _util.run_period, cut_type.c_str()), "h_true_nue_phi_numi", cut_type, true);
             Save1DHists(Form("plots/run%s/Truth/true_nue_angle_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_nue_angle", cut_type, true);
             Save1DHists(Form("plots/run%s/Truth/true_nue_px_%s.pdf",    _util.run_period, cut_type.c_str()), "h_true_nue_px", cut_type, true);
             Save1DHists(Form("plots/run%s/Truth/true_nue_py_%s.pdf",    _util.run_period, cut_type.c_str()), "h_true_nue_py", cut_type, true);
@@ -132,6 +136,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
             Save1DHists(Form("plots/run%s/Truth/true_elec_E_%s.pdf",     _util.run_period, cut_type.c_str()),     "h_true_elec_E", cut_type, true);
             Save1DHists(Form("plots/run%s/Truth/true_elec_phi_%s.pdf",   _util.run_period, cut_type.c_str()),     "h_true_elec_phi", cut_type, true);
             Save1DHists(Form("plots/run%s/Truth/true_elec_theta_%s.pdf", _util.run_period, cut_type.c_str()),     "h_true_elec_theta", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/reco_true_nu_ang_%s.pdf", _util.run_period, cut_type.c_str()),     "h_reco_true_ang", cut_type, true);
 
             // Make the 2D histograms
             Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta_%s.pdf",          _util.run_period, cut_type.c_str()), "h_true_nue_phi_theta", cut_type, false);
@@ -165,17 +170,17 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
 
         // pi0 mass peak unweighted
         MakeStack("h_pi0_mass", " ",
-                area_norm, false, 1.0, "Mass [MeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                area_norm, false, 1.6, "Mass [MeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
                 Form("plots/run%s/pi0/pi0_mass.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
 
         // pi0 mass normlaisation fixed
         MakeStack("h_pi0_mass_norm", " ",
-                area_norm, false, 1.0, "Mass [MeV] (Normalisation Fixed)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                area_norm, false, 1.6, "Mass [MeV] (Normalisation Fixed)",  0.35, 0.85, 0.55, 0.85, Data_POT,
                 Form("plots/run%s/pi0/pi0_mass_norm.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
 
         // pi0 mass peak unweighted
         MakeStack("h_pi0_mass_EScale", " ",
-                area_norm, false, 1.0, "Mass [MeV] (E Dependent Scaling)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                area_norm, false, 1.6, "Mass [MeV] (E Dependent Scaling)",  0.35, 0.85, 0.55, 0.85, Data_POT,
                 Form("plots/run%s/pi0/pi0_mass_EScale.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
 
         // pi0 energy unweighted
@@ -199,12 +204,12 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
 
         // Track Theta
         MakeStack("h_track_theta", " ",
-                area_norm, false, 1.0, "Leading Track Theta [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                area_norm, false, 1.0, "Leading Track Theta [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
                 Form("plots/run%s/numu/track_theta.pdf", _util.run_period), false, "classifications_numu", false, false, true);
 
         // Track phi
         MakeStack("h_track_phi", " ",
-                area_norm, false, 1.0, "Leading Track Phi [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                area_norm, false, 1.0, "Leading Track Phi [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
                 Form("plots/run%s/numu/track_phi.pdf", _util.run_period), false, "classifications_numu", false, false, true);
 
         // Track Cos theta
@@ -915,7 +920,53 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     // and if you want to plot sys+stat
     if ( _util.CheckHistogram(_util.vec_hist_name, hist_name) && _util.plot_sys_uncertainty ) {
 
-        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "TotalDetectorSys", "MC");
+        // Couldnt get the unsim plots to save without nuclear destiction of root so this is what you get...
+        
+        // Genie Unisim
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "RPA", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "CCMEC", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "AxFFCCQE", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "VecFFCCQE", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "DecayAngMEC", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "ThetaDelta2Npi", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "ThetaDelta2NRad", "MC");
+        // AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "RPA_CCQE_Reduced", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "NormCCCOH", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "NormNCCOH", "MC");
+       
+        // Beamline
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Horn1_x", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Horn_curr", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Horn1_y", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Beam_spot", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Horn2_x", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Horn2_y", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Horn_Water", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Beam_shift_x", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Beam_shift_y", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Target_z", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Decay_pipe_Bfield", "MC");
+        
+        // Total Detector Systematics
+        // AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "TotalDetectorSys", "MC");
+        
+        // Individual detector systematics
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "LYRayleigh", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "SCE", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Recomb2", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "WireModX", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "WireModYZ", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "WireModThetaXZ", "MC");
+        AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "WireModThetaYZ_withSigmaSplines", "MC");
+        // AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "WireModThetaYZ_withoutSigmaSplines", "MC");
+        // AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "WireModdEdX" "MC");
+        
+        if (std::string(_util.run_period) == "3")
+            AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "LYAttenuation", "MC");
+
+
+        
+        // Other
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsPPFX", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsGenie", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "weightsReint", "MC");
@@ -1007,7 +1058,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         // h_ratio->GetYaxis()->SetRangeUser(-0.2, 0.2);
 
         // For ratio
-        if (cut_name == "Unselected" || cut_name == "SoftwareTrig" )
+        if (cut_name == "Unselected" || cut_name == "SoftwareTrig"  || cut_name == "Slice_ID")
             h_ratio->GetYaxis()->SetRangeUser(0.8, 1.2);
         else
             h_ratio->GetYaxis()->SetRangeUser(0, 2.0);
@@ -1131,12 +1182,12 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Leading shower phi
     MakeStack("h_reco_leading_shower_phi", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.8, "Leading Shower Phi [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.8, "Leading Shower Phi [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_leading_shower_phi.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Leading shower theta
     MakeStack("h_reco_leading_shower_theta", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.5, "Leading Shower Theta [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.5, "Leading Shower Theta [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_leading_shower_theta.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Leading shower cos theta
@@ -1172,7 +1223,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Track shower angle
     MakeStack("h_reco_track_shower_angle", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.5, "Longest Track Leading Shower Angle [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.5, "Longest Track Leading Shower Angle [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_track_shower_angle.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Ratio hits from showers to slice
@@ -1339,7 +1390,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Shower Moliere Average
     MakeStack("h_reco_shrmoliereavg", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.6, "Leading Shower Moliere Average [degrees]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.6, "Leading Shower Moliere Average [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shrmoliereavg.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Median of 1st component of shr PCA (5cm window)
@@ -1395,6 +1446,19 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
     MakeStack("h_reco_crthitpe", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, true, 1.0, "CRT Hit Intensity [PE]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_crthitpe_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, false);
+
+
+    // Angle between vector from NuMI targ to shower direction
+    MakeStack("h_reco_effective_angle", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "Effective Angle [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_effective_angle.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
+
+    // Cosine of the Angle between vector from NuMI targ to shower direction
+    MakeStack("h_reco_effective_cosangle", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "Cosine Effective Angle",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_effective_cosangle.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
+
+    
 
     // Stacked Histograms by particle type
 
@@ -1514,6 +1578,7 @@ void HistogramPlotter::MakeFlashPlot(double Data_POT, const char *print_name, st
     h_stack->GetXaxis()->SetLabelSize(0);
     h_stack->GetXaxis()->SetRangeUser(0, 23);
     if (histname == "h_flash_time_single_bin") h_stack->GetXaxis()->SetRangeUser(5.6,15.4);
+    h_stack->SetMaximum(1.1*hist.at(_util.k_data)->GetMaximum());
 
     // MC error histogram ------------------------------------------------------
     TH1D *h_error_hist = (TH1D *)hist.at(_util.k_mc)->Clone("h_error_hist");
@@ -1773,7 +1838,8 @@ void HistogramPlotter::MakeEfficiencyPlot(const char *print_name) {
     // Fill the efficiency and purity vectors
     for (int y = 0; y < num_entries; y++) {
         mc_tree->GetEntry(y);
-        efficiency_v.push_back(efficiency);
+        if (y ==0 || y == 1) efficiency_v.push_back(1.0);
+        else efficiency_v.push_back(efficiency);
         eff_err_v.push_back(eff_err);
         purity_v.push_back(purity);
     }
@@ -1852,7 +1918,7 @@ void HistogramPlotter::MakeEfficiencyPlot(const char *print_name) {
     delete c;
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title) {
+void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title, bool mask_ax_label, const char* pri_ax_name, const char* sec_ax_name, const char* printname) {
 
     std::vector<TH1D *> hist(_util.k_cuts_MAX); // The vector of histograms from the file for the plot
     std::vector<TEfficiency *> TEff_v(_util.k_cuts_MAX);
@@ -1861,15 +1927,6 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
 
     // Helps determine what axes labels to draw 
     std::string var_string;
-
-    if (var == "h_true_nu_E" || var == "h_true_nu_E_single_bin")              var_string = "nu";
-    else if (var == "h_true_elec_E")       var_string = "elec";
-    else if (var == "h_true_elec_E_rebin") var_string = "elec";
-    else if (var == "h_true_nu_E_nue")     var_string = "nue";
-    else if (var == "h_true_nu_E_nuebar")  var_string = "nuebar";
-    else if (var == "h_true_nu_E_nue_single_bin")     var_string = "nue";
-    else if (var == "h_true_nu_E_nuebar_single_bin")  var_string = "nuebar";
-    else return;
 
     // Loop over the classifications and get the histograms
     for (unsigned int i = 0; i < _util.k_cuts_MAX; i++) {
@@ -1908,12 +1965,15 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
         
         
         h_clone->SetStats(kFALSE);
+        h_clone->SetTitle(Form("%s;%s", _util.cut_dirs_pretty.at(p).c_str(), pri_ax_name));
         
-        if (var_string == "nu")     h_clone->SetTitle(Form("%s;True #nu_{e} + #bar{#nu}_{e} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
-        if (var_string == "elec")   h_clone->SetTitle(Form("%s;True Electron Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
-        if (var_string == "nue")    h_clone->SetTitle(Form("%s;True #nu_{e} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
-        if (var_string == "nuebar") h_clone->SetTitle(Form("%s;True #bar{#nu}_{e} Energy [GeV]; Efficiency", _util.cut_dirs_pretty.at(p).c_str()));
+        // Get rid of the ticks and the axes labels for single bin
+        if (mask_ax_label) {
+            h_clone->GetXaxis()->SetLabelOffset(100);
+            h_clone->GetXaxis()->SetTickSize(0);
+        }
 
+        h_clone->GetXaxis()->CenterTitle();
         h_clone->GetYaxis()->SetRangeUser(0, 1);
         h_clone->SetLineColor(kBlack);
         h_clone->SetLineWidth(2);
@@ -1935,10 +1995,7 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
         c->Update();
 
         TGaxis *axis = new TGaxis(gPad->GetUxmax(), gPad->GetUymin(), gPad->GetUxmax(), gPad->GetUymax(), 0, rightmax, 510, "+L");
-        if (var_string == "nu")axis->SetTitle("True #nu_{e} + #bar{#nu}_{e} Events in FV");
-        if (var_string == "elec")axis->SetTitle("True Electron Events in FV");
-        if (var_string == "nue") axis->SetTitle("True #nu_{e} Events in FV");
-        if (var_string == "nuebar") axis->SetTitle("True #bar{#nu}_{e} Events in FV");
+        axis->SetTitle(Form("%s", sec_ax_name));
         axis->SetTitleOffset(1.8);
         axis->SetLineColor(kAzure - 6);
         axis->SetLabelColor(kAzure - 6);
@@ -1950,15 +2007,8 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
         // Draw the run period on the plot
         _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);
 
-        if (var == "h_true_nu_E")         c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
-        if (var == "h_true_elec_E")       c->Print(Form("plots/run%s/Efficiency/TEff_%s_elec_E.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
-        if (var == "h_true_elec_E_rebin") c->Print(Form("plots/run%s/Efficiency/TEff_%s_elec_E_rebin.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
-        if (var == "h_true_nu_E_single_bin") c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E_single_bin.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
-        if (var == "h_true_nu_E_nue") c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E_nue.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
-        if (var == "h_true_nu_E_nuebar") c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E_nuebar.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
-        if (var == "h_true_nu_E_nue_single_bin") c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E_nue_single_bin.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
-        if (var == "h_true_nu_E_nuebar_single_bin") c->Print(Form("plots/run%s/Efficiency/TEff_%s_nu_E_nuebar_single_bin.pdf", _util.run_period, _util.cut_dirs.at(p).c_str()));
-
+        c->Print(Form("plots/run%s/Efficiency/TEff_%s_%s.pdf", _util.run_period, _util.cut_dirs.at(p).c_str(), printname) );
+        
         delete c;
     }
 }
@@ -1966,6 +2016,8 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title)
 void HistogramPlotter::MakeInteractionPlot(const char *print_name, std::string cut_type, std::string flav, bool scale){
 
     std::vector<TH1D *> hist(_util.interaction_types.size());
+    std::vector<double> hist_integrals(_util.interaction_types.size()); // The integrals of all the histograms
+    double sum_integrals{0.0};
 
     TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
     THStack *h_stack = new THStack();
@@ -1995,6 +2047,10 @@ void HistogramPlotter::MakeInteractionPlot(const char *print_name, std::string c
         }
 
         hist.at(k)->Scale(scale_factor);
+        hist_integrals.at(k) = hist.at(k)->Integral();
+        sum_integrals += hist.at(k)->Integral();
+        hist.at(k)->SetLineWidth(0);
+
     }
 
     hist.at(_util.k_plot_qe) ->SetFillColor(30);
@@ -2018,8 +2074,8 @@ void HistogramPlotter::MakeInteractionPlot(const char *print_name, std::string c
     gPad->SetBottomMargin(0.12);
     c->Update();
     if (flav == "nue_nuebar")h_stack->GetXaxis()->SetTitle("True #nu_{e} + #bar{#nu}_{e} Energy");
-    if (flav == "nue")h_stack->GetXaxis()->SetTitle("True #nu_{e} Energy");
-    if (flav == "nuebar")h_stack->GetXaxis()->SetTitle("True #bar{#nu}_{e} Energy");
+    if (flav == "nue")       h_stack->GetXaxis()->SetTitle("True #nu_{e} Energy");
+    if (flav == "nuebar")    h_stack->GetXaxis()->SetTitle("True #bar{#nu}_{e} Energy");
     h_stack->GetYaxis()->SetTitle("Entries");
 
     if (scale) h_stack->SetMaximum(625);
@@ -2038,11 +2094,11 @@ void HistogramPlotter::MakeInteractionPlot(const char *print_name, std::string c
     leg_stack->SetFillStyle(0);
 
     // leg_stack->AddEntry(hist.at(_util.k_plot_nc), "NC", "f");
-    leg_stack->AddEntry(hist.at(_util.k_plot_mec), "CC MEC", "f");
-    leg_stack->AddEntry(hist.at(_util.k_plot_coh), "CC Coh", "f");
-    leg_stack->AddEntry(hist.at(_util.k_plot_dis), "CC DIS", "f");
-    leg_stack->AddEntry(hist.at(_util.k_plot_res), "CC Res", "f");
-    leg_stack->AddEntry(hist.at(_util.k_plot_qe),  "CC QE", "f");
+    leg_stack->AddEntry(hist.at(_util.k_plot_mec), Form("CC MEC (%2.1f%%)", 100 * hist_integrals.at(_util.k_plot_mec) / sum_integrals), "f");
+    leg_stack->AddEntry(hist.at(_util.k_plot_coh), Form("CC Coh (%2.1f%%)", 100 * hist_integrals.at(_util.k_plot_coh) / sum_integrals), "f");
+    leg_stack->AddEntry(hist.at(_util.k_plot_dis), Form("CC DIS (%2.1f%%)", 100 * hist_integrals.at(_util.k_plot_dis) / sum_integrals), "f");
+    leg_stack->AddEntry(hist.at(_util.k_plot_res), Form("CC Res (%2.1f%%)", 100 * hist_integrals.at(_util.k_plot_res) / sum_integrals), "f");
+    leg_stack->AddEntry(hist.at(_util.k_plot_qe),  Form("CC QE (%2.1f%%) ", 100 * hist_integrals.at(_util.k_plot_qe) / sum_integrals), "f");
 
     leg_stack->Draw();
 
@@ -2237,9 +2293,12 @@ void HistogramPlotter::Save1DHists(const char *print_name, const char *histname,
 
     hist->SetStats(kFALSE);
 
+    hist->SetLineColor(kBlack);
+    hist->SetFillColorAlpha(kAzure - 6, 0.3);
+
     _util.IncreaseLabelSize(hist, c);
 
-    hist->SetLineColor(kAzure - 6);
+    // hist->SetLineColor(kAzure - 6);
     hist->SetLineWidth(2);
     hist->Draw("hist,E");
 

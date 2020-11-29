@@ -45,16 +45,6 @@ void Selection::Initialise(Utility _utility){
     bool_use_data      = _util.GetFile(f_data,      _util.data_file_name);
     bool_use_dirt      = _util.GetFile(f_dirt,      _util.dirt_file_name);
 
-    // Load in the flux weights file
-    std::cout << "Getting the CV flux file..."<< std::endl;
-    if (strcmp(_util.run_period, "1") == 0) {
-        f_flux_weights = new TFile("Systematics/f_flux_CV_weights_fhc.root", "READ");
-    }
-    if (strcmp(_util.run_period, "3") == 0) {
-        f_flux_weights = new TFile("Systematics/f_flux_CV_weights_rhc.root", "READ");
-       
-    }
-
     // Resize the counter vector
     counter_v.resize(_util.k_cuts_MAX);
 
@@ -68,7 +58,7 @@ void Selection::Initialise(Utility _utility){
         _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the mc slice container
-        mc_SC.Initialise(mc_tree, _util.k_mc, f_flux_weights, _util);
+        mc_SC.Initialise(mc_tree, _util.k_mc, _util);
 
         // Initialise the Tree Helper
         _thelper.at(_util.k_mc).Initialise(_util.k_mc, _util.mc_tree_file_name_out, _util);
@@ -96,7 +86,7 @@ void Selection::Initialise(Utility _utility){
         _util.GetTree(f_data, data_tree, "nuselection/NeutrinoSelectionFilter");
         
         // Initialise all the data slice container
-        data_SC.Initialise(data_tree, _util.k_data, f_flux_weights, _util);
+        data_SC.Initialise(data_tree, _util.k_data, _util);
 
         // Initialise the histogram helper
         if (!_util.slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, _util.data_file_name_out, _util);
@@ -126,7 +116,7 @@ void Selection::Initialise(Utility _utility){
         _util.GetTree(f_ext, ext_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
-        ext_SC.Initialise(ext_tree, _util.k_ext, f_flux_weights, _util);
+        ext_SC.Initialise(ext_tree, _util.k_ext, _util);
 
         // Initialise the histogram helper
         if (!_util.slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, _util.ext_file_name_out, _util);
@@ -156,7 +146,7 @@ void Selection::Initialise(Utility _utility){
         _util.GetTree(f_dirt, dirt_tree, "nuselection/NeutrinoSelectionFilter");
 
         // Initialise all the data slice container
-        dirt_SC.Initialise(dirt_tree, _util.k_dirt, f_flux_weights, _util);
+        dirt_SC.Initialise(dirt_tree, _util.k_dirt, _util);
 
         // Initialise the histogram helper
         if (!_util.slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, _util.dirt_file_name_out ,_util);
@@ -197,6 +187,21 @@ void Selection::MakeSelection(){
         std::ofstream run_subrun_file_mc;
         run_subrun_file_mc.open(Form("files/run%s_run_subrun_list_mc.txt",_util.run_period));
 
+        // Create a file for the selected events and their properties
+        std::ofstream evt_dist_sig;
+        evt_dist_sig.open(Form("files/run%s_evt_dist_sig.txt",_util.run_period));
+        evt_dist_sig << "true_E," << "true_theta," << "true_phi,"<< "reco_E," << "w" << "\n";
+
+        // Create a file for the generated events and their properties
+        std::ofstream evt_dist_gen;
+        evt_dist_gen.open(Form("files/run%s_evt_dist_gen.txt",_util.run_period));
+        evt_dist_gen << "true_E," << "true_theta," << "true_phi,"<< "w" << "\n";
+
+        // Create a file for the generated events and their properties
+        std::ofstream evt_dist_bkg;
+        evt_dist_bkg.open(Form("files/run%s_evt_dist_bkg.txt",_util.run_period));
+        evt_dist_bkg << "reco_E," << "w" << "\n";
+
         // Event loop
         for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
 
@@ -228,10 +233,30 @@ void Selection::MakeSelection(){
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_mc << mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt << '\n';
 
+            // if passed ans is a signal the write events to the file
+            if (pass && mc_SC.is_signal && mc_SC.cv_weight != 0.0) {
+                // evt_dist_sig << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.shr_energy_cali << "," << mc_SC.cv_weight*_util.mc_scale_factor << "\n";
+                evt_dist_sig << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.shr_energy_cali << "," << mc_SC.cv_weight<< "\n";
+            }
+
+            // Generated events
+            if (mc_SC.is_signal && mc_SC.cv_weight != 0.0) {
+                // evt_dist_gen << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.cv_weight*_util.mc_scale_factor << "\n";
+                evt_dist_gen << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.cv_weight << "\n";
+            }
+
+            // if passed and is a background the write events to the file
+            if (pass && !mc_SC.is_signal && mc_SC.cv_weight != 0.0) {
+                evt_dist_bkg << mc_SC.shr_energy_cali << "," << mc_SC.cv_weight*_util.mc_scale_factor << "\n";
+            }
+
 
         } // End Event loop
 
         run_subrun_file_mc.close();
+        evt_dist_sig.close();
+        evt_dist_gen.close();
+        evt_dist_bkg.close();
 
         std::cout << "Ending Selection over MC" << std::endl;
 
@@ -243,6 +268,12 @@ void Selection::MakeSelection(){
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_data;
         run_subrun_file_data.open(Form("files/run%s_run_subrun_list_data.txt",_util.run_period));
+
+        // Create a file for the selected events
+        std::ofstream evt_dist_data;
+        evt_dist_data.open(Form("files/run%s_evt_dist_data.txt",_util.run_period));
+        evt_dist_data << "reco_E" << "\n";
+
 
         for (int ievent = 0; ievent < data_tree_total_entries; ievent++){
 
@@ -260,14 +291,18 @@ void Selection::MakeSelection(){
             // Skip the events with different sw trigger configured
             if (std::string(_util.run_period) == "3" && data_SC.run > 16880 ){
             // if (_run_period == 3 && data_SC.run < 16880 ){
-                continue;
+                // continue;
             }
 
             // Look at different regions of run 1
-            // if (std::string(_util.run_period) == "1" && data_SC.run >= 6748 ){
-            // // if (std::string(_util.run_period) == "1" && data_SC.run < 6450 ){
-            //     continue;
-            // }
+            if (std::string(_util.run_period) == "1" ){
+
+                // 4p6
+                // if (data_SC.run > 5900) continue;
+
+                // 6p6
+                // if (data_SC.run < 6600) continue;
+            }
 
             // Apply Pi0 Selection
             ApplyPiZeroSelection(_util.k_data, data_SC);
@@ -282,9 +317,12 @@ void Selection::MakeSelection(){
             
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_data << data_SC.run << " " << data_SC.sub << " " << data_SC.evt << '\n';
+
+            if (pass) evt_dist_data << data_SC.shr_energy_cali << "\n";
         }
 
         run_subrun_file_data.close();
+        evt_dist_data.close();
         
         std::cout << "Ending Selection over Data" << std::endl;
     }
@@ -295,6 +333,10 @@ void Selection::MakeSelection(){
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_ext;
         run_subrun_file_ext.open(Form("files/run%s_run_subrun_list_ext.txt",_util.run_period));
+
+        // Create a file for the bkg events and their properties
+        std::ofstream evt_dist_ext;
+        evt_dist_ext.open(Form("files/run%s_evt_dist_ext.txt",_util.run_period));
 
         for (int ievent = 0; ievent < ext_tree_total_entries; ievent++){
 
@@ -312,7 +354,20 @@ void Selection::MakeSelection(){
             // Skip the RHC events contaminated in the FHC files
             if (std::string(_util.run_period) == "3" && ext_SC.run > 16880 ){
             // if (_run_period == 3 && ext_SC.run < 16880 ){
-                continue;
+                // continue;
+            }
+
+            // Look at different regions of run 1
+            if (std::string(_util.run_period) == "1" ){
+
+                // Set 1
+                // if (ext_SC.run >= 6550) continue;
+
+                // Set2
+                // if (ext_SC.run < 6550 || ext_SC.run > 7013) continue;
+
+                // Set 3
+                // if (ext_SC.run < 7013) continue;
             }
 
             // Apply Pi0 Selection
@@ -328,9 +383,15 @@ void Selection::MakeSelection(){
 
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_ext << ext_SC.run << " " << ext_SC.sub << " " << ext_SC.evt << '\n';
+
+            // if passed and is a background the write events to the file
+            if (pass) {
+                evt_dist_ext << ext_SC.shr_energy_cali << "," << ext_SC.cv_weight*_util.ext_scale_factor << "\n";
+            }
         }
          
         run_subrun_file_ext.close();
+        evt_dist_ext.close();
 
         std::cout << "Ending Selection over EXT" << std::endl;
 
@@ -343,6 +404,10 @@ void Selection::MakeSelection(){
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_dirt;
         run_subrun_file_dirt.open(Form("files/run%s_run_subrun_list_dirt.txt",_util.run_period));
+
+        // Create a file for the bkg events and their properties
+        std::ofstream evt_dist_dirt;
+        evt_dist_dirt.open(Form("files/run%s_evt_dist_dirt.txt",_util.run_period));
 
         for (int ievent = 0; ievent < dirt_tree_total_entries; ievent++){
 
@@ -370,9 +435,15 @@ void Selection::MakeSelection(){
             
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_dirt << dirt_SC.run << " " << dirt_SC.sub << " " << dirt_SC.evt << '\n';
+
+            // if passed and is a background the write events to the file
+            if (pass) {
+                evt_dist_dirt << dirt_SC.shr_energy_cali << "," << dirt_SC.cv_weight*_util.dirt_scale_factor << "\n";
+            }
         }
 
         run_subrun_file_dirt.close();
+        evt_dist_dirt.close();
          
         std::cout << "Ending Selection over Dirt" << std::endl;
 
@@ -404,12 +475,17 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     bool pass; // A flag to see if an event passes an event
 
     
+    // Set derived variables in the slice container
+    SC.SetSignal();                // Set the event as either signal or other
+    SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
+    SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
+    SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
+
     // Classify the event -- sets variable in the slice contianer
     SC.SliceClassifier(type);      // Classification of the event
     SC.SliceInteractionType(type); // Genie interaction type
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
     SC.Pi0Classifier(type); 
-    SC.SetSignal();                // Set the event as either signal or other
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
@@ -612,12 +688,6 @@ void Selection::SelectionFill(int type, SliceContainer &SC, int cut_index, std::
     // Set the CV weight variable in the slice container
     SC.SetCVWeight(weight);
     
-    // *************************************************************************
-    // Calculate the reconstructed neutrino energy
-    // This is in many places, need to have a way for setting this number by default
-    // *************************************************************************
-    double reco_nu_e = SC.shr_energy_tot_cali / 0.83 + SC.trk_energy_tot;
-
     // *************************************************************************
     // Fill Histograms
     // *************************************************************************

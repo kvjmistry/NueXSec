@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+
+<!-- Production Project -->
+<!DOCTYPE project [
+<!ENTITY release "v08_00_00_49">
+<!ENTITY file_type "mc">
+<!ENTITY run_type "physics">
+<!ENTITY user "kmistry">
+<!ENTITY name "prodgenie_numi_uboone_overlay_fhc_mcc9_run1_v49_flugg">
+<!ENTITY indef "kmistry_run1_ext_unbiased_high_lifetime_large_events"> <!-- your prestaged input ext unbiased sample -->
+
+<!-- Production xml for generating overlay with flugg as an input flux -->
+
+
+]>
+
+<job>
+
+<project name="&name;">
+
+  <!-- Project size -->
+  <numevents>-1</numevents>
+
+  <!-- Operating System -->
+  <os>SL7</os>
+
+  <!-- Batch resources -->
+  <resource>DEDICATED,OPPORTUNISTIC</resource>
+
+  <fcldir>/pnfs/uboone/persistent/users/kmistry/FLUGG_sample/</fcldir> 
+
+  <!-- Larsoft information -->
+  <larsoft>
+    <tag>&release;</tag>
+    <qual>e17:prof</qual>
+  </larsoft>
+
+  <!-- <check>1</check> -->
+  <!-- <copy>1</copy> -->
+  
+  <!-- Project stages -->
+  <stage name="flugg">
+    <fcl>standard_overlay_gen_numi_intrinsic_nue_uboone_griddriver_fhc_flugg.fcl</fcl>
+    <fcl>wirecell_g4_uboone.fcl</fcl>
+    <fcl>wirecell_detsim_overlay_numi_uboone.fcl</fcl>
+    <fcl>standard_overlay_numi_uboone.fcl</fcl>
+    <fcl>reco_uboone_mcc9_8_driver_overlay_stage1a.fcl</fcl>
+    <fcl>reco_uboone_mcc9_8_driver_overlay_stage1b.fcl</fcl>
+    <fcl>reco_uboone_mcc9_8_driver_overlay_numi_stage1c.fcl</fcl>
+    <fcl>wirecell_detsim_optical_overlay_numi_uboone.fcl</fcl>
+    <fcl>standard_overlay_optical_numi_uboone.fcl</fcl>
+    <fcl>reco_uboone_mcc9_8_driver_overlay_numi_optical.fcl</fcl>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/flugg_sample/reco1</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/flugg_sample/reco1</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/flugg_sample/reco1</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/flugg_sample/reco1</bookdir>
+    <maxfilesperjob>1</maxfilesperjob>
+    <numjobs>574</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>3500</memory>
+    <schema>root</schema>
+    <inputdef>&indef;</inputdef>
+    <disk>30GB</disk>
+    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1</jobsub>
+    <jobsub_start>  --expected-lifetime=short</jobsub_start>
+    <!-- <blacklist>Lancaster</blacklist> -->
+  </stage>
+ 
+  <stage name="flugg_reco2">
+    <fcl>reco_uboone_mcc9_8_driver_overlay_numi_stage2.fcl</fcl>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/flugg_sample/reco2</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/flugg_sample/reco2</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/flugg_sample/reco2</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/flugg_sample/reco2</bookdir>
+    <maxfilesperjob>1</maxfilesperjob>
+    <numjobs>2300</numjobs> <!--2383 -->
+    <datatier>reconstructed</datatier>
+    <memory>3500</memory>
+    <schema>root</schema>
+    <disk>10GB</disk>
+    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1</jobsub>
+    <jobsub_start>  --expected-lifetime=short</jobsub_start>
+    <!-- <blacklist>Lancaster</blacklist> -->
+  </stage>
+
+ 
+  <!-- file type -->
+  <filetype>&file_type;</filetype>
+
+  <!-- run type -->
+  <runtype>&run_type;</runtype>
+
+</project>
+
+
+</job>

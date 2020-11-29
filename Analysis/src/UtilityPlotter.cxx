@@ -17,6 +17,10 @@ void UtilityPlotter::Initialise(Utility _utility){
     // Standard variation mode
     if (std::string(_util.uplotmode) == "default")  {
 
+        // Compare the efficiency for the det var CV and intrinsic nue det var CV
+        // leave this commented out, needs speccific files for this to run 
+        // CompareDetVarEfficiency();
+
         // Compare the efficiency in run 1 and run 3
         CompareEfficiency();
 
@@ -941,7 +945,6 @@ void UtilityPlotter::ColumnNorm(TH2D* hist){
     } 
 
 }
-
 // -----------------------------------------------------------------------------
 void UtilityPlotter::StudyPPFXWeights(){
 
@@ -1319,3 +1322,86 @@ void UtilityPlotter::PopulateEff(TH1D* h_eff, TH1D *h_pur, TH1D* h_eff_clone, co
 
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::CompareDetVarEfficiency(){
+
+    TFile *f_cv, *f_cv_intrinsic;
+
+    gStyle->SetOptStat(0);
+
+
+    // Get the CV files
+    f_cv = TFile::Open( Form("files/nuexsec_mc_run%s_CV.root", _util.run_period ));
+    f_cv_intrinsic = TFile::Open( Form("files/nuexsec_mc_run%s_CV_intrinsic.root", _util.run_period ));
+
+    // Now get the efficiency denominators and numerators
+    TH1D *h_cv_den, *h_cv_intrinsic_den;
+    TH1D *h_cv_num, *h_cv_intrinsic_num;
+
+    _util.GetHist(f_cv, h_cv_den, "TEff/h_true_elec_E_rebin_Unselected");
+    _util.GetHist(f_cv, h_cv_num, "TEff/h_true_elec_E_rebin_dEdx_max_no_tracks");
+
+    _util.GetHist(f_cv_intrinsic, h_cv_intrinsic_den, "TEff/h_true_elec_E_rebin_Unselected");
+    _util.GetHist(f_cv_intrinsic, h_cv_intrinsic_num, "TEff/h_true_elec_E_rebin_dEdx_max_no_tracks");
+
+
+    std::vector<double> err_cv(h_cv_den->GetNbinsX(), 0.0);
+    std::vector<double> err_cv_intrinsic(h_cv_den->GetNbinsX(), 0.0);
+
+    // Get the errors for using binomial errors
+    for (int bin = 1; bin < h_cv_den->GetNbinsX()+1; bin ++){
+        double n = h_cv_num->GetBinContent(bin);
+        double N = h_cv_den->GetBinContent(bin);
+        err_cv.at(bin-1) = (1.0/std::sqrt(N))*std::sqrt( (n/N)*(1.0 - (n/N)));
+
+        
+
+        n = h_cv_intrinsic_num->GetBinContent(bin)*(1.0/0.124933);
+        N = h_cv_intrinsic_den->GetBinContent(bin)*(1.0/0.124933);
+        err_cv_intrinsic.at(bin-1) = (1.0/std::sqrt(N))*std::sqrt( (n/N)*(1.0 - (n/N)));
+
+        std::cout << N << " " << n<< " "<< err_cv_intrinsic.at(bin-1) << std::endl;
+    
+    }
+    
+
+
+    // Now divide the histograms
+    h_cv_num->Divide(h_cv_den);
+    h_cv_intrinsic_num->Divide(h_cv_intrinsic_den);
+
+
+    // Now set the bin error
+    for (int bin = 1; bin < h_cv_den->GetNbinsX()+1; bin ++){
+        h_cv_num->SetBinError(bin, err_cv.at(bin-1));
+        h_cv_intrinsic_num->SetBinError(bin, err_cv_intrinsic.at(bin-1));
+    }
+
+    // And save them
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+
+    TLegend *leg = new TLegend(0.15, 0.7, 0.55, 0.85);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+
+    h_cv_num->SetTitle(";True Electron Energy [GeV]; Efficiency");
+    h_cv_num->GetYaxis()->SetTitleOffset(1.4);
+    h_cv_num->SetMaximum(0.5);
+    h_cv_num->SetMinimum(0);
+    h_cv_num->SetLineWidth(2);
+    h_cv_num->SetLineColor(kBlack);
+    h_cv_intrinsic_num->SetLineWidth(2);
+    
+    h_cv_num->Draw("hist,E");
+    h_cv_intrinsic_num->Draw("hist,E,same");
+
+    leg->AddEntry(h_cv_num, "DetVar CV", "l");
+    leg->AddEntry(h_cv_intrinsic_num, "Intrinsic DetVar CV", "l");
+    leg->Draw();
+
+
+    c->Print("plots/run1/detvar/comparisons/Eff_CV_comparison.pdf");
+
+    delete c;
+
+
+}

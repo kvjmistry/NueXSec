@@ -19,7 +19,7 @@ public:
 
     // -------------------------------------------------------------------------
     // Initialise the class
-    void Initialise(TTree* tree, int type, TFile *f_flux_weights, Utility util);
+    void Initialise(TTree* tree, int type, Utility util);
     // -------------------------------------------------------------------------
     // Function to classify the slice
     void  SliceClassifier(int type);
@@ -48,6 +48,19 @@ public:
     // -------------------------------------------------------------------------
     void SetSignal();
     // -------------------------------------------------------------------------
+    // Set the theta and Phi angles for the electron
+    void SetTrueElectronThetaPhi();
+    // -------------------------------------------------------------------------
+    // Calculate and set the effective angle variable
+    void SetNuMIAngularVariables();
+    // -------------------------------------------------------------------------
+    // Apply the 0.83 calibration factor to the shower energy so it is applied universally
+    void CalibrateShowerEnergy();
+    // -------------------------------------------------------------------------
+
+
+
+
 
 
     Utility _util;
@@ -63,6 +76,9 @@ public:
 
     double cv_weight;
 
+    double effective_angle;     // The angle between the vector from the target to nu vtx compared to the reconstructed shower direction.
+    double cos_effective_angle; // The cosine of the angle between the vector from the target to nu vtx compared to the reconstructed shower direction.
+
     bool is_signal{false}; // bool to check if the event is signal or not
 
     // Shower Properties 
@@ -73,6 +89,7 @@ public:
     
     float shr_theta;             // Shower: Reconstructed theta angle for the leading shower
     float shr_phi;               // Shower: Reconstructed phi angle for the leading shower
+    double shr_ang_numi;         // Shower: angle of the reconstructed shower relative to the NuMI target to detector vector
     
     float shr_pca_0;             // Shower: First eigenvalue of the PCAxis of the leading shower
     float shr_pca_1;             // Shower: Second eigenvalue of the PCAxis of the leading shower
@@ -81,6 +98,7 @@ public:
     float shr_px;                // Shower: X component of the reconstructed momentum of the leading shower (in GeV/c)
     float shr_py;                // Shower: Y component of the reconstructed momentum of the leading shower (in GeV/c)
     float shr_pz;                // Shower: Z component of the reconstructed momentum of the leading shower (in GeV/c)
+    double shr_p;                // Shower: reconstructed momentum of the leading shower (in GeV/c)
     
     float shr_openangle;         // Shower: Opening angle of the shower -- variable does not work...
     
@@ -278,6 +296,13 @@ public:
     float nu_pt;       // True Neutrino Transverse Energy of Interaction
     float theta;       // True Neutrino Theta
     bool  isVtxInFiducial; // True Neutrino Vertex in FV
+    double nu_p;
+    double nu_theta;
+    double nu_phi;
+    double nu_angle;         // True nue angle from numi beamline 
+    double nu_angle_targ;    // True nue angle wrt numi target to uboone vector
+    double reco_true_nu_ang; // Angle between the effectve neutrino direction and the true neutrino direction
+    float reco_e;            // Reconstructed Neutrino energy 
     
     // Is the truth information contained? 
     // Require all track start/end point in FV and showers deposit > 60% of energy
@@ -318,6 +343,10 @@ public:
     float elec_px;   // Truth Electron Px
     float elec_py;   // Truth Electron Py
     float elec_pz;   // Truth Electron Pz
+    double elec_mom; // Truth Electron P
+    float elec_theta; // True electron theta
+    float elec_phi;  // True electron phi
+    double elec_ang_targ; // True electron angle wrt numi target to uboone vector
 
     int   npi0;     // Truth Number of Pi0
     float pi0_e;    // Truth Pi0 Energy

@@ -377,13 +377,13 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     // Set the scale factors
     if (strcmp(run_period, "1") == 0){
         mc_scale_factor     = config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_MC_POT);
-        dirt_scale_factor   = config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_Dirt_POT);
-        ext_scale_factor    = config_v.at(k_Run1_Data_trig) / config_v.at(k_Run1_EXT_trig);
+        dirt_scale_factor   = 0.45*config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_Dirt_POT);
+        ext_scale_factor    = 0.98*config_v.at(k_Run1_Data_trig) / config_v.at(k_Run1_EXT_trig);
         intrinsic_weight    = config_v.at(k_Run1_MC_POT)    / config_v.at(k_Run1_Intrinsic_POT);
     }
     else if (strcmp(run_period, "3") == 0){
         mc_scale_factor     = config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_MC_POT);
-        dirt_scale_factor   = config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_Dirt_POT);
+        dirt_scale_factor   = 0.45*config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_Dirt_POT);
         ext_scale_factor    = config_v.at(k_Run3_Data_trig) / config_v.at(k_Run3_EXT_trig);
     }
     else {
@@ -508,13 +508,7 @@ void Utility::CheckWeight(float &weight){
 double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv){
 
     // Always give weights of 1 to the data
-    if (type == k_data ) return 1.0;
-
-    // Run 1 and ext, correct by 2%
-    if (type == k_ext && std::string(run_period) == "1" && weight_ext) return 0.98;
-
-    // Run 3 and ext, correct by 5%
-    if (type == k_ext && std::string(run_period) == "3" && weight_ext) return 0.95;
+    if (type == k_data || type == k_ext) return 1.0;
 
     double weight = 1.0;
 
@@ -532,9 +526,6 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
 
     if (weight_ppfx) weight = weight * weight_flux;
 
-    // For the dirt we correct it by 65%
-    if (type == k_dirt && weight_dirt) weight = weight*0.45;
-
     // Weight the below threshold events to zero. Current threhsold is 125 MeV
     if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12) && nu_e <= 0.125) weight = 0.0;
 
@@ -546,6 +537,9 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
         else weight = weight * intrinsic_weight;
         
     }
+
+    // Create a random energy dependent nue weight for testing model dependence
+    // if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12)) weight *= (1.0 + (nu_e * nu_e * nu_e)/6.0);
 
 
     return weight;
@@ -738,19 +732,11 @@ double Utility::GetNuMIAngle(double px, double py, double pz, std::string direct
         beamdir = {5502, 7259, 67270};
         beamdir = beamdir.Unit(); // Get the direction
     }
-    // NuMI acos(Pz/P)
-    else if (direction == "numi_theta"){
-        double p = std::sqrt(BeamCoords.X()*BeamCoords.X() +BeamCoords.Y()*BeamCoords.Y() +  BeamCoords.Z()*BeamCoords.Z() );
-        return acos(BeamCoords.Z()/p) * (180 / 3.1415);
-    }
-    else if (direction == "numi_phi"){
-        return atan2(BeamCoords.Y(), BeamCoords.X()) * 180 / 3.1415;
-    } 
     else {
         std::cout << "Warning unknown angle type specified, you should check this" << std::endl;
     }
     
-    double theta = BeamCoords.Angle(beamdir) * 180 / 3.1415926;
+    double angle = BeamCoords.Angle(beamdir) * 180 / 3.1415926;
 
 
     // Create vectors to get the angle in the yz and xz planes
@@ -761,7 +747,7 @@ double Utility::GetNuMIAngle(double px, double py, double pz, std::string direct
 
     // std::cout << theta << std::endl;
 
-    return theta;
+    return angle;
 }
 // -----------------------------------------------------------------------------
 bool Utility::in_fv(double x, double y, double z){

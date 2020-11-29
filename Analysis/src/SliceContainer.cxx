@@ -1,7 +1,7 @@
 #include "../include/SliceContainer.h"
 
 // -----------------------------------------------------------------------------
-void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, Utility util){
+void SliceContainer::Initialise(TTree *tree, int type, Utility util){
 
     std::cout << "Initalising Slice Container" << std::endl;
     _util = util;
@@ -184,6 +184,7 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, Ut
     tree->SetBranchAddress("theta",  &theta);
     tree->SetBranchAddress("isVtxInFiducial",  &isVtxInFiducial);
     tree->SetBranchAddress("truthFiducial",    &truthFiducial);
+    tree->SetBranchAddress("reco_e",           &reco_e);
     
     tree->SetBranchAddress("true_nu_vtx_t", &true_nu_vtx_t);
     tree->SetBranchAddress("true_nu_vtx_x", &true_nu_vtx_x);
@@ -383,6 +384,7 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, Ut
     tree->SetBranchAddress("pi0_dedx1_fit_Y",&pi0_dedx1_fit_Y);
     tree->SetBranchAddress("pi0_mass_Y",     &pi0_mass_Y);
     
+    tree->SetBranchAddress("trk_pfp_id_v",        &trk_pfp_id_v);
     tree->SetBranchAddress("trk_sce_start_x_v",        &trk_sce_start_x_v);
     tree->SetBranchAddress("trk_sce_start_y_v",        &trk_sce_start_y_v);
     tree->SetBranchAddress("trk_sce_start_z_v",        &trk_sce_start_z_v);
@@ -394,16 +396,6 @@ void SliceContainer::Initialise(TTree *tree, int type, TFile *f_flux_weights, Ut
     tree->SetBranchAddress("trk_mcs_muon_mom_v",       &trk_mcs_muon_mom_v);
     tree->SetBranchAddress("trk_range_muon_mom_v",     &trk_range_muon_mom_v);
     tree->SetBranchAddress("trk_llr_pid_score_v",      &trk_llr_pid_score_v);
-
-    // Initalise the flux histograms if MC only
-    if (type == _util.k_mc){
-        bool boolhist;
-        boolhist = _util.GetHist(f_flux_weights, h_2D_CV_UW_PPFX_ratio_nue,     "h_2D_CV_UW_PPFX_ratio_nue");     if (boolhist == false) exit(2); 
-        boolhist = _util.GetHist(f_flux_weights, h_2D_CV_UW_PPFX_ratio_nuebar,  "h_2D_CV_UW_PPFX_ratio_nuebar");  if (boolhist == false) exit(2);
-        boolhist = _util.GetHist(f_flux_weights, h_2D_CV_UW_PPFX_ratio_numu,    "h_2D_CV_UW_PPFX_ratio_numu");    if (boolhist == false) exit(2);
-        boolhist = _util.GetHist(f_flux_weights, h_2D_CV_UW_PPFX_ratio_numubar, "h_2D_CV_UW_PPFX_ratio_numubar"); if (boolhist == false) exit(2);
-    }
-
 
 }
 // -----------------------------------------------------------------------------
@@ -919,3 +911,76 @@ void SliceContainer::SetSignal(){
 
 }
 // -----------------------------------------------------------------------------
+void SliceContainer::SetTrueElectronThetaPhi(){
+
+    TVector3 vec(elec_px, elec_py, elec_pz);
+
+    elec_theta = vec.Theta() * 180.0/3.14159;
+    elec_phi   = vec.Phi()   * 180.0/3.14159;
+
+}
+// -----------------------------------------------------------------------------
+void SliceContainer::SetNuMIAngularVariables(){
+
+
+    // --- Effective Angle -- //
+    // Calculate the angle between the shower direction and the vector from the target to the nu vtx
+    TVector3 shr_dir(shr_px, shr_py, shr_pz); // Shower direction
+    shr_dir.Unit();
+    
+    TVector3 v_targ_uboone(-31387.58422, -3316.402543, -60100.2414);
+    TVector3 v_nu_vtx(reco_nu_vtx_sce_x, reco_nu_vtx_sce_y, reco_nu_vtx_sce_z);
+    TVector3 v_targ_to_vtx = (-1*v_targ_uboone + v_nu_vtx).Unit(); // -1 because the vector points from uboone to tgt, we need the other way around
+
+    // Set the values
+    effective_angle = shr_dir.Angle(v_targ_to_vtx) * 180 / 3.14159;
+    cos_effective_angle = std::cos(shr_dir.Angle(v_targ_to_vtx));
+    // --
+
+    // Momentum of neutrino
+    nu_p = std::sqrt(true_nu_px*true_nu_px + true_nu_py*true_nu_py + true_nu_pz*true_nu_pz);
+
+    // Reconstructed Shower momentum
+    shr_p = std::sqrt(shr_px*shr_px + shr_py*shr_py + shr_pz*shr_pz);
+    
+    // Momentum of electron
+    elec_mom = std::sqrt(elec_px*elec_px + elec_py*elec_py + elec_pz*elec_pz);
+
+    // --
+
+    TVector3 nu_p_vec(true_nu_px, true_nu_py, true_nu_pz);
+
+    // True nue theta in BNB coordinates (up from beam dir)
+    nu_theta = nu_p_vec.Theta() * 180.0/3.14159;
+    
+    // True nue phi in BNB coordinates (around beam dir)
+    nu_phi = nu_p_vec.Phi()   * 180.0/3.14159;
+    
+    // True nue angle from numi beamline 
+    nu_angle = _util.GetNuMIAngle(true_nu_px, true_nu_py, true_nu_pz, "beam"); 
+
+    // True nue angle wrt numi target to uboone vector
+    nu_angle_targ = _util.GetNuMIAngle(true_nu_px, true_nu_py, true_nu_pz, "target"); 
+
+    // True electron angle wrt numi target to uboone vector
+    elec_ang_targ = _util.GetNuMIAngle(elec_px, elec_py, elec_pz, "target");
+
+    // --- Calculate the dot-product of the proxy for neutrino direction --- //
+    // (the vector from the target to the reco nu vtx) and the true nu angle
+    TVector3 nu_dir(true_nu_px, true_nu_py, true_nu_pz); 
+    nu_dir.Unit();
+
+    reco_true_nu_ang = nu_dir.Angle(v_targ_to_vtx) * 180/3.14159;
+    // ---
+
+    // The angle of the reconstructed shower relative to the NuMI target to detector direction
+    shr_ang_numi = _util.GetNuMIAngle(shr_px, shr_py, shr_pz, "target");
+
+}
+// -----------------------------------------------------------------------------
+void SliceContainer::CalibrateShowerEnergy(){
+
+    // Divide the shower energy by 0.83 to calibrate it properly. 
+    shr_energy_cali= shr_energy_cali/0.83;
+
+}
