@@ -1458,7 +1458,10 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               area_norm, false, 1.0, "Cosine Effective Angle",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_effective_cosangle.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
-    
+    // Track LLR PID score
+    MakeStack("h_reco_trk_pid_score", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "Track LLR PID Score",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_trk_pid_score.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Stacked Histograms by particle type
 
@@ -1471,6 +1474,11 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
     MakeStack("h_reco_shr_tkfit_dedx_max_par", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Leading Shower dEdx (All Planes) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_max_par.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "particle", true, false, true);
+
+    // Track LLR PID score
+    MakeStack("h_reco_trk_pid_score_par", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "Track LLR PID Score",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_trk_pid_score_par.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "particle", false, false, true);
 
 
 }

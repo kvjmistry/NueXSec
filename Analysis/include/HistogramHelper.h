@@ -190,6 +190,7 @@ class HistogramHelper{
         k_reco_single_bin,                                                      // Just fill with weight. We need this to get the uncertainty on the purity
         k_reco_effective_angle,                                                 // Angle between vector from target to vertex and shower direction.
         k_reco_effective_cosangle,                                              // Cosine of the Angle between vector from target to vertex and shower direction.
+        k_reco_trk_pid_score,                                                   // The PID score for tracks in the event
         k_TH1D_MAX
     };
 
@@ -197,6 +198,7 @@ class HistogramHelper{
     enum TH1D_par_hist_vars {
         k_reco_shr_tkfit_dedx_max_par,  // dEdx in the plane with most hits with trackfit 1x4 cm box
         k_reco_shr_tkfit_dedx_y_par,    // dEdx in the collection plane with trackfit 1x4 cm box
+        k_reco_trk_pid_score_par,           // Track PID Score
         k_TH1D_par_MAX
     };
 
