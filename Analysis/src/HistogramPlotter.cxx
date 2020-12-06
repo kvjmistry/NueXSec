@@ -83,6 +83,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_eff_nu_phi",                  false, false, "True #nu_{e} + #bar{#nu}_{e} #phi [deg]; Efficiency",   "True #nu_{e} + #bar{#nu}_{e} Events in FV", "nu_phi" );
         MakeEfficiencyPlotByCut("h_eff_elec_theta",              false, false, "True e^{-} + e^{+} #theta [deg]; Efficiency",           "True e^{-} + e^{+} Events in FV", "elec_theta" );
         MakeEfficiencyPlotByCut("h_eff_elec_phi",                false, false, "True e^{-} + e^{+} #phi [deg]; Efficiency",             "True e^{-} + e^{+} Events in FV", "elec_phi" );
+        MakeEfficiencyPlotByCut("h_eff_effective_ang",           false, false, "True e^{-} + e^{+} Eff Ang. [deg]; Efficiency",         "True e^{-} + e^{+} Events in FV", "eff_ang" );
 
         // Create the interaction folder
         _util.CreateDirectory("Interaction");

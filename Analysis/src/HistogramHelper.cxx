@@ -453,6 +453,7 @@ void HistogramHelper::InitHistograms(){
                 TEfficiency_hists.at(k_eff_nu_phi).at(l)            = new TH1D( Form("h_eff_nu_phi_%s",_util.cut_dirs.at(l).c_str() ), "", 14, 0, 70 );
                 TEfficiency_hists.at(k_eff_elec_theta).at(l)        = new TH1D( Form("h_eff_elec_theta_%s",_util.cut_dirs.at(l).c_str() ), "", 13, 0, 190 );
                 TEfficiency_hists.at(k_eff_elec_phi).at(l)          = new TH1D( Form("h_eff_elec_phi_%s",_util.cut_dirs.at(l).c_str() ), "", 14, -190, 190 );
+                TEfficiency_hists.at(k_eff_effective_ang).at(l)     = new TH1D( Form("h_eff_effective_ang_%s",_util.cut_dirs.at(l).c_str() ), "", 13, 0, 190 );
             }
             
         }
@@ -1254,6 +1255,7 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
             TEfficiency_hists.at(k_eff_nu_phi).at(cut_index)           ->Fill(SC.nu_phi, weight);
             TEfficiency_hists.at(k_eff_elec_theta).at(cut_index)       ->Fill(SC.elec_theta, weight);
             TEfficiency_hists.at(k_eff_elec_phi).at(cut_index)         ->Fill(SC.elec_phi, weight);
+            TEfficiency_hists.at(k_eff_effective_ang).at(cut_index)    ->Fill(SC.true_effective_angle, weight);
 
         }
         
@@ -1285,6 +1287,7 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
             TEfficiency_hists.at(k_eff_nu_phi).at(cut_index)         ->Fill(SC.nu_phi, weight);
             TEfficiency_hists.at(k_eff_elec_theta).at(cut_index)     ->Fill(SC.elec_theta, weight);
             TEfficiency_hists.at(k_eff_elec_phi).at(cut_index)       ->Fill(SC.elec_phi, weight);
+            TEfficiency_hists.at(k_eff_effective_ang).at(cut_index)  ->Fill(SC.true_effective_angle, weight);
         }
     
         // Nue only

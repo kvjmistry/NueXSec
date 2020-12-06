@@ -219,6 +219,7 @@ class HistogramHelper{
         k_eff_nu_phi,                // Efficiency as a function of nu phi
         k_eff_elec_theta,            // Efficiency as a function of electron theta
         k_eff_elec_phi,              // Efficiency as a function of electron phi
+        k_eff_effective_ang,         // Efficiency as a function of the effective angle (angle between nu dir and elec dir)
         k_TH1D_eff_MAX
     };
 

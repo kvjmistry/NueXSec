@@ -935,6 +935,18 @@ void SliceContainer::SetNuMIAngularVariables(){
     // Set the values
     effective_angle = shr_dir.Angle(v_targ_to_vtx) * 180 / 3.14159;
     cos_effective_angle = std::cos(shr_dir.Angle(v_targ_to_vtx));
+    
+    // Calculate the effective angle using true variables
+    TVector3 nu_dir(true_nu_px, true_nu_py, true_nu_pz); 
+    nu_dir.Unit();
+
+    TVector3 v_nu_vtx_true(true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z);
+    TVector3 v_targ_to_vtx_true = (-1*v_targ_uboone + v_nu_vtx_true).Unit(); // -1 because the vector points from uboone to tgt, we need the other way around
+
+    TVector3 elec_dir(elec_px, elec_py, elec_pz); 
+    elec_dir.Unit();
+    true_effective_angle = elec_dir.Angle(v_targ_to_vtx_true) * 180 / 3.14159;
+    
     // --
 
     // Momentum of neutrino
@@ -967,8 +979,6 @@ void SliceContainer::SetNuMIAngularVariables(){
 
     // --- Calculate the dot-product of the proxy for neutrino direction --- //
     // (the vector from the target to the reco nu vtx) and the true nu angle
-    TVector3 nu_dir(true_nu_px, true_nu_py, true_nu_pz); 
-    nu_dir.Unit();
 
     reco_true_nu_ang = nu_dir.Angle(v_targ_to_vtx) * 180/3.14159;
     // ---
