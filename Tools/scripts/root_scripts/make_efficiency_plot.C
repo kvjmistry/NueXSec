@@ -12,7 +12,7 @@ void make_efficiency_plot(){
     //std::vector<double> purity_nu_v = {0, 0.1225, 0.1612, 0.1943, 0.3253, 0.5142, 0.6978}    ; // purity nu Only vector -- with mixed as bkg
     std::vector<double> efficiency_v = {1, 0.694, 0.451, 0.360, 0.299, 0.15, 0.091}; // efficiency vector -- with mixed as sig
     std::vector<double> purity_v = {0, 0.0092, 0.042, 0.047, 0.172, 0.331, 0.385}    ; // purity vector -- with mixec as sig
-    std::vector<double> purity_nu_v = {0, 0.04, 0.130,  0.147, 0.316, 0.530, 0.621}    ; // purity nu Only vector -- with mixed as sig
+    std::vector<double> purity_nu_v = {0, 0.077, 0.162,  0.184, 0.352, 0.569, 0.669}    ; // purity nu Only vector -- with mixed as sig
     std::vector<std::string> names = {"No Selection (0)","Pre-selection (1)", "Flash Matching (2)", "Vertex Reco. Quality (3)", "Shower Hit Threshold (4)", "Electron-like Shower (5)", "Final Tuning (6)"};
 
     double efficiency, purity;
@@ -99,15 +99,15 @@ void make_efficiency_plot(){
 
     leg_stack->Draw();
    
-    TPaveText *pt;
-    pt = new TPaveText(0.21, 0.88, 0.21, 0.88,"NDC");
-    pt->AddText("MicroBooNE");
-    pt->SetTextColor(kBlack);
-    pt->SetBorderSize(0);
-    pt->SetFillColor(0);
-    pt->SetFillStyle(0);
-    pt->SetTextSize(0.04);
-    pt->Draw();
+    //TPaveText *pt;
+    //pt = new TPaveText(0.21, 0.88, 0.21, 0.88,"NDC");
+    //pt->AddText("MicroBooNE");
+    //pt->SetTextColor(kBlack);
+    //pt->SetBorderSize(0);
+    //pt->SetFillColor(0);
+    //pt->SetFillStyle(0);
+    //pt->SetTextSize(0.04);
+    //pt->Draw();
 
 
     c->Print("efficiency_plot_mcc8.pdf");
