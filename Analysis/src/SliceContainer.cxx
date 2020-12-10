@@ -837,13 +837,13 @@ double SliceContainer::GetdEdxMax(){
 
     // We want to also use the dedx when it is defined properly. Sometimes, the plane can have hits but an undefined dedx
     // use the dedx where we get the max number of hits and the dedx > 0
-    int temp_shr_hits_u_tot = shr_hits_u_tot;
-    int temp_shr_hits_v_tot = shr_hits_v_tot;
-    int temp_shr_hits_y_tot = shr_hits_y_tot;
+    // int temp_shr_hits_u_tot = shr_hits_u_tot;
+    // int temp_shr_hits_v_tot = shr_hits_v_tot;
+    // int temp_shr_hits_y_tot = shr_hits_y_tot;
 
-    // int temp_shr_hits_u_tot = shr_tkfit_nhits_U; // These variables give a bigger difference in run 1 and run 3
-    // int temp_shr_hits_v_tot = shr_tkfit_nhits_V;
-    // int temp_shr_hits_y_tot = shr_tkfit_nhits_Y;
+    int temp_shr_hits_u_tot = shr_tkfit_nhits_U; // These variables give a bigger difference in run 1 and run 3
+    int temp_shr_hits_v_tot = shr_tkfit_nhits_V;
+    int temp_shr_hits_y_tot = shr_tkfit_nhits_Y;
 
     // If the dedx is undefined, set the hits to zero
     if (shr_tkfit_dedx_U <= 0) temp_shr_hits_u_tot = 0;
