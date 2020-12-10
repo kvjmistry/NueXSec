@@ -25,7 +25,7 @@ void mcc8_xsec_plot(){
     h_data->GetXaxis()->SetTickLength(0);
     
     // Y-Axis
-    h_data->GetYaxis()->SetRangeUser(0.2e-38,1.2e-38);
+    h_data->GetYaxis()->SetRangeUser(0.22e-38,1.22e-38);
     h_data->GetYaxis()->CenterTitle();
     h_data->GetYaxis()->SetLabelSize(0.1);
     h_data->GetYaxis()->SetTitleSize(0.1);
@@ -36,13 +36,16 @@ void mcc8_xsec_plot(){
     h_data->SetLineColor(kBlack);
     
     // Fill it
-    h_data->Fill(0.5, 6.67e-39);
-    h_data->SetBinError(1, 0.267e-38);
+    // h_data->Fill(0.5, 6.67e-39);
+    // h_data->SetBinError(1, 0.267e-38);
+    h_data->Fill(0.5, 6.8426915e-39); // new in FV flux
+    h_data->SetBinError(1, 6.8426915e-39 * 0.40); // new in FV flux
     h_data->Draw("E1,X0");
 
-    // Systematic band
+    // Statistical band
     TH1D * h_data_stat = (TH1D*) h_data->Clone();
-    h_data_stat->SetBinError(1, 0.144e-38);
+    // h_data_stat->SetBinError(1, 0.144e-38);
+    h_data_stat->SetBinError(1, 6.8426915e-39 * 0.22 ); // new in FV flux
     h_data_stat->SetLineColor(kBlack);
     h_data_stat->Draw("E1,X0,same");
 
@@ -52,7 +55,7 @@ void mcc8_xsec_plot(){
     // h_genie_v2_nue_nuebar->Fill(0.5,7.19925e-39 );
     h_genie_v2_nue_nuebar->Fill(0.5,7.3125100e-39 ); // with FV flux
     h_genie_v2_nue_nuebar->SetLineColor(kViolet-5);
-    h_genie_v2_nue_nuebar->SetLineWidth(3);
+    h_genie_v2_nue_nuebar->SetLineWidth(3); 
     h_genie_v2_nue_nuebar->SetLineStyle(7);
     h_genie_v2_nue_nuebar->Draw("hist,same");
 
