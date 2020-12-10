@@ -99,9 +99,9 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeInteractionEfficiency("h_true_nue_E",                 false, ";True #nu_{e} Energy [GeV]; Efficiency",                    "nue_E");
         MakeInteractionEfficiency("h_true_nuebar_E",              false, ";True #bar{#nu}_{e} Energy [GeV]; Efficiency",              "nuebar_E");
         MakeInteractionEfficiency("h_true_nue_nuebar_E",          false, ";True #nu_{e} + #bar{#nu}_{e} Energy [GeV]; Efficiency",    "nue_nuebar_E");
-        MakeInteractionEfficiency("h_int_nu_E_single_bin",        false, ";True #nu_{e} + #bar{#nu}_{e}; Efficiency",                 "nu_E_nuebar_single_bin");
-        MakeInteractionEfficiency("h_int_nu_E_nue_single_bin",    false, ";True #nu_{e}; Efficiency",                                 "nu_E_nue_single_bin");
-        MakeInteractionEfficiency("h_int_nu_E_nuebar_single_bin", false, ";True #bar{#nu}_{e}; Efficiency",                           "nu_E_nuebar_single_bin");
+        MakeInteractionEfficiency("h_int_nu_E_single_bin",        true, ";True #nu_{e} + #bar{#nu}_{e}; Efficiency",                 "nu_E_nuebar_single_bin");
+        MakeInteractionEfficiency("h_int_nu_E_nue_single_bin",    true, ";True #nu_{e}; Efficiency",                                 "nu_E_nue_single_bin");
+        MakeInteractionEfficiency("h_int_nu_E_nuebar_single_bin", true, ";True #bar{#nu}_{e}; Efficiency",                           "nu_E_nuebar_single_bin");
         MakeInteractionEfficiency("h_int_elec_E",                 false, ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",   "elec_E");
         MakeInteractionEfficiency("h_int_elec_E_rebin",           false, ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",   "elec_E_rebin");
         MakeInteractionEfficiency("h_int_elec_E_rebin_nue",       false, ";True e#lower[-0.5]{-} Energy [GeV]; Efficiency",           "elec_E_rebin_nue");
@@ -2218,6 +2218,17 @@ void HistogramPlotter::MakeInteractionEfficiency(std::string var, bool mask_ax_l
 
         hist.at(0).at(k)->SetTitle(ax_name);
         hist.at(1).at(k)->SetTitle(ax_name);
+
+        // Get rid of the ticks and the axes labels for single bin
+        if (mask_ax_label) {
+            hist.at(0).at(k)->GetXaxis()->SetLabelOffset(100);
+            hist.at(0).at(k)->GetXaxis()->SetTickSize(0);
+            hist.at(1).at(k)->GetXaxis()->SetLabelOffset(100);
+            hist.at(1).at(k)->GetXaxis()->SetTickSize(0);
+        }
+
+        hist.at(0).at(k)->GetXaxis()->CenterTitle();
+        hist.at(1).at(k)->GetXaxis()->CenterTitle();
 
     }
 
