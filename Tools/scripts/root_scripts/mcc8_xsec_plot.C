@@ -34,13 +34,6 @@ void mcc8_xsec_plot(){
     h_data->SetMarkerStyle(20);
     h_data->SetMarkerSize(0.7);
     h_data->SetLineColor(kBlack);
-
-    TH1D * h_data_open = (TH1D*) h_data->Clone(); // for plotting the x-sec calculatiion without the open angle cut
-    h_data_open->Fill(0.75, 7.40e-39);
-    h_data_open->SetBinError(1, 1.52e-39);
-    h_data_open->SetLineColor(kRed);
-    h_data_open->SetMarkerColor(kRed);
-    
     
     // Fill it
     h_data->Fill(0.5, 6.67e-39);
@@ -54,30 +47,46 @@ void mcc8_xsec_plot(){
     h_data_stat->Draw("E1,X0,same");
 
 
-    
+    // Genie v12.2.2 nue + nuebar
+    TH1D* h_genie_v2_nue_nuebar = new TH1D("h_genie_v2", "", 1, 0.0, 1.0);
+    // h_genie_v2_nue_nuebar->Fill(0.5,7.19925e-39 );
+    h_genie_v2_nue_nuebar->Fill(0.5,7.3125100e-39 ); // with FV flux
+    h_genie_v2_nue_nuebar->SetLineColor(kViolet-5);
+    h_genie_v2_nue_nuebar->SetLineWidth(3);
+    h_genie_v2_nue_nuebar->SetLineStyle(7);
+    h_genie_v2_nue_nuebar->Draw("hist,same");
 
-    // Genie nue + nuebar
-    TH1D* h_genie_nue_nuebar = new TH1D("h_genie", "", 1, 0.0, 1.0);
-    h_genie_nue_nuebar->Fill(0.5,6.9e-39 );
-    h_genie_nue_nuebar->SetLineColor(kViolet-5);
-    h_genie_nue_nuebar->SetLineWidth(3);
-    h_genie_nue_nuebar->SetLineStyle(7);
-    h_genie_nue_nuebar->Draw("hist,same");
+    // Genie v3 nue + nuebar
+    TH1D* h_genie_v3_nue_nuebar = new TH1D("h_genie_v3", "", 1, 0.0, 1.0);
+    // h_genie_v3_nue_nuebar->Fill(0.5,5.5228738e-39 );
+    h_genie_v3_nue_nuebar->Fill(0.5,5.5711475e-39 ); // with FV flux
+    h_genie_v3_nue_nuebar->SetLineColor(kBlue+2);
+    h_genie_v3_nue_nuebar->SetLineWidth(3);
+    h_genie_v3_nue_nuebar->SetLineStyle(8);
+    h_genie_v3_nue_nuebar->Draw("hist,same");
 
-    // Draw the open angle x-sec
-    // h_data_open->Draw("E1,X0,same");
+    // NuWro nue + nuebar
+    TH1D* h_genie_NuWro_nue_nuebar = new TH1D("h_nuwro_v2", "", 1, 0.0, 1.0);
+    // h_genie_NuWro_nue_nuebar->Fill(0.5,3.8158e-39 );
+    h_genie_NuWro_nue_nuebar->Fill(0.5,3.8738945e-39 ); // with FV flux
+    h_genie_NuWro_nue_nuebar->SetLineColor(kRed+2);
+    h_genie_NuWro_nue_nuebar->SetLineWidth(3);
+    h_genie_NuWro_nue_nuebar->SetLineStyle(1);
+    h_genie_NuWro_nue_nuebar->Draw("hist,same");
+
+
+    h_data->Draw("E1,X0,same");
+    h_data_stat->Draw("E1,X0,same");
+
 
     // Draw the Legend
-    TLegend *leg = new TLegend(0.35, 0.75, 0.70, 0.9);
+    TLegend *leg = new TLegend(0.35, 0.70, 0.70, 0.89);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
-    leg->AddEntry(h_data, "#lower[-0.2]{Data (Stat. + Sys.)}",      "ep");
-    // leg->AddEntry(h_data_open, "Data no O. A. (Stat.)",      "ep");
-    // leg->AddEntry(g_xsec_sys,      "Stat. + Sys. Uncertainty",                  "f");
-    // leg->AddEntry(h_data_stat,     "Data (Stat.)",                        "ep");
-    // leg->AddEntry(g_xsec_nue,      "GENIE #nu_{e} CC Cross-Section",          "l");
-    // leg->AddEntry(g_xsec_nuebar,   "GENIE #bar{#nu}_{e} CC Cross-Section",    "l");
-    leg->AddEntry(h_genie_nue_nuebar,   "#lower[-0.2]{GENIE v2.12.2}",    "l");
+    leg->AddEntry(h_data, "Data (stat. + sys.)",      "ep");
+    leg->AddEntry(h_genie_v2_nue_nuebar,   "GENIE v2.12.2",    "l");
+    leg->AddEntry(h_genie_v3_nue_nuebar,   "GENIE v3.0.6",    "l");
+    leg->AddEntry(h_genie_NuWro_nue_nuebar,   "NuWro v19.02.1",    "l");
     
     leg->Draw();
 
@@ -85,16 +94,10 @@ void mcc8_xsec_plot(){
    
     std::cout << gStyle->GetLegendTextSize() << std::endl;
 
-    // pt->Draw();   
-
-
-    // c->Range(0.0, 1.0, 0.2e-38,1.4e-38);
-    // c->Update();
-
-    TLatex *t = new TLatex(.40, .175, "#splitline{MicroBooNE NuMI}{Data 2.4#times10^{20} POT}");
+    TLatex *t = new TLatex(.34, .145, "#splitline{MicroBooNE NuMI}{Data 2.4#times10^{20} POT}");
     t->SetTextColor(kBlack);
     t->SetNDC();
-    t->SetTextSize(1.5/30.);
+    t->SetTextSize(2.0/30.);
     t->SetTextAlign(11);
     t->Draw();
 
