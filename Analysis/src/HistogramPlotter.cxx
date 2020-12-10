@@ -95,7 +95,20 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeInteractionPlot(Form("plots/run%s/Interaction/True_nue_e_interaction_selected.pdf", _util.run_period), "selected","nue", true);
         MakeInteractionPlot(Form("plots/run%s/Interaction/True_nuebar_e_interaction_unselected.pdf", _util.run_period), "unselected","nuebar", true);
         MakeInteractionPlot(Form("plots/run%s/Interaction/True_nuebar_e_interaction_selected.pdf", _util.run_period), "selected","nuebar", true);
-        MakeInteractionEfficiency(Form("plots/run%s/Interaction/True_nue_e_interaction_efficiency.pdf", _util.run_period));
+        
+        MakeInteractionEfficiency("h_true_nue_E",                 false, ";True #nu_{e} Energy [GeV]; Efficiency",                    "nue_E");
+        MakeInteractionEfficiency("h_true_nuebar_E",              false, ";True #bar{#nu}_{e} Energy [GeV]; Efficiency",              "nuebar_E");
+        MakeInteractionEfficiency("h_true_nue_nuebar_E",          false, ";True #nu_{e} + #bar{#nu}_{e} Energy [GeV]; Efficiency",    "nue_nuebar_E");
+        MakeInteractionEfficiency("h_int_nu_E_single_bin",        false, ";True #nu_{e} + #bar{#nu}_{e}; Efficiency",                 "nu_E_nuebar_single_bin");
+        MakeInteractionEfficiency("h_int_nu_E_nue_single_bin",    false, ";True #nu_{e}; Efficiency",                                 "nu_E_nue_single_bin");
+        MakeInteractionEfficiency("h_int_nu_E_nuebar_single_bin", false, ";True #bar{#nu}_{e}; Efficiency",                           "nu_E_nuebar_single_bin");
+        MakeInteractionEfficiency("h_int_elec_E",                 false, ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",   "elec_E");
+        MakeInteractionEfficiency("h_int_elec_E_rebin",           false, ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",   "elec_E_rebin");
+        MakeInteractionEfficiency("h_int_elec_E_rebin_nue",       false, ";True e#lower[-0.5]{-} Energy [GeV]; Efficiency",           "elec_E_rebin_nue");
+        MakeInteractionEfficiency("h_int_elec_E_rebin_nuebar",    false, ";True e^{+} Energy [GeV]; Efficiency",                      "elec_E_rebin_nuebar");
+        MakeInteractionEfficiency("h_int_elec_theta",             false, ";True e#lower[-0.5]{-} + e^{+} #theta [deg]; Efficiency",   "elec_theta");
+        MakeInteractionEfficiency("h_int_elec_phi",               false, ";True e#lower[-0.5]{-} + e^{+} #phi [deg]; Efficiency",     "elec_phi");
+        MakeInteractionEfficiency("h_int_effective_ang",          false, ";True e#lower[-0.5]{-} + e^{+} Eff Ang. [deg]; Efficiency", "eff_ang");
 
         // Create the 2D folder
         _util.CreateDirectory("2D");
@@ -1972,8 +1985,8 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title,
         
         // Get the bin errors based on binomial dist = sqrt(e/N*(1-e))) where e = n/N is the efficiency
         for (int bin = 0; bin < h_clone->GetNbinsX(); bin++){
-            double n = h_clone->GetBinContent(bin+1); // selected = n
-            double N = hist.at(_util.k_unselected)->GetBinContent(bin+1); // generated = N
+            double n = h_clone->GetBinContent(bin+1)/_util.intrinsic_weight; // selected = n
+            double N = hist.at(_util.k_unselected)->GetBinContent(bin+1)/_util.intrinsic_weight; // generated = N
             eff_err.at(bin) = (1.0/std::sqrt(N))*std::sqrt( (n/N)*(1.0 - (n/N)));
         }
         
@@ -2070,7 +2083,7 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title,
         if (p == _util.k_shr_moliere_avg)
             hist_eff.at(p)->SetLineColor(30);
 
-        hist_eff.at(p)->Draw("hist, same");
+        hist_eff.at(p)->Draw("hist,E, same");
     }
 
     leg->Draw();
@@ -2148,8 +2161,8 @@ void HistogramPlotter::MakeInteractionPlot(const char *print_name, std::string c
     if (flav == "nuebar")    h_stack->GetXaxis()->SetTitle("True #bar{#nu}_{e} Energy");
     h_stack->GetYaxis()->SetTitle("Entries");
 
-    if (scale) h_stack->SetMaximum(625);
-    if (flav == "nuebar") h_stack->SetMaximum(100);
+    if (scale) h_stack->SetMaximum(1200);
+    if (flav == "nuebar") h_stack->SetMaximum(200);
 
     TH1D *h_sum = (TH1D *)hist.at(_util.k_plot_qe)->Clone("h_sum");
 
@@ -2181,7 +2194,7 @@ void HistogramPlotter::MakeInteractionPlot(const char *print_name, std::string c
     c->Print(print_name);
 }
 // -----------------------------------------------------------------------------
-void HistogramPlotter::MakeInteractionEfficiency(const char *print_name){
+void HistogramPlotter::MakeInteractionEfficiency(std::string var, bool mask_ax_label, const char* ax_name, const char *print_name){
 
     gStyle->SetOptStat(0);
 
@@ -2190,23 +2203,21 @@ void HistogramPlotter::MakeInteractionEfficiency(const char *print_name){
     hist.at(0).resize(_util.interaction_types.size());  // Unselected
     hist.at(1).resize(_util.interaction_types.size());  // Selected
 
-    TCanvas *c = new TCanvas();
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+    c->SetTopMargin(0.11);
 
     for (unsigned int k = 0; k < hist.at(0).size(); k++) {
         
-        _util.GetHist(f_nuexsec, hist.at(0).at(k), Form("Interaction/h_true_nue_nuebar_E_%s_unselected", _util.interaction_types.at(k).c_str()));
-        _util.GetHist(f_nuexsec, hist.at(1).at(k), Form("Interaction/h_true_nue_nuebar_E_%s_selected",   _util.interaction_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, hist.at(0).at(k), Form("Interaction/%s_%s_unselected", var.c_str(), _util.interaction_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, hist.at(1).at(k), Form("Interaction/%s_%s_selected",   var.c_str(), _util.interaction_types.at(k).c_str()));
         
         if (hist.at(0).at(k) == NULL || hist.at(1).at(k) == NULL) {
             std::cout << "Couldn't get all the interaction histograms so exiting function..." << std::endl;
             return;
         }
 
-        hist.at(0).at(k) ->GetXaxis()->SetTitle("True #nu_{e} Energy");
-        hist.at(0).at(k) ->GetYaxis()->SetTitle("Efficiency");
-
-        hist.at(1).at(k) ->GetXaxis()->SetTitle("True #nu_{e} Energy");
-        hist.at(1).at(k) ->GetYaxis()->SetTitle("Efficiency");
+        hist.at(0).at(k)->SetTitle(ax_name);
+        hist.at(1).at(k)->SetTitle(ax_name);
 
     }
 
@@ -2215,9 +2226,25 @@ void HistogramPlotter::MakeInteractionEfficiency(const char *print_name){
     
     // Make the ratio histogram
     for (unsigned int type = 0; type < hist.at(0).size(); type++){
+
+
+        std::vector<double> eff_err;
+        eff_err.resize(hist.at(0).at(type)->GetNbinsX());
+        
+        // Get the bin errors based on binomial dist = sqrt(e/N*(1-e))) where e = n/N is the efficiency
+        for (int bin = 0; bin <  hist.at(1).at(type)->GetNbinsX(); bin++){
+            double n = hist.at(1).at(type)->GetBinContent(bin+1)/_util.intrinsic_weight; // selected = n
+            double N = hist.at(0).at(type)->GetBinContent(bin+1)/_util.intrinsic_weight; // generated = N
+            eff_err.at(bin) = (1.0/std::sqrt(N))*std::sqrt( (n/N)*(1.0 - (n/N)));
+        }
         
         h_ratio.at(type) = (TH1D*) hist.at(1).at(type)->Clone(Form("h_ratio_%s" ,_util.interaction_types.at(type).c_str()) );
         h_ratio.at(type)  ->Divide(hist.at(0).at(type));
+
+        // Now set the bin errors after the divide
+        for (int bin = 0; bin < h_ratio.at(type)->GetNbinsX(); bin++){
+            h_ratio.at(type)->SetBinError(bin+1, eff_err.at(bin));
+        }
 
         if (type == _util.k_plot_qe){
             h_ratio.at(_util.k_plot_qe) ->SetLineColor(30); 
@@ -2239,20 +2266,21 @@ void HistogramPlotter::MakeInteractionEfficiency(const char *print_name){
         _util.IncreaseLabelSize(h_ratio.at(type), c);
         h_ratio.at(type) ->SetFillColor(0);
         h_ratio.at(type)->GetYaxis()->SetRangeUser(0, 0.6);
-        h_ratio.at(type)->GetXaxis()->SetRangeUser(0, 3.5);
+        // h_ratio.at(type)->GetXaxis()->SetRangeUser(0, 6.0);
         h_ratio.at(type)->SetLineWidth(2);
 
         if (type == _util.k_plot_nc || type == _util.k_plot_coh) continue; // Too low stats for the plot
-        h_ratio.at(type)->Draw("hist,L,same");
+        h_ratio.at(type)->Draw("hist,same");
 
     }
 
     
     
 
-    TLegend *leg_stack = new TLegend(0.55, 0.89, 0.75, 0.6);
+    TLegend *leg_stack = new TLegend(0.30, 0.7, 0.70, 0.89);
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
+    leg_stack->SetNColumns(2);
 
     // leg_stack->AddEntry(hist.at(_util.k_plot_nc), "NC", "f");
     leg_stack->AddEntry(h_ratio.at(_util.k_plot_mec), "CC MEC", "l");
@@ -2269,7 +2297,9 @@ void HistogramPlotter::MakeInteractionEfficiency(const char *print_name){
     // Add the weight labels
     // Draw_WeightLabels(c);
 
-    c->Print(print_name);
+    c->Print(Form("plots/run%s/Interaction/True_%s_interaction_efficiency.pdf", _util.run_period, print_name));
+
+    delete c;
 }
 // -----------------------------------------------------------------------------
 void HistogramPlotter::Plot2D_Signal_Background(const char *print_name, const char *histname){

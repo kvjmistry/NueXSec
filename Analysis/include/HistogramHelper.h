@@ -315,6 +315,23 @@ class HistogramHelper{
         k_TH2D_cut_MAX
     };
 
+    enum TH1D_interaction_vars {
+        k_int_nu_E_nue,
+        k_int_nu_E_nuebar,
+        k_int_nu_E_nue_nuebar,
+        k_int_nu_E_single_bin,
+        k_int_nu_E_nue_single_bin,
+        k_int_nu_E_nuebar_single_bin,
+        k_int_elec_E,
+        k_int_elec_E_rebin,
+        k_int_elec_E_rebin_nue,
+        k_int_elec_E_rebin_nuebar,
+        k_int_elec_theta,
+        k_int_elec_phi,
+        k_int_effective_ang,
+        k_INTERACTION_MAX
+    };
+
 }; // End Class Histogram Helper 
 
 #endif
