@@ -604,7 +604,7 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     
     SelectionFill(type, SC, _util.k_dEdx_max_no_tracks, counter_v );
 
-    // if ((SC.nu_pdg == 12 || SC.nu_pdg == -12) && SC.nu_e < 0.3) std::cout<<"Low nu_e E!: " <<SC.nu_e << std::endl; 
+    // if (SC.is_signal && SC.nu_e < 0.3) std::cout<<"Low elec E!: " <<SC.elec_e*1000 << " MeV" << "  | E Nu: "<< SC.nu_e*1000 << " MeV" <<  std::endl; 
 
     // **************************************************************************
     return true;

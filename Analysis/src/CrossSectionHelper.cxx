@@ -89,7 +89,7 @@ void CrossSectionHelper::Initialise(Utility _utility){
 
     std::cout << "Volume used in cuts: " << volume << std::endl;
 
-    N_target_MC   = (lar_density_data   * volume * NA * N_nuc) / m_mol; // Now use the same number of targets for MC and data since we fixed the simulated density in MCC9
+    N_target_MC   = (lar_density_mc   * volume * NA * N_nuc) / m_mol; // Now use the same number of targets for MC and data since we fixed the simulated density in MCC9
     std::cout << "Number of Target Nucleons in MC: " << N_target_MC << std::endl;
     
     N_target_Data = (lar_density_data * volume * NA * N_nuc) / m_mol;
@@ -122,7 +122,7 @@ void CrossSectionHelper::LoopEvents(){
 
         tree->GetEntry(ievent); 
 
-        if (shr_energy_cali > 6.0 && *classification == "data" ) std::cout << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins" <<std::endl;
+        if (shr_energy_cali > 4.0 && *classification == "data" ) std::cout << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins " << run << " " << subrun << " " << event <<std::endl;
 
         double cv_weight = weight; // SplinetimesTune * PPFX CV * Pi0 Tune
 
