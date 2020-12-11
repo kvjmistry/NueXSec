@@ -220,6 +220,15 @@ class HistogramHelper{
         k_eff_elec_theta,            // Efficiency as a function of electron theta
         k_eff_elec_phi,              // Efficiency as a function of electron phi
         k_eff_effective_ang,         // Efficiency as a function of the effective angle (angle between nu dir and elec dir)
+        k_eff_proton_multi,          // Efficiency as a function of the number of true protons in the interaction.
+        k_eff_proton_multi_nue,      // Efficiency as a function of the number of true protons in the interaction. Nue events only
+        k_eff_proton_multi_nuebar,   // Efficiency as a function of the number of true protons in the interaction. Nuebar events only
+        k_eff_pion_multi,            // Efficiency as a function of the number of true pions in the interaction.
+        k_eff_pion_multi_nue,        // Efficiency as a function of the number of true pions in the interaction. Nue events only
+        k_eff_pion_multi_nuebar,     // Efficiency as a function of the number of true pions in the interaction. Nuebar events only
+        k_eff_charg_par_multi,       // Efficiency as a function of the number of true charged particles (protons + pions) in the interaction.
+        k_eff_charg_par_multi_nue,   // Efficiency as a function of the number of true charged particles (protons + pions) in the interaction. Nue events only
+        k_eff_charg_par_multi_nuebar,// Efficiency as a function of the number of true charged particles (protons + pions) in the interaction. Nuebar events only
         k_TH1D_eff_MAX
     };
 
