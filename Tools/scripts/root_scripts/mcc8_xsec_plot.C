@@ -71,7 +71,7 @@ void mcc8_xsec_plot(){
     // NuWro nue + nuebar
     TH1D* h_genie_NuWro_nue_nuebar = new TH1D("h_nuwro_v2", "", 1, 0.0, 1.0);
     // h_genie_NuWro_nue_nuebar->Fill(0.5,3.8158e-39 );
-    h_genie_NuWro_nue_nuebar->Fill(0.5,3.8738945e-39 ); // with FV flux
+    h_genie_NuWro_nue_nuebar->Fill(0.5,5.9205940e-39 ); // with FV flux
     h_genie_NuWro_nue_nuebar->SetLineColor(kRed+2);
     h_genie_NuWro_nue_nuebar->SetLineWidth(3);
     h_genie_NuWro_nue_nuebar->SetLineStyle(1);

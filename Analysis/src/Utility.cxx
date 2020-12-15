@@ -549,7 +549,7 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
 void Utility::GetPiZeroWeight(double &weight, int pizero_mode, int nu_pdg, int ccnc, int npi0, double pi0_e){
 
     // Dont weight the nuecc events
-    if ( (nu_pdg == 12 || nu_pdg == -12) && ccnc == k_CC) return;
+    // if ( (nu_pdg == 12 || nu_pdg == -12) && ccnc == k_CC) return; // Actually I think we should
 
 
     // Fix the normalisation
