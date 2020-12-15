@@ -319,6 +319,7 @@ public:
     float true_nu_px;            // True Neutrino Px
     float true_nu_py;            // True Neutrino Py
     float true_nu_pz;            // True Neutrino Pz
+    double true_effective_angle; // True angle between electron and neutrino vectors
     
     float reco_nu_vtx_x;         // Reco Neutrino Vtx x
     float reco_nu_vtx_y;         // Reco Neutrino Vtx y

@@ -837,13 +837,13 @@ double SliceContainer::GetdEdxMax(){
 
     // We want to also use the dedx when it is defined properly. Sometimes, the plane can have hits but an undefined dedx
     // use the dedx where we get the max number of hits and the dedx > 0
-    int temp_shr_hits_u_tot = shr_hits_u_tot;
-    int temp_shr_hits_v_tot = shr_hits_v_tot;
-    int temp_shr_hits_y_tot = shr_hits_y_tot;
+    // int temp_shr_hits_u_tot = shr_hits_u_tot;
+    // int temp_shr_hits_v_tot = shr_hits_v_tot;
+    // int temp_shr_hits_y_tot = shr_hits_y_tot;
 
-    // int temp_shr_hits_u_tot = shr_tkfit_nhits_U; // These variables give a bigger difference in run 1 and run 3
-    // int temp_shr_hits_v_tot = shr_tkfit_nhits_V;
-    // int temp_shr_hits_y_tot = shr_tkfit_nhits_Y;
+    int temp_shr_hits_u_tot = shr_tkfit_nhits_U; // These variables give a bigger difference in run 1 and run 3
+    int temp_shr_hits_v_tot = shr_tkfit_nhits_V;
+    int temp_shr_hits_y_tot = shr_tkfit_nhits_Y;
 
     // If the dedx is undefined, set the hits to zero
     if (shr_tkfit_dedx_U <= 0) temp_shr_hits_u_tot = 0;
@@ -935,6 +935,18 @@ void SliceContainer::SetNuMIAngularVariables(){
     // Set the values
     effective_angle = shr_dir.Angle(v_targ_to_vtx) * 180 / 3.14159;
     cos_effective_angle = std::cos(shr_dir.Angle(v_targ_to_vtx));
+    
+    // Calculate the effective angle using true variables
+    TVector3 nu_dir(true_nu_px, true_nu_py, true_nu_pz); 
+    nu_dir.Unit();
+
+    TVector3 v_nu_vtx_true(true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z);
+    TVector3 v_targ_to_vtx_true = (-1*v_targ_uboone + v_nu_vtx_true).Unit(); // -1 because the vector points from uboone to tgt, we need the other way around
+
+    TVector3 elec_dir(elec_px, elec_py, elec_pz); 
+    elec_dir.Unit();
+    true_effective_angle = elec_dir.Angle(v_targ_to_vtx_true) * 180 / 3.14159;
+    
     // --
 
     // Momentum of neutrino
@@ -967,8 +979,6 @@ void SliceContainer::SetNuMIAngularVariables(){
 
     // --- Calculate the dot-product of the proxy for neutrino direction --- //
     // (the vector from the target to the reco nu vtx) and the true nu angle
-    TVector3 nu_dir(true_nu_px, true_nu_py, true_nu_pz); 
-    nu_dir.Unit();
 
     reco_true_nu_ang = nu_dir.Angle(v_targ_to_vtx) * 180/3.14159;
     // ---

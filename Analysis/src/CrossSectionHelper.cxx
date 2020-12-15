@@ -122,7 +122,7 @@ void CrossSectionHelper::LoopEvents(){
 
         tree->GetEntry(ievent); 
 
-        if (shr_energy_cali > 4.0 && *classification == "data" ) std::cout << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins" <<std::endl;
+        if (shr_energy_cali > 6.0 && *classification == "data" ) std::cout << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins" <<std::endl;
 
         double cv_weight = weight; // SplinetimesTune * PPFX CV * Pi0 Tune
 
@@ -486,7 +486,7 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
     for (unsigned int label = 0; label < reweighter_labels.size(); label++){
 
         // Call switch function
-        SwitchReweighterLabel(reweighter_labels.at(label), SC);
+        SwitchReweighterLabel(reweighter_labels[label], SC);
 
         bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
 
@@ -510,34 +510,40 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
             double weight_uni{1.0}; 
 
             double _numi_ang = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "beam");
-            SetUniverseWeight(reweighter_labels.at(label), weight_uni, weight_dirt, weight_ext, SC.weightSplineTimesTune, classification.first, cv_weight, uni, SC.nu_pdg, SC.nu_e, _numi_ang);
+            SetUniverseWeight(reweighter_labels[label], weight_uni, weight_dirt, weight_ext, SC.weightSplineTimesTune, classification.first, cv_weight, uni, SC.nu_pdg, SC.nu_e, _numi_ang);
 
             double dedx_max = SC.GetdEdxMax();
 
             // Now we got the weight for universe i, lets fill the histograms :D
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_softwaretrig).at(uni)             ->Fill(SC.swtrig,                 weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_nslice).at(uni)                   ->Fill(SC.nslice,                 weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_shower_multiplicity).at(uni)      ->Fill(SC.n_showers,              weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_track_multiplicity).at(uni)       ->Fill(SC.n_tracks,               weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_topological_score).at(uni)        ->Fill(SC.topological_score,      weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_vtx_x_sce).at(uni)                ->Fill(SC.reco_nu_vtx_sce_x,      weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_vtx_y_sce).at(uni)                ->Fill(SC.reco_nu_vtx_sce_y,      weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_vtx_z_sce).at(uni)                ->Fill(SC.reco_nu_vtx_sce_z,      weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_shower_score).at(uni)             ->Fill(SC.shr_score,              weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_shr_tkfit_dedx_max).at(uni)       ->Fill(dedx_max, weight_uni);
-            if (SC.n_tracks > 0)  h_cut_v.at(label).at(cut_index).at(_util.k_cut_shr_tkfit_dedx_max_with_tracks).at(uni)    ->Fill(dedx_max, weight_uni);
-            if (SC.n_tracks == 0) h_cut_v.at(label).at(cut_index).at(_util.k_cut_shr_tkfit_dedx_max_no_tracks).at(uni)      ->Fill(dedx_max, weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_shower_to_vtx_dist).at(uni)       ->Fill(SC.shr_distance,           weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_hits_ratio).at(uni)               ->Fill(SC.hits_ratio,             weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_CosmicIPAll3D).at(uni)            ->Fill(SC.CosmicIPAll3D,          weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_contained_fraction).at(uni)       ->Fill(SC.contained_fraction,     weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_shrmoliereavg).at(uni)            ->Fill(SC.shrmoliereavg,          weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_leading_shower_theta).at(uni)     ->Fill(SC.shr_theta * 180/3.14159,weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_leading_shower_phi).at(uni)       ->Fill(SC.shr_phi * 180/3.14159,  weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_shower_energy_cali).at(uni)       ->Fill(SC.shr_energy_cali,   weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_shower_energy_cali_rebin).at(uni) ->Fill(SC.shr_energy_cali,   weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_flash_time).at(uni)               ->Fill(SC.flash_time,   weight_uni);
-            h_cut_v.at(label).at(cut_index).at(_util.k_cut_flash_pe).at(uni)                 ->Fill(SC.flash_pe,   weight_uni);
+            // Use [] rather than .at() to speed this process up. This can cause errors if indexes go out of bound
+            h_cut_v[label][cut_index][_util.k_cut_softwaretrig][uni]             ->Fill(SC.swtrig,                 weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_nslice][uni]                   ->Fill(SC.nslice,                 weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_shower_multiplicity][uni]      ->Fill(SC.n_showers,              weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_track_multiplicity][uni]       ->Fill(SC.n_tracks,               weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_topological_score][uni]        ->Fill(SC.topological_score,      weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_vtx_x_sce][uni]                ->Fill(SC.reco_nu_vtx_sce_x,      weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_vtx_y_sce][uni]                ->Fill(SC.reco_nu_vtx_sce_y,      weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_vtx_z_sce][uni]                ->Fill(SC.reco_nu_vtx_sce_z,      weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_shower_score][uni]             ->Fill(SC.shr_score,              weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_shr_tkfit_dedx_max][uni]       ->Fill(dedx_max, weight_uni);
+            
+            if (SC.n_tracks > 0)
+                h_cut_v[label][cut_index][_util.k_cut_shr_tkfit_dedx_max_with_tracks][uni]    ->Fill(dedx_max, weight_uni);
+            
+            if (SC.n_tracks == 0)
+                h_cut_v[label][cut_index][_util.k_cut_shr_tkfit_dedx_max_no_tracks][uni]      ->Fill(dedx_max, weight_uni);
+            
+            h_cut_v[label][cut_index][_util.k_cut_shower_to_vtx_dist][uni]       ->Fill(SC.shr_distance,           weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_hits_ratio][uni]               ->Fill(SC.hits_ratio,             weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_CosmicIPAll3D][uni]            ->Fill(SC.CosmicIPAll3D,          weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_contained_fraction][uni]       ->Fill(SC.contained_fraction,     weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_shrmoliereavg][uni]            ->Fill(SC.shrmoliereavg,          weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_leading_shower_theta][uni]     ->Fill(SC.shr_theta * 180/3.14159,weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_leading_shower_phi][uni]       ->Fill(SC.shr_phi * 180/3.14159,  weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_shower_energy_cali][uni]       ->Fill(SC.shr_energy_cali,        weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_shower_energy_cali_rebin][uni] ->Fill(SC.shr_energy_cali,        weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_flash_time][uni]               ->Fill(SC.flash_time,             weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_flash_pe][uni]                 ->Fill(SC.flash_pe,               weight_uni);
         
         }
 
@@ -552,9 +558,9 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
     // Weight equal to universe weight times cv weight
     if (label == "weightsReint" || label == "weightsPPFX" || label == "CV" ){
         
-        _util.CheckWeight(vec_universes.at(uni));
+        _util.CheckWeight(vec_universes[uni]);
 
-        weight_uni = cv_weight * vec_universes.at(uni);
+        weight_uni = cv_weight * vec_universes[uni];
     }
     // This is a mc stats variation which studies the statisitcal uncertainty on the smearing matrix and efficiency by 
     // varying the signal and generated events
@@ -595,7 +601,7 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
         _util.CheckWeight(_weightSplineTimesTune);
 
         // Check the uiverse weight
-        if (std::isnan(vec_universes.at(uni)) == 1 || std::isinf(vec_universes.at(uni)) || vec_universes.at(uni) < 0 || vec_universes.at(uni) > 30) {
+        if (std::isnan(vec_universes[uni]) == 1 || std::isinf(vec_universes[uni]) || vec_universes[uni] < 0 || vec_universes[uni] > 30) {
             
             // We set the universe to be the spline times tune, so it cancels with the divide below to just return the CV weight
             // i.e. a universe weight of 1
@@ -603,7 +609,7 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
         }
 
         if (_weightSplineTimesTune == 0) weight_uni = 0.0; // Special case where the genie tune or we have thresholded events are zero
-        else weight_uni = (cv_weight * vec_universes.at(uni)) / _weightSplineTimesTune;
+        else weight_uni = (cv_weight * vec_universes[uni]) / _weightSplineTimesTune;
 
         // std::cout << vec_universes.at(uni) << " " << weight_uni << "   "<< weightSplineTimesTune<< std::endl;
 

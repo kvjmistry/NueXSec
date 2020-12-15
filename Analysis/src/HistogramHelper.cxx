@@ -383,7 +383,11 @@ void HistogramHelper::InitHistograms(){
             // Angle between the vector from target to nu vtx and the shower direction
             TH1D_hists.at(k_reco_effective_angle).at(i).at(j) = new TH1D ( Form("h_reco_effective_angle_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 13, 0, 190);
 
+            // Cosine of the Angle between the vector from target to nu vtx and the shower direction
             TH1D_hists.at(k_reco_effective_cosangle).at(i).at(j) = new TH1D ( Form("h_reco_effective_cosangle_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 16, -1, 1);
+
+            // Track PID score in the event
+            TH1D_hists.at(k_reco_trk_pid_score).at(i).at(j) = new TH1D ( Form("h_reco_trk_pid_score_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 25, -1, 1);
 
         }
         
@@ -413,6 +417,8 @@ void HistogramHelper::InitHistograms(){
             TH1D_hists_particle.at(k_reco_shr_tkfit_dedx_max_par).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_max_par_%s_%s",_util.cut_dirs.at(i).c_str(), _util.particle_types.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists_particle.at(k_reco_shr_tkfit_dedx_y_par).at(i).at(j)  = new TH1D ( Form("h_reco_shr_tkfit_dedx_y_par_%s_%s", _util.cut_dirs.at(i).c_str(), _util.particle_types.at(j).c_str()) ,"", 40, 0, 10);
 
+            // Track PID score in the event
+            TH1D_hists_particle.at(k_reco_trk_pid_score_par).at(i).at(j) = new TH1D ( Form("h_reco_trk_pid_score_par_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 25, -1, 1);
         }
     }
 
@@ -432,13 +438,13 @@ void HistogramHelper::InitHistograms(){
             }
             
             for (unsigned int l = 0; l < _util.k_cuts_MAX; l++ ){
-                TEfficiency_hists.at(k_eff_nu_E).at(l)            = new TH1D( Form("h_true_nu_E_%s",_util.cut_dirs.at(l).c_str() ), "", 15, 0, 5 );
-                TEfficiency_hists.at(k_eff_elec_E).at(l)          = new TH1D( Form("h_true_elec_E_%s",_util.cut_dirs.at(l).c_str() ), "", 15, 0, 5 );
+                TEfficiency_hists.at(k_eff_nu_E).at(l)            = new TH1D( Form("h_true_nu_E_%s",_util.cut_dirs.at(l).c_str() ), "", 15, 0, 6 );
+                TEfficiency_hists.at(k_eff_elec_E).at(l)          = new TH1D( Form("h_true_elec_E_%s",_util.cut_dirs.at(l).c_str() ), "", 15, 0, 6 );
                 TEfficiency_hists.at(k_eff_elec_E_rebin).at(l)    = new TH1D( Form("h_true_elec_E_rebin_%s", _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins.size()-1, edges);
                 TEfficiency_hists.at(k_eff_elec_E_rebin_nue).at(l)        = new TH1D( Form("h_true_elec_E_rebin_nue_%s", _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins.size()-1, edges);
                 TEfficiency_hists.at(k_eff_elec_E_rebin_nuebar).at(l)     = new TH1D( Form("h_true_elec_E_rebin_nuebar_%s", _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins.size()-1, edges);
-                TEfficiency_hists.at(k_eff_nu_E_nue).at(l)        = new TH1D( Form("h_true_nu_E_nue_%s",_util.cut_dirs.at(l).c_str() ), "", 8, 0, 5 );
-                TEfficiency_hists.at(k_eff_nu_E_nuebar).at(l)     = new TH1D( Form("h_true_nu_E_nuebar_%s",_util.cut_dirs.at(l).c_str() ), "", 8, 0, 5 );
+                TEfficiency_hists.at(k_eff_nu_E_nue).at(l)        = new TH1D( Form("h_true_nu_E_nue_%s",_util.cut_dirs.at(l).c_str() ), "", 8, 0, 6 );
+                TEfficiency_hists.at(k_eff_nu_E_nuebar).at(l)     = new TH1D( Form("h_true_nu_E_nuebar_%s",_util.cut_dirs.at(l).c_str() ), "", 8, 0, 6 );
                 TEfficiency_hists.at(k_eff_nu_E_single_bin).at(l) = new TH1D( Form("h_true_nu_E_single_bin_%s",_util.cut_dirs.at(l).c_str() ), "", 1, 0, 10);
                 TEfficiency_hists.at(k_eff_nu_E_nue_single_bin).at(l)    = new TH1D( Form("h_true_nu_E_nue_single_bin_%s",_util.cut_dirs.at(l).c_str() ), "", 1, 0, 10 );
                 TEfficiency_hists.at(k_eff_nu_E_nuebar_single_bin).at(l) = new TH1D( Form("h_true_nu_E_nuebar_single_bin_%s",_util.cut_dirs.at(l).c_str() ), "", 1, 0, 10 );
@@ -447,6 +453,7 @@ void HistogramHelper::InitHistograms(){
                 TEfficiency_hists.at(k_eff_nu_phi).at(l)            = new TH1D( Form("h_eff_nu_phi_%s",_util.cut_dirs.at(l).c_str() ), "", 14, 0, 70 );
                 TEfficiency_hists.at(k_eff_elec_theta).at(l)        = new TH1D( Form("h_eff_elec_theta_%s",_util.cut_dirs.at(l).c_str() ), "", 13, 0, 190 );
                 TEfficiency_hists.at(k_eff_elec_phi).at(l)          = new TH1D( Form("h_eff_elec_phi_%s",_util.cut_dirs.at(l).c_str() ), "", 14, -190, 190 );
+                TEfficiency_hists.at(k_eff_effective_ang).at(l)     = new TH1D( Form("h_eff_effective_ang_%s",_util.cut_dirs.at(l).c_str() ), "", 13, 0, 190 );
             }
             
         }
@@ -482,11 +489,11 @@ void HistogramHelper::InitHistograms(){
             TH1D_true_hists.at(i).at(k_true_vtx_y_sce) = new TH1D( Form("h_true_vtx_y_sce_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ) ,";True #nu_{e} + #bar{#nu}_{e} Vtx y SCE Corr. [cm]; Entries", 20, -10, 120);
             TH1D_true_hists.at(i).at(k_true_vtx_z_sce) = new TH1D( Form("h_true_vtx_z_sce_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ) ,";True #nu_{e} + #bar{#nu}_{e} Vtx z SCE Corr. [cm]; Entries", 40, -10, 1050);
             TH1D_true_hists.at(i).at(k_true_nu_ang_targ)     = new TH1D( Form("h_true_nu_ang_targ_%s_%s",     _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True #nu_{e} + #bar{#nu}_{e} Angle wrt NuMI Targ Vec [deg]; Entries",  40, 0, 180 );
-            TH1D_true_hists.at(i).at(k_true_elec_ang_targ)   = new TH1D( Form("h_true_elec_ang_targ_%s_%s",   _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e^{-} + e^{+} Angle wrt NuMI Targ Vec [deg]; Entries", 25, 0, 180 );
+            TH1D_true_hists.at(i).at(k_true_elec_ang_targ)   = new TH1D( Form("h_true_elec_ang_targ_%s_%s",   _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e#lower[-0.5]{-} + e^{+} Angle wrt NuMI Targ Vec [deg]; Entries", 25, 0, 180 );
 
-            TH1D_true_hists.at(i).at(k_true_elec_E)      = new TH1D( Form("h_true_elec_E_%s_%s",      _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e^{-} + e^{+} Energy [GeV]; Entries",                15, 0, 5 );
-            TH1D_true_hists.at(i).at(k_true_elec_theta)  = new TH1D( Form("h_true_elec_theta_%s_%s",  _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e^{-} + e^{+} #theta [deg]; Entries",            14, 0, 180 );
-            TH1D_true_hists.at(i).at(k_true_elec_phi)    = new TH1D( Form("h_true_elec_phi_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e^{-} + e^{+} #phi [deg]; Entries",              25, -180, 180);
+            TH1D_true_hists.at(i).at(k_true_elec_E)      = new TH1D( Form("h_true_elec_E_%s_%s",      _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries",                15, 0, 5 );
+            TH1D_true_hists.at(i).at(k_true_elec_theta)  = new TH1D( Form("h_true_elec_theta_%s_%s",  _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e#lower[-0.5]{-} + e^{+} #theta [deg]; Entries",            14, 0, 180 );
+            TH1D_true_hists.at(i).at(k_true_elec_phi)    = new TH1D( Form("h_true_elec_phi_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e#lower[-0.5]{-} + e^{+} #phi [deg]; Entries",              25, -180, 180);
 
             TH1D_true_hists.at(i).at(k_reco_true_ang)    = new TH1D( Form("h_reco_true_ang_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), "; Angle (Reco to True) Nu Dir [deg]; Entries",              25, -2, 20);
 
@@ -498,9 +505,9 @@ void HistogramHelper::InitHistograms(){
             TH2D_true_hists.at(i).at(k_true_nue_vtx_z_y)     = new TH2D( Form("h_true_nue_vtx_z_y_%s_%s",     _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} + #bar{#nu}_{e} Vtx Z [cm] ;True #nu_{e} + #bar{#nu}_{e} Vtx Y [cm]", 40, -10, 1050, 20, -10, 120);
             TH2D_true_hists.at(i).at(k_true_nue_vtx_z_y_sce) = new TH2D( Form("h_true_nue_vtx_z_y_sce_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),";True #nu_{e} + #bar{#nu}_{e} Vtx Z  SCE Corr. [cm];True #nu_{e} + #bar{#nu}_{e} Vtx Y SCE Corr. [cm]", 40, -10, 1050, 20, -10, 120);
         
-            TH2D_true_hists.at(i).at(k_true_elec_E_reco_elec_E) = new TH2D( Form("h_true_elec_E_reco_elec_E_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True e^{-} + e^{+} Energy [GeV] ;Reco Shower Energy [GeV]", _util.reco_shr_bins.size()-1, edges, _util.reco_shr_bins.size()-1, edges);
+            TH2D_true_hists.at(i).at(k_true_elec_E_reco_elec_E) = new TH2D( Form("h_true_elec_E_reco_elec_E_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True e#lower[-0.5]{-} + e^{+} Energy [GeV] ;Reco Shower Energy [GeV]", _util.reco_shr_bins.size()-1, edges, _util.reco_shr_bins.size()-1, edges);
             TH2D_true_hists.at(i).at(k_true_nu_E_reco_nu_E)     = new TH2D( Form("h_true_nu_E_reco_nu_E_%s_%s",             _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} + #bar{#nu}_{e} Energy [GeV] ;Reco #nu_{e} + #bar{#nu}_{e} Energy [GeV]", 25, 0, 4, 25, 0, 4);
-            TH2D_true_hists.at(i).at(k_true_elec_E_reco_elec_E_extra_bins) = new TH2D( Form("h_true_elec_E_reco_elec_E_extra_bins_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True e^{-} Energy [GeV] ;Reco Shower Energy [GeV]", 50, 0, 4, 50, 0, 4);
+            TH2D_true_hists.at(i).at(k_true_elec_E_reco_elec_E_extra_bins) = new TH2D( Form("h_true_elec_E_reco_elec_E_extra_bins_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True e#lower[-0.5]{-} Energy [GeV] ;Reco Shower Energy [GeV]", 50, 0, 4, 50, 0, 4);
             TH2D_true_hists.at(i).at(k_true_nu_E_reco_nu_E_extra_bins)     = new TH2D( Form("h_true_nu_E_reco_nu_E_extra_bins_%s_%s",             _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} + #bar{#nu}_{e} Energy [GeV] ;Reco #nu_{e} + #bar{#nu}_{e} Energy [GeV]", 50, 0, 4, 50, 0, 4);
 
             TH2D_true_hists.at(i).at(k_true_nu_vtx_x_reco_nu_vtx_x)  = new TH2D( Form("h_true_nu_vtx_x_reco_nu_vtx_x_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} + #bar{#nu}_{e} Vtx X [cm] ;Reco #nu_{e} + #bar{#nu}_{e} Vtx X [cm]", 20, -10, 270, 20, -10, 270);
@@ -528,30 +535,48 @@ void HistogramHelper::InitHistograms(){
     TH1D_flash_hists.at(k_flash_pe_sid0)   = new TH1D( Form("h_flash_pe_sid0_%s", _util.type_prefix.at(_type).c_str()),   "; Largest Flash Intensity (Non Neutrino Canidate) [PE]; Entries", 40, 0, 10000 );
     
     // Interaction Histograms
-    TH1D_interaction_hists.resize(3); // nue+nuebar, nue, nuebar
+    TH1D_interaction_hists.resize(k_INTERACTION_MAX); // All the interaction histograms
     
     for (unsigned int l=0; l < TH1D_interaction_hists.size(); l++){
         TH1D_interaction_hists.at(l).resize(2); // Unselected and Selected
     }
     
+    // Interaction types
     for (unsigned int l=0; l < TH1D_interaction_hists.size(); l++){
         for (unsigned int i = 0; i < TH1D_interaction_hists.at(l).size(); i++){
             TH1D_interaction_hists.at(l).at(i).resize(_util.k_interactions_MAX);
         }
     }
     
-    for (unsigned int p =0 ; p < TH1D_interaction_hists.at(0).at(0).size(); p++ ){
-        TH1D_interaction_hists.at(0).at(0).at(p) = new TH1D( Form("h_true_nue_nuebar_E_%s_unselected", _util.interaction_types.at(p).c_str() ), "; True #nu_{e} + #bar{nu}_{e} Energy; Entries", 15, 0, 5 );
-        TH1D_interaction_hists.at(0).at(1).at(p) = new TH1D( Form("h_true_nue_nuebar_E_%s_selected",   _util.interaction_types.at(p).c_str() ), "; True #nu_{e} + #bar{nu}_{e} Energy; Entries", 15, 0, 5 );
-        TH1D_interaction_hists.at(1).at(0).at(p) = new TH1D( Form("h_true_nue_E_%s_unselected",        _util.interaction_types.at(p).c_str() ), "; True #nu_{e} Energy; Entries", 15, 0, 5 );
-        TH1D_interaction_hists.at(1).at(1).at(p) = new TH1D( Form("h_true_nue_E_%s_selected",          _util.interaction_types.at(p).c_str() ), "; True #nu_{e} Energy; Entries", 15, 0, 5 );
-        TH1D_interaction_hists.at(2).at(0).at(p) = new TH1D( Form("h_true_nuebar_E_%s_unselected",     _util.interaction_types.at(p).c_str() ), "; True #bar{#nu}_{e} Energy; Entries", 15, 0, 5 );
-        TH1D_interaction_hists.at(2).at(1).at(p) = new TH1D( Form("h_true_nuebar_E_%s_selected",       _util.interaction_types.at(p).c_str() ), "; True #bar{#nu}_{e} Energy; Entries", 15, 0, 5 );
+
+    // Loop over the unselected/selected
+    for (int i = 0; i < 2; i++){
+
+        std::string stage = "unselected";
+        
+        if (i == 1)
+            stage = "selected";
+    
+        // Loop over the interaction types
+        for (unsigned int p =0 ; p < TH1D_interaction_hists.at(0).at(0).size(); p++ ){
+            double* edges = &_util.reco_shr_bins[0]; // Cast to an array 
+
+            TH1D_interaction_hists.at(k_int_nu_E_nue_nuebar).at(i).at(p)        = new TH1D( Form("h_true_nue_nuebar_E_%s_%s",          _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True #nu_{e} + #bar{nu}_{e} Energy [GeV]; Entries",   8, 0, 6 );
+            TH1D_interaction_hists.at(k_int_nu_E_nue).at(i).at(p)               = new TH1D( Form("h_true_nue_E_%s_%s",                 _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True #nu_{e} Energy [GeV]; Entries",                  8, 0, 6 );
+            TH1D_interaction_hists.at(k_int_nu_E_nuebar).at(i).at(p)            = new TH1D( Form("h_true_nuebar_E_%s_%s",              _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True #bar{#nu}_{e} Energy [GeV]; Entries",            8, 0, 6 );
+            TH1D_interaction_hists.at(k_int_nu_E_single_bin).at(i).at(p)        = new TH1D( Form("h_int_nu_E_single_bin_%s_%s",        _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True #nu_{e}; Entries",                               1, 0, 10 );
+            TH1D_interaction_hists.at(k_int_nu_E_nue_single_bin).at(i).at(p)    = new TH1D( Form("h_int_nu_E_nue_single_bin_%s_%s",    _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True #bar{nu}_{e}; Entries",                          1, 0, 10 );
+            TH1D_interaction_hists.at(k_int_nu_E_nuebar_single_bin).at(i).at(p) = new TH1D( Form("h_int_nu_E_nuebar_single_bin_%s_%s", _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True #nu_{e} + #bar{nu}_{e}; Entries",                1, 0, 10 );
+            TH1D_interaction_hists.at(k_int_elec_E).at(i).at(p)                 = new TH1D( Form("h_int_elec_E_%s_%s",                 _util.interaction_types.at(p).c_str(), stage.c_str() ), "; e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries",      8, 0, 6 );
+            TH1D_interaction_hists.at(k_int_elec_E_rebin).at(i).at(p)           = new TH1D( Form("h_int_elec_E_rebin_%s_%s",           _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries", _util.reco_shr_bins.size()-1, edges );
+            TH1D_interaction_hists.at(k_int_elec_E_rebin_nue).at(i).at(p)       = new TH1D( Form("h_int_elec_E_rebin_nue_%s_%s",       _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e#lower[-0.5]{-} Energy [GeV]; Entries",         _util.reco_shr_bins.size()-1, edges );
+            TH1D_interaction_hists.at(k_int_elec_E_rebin_nuebar).at(i).at(p)    = new TH1D( Form("h_int_elec_E_rebin_nuebar_%s_%s",    _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e^{+} Energy [GeV]; Entries",                    _util.reco_shr_bins.size()-1, edges );
+            TH1D_interaction_hists.at(k_int_elec_theta).at(i).at(p)             = new TH1D( Form("h_int_elec_theta_%s_%s",             _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries", 13, 0, 190 );
+            TH1D_interaction_hists.at(k_int_elec_phi).at(i).at(p)               = new TH1D( Form("h_int_elec_phi_%s_%s",               _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries", 14, -190, 190 );
+            TH1D_interaction_hists.at(k_int_effective_ang).at(i).at(p)          = new TH1D( Form("h_int_effective_ang_%s_%s",          _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries", 13, 0, 190 );
+        }
     }
-
-    
-    
-
+        
     // 2D signal and background separation plots
     
     // Resizing the histograms
@@ -662,7 +687,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
     TH1D_hists.at(k_reco_vtx_y_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_y, weight);
     TH1D_hists.at(k_reco_vtx_z_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_z, weight);
  
-    TH1D_hists.at(k_reco_leading_mom).at(cut_index).at(classification_index)->Fill(reco_shr_p, weight);
+    TH1D_hists.at(k_reco_leading_mom).at(cut_index).at(classification_index)->Fill(SC.shr_p, weight);
     
     TH1D_hists.at(k_reco_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.shr_distance, weight);
 
@@ -792,6 +817,10 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
     
     TH1D_hists.at(k_reco_effective_cosangle).at(cut_index).at(classification_index)->Fill(SC.cos_effective_angle, weight);
     
+    for (unsigned int trk = 0; trk < SC.trk_llr_pid_score_v->size(); trk++){
+        TH1D_hists.at(k_reco_trk_pid_score).at(cut_index).at(classification_index)->Fill(SC.trk_llr_pid_score_v->at(trk), weight);
+    }
+
     
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
@@ -892,38 +921,128 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
             // True nue interaction histograms
             if (interaction == "nue_cc_qe" || interaction == "nue_bar_cc_qe"){
                 
-                TH1D_interaction_hists.at(0).at(index).at(_util.k_plot_qe)->Fill(SC.nu_e, weight);
+                // All 
+                TH1D_interaction_hists.at(k_int_nu_E_nue_nuebar).at(index).at(_util.k_plot_qe)->Fill(SC.nu_e, weight);
+                TH1D_interaction_hists.at(k_int_nu_E_single_bin).at(index).at(_util.k_plot_qe)->Fill(weight);
+                TH1D_interaction_hists.at(k_int_elec_E)         .at(index).at(_util.k_plot_qe)->Fill(SC.elec_e, weight);
+                TH1D_interaction_hists.at(k_int_elec_E_rebin)   .at(index).at(_util.k_plot_qe)->Fill(SC.elec_e, weight);
+                TH1D_interaction_hists.at(k_int_elec_theta)     .at(index).at(_util.k_plot_qe)->Fill(SC.elec_theta, weight);
+                TH1D_interaction_hists.at(k_int_elec_phi)       .at(index).at(_util.k_plot_qe)->Fill(SC.elec_phi, weight);
+                TH1D_interaction_hists.at(k_int_effective_ang)  .at(index).at(_util.k_plot_qe)->Fill(SC.true_effective_angle, weight);
                 
-                if (interaction == "nue_cc_qe")     TH1D_interaction_hists.at(1).at(index).at(_util.k_plot_qe)->Fill(SC.nu_e, weight);
-                if (interaction == "nue_bar_cc_qe") TH1D_interaction_hists.at(2).at(index).at(_util.k_plot_qe)->Fill(SC.nu_e, weight);
+                // Nue
+                if (interaction == "nue_cc_qe")     {
+                    TH1D_interaction_hists.at(k_int_nu_E_nue).at(index).at(_util.k_plot_qe)->Fill(SC.nu_e, weight);
+                    TH1D_interaction_hists.at(k_int_nu_E_nue_single_bin).at(index).at(_util.k_plot_qe)->Fill(weight);
+                    TH1D_interaction_hists.at(k_int_elec_E_rebin_nue)   .at(index).at(_util.k_plot_qe)->Fill(SC.elec_e, weight);
+                }
+
+                // Nuebar
+                if (interaction == "nue_bar_cc_qe") {
+                    TH1D_interaction_hists.at(k_int_nu_E_nuebar).at(index).at(_util.k_plot_qe)->Fill(SC.nu_e, weight);
+                    TH1D_interaction_hists.at(k_int_nu_E_nuebar_single_bin).at(index).at(_util.k_plot_qe)->Fill(weight);
+                    TH1D_interaction_hists.at(k_int_elec_E_rebin_nuebar)   .at(index).at(_util.k_plot_qe)->Fill(SC.elec_e, weight);
+                }
             }
             else if (interaction == "nue_cc_res" || interaction == "nue_bar_cc_res"){
                 
-                TH1D_interaction_hists.at(0).at(index).at(_util.k_plot_res)->Fill(SC.nu_e, weight);
+                // All
+                TH1D_interaction_hists.at(k_int_nu_E_nue_nuebar).at(index).at(_util.k_plot_res)->Fill(SC.nu_e, weight);
+                TH1D_interaction_hists.at(k_int_nu_E_single_bin).at(index).at(_util.k_plot_res)->Fill(weight);
+                TH1D_interaction_hists.at(k_int_elec_E)         .at(index).at(_util.k_plot_res)->Fill(SC.elec_e, weight);
+                TH1D_interaction_hists.at(k_int_elec_E_rebin)   .at(index).at(_util.k_plot_res)->Fill(SC.elec_e, weight);
+                TH1D_interaction_hists.at(k_int_elec_theta)     .at(index).at(_util.k_plot_res)->Fill(SC.elec_theta, weight);
+                TH1D_interaction_hists.at(k_int_elec_phi)       .at(index).at(_util.k_plot_res)->Fill(SC.elec_phi, weight);
+                TH1D_interaction_hists.at(k_int_effective_ang)  .at(index).at(_util.k_plot_res)->Fill(SC.true_effective_angle, weight);
                 
-                if (interaction == "nue_cc_res")     TH1D_interaction_hists.at(1).at(index).at(_util.k_plot_res)->Fill(SC.nu_e, weight);
-                if (interaction == "nue_bar_cc_res") TH1D_interaction_hists.at(2).at(index).at(_util.k_plot_res)->Fill(SC.nu_e, weight);
+                // Nue
+                if (interaction == "nue_cc_res"){     
+                    TH1D_interaction_hists.at(k_int_nu_E_nue).at(index).at(_util.k_plot_res)->Fill(SC.nu_e, weight);
+                    TH1D_interaction_hists.at(k_int_nu_E_nue_single_bin).at(index).at(_util.k_plot_res)->Fill(weight);
+                    TH1D_interaction_hists.at(k_int_elec_E_rebin_nue)   .at(index).at(_util.k_plot_res)->Fill(SC.elec_e, weight);
+                }
+
+                // Nuebar
+                if (interaction == "nue_bar_cc_res"){ 
+                    TH1D_interaction_hists.at(k_int_nu_E_nuebar).at(index).at(_util.k_plot_res)->Fill(SC.nu_e, weight);
+                    TH1D_interaction_hists.at(k_int_nu_E_nuebar_single_bin).at(index).at(_util.k_plot_res)->Fill(weight);
+                    TH1D_interaction_hists.at(k_int_elec_E_rebin_nuebar)   .at(index).at(_util.k_plot_res)->Fill(SC.elec_e, weight);
+                }
             }
             else if (interaction == "nue_cc_dis" || interaction == "nue_bar_cc_dis"){
                 
-                TH1D_interaction_hists.at(0).at(index).at(_util.k_plot_dis)->Fill(SC.nu_e, weight);
+                // All
+                TH1D_interaction_hists.at(k_int_nu_E_nue_nuebar).at(index).at(_util.k_plot_dis)->Fill(SC.nu_e, weight);
+                TH1D_interaction_hists.at(k_int_nu_E_single_bin).at(index).at(_util.k_plot_dis)->Fill(weight);
+                TH1D_interaction_hists.at(k_int_elec_E)         .at(index).at(_util.k_plot_dis)->Fill(SC.elec_e, weight);
+                TH1D_interaction_hists.at(k_int_elec_E_rebin)   .at(index).at(_util.k_plot_dis)->Fill(SC.elec_e, weight);
+                TH1D_interaction_hists.at(k_int_elec_theta)     .at(index).at(_util.k_plot_dis)->Fill(SC.elec_theta, weight);
+                TH1D_interaction_hists.at(k_int_elec_phi)       .at(index).at(_util.k_plot_dis)->Fill(SC.elec_phi, weight);
+                TH1D_interaction_hists.at(k_int_effective_ang)  .at(index).at(_util.k_plot_dis)->Fill(SC.true_effective_angle, weight);
                 
-                if (interaction == "nue_cc_dis")     TH1D_interaction_hists.at(1).at(index).at(_util.k_plot_dis)->Fill(SC.nu_e, weight);
-                if (interaction == "nue_bar_cc_dis") TH1D_interaction_hists.at(2).at(index).at(_util.k_plot_dis)->Fill(SC.nu_e, weight);
+                // Nue
+                if (interaction == "nue_cc_dis"){     
+                    TH1D_interaction_hists.at(k_int_nu_E_nue).at(index).at(_util.k_plot_dis)->Fill(SC.nu_e, weight);
+                    TH1D_interaction_hists.at(k_int_nu_E_nue_single_bin).at(index).at(_util.k_plot_dis)->Fill(weight);
+                    TH1D_interaction_hists.at(k_int_elec_E_rebin_nue)   .at(index).at(_util.k_plot_dis)->Fill(SC.elec_e, weight);
+                }
+
+                // Nuebar
+                if (interaction == "nue_bar_cc_dis"){ 
+                    TH1D_interaction_hists.at(k_int_nu_E_nuebar).at(index).at(_util.k_plot_dis)->Fill(SC.nu_e, weight);
+                    TH1D_interaction_hists.at(k_int_nu_E_nuebar_single_bin).at(index).at(_util.k_plot_dis)->Fill(weight);
+                    TH1D_interaction_hists.at(k_int_elec_E_rebin_nuebar)   .at(index).at(_util.k_plot_dis)->Fill(SC.elec_e, weight);
+                }
             }
             else if (interaction == "nue_cc_coh" || interaction == "nue_bar_cc_coh"){
                 
-                TH1D_interaction_hists.at(0).at(index).at(_util.k_plot_coh)->Fill(SC.nu_e, weight);
+                // All
+                TH1D_interaction_hists.at(k_int_nu_E_nue_nuebar).at(index).at(_util.k_plot_coh)->Fill(SC.nu_e, weight);
+                TH1D_interaction_hists.at(k_int_nu_E_single_bin).at(index).at(_util.k_plot_coh)->Fill(weight);
+                TH1D_interaction_hists.at(k_int_elec_E)         .at(index).at(_util.k_plot_coh)->Fill(SC.elec_e, weight);
+                TH1D_interaction_hists.at(k_int_elec_E_rebin)   .at(index).at(_util.k_plot_coh)->Fill(SC.elec_e, weight);
+                TH1D_interaction_hists.at(k_int_elec_theta)     .at(index).at(_util.k_plot_coh)->Fill(SC.elec_theta, weight);
+                TH1D_interaction_hists.at(k_int_elec_phi)       .at(index).at(_util.k_plot_coh)->Fill(SC.elec_phi, weight);
+                TH1D_interaction_hists.at(k_int_effective_ang)  .at(index).at(_util.k_plot_coh)->Fill(SC.true_effective_angle, weight);
                 
-                if (interaction == "nue_cc_coh")     TH1D_interaction_hists.at(1).at(index).at(_util.k_plot_coh)->Fill(SC.nu_e, weight);
-                if (interaction == "nue_bar_cc_coh") TH1D_interaction_hists.at(2).at(index).at(_util.k_plot_coh)->Fill(SC.nu_e, weight);
+                // Nue
+                if (interaction == "nue_cc_coh"){     
+                    TH1D_interaction_hists.at(k_int_nu_E_nue).at(index).at(_util.k_plot_coh)->Fill(SC.nu_e, weight);
+                    TH1D_interaction_hists.at(k_int_nu_E_nue_single_bin).at(index).at(_util.k_plot_coh)->Fill(weight);
+                    TH1D_interaction_hists.at(k_int_elec_E_rebin_nue)   .at(index).at(_util.k_plot_coh)->Fill(SC.elec_e, weight);
+                }
+
+                // Nuebar
+                if (interaction == "nue_bar_cc_coh"){ 
+                    TH1D_interaction_hists.at(k_int_nu_E_nuebar).at(index).at(_util.k_plot_coh)->Fill(SC.nu_e, weight);
+                    TH1D_interaction_hists.at(k_int_nu_E_nuebar_single_bin).at(index).at(_util.k_plot_coh)->Fill(weight);
+                    TH1D_interaction_hists.at(k_int_elec_E_rebin_nuebar)   .at(index).at(_util.k_plot_coh)->Fill(SC.elec_e, weight);
+                }
             }
             else if (interaction == "nue_cc_mec" || interaction == "nue_bar_cc_mec"){
                 
-                TH1D_interaction_hists.at(0).at(index).at(_util.k_plot_mec)->Fill(SC.nu_e, weight);
+                // All
+                TH1D_interaction_hists.at(k_int_nu_E_nue_nuebar).at(index).at(_util.k_plot_mec)->Fill(SC.nu_e, weight);
+                TH1D_interaction_hists.at(k_int_nu_E_single_bin).at(index).at(_util.k_plot_mec)->Fill(weight);
+                TH1D_interaction_hists.at(k_int_elec_E)         .at(index).at(_util.k_plot_mec)->Fill(SC.elec_e, weight);
+                TH1D_interaction_hists.at(k_int_elec_E_rebin)   .at(index).at(_util.k_plot_mec)->Fill(SC.elec_e, weight);
+                TH1D_interaction_hists.at(k_int_elec_theta)     .at(index).at(_util.k_plot_mec)->Fill(SC.elec_theta, weight);
+                TH1D_interaction_hists.at(k_int_elec_phi)       .at(index).at(_util.k_plot_mec)->Fill(SC.elec_phi, weight);
+                TH1D_interaction_hists.at(k_int_effective_ang)  .at(index).at(_util.k_plot_mec)->Fill(SC.true_effective_angle, weight);
                 
-                if (interaction == "nue_cc_mec")     TH1D_interaction_hists.at(1).at(index).at(_util.k_plot_mec)->Fill(SC.nu_e, weight);
-                if (interaction == "nue_bar_cc_mec") TH1D_interaction_hists.at(2).at(index).at(_util.k_plot_mec)->Fill(SC.nu_e, weight);
+                // Nue
+                if (interaction == "nue_cc_mec"){     
+                    TH1D_interaction_hists.at(k_int_nu_E_nue).at(index).at(_util.k_plot_mec)->Fill(SC.nu_e, weight);
+                    TH1D_interaction_hists.at(k_int_nu_E_nue_single_bin).at(index).at(_util.k_plot_mec)->Fill(weight);
+                    TH1D_interaction_hists.at(k_int_elec_E_rebin_nue)   .at(index).at(_util.k_plot_mec)->Fill(SC.elec_e, weight);
+                }
+
+                // Nuebar
+                if (interaction == "nue_bar_cc_mec"){ 
+                    TH1D_interaction_hists.at(k_int_nu_E_nuebar).at(index).at(_util.k_plot_mec)->Fill(SC.nu_e, weight);
+                    TH1D_interaction_hists.at(k_int_nu_E_nuebar_single_bin).at(index).at(_util.k_plot_mec)->Fill(weight);
+                    TH1D_interaction_hists.at(k_int_elec_E_rebin_nuebar)   .at(index).at(_util.k_plot_mec)->Fill(SC.elec_e, weight);
+                }
             }
             // NC
             else {
@@ -1244,6 +1363,7 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
             TEfficiency_hists.at(k_eff_nu_phi).at(cut_index)           ->Fill(SC.nu_phi, weight);
             TEfficiency_hists.at(k_eff_elec_theta).at(cut_index)       ->Fill(SC.elec_theta, weight);
             TEfficiency_hists.at(k_eff_elec_phi).at(cut_index)         ->Fill(SC.elec_phi, weight);
+            TEfficiency_hists.at(k_eff_effective_ang).at(cut_index)    ->Fill(SC.true_effective_angle, weight);
 
         }
         
@@ -1275,6 +1395,7 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
             TEfficiency_hists.at(k_eff_nu_phi).at(cut_index)         ->Fill(SC.nu_phi, weight);
             TEfficiency_hists.at(k_eff_elec_theta).at(cut_index)     ->Fill(SC.elec_theta, weight);
             TEfficiency_hists.at(k_eff_elec_phi).at(cut_index)       ->Fill(SC.elec_phi, weight);
+            TEfficiency_hists.at(k_eff_effective_ang).at(cut_index)  ->Fill(SC.true_effective_angle, weight);
         }
     
         // Nue only
@@ -1355,22 +1476,18 @@ void HistogramHelper::WriteInteractions(){
     bool bool_dir = _util.GetDirectory(f_nuexsec, dir ,"Interaction");
     if (bool_dir) dir->cd();
     
-    // TH1D
-    for (unsigned int p = 0; p < TH1D_interaction_hists.at(0).at(0).size(); p++){
-        TH1D_interaction_hists.at(0).at(0).at(p)->SetOption("hist,E");
-        TH1D_interaction_hists.at(0).at(0).at(p)->Write("",TObject::kOverwrite);
-        TH1D_interaction_hists.at(0).at(1).at(p)->SetOption("hist,E");
-        TH1D_interaction_hists.at(0).at(1).at(p)->Write("",TObject::kOverwrite);
+    // Loop over the histogram types
+    for (unsigned int hist = 0; hist < TH1D_interaction_hists.size(); hist++){
+        
+        // Loop over the stages
+        for (unsigned int stage = 0; stage < TH1D_interaction_hists.at(0).size(); stage++){
 
-        TH1D_interaction_hists.at(1).at(0).at(p)->SetOption("hist,E");
-        TH1D_interaction_hists.at(1).at(0).at(p)->Write("",TObject::kOverwrite);
-        TH1D_interaction_hists.at(1).at(1).at(p)->SetOption("hist,E");
-        TH1D_interaction_hists.at(1).at(1).at(p)->Write("",TObject::kOverwrite);
-
-        TH1D_interaction_hists.at(2).at(0).at(p)->SetOption("hist,E");
-        TH1D_interaction_hists.at(2).at(0).at(p)->Write("",TObject::kOverwrite);
-        TH1D_interaction_hists.at(2).at(1).at(p)->SetOption("hist,E");
-        TH1D_interaction_hists.at(2).at(1).at(p)->Write("",TObject::kOverwrite);
+            // loop over the variables
+            for (unsigned int p = 0; p < TH1D_interaction_hists.at(0).at(0).size(); p++){
+                TH1D_interaction_hists.at(hist).at(stage).at(p)->SetOption("hist,E");
+                TH1D_interaction_hists.at(hist).at(stage).at(p)->Write("",TObject::kOverwrite);
+            }
+        }
     }
     
     

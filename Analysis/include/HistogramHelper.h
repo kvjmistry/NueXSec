@@ -190,6 +190,7 @@ class HistogramHelper{
         k_reco_single_bin,                                                      // Just fill with weight. We need this to get the uncertainty on the purity
         k_reco_effective_angle,                                                 // Angle between vector from target to vertex and shower direction.
         k_reco_effective_cosangle,                                              // Cosine of the Angle between vector from target to vertex and shower direction.
+        k_reco_trk_pid_score,                                                   // The PID score for tracks in the event
         k_TH1D_MAX
     };
 
@@ -197,6 +198,7 @@ class HistogramHelper{
     enum TH1D_par_hist_vars {
         k_reco_shr_tkfit_dedx_max_par,  // dEdx in the plane with most hits with trackfit 1x4 cm box
         k_reco_shr_tkfit_dedx_y_par,    // dEdx in the collection plane with trackfit 1x4 cm box
+        k_reco_trk_pid_score_par,           // Track PID Score
         k_TH1D_par_MAX
     };
 
@@ -217,6 +219,7 @@ class HistogramHelper{
         k_eff_nu_phi,                // Efficiency as a function of nu phi
         k_eff_elec_theta,            // Efficiency as a function of electron theta
         k_eff_elec_phi,              // Efficiency as a function of electron phi
+        k_eff_effective_ang,         // Efficiency as a function of the effective angle (angle between nu dir and elec dir)
         k_TH1D_eff_MAX
     };
 
@@ -310,6 +313,23 @@ class HistogramHelper{
     enum TH2D_cut_vars {
         k_2D_dedx_shower_energy,      // 2D plot of dedx and reconstrcted shower energy
         k_TH2D_cut_MAX
+    };
+
+    enum TH1D_interaction_vars {
+        k_int_nu_E_nue,
+        k_int_nu_E_nuebar,
+        k_int_nu_E_nue_nuebar,
+        k_int_nu_E_single_bin,
+        k_int_nu_E_nue_single_bin,
+        k_int_nu_E_nuebar_single_bin,
+        k_int_elec_E,
+        k_int_elec_E_rebin,
+        k_int_elec_E_rebin_nue,
+        k_int_elec_E_rebin_nuebar,
+        k_int_elec_theta,
+        k_int_elec_phi,
+        k_int_effective_ang,
+        k_INTERACTION_MAX
     };
 
 }; // End Class Histogram Helper 

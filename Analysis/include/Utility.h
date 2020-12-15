@@ -133,7 +133,7 @@ public:
     std::string reset   = "\033[0m";
 
     // Bins for the reconstructed shower energy
-    std::vector<double> reco_shr_bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 4.0};
+    std::vector<double> reco_shr_bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 6.0};
     
     bool slim                      = false;
     bool make_histos               = false;

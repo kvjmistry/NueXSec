@@ -67,7 +67,7 @@ bool SelectionCuts::e_candidate(SliceContainer &SC){
 }
 // -----------------------------------------------------------------------------
 bool SelectionCuts::topo_score(SliceContainer &SC){
-    if (SC.topological_score > 0.2) return true; // pass 
+    if (SC.topological_score <= 0.01 || SC.topological_score > 0.2) return true; // pass 
     else return false;                            // fail
 }
 // -----------------------------------------------------------------------------
