@@ -4,7 +4,7 @@
 
 <!-- Production Project -->
 <!DOCTYPE project [
-<!ENTITY release "v08_00_00_46">
+<!ENTITY release "v08_00_00_51">
 <!ENTITY file_type "mc">
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
@@ -29,19 +29,19 @@
   <larsoft>
     <tag>&release;</tag>
     <qual>e17:prof</qual>
-    <local>/pnfs/uboone/resilient/users/kmistry/tars/uboonecode_mcc9_v08_00_00_46_sl7.tar</local>
+    <local>/pnfs/uboone/resilient/users/kmistry/tars/uboonecode_mcc9_v08_00_00_51_sl7.tar</local>
   </larsoft>
 
   <!-- <check>1</check> -->
   <!-- <copy>1</copy> -->
 
-  <fcldir>/pnfs/uboone/persistent/users/kmistry/searchingfornues/</fcldir>
+  <!-- <fcldir>/pnfs/uboone/persistent/users/kmistry/searchingfornues/</fcldir> -->
   
   <!-- Project stages -->
   <stage name="ntuple">
     <fcl>run_redk2nu_fhc.fcl</fcl>
     <fcl>standard_overlay_optical_numi_uboone_updated.fcl</fcl>
-    <fcl>run_eventweight_microboone_mar18_numi_fhc_slim.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_numi_fhc_slim.fcl</fcl>
     <fcl>run_neutrinoselectionfilter_run1_overlay_cc0pinp_numi.fcl</fcl>
     <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</outdir>
     <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</logdir>
@@ -54,7 +54,7 @@
     <disk>25GB</disk>
     <schema>root</schema>
     <inputdef>prodgenie__numi_nue_Reco2_run1_WireModThetaYZ_without_sigma_splines_v08_00_00_48_reco2_run1_reco2</inputdef>
-    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 </jobsub>
+    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/FHC/flux_cached_entries.root</jobsub>
     <jobsub_start>  --expected-lifetime=short</jobsub_start>
   </stage>
   
