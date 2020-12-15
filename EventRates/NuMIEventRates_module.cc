@@ -57,9 +57,6 @@ public:
     void endSubRun(art::SubRun const &sr) override;
     void endJob() override;
     
-    double Calc_Theta(double Pz, double P);
-    double Calc_Phi  (double Px, double Py, double P);
-
 private:
 
     // Declare member data here.
@@ -71,64 +68,17 @@ private:
     // POT product labels
     std::string _potsum_producer_mc;
     std::string _potsum_instance;
-    
-    // Histograms
-    // Nue all
-    TH1D* 	hNue_Energy_All;	 
-    TH1D* 	hNue_Theta_All;	  
-    TH1D* 	hNue_Phi_All;	
-
-    TH2D* 	hNue_E_vs_Theta_All;	 
-    TH2D* 	hNue_E_vs_Phi_All;   
-
-    // Nue
-    TH1D* 	hNue_Energy;	
-    TH1D*	hNue_Theta;		 
-    TH1D* 	hNue_Phi;			  
-
-    // Nue bar
-    TH1D* 	hNue_bar_Energy;	
-    TH1D*	hNue_bar_Theta;		 
-    TH1D* 	hNue_bar_Phi;			 
-
-    // NuMu all
-    TH1D* 	hNuMu_Energy_All;	 
-    TH1D* 	hNuMu_Theta_All;	  
-    TH1D* 	hNuMu_Phi_All;	    
-
-    TH2D* 	hNuMu_E_vs_Theta_All;	 
-    TH2D* 	hNuMu_E_vs_Phi_All;  
-
-    // NuMu
-    TH1D* 	hNuMu_Energy;	
-    TH1D*	hNuMu_Theta;		 
-    TH1D* 	hNuMu_Phi;	
-
-    // NuMu bar
-    TH1D* 	hNuMu_bar_Energy;	
-    TH1D*	hNuMu_bar_Theta;		 
-    TH1D* 	hNuMu_bar_Phi;	
-
-    // Generated Time histogram
-    TH1D* h_generated_time;
-
-    int NC_event{0};
 
     // Add Ttree variables 
     TTree *MCTree;
     int run, subrun, evt;
-    double NueEnergy,  NueTheta,  NuePhi;
-    double NuMuEnergy, NuMuTheta, NuMuPhi;
+    double vx, vy, vz;
+    double energy;
+    int Interaction;
     int PDG;
 
-    TTree * pot_tree;
-    double pot = 0.0;
-
     TTree* _sr_tree;
-    int _sr_run, _sr_subrun;
-    double _sr_begintime, _sr_endtime;
     double _sr_pot;
-    std::ofstream _run_subrun_list_file;
 
     int iteration{0};
 
@@ -146,24 +96,6 @@ NuMIEventRates::NuMIEventRates(fhicl::ParameterSet const& p) : EDAnalyzer{p} {
 
 }
 //______________________________________________________________________________
-double NuMIEventRates::Calc_Theta(double Pz, double P){
-
-  double Z_dir{ Pz / P }; // Z direction
-  double Theta{ std::acos(Z_dir) * (180. / PI) }; // Theta
-
-  return Theta; 
-}
-//______________________________________________________________________________
-double NuMIEventRates::Calc_Phi(double Px, double Py, double P){
-
-  double Y_dir {Py / P}; // Y direction 
-  double X_dir {Px / P}; // X direction
-  
-  double Phi{std::atan2(Y_dir, X_dir) * (180. / PI)}; // Phi
-
-  return Phi; 
-}
-//______________________________________________________________________________
 void NuMIEventRates::beginJob() {
  
     std::cout << "Starting begin Job" << std::endl;
@@ -172,105 +104,20 @@ void NuMIEventRates::beginJob() {
     art::ServiceHandle<art::TFileService> tfs;
 
     // POT Trees
-     pot_tree = tfs->make<TTree>("pot_tree", "pot_per_subrun");
     _sr_tree = tfs->make<TTree>("pottree","");
-    pot_tree->Branch("pot", &pot, "pot/D");
-
-	_sr_tree->Branch("run",                &_sr_run,                "run/I");
-	_sr_tree->Branch("subrun",             &_sr_subrun,             "subrun/I");
-	_sr_tree->Branch("begintime",          &_sr_begintime,          "begintime/D");
-	_sr_tree->Branch("endtime",            &_sr_endtime,            "endtime/D");
 	_sr_tree->Branch("pot",                &_sr_pot,                "pot/D");
-    _run_subrun_list_file.open ("run_subrun_list.txt", std::ofstream::out | std::ofstream::trunc);
 
     // Create the TTree and add relavent branches
     MCTree = tfs->make<TTree>("EventTree","EventTree");
         
-    // Make directories
-    art::TFileDirectory Nue_All_dir = tfs->mkdir( "Nue_All_dir" );
-    art::TFileDirectory Nue_dir     = tfs->mkdir( "Nue_dir"     );
-    art::TFileDirectory Nue_bar_dir = tfs->mkdir( "Nue_bar_dir" );
-
-    art::TFileDirectory NuMu_All_dir  = tfs->mkdir( "NuMu_All_dir" );
-    art::TFileDirectory NuMu_dir      = tfs->mkdir( "NuMu_dir"  );
-    art::TFileDirectory NuMu_bar_dir  = tfs->mkdir( "NuMu_bar_dir"   );
-
-    // Histograms 
-
-    // Generated neutrino time histogram
-    h_generated_time = tfs->make<TH1D>("h_generated_time", "Genie Generated time; Generated Time [us]; Entries",1200, 5, 17);
-
-    // Nue All
-    hNue_E_vs_Theta_All = Nue_All_dir.make<TH2D>("Nue_E_vs_Theta_All","Nue_E_vs_Theta_All; Energy [GeV]; Theta [degrees]",15., 0., 7. , 10., 0., 180);
-    hNue_E_vs_Phi_All   = Nue_All_dir.make<TH2D>("Nue_E_vs_Phi_All","Nue_E_vs_Phi_All; Energy [GeV]; Phi [degrees]",10., 0., 10. , 10., -180., 180);
-    hNue_E_vs_Theta_All ->SetOption("COLZ,TEXT");
-    hNue_E_vs_Phi_All   ->SetOption("COLZ,TEXT");
-    
-    hNue_Energy_All = Nue_All_dir.make<TH1D>("Nue_Energy_All","Nue_Energy_All; E [GeV]; Events",400., 0., 20.);
-    hNue_Theta_All  = Nue_All_dir.make<TH1D>("Nue_Theta_All","Nue_Theta_All; Theta [Degrees]; Events", 100., 0., 180);
-    hNue_Phi_All    = Nue_All_dir.make<TH1D>("Nue_Phi_All","Nue_Phi_All; Phi [Degrees]; Events", 10., -180., 180);
-    hNue_Energy_All ->SetOption("HIS");
-    hNue_Theta_All  ->SetOption("HIST,TEXT00");
-    hNue_Phi_All    ->SetOption("HIST,TEXT00");
-
-    // Nue
-    hNue_Energy = Nue_dir.make<TH1D>("Nue_Energy","Nue_Energy; E [GeV]; Events",400., 0., 20.);
-    hNue_Theta  = Nue_dir.make<TH1D>("Nue_Theta","Nue_Theta; Theta [Degrees]; Events", 200., 0., 180);
-    hNue_Phi    = Nue_dir.make<TH1D>("Nue_Phi","Nue_Phi; Phi [Degrees]; Events", 10., -180., 180);
-    hNue_Energy ->SetOption("HIST,TEXT00");
-    hNue_Theta  ->SetOption("HIST,TEXT00");
-    hNue_Phi    ->SetOption("HIST,TEXT00");
-
-    // Nue bar
-    hNue_bar_Energy = Nue_bar_dir.make<TH1D>("Nue_bar_Energy","Nue_bar_Energy; E [GeV]; Events",400., 0., 20.);
-    hNue_bar_Theta  = Nue_bar_dir.make<TH1D>("Nue_bar_Theta","Nue_bar_Theta; Theta [Degrees]; Events", 10., 0., 180);
-    hNue_bar_Phi    = Nue_bar_dir.make<TH1D>("Nue_bar_Phi","Nue_bar_Phi; Phi [Degrees]; Events", 10., -180., 180);
-    hNue_bar_Energy ->SetOption("HIS");
-    hNue_bar_Theta  ->SetOption("HIST,TEXT00");
-    hNue_bar_Phi    ->SetOption("HIST,TEXT00");  
-
-    // NuMu all
-    hNuMu_E_vs_Theta_All = NuMu_All_dir.make<TH2D>("NuMu_E_vs_Theta_All","NuMu_E_vs_Theta_All; Energy [GeV]; Theta [degrees]",20., 0., 10. , 10., 0., 180);
-    hNuMu_E_vs_Phi_All   = NuMu_All_dir.make<TH2D>("NuMu_E_vs_Phi_All","NuMu_E_vs_Phi_All; Energy [GeV]; Phi [degrees]",20., 0., 10. , 10., -180., 180);
-    hNuMu_E_vs_Theta_All->SetOption("COLZ,TEXT");
-    hNuMu_E_vs_Phi_All->SetOption("COLZ,TEXT");
-    
-    hNuMu_Energy_All = NuMu_All_dir.make<TH1D>("NuMu_Energy_All","NuMu_Energy_All; E [GeV]; Events",400., 0., 20.);
-    hNuMu_Theta_All  = NuMu_All_dir.make<TH1D>("NuMu_Theta_All","NuMu_Theta_All; Theta [Degrees]; Events", 10., 0., 180);
-    hNuMu_Phi_All    = NuMu_All_dir.make<TH1D>("NuMu_Phi_All","NuMu_Phi_All; Phi [Degrees]; Events", 10., -180., 180);
-    hNuMu_Energy_All  ->SetOption("HIS");
-    hNuMu_Theta_All   ->SetOption("HIST,TEXT00");
-    hNuMu_Phi_All     ->SetOption("HIST,TEXT00");
-
-    // NuMu
-    hNuMu_Energy = NuMu_dir.make<TH1D>("NuMu_Energy","NuMu_Energy; E [GeV]; Events",400., 0., 20.);
-    hNuMu_Theta  = NuMu_dir.make<TH1D>("NuMu_Theta","NuMu_Theta; Theta [Degrees]; Events", 10., 0., 180);
-    hNuMu_Phi    = NuMu_dir.make<TH1D>("NuMu_Phi","NuMu_Phi; Phi [Degrees]; Events", 10., -180., 180);
-    hNuMu_Energy ->SetOption("HIS");
-    hNuMu_Theta ->SetOption("HIST,TEXT00");
-    hNuMu_Phi   ->SetOption("HIST,TEXT00");
-
-    // NuMu_bar
-    hNuMu_bar_Energy = NuMu_bar_dir.make<TH1D>("NuMu_bar_Energy","NuMu_bar_Energy; E [GeV]; Events",400., 0., 20.);
-    hNuMu_bar_Theta  = NuMu_bar_dir.make<TH1D>("NuMu_bar_Theta","NuMu_bar_Theta; Theta [Degrees]; Events", 10., 0., 180);
-    hNuMu_bar_Phi    = NuMu_bar_dir.make<TH1D>("NuMu_bar_Phi","NuMu_bar_Phi; Phi [Degrees]; Events", 10., -180., 180);
-    hNuMu_bar_Energy->SetOption("HIS");
-    hNuMu_bar_Theta->SetOption("HIST,TEXT00");
-    hNuMu_bar_Phi->SetOption("HIST,TEXT00");
-
     // Add Tree Information
     MCTree->Branch("run",   &run);
     MCTree->Branch("subrun",&subrun);
     MCTree->Branch("event", &evt);
     MCTree->Branch("PDG",   &PDG);
+    MCTree->Branch("Interaction",   &Interaction);
+    MCTree->Branch("energy",   &energy);
 
-    MCTree->Branch("NueEnergy", &NueEnergy);
-    MCTree->Branch("NueTheta",  &NueTheta);
-    MCTree->Branch("NuePhi",    &NuePhi);
-    
-    MCTree->Branch("NuMuEnergy", &NuMuEnergy);
-    MCTree->Branch("NuMuTheta",  &NuMuTheta);
-    MCTree->Branch("NuMuPhi",    &NuMuPhi);
     
     std::cout << "Ending begin Job" << std::endl;
 
@@ -286,11 +133,6 @@ void NuMIEventRates::analyze(art::Event const& e) {
     subrun = e.id().subRun();
     evt    = e.id().event();
 
-    double ParticleE{ 0. };
-    double Theta{ 0. }; 
-    double Phi{ 0. }; 
-    NC_event = 0; // reset NC counter
-
     // Get the MC Truth vector
     art::Handle< std::vector<simb::MCTruth> > mctruthListHandle;
     std::vector<art::Ptr<simb::MCTruth> > mclist;
@@ -302,138 +144,43 @@ void NuMIEventRates::analyze(art::Event const& e) {
 
     for (int p = 0; p < mclist[iList]->NParticles(); p++) { // Loop over MCTruth Particles
 
-        //if (mclist[iList]->GetNeutrino().CCNC() == 1) NC_event ++; // The event was NC and we dont want to include the additional scattered neutrino
-        if (mclist[iList]->GetNeutrino().CCNC() == 1) continue; // The event was NC then skip the event
+
+
+        // Get the interation type
+        Interaction = mclist[iList]->GetNeutrino().Mode();
 
         simb::MCParticle particle{mclist[iList]->GetParticle(p)}; // Get a MC Particle
 
-        ParticleE = particle.E() ;                               // Energy
-
-        if ( NC_event >= 2 ) continue;// Skip fill for the second neutrino if NC
-
         if (mclist[iList]->Origin() == simb::kBeamNeutrino){ // Require a beam neutrino
+
+            if (particle.PdgCode() == 12 || particle.PdgCode() == -12){ // nue in the event
             
-            //if (particle.PdgCode() < 2212) std::cout << "PDG:\t"<< particle.PdgCode()<< std::endl;
-            
-            // BEGIN SELECTING PARTICLE BLOCK
-            if (particle.PdgCode() == 12){ // nue in the event
-                
-                // Fill a histogram with the pdg code, energy, theta, phi
-                hNue_Energy_All             ->Fill( ParticleE );
-                hNue_Theta_All              ->Fill(Theta); 
-                hNue_Phi_All                ->Fill(Phi); 
-                hNue_E_vs_Theta_All         ->Fill(ParticleE, Theta);
-                hNue_E_vs_Phi_All           ->Fill(ParticleE, Phi);
-                
-                hNue_Energy ->Fill( ParticleE );
-                hNue_Theta  ->Fill(Theta); 
-                hNue_Phi    ->Fill(Phi);
+                // Set values for filling TTree
+                PDG =  particle.PdgCode();
+                vx  =  particle.Vx();
+                vy  =  particle.Vy();
+                vz  =  particle.Vz();
+                energy = particle.E();
+            }
 
-                // Set laues for filling TTree
-                NueEnergy =  ParticleE;
-                NueTheta  =  Theta; 
-                NuePhi    =  Phi;
-                PDG       =  particle.PdgCode();
-
-                
-            } 
-            else if (particle.PdgCode() == -12){ // nue bar in the event
-
-                // Fill a histogram with the pdg code, energy, theta, phi
-                hNue_Energy_All       ->Fill( ParticleE );
-                hNue_Theta_All        ->Fill( Theta ); 
-                hNue_Phi_All          ->Fill( Phi ); 
-                hNue_E_vs_Theta_All   ->Fill( ParticleE, Theta );
-                hNue_E_vs_Phi_All     ->Fill( ParticleE, Phi );
-
-                hNue_bar_Energy ->Fill( ParticleE );
-                hNue_bar_Theta  ->Fill( Theta ); 
-                hNue_bar_Phi    ->Fill( Phi );
-
-                // Set laues for filling TTree
-                NueEnergy =  ParticleE;
-                NueTheta  =  Theta; 
-                NuePhi    =  Phi;
-                PDG       =  particle.PdgCode();
-
-            } 
-            else if (particle.PdgCode() == 14){ // numu in the event
-
-                // Fill a histogram with the pdg code, energy, theta, phi
-                hNuMu_Energy_All     ->Fill( ParticleE );
-                hNuMu_Theta_All      ->Fill( Theta );
-                hNuMu_Phi_All        ->Fill( Phi );
-                hNuMu_E_vs_Theta_All ->Fill( ParticleE, Theta );
-                hNuMu_E_vs_Phi_All   ->Fill( ParticleE, Phi );
-
-                hNuMu_Energy   ->Fill( ParticleE );
-                hNuMu_Theta    ->Fill( Theta );
-                hNuMu_Phi      ->Fill( Phi );
-
-                // Set laues for filling TTree
-                NuMuEnergy =  ParticleE;
-                NuMuTheta  =  Theta; 
-                NuMuPhi    =  Phi;
-                PDG        =  particle.PdgCode();
-
-            } 
-            else if (particle.PdgCode() == -14){ // numu bar in the event
-
-                // Fill a histogram with the pdg code, energy, theta, phi
-                hNuMu_Energy_All     ->Fill( ParticleE );
-                hNuMu_Theta_All      ->Fill( Theta );
-                hNuMu_Phi_All        ->Fill( Phi );
-                hNuMu_E_vs_Theta_All ->Fill( ParticleE, Theta );
-                hNuMu_E_vs_Phi_All   ->Fill( ParticleE, Phi );
-
-                hNuMu_bar_Energy   ->Fill( ParticleE );
-                hNuMu_bar_Theta    ->Fill( Theta );
-                hNuMu_bar_Phi      ->Fill( Phi );
-
-                // Set laues for filling TTree
-                NuMuEnergy =  ParticleE;
-                NuMuTheta  =  Theta; 
-                NuMuPhi    =  Phi;
-                PDG        =  particle.PdgCode();
-
-            } // END IF CONDITION BLOCK  
-
-	    // Here we make a plot of the neutrino generation time for validation
-	    
-	    // Require a charged lepton or neutrino and require final state particles
-	    if ((particle.PdgCode() > 10 && particle.PdgCode() < 17) && particle.StatusCode() == 1){
-		    h_generated_time->Fill(particle.T()/1000);
-	    }
-    
         } // END if a beam neutrino
 
     } // END loop over mclist
 
-    MCTree->Fill();
+    // Check whether the interaction was in the FV and if the energy is > 250 MeV
+     if ( vx   >= 20.0   && vx <= 236.35 && vy >= -96.5 && vy <= 96.5 && vz   >= 20.0   && vz <= 1016.8  ){
+        // Was in FV
 
+        // And the energy was greater than the threshold
+        if (energy > 0.250){
+             MCTree->Fill();
+        }
+
+    }  
 }
 
 void NuMIEventRates::endSubRun(art::SubRun const & sr) {
-
-    
-    auto const & POTSummaryHandle = sr.getValidHandle < sumdata::POTSummary >("generator");
-    auto const & POTSummary(*POTSummaryHandle);
-    const double total_pot = POTSummary.totpot;
-    std::cout << "----------------------------" << std::endl;
-    std::cout << "Total POT / subRun: " << total_pot << std::endl;
-    std::cout << "----------------------------" << std::endl;
-
-    pot = total_pot;
-    pot_tree->Fill();
-
-    // Saving run and subrun number on file so that we can run Zarko's script easily
-	_run_subrun_list_file << sr.run() << " " << sr.subRun() << std::endl;
 	
-    _sr_run       = sr.run();
-    _sr_subrun    = sr.subRun();
-    _sr_begintime = sr.beginTime().value();
-    _sr_endtime   = sr.endTime().value();
-
     art::Handle<sumdata::POTSummary> potsum_h;
 
     // MC
@@ -442,6 +189,11 @@ void NuMIEventRates::endSubRun(art::SubRun const & sr) {
     }
     else
         _sr_pot = 0.;
+
+    std::cout << "----------------------------" << std::endl;
+    std::cout << "Total POT / subRun: " << _sr_pot << std::endl;
+    std::cout << "----------------------------" << std::endl;
+
 
     _sr_tree->Fill();
 
