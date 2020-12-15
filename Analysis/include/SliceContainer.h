@@ -356,7 +356,7 @@ public:
     
     int   nneutron; // Truth Number of Neutrons
     
-    int   nproton;  // Truth Number of Protons
+    int   nproton;  // Truth Number of Protons with a kinetic energy (E - M_proton) > 40 MeV
     float proton_e; // Truth Proton Energy
     float proton_c; // Proton Completeness
     float proton_p; // Proton Purity

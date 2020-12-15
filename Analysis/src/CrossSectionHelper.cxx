@@ -89,7 +89,7 @@ void CrossSectionHelper::Initialise(Utility _utility){
 
     std::cout << "Volume used in cuts: " << volume << std::endl;
 
-    N_target_MC   = (lar_density_data   * volume * NA * N_nuc) / m_mol; // Now use the same number of targets for MC and data since we fixed the simulated density in MCC9
+    N_target_MC   = (lar_density_mc   * volume * NA * N_nuc) / m_mol; // Now use the same number of targets for MC and data since we fixed the simulated density in MCC9
     std::cout << "Number of Target Nucleons in MC: " << N_target_MC << std::endl;
     
     N_target_Data = (lar_density_data * volume * NA * N_nuc) / m_mol;
@@ -122,7 +122,7 @@ void CrossSectionHelper::LoopEvents(){
 
         tree->GetEntry(ievent); 
 
-        if (shr_energy_cali > 6.0 && *classification == "data" ) std::cout << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins" <<std::endl;
+        if (shr_energy_cali > 4.0 && *classification == "data" ) std::cout << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins " << run << " " << subrun << " " << event <<std::endl;
 
         double cv_weight = weight; // SplinetimesTune * PPFX CV * Pi0 Tune
 
@@ -704,12 +704,16 @@ double CrossSectionHelper::GetIntegratedFlux(int uni, std::string value, std::st
         double xbin_th = h_nue->GetXaxis()->FindBin(energy_threshold);   // find the x bin to integrate from
         integral_nue = h_nue->Integral( xbin_th, h_nue->GetNbinsX()+1, 0, h_nue->GetNbinsY()+1); // Integrate over the flux for nue
 
-        std::cout << "\nIntegral Nue Flux: " << flux_scale_factor * integral_nue / POT_flux << " nue / POT / GeV / cm2" << std::endl;
+        std::cout << "\nIntegral Nue Flux: " << flux_scale_factor * integral_nue / POT_flux << " nue / POT / cm2" << std::endl;
 
         xbin_th   = h_nuebar->GetXaxis()->FindBin(energy_threshold);              // find the x bin to integrate from
         integral_nuebar = h_nuebar->Integral( xbin_th, h_nuebar->GetNbinsX()+1, 0, h_nuebar->GetNbinsY()+1); // Integrate over the flux for nue
 
-        std::cout << "\nIntegral Nuebar Flux: " << flux_scale_factor * integral_nuebar / POT_flux << " nuebar / POT / GeV / cm2" << "\n" << std::endl;
+        std::cout << "\nIntegral Nuebar Flux: " << flux_scale_factor * integral_nuebar / POT_flux << " nuebar / POT / cm2" << "\n" << std::endl;
+
+        std::cout << "Integral Flux MC: " << mc_flux_scale_factor * integral_nuebar / POT_flux << " nu / MC POT / cm2" << "\n" << std::endl;
+
+        std::cout << "Integral Flux Data: " << data_flux_scale_factor * integral_nuebar / POT_flux << " nu / Data POT / cm2" << "\n" << std::endl;
 
         // Return the flux per POT
         return (integral_nue + integral_nuebar) / POT_flux;
