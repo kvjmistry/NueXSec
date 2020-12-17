@@ -77,10 +77,11 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_true_elec_E_rebin_nue",       true,  false, "True e#lower[-0.5]{-} Energy [GeV]; Efficiency",                  "True e#lower[-0.5]{-} Events in FV / GeV",         "elec_E_rebin_nue");
         MakeEfficiencyPlotByCut("h_true_elec_E_rebin_nuebar",    true,  false, "True e^{+} Energy [GeV]; Efficiency",                             "True e^{+} Events in FV / GeV",                    "elec_E_rebin_nuebar");
         
-        MakeEfficiencyPlotByCut("h_true_elec_E",                 false, false, "True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_E");
         MakeEfficiencyPlotByCut("h_true_nu_E_single_bin",        true,  true,  "True #nu_{e} + #bar{#nu}_{e}; Efficiency",                        "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "nu_E_single_bin");
         MakeEfficiencyPlotByCut("h_true_nu_E_nue_single_bin",    true,  true,  "True #nu_{e}; Efficiency",                                        "True #nu_{e} Events in FV",                        "nu_E_nue_single_bin");
         MakeEfficiencyPlotByCut("h_true_nu_E_nuebar_single_bin", true,  true,  "True #bar{#nu}_{e}; Efficiency",                                  "True #bar{#nu}_{e} Events in FV",                  "nu_E_nuebar_single_bin");
+        
+        MakeEfficiencyPlotByCut("h_true_elec_E",                 false, false, "True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_E");
         MakeEfficiencyPlotByCut("h_eff_nu_theta",                false, false, "True #nu_{e} + #bar{#nu}_{e} #theta [deg]; Efficiency",           "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "nu_theta" );
         MakeEfficiencyPlotByCut("h_eff_nu_phi",                  false, false, "True #nu_{e} + #bar{#nu}_{e} #phi [deg]; Efficiency",             "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "nu_phi" );
         MakeEfficiencyPlotByCut("h_eff_elec_theta",              false, false, "True e#lower[-0.5]{-} + e^{+} #theta [deg]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_theta" );
@@ -90,10 +91,12 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_eff_proton_multi",            false, false, "True #nu_{e} + #bar{#nu}_{e} Proton Multi.; Efficiency",          "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "prot_multi" );
         MakeEfficiencyPlotByCut("h_eff_proton_multi_nue",        false, false, "True #nu_{e} Proton Multi.; Efficiency",                          "True #nu_{e} Events in FV",                        "prot_multi_nue" );
         MakeEfficiencyPlotByCut("h_eff_proton_multi_nuebar",     false, false, "True #bar{#nu}_{e} Proton Multi.; Efficiency",                    "True #bar{#nu}_{e} Events in FV",                  "prot_multi_nuebar" );
+        
         MakeEfficiencyPlotByCut("h_eff_pion_multi",              false, false, "True #nu_{e} + #bar{#nu}_{e} Pion Multi.; Efficiency",            "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "pion_multi" );
         MakeEfficiencyPlotByCut("h_eff_pion_multi_nue",          false, false, "True #nu_{e} Pion Multi.; Efficiency",                            "True #nu_{e} Events in FV",                        "pion_multi_nue" );
         MakeEfficiencyPlotByCut("h_eff_pion_multi_nuebar",       false, false, "True #bar{#nu}_{e} Pion Multi.; Efficiency",                      "True #bar{#nu}_{e} Events in FV",                  "pion_multi_nuebar" );
-        MakeEfficiencyPlotByCut("h_eff_charg_par_multi",         false, false, "True #nu_{e} + #bar{#nu}_{e} Charged Particle Multi.; Efficiency","True #nu_{e} + #bar{#nu}_{e} Events in FV",        "charg_par_multi" );
+        
+        MakeEfficiencyPlotByCut("h_eff_charg_par_multi",         false, false, "True #nu_{e} + #bar{#nu}_{e} Charged Particle Multi; Efficiency","True #nu_{e} + #bar{#nu}_{e} Events in FV",        "charg_par_multi" );
         MakeEfficiencyPlotByCut("h_eff_charg_par_multi_nue",     false, false, "True #nu_{e} Charged Particle Multi.; Efficiency",                "True #nu_{e} Events in FV",                        "charg_par_multi_nue" );
         MakeEfficiencyPlotByCut("h_eff_charg_par_multi_nuebar",  false, false, "True #bar{#nu}_{e} Charged Particle Multi.; Efficiency",          "True #bar{#nu}_{e} Events in FV",                  "charg_par_multi_nuebar" );
 
@@ -2270,9 +2273,9 @@ void HistogramPlotter::MakeInteractionPlot(std::string var, bool scale, const ch
     double scale_factor{1.0};
     if (scale){
         if (std::string(_util.run_period) =="1") 
-            scale_factor = 6.0e20 / _util.config_v.at(_util.k_Run1_MC_POT);
+            scale_factor = 2.0e20 / _util.config_v.at(_util.k_Run1_MC_POT);
         else if (std::string(_util.run_period) == "3")
-            scale_factor = 6.0e20 / _util.config_v.at(_util.k_Run3_MC_POT);
+            scale_factor = 2.0e20 / _util.config_v.at(_util.k_Run3_MC_POT);
         else
             std::cout << "Unknown Run Period Configured" << std::endl;
     }

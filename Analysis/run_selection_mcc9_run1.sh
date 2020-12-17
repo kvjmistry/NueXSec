@@ -42,8 +42,8 @@ if [ -z "$1" ]; then
   source merge/merge_run1_files.sh files/nuexsec_mc_run1.root files/nuexsec_run1_merged.root
 
   # Run the histogram plotter
-  #./nuexsec --run 1 --hist files/nuexsec_run1_merged.root
-  ./nuexsec --run 1 --hist files/nuexsec_run1_merged.root --plotsys tot
+  ./nuexsec --run 1 --hist files/nuexsec_run1_merged.root
+  # ./nuexsec --run 1 --hist files/nuexsec_run1_merged.root --plotsys tot
 
   # Merge the ttrees to one file
   root -l -b -q 'merge/merge_uneaventrees.C("1", true, "files/trees/nuexsec_selected_tree_mc_run1.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "")'

@@ -724,19 +724,19 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
     // Software Trigger -- MC Only  --------------------------------------------
     // *************************************************************************
     pass = _scuts.swtrig(SC, type);
-    if(!pass) return; // Failed the cut!
+    // if(!pass) return; // Failed the cut!
     
     // *************************************************************************
     // Common Optical Filter PE  -----------------------------------------------
     // *************************************************************************
     pass = _scuts.opfilt_pe(SC, type);
-    if(!pass) return; // Failed the cut!
+    // if(!pass) return; // Failed the cut!
 
     // *************************************************************************
     // Common Optical Filter Veto  ---------------------------------------------
     // *************************************************************************
     pass = _scuts.opfilt_veto(SC, type);
-    if(!pass) return; // Failed the cut!
+    // if(!pass) return; // Failed the cut!
 
     // *************************************************************************
     // Slice ID ----------------------------------------------------------------
