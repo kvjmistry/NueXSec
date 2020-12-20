@@ -55,6 +55,9 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
     float shr_bkt_completeness{0.0},  _shr_bkt_completeness{0.0};
     float shr_bkt_E{0.0},             _shr_bkt_E{0.0};
     int shr_bkt_pdg{0},               _shr_bkt_pdg{0};
+    int npi0{0},                      _npi0{0};
+    double pi0_e{0.0},                _pi0_e{0};
+    int interaction{0},               _interaction{0};
     std::vector<float> all_shr_hits;
     std::vector<float> all_shr_energies;
     std::vector<float> *_all_shr_hits = NULL;
@@ -133,8 +136,11 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
     outtree->Branch("shr_bkt_completeness", &shr_bkt_completeness);
     outtree->Branch("shr_bkt_E",            &shr_bkt_E);
     outtree->Branch("shr_bkt_pdg",          &shr_bkt_pdg);
+    outtree->Branch("npi0",                 &npi0,  "npi0/I");
+    outtree->Branch("pi0_e",                &pi0_e,  "pi0_e/D");
     outtree->Branch("all_shr_hits", "std::vector<float>",     &all_shr_hits);
     outtree->Branch("all_shr_energies", "std::vector<float>", &all_shr_energies);
+    outtree->Branch("interaction",                            &interaction,  "interaction/I");
     
     outtree->Branch("weightsGenie", "std::vector<unsigned short>", &weightsGenie);
     outtree->Branch("weightsReint", "std::vector<unsigned short>", &weightsReint);
@@ -200,6 +206,9 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
         trees.at(k)->SetBranchAddress("shr_bkt_pdg",      &_shr_bkt_pdg);
         trees.at(k)->SetBranchAddress("all_shr_hits",     &_all_shr_hits);
         trees.at(k)->SetBranchAddress("all_shr_energies", &_all_shr_energies);
+        trees.at(k)->SetBranchAddress("npi0",             &_npi0);
+        trees.at(k)->SetBranchAddress("pi0_e",            &_pi0_e);
+        trees.at(k)->SetBranchAddress("interaction",             &_interaction);
         
         trees.at(k)->SetBranchAddress("weightsGenie",          &_weightsGenie);
         trees.at(k)->SetBranchAddress("weightsReint",          &_weightsReint);
@@ -262,7 +271,10 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
                 shr_bkt_purity   = _shr_bkt_purity;
                 shr_bkt_completeness = _shr_bkt_completeness;
                 shr_bkt_E        = _shr_bkt_E;
-                
+                npi0             = _npi0;
+                pi0_e            = _pi0_e;
+                interaction      = _interaction;
+
                 if (_all_shr_hits != NULL)    all_shr_hits = *_all_shr_hits;
                 if (_all_shr_energies != NULL)all_shr_energies = *_all_shr_energies;
 

@@ -55,7 +55,7 @@ fi
 
 # Running slimmed down version of pelee ntuples with event weights
 if [ "$1" == "weight" ]; then
-  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_weight.root weight 
+  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root weight 
 
   ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root weight --intrinsic intrinsic
 

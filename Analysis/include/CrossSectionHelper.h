@@ -45,6 +45,8 @@ class CrossSectionHelper{
     float weightSplineTimesTune{1.0};
     float numi_ang{0.0};
     int nu_pdg{0};
+    int npi0{0};
+    double pi0_e{0.0};
 
     // Weights
     std::vector<unsigned short> *weightsGenie = NULL;
@@ -200,9 +202,11 @@ class CrossSectionHelper{
         "Dirtdn",
         "POTup",
         "POTdn",
+        "pi0",
         "weightsGenie",
         "weightsReint",
-        "weightsPPFX"
+        "weightsPPFX",
+        "MCStats"
     };
 
     std::vector<std::vector<TH2D*>> beamline_hists;
@@ -291,7 +295,8 @@ class CrossSectionHelper{
     void FillCutHists(int type, SliceContainer &SC, std::pair<std::string, int> classification, int cut_index);
     // -------------------------------------------------------------------------
     // Set the weight for universe i depending on the variation 
-    void SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double &weight_ext,  double _weightSplineTimesTune, std::string _classification, double cv_weight, int uni, int _nu_pdg, double _true_energy, double _numi_ang);
+    void SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double &weight_ext,  double _weightSplineTimesTune,
+                           std::string _classification, double cv_weight, int uni, int _nu_pdg, double _true_energy, double _numi_ang, int _npi0, double _pi0_e);
     // -------------------------------------------------------------------------
     // Function to calculate the cross section
     double CalcCrossSec(double sel, double gen, double sig, double bkg, double flux, double ext, double dirt, double targ);

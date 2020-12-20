@@ -151,7 +151,7 @@ void CrossSectionHelper::LoopEvents(){
                 double weight_uni{1.0}; 
 
                 // Set the weight for universe i
-                SetUniverseWeight(reweighter_labels.at(label), weight_uni, weight_dirt, weight_ext, weightSplineTimesTune, *classification, cv_weight, uni, nu_pdg, true_energy, numi_ang);
+                SetUniverseWeight(reweighter_labels.at(label), weight_uni, weight_dirt, weight_ext, weightSplineTimesTune, *classification, cv_weight, uni, nu_pdg, true_energy, numi_ang, npi0, pi0_e);
 
                 // Signal event
                 if ((*classification == "nue_cc" || *classification == "nuebar_cc" || *classification == "unmatched_nue" || *classification == "unmatched_nuebar") && passed_selection) {
@@ -510,7 +510,7 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
             double weight_uni{1.0}; 
 
             double _numi_ang = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "beam");
-            SetUniverseWeight(reweighter_labels[label], weight_uni, weight_dirt, weight_ext, SC.weightSplineTimesTune, classification.first, cv_weight, uni, SC.nu_pdg, SC.nu_e, _numi_ang);
+            SetUniverseWeight(reweighter_labels[label], weight_uni, weight_dirt, weight_ext, SC.weightSplineTimesTune, classification.first, cv_weight, uni, SC.nu_pdg, SC.nu_e, _numi_ang, SC.npi0, SC.pi0_e);
 
             double dedx_max = SC.GetdEdxMax();
 
@@ -553,7 +553,8 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
 
 }
 // -----------------------------------------------------------------------------
-void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double &weight_ext,  double _weightSplineTimesTune, std::string _classification, double cv_weight, int uni, int _nu_pdg, double _true_energy, double _numi_ang ){
+void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double &weight_ext,  double _weightSplineTimesTune,
+                                           std::string _classification, double cv_weight, int uni, int _nu_pdg, double _true_energy, double _numi_ang, int _npi0, double _pi0_e ){
 
     // Weight equal to universe weight times cv weight
     if (label == "weightsReint" || label == "weightsPPFX" || label == "CV" ){
@@ -592,6 +593,36 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
         weight_uni  = cv_weight;
         weight_dirt = cv_weight;
     }
+    // Pi0 Tune -- This undoes the pi0 tune to see what effect it has
+    else if ( label == "pi0"){
+
+        // Fix the normalisation
+        if (_util.pi0_correction == 1){
+            
+            if (_npi0 > 0) {
+                weight_uni = cv_weight / 0.759;
+            }
+
+        }
+        // Try energy dependent scaling for pi0
+        else if (_util.pi0_correction == 2){
+            
+            if (_npi0 > 0) {
+                double pi0emax = 0.6;
+                if (_pi0_e > 0.1 && _pi0_e < pi0emax){
+                    weight_uni = cv_weight / (1 - 0.4 * pi0_e);
+                }
+                else if (_pi0_e > 0.1 && _pi0_e >= pi0emax){
+                    weight_uni = cv_weight / (1 - 0.4 * pi0emax);
+                }
+                
+            }
+        }
+        else {
+            // Dont touch the weight
+            weight_uni = cv_weight;
+        }
+    }
     // If we are using the genie systematics and unisim systematics then we want to undo the genie tune on them so we dont double count
     else {
         // Note we actually dont want to divide out by the spline, but since this is 1 in numi, it doesnt matter!
@@ -601,7 +632,7 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
         _util.CheckWeight(_weightSplineTimesTune);
 
         // Check the uiverse weight
-        if (std::isnan(vec_universes[uni]) == 1 || std::isinf(vec_universes[uni]) || vec_universes[uni] < 0 || vec_universes[uni] > 30) {
+        if (std::isnan(vec_universes[uni]) == 1 || std::isinf(vec_universes[uni]) || vec_universes[uni] < 0 || vec_universes[uni] > 30 || vec_universes[uni] == 1.0) {
             
             // We set the universe to be the spline times tune, so it cancels with the divide below to just return the CV weight
             // i.e. a universe weight of 1
@@ -861,6 +892,10 @@ void CrossSectionHelper::WriteHists(){
                 
                     // Now write the histograms, 
                     for (unsigned int p = 0; p < h_cross_sec.at(label).at(uni).at(var).size(); p++){
+                        // Certain histograms we want to divide out by the bin width
+                        if ((var == k_var_reco_el_E || var == k_var_true_el_E) && p != k_xsec_eff )
+                            h_cross_sec.at(label).at(uni).at(var).at(p)->Scale(1.0, "width");
+
                         h_cross_sec.at(label).at(uni).at(var).at(p)->SetOption("hist");
                         h_cross_sec.at(label).at(uni).at(var).at(p)->Write("",TObject::kOverwrite);
                     }
@@ -928,6 +963,8 @@ void CrossSectionHelper::InitTree(){
     tree->SetBranchAddress("weightSplineTimesTune",  &weightSplineTimesTune);
     tree->SetBranchAddress("numi_ang",  &numi_ang);
     tree->SetBranchAddress("nu_pdg",  &nu_pdg);
+    tree->SetBranchAddress("npi0",  &npi0);
+    tree->SetBranchAddress("pi0_e",  &pi0_e);
     
     tree->SetBranchAddress("weightsGenie",          &weightsGenie);
     tree->SetBranchAddress("weightsReint",          &weightsReint);
@@ -1227,7 +1264,8 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 "Dirtup",
                 "Dirtdn",
                 "POTup",
-                "POTdn"
+                "POTdn", 
+                "pi0"
             };
         }
         // Only run PPFX
@@ -1364,10 +1402,10 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 // loop over and create the histograms
                 for (unsigned int i=0; i < xsec_types.size();i++){    
                     if (i == k_xsec_sel || i == k_xsec_bkg || i == k_xsec_gen || i == k_xsec_sig || i == k_xsec_ext || i == k_xsec_dirt || i == k_xsec_data){
-                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Reco. Leading Shower Energy [GeV]; Entries", nbins, edges);
+                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Leading Shower Energy [GeV]; Entries", nbins, edges);
                     }
                     else if (i == k_xsec_eff){
-                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Reco. Leading Shower Energy [GeV]; Efficiency", nbins, edges);
+                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Leading Shower Energy [GeV]; Efficiency", nbins, edges);
                     }
                     else if (i == k_xsec_dataxsec || i == k_xsec_mcxsec){
                         h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels.at(var).c_str()), nbins, edges);

@@ -73,6 +73,7 @@ class TreeHelper{
     float shr_bkt_E{0.0}; // energy of truth matched particle to the leading shower
     int npi0{0};
     double pi0_e{0.0};
+    int interaction{0};
     std::vector<float> all_shr_hits;
     std::vector<float> all_shr_energies;
 

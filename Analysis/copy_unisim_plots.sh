@@ -1,8 +1,8 @@
 # Script to copy all the beamline plots we want to put into the technote into a common folder
 # this will make it easier to drag and drop them into the overleaf folder
 
-file_path=/Users/kvjmistry/Documents/work/NueXSec/Analysis/plots/run1/Systematics/
-copy_path=/Users/kvjmistry/Documents/work/NueXSec/Analysis/plots/run1/Systematics/Beamline
+file_path=/Users/kvjmistry/work/NueXSec/Analysis/plots/run1/Systematics/
+copy_path=/Users/kvjmistry/work/NueXSec/Analysis/plots/run1/Systematics/Beamline
 
 # Make the directory
 mkdir -p $copy_path
@@ -36,7 +36,7 @@ for i in ${!vars[*]}; do
 done
 
 
-copy_path=/Users/kvjmistry/Documents/work/NueXSec/Analysis/plots/run1/Systematics/Genie_Unisim
+copy_path=/Users/kvjmistry/work/NueXSec/Analysis/plots/run1/Systematics/Genie_Unisim
 
 # Make the directory
 mkdir -p $copy_path
@@ -65,7 +65,7 @@ for i in ${!vars[*]}; do
     cp $file_path${vars[$i]}/true_el_E/*eff* $copy_path
 done
 
-copy_path=/Users/kvjmistry/Documents/work/NueXSec/Analysis/plots/run1/Systematics/DetVar
+copy_path=/Users/kvjmistry/work/NueXSec/Analysis/plots/run1/Systematics/DetVar
 
 # Make the directory
 mkdir -p $copy_path
