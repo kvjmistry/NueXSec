@@ -604,6 +604,10 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     
     SelectionFill(type, SC, _util.k_dEdx_max_no_tracks, counter_v );
 
+    // Skip unnaturally high shower energies?
+    // if (SC.shr_energy_cali > 6.0)
+    //     std::cout << "reco shr energy: "  << SC.shr_energy_cali << "  elec E: "<< SC.elec_e << "  nu E: " << SC.nu_e<< std::endl;
+
     // if (SC.is_signal && SC.nu_e < 0.3) std::cout<<"Low elec E!: " <<SC.elec_e*1000 << " MeV" << "  | E Nu: "<< SC.nu_e*1000 << " MeV" <<  std::endl; 
     // if (type == _util.k_mc && (SC.nu_pdg == -12 || SC.nu_pdg == 12) && SC.nu_e <= 0.125 && SC.ccnc == _util.k_NC) std::cout << "Got nue NC event selected thats below th: " << SC.nu_e << std::endl;
 
