@@ -218,8 +218,6 @@ class SystematicsHelper{
         k_var_integrated,     // Integrated X-Section
         k_var_reco_el_E,      // Reconstructed electron energy
         k_var_true_el_E,      // True electron energy
-        // k_var_true_nu_E,      // True neutrino energy
-        // k_var_reco_nu_E,      // Reconstructed neutrino energy
         k_TH1D_xsec_var_MAX
     };
 
@@ -230,33 +228,23 @@ class SystematicsHelper{
     std::vector<std::string> vars = {"integrated",
                                      "reco_el_E",
                                      "true_el_E"
-                                    //  "true_nu_E",
-                                    //  "reco_nu_e"
                                      };
-
-
-    // Use these for when we do the cross-section
-    // std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Cross-Section [10^{-39} cm^{2}]",
-    //                                     ";Reco Leading Shower Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
-    //                                     ";True Electron Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]"
-    //                                     // ";True #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
-    //                                     // ";Reco #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]"
-    //                                     };
     
     // Use these for when we do the flux normalised event rate
-    std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",
-                                        ";Reco. Leading Shower Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]",
-                                        ";True e^{-} + e^{+} Energy [GeV]; #nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
-                                        // ";True #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
-                                        // ";Reco #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]"
+    std::vector<std::string> var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",
+                                           ";Reco. Leading Shower Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]",
+                                           ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
                                         };
 
 
-    std::vector<std::string> var_labels_x = {"",
-                                        "Reco. Leading Shower Energy [GeV]",
-                                        "True e^{-} + e^{+} Energy [GeV]"
-                                        // "True #nu_{e} Energy [GeV]",
-                                        // "Reco #nu_{e} Energy [GeV]"
+    std::vector<std::string> var_labels_events = {";;Entries",
+                                        ";Reco. Leading Shower Energy [GeV]; Entries / GeV",
+                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries / GeV"
+                                        };
+
+    std::vector<std::string> var_labels_eff = {";;Efficiency",
+                                        ";Reco. Leading Shower Energy [GeV]; Efficiency",
+                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency"
                                         };
 
     // Containter for the central value histograms

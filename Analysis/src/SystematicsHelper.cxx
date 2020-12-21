@@ -645,7 +645,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
     // Now lets initialse the vectors which will store the total uncertainties
     InitialiseUncertaintyVectors();
 
-    // Initialise the covariance matrices
+    // Initialise the covariance matrices -- this needs to be vectorized
     int n_bins = cv_hist_vec.at(k_var_reco_el_E).at(0)->GetNbinsX();
     h_cov_tot         = new TH2D("h_cov_tot",         "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
     h_cov_sys         = new TH2D("h_cov_sys",         "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
@@ -824,7 +824,7 @@ void SystematicsHelper::SetLabelName(std::string label, std::string &label_up, s
     else if  (label == "Horn1_refined_descr" || label == "Decay_pipe_Bfield" || label == "Old_Horn_Geometry" ||
               label == "LYRayleigh" || label == "LYAttenuation" || label == "SCE" || label == "Recomb2" || 
               label == "WireModX" || label == "WireModYZ" || label == "WireModThetaXZ" || label == "WireModThetaYZ_withSigmaSplines" || 
-              label == "WireModThetaYZ_withoutSigmaSplines" || label == "WireModdEdX"){
+              label == "WireModThetaYZ_withoutSigmaSplines" || label == "WireModdEdX" || label == "pi0"){
         label_up = label;
         label_dn = label;
     }
@@ -895,6 +895,14 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         _util.SetTPadOptions(topPad, bottomPad);
         // topPad->SetRightMargin(0.10 );
         // bottomPad->SetRightMargin(0.10 );
+
+        // Set the Titles
+        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
+            h_universe.at(k_up).at(k)->SetTitle(var_labels_xsec.at(var).c_str());
+        else if (k == k_xsec_eff)
+            h_universe.at(k_up).at(k)->SetTitle(var_labels_eff.at(var).c_str());
+        else
+            h_universe.at(k_up).at(k)->SetTitle(var_labels_events.at(var).c_str());
         
         h_universe.at(k_up).at(k)->SetTitle(Form("%s", xsec_types_pretty.at(k).c_str() ));
         h_universe.at(k_up).at(k)->GetXaxis()->SetTitle("");
@@ -942,7 +950,16 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         h_err_up->SetLineColor(kGreen+2);
         h_err_up->Scale(100);
 
-        h_err_up->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+
+        // Set the Titles
+        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
+            h_err_up->SetTitle(var_labels_xsec.at(var).c_str());
+        else if (k == k_xsec_eff)
+            h_err_up->SetTitle(var_labels_eff.at(var).c_str());
+        else
+            h_err_up->SetTitle(var_labels_events.at(var).c_str());
+
+        // h_err_up->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
         
         // Down ratio to CV
         TH1D* h_err_dn = (TH1D *)h_universe.at(k_dn).at(k)->Clone("h_ratio_dn");
@@ -1101,7 +1118,16 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
         h_err->SetLineWidth(2);
         h_err->SetLineColor(kGreen+2);
         h_err->Scale(100);
-        h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+        
+        // Set the Titles
+        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
+            h_err->SetTitle(var_labels_xsec.at(var).c_str());
+        else if (k == k_xsec_eff)
+            h_err->SetTitle(var_labels_eff.at(var).c_str());
+        else
+            h_err->SetTitle(var_labels_events.at(var).c_str());
+        
+        // h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
         
 
         SetRatioOptions(h_err);
@@ -1176,16 +1202,16 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
     }
     // Set 2D bins for other
     else {
-        h_universe_2D.at(k_xsec_sel)           = new TH2D("h_2D_sel",      "", nbins, edges, 100, 0, 700);
-        h_universe_2D.at(k_xsec_bkg)           = new TH2D("h_2D_bkg",      "", nbins, edges, 100, 0, 250);
-        h_universe_2D.at(k_xsec_gen)           = new TH2D("h_2D_gen",      "", nbins, edges, 100, 0, 8000);
-        h_universe_2D.at(k_xsec_sig)           = new TH2D("h_2D_sig",      "", nbins, edges, 100, 0, 800);
+        h_universe_2D.at(k_xsec_sel)           = new TH2D("h_2D_sel",      "", nbins, edges, 100, 0, 2500);
+        h_universe_2D.at(k_xsec_bkg)           = new TH2D("h_2D_bkg",      "", nbins, edges, 100, 0, 1200);
+        h_universe_2D.at(k_xsec_gen)           = new TH2D("h_2D_gen",      "", nbins, edges, 100, 0, 16000);
+        h_universe_2D.at(k_xsec_sig)           = new TH2D("h_2D_sig",      "", nbins, edges, 100, 0, 2700);
         h_universe_2D.at(k_xsec_eff)           = new TH2D("h_2D_eff",      "", nbins, edges, 100, 0, 0.5);
-        h_universe_2D.at(k_xsec_ext)           = new TH2D("h_2D_ext",      "", nbins, edges, 5, 0, 5);
-        h_universe_2D.at(k_xsec_dirt)          = new TH2D("h_2D_dirt",     "", nbins, edges, 10, 0, 10);
-        h_universe_2D.at(k_xsec_data)          = new TH2D("h_2D_data",     "", nbins, edges, 100, 0, 50);
-        h_universe_2D.at(k_xsec_mcxsec)        = new TH2D("h_2D_mcxsec",   "", nbins, edges, 100, 0, 0.5e-39);
-        h_universe_2D.at(k_xsec_dataxsec)      = new TH2D("h_2D_dataxsec", "", nbins, edges, 100, 0, 0.5e-39);
+        h_universe_2D.at(k_xsec_ext)           = new TH2D("h_2D_ext",      "", nbins, edges, 30, 0, 30);
+        h_universe_2D.at(k_xsec_dirt)          = new TH2D("h_2D_dirt",     "", nbins, edges, 40, 0, 40);
+        h_universe_2D.at(k_xsec_data)          = new TH2D("h_2D_data",     "", nbins, edges, 100, 0, 250);
+        h_universe_2D.at(k_xsec_mcxsec)        = new TH2D("h_2D_mcxsec",   "", nbins, edges, 100, 0, 1.5e-39);
+        h_universe_2D.at(k_xsec_dataxsec)      = new TH2D("h_2D_dataxsec", "", nbins, edges, 100, 0, 1.5e-39);
     }
     
     
@@ -1301,9 +1327,19 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         if (scale_val <  h_universe.at(k_dn).at(k)->GetMaximum()) scale_val =  h_universe.at(k_dn).at(k)->GetMaximum();
 
         // if (scale_val < h_universe.at(uni).at(k)->GetMaximum()) scale_val = h_universe.at(uni).at(k)->GetMaximum();
-        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec) h_universe_2D.at(k)->SetTitle(Form("%s", var_labels.at(var).c_str()));
-        else if (k == k_xsec_eff) h_universe_2D.at(k)->GetYaxis()->SetTitle("Efficiency");
-        else h_universe_2D.at(k)->GetYaxis()->SetTitle("Entries");
+        // if (k == k_xsec_mcxsec || k == k_xsec_dataxsec) h_universe_2D.at(k)->SetTitle(Form("%s", var_labels.at(var).c_str()));
+        // else if (k == k_xsec_eff) h_universe_2D.at(k)->GetYaxis()->SetTitle("Efficiency");
+        // else h_universe_2D.at(k)->GetYaxis()->SetTitle("Entries");
+
+        // Set the Titles
+        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
+            h_universe_2D.at(k)->SetTitle(var_labels_xsec.at(var).c_str());
+        else if (k == k_xsec_eff)
+            h_universe_2D.at(k)->SetTitle(var_labels_eff.at(var).c_str());
+        else
+            h_universe_2D.at(k)->SetTitle(var_labels_events.at(var).c_str());
+
+
         h_universe_2D.at(k)->Draw("colz,same");
         h_universe_2D.at(k)->GetXaxis()->SetTitle("");
         h_universe_2D.at(k)->GetXaxis()->SetLabelSize(0);
@@ -1364,8 +1400,17 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_err->GetYaxis()->SetTitleFont(44);
         h_err->GetYaxis()->CenterTitle();
         h_err->GetYaxis()->SetTitleOffset(1.5);
+
+        // Set the Titles
+        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
+            h_err->SetTitle(var_labels_xsec.at(var).c_str());
+        else if (k == k_xsec_eff)
+            h_err->SetTitle(var_labels_eff.at(var).c_str());
+        else
+            h_err->SetTitle(var_labels_events.at(var).c_str());
+
         h_err->SetTitle(" ");
-        h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+        // h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
         h_err->SetMarkerColor(kBlack);
         h_err->SetLineStyle(1);
         h_err->SetLineColor(kBlack);
@@ -1423,7 +1468,7 @@ void SystematicsHelper::CompareCVXSec(){
 
             // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
             if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(0.5e-39, 2.5e-39);
-            else h_dataxsec->GetYaxis()->SetRangeUser(0.0e-39, 0.5e-39);
+            else h_dataxsec->GetYaxis()->SetRangeUser(0.0e-39, 1.5e-39);
 
             h_dataxsec->GetYaxis()->SetLabelSize(0.04);
             h_dataxsec->GetYaxis()->SetTitleSize(14);
@@ -1485,7 +1530,6 @@ void SystematicsHelper::CompareCVXSec(){
             h_err->Add(h_mcxsec, -1);
             h_err->Divide(h_dataxsec);
             h_err->Scale(100);
-            h_err->GetYaxis()->SetTitle("Data - MC / Data [\%]");
             h_err->SetLineWidth(2);
             h_err->SetLineColor(kGreen+2);
 
@@ -1497,9 +1541,12 @@ void SystematicsHelper::CompareCVXSec(){
             h_err->SetLineColor(kBlack);
             h_err->GetYaxis()->SetTitleSize(11);
             h_err->GetYaxis()->SetRangeUser(-100, 100);
-            
+
+            // Set the Titles
+            h_err->SetTitle(var_labels_xsec.at(var).c_str());
+            h_err->GetYaxis()->SetTitle("Data - MC / Data [\%]");
             h_err->GetYaxis()->SetTitleOffset(2.5);
-            h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+            // h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
             if (vars.at(var) == "integrated")  h_err->GetXaxis()->SetLabelSize(0);
             h_err->SetMarkerSize(3.0);
             h_err->Draw("hist,text00");
@@ -1548,12 +1595,12 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
 
             // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
             if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(0.5e-39, 2.5e-39);
-            else h_dataxsec->GetYaxis()->SetRangeUser(0.0e-39, 0.5e-39);
+            else h_dataxsec->GetYaxis()->SetRangeUser(0.0e-39, 1.5e-39);
 
             _util.IncreaseLabelSize(h_dataxsec, c);
             if (vars.at(var) == "integrated")h_dataxsec->GetXaxis()->SetLabelSize(0);
             h_dataxsec->GetYaxis()->SetTitleSize(0.04);
-            h_dataxsec->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+            h_dataxsec->SetTitle(var_labels_xsec.at(var).c_str());
             h_dataxsec->SetMarkerStyle(20);
             h_dataxsec->SetMarkerSize(0.5);
             h_dataxsec_tot->SetMarkerStyle(20);
@@ -1650,6 +1697,17 @@ void SystematicsHelper::InitialsePlotCV(){
             // Customise
             cv_hist_vec.at(var).at(k)->SetLineWidth(2);
             cv_hist_vec.at(var).at(k)->SetLineColor(kBlack);
+
+            // Set the Titles
+            if (k == k_xsec_mcxsec)
+                cv_hist_vec.at(var).at(k)->SetTitle(var_labels_xsec.at(var).c_str());
+            else if (k == k_xsec_dataxsec)
+                cv_hist_vec.at(var).at(k)->SetTitle(var_labels_events.at(var).c_str());
+            else if (k == k_xsec_eff)
+                cv_hist_vec.at(var).at(k)->SetTitle(var_labels_eff.at(var).c_str());
+            else
+                cv_hist_vec.at(var).at(k)->SetTitle(var_labels_events.at(var).c_str());
+
         }
 
         // Create the CV directory and draw the CV
@@ -1787,7 +1845,19 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
     h_err_up->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
     h_err_up->GetYaxis()->SetRangeUser(-100, 100);
     h_err_up->GetYaxis()->SetTitle("\% change of Data to MC");
-    h_err_up->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+
+    // Set the Titles
+    if (var == k_xsec_mcxsec)
+        h_err_up->SetTitle(var_labels_xsec.at(var).c_str());
+    else if (var == k_xsec_dataxsec)
+        h_err_up->SetTitle(var_labels_events.at(var).c_str());
+    else if (var == k_xsec_eff)
+        h_err_up->SetTitle(var_labels_eff.at(var).c_str());
+    else
+        h_err_up->SetTitle(var_labels_events.at(var).c_str());
+
+    // h_err_up->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+    
     h_err_up->Draw("hist,same");
     h_err_dn->Draw("hist,same");
     h_err->Draw("hist,same");
@@ -2518,9 +2588,19 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             h_CV_clone->SetTitle(Form("%s", unisim_type.c_str() ));
 
             // if (scale_val < h_universe.at(uni).at(k)->GetMaximum()) scale_val = h_universe.at(uni).at(k)->GetMaximum();
-            if (type == k_xsec_mcxsec || type == k_xsec_dataxsec) h_CV_clone->SetTitle(Form("%s", var_labels.at(var).c_str()));
-            else if (type == k_xsec_eff) h_CV_clone->GetYaxis()->SetTitle("Efficiency");
-            else h_CV_clone->GetYaxis()->SetTitle("Entries");
+            // if (type == k_xsec_mcxsec || type == k_xsec_dataxsec) h_CV_clone->SetTitle(Form("%s", var_labels.at(var).c_str()));
+            
+            // Set the Titles
+            if (type == k_xsec_mcxsec || type == k_xsec_dataxsec)
+                h_CV_clone->SetTitle(var_labels_xsec.at(var).c_str());
+            else if (type == k_xsec_eff)
+                h_CV_clone->SetTitle(var_labels_eff.at(var).c_str());
+            else
+                h_CV_clone->SetTitle(var_labels_events.at(var).c_str());
+
+
+            // else if (type == k_xsec_eff) h_CV_clone->GetYaxis()->SetTitle("Efficiency");
+            // else h_CV_clone->GetYaxis()->SetTitle("Entries");
             h_CV_clone->SetFillColorAlpha(12, 0.15);
             h_CV_clone->Draw("e2, same");
             h_CV_clone->GetXaxis()->SetTitle("");
@@ -2597,8 +2677,18 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             h_err->GetYaxis()->SetTitleFont(44);
             h_err->GetYaxis()->CenterTitle();
             h_err->GetYaxis()->SetTitleOffset(1.5);
+
+             // Set the Titles
+            if (var == k_xsec_mcxsec || var == k_xsec_dataxsec)
+                h_err->SetTitle(var_labels_xsec.at(var).c_str());
+            else if (var == k_xsec_eff)
+                h_err->SetTitle(var_labels_eff.at(var).c_str());
+            else
+                h_err->SetTitle(var_labels_events.at(var).c_str());
+
+
             h_err->SetTitle(" ");
-            h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+            // h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
             h_err->SetMarkerColor(kBlack);
             h_err->SetLineStyle(1);
             h_err->SetLineColor(kBlack);
