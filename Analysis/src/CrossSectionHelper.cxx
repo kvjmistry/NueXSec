@@ -631,7 +631,7 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
         // Check the spline times tune weight
         _util.CheckWeight(_weightSplineTimesTune);
 
-        // Check the uiverse weight
+        // Check the uiverse weight -- Also need to set weights equal to 1.0 to the tune weight. Othwerwise we will introduce a bias when we divide this universe weight by the tune weight below.
         if (std::isnan(vec_universes[uni]) == 1 || std::isinf(vec_universes[uni]) || vec_universes[uni] < 0 || vec_universes[uni] > 30 || vec_universes[uni] == 1.0) {
             
             // We set the universe to be the spline times tune, so it cancels with the divide below to just return the CV weight
