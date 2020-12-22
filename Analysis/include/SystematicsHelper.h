@@ -252,6 +252,40 @@ class SystematicsHelper{
 
     enum updn {k_up, k_dn};
 
+    // Names of the overall errors
+    enum enum_sys {
+        k_err_tot,
+        k_err_stat,
+        k_err_sys,
+        k_err_genie_uni,
+        k_err_genie_multi,
+        k_err_hp,
+        k_err_beamline,
+        k_err_dirt,
+        k_err_pot,
+        k_err_reint,
+        k_err_detvar,
+        k_err_pi0,
+        k_err_mcstats,
+        k_ERR_MAX
+    };
+
+    std::vector<std::string> systematic_names = {
+        "tot",
+        "stat",
+        "sys",
+        "genie_uni",
+        "genie_multi",
+        "hp",
+        "beamline",
+        "dirt",
+        "pot",
+        "reint",
+        "detvar",
+        "pi0",
+        "mcstats"
+    };
+
     // Vectors to store the quadrature sum of the uncertainties
     // We combine all of these to then get the total error and plot it
     std::vector<std::vector<std::vector<double>>> v_sys_total;         // differential variable, type, bin error [total systematic]
@@ -265,17 +299,7 @@ class SystematicsHelper{
     std::vector<std::vector<std::vector<double>>> v_pot_total;         // differential variable, type, bin error [Flat 2% for POT counting]
     std::vector<std::vector<std::vector<double>>> v_detvar_total;      // differential variable, type, bin error [Total detector variation err]
 
-    TH2D* h_cov_tot;         // Sum of all covariance matrices
-    TH2D* h_cov_sys;         // Total Systematic covariance matrix
-    TH2D* h_cov_stat;        // Diagonal statistical covariance matrix
-    TH2D* h_cov_genie_uni;   // Genie unisims
-    TH2D* h_cov_genie_multi; // Genie multisims
-    TH2D* h_cov_hp;          // PPFX HP
-    TH2D* h_cov_beamline;    // Beamline 
-    TH2D* h_cov_dirt;        // Dirt 
-    TH2D* h_cov_pot;         // POT counting
-    TH2D* h_cov_reint;       // Geant reinteractions
-    TH2D* h_cov_detvar;      // Detector Variations
+    std::vector<TH2D*> h_cov_v; // Vector to store all the final covariance matrices
 
 
 

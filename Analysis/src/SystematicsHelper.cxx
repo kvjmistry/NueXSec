@@ -647,17 +647,10 @@ void SystematicsHelper::InitialiseReweightingMode(){
 
     // Initialise the covariance matrices -- this needs to be vectorized
     int n_bins = cv_hist_vec.at(k_var_reco_el_E).at(0)->GetNbinsX();
-    h_cov_tot         = new TH2D("h_cov_tot",         "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
-    h_cov_sys         = new TH2D("h_cov_sys",         "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
-    h_cov_stat        = new TH2D("h_cov_stat",        "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
-    h_cov_genie_uni   = new TH2D("h_cov_genie_uni",   "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
-    h_cov_genie_multi = new TH2D("h_cov_genie_multi", "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
-    h_cov_hp          = new TH2D("h_cov_hp",          "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
-    h_cov_beamline    = new TH2D("h_cov_beamline",    "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
-    h_cov_dirt        = new TH2D("h_cov_dirt",        "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
-    h_cov_pot         = new TH2D("h_cov_pot",         "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
-    h_cov_reint       = new TH2D("h_cov_reint",       "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
-
+    h_cov_v.resize(k_ERR_MAX);
+    for (unsigned int cov = 0; cov < h_cov_v.size(); cov++){
+        h_cov_v.at(cov) = new TH2D(Form("h_cov_%s", systematic_names.at(cov).c_str()),         "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
+    }
 
     // Loop over the cross-section variables
     for (unsigned int var = 0; var <  vars.size(); var++){
@@ -734,16 +727,10 @@ void SystematicsHelper::InitialiseReweightingMode(){
 
     // Save the total covariance matrices
     _util.CreateDirectory("/Systematics/Covariance");
-    SaveCovMatrix(h_cov_tot,         Form("plots/run%s/Systematics/Covariance/run%s_tot_cov.pdf",         _util.run_period, _util.run_period));
-    SaveCovMatrix(h_cov_sys,         Form("plots/run%s/Systematics/Covariance/run%s_tot_sys_cov.pdf",     _util.run_period, _util.run_period));
-    SaveCovMatrix(h_cov_stat,        Form("plots/run%s/Systematics/Covariance/run%s_tot_stat_cov.pdf",    _util.run_period, _util.run_period));
-    SaveCovMatrix(h_cov_genie_uni,   Form("plots/run%s/Systematics/Covariance/run%s_genie_uni_cov.pdf",   _util.run_period, _util.run_period));
-    SaveCovMatrix(h_cov_genie_multi, Form("plots/run%s/Systematics/Covariance/run%s_genie_multi_cov.pdf", _util.run_period, _util.run_period));
-    SaveCovMatrix(h_cov_hp,          Form("plots/run%s/Systematics/Covariance/run%s_hp_cov.pdf",          _util.run_period, _util.run_period));
-    SaveCovMatrix(h_cov_beamline,    Form("plots/run%s/Systematics/Covariance/run%s_beamline_cov.pdf",    _util.run_period, _util.run_period));
-    SaveCovMatrix(h_cov_dirt,        Form("plots/run%s/Systematics/Covariance/run%s_dirt_cov.pdf",        _util.run_period, _util.run_period));
-    SaveCovMatrix(h_cov_pot,         Form("plots/run%s/Systematics/Covariance/run%s_pot_cov.pdf",         _util.run_period, _util.run_period));
-    SaveCovMatrix(h_cov_reint,       Form("plots/run%s/Systematics/Covariance/run%s_reint_cov.pdf",       _util.run_period, _util.run_period));
+    for (unsigned int cov = 0; cov < h_cov_v.size(); cov++){
+        SaveCovMatrix(h_cov_v.at(cov),         Form("plots/run%s/Systematics/Covariance/run%s_%s_cov.pdf",         _util.run_period, _util.run_period,systematic_names.at(cov).c_str()));
+
+    }
 
     // Create the directories
     _util.CreateDirectory("/Systematics/Beamline");
@@ -763,16 +750,16 @@ void SystematicsHelper::InitialiseReweightingMode(){
 
     // Print the sqrt of the diagonals of the covariance matrix
     // loop over rows
-    for (int row = 1; row < h_cov_sys->GetNbinsX()+1; row++) {
+    for (int row = 1; row < h_cov_v.at(k_err_sys)->GetNbinsX()+1; row++) {
         
         // Loop over columns
-        for (int col = 1; col < h_cov_sys->GetNbinsY()+1; col++) {
+        for (int col = 1; col < h_cov_v.at(k_err_sys)->GetNbinsY()+1; col++) {
             
             // Only set the bin content of the diagonals
             double bin_diag = cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->GetBinContent(row);
 
             // 0.01 converts each percentage back to a number. We multiply this by the cv to get the deviate
-            if (row == col) std::cout << 100 * std::sqrt(h_cov_sys->GetBinContent(row, col)) / bin_diag << std::endl;  
+            if (row == col) std::cout << 100 * std::sqrt(h_cov_v.at(k_err_sys)->GetBinContent(row, col)) / bin_diag << std::endl;  
         }
     }
 
@@ -1963,9 +1950,9 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
             label == "RPA_CCQE_Reduced" ||
             label == "NormCCCOH"        ||
             label == "NormNCCOH"){
-                h_cov_genie_uni->Add(cov);
-                h_cov_tot->Add(cov);
-                h_cov_sys->Add(cov);
+                h_cov_v.at(k_err_genie_uni)->Add(cov);
+                h_cov_v.at(k_err_tot)->Add(cov);
+                h_cov_v.at(k_err_sys)->Add(cov);
 
         }
         else if (label == "Horn_curr" ||
@@ -1979,38 +1966,50 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
                 label == "Beam_shift_y" ||
                 label == "Target_z" ||
                 label == "Decay_pipe_Bfield"){
-                h_cov_beamline->Add(cov);
-                h_cov_tot->Add(cov);
-                h_cov_sys->Add(cov);
+                h_cov_v.at(k_err_beamline)->Add(cov);
+                h_cov_v.at(k_err_tot)->Add(cov);
+                h_cov_v.at(k_err_sys)->Add(cov);
         }
         else if (label == "weightsGenie"){
-            h_cov_genie_multi->Add(cov);
-            h_cov_tot->Add(cov);
-            h_cov_sys->Add(cov);
+            h_cov_v.at(k_err_genie_multi)->Add(cov);
+            h_cov_v.at(k_err_tot)->Add(cov);
+            h_cov_v.at(k_err_sys)->Add(cov);
 
         }
         else if (label == "weightsReint"){
-            h_cov_reint->Add(cov);
-            h_cov_tot->Add(cov);
-            h_cov_sys->Add(cov);
+            h_cov_v.at(k_err_reint)->Add(cov);
+            h_cov_v.at(k_err_tot)->Add(cov);
+            h_cov_v.at(k_err_sys)->Add(cov);
 
         }
         else if (label == "weightsPPFX"){
-            h_cov_hp->Add(cov);
-            h_cov_tot->Add(cov);
-            h_cov_sys->Add(cov);
+            h_cov_v.at(k_err_hp)->Add(cov);
+            h_cov_v.at(k_err_tot)->Add(cov);
+            h_cov_v.at(k_err_sys)->Add(cov);
 
         }
         else if (label == "Dirt"){
-            h_cov_dirt->Add(cov);
-            h_cov_tot->Add(cov);
-            h_cov_sys->Add(cov);
+            h_cov_v.at(k_err_dirt)->Add(cov);
+            h_cov_v.at(k_err_tot)->Add(cov);
+            h_cov_v.at(k_err_sys)->Add(cov);
 
         }
         else if (label == "POT"){
-            h_cov_pot->Add(cov);
-            h_cov_tot->Add(cov);
-            h_cov_sys->Add(cov);
+            h_cov_v.at(k_err_pot)->Add(cov);
+            h_cov_v.at(k_err_tot)->Add(cov);
+            h_cov_v.at(k_err_sys)->Add(cov);
+
+        }
+        else if (label == "MCStats"){
+            h_cov_v.at(k_err_mcstats)->Add(cov);
+            h_cov_v.at(k_err_tot)->Add(cov);
+            h_cov_v.at(k_err_sys)->Add(cov);
+
+        }
+        else if (label == "pi0"){
+            h_cov_v.at(k_err_pi0)->Add(cov);
+            h_cov_v.at(k_err_tot)->Add(cov);
+            h_cov_v.at(k_err_sys)->Add(cov);
 
         }
         else {
@@ -2257,21 +2256,21 @@ void SystematicsHelper::FillStatVector(){
 
     // Lets also fill the diagonals of the statistical covariance matrix
     // loop over rows
-    for (int row = 1; row < h_cov_stat->GetNbinsX()+1; row++) {
+    for (int row = 1; row < h_cov_v.at(k_err_stat)->GetNbinsX()+1; row++) {
         
         // Loop over columns
-        for (int col = 1; col < h_cov_stat->GetNbinsY()+1; col++) {
+        for (int col = 1; col < h_cov_v.at(k_err_stat)->GetNbinsY()+1; col++) {
             
             // Only set the bin content of the diagonals
             double bin_diag = cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->GetBinContent(row); // We use the MC value to fill the cov matrix, but use the data stat err for now. 
 
             // 0.01 converts each percentage back to a number. We multiply this by the cv to get the deviate
-            if (row == col) h_cov_stat->SetBinContent(row, col, 0.01*0.01*v_stat_total.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(row-1)*bin_diag*bin_diag);  
+            if (row == col) h_cov_v.at(k_err_stat)->SetBinContent(row, col, 0.01*0.01*v_stat_total.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(row-1)*bin_diag*bin_diag);  
         }
     }
 
     // Add the stat to the total
-    h_cov_tot->Add(h_cov_stat);
+    h_cov_v.at(k_err_tot)->Add(h_cov_v.at(k_err_stat));
 
 
 }
