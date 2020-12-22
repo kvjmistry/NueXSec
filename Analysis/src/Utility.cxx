@@ -566,10 +566,10 @@ void Utility::GetPiZeroWeight(double &weight, int pizero_mode, int nu_pdg, int c
         if (npi0 > 0) {
             double pi0emax = 0.6;
             if (pi0_e > 0.1 && pi0_e < pi0emax){
-                weight = weight * (1 - 0.4 * pi0_e);
+                weight = weight * (1. - 0.4 * pi0_e);
             }
             else if (pi0_e > 0.1 && pi0_e >= pi0emax){
-                weight = weight * (1 - 0.4 * pi0emax);
+                weight = weight * (1. - 0.4 * pi0emax);
             }
             
         }

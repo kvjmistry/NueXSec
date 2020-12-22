@@ -190,12 +190,12 @@ void Selection::MakeSelection(){
         // Create a file for the selected events and their properties
         std::ofstream evt_dist_sig;
         evt_dist_sig.open(Form("files/run%s_evt_dist_sig.txt",_util.run_period));
-        evt_dist_sig << "true_E," << "true_theta," << "true_phi,"<< "reco_E," << "w" << "\n";
+        evt_dist_sig << "true_E," << "reco_E," << "w" << "\n";
 
         // Create a file for the generated events and their properties
         std::ofstream evt_dist_gen;
         evt_dist_gen.open(Form("files/run%s_evt_dist_gen.txt",_util.run_period));
-        evt_dist_gen << "true_E," << "true_theta," << "true_phi,"<< "w" << "\n";
+        evt_dist_gen << "true_E,"<< "w" << "\n";
 
         // Create a file for the generated events and their properties
         std::ofstream evt_dist_bkg;
@@ -236,13 +236,13 @@ void Selection::MakeSelection(){
             // if passed ans is a signal the write events to the file
             if (pass && mc_SC.is_signal && mc_SC.cv_weight != 0.0) {
                 // evt_dist_sig << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.shr_energy_cali << "," << mc_SC.cv_weight*_util.mc_scale_factor << "\n";
-                evt_dist_sig << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.shr_energy_cali << "," << mc_SC.cv_weight<< "\n";
+                evt_dist_sig << mc_SC.elec_e << "," << mc_SC.shr_energy_cali << "," << mc_SC.cv_weight<< "\n";
             }
 
             // Generated events
             if (mc_SC.is_signal && mc_SC.cv_weight != 0.0) {
                 // evt_dist_gen << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.cv_weight*_util.mc_scale_factor << "\n";
-                evt_dist_gen << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.cv_weight << "\n";
+                evt_dist_gen << mc_SC.elec_e << "," << mc_SC.cv_weight << "\n";
             }
 
             // if passed and is a background the write events to the file
@@ -723,37 +723,7 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
     SC.SliceClassifier(type);      // Classification of the event
     SC.SliceInteractionType(type); // Genie interaction type
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
-    
-    // *************************************************************************
-    // Software Trigger -- MC Only  --------------------------------------------
-    // *************************************************************************
-    pass = _scuts.swtrig(SC, type);
-    // if(!pass) return; // Failed the cut!
-    
-    // *************************************************************************
-    // Common Optical Filter PE  -----------------------------------------------
-    // *************************************************************************
-    pass = _scuts.opfilt_pe(SC, type);
-    // if(!pass) return; // Failed the cut!
-
-    // *************************************************************************
-    // Common Optical Filter Veto  ---------------------------------------------
-    // *************************************************************************
-    pass = _scuts.opfilt_veto(SC, type);
-    // if(!pass) return; // Failed the cut!
-
-    // *************************************************************************
-    // Slice ID ----------------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.slice_id(SC);
-    if(!pass) return; // Failed the cut!
-
-    // *************************************************************************
-    // In FV -------------------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.in_fv(SC);
-    if(!pass) return; // Failed the cut!
-    
+        
     // *************************************************************************
     // Pi0 Selection Cuts ------------------------------------------------------
     // *************************************************************************

@@ -2121,9 +2121,18 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
             
             double av_err = 0;
             // Get the max error in each bin, then add the square
-            av_err += std::abs(h_up->GetBinContent(bin+1));
-            av_err += std::abs(h_dn->GetBinContent(bin+1));
-            av_err /= std::sqrt(2.0); // sqrt 2 since we are using the covariance matrix formalism (cov matrix with 2 universes) -- error is sqrt diag
+            
+            // Singular variation
+            if (variation == "Decay_pipe_Bfield"){
+                av_err += std::abs(h_up->GetBinContent(bin+1));
+            }
+            // Two sided variation
+            else {
+                av_err += std::abs(h_up->GetBinContent(bin+1));
+                av_err += std::abs(h_dn->GetBinContent(bin+1));
+                av_err /= std::sqrt(2.0); // sqrt 2 since we are using the covariance matrix formalism (cov matrix with 2 universes) -- error is sqrt diag
+            }
+            
             v_beamline_total.at(var).at(type).at(bin) += av_err*av_err;
             v_sys_total.at(var).at(type).at(bin)      += av_err*av_err;
             
