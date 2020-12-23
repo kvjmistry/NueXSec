@@ -899,6 +899,12 @@ void CrossSectionHelper::WriteHists(){
                         h_cross_sec.at(label).at(uni).at(var).at(p)->SetOption("hist");
                         h_cross_sec.at(label).at(uni).at(var).at(p)->Write("",TObject::kOverwrite);
                     }
+
+                    // Write the smearing matrix to the reco folder
+                    if (var == k_var_reco_el_E){
+                        h_smear.at(label).at(uni)->SetOption("colz");
+                        h_smear.at(label).at(uni)->Write("",TObject::kOverwrite);
+                    }
                 
                 } // End loop over the variables
 
@@ -1317,6 +1323,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
 
     // Resize to the number of reweighters
     h_cross_sec.resize(reweighter_labels.size());
+    h_smear.resize(reweighter_labels.size());
     
     // Resize each reweighter to their number of universes
     for (unsigned int j=0; j < reweighter_labels.size(); j++){
@@ -1325,25 +1332,30 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
         if ( reweighter_labels.at(j) == "weightsGenie"){
             std::cout << "Setting Genie All Histogram universe vector to size: " << uni_genie << std::endl;
             h_cross_sec.at(j).resize(uni_genie);
+            h_smear.at(j).resize(uni_genie);
         }
         // Specific resizing -- hardcoded and may break in the future
         else if ( reweighter_labels.at(j) == "weightsPPFX"){
             std::cout << "Setting PPFX All Histogram universe vector to size: " << uni_ppfx << std::endl;
             h_cross_sec.at(j).resize(uni_ppfx);
+            h_smear.at(j).resize(uni_ppfx);
         }
         // Specific resizing -- hardcoded and may break in the future
         else if ( reweighter_labels.at(j) == "weightsReint" ){
             std::cout << "Setting Geant Reinteractions Histogram universe vector to size: " << uni_reint << std::endl;
             h_cross_sec.at(j).resize(uni_reint);
+            h_smear.at(j).resize(uni_reint);
         }
          // Specific resizing -- hardcoded and may break in the future
         else if ( reweighter_labels.at(j) == "MCStats" ){
             std::cout << "Setting MCStats Histogram universe vector to size: " << uni_mcstats << std::endl;
             h_cross_sec.at(j).resize(uni_mcstats);
+            h_smear.at(j).resize(uni_mcstats);
         }
         // Default size of 1
         else {
             h_cross_sec.at(j).resize(1);
+            h_smear.at(j).resize(1);
         }
 
     }
@@ -1388,6 +1400,10 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
 
         // loop over the universes
         for (unsigned int uni=0; uni < h_cross_sec.at(label).size(); uni++){
+
+            // Define bin labels fro smearing matrix
+            int nbins_smear;
+            double* edges_smear;
             
             // Loop over the variables
             for (unsigned int var = 0; var < h_cross_sec.at(label).at(uni).size(); var ++){
@@ -1398,6 +1414,10 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 temp_bins = bins.at(var);
                 double* edges = &temp_bins[0]; // Cast to an array 
 
+                if (var == k_var_reco_el_E){
+                    nbins_smear = nbins;
+                    edges_smear = edges;
+                }
 
                 // loop over and create the histograms
                 for (unsigned int i=0; i < xsec_types.size();i++){    
@@ -1416,6 +1436,8 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                     }
                 }
             } // End loop over the variables
+
+            h_smear.at(label).at(uni) = new TH2D ( Form("h_run%s_%s_%i_smearing",_util.run_period, reweighter_labels.at(label).c_str(), uni) ,";Leading Shower Energy [GeV]; True e#lower[-0.5]{-} + e^{+} Energy [GeV]", nbins_smear, edges_smear, nbins_smear, edges_smear);
         
         } // End loop over the universes
     
@@ -1534,6 +1556,10 @@ void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double wei
 
     // True Electron Energy
     h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(xsec_type)->Fill(elec_e, weight_uni);
+
+    // Smearing Matrix -- only fill for selected signal events
+    if (xsec_type == k_xsec_sig)
+        h_smear.at(label).at(uni)->Fill(shr_energy_cali, elec_e, weight_uni);
 
 }
 // -----------------------------------------------------------------------------

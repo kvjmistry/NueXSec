@@ -198,7 +198,7 @@ class SystematicsHelper{
         //  7 // WM dE/dX
     };
 
-    // enum for histogram vars
+    // enum for histogram types
     enum TH1D_xsec_hist_vars {
         k_xsec_sel,     // Selected event histogram binned in energy
         k_xsec_bkg,     // Bkg event histogram binned in energy

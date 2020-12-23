@@ -107,10 +107,13 @@ class CrossSectionHelper{
     // Define histograms for the cross section calculation
     std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_cross_sec; // Label -- Universe -- variable -- xsec_type
 
+    // define vector of smearing matrices
+    std::vector<std::vector<TH2D*>> h_smear; // Label -- Universe
+
     // Define histograms for the reweighting by cut
     std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_cut_v; // Label -- Cut -- variable -- Universe
 
-    // enum for histogram vars
+    // enum for histogram types
     enum TH1D_xsec_hist_vars {
         k_xsec_sel,     // Selected event histogram binned in energy
         k_xsec_bkg,     // Bkg event histogram binned in energy
