@@ -286,20 +286,11 @@ class SystematicsHelper{
         "mcstats"
     };
 
-    // Vectors to store the quadrature sum of the uncertainties
-    // We combine all of these to then get the total error and plot it
-    std::vector<std::vector<std::vector<double>>> v_sys_total;         // differential variable, type, bin error [total systematic]
-    std::vector<std::vector<std::vector<double>>> v_stat_total;        // differential variable, type, bin error [total statistical]
-    std::vector<std::vector<std::vector<double>>> v_genie_uni_total;   // differential variable, type, bin error [genie unisim]
-    std::vector<std::vector<std::vector<double>>> v_genie_multi_total; // differential variable, type, bin error [genie multisim]
-    std::vector<std::vector<std::vector<double>>> v_beamline_total;    // differential variable, type, bin error [beamline unisim]
-    std::vector<std::vector<std::vector<double>>> v_hp_total;          // differential variable, type, bin error [hadron production multisim]
-    std::vector<std::vector<std::vector<double>>> v_reint_total;       // differential variable, type, bin error [geant reinteraction multisim]
-    std::vector<std::vector<std::vector<double>>> v_dirt_total;        // differential variable, type, bin error [dirt shift by +/- 100%]
-    std::vector<std::vector<std::vector<double>>> v_pot_total;         // differential variable, type, bin error [Flat 2% for POT counting]
-    std::vector<std::vector<std::vector<double>>> v_detvar_total;      // differential variable, type, bin error [Total detector variation err]
-
-    std::vector<TH2D*> h_cov_v; // Vector to store all the final covariance matrices
+    // Vector to store the quadrature sum of the uncertainties
+    std::vector<std::vector<std::vector<std::vector<double>>>> v_err;
+    
+    // Vector to store all the final covariance matrices
+    std::vector<TH2D*> h_cov_v;
 
 
 
