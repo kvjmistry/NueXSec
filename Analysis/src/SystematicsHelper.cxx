@@ -1202,8 +1202,8 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_universe_2D.at(k_xsec_ext)           = new TH2D("h_2D_ext",      "", nbins, edges, 30, 0, 30);
         h_universe_2D.at(k_xsec_dirt)          = new TH2D("h_2D_dirt",     "", nbins, edges, 40, 0, 40);
         h_universe_2D.at(k_xsec_data)          = new TH2D("h_2D_data",     "", nbins, edges, 100, 0, 250);
-        h_universe_2D.at(k_xsec_mcxsec)        = new TH2D("h_2D_mcxsec",   "", nbins, edges, 100, 0, 1.5e-39);
-        h_universe_2D.at(k_xsec_dataxsec)      = new TH2D("h_2D_dataxsec", "", nbins, edges, 100, 0, 1.5e-39);
+        h_universe_2D.at(k_xsec_mcxsec)        = new TH2D("h_2D_mcxsec",   "", nbins, edges, 100, 0, xsec_scale);
+        h_universe_2D.at(k_xsec_dataxsec)      = new TH2D("h_2D_dataxsec", "", nbins, edges, 100, 0, xsec_scale);
     }
     
     
@@ -1460,7 +1460,7 @@ void SystematicsHelper::CompareCVXSec(){
 
             // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
             if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(0.5e-39, 2.5e-39);
-            else h_dataxsec->GetYaxis()->SetRangeUser(0.0e-39, 1.5e-39);
+            else h_dataxsec->GetYaxis()->SetRangeUser(0.0e-39, xsec_scale);
 
             h_dataxsec->GetYaxis()->SetLabelSize(0.04);
             h_dataxsec->GetYaxis()->SetTitleSize(14);
@@ -1587,7 +1587,7 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
 
             // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
             if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(0.5e-39, 2.5e-39);
-            else h_dataxsec->GetYaxis()->SetRangeUser(0.0e-39, 1.5e-39);
+            else h_dataxsec->GetYaxis()->SetRangeUser(0.0e-39, xsec_scale);
 
             _util.IncreaseLabelSize(h_dataxsec, c);
             if (vars.at(var) == "integrated")h_dataxsec->GetXaxis()->SetLabelSize(0);
@@ -2976,7 +2976,7 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
                 h_uncertainty.at(k_err_detvar)->SetLineColor(32);
                 h_uncertainty.at(k_err_dirt)->SetLineColor(46);
                 h_uncertainty.at(k_err_pot)->SetLineColor(42);
-                h_uncertainty.at(k_err_pi0)->SetLineColor(kRed);
+                h_uncertainty.at(k_err_pi0)->SetLineColor(kSpring-1);
 
                 TCanvas *c = new TCanvas("c", "c", 500, 500);
                 c->SetLeftMargin(0.13);

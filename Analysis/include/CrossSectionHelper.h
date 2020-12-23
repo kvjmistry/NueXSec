@@ -349,6 +349,10 @@ class CrossSectionHelper{
     // Concatenates the run subrun event number to a single number
     int ConcatRunSubRunEvent(int run, int subrun, int event);
     // -------------------------------------------------------------------------
+    // Normalise the smearing matrix and then use it to get a smeared efficiency
+    void Smear(TH1D* h_sig, TH1D* h_gen, TH2D* h_smear, TH1D* h_eff);
+    // -------------------------------------------------------------------------
+
 
 
 
