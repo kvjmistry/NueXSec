@@ -36,7 +36,7 @@
   <!-- <copy>1</copy> -->
 
   <!-- <fcldir>/pnfs/uboone/persistent/users/kmistry/searchingfornues/</fcldir> -->
-  
+   
   <!-- Project stages -->
   <stage name="ntuple">
     <fcl>run_redk2nu_fhc.fcl</fcl>
@@ -53,6 +53,7 @@
     <memory>2000</memory>
     <disk>25GB</disk>
     <schema>root</schema>
+    <prestagefraction>1</prestagefraction>
     <inputdef>prod_numi_overlay_mcc9_v08_00_00_48_TPCDetVar_run1_reco2_nu_SCE_reco2</inputdef>
     <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/FHC/flux_cached_entries.root</jobsub>
     <jobsub_start>  --expected-lifetime=short</jobsub_start>

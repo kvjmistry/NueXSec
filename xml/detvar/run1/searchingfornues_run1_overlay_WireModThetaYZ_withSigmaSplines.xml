@@ -23,7 +23,7 @@
   <os>SL7</os>
 
   <!-- Batch resources -->
-  <resource>DEDICATED,OPPORTUNISTIC,OFFSITE</resource>
+  <resource>DEDICATED,OPPORTUNISTIC</resource>
 
   <!-- Larsoft information -->
   <larsoft>
