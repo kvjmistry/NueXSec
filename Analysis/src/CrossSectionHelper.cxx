@@ -151,7 +151,7 @@ void CrossSectionHelper::LoopEvents(){
                 double weight_uni{1.0}; 
 
                 // Set the weight for universe i
-                SetUniverseWeight(reweighter_labels.at(label), weight_uni, weight_dirt, weight_ext, weightSplineTimesTune, *classification, cv_weight, uni, nu_pdg, true_energy, numi_ang);
+                SetUniverseWeight(reweighter_labels.at(label), weight_uni, weight_dirt, weight_ext, weightSplineTimesTune, *classification, cv_weight, uni, nu_pdg, true_energy, numi_ang, npi0, pi0_e);
 
                 // Signal event
                 if ((*classification == "nue_cc" || *classification == "nuebar_cc" || *classification == "unmatched_nue" || *classification == "unmatched_nuebar") && passed_selection) {
@@ -251,8 +251,15 @@ void CrossSectionHelper::LoopEvents(){
                 if (reweighter_labels.at(label) == "POTup") weight_POT =1.0/1.02;
                 if (reweighter_labels.at(label) == "POTdn") weight_POT =1.0/0.98;
 
-                // Calculate the efficiency histogram -- this is incorrect, we need to smear the truth efficiency!
-                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff)->Divide(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(var).at(k_xsec_gen));
+                // Calculate the efficiency histogram with smearing of the truth
+                if (var == k_var_reco_el_E){
+                    Smear(h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_gen),
+                          h_smear.at(label).at(uni), h_cross_sec.at(label).at(uni).at(k_var_reco_el_E).at(k_xsec_eff));
+                }
+                // Calculate the efficiency histogram by dividing the sig and gen
+                else{ 
+                    h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff)->Divide(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(var).at(k_xsec_gen));
+                }
 
                 // MC Cross section -- currently using eventrate
                 CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sel), // N Sel
@@ -510,7 +517,7 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
             double weight_uni{1.0}; 
 
             double _numi_ang = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "beam");
-            SetUniverseWeight(reweighter_labels[label], weight_uni, weight_dirt, weight_ext, SC.weightSplineTimesTune, classification.first, cv_weight, uni, SC.nu_pdg, SC.nu_e, _numi_ang);
+            SetUniverseWeight(reweighter_labels[label], weight_uni, weight_dirt, weight_ext, SC.weightSplineTimesTune, classification.first, cv_weight, uni, SC.nu_pdg, SC.nu_e, _numi_ang, SC.npi0, SC.pi0_e);
 
             double dedx_max = SC.GetdEdxMax();
 
@@ -553,7 +560,8 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
 
 }
 // -----------------------------------------------------------------------------
-void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double &weight_ext,  double _weightSplineTimesTune, std::string _classification, double cv_weight, int uni, int _nu_pdg, double _true_energy, double _numi_ang ){
+void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double &weight_ext,  double _weightSplineTimesTune,
+                                           std::string _classification, double cv_weight, int uni, int _nu_pdg, double _true_energy, double _numi_ang, int _npi0, double _pi0_e ){
 
     // Weight equal to universe weight times cv weight
     if (label == "weightsReint" || label == "weightsPPFX" || label == "CV" ){
@@ -592,6 +600,36 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
         weight_uni  = cv_weight;
         weight_dirt = cv_weight;
     }
+    // Pi0 Tune -- This undoes the pi0 tune to see what effect it has
+    else if ( label == "pi0"){
+
+        // Fix the normalisation
+        if (_util.pi0_correction == 1){
+            
+            if (_npi0 > 0) {
+                weight_uni = cv_weight / 0.759;
+            }
+
+        }
+        // Try energy dependent scaling for pi0
+        else if (_util.pi0_correction == 2){
+            
+            if (_npi0 > 0) {
+                double pi0emax = 0.6;
+                if (_pi0_e > 0.1 && _pi0_e < pi0emax){
+                    weight_uni = cv_weight / (1 - 0.4 * pi0_e);
+                }
+                else if (_pi0_e > 0.1 && _pi0_e >= pi0emax){
+                    weight_uni = cv_weight / (1 - 0.4 * pi0emax);
+                }
+                
+            }
+        }
+        else {
+            // Dont touch the weight
+            weight_uni = cv_weight;
+        }
+    }
     // If we are using the genie systematics and unisim systematics then we want to undo the genie tune on them so we dont double count
     else {
         // Note we actually dont want to divide out by the spline, but since this is 1 in numi, it doesnt matter!
@@ -600,8 +638,8 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
         // Check the spline times tune weight
         _util.CheckWeight(_weightSplineTimesTune);
 
-        // Check the uiverse weight
-        if (std::isnan(vec_universes[uni]) == 1 || std::isinf(vec_universes[uni]) || vec_universes[uni] < 0 || vec_universes[uni] > 30) {
+        // Check the uiverse weight -- Also need to set weights equal to 1.0 to the tune weight. Othwerwise we will introduce a bias when we divide this universe weight by the tune weight below.
+        if (std::isnan(vec_universes[uni]) == 1 || std::isinf(vec_universes[uni]) || vec_universes[uni] < 0 || vec_universes[uni] > 30 || vec_universes[uni] == 1.0) {
             
             // We set the universe to be the spline times tune, so it cancels with the divide below to just return the CV weight
             // i.e. a universe weight of 1
@@ -667,7 +705,7 @@ void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg,
     h_xsec->Add(h_ext_clone,  -1);
     h_xsec->Add(h_dirt_clone, -1);
     
-    // h_xsec->Divide(h_eff) ; // For flux normalised event rate we dont do anything to the efficiency
+    h_xsec->Divide(h_eff) ; // For flux normalised event rate we dont do anything to the efficiency
 
     h_xsec->Scale(1.0 / (targ*flux) );
 
@@ -861,8 +899,18 @@ void CrossSectionHelper::WriteHists(){
                 
                     // Now write the histograms, 
                     for (unsigned int p = 0; p < h_cross_sec.at(label).at(uni).at(var).size(); p++){
+                        // Certain histograms we want to divide out by the bin width
+                        if ((var == k_var_reco_el_E || var == k_var_true_el_E) && p != k_xsec_eff )
+                            h_cross_sec.at(label).at(uni).at(var).at(p)->Scale(1.0, "width");
+
                         h_cross_sec.at(label).at(uni).at(var).at(p)->SetOption("hist");
                         h_cross_sec.at(label).at(uni).at(var).at(p)->Write("",TObject::kOverwrite);
+                    }
+
+                    // Write the smearing matrix to the reco folder
+                    if (var == k_var_reco_el_E){
+                        h_smear.at(label).at(uni)->SetOption("colz,text00");
+                        h_smear.at(label).at(uni)->Write("",TObject::kOverwrite);
                     }
                 
                 } // End loop over the variables
@@ -928,6 +976,8 @@ void CrossSectionHelper::InitTree(){
     tree->SetBranchAddress("weightSplineTimesTune",  &weightSplineTimesTune);
     tree->SetBranchAddress("numi_ang",  &numi_ang);
     tree->SetBranchAddress("nu_pdg",  &nu_pdg);
+    tree->SetBranchAddress("npi0",  &npi0);
+    tree->SetBranchAddress("pi0_e",  &pi0_e);
     
     tree->SetBranchAddress("weightsGenie",          &weightsGenie);
     tree->SetBranchAddress("weightsReint",          &weightsReint);
@@ -1227,7 +1277,8 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 "Dirtup",
                 "Dirtdn",
                 "POTup",
-                "POTdn"
+                "POTdn", 
+                "pi0"
             };
         }
         // Only run PPFX
@@ -1279,6 +1330,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
 
     // Resize to the number of reweighters
     h_cross_sec.resize(reweighter_labels.size());
+    h_smear.resize(reweighter_labels.size());
     
     // Resize each reweighter to their number of universes
     for (unsigned int j=0; j < reweighter_labels.size(); j++){
@@ -1287,25 +1339,30 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
         if ( reweighter_labels.at(j) == "weightsGenie"){
             std::cout << "Setting Genie All Histogram universe vector to size: " << uni_genie << std::endl;
             h_cross_sec.at(j).resize(uni_genie);
+            h_smear.at(j).resize(uni_genie);
         }
         // Specific resizing -- hardcoded and may break in the future
         else if ( reweighter_labels.at(j) == "weightsPPFX"){
             std::cout << "Setting PPFX All Histogram universe vector to size: " << uni_ppfx << std::endl;
             h_cross_sec.at(j).resize(uni_ppfx);
+            h_smear.at(j).resize(uni_ppfx);
         }
         // Specific resizing -- hardcoded and may break in the future
         else if ( reweighter_labels.at(j) == "weightsReint" ){
             std::cout << "Setting Geant Reinteractions Histogram universe vector to size: " << uni_reint << std::endl;
             h_cross_sec.at(j).resize(uni_reint);
+            h_smear.at(j).resize(uni_reint);
         }
          // Specific resizing -- hardcoded and may break in the future
         else if ( reweighter_labels.at(j) == "MCStats" ){
             std::cout << "Setting MCStats Histogram universe vector to size: " << uni_mcstats << std::endl;
             h_cross_sec.at(j).resize(uni_mcstats);
+            h_smear.at(j).resize(uni_mcstats);
         }
         // Default size of 1
         else {
             h_cross_sec.at(j).resize(1);
+            h_smear.at(j).resize(1);
         }
 
     }
@@ -1350,6 +1407,10 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
 
         // loop over the universes
         for (unsigned int uni=0; uni < h_cross_sec.at(label).size(); uni++){
+
+            // Define bin labels fro smearing matrix
+            int nbins_smear;
+            double* edges_smear;
             
             // Loop over the variables
             for (unsigned int var = 0; var < h_cross_sec.at(label).at(uni).size(); var ++){
@@ -1360,14 +1421,18 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 temp_bins = bins.at(var);
                 double* edges = &temp_bins[0]; // Cast to an array 
 
+                if (var == k_var_reco_el_E){
+                    nbins_smear = nbins;
+                    edges_smear = edges;
+                }
 
                 // loop over and create the histograms
                 for (unsigned int i=0; i < xsec_types.size();i++){    
                     if (i == k_xsec_sel || i == k_xsec_bkg || i == k_xsec_gen || i == k_xsec_sig || i == k_xsec_ext || i == k_xsec_dirt || i == k_xsec_data){
-                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Reco. Leading Shower Energy [GeV]; Entries", nbins, edges);
+                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Leading Shower Energy [GeV]; Entries", nbins, edges);
                     }
                     else if (i == k_xsec_eff){
-                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Reco. Leading Shower Energy [GeV]; Efficiency", nbins, edges);
+                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Leading Shower Energy [GeV]; Efficiency", nbins, edges);
                     }
                     else if (i == k_xsec_dataxsec || i == k_xsec_mcxsec){
                         h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels.at(var).c_str()), nbins, edges);
@@ -1378,6 +1443,8 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                     }
                 }
             } // End loop over the variables
+
+            h_smear.at(label).at(uni) = new TH2D ( Form("h_run%s_%s_%i_smearing",_util.run_period, reweighter_labels.at(label).c_str(), uni) ,";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]", nbins_smear, edges_smear, nbins_smear, edges_smear);
         
         } // End loop over the universes
     
@@ -1460,7 +1527,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                     h_cut_v.at(label).at(cut).at(_util.k_cut_shower_score).at(uni)                   = new TH1D(Form("h_reco_shower_score_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 0.5);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max).at(uni)             = new TH1D(Form("h_reco_shr_tkfit_dedx_max_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max_with_tracks).at(uni) = new TH1D(Form("h_reco_shr_tkfit_dedx_max_with_tracks_%s_%s_%i", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max_no_tracks).at(uni)   = new TH1D(Form("h_reco_shr_tkfit_dedx_max_no_tracks_%s_%s_%i",   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max_no_tracks).at(uni)   = new TH1D(Form("h_reco_shr_tkfit_dedx_max_no_tracks_%s_%s_%i",   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 10);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_shower_to_vtx_dist).at(uni)             = new TH1D(Form("h_reco_shower_to_vtx_dist_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 20);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_hits_ratio).at(uni)                     = new TH1D(Form("h_reco_hits_ratio_%s_%s_%i",                     reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 21, 0, 1.05);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_CosmicIPAll3D).at(uni)                  = new TH1D(Form("h_reco_CosmicIPAll3D_%s_%s_%i",                  reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 200);
@@ -1496,6 +1563,10 @@ void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double wei
 
     // True Electron Energy
     h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(xsec_type)->Fill(elec_e, weight_uni);
+
+    // Smearing Matrix -- only fill for selected signal events
+    if (xsec_type == k_xsec_sig)
+        h_smear.at(label).at(uni)->Fill(elec_e, shr_energy_cali, weight_uni);
 
 }
 // -----------------------------------------------------------------------------
@@ -1724,6 +1795,60 @@ int CrossSectionHelper::ConcatRunSubRunEvent(int run, int subrun, int event){
     return c; 
 } 
 // -----------------------------------------------------------------------------
+void CrossSectionHelper::Smear(TH1D* h_sig, TH1D* h_gen, TH2D* h_smear, TH1D* h_eff){
+
+    // Change this bool to print info
+    bool debug = false;
+
+    //  ------ First normalise the smearing matrix ------
+    // Loop over rows
+    for (int row=1; row<h_smear->GetXaxis()->GetNbins()+2; row++) {
+        double integral = 0;
+
+        // Loop over columns and get the integral
+        for (int col=1; col<h_smear->GetYaxis()->GetNbins()+2; col++){
+            integral+=h_smear->GetBinContent(row, col);            
+        }
+
+        // Now normalise the column entries by the integral
+        for (int col=1; col<h_smear->GetYaxis()->GetNbins()+2; col++){
+            h_smear->SetBinContent(row,col, h_smear->GetBinContent(row, col)/ integral );
+            
+        }
+    } 
+
+    // Convert the smearing matrix and histograms to a Matrix
+    TMatrixD SMatrix(_util.reco_shr_bins.size()+1,_util.reco_shr_bins.size()+1,h_smear->GetArray(), "F");
+    TMatrixD SigMatrix(_util.reco_shr_bins.size()+1,1,h_sig->GetArray(), "F");
+    TMatrixD GenMatrix(_util.reco_shr_bins.size()+1,1,h_gen->GetArray(), "F");
+    
+
+    // Smear the signal selected events
+    TMatrixD SigMatrixSmear(_util.reco_shr_bins.size()+1,1);
+    SigMatrixSmear.Mult(SMatrix,SigMatrix);
+    
+    // Smear the generated events
+    TMatrixD GenMatrixSmear(_util.reco_shr_bins.size()+1,1);
+    GenMatrixSmear.Mult(SMatrix,GenMatrix);
+
+    if (debug){
+        SMatrix.Print();
+        SigMatrix.Print();
+        SigMatrixSmear.Print();
+        GenMatrix.Print();
+        GenMatrixSmear.Print();
+    }
+
+    // Set the efficiency bins
+    for (int bin = 1; bin < h_sig->GetNbinsX()+1; bin++){
+        h_eff->SetBinContent(bin, SigMatrixSmear(bin,0) / GenMatrixSmear(bin,0));
+        h_eff->SetBinError(bin, 0);
+        
+        if (debug)
+            std::cout << 100 * SigMatrix(bin,0) / GenMatrix(bin,0) << "  "<< 100 * SigMatrixSmear(bin,0) / GenMatrixSmear(bin,0) << std::endl;
+    }
+    
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

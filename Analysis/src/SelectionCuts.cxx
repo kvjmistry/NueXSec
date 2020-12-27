@@ -180,7 +180,8 @@ bool SelectionCuts::shr_moliere_avg(SliceContainer &SC){
 // -----------------------------------------------------------------------------
 bool SelectionCuts::pi_zero_cuts(SliceContainer &SC){
     
-    if (SC.pi0_shrscore1 < 0.5  &&
+    if (SC.nslice == 1          &&
+        SC.pi0_shrscore1 < 0.5  &&
         SC.pi0_shrscore2 < 0.5  &&
         SC.pi0_dot1      > 0.8  &&
         SC.pi0_dot2      > 0.8  &&

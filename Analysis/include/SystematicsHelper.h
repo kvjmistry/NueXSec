@@ -198,7 +198,7 @@ class SystematicsHelper{
         //  7 // WM dE/dX
     };
 
-    // enum for histogram vars
+    // enum for histogram types
     enum TH1D_xsec_hist_vars {
         k_xsec_sel,     // Selected event histogram binned in energy
         k_xsec_bkg,     // Bkg event histogram binned in energy
@@ -218,8 +218,6 @@ class SystematicsHelper{
         k_var_integrated,     // Integrated X-Section
         k_var_reco_el_E,      // Reconstructed electron energy
         k_var_true_el_E,      // True electron energy
-        // k_var_true_nu_E,      // True neutrino energy
-        // k_var_reco_nu_E,      // Reconstructed neutrino energy
         k_TH1D_xsec_var_MAX
     };
 
@@ -230,33 +228,32 @@ class SystematicsHelper{
     std::vector<std::string> vars = {"integrated",
                                      "reco_el_E",
                                      "true_el_E"
-                                    //  "true_nu_E",
-                                    //  "reco_nu_e"
                                      };
 
-
-    // Use these for when we do the cross-section
-    // std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Cross-Section [10^{-39} cm^{2}]",
-    //                                     ";Reco Leading Shower Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
-    //                                     ";True Electron Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]"
-    //                                     // ";True #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
-    //                                     // ";Reco #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]"
-    //                                     };
+    // Choose the cross section scale to set the histogram
+    double xsec_scale = 13.0e-39;
+    // double xsec_scale = 0.5e-39;
     
     // Use these for when we do the flux normalised event rate
-    std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",
-                                        ";Reco. Leading Shower Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]",
-                                        ";True e^{-} + e^{+} Energy [GeV]; #nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
-                                        // ";True #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
-                                        // ";Reco #nu_{e} Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{#nu_{e}}} CC Cross-Section [10^{-39} cm^{2}/GeV]"
+    // std::vector<std::string> var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",
+    //                                        ";Reco. Leading Shower Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]",
+    //                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
+                                        // };
+    
+    std::vector<std::string> var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross-Section [10^{-39} cm^{2}/GeV]",
+                                           ";Reco. Leading Shower Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
+                                           ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
                                         };
 
 
-    std::vector<std::string> var_labels_x = {"",
-                                        "Reco. Leading Shower Energy [GeV]",
-                                        "True e^{-} + e^{+} Energy [GeV]"
-                                        // "True #nu_{e} Energy [GeV]",
-                                        // "Reco #nu_{e} Energy [GeV]"
+    std::vector<std::string> var_labels_events = {";;Entries",
+                                        ";Reco. Leading Shower Energy [GeV]; Entries / GeV",
+                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries / GeV"
+                                        };
+
+    std::vector<std::string> var_labels_eff = {";;Efficiency",
+                                        ";Reco. Leading Shower Energy [GeV]; Efficiency",
+                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency"
                                         };
 
     // Containter for the central value histograms
@@ -264,30 +261,45 @@ class SystematicsHelper{
 
     enum updn {k_up, k_dn};
 
-    // Vectors to store the quadrature sum of the uncertainties
-    // We combine all of these to then get the total error and plot it
-    std::vector<std::vector<std::vector<double>>> v_sys_total;         // differential variable, type, bin error [total systematic]
-    std::vector<std::vector<std::vector<double>>> v_stat_total;        // differential variable, type, bin error [total statistical]
-    std::vector<std::vector<std::vector<double>>> v_genie_uni_total;   // differential variable, type, bin error [genie unisim]
-    std::vector<std::vector<std::vector<double>>> v_genie_multi_total; // differential variable, type, bin error [genie multisim]
-    std::vector<std::vector<std::vector<double>>> v_beamline_total;    // differential variable, type, bin error [beamline unisim]
-    std::vector<std::vector<std::vector<double>>> v_hp_total;          // differential variable, type, bin error [hadron production multisim]
-    std::vector<std::vector<std::vector<double>>> v_reint_total;       // differential variable, type, bin error [geant reinteraction multisim]
-    std::vector<std::vector<std::vector<double>>> v_dirt_total;        // differential variable, type, bin error [dirt shift by +/- 100%]
-    std::vector<std::vector<std::vector<double>>> v_pot_total;         // differential variable, type, bin error [Flat 2% for POT counting]
-    std::vector<std::vector<std::vector<double>>> v_detvar_total;      // differential variable, type, bin error [Total detector variation err]
+    // Names of the overall errors
+    enum enum_sys {
+        k_err_tot,
+        k_err_stat,
+        k_err_sys,
+        k_err_genie_uni,
+        k_err_genie_multi,
+        k_err_hp,
+        k_err_beamline,
+        k_err_dirt,
+        k_err_pot,
+        k_err_reint,
+        k_err_detvar,
+        k_err_pi0,
+        k_err_mcstats,
+        k_ERR_MAX
+    };
 
-    TH2D* h_cov_tot;         // Sum of all covariance matrices
-    TH2D* h_cov_sys;         // Total Systematic covariance matrix
-    TH2D* h_cov_stat;        // Diagonal statistical covariance matrix
-    TH2D* h_cov_genie_uni;   // Genie unisims
-    TH2D* h_cov_genie_multi; // Genie multisims
-    TH2D* h_cov_hp;          // PPFX HP
-    TH2D* h_cov_beamline;    // Beamline 
-    TH2D* h_cov_dirt;        // Dirt 
-    TH2D* h_cov_pot;         // POT counting
-    TH2D* h_cov_reint;       // Geant reinteractions
-    TH2D* h_cov_detvar;      // Detector Variations
+    std::vector<std::string> systematic_names = {
+        "tot",
+        "stat",
+        "sys",
+        "genie_uni",
+        "genie_multi",
+        "hp",
+        "beamline",
+        "dirt",
+        "pot",
+        "reint",
+        "detvar",
+        "pi0",
+        "mcstats"
+    };
+
+    // Vector to store the quadrature sum of the uncertainties
+    std::vector<std::vector<std::vector<std::vector<double>>>> v_err;
+    
+    // Vector to store all the final covariance matrices
+    std::vector<TH2D*> h_cov_v;
 
 
 

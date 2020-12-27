@@ -2,8 +2,8 @@
 # basically its saving the plots before we apply the cut to it
 
 # Make the directory
-mkdir -p /Users/kvjmistry/Documents/work/NueXSec/Analysis/plots/run1/cut_plots/
-mkdir -p /Users/kvjmistry/Documents/work/NueXSec/Analysis/plots/run3/cut_plots/
+mkdir -p /Users/kvjmistry/work/NueXSec/Analysis/plots/run1/cut_plots/
+mkdir -p /Users/kvjmistry/work/NueXSec/Analysis/plots/run3/cut_plots/
 
 # list of cuts minus the last one
 cuts=(
@@ -47,8 +47,8 @@ reco_shr_tkfit_dedx_max_with_tracks.pdf
 reco_shr_tkfit_dedx_max_no_tracks.pdf
 )
 
-cut_path=/Users/kvjmistry/Documents/work/NueXSec/Analysis/plots/run1/cuts/
-copy_path=/Users/kvjmistry/Documents/work/NueXSec/Analysis/plots/run1/cut_plots/
+cut_path=/Users/kvjmistry/work/NueXSec/Analysis/plots/run1/cuts/
+copy_path=/Users/kvjmistry/work/NueXSec/Analysis/plots/run1/cut_plots/
 
 # Do the copy
 for i in ${!cuts[*]}; do 

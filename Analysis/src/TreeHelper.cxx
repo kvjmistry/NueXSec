@@ -210,6 +210,9 @@ void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
     nu_pdg = SC.nu_pdg;
     numi_ang = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "beam");
     shr_bkt_pdg = SC.shr_bkt_pdg;
+    npi0 = SC.npi0;
+    pi0_e = SC.pi0_e;
+    interaction = SC.interaction;
 
     shr_bkt_purity       = SC.shr_bkt_purity;
     shr_bkt_completeness = SC.shr_bkt_completeness;
@@ -423,8 +426,11 @@ void TreeHelper::SetBranches(TTree * tree){
     tree->Branch("shr_bkt_purity",         &shr_bkt_purity);
     tree->Branch("shr_bkt_completeness",   &shr_bkt_completeness);
     tree->Branch("shr_bkt_E",              &shr_bkt_E);
+    tree->Branch("npi0",                 &npi0,  "npi0/I");
+    tree->Branch("pi0_e",                &pi0_e, "pi0_e/D");
     tree->Branch("all_shr_hits",     "std::vector<float>", &all_shr_hits);
     tree->Branch("all_shr_energies", "std::vector<float>", &all_shr_energies);
+    tree->Branch("interaction",                 &interaction,  "interaction/I");
 
     tree->Branch("weightsGenie", "std::vector<unsigned short>", &weightsGenie);
     tree->Branch("weightsReint", "std::vector<unsigned short>", &weightsReint);
