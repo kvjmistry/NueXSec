@@ -716,9 +716,9 @@ void SystematicsHelper::InitialiseReweightingMode(){
         // PlotReweightingModeDetVar("WireModdEdX",                        var, k_WireModdEdX,                        var_string_pretty.at(k_WireModdEdX));
 
         // Plot the multisims
-        PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 600);
+        PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 500);
         PlotReweightingModeMultisim("weightsReint", var,  "Geant Reinteractions", 1000);
-        PlotReweightingModeMultisim("weightsPPFX",  var,  "PPFX", 600);
+        PlotReweightingModeMultisim("weightsPPFX",  var,  "PPFX", 500);
         PlotReweightingModeMultisim("MCStats",      var,  "MC Stats", 1000);
         
     }
@@ -2845,9 +2845,9 @@ void SystematicsHelper::InitialiseReweightingModeCut(){
             GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Beam_shift_y",     2, "unisim");
             GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Target_z",         2, "unisim");
             GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Decay_pipe_Bfield",2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsGenie",600,  "multisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsGenie",500,  "multisim");
             GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsReint",1000,  "multisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsPPFX", 600, "multisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsPPFX", 500, "multisim");
         }
     }
         
