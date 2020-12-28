@@ -318,6 +318,18 @@ void CrossSectionHelper::LoopEvents(){
     << std::endl;
 
 
+    for (unsigned int uni = 0; uni < h_cross_sec.at(1).size(); uni++){
+        double B  = h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_bkg)->GetBinContent(1) + h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_ext)->GetBinContent(1)* (_util.ext_scale_factor / _util.mc_scale_factor) + h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_dirt)->GetBinContent(1)* (_util.dirt_scale_factor / _util.mc_scale_factor);
+        double B_beam  = h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_bkg)->GetBinContent(1);
+        double B_ext  = h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_ext)->GetBinContent(1)* (_util.ext_scale_factor / _util.mc_scale_factor);
+        double B_dirt  = h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_dirt)->GetBinContent(1)* (_util.dirt_scale_factor / _util.mc_scale_factor);
+        
+        // std::cout << "Uni: " << uni << " N-B: " << h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_sel)->GetBinContent(1) - B <<
+        //  " Bkg: " << B  << " B beam: " << B_beam << " B ext: " << B_ext << " B dirt: " << B_dirt<<
+        //  " MC XSec: " << h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_mcxsec)->GetBinContent(1)<< " N: " << h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_sel)->GetBinContent(1) << " N Sig: " << h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_sig)->Integral() << std::endl;
+    }
+
+
     // Write the histograms to file for inspection
     WriteHists();
 
@@ -717,7 +729,7 @@ double CrossSectionHelper::GetIntegratedFlux(int uni, std::string value, std::st
 
     TH2D* h_nue, *h_nuebar;
     TH2D *h_uni_nue, *h_uni_nuebar;
-    double weight = {1.0};
+    // double weight = {1.0};
     double xbin, ybin;
     double POT_flux{0.0}; // The POT of the flux file (i.e the POT used in the flux histogram)
     double xbin_th{0.0};
@@ -1234,13 +1246,13 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 "Horn_p2kA",
                 "Horn_m2kA",
                 "Horn1_x_p3mm",
-                "Horm1_x_m3mm",
+                "n1_x_m3mm",
                 "Horn1_y_p3mm",
                 "Horn1_y_m3mm",
                 "Beam_spot_1_1mm",
                 "Beam_spot_1_5mm",
                 "Horn2_x_p3mm",
-                "Horm2_x_m3mm",
+                "Horn2_x_m3mm",
                 "Horn2_y_p3mm",
                 "Horn2_y_m3mm",
                 "Horns_0mm_water",
@@ -1700,13 +1712,13 @@ bool CrossSectionHelper::CheckBeamline(std::string variation){
     if (variation == "Horn_p2kA"           ||
         variation == "Horn_m2kA"           ||
         variation == "Horn1_x_p3mm"        ||
-        variation == "Horm1_x_m3mm"        ||
+        variation == "Horn1_x_m3mm"        ||
         variation == "Horn1_y_p3mm"        ||
         variation == "Horn1_y_m3mm"        ||
         variation == "Beam_spot_1_1mm"     ||
         variation == "Beam_spot_1_5mm"     ||
         variation == "Horn2_x_p3mm"        ||
-        variation == "Horm2_x_m3mm"        ||
+        variation == "Horn2_x_m3mm"        ||
         variation == "Horn2_y_p3mm"        ||
         variation == "Horn2_y_m3mm"        ||
         variation == "Horns_0mm_water"     ||
@@ -1733,13 +1745,13 @@ int CrossSectionHelper::GetBeamlineIndex(std::string variation){
     if       (variation == "Horn_p2kA"          ) return k_Horn_p2kA;
     else if  (variation == "Horn_m2kA"          ) return k_Horn_m2kA;
     else if  (variation == "Horn1_x_p3mm"       ) return k_Horn1_x_p3mm;
-    else if  (variation == "Horm1_x_m3mm"       ) return k_Horm1_x_m3mm;
+    else if  (variation == "Horn1_x_m3mm"       ) return k_Horn1_x_m3mm;
     else if  (variation == "Horn1_y_p3mm"       ) return k_Horn1_y_p3mm;
     else if  (variation == "Horn1_y_m3mm"       ) return k_Horn1_y_m3mm;
     else if  (variation == "Beam_spot_1_1mm"    ) return k_Beam_spot_1_1mm;
     else if  (variation == "Beam_spot_1_5mm"    ) return k_Beam_spot_1_5mm;
     else if  (variation == "Horn2_x_p3mm"       ) return k_Horn2_x_p3mm;
-    else if  (variation == "Horm2_x_m3mm"       ) return k_Horm2_x_m3mm;
+    else if  (variation == "Horn2_x_m3mm"       ) return k_Horn2_x_m3mm;
     else if  (variation == "Horn2_y_p3mm"       ) return k_Horn2_y_p3mm;
     else if  (variation == "Horn2_y_m3mm"       ) return k_Horn2_y_m3mm;
     else if  (variation == "Horns_0mm_water"    ) return k_Horns_0mm_water;
@@ -1767,11 +1779,11 @@ double CrossSectionHelper::PoissonRandomNumber(int uni){
     if (uni == 0) rand->SetSeed(seed);
 
     // Generate the weight, using a poisson dist with mean 1
-    double weight = rand->Poisson(1);
+    double weight_poisson = rand->Poisson(1);
 
     // std::cout << weight << std::endl;
 
-    return weight;
+    return weight_poisson;
 
 }
 // -----------------------------------------------------------------------------
