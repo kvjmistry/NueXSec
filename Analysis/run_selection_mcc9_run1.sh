@@ -55,11 +55,16 @@ fi
 
 # Running slimmed down version of pelee ntuples with event weights
 if [ "$1" == "weight" ]; then
-  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root weight 
 
+  # old tune
+  # ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_weight.root weight
+  # ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic.root weight --intrinsic intrinsic
+
+  # new tune
+  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root weight
   ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root weight --intrinsic intrinsic
 
-  root -l -b -q 'merge/merge_uneaventrees.C("1", true, "files/trees/nuexsec_selected_tree_mc_run1_weight.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "weight")'
+  root -l -b -q 'merge/merge_uneaventrees.C("1", false, "files/trees/nuexsec_selected_tree_mc_run1_weight.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "weight")'
 
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_weight.root --var dummy weight --xsecmode reweight unisim default
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_weight.root --var dummy weight --xsecmode reweight ppfx default
@@ -83,21 +88,21 @@ fi
 
 # To run the det var samples now do source run_selection_mcc9_run1.sh var <variation name>
 # The variation are:
-# CV, BNB_Diffusion, LYAttenuation, LYRayleigh, SCE, Recomb2, WireModX, WireModYZ, WireModThetaXZ, WireModThetaYZ_withSigmaSplines, WireModThetaYZ_withoutSigmaSplines, WireModdEdX
+# CV, BNB_Diffusion, LYAttenuation, LYRayleigh, LYDown, SCE, Recomb2, WireModX, WireModYZ, WireModThetaXZ, WireModThetaYZ_withSigmaSplines, WireModThetaYZ_withoutSigmaSplines, WireModdEdX
 
 # Could loop these to make it easier to run them all!
 
 if [ "$1" == "var" ]; then
-  ./nuexsec --run 1 --var ../ntuples/detvar/run1/neutrinoselection_filt_run1_overlay_$2.root $2
+  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_$2.root $2
   
   # Overwrite the true nue information
-  ./nuexsec --run 1 --var ../ntuples/detvar/run1/intrinsic/neutrinoselection_filt_run1_overlay_$2_intrinsic.root $2 --intrinsic intrinsic
+  # ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_$2_intrinsic.root $2 --intrinsic intrinsic
 
   source merge/merge_run1_files.sh files/nuexsec_mc_run1_$2.root files/nuexsec_run1_$2_merged.root
 
   ./nuexsec --run 1 --hist files/nuexsec_run1_$2_merged.root --var dummy $2
 
-  root -l -b -q 'merge/merge_uneaventrees.C("1", true, "files/trees/nuexsec_selected_tree_mc_run1_'"$2"'.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "'"$2"'")'
+  root -l -b -q 'merge/merge_uneaventrees.C("1", false, "files/trees/nuexsec_selected_tree_mc_run1_'"$2"'.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "'"$2"'")'
 
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$2.root --var dummy $2 --xsecmode default
 
@@ -117,6 +122,7 @@ declare -a var=(
   CV
   LYRayleigh
   LYAttenuation
+  LYDown
   SCE
   Recomb2
   WireModX

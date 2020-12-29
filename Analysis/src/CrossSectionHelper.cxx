@@ -318,16 +318,16 @@ void CrossSectionHelper::LoopEvents(){
     << std::endl;
 
 
-    for (unsigned int uni = 0; uni < h_cross_sec.at(1).size(); uni++){
-        double B  = h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_bkg)->GetBinContent(1) + h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_ext)->GetBinContent(1)* (_util.ext_scale_factor / _util.mc_scale_factor) + h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_dirt)->GetBinContent(1)* (_util.dirt_scale_factor / _util.mc_scale_factor);
-        double B_beam  = h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_bkg)->GetBinContent(1);
-        double B_ext  = h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_ext)->GetBinContent(1)* (_util.ext_scale_factor / _util.mc_scale_factor);
-        double B_dirt  = h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_dirt)->GetBinContent(1)* (_util.dirt_scale_factor / _util.mc_scale_factor);
+    // for (unsigned int uni = 0; uni < h_cross_sec.at(1).size(); uni++){
+    //     double B  = h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_bkg)->GetBinContent(1) + h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_ext)->GetBinContent(1)* (_util.ext_scale_factor / _util.mc_scale_factor) + h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_dirt)->GetBinContent(1)* (_util.dirt_scale_factor / _util.mc_scale_factor);
+    //     double B_beam  = h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_bkg)->GetBinContent(1);
+    //     double B_ext  = h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_ext)->GetBinContent(1)* (_util.ext_scale_factor / _util.mc_scale_factor);
+    //     double B_dirt  = h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_dirt)->GetBinContent(1)* (_util.dirt_scale_factor / _util.mc_scale_factor);
         
-        // std::cout << "Uni: " << uni << " N-B: " << h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_sel)->GetBinContent(1) - B <<
-        //  " Bkg: " << B  << " B beam: " << B_beam << " B ext: " << B_ext << " B dirt: " << B_dirt<<
-        //  " MC XSec: " << h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_mcxsec)->GetBinContent(1)<< " N: " << h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_sel)->GetBinContent(1) << " N Sig: " << h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_sig)->Integral() << std::endl;
-    }
+    //     // std::cout << "Uni: " << uni << " N-B: " << h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_sel)->GetBinContent(1) - B <<
+    //     //  " Bkg: " << B  << " B beam: " << B_beam << " B ext: " << B_ext << " B dirt: " << B_dirt<<
+    //     //  " MC XSec: " << h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_mcxsec)->GetBinContent(1)<< " N: " << h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_sel)->GetBinContent(1) << " N Sig: " << h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_sig)->Integral() << std::endl;
+    // }
 
 
     // Write the histograms to file for inspection
@@ -344,20 +344,23 @@ void CrossSectionHelper::LoopEventsbyCut(){
     
     SliceContainer SC;
 
-    // Load in the TFile
-    TFile *f_mc;
+    int treeNumber = -1; // TTree number in TChain
+
+    // Create the TChain and add the MC and intrinsic events
+    TChain *in_chain = new TChain("nuselection/NeutrinoSelectionFilter");
+
+    // For now we need to keep the intrinsic file name in this format unless we add more options for configuration
+    if (std::string(_util.intrinsic_mode) == "intrinsic")
+        in_chain->Add(Form("../ntuples/neutrinoselection_filt_run%s_overlay_intrinsic_newtune.root", _util.run_period)); 
     
-    _util.GetFile(f_mc, _util.mc_file_name); // We need the MC file as an input argument
+    // Add the Main MC file
+    in_chain->Add(_util.mc_file_name);
 
-    // Initialise the TTree and Slice Container class
-    TTree *mc_tree;
-    _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
-    SC.Initialise(mc_tree, _util.k_mc, _util);
-
-    int mc_tree_total_entries = mc_tree->GetEntries();
+    // Initialise the TChain and Slice Container class
+    SC.Initialise(in_chain, _util.k_mc, _util);
 
     // Event loop
-    for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
+    for (int ievent = 0; ievent < in_chain->GetEntries(); ++ievent){
 
         // See if we want to process all the events
         if (_util.num_events > 0){
@@ -368,10 +371,25 @@ void CrossSectionHelper::LoopEventsbyCut(){
         if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
 
         // Get the entry in the tree
-        mc_tree->GetEntry(ievent); 
+        in_chain->GetEntry(ievent);
+
+        // Print the TChain number
+        if(treeNumber != in_chain->GetTreeNumber()) {
+            treeNumber = in_chain->GetTreeNumber();
+            std::cout << "Moving to tree number " << treeNumber << "." << std::endl;
+            
+            // if there is more than one tree and its the second file, make sure the intrinsic mode is turned off
+            // otherwise we will apply the intrinsic weights to the bkg, this is not what we want
+            if (treeNumber == 1){
+                _util.TurnoffIntrinsicMode();
+            }
+
+            std::cout << "Intrinsic Mode is: " << std::string(_util.intrinsic_mode) << std::endl;
+
+        }
 
         // Apply the selection cuts and fill histograms for each universe
-        ApplyCuts(_util.k_mc, SC, _scuts);
+        ApplyCuts(_util.k_mc, SC, _scuts, treeNumber);
 
     }
 
@@ -380,18 +398,22 @@ void CrossSectionHelper::LoopEventsbyCut(){
 
 }
 // -----------------------------------------------------------------------------
-bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _scuts){
+bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _scuts, int treeNum){
 
     bool pass = true;
 
     // Set derived variables in the slice container
+    // Classify the event
+    SC.SliceClassifier(type);      // Classification of the event
     SC.SetSignal();                // Set the event as either signal or other
     SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
     SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
     SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
 
-    // Classify the event
-    SC.SliceClassifier(type);      // Classification of the event
+    // Skip signal events in the standard MC file so we dont double count the signal events
+    if (treeNum == 1 && SC.is_signal){
+        return false;
+    }
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
@@ -526,10 +548,9 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
         for (unsigned int uni = 0; uni < vec_universes.size(); uni++){
 
             // Update the CV weight to CV * universe i
-            double weight_uni{1.0}; 
+            double weight_uni{cv_weight}; 
 
-            double _numi_ang = _util.GetNuMIAngle(SC.true_nu_px, SC.true_nu_py, SC.true_nu_pz, "beam");
-            SetUniverseWeight(reweighter_labels[label], weight_uni, weight_dirt, weight_ext, SC.weightSplineTimesTune, classification.first, cv_weight, uni, SC.nu_pdg, SC.nu_e, _numi_ang, SC.npi0, SC.pi0_e);
+            SetUniverseWeight(reweighter_labels[label], weight_uni, weight_dirt, weight_ext, SC.weightSplineTimesTune, classification.first, cv_weight, uni, SC.nu_pdg, SC.nu_e, SC.nu_angle, SC.npi0, SC.pi0_e);
 
             double dedx_max = SC.GetdEdxMax();
 
@@ -563,6 +584,8 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
             h_cut_v[label][cut_index][_util.k_cut_shower_energy_cali_rebin][uni] ->Fill(SC.shr_energy_cali,        weight_uni);
             h_cut_v[label][cut_index][_util.k_cut_flash_time][uni]               ->Fill(SC.flash_time,             weight_uni);
             h_cut_v[label][cut_index][_util.k_cut_flash_pe][uni]                 ->Fill(SC.flash_pe,               weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_effective_angle][uni]          ->Fill(SC.effective_angle,        weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_effective_cosangle][uni]       ->Fill(SC.cos_effective_angle,    weight_uni);
         
         }
 
@@ -593,7 +616,8 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
             weight_uni = cv_weight * PoissonRandomNumber(uni);
         
         }
-        else weight_uni = cv_weight;
+        else
+            weight_uni = cv_weight;
         
     }
     // This is a beamline variation
@@ -603,8 +627,12 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
     }
     // Dirt reweighting
     else if ( label == "Dirtup" || label == "Dirtdn"){
-        if (label == "Dirtup") weight_dirt = cv_weight*2.0; // increase the dirt by 100%
-        else weight_dirt = cv_weight*0.0; // decrease the dirt by 100%
+        
+        if (label == "Dirtup")
+            weight_dirt = cv_weight*2.0; // increase the dirt by 100%
+        else
+            weight_dirt = cv_weight*0.0; // decrease the dirt by 100%
+        
         weight_uni = cv_weight;
     }
     // POT Counting
@@ -619,7 +647,10 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
         if (_util.pi0_correction == 1){
             
             if (_npi0 > 0) {
-                weight_uni = cv_weight / 0.759;
+                weight_uni = cv_weight / 0.759; 
+            }
+            else {
+                weight_uni = cv_weight;
             }
 
         }
@@ -633,8 +664,10 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
                 }
                 else if (_pi0_e > 0.1 && _pi0_e >= pi0emax){
                     weight_uni = cv_weight / (1 - 0.4 * pi0emax);
-                }
-                
+                }    
+                else {
+                    weight_uni = cv_weight;
+                }            
             }
         }
         else {
@@ -1246,7 +1279,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 "Horn_p2kA",
                 "Horn_m2kA",
                 "Horn1_x_p3mm",
-                "n1_x_m3mm",
+                "Horn1_x_m3mm",
                 "Horn1_y_p3mm",
                 "Horn1_y_m3mm",
                 "Beam_spot_1_1mm",
@@ -1550,6 +1583,9 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                     h_cut_v.at(label).at(cut).at(_util.k_cut_shower_energy_cali).at(uni)             = new TH1D(Form("h_reco_shower_energy_cali_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 4);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_flash_time).at(uni)                     = new TH1D(Form("h_reco_flash_time_%s_%s_%i",                     reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 50, 0, 25);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_flash_pe).at(uni)                       = new TH1D(Form("h_reco_flash_pe_%s_%s_%i",                       reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 25, 0, 5000);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_effective_angle).at(uni)                = new TH1D(Form("h_reco_effective_angle_%s_%s_%i",                reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 13, 0, 190);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_effective_cosangle).at(uni)             = new TH1D(Form("h_reco_effective_cosangle_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 16, -1, 1);
+
 
                     double* edges = &_util.reco_shr_bins[0]; // Cast to an array 
                     h_cut_v.at(label).at(cut).at(_util.k_cut_shower_energy_cali_rebin).at(uni)  = new TH1D(Form("h_reco_shower_energy_cali_rebin_%s_%s_%i",  reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", _util.reco_shr_bins.size()-1, edges);

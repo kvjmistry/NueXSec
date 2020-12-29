@@ -1,7 +1,7 @@
 #include "../include/SliceContainer.h"
 
 // -----------------------------------------------------------------------------
-void SliceContainer::Initialise(TTree *tree, int type, Utility util){
+template<typename T> void SliceContainer::Initialise(T *tree, int type, Utility util){
 
     std::cout << "Initalising Slice Container" << std::endl;
     _util = util;
@@ -398,6 +398,9 @@ void SliceContainer::Initialise(TTree *tree, int type, Utility util){
     tree->SetBranchAddress("trk_llr_pid_score_v",      &trk_llr_pid_score_v);
 
 }
+// Explicitly initialise the templates for this function which include TTree and TChain
+template void SliceContainer::Initialise<TTree>(TTree *tree, int type, Utility util);
+template void SliceContainer::Initialise<TChain>(TChain *tree, int type, Utility util );
 // -----------------------------------------------------------------------------
 void SliceContainer::SliceClassifier(int type){
     

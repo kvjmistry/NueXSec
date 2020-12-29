@@ -292,7 +292,7 @@ class CrossSectionHelper{
     void LoopEventsbyCut();
     // -------------------------------------------------------------------------
     // Apply the selection cuts -- so we can reweight events at differnt points in the selection
-    bool ApplyCuts(int type, SliceContainer &SC, SelectionCuts _scuts);
+    bool ApplyCuts(int type, SliceContainer &SC, SelectionCuts _scuts, int treeNum);
     // -------------------------------------------------------------------------
     // Fill histograms for each variable for all universes
     void FillCutHists(int type, SliceContainer &SC, std::pair<std::string, int> classification, int cut_index);

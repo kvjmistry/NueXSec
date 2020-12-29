@@ -45,40 +45,55 @@ Run1_Intrinsic_POT 2.59311e+22 //  new Genie tune
 // Run1_MC_POT_weight 2.31956e+21
 Run1_MC_POT_weight 2.32136e+21 // new Genie tune
 -
+// Run1_Intrinsic_POT_weight 1.85664e+22
 Run1_Intrinsic_POT_weight 2.59311e+22 // new Genie tune
 -
 // Run 1 Det var CV
-Run1_MC_POT_CV 3.65214e+20
+// Run1_MC_POT_CV 3.65214e+20
+Run1_MC_POT_CV 3.68983e+20 // newtune
 -
 // Run 1 Det var LYAttenuation
-Run1_MC_POT_LYAttenuation 3.67755e+20
+// Run1_MC_POT_LYAttenuation 3.67755e+20
+Run1_MC_POT_LYAttenuation 3.64207e+20 // new tune
 -
 // Run 1 Det var LYRayleigh
-Run1_MC_POT_LYRayleigh 3.60847e+20
+// Run1_MC_POT_LYRayleigh 3.60847e+20
+Run1_MC_POT_LYRayleigh 3.68926e+20 // new tune
+-
+// Run 1 Det var LYDown
+Run1_MC_POT_LYDown 3.566e+20 // new tune
 -
 // Run 1 Det var SCE
-Run1_MC_POT_SCE 3.66636e+20
+// Run1_MC_POT_SCE 3.66636e+20
+Run1_MC_POT_SCE 3.71139e+20 // new tune
 -
 // Run 1 Det var Recomb2
-Run1_MC_POT_Recomb2 3.72107e+20
+// Run1_MC_POT_Recomb2 3.72107e+20
+Run1_MC_POT_Recomb2 3.72109e+20 // new tune
 -
 // Run 1 Det var WireModX
-Run1_MC_POT_WireModX 3.67495e+20
+// Run1_MC_POT_WireModX 3.67495e+20
+Run1_MC_POT_WireModX 3.6749e+20 // new tune
 -
 // Run 1 Det var WireModYZ
-Run1_MC_POT_WireModYZ 3.68494e+20
+// Run1_MC_POT_WireModYZ 3.68494e+20
+Run1_MC_POT_WireModYZ 3.69849e+20 // new tune
 -
 // Run 1 Det var WireModThetaXZ
-Run1_MC_POT_WireModThetaXZ 3.64542e+20
+// Run1_MC_POT_WireModThetaXZ 3.64542e+20
+Run1_MC_POT_WireModThetaXZ 3.68008e+20 // new tune
 -
 // Run 1 Det var WireModThetaYZ_withSigmaSplines
-Run1_MC_POT_WireModThetaYZ_withSigmaSplines 3.67869e+20
+// Run1_MC_POT_WireModThetaYZ_withSigmaSplines 3.67869e+20
+Run1_MC_POT_WireModThetaYZ_withSigmaSplines 3.68995e+20 //new tune
 -
 // Run 1 Det var WireModThetaYZ_withoutSigmaSplines
-Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 3.69423e+20
+// Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 3.69423e+20
+Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 3.69422e+20 // new tune
 -
 // Run 1 Det var WireModdEdX
-Run1_MC_POT_WireModdEdX 3.6318e+20
+// Run1_MC_POT_WireModdEdX 3.6318e+20
+Run1_MC_POT_WireModdEdX 3.66871e+20 // new tune
 -
 // Run 1 Det Var for flugg -- this is actually dk2nu for now
 Run1_MC_POT_FLUGG 3.65214e+20

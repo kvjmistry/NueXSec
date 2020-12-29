@@ -779,7 +779,7 @@ void SystematicsHelper::SetLabelName(std::string label, std::string &label_up, s
     }
     else if  (label == "Horn1_x"       ){
         label_up = label + "_p3mm";
-        label_dn = "Horm1_x_m3mm";
+        label_dn = label + "_m3mm";
     }
     else if  (label == "Horn1_y"       ){
         label_up = label + "_p3mm";
@@ -791,7 +791,7 @@ void SystematicsHelper::SetLabelName(std::string label, std::string &label_up, s
     }
     else if  (label == "Horn2_x"       ){
         label_up = label + "_p3mm";
-        label_dn = "Horm2_x_m3mm";
+        label_dn = label + "_m3mm";
     }
     else if  (label == "Horn2_y"       ){
         label_up = label + "_p3mm";
@@ -1459,7 +1459,7 @@ void SystematicsHelper::CompareCVXSec(){
             h_mcxsec  ->SetLineColor(kRed+2);
 
             // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
-            if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(0.5e-39, 2.5e-39);
+            if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(3.5e-39, 10.5e-39);
             else h_dataxsec->GetYaxis()->SetRangeUser(0.0e-39, xsec_scale);
 
             h_dataxsec->GetYaxis()->SetLabelSize(0.04);
@@ -1586,7 +1586,7 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             h_mcxsec  ->SetLineColor(kRed+2);
 
             // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
-            if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(0.5e-39, 2.5e-39);
+            if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(3.5e-39, 10.5e-39);
             else h_dataxsec->GetYaxis()->SetRangeUser(0.0e-39, xsec_scale);
 
             _util.IncreaseLabelSize(h_dataxsec, c);

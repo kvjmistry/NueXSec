@@ -18,8 +18,8 @@ class SliceContainer {
 public:
 
     // -------------------------------------------------------------------------
-    // Initialise the class
-    void Initialise(TTree* tree, int type, Utility util);
+    // Initialise the class with a template function
+    template<typename T> void Initialise(T *tree, int type, Utility util);
     // -------------------------------------------------------------------------
     // Function to classify the slice
     void  SliceClassifier(int type);

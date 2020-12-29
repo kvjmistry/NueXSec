@@ -36,6 +36,7 @@
 #include "TRandom3.h"
 #include "TColor.h"
 #include "TMatrixD.h"
+#include "TChain.h"
 
 /*
 
@@ -122,6 +123,8 @@ public:
     // Check if a specific histogram exists in the given vector of strings
     bool CheckHistogram(std::vector<std::string> vector, TString hist_name);
     // -------------------------------------------------------------------------
+    // Turn off the intrinsic nue mode
+    void TurnoffIntrinsicMode(){intrinsic_mode = (char*)"empty";};
     // -------------------------------------------------------------------------
 
     // Variables
@@ -532,6 +535,8 @@ public:
         k_cut_shower_energy_cali_rebin,
         k_cut_flash_time,
         k_cut_flash_pe,
+        k_cut_effective_angle,
+        k_cut_effective_cosangle,
         k_cut_vars_max
     };
 
@@ -560,7 +565,9 @@ public:
         "h_reco_shower_energy_cali",
         "h_reco_shower_energy_cali_rebin",
         "h_reco_flash_time",
-        "h_reco_flash_pe"
+        "h_reco_flash_pe",
+        "h_reco_effective_angle",
+        "h_reco_effective_cosangle"
     };
  
     // x axis label for those plots
@@ -581,13 +588,15 @@ public:
         "Hit Ratio",
         "Pandora Cosmic Impact Parameter 3D [cm]",
         "Contained Fraction (PFP hits in FV / hits in slice)",
-        "Leading Shower Moliere Average [degrees]",
-        "Leading Shower Theta [degrees]",
-        "Leading Shower Phi [degrees]",
+        "Leading Shower Moliere Average [deg]",
+        "Leading Shower Theta [deg]",
+        "Leading Shower Phi [deg]",
         "Reconstructed Leading Shower Energy [GeV]",
         "Reconstructed Leading Shower Energy [GeV]",
         "Largest Flash Time [#mus]",
-        "Largest Flash Intensity [PE]"
+        "Largest Flash Intensity [PE]",
+        "Leading Shower Effective Angle [deg]",
+        "Leading Shower Cosine Effective Angle [deg]"
     };
 
     // list of detector variations
