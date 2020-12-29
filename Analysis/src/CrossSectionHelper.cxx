@@ -272,7 +272,8 @@ void CrossSectionHelper::LoopEvents(){
                                 _util.dirt_scale_factor,
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dirt), // N Dirt
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec),
-                                 N_target_MC, "MC");
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig),  // N Sig
+                                 N_target_MC, "MC", var);
 
                 // Data Cross section -- currently using eventrate
                 CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_data), // N Sel
@@ -285,7 +286,8 @@ void CrossSectionHelper::LoopEvents(){
                                 _util.dirt_scale_factor,
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dirt),  // N Dirt
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dataxsec),
-                                N_target_Data, "Data");
+                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig),   // N Sig
+                                N_target_Data, "Data", var);
 
             } // End loop over the vars
         
@@ -721,7 +723,7 @@ double CrossSectionHelper::CalcCrossSec(double sel, double gen, double sig, doub
 
 }
 // -----------------------------------------------------------------------------
-void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double ext_scale_factor, TH1D* h_ext, double dirt_scale_factor ,TH1D* h_dirt, TH1D* h_xsec, double targ, std::string mcdata){
+void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double ext_scale_factor, TH1D* h_ext, double dirt_scale_factor ,TH1D* h_dirt, TH1D* h_xsec, TH1D* h_sig, double targ, std::string mcdata, int _var){
 
 
     // I think this is the slow bit -- maybe make copies only once?
@@ -745,10 +747,20 @@ void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg,
 
     // (N - B) / (eff * targ * flux)
     h_xsec->Sumw2();
-    h_xsec->Add(h_sel,         1);
-    h_xsec->Add(h_bkg_clone,  -1);
-    h_xsec->Add(h_ext_clone,  -1);
-    h_xsec->Add(h_dirt_clone, -1);
+    
+    if (_var == k_var_true_el_E){
+        h_xsec->Add(h_sig,         1);
+    }
+    else {
+        h_xsec->Add(h_sel,         1);
+    }
+    
+    
+    if (_var != k_var_true_el_E){
+        h_xsec->Add(h_bkg_clone,  -1);
+        h_xsec->Add(h_ext_clone,  -1);
+        h_xsec->Add(h_dirt_clone, -1);
+    }
     
     h_xsec->Divide(h_eff) ; // For flux normalised event rate we dont do anything to the efficiency
 
@@ -1474,13 +1486,13 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 // loop over and create the histograms
                 for (unsigned int i=0; i < xsec_types.size();i++){    
                     if (i == k_xsec_sel || i == k_xsec_bkg || i == k_xsec_gen || i == k_xsec_sig || i == k_xsec_ext || i == k_xsec_dirt || i == k_xsec_data){
-                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Leading Shower Energy [GeV]; Entries", nbins, edges);
+                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels_events.at(var).c_str()), nbins, edges);
                     }
                     else if (i == k_xsec_eff){
-                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,";Leading Shower Energy [GeV]; Efficiency", nbins, edges);
+                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels_eff.at(var).c_str()), nbins, edges);
                     }
                     else if (i == k_xsec_dataxsec || i == k_xsec_mcxsec){
-                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels.at(var).c_str()), nbins, edges);
+                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels_xsec.at(var).c_str()), nbins, edges);
                     }
                     else {
                         // If this is the case then there is an uncaught case

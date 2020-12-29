@@ -143,18 +143,27 @@ class CrossSectionHelper{
                                     //  "true_nu_E", "reco_nu_e"
                                      };
     
-    // Use these for when we do the cross-section
-    // std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Cross-Section [10^{-39} cm^{2}]",
-    //                                     ";Reco Leading Shower Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
-    //                                     ";True Electron Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]"
+    // Use these for when we do the flux normalised event rate
+    // std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",
+    //                                     ";Reco. Leading Shower Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]",
+    //                                     ";True Electron Energy [GeV]; #nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
     //                                     };
     
-    // Use these for when we do the flux normalised event rate
-    std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",
-                                        ";Reco. Leading Shower Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]",
-                                        ";True Electron Energy [GeV]; #nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
+    std::vector<std::string> var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
+                                           ";Reco. Leading Shower Energy [GeV];#frac{d#sigma}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon]",
+                                           ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];#frac{d#sigma}{dE^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon"
                                         };
-    
+
+
+    std::vector<std::string> var_labels_events = {";;Entries",
+                                        ";Reco. Leading Shower Energy [GeV]; Entries / GeV",
+                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries / GeV"
+                                        };
+
+    std::vector<std::string> var_labels_eff = {";;Efficiency",
+                                        ";Reco. Leading Shower Energy [GeV]; Efficiency",
+                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency"
+                                        };
 
     std::vector<std::string> reweighter_labels = {
         "CV",    // Dont comment this out
@@ -305,7 +314,7 @@ class CrossSectionHelper{
     double CalcCrossSec(double sel, double gen, double sig, double bkg, double flux, double ext, double dirt, double targ);
     // -------------------------------------------------------------------------
     // Function to calculate the cross section using binned histograms
-    void CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double ext_scale_factor, TH1D* h_ext, double dirt_scale_factor, TH1D* h_dirt, TH1D* h_xsec, double targ, std::string mcdata);
+    void CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double ext_scale_factor, TH1D* h_ext, double dirt_scale_factor, TH1D* h_dirt, TH1D* h_xsec, TH1D* h_sig, double targ, std::string mcdata, int _var);
     // -------------------------------------------------------------------------
     // Function to get the integrated flux OR a weight
     double GetIntegratedFlux(int uni, std::string value, std::string label, std::string variation, int _nu_pdg, double _true_energy, double _numi_ang);
