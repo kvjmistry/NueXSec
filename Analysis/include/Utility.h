@@ -69,11 +69,8 @@ public:
     // Get a 2D histogram from a file
     bool GetHist(TFile* f, TH2D* &h, TString string);
     // -------------------------------------------------------------------------
-    // Check whether a weight has a suitable value
-    void CheckWeight(double &weight);
-    // -------------------------------------------------------------------------
-    // Check whether a weight has a suitable value
-    void CheckWeight(float &weight);
+    // Check whether a weight has a suitable value, templated with double and float
+    template<typename T> void CheckWeight(T &weight);
     // -------------------------------------------------------------------------
     // Get the CV weight correction
     double GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv);
@@ -125,6 +122,20 @@ public:
     // -------------------------------------------------------------------------
     // Turn off the intrinsic nue mode
     void TurnoffIntrinsicMode(){intrinsic_mode = (char*)"empty";};
+    // -------------------------------------------------------------------------
+    // Calculate a covariance matrix
+    void CalcCovariance(std::vector<TH1D*> h_universe, TH1D *h_CV, TH2D *h_cov);
+    // -------------------------------------------------------------------------
+    // Calculate a correlation matrix
+    void CalcCorrelation(TH1D *h_CV, TH2D  *h_cov, TH2D *h_cor);
+    // -------------------------------------------------------------------------
+    // Calculate a fractional covariance matrix
+    // ** Requires the input frac cov to be a cloned version of the covariance matrix **
+    void CalcCFracCovariance(TH1D *h_CV, TH2D *h_frac_cov);
+    // -------------------------------------------------------------------------
+    // Calulate a chi squared using a covarinace matrix, for a model to data
+    void CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov);
+    // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 
     // Variables

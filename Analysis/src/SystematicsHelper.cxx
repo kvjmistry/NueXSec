@@ -753,6 +753,9 @@ void SystematicsHelper::InitialiseReweightingMode(){
     // Plot the systematic uncertainty
     MakeTotUncertaintyPlot();
 
+    // Calculate a chi-squared using the total covariance matrix
+    _util.CalcChiSquared(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_err_tot));
+
     // Print the sqrt of the diagonals of the covariance matrix
     // loop over rows
     for (int row = 1; row < h_cov_v.at(k_err_sys)->GetNbinsX()+1; row++) {
@@ -1895,49 +1898,13 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
     }
 
 
-    // ------------ Now calculate the correlation matrix ------------
-    double cor_bini;
-    // loop over rows
-    for (int row = 1; row < cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetNbinsX()+1; row++) {
-        
-        double cii = cov->GetBinContent(row, row);
-
-        // Loop over columns
-        for (int col = 1; col < cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetNbinsX()+1; col++) {
-            
-            double cjj = cov->GetBinContent(col, col);
-            
-            double n = sqrt(cii * cjj);
-
-            // Catch Zeros, set to arbitary 1.0
-            if (n == 0) cor_bini = 0;
-            else cor_bini = cov->GetBinContent(row, col) / n;
-
-            cor->SetBinContent(row, col, cor_bini );
-        }
-    }
-
+    // Correlation Matrix
+    _util.CalcCorrelation(cv_hist_vec.at(var).at(k_xsec_mcxsec), cov, cor);
+    
+    // Fractional Covariance Matrix
     TH2D *frac_cov = (TH2D*) cov->Clone("h_frac_cov");
+    _util.CalcCFracCovariance(cv_hist_vec.at(var).at(k_xsec_mcxsec), frac_cov);
 
-    // ------------ Now calculate the fractional covariance matrix ------------
-    double setbin;
-    // loop over rows
-    for (int row = 1; row < cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetNbinsX()+1; row++) {
-       
-       double cii = cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(row);
-
-        // Loop over columns
-        for (int col = 1; col < cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetNbinsX()+1; col++) {
-            double cjj = cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(col);
-            double n = cii * cjj;
-
-            // Catch Zeros, set to arbitary 0
-            if (n == 0) setbin = 0;
-            else setbin = frac_cov->GetBinContent(row, col) / n;
-
-            frac_cov->SetBinContent(row, col, setbin );
-        }
-    }
 
     gStyle->SetPalette(kBlueGreenYellow);
 

@@ -197,6 +197,9 @@ void CrossSectionHelper::LoopEvents(){
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_ext, cv_weight, shr_energy_cali, elec_e);
+
+                    // Apply additional weight to the ext events to get the N selected number correct
+                    FillHists(label, uni, k_xsec_sel, cv_weight*(_util.ext_scale_factor / _util.mc_scale_factor), shr_energy_cali, elec_e);
                 }
 
                 // Dirt event
@@ -204,6 +207,9 @@ void CrossSectionHelper::LoopEvents(){
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_dirt, weight_dirt, shr_energy_cali, elec_e);
+
+                    // Apply additional weight to the dirt events to get the N selected number correct
+                    FillHists(label, uni, k_xsec_sel, cv_weight*(_util.dirt_scale_factor / _util.mc_scale_factor), shr_energy_cali, elec_e);
                 }
             } // End loop over uni
 
@@ -314,9 +320,10 @@ void CrossSectionHelper::LoopEvents(){
     "Dirt Data:       " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dirt)->Integral()* _util.dirt_scale_factor << "\n"
     << std::endl;
 
-    std::cout << 
-    "MC Flux Norm. Event Rate: "   << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_mcxsec)  ->Integral() << " cm2" << "\n" << 
-    "Data Flux Norm. Event Rate: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dataxsec)->Integral() << " cm2      \n"
+    std::cout <<
+    "GENIE X-Sec:           " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sig) ->Integral() / (h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_eff)->Integral() *integrated_flux * mc_flux_scale_factor * N_target_MC) << "  cm2/nucleon" << "\n" << 
+    "MC CC Cross Section:   "   << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_mcxsec)  ->Integral() << "  cm2/nucleon" << "\n" << 
+    "Data CC Cross Section: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dataxsec)->Integral() << "  cm2/nucleon      \n"
     << std::endl;
 
 
