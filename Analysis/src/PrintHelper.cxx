@@ -231,6 +231,18 @@ void PrintHelper::PrintResults(){
             if (_util.print_ext) init_count_ext = count_ext;
             if (_util.print_dirt) init_count_dirt = count_dirt;
 
+            init_count_nue_cc_qe  = count_nue_cc_qe;
+            init_count_nue_cc_res = count_nue_cc_res;
+            init_count_nue_cc_dis = count_nue_cc_dis;
+            init_count_nue_cc_coh = count_nue_cc_coh;
+            init_count_nue_cc_mec = count_nue_cc_mec;
+
+            init_count_nuebar_cc_qe  = count_nuebar_cc_qe;
+            init_count_nuebar_cc_res = count_nuebar_cc_res;
+            init_count_nuebar_cc_dis = count_nuebar_cc_dis;
+            init_count_nuebar_cc_coh = count_nuebar_cc_coh;
+            init_count_nuebar_cc_mec = count_nuebar_cc_mec;
+
         }
 
         
@@ -303,11 +315,11 @@ void PrintHelper::PrintResults(){
   
         if (_util.print_mc){
             std::cout << "\n----------- Neutrinos in FV Truth -------------" << std::endl;
-            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC QE",    count_nue_cc_qe*mc_scale_factor,  "Nuebar CC QE",    count_nuebar_cc_qe*mc_scale_factor);
-            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC Res",   count_nue_cc_res*mc_scale_factor, "Nuebar CC Res",   count_nuebar_cc_res*mc_scale_factor);
-            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC DIS",   count_nue_cc_dis*mc_scale_factor, "Nuebar CC DIS",   count_nuebar_cc_dis*mc_scale_factor);
-            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC COH",   count_nue_cc_coh*mc_scale_factor, "Nuebar CC COH",   count_nuebar_cc_coh*mc_scale_factor);
-            printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Nue CC MEC",   count_nue_cc_mec*mc_scale_factor, "Nuebar CC MEC",   count_nuebar_cc_mec*mc_scale_factor);
+            printf (" %-12s: %-7.2f(%2.1f%%) %-12s: %-8.2f(%2.1f%%)\n", "Nue CC QE ",   count_nue_cc_qe*mc_scale_factor , 100 * count_nue_cc_qe  / init_count_nue_cc_qe,  "Nuebar CC QE",    count_nuebar_cc_qe*mc_scale_factor,  100 * count_nuebar_cc_qe  / init_count_nuebar_cc_qe);
+            printf (" %-12s: %-7.2f(%2.1f%%) %-12s: %-7.2f(%2.1f%%)\n", "Nue CC Res",   count_nue_cc_res*mc_scale_factor, 100 * count_nue_cc_res / init_count_nue_cc_res, "Nuebar CC Res",   count_nuebar_cc_res*mc_scale_factor, 100 * count_nuebar_cc_res / init_count_nuebar_cc_res);
+            printf (" %-12s: %-7.2f(%2.1f%%) %-12s: %-7.2f(%2.1f%%)\n", "Nue CC DIS",   count_nue_cc_dis*mc_scale_factor, 100 * count_nue_cc_dis / init_count_nue_cc_dis, "Nuebar CC DIS",   count_nuebar_cc_dis*mc_scale_factor, 100 * count_nuebar_cc_dis / init_count_nuebar_cc_dis);
+            printf (" %-12s: %-7.2f(%2.1f%%) %-12s: %-7.2f(%2.1f%%)\n", "Nue CC COH",   count_nue_cc_coh*mc_scale_factor, 100 * count_nue_cc_coh / init_count_nue_cc_coh, "Nuebar CC COH",   count_nuebar_cc_coh*mc_scale_factor, 100 * count_nuebar_cc_coh / init_count_nuebar_cc_coh);
+            printf (" %-12s: %-7.2f(%2.1f%%) %-12s: %-7.2f(%2.1f%%)\n", "Nue CC MEC",   count_nue_cc_mec*mc_scale_factor, 100 * count_nue_cc_mec / init_count_nue_cc_mec, "Nuebar CC MEC",   count_nuebar_cc_mec*mc_scale_factor, 100 * count_nuebar_cc_mec / init_count_nuebar_cc_mec);
             std::cout << std::endl;
             printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Numu CC QE",    count_numu_cc_qe*mc_scale_factor,  "Numubar CC QE",    count_numubar_cc_qe*mc_scale_factor);
             printf (" %-12s: %-10.2f %-12s: %-10.2f\n", "Numu CC Res",   count_numu_cc_res*mc_scale_factor, "Numubar CC Res",   count_numubar_cc_res*mc_scale_factor);
