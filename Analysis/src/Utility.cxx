@@ -524,7 +524,7 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
     }
 
     // Create a random energy dependent nue weight for testing model dependence
-    if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12)) weight *= nu_e*nu_e;
+    // if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12)) weight *= nu_e*nu_e;
 
 
     return weight;
