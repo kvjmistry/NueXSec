@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<!-- note using dirt fcl which has genie weights turned off as we dont do syatematics over det var samples-->
+<!-- Recomb2 Systematic-->
 
 <!-- Production Project -->
 <!DOCTYPE project [
@@ -8,7 +8,7 @@
 <!ENTITY file_type "mc">
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
-<!ENTITY name "searchingfornues_run1_overlay_detvar_CV">
+<!ENTITY name "searchingfornues_run1_overlay_detvar_Recomb2">
 <!ENTITY version "v1">
 ]>
 
@@ -23,7 +23,7 @@
   <os>SL7</os>
 
   <!-- Batch resources -->
-  <resource>DEDICATED,OPPORTUNISTIC</resource>
+  <resource>DEDICATED,OPPORTUNISTIC,OFFSITE</resource>
 
   <!-- Larsoft information -->
   <larsoft>
@@ -34,6 +34,8 @@
 
   <!-- <check>1</check> -->
   <!-- <copy>1</copy> -->
+
+  <!-- <fcldir>/pnfs/uboone/persistent/users/kmistry/searchingfornues/</fcldir> -->
   
   <!-- Project stages -->
   <stage name="ntuple">
@@ -46,12 +48,12 @@
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <maxfilesperjob>5</maxfilesperjob>
-    <numjobs>912</numjobs> <!-- 912 -->
+    <numjobs>918</numjobs> <!-- 918 -->
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <disk>25GB</disk>
     <schema>root</schema>
-    <inputdef>prodgenie_numi_nu_overlay_mcc9_v08_00_00_48_CV_reco2_run1_reco2</inputdef>
+    <inputdef>prod_numi_overlay_mcc9_v08_00_00_48_TPCDetVar_run1_reco2_nu_Recomb2_reco2</inputdef>
     <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/FHC/flux_cached_entries.root</jobsub>
     <jobsub_start>  --expected-lifetime=short</jobsub_start>
   </stage>
