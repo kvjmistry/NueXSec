@@ -27,7 +27,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
 
         // XSec mode
         if (strcmp(arg, "--xsec") == 0) {
-            std::cout << yellow << "Calculating the Cross Section with input file name: " << argv[i+1] << yellow << std::endl;
+            std::cout << yellow << "Calculating the Cross Section with input file name: " << argv[i+1] << reset << std::endl;
             calc_cross_sec = true;
             run_selection = false; // switch this bool out
             tree_file_name = argv[i+1];
@@ -405,6 +405,9 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         std::cout << "-------------------------------" << reset << std::endl;
     }
 
+    std::cout << "Using Energy Threshold of: " << red << energy_threshold * 1000 << " MeV" << reset <<  std::endl;
+    std::cout << green << "-------------------------------" << reset << std::endl;
+
     if (use_gpvm)
         std::cout << red << "Using gpvm environment, all paths will be set compatible with running on a gpvm"<< reset << std::endl;
     else 
@@ -509,7 +512,7 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
     if (weight_ppfx) weight = weight * weight_flux;
 
     // Weight the below threshold events to zero. Current threhsold is 125 MeV
-    if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12) && nu_e <= 0.125) weight = 0.0;
+    if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12) && nu_e <= energy_threshold) weight = 0.0;
 
     // This is the intrinsic nue weight that scales it to the standard overlay sample
     if (std::string(intrinsic_mode) == "intrinsic" && type == k_mc){

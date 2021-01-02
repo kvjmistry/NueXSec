@@ -149,6 +149,9 @@ public:
 
     // Bins for the reconstructed shower energy
     std::vector<double> reco_shr_bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 6.0};
+
+    // Neutrino Energy Threshold to integrate from
+    double energy_threshold = 0.125; // GeV
     
     bool slim                      = false;
     bool make_histos               = false;

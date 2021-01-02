@@ -21,11 +21,6 @@ class CrossSectionHelper{
     // Class instances
     Utility _util;
 
-    // Set threshold to integrate the flux from [GeV]
-    // Remember to make sure you set this number past the bin boundary or it wont work
-    // Current flux bins are 0.00 ,0.06, 0.125, 0.25, 0.5... GeV
-    double energy_threshold = 0.130; 
-
     // Variables
     int run{0}, subrun{0}, event{0};
     std::string *classification = NULL; // The classification of the event

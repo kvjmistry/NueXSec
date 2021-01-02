@@ -786,23 +786,22 @@ double CrossSectionHelper::GetIntegratedFlux(int uni, std::string value, std::st
         boolhist      = _util.GetHist(f_flux, h_nuebar, "nuebar/Detsmear/nuebar_CV_AV_TPC_2D");
         if (boolhist == false) gSystem->Exit(0); 
 
-        std::cout << "Using Energy Threshold of: \033[0;31m" << energy_threshold * 1000 << " MeV" << "\033[0m" <<  std::endl;
-
+        // Get the POT from the flux histogram
         POT_flux = GetPOT(f_flux);
 
-        double xbin_th = h_nue->GetXaxis()->FindBin(energy_threshold);   // find the x bin to integrate from
+        // Nue Integrated Flux
+        double xbin_th = h_nue->GetXaxis()->FindBin(_util.energy_threshold);                     // Find the x bin to integrate from
         integral_nue = h_nue->Integral( xbin_th, h_nue->GetNbinsX()+1, 0, h_nue->GetNbinsY()+1); // Integrate over the flux for nue
-
         std::cout << "\nIntegral Nue Flux: " << flux_scale_factor * integral_nue / POT_flux << " nue / POT / cm2" << std::endl;
 
-        xbin_th   = h_nuebar->GetXaxis()->FindBin(energy_threshold);              // find the x bin to integrate from
+        // Nuebar Integrated Flux
+        xbin_th   = h_nuebar->GetXaxis()->FindBin(_util.energy_threshold);                                   // Find the x bin to integrate from
         integral_nuebar = h_nuebar->Integral( xbin_th, h_nuebar->GetNbinsX()+1, 0, h_nuebar->GetNbinsY()+1); // Integrate over the flux for nue
-
         std::cout << "\nIntegral Nuebar Flux: " << flux_scale_factor * integral_nuebar / POT_flux << " nuebar / POT / cm2" << "\n" << std::endl;
 
-        std::cout << "Integral Flux MC: " << mc_flux_scale_factor * integral_nuebar / POT_flux << " nu / MC POT / cm2" << "\n" << std::endl;
-
-        std::cout << "Integral Flux Data: " << data_flux_scale_factor * integral_nuebar / POT_flux << " nu / Data POT / cm2" << "\n" << std::endl;
+        // Print the flux scaled to the MC and Data POT
+        std::cout << "Integral Flux MC POT: "   << mc_flux_scale_factor * integral_nuebar / POT_flux   << " nu / MC POT / cm2"   << "\n" << std::endl;
+        std::cout << "Integral Flux Data POT: " << data_flux_scale_factor * integral_nuebar / POT_flux << " nu / Data POT / cm2" << "\n" << std::endl;
 
         // Return the flux per POT
         return (integral_nue + integral_nuebar) / POT_flux;
@@ -814,23 +813,22 @@ double CrossSectionHelper::GetIntegratedFlux(int uni, std::string value, std::st
         // Get the POT from the file
         POT_flux = GetPOT(f_flux);
 
+        // Get Nue histogram
         boolhist = _util.GetHist(f_flux, h_uni_nue, Form("nue/Multisims/nue_%s_Uni_%i_AV_TPC_2D", label.c_str(), uni));
-
         if (boolhist == false) gSystem->Exit(0);
         
+        // Get Nuebar histogram
         boolhist = _util.GetHist(f_flux, h_uni_nuebar, Form("nuebar/Multisims/nuebar_%s_Uni_%i_AV_TPC_2D", label.c_str(), uni));
         if (boolhist == false) gSystem->Exit(0);
 
-        xbin_th = h_uni_nue->GetXaxis()->FindBin(energy_threshold);   // find the x bin to integrate from
+        // Integrate the Nue flux histogram
+        xbin_th = h_uni_nue->GetXaxis()->FindBin(_util.energy_threshold);                                    // Find the x bin to integrate from
         integral_nue = h_uni_nue->Integral( xbin_th, h_uni_nue->GetNbinsX()+1, 0, h_uni_nue->GetNbinsY()+1); // Integrate over the flux for nue
-
-        // std::cout << xbin_th << std::endl;
-
         // std::cout << "\nIntegral Nue Flux: " << flux_scale_factor * integral_nue / POT_flux << " nue / POT / GeV / cm2" << std::endl;
 
-        xbin_th   = h_uni_nuebar->GetXaxis()->FindBin(energy_threshold);              // find the x bin to integrate from 
+        // Integrate the Nuebar flux histogram
+        xbin_th   = h_uni_nuebar->GetXaxis()->FindBin(_util.energy_threshold);                                           // Find the x bin to integrate from 
         integral_nuebar = h_uni_nuebar->Integral( xbin_th, h_uni_nuebar->GetNbinsX()+1, 0, h_uni_nuebar->GetNbinsY()+1); // Integrate over the flux for nuebar
-
         // std::cout << "Integral Nuebar Flux: " << flux_scale_factor * integral_nuebar / POT_flux << " nuebar / POT / GeV / cm2" << "\n" << std::endl;
 
         // Return the flux per POT
@@ -841,9 +839,8 @@ double CrossSectionHelper::GetIntegratedFlux(int uni, std::string value, std::st
     // Return a weight based on the energy and angle of the event -- used for weighting by beamline variations and ppfx HP types broken down 
     else {
 
+        // Get the beamline variation index so we can get the right histogram to weight from
         int var_index = GetBeamlineIndex(variation);
-
-        // std::cout <<true_energy << "  " <<  numi_ang << "  " << nu_pdg<< std::endl;
 
         // Nue
         if (_nu_pdg == 12){
@@ -1713,7 +1710,7 @@ void CrossSectionHelper::GetBeamlineHists(){
         beamline_hists.at(f).at(k_nue)->SetDirectory(f_flux);
 
         // Get the flux before dividing
-        double xbin_th   = beamline_hists.at(f).at(k_nue)->GetXaxis()->FindBin(energy_threshold);              // find the x bin to integrate from 
+        double xbin_th   = beamline_hists.at(f).at(k_nue)->GetXaxis()->FindBin(_util.energy_threshold);              // find the x bin to integrate from 
         beamline_flux.at(f) += beamline_hists.at(f).at(k_nue)->Integral( xbin_th, beamline_hists.at(f).at(k_nue)->GetNbinsX()+1, 0, beamline_hists.at(f).at(k_nue)->GetNbinsY()+1); // Integrate over the flux
     
         // Now divide it by the CV
@@ -1731,7 +1728,7 @@ void CrossSectionHelper::GetBeamlineHists(){
         beamline_hists.at(f).at(k_nuebar)->SetDirectory(f_flux);
         
         // Get the flux before dividing
-        xbin_th   = beamline_hists.at(f).at(k_nuebar)->GetXaxis()->FindBin(energy_threshold);              // find the x bin to integrate from 
+        xbin_th   = beamline_hists.at(f).at(k_nuebar)->GetXaxis()->FindBin(_util.energy_threshold);              // find the x bin to integrate from 
         beamline_flux.at(f) += beamline_hists.at(f).at(k_nuebar)->Integral( xbin_th, beamline_hists.at(f).at(k_nuebar)->GetNbinsX()+1, 0, beamline_hists.at(f).at(k_nuebar)->GetNbinsY()+1); // Integrate over the flux
 
         // Now divide it by the CV
