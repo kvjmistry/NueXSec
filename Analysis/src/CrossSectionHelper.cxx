@@ -326,19 +326,6 @@ void CrossSectionHelper::LoopEvents(){
     "Data CC Cross Section: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dataxsec)->Integral() << "  cm2/nucleon      \n"
     << std::endl;
 
-
-    // for (unsigned int uni = 0; uni < h_cross_sec.at(1).size(); uni++){
-    //     double B  = h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_bkg)->GetBinContent(1) + h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_ext)->GetBinContent(1)* (_util.ext_scale_factor / _util.mc_scale_factor) + h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_dirt)->GetBinContent(1)* (_util.dirt_scale_factor / _util.mc_scale_factor);
-    //     double B_beam  = h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_bkg)->GetBinContent(1);
-    //     double B_ext  = h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_ext)->GetBinContent(1)* (_util.ext_scale_factor / _util.mc_scale_factor);
-    //     double B_dirt  = h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_dirt)->GetBinContent(1)* (_util.dirt_scale_factor / _util.mc_scale_factor);
-        
-    //     // std::cout << "Uni: " << uni << " N-B: " << h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_sel)->GetBinContent(1) - B <<
-    //     //  " Bkg: " << B  << " B beam: " << B_beam << " B ext: " << B_ext << " B dirt: " << B_dirt<<
-    //     //  " MC XSec: " << h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_mcxsec)->GetBinContent(1)<< " N: " << h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_sel)->GetBinContent(1) << " N Sig: " << h_cross_sec.at(1).at(uni).at(k_var_reco_el_E).at(k_xsec_sig)->Integral() << std::endl;
-    // }
-
-
     // Write the histograms to file for inspection
     WriteHists();
 

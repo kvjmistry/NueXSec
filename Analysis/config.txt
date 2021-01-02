@@ -99,25 +99,35 @@ Run1_MC_POT_WireModdEdX 3.66871e+20 // new tune
 Run1_MC_POT_FLUGG 3.65214e+20
 -
 // Run 1 Det var CV intrinsic nue sample
-Run1_Intrinsic_POT_CV 2.68294e+22
+// Run1_Intrinsic_POT_CV 2.68294e+22
+Run1_Intrinsic_POT_CV 2.37261e+22 // new tune
 -
 // Run 1 Det var LYAttenuation intrinsic nue sample
-Run1_Intrinsic_POT_LYAttenuation 2.64165e+22
+// Run1_Intrinsic_POT_LYAttenuation 2.64165e+22
+Run1_Intrinsic_POT_LYAttenuation 2.3837e+22 // new tune
+-
+// Run 1 Det var LYDown intrinsic nue sample
+Run1_Intrinsic_POT_LYDown 2.24505e+22 // new tune
 -
 // Run 1 Det var LYRayleigh intrinsic nue sample
-Run1_Intrinsic_POT_LYRayleigh 2.67655e+22
+// Run1_Intrinsic_POT_LYRayleigh 2.67655e+22
+Run1_Intrinsic_POT_LYRayleigh 2.38081e+22 // new tune
 -
 // Run 1 Det var SCE intrinsic nue sample
-Run1_Intrinsic_POT_SCE 2.60685e+22
+// Run1_Intrinsic_POT_SCE 2.60685e+22
+Run1_Intrinsic_POT_SCE 2.39023e+22 // new tune
 -
 // Run 1 Det var Recomb2 intrinsic nue sample
-Run1_Intrinsic_POT_Recomb2 2.60657e+22
+// Run1_Intrinsic_POT_Recomb2 2.60657e+22
+Run1_Intrinsic_POT_Recomb2 2.38193e+22 // new tune
 -
 // Run 1 Det var WireModX intrinsic nue sample
-Run1_Intrinsic_POT_WireModX 2.66184e+22
+// Run1_Intrinsic_POT_WireModX 2.66184e+22
+Run1_Intrinsic_POT_WireModX 2.38318e+22 // new tune
 -
 // Run 1 Det var WireModYZ intrinsic nue sample
-Run1_Intrinsic_POT_WireModYZ 2.62256e+22
+// Run1_Intrinsic_POT_WireModYZ 2.62256e+22
+Run1_Intrinsic_POT_WireModYZ 2.38416e+22 // new tune
 -
 // Run 1 Det var WireModThetaXZ intrinsic nue sample
 Run1_Intrinsic_POT_WireModThetaXZ 2.65175e+22

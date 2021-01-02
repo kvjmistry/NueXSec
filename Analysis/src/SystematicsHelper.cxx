@@ -705,13 +705,14 @@ void SystematicsHelper::InitialiseReweightingMode(){
 
         // Detector Variations
         PlotReweightingModeDetVar("LYRayleigh",                         var, k_LYRayleigh,                         var_string_pretty.at(k_LYRayleigh));
+        PlotReweightingModeDetVar("LYDown",                             var, k_LYDown,                             var_string_pretty.at(k_LYDown));
         PlotReweightingModeDetVar("SCE",                                var, k_SCE,                                var_string_pretty.at(k_SCE));
         // PlotReweightingModeDetVar("LYAttenuation",                      var, k_LYAttenuation,                      var_string_pretty.at(k_LYAttenuation));
         PlotReweightingModeDetVar("Recomb2",                            var, k_Recomb2,                            var_string_pretty.at(k_Recomb2));
         PlotReweightingModeDetVar("WireModX",                           var, k_WireModX,                           var_string_pretty.at(k_WireModX));
-        PlotReweightingModeDetVar("WireModYZ",                          var, k_WireModYZ,                          var_string_pretty.at(k_WireModYZ));
-        PlotReweightingModeDetVar("WireModThetaXZ",                     var, k_WireModThetaXZ,                     var_string_pretty.at(k_WireModThetaXZ));
-        PlotReweightingModeDetVar("WireModThetaYZ_withSigmaSplines",    var, k_WireModThetaYZ_withSigmaSplines,    var_string_pretty.at(k_WireModThetaYZ_withSigmaSplines));
+        // PlotReweightingModeDetVar("WireModYZ",                          var, k_WireModYZ,                          var_string_pretty.at(k_WireModYZ));
+        // PlotReweightingModeDetVar("WireModThetaXZ",                     var, k_WireModThetaXZ,                     var_string_pretty.at(k_WireModThetaXZ));
+        // PlotReweightingModeDetVar("WireModThetaYZ_withSigmaSplines",    var, k_WireModThetaYZ_withSigmaSplines,    var_string_pretty.at(k_WireModThetaYZ_withSigmaSplines));
         // PlotReweightingModeDetVar("WireModThetaYZ_withoutSigmaSplines", var, k_WireModThetaYZ_withoutSigmaSplines, var_string_pretty.at(k_WireModThetaYZ_withoutSigmaSplines));
         // PlotReweightingModeDetVar("WireModdEdX",                        var, k_WireModdEdX,                        var_string_pretty.at(k_WireModdEdX));
 
@@ -816,10 +817,10 @@ void SystematicsHelper::SetLabelName(std::string label, std::string &label_up, s
         label_up = label + "_p7mm";
         label_dn = label + "_m7mm";
     }
-    else if  (label == "Horn1_refined_descr" || label == "Decay_pipe_Bfield" || label == "Old_Horn_Geometry" ||
-              label == "LYRayleigh" || label == "LYAttenuation" || label == "SCE" || label == "Recomb2" || 
-              label == "WireModX" || label == "WireModYZ" || label == "WireModThetaXZ" || label == "WireModThetaYZ_withSigmaSplines" || 
-              label == "WireModThetaYZ_withoutSigmaSplines" || label == "WireModdEdX" || label == "pi0"){
+    else if  (label == "Horn1_refined_descr"                || label == "Decay_pipe_Bfield" || label == "Old_Horn_Geometry" ||
+              label == "LYRayleigh"                         || label == "LYDown"            || label == "LYAttenuation"     || label == "SCE" || label == "Recomb2"       || 
+              label == "WireModX"                           || label == "WireModYZ"         || label == "WireModThetaXZ"    || label == "WireModThetaYZ_withSigmaSplines" || 
+              label == "WireModThetaYZ_withoutSigmaSplines" || label == "WireModdEdX"       || label == "pi0"){
         label_up = label;
         label_dn = label;
     }
@@ -1927,6 +1928,7 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
                 h_cov_v.at(k_err_sys)->Add(cov);
 
         }
+        // Beamline
         else if (label == "Horn_curr" ||
                 label == "Horn1_x" ||
                 label == "Horn1_y" ||
@@ -1939,6 +1941,23 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
                 label == "Target_z" ||
                 label == "Decay_pipe_Bfield"){
                 h_cov_v.at(k_err_beamline)->Add(cov);
+                h_cov_v.at(k_err_tot)->Add(cov);
+                h_cov_v.at(k_err_sys)->Add(cov);
+        }
+        // Detector Variation
+        else if (
+                label == "LYRayleigh" ||
+                label == "LYDown"     ||
+                label == "LYAttenuation" ||
+                label == "SCE" ||
+                label == "Recomb2" ||
+                label == "WireModX" ||
+                label == "WireModYZ" ||
+                label == "WireModThetaXZ" ||
+                label == "WireModThetaYZ_withSigmaSplines" ||
+                label == "WireModThetaYZ_withoutSigmaSplines" ||
+                label == "WireModdEdX" ){
+                h_cov_v.at(k_err_detvar)->Add(cov);
                 h_cov_v.at(k_err_tot)->Add(cov);
                 h_cov_v.at(k_err_sys)->Add(cov);
         }
@@ -2113,6 +2132,7 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
     // This is a detector variation
     else if (
         variation == "LYRayleigh" ||
+        variation == "LYDown"     ||
         variation == "LYAttenuation" ||
         variation == "SCE" ||
         variation == "Recomb2" ||
@@ -2763,7 +2783,7 @@ void SystematicsHelper::SetUnisimColours(std::string label, TH1D* h_up, TH1D* h_
         h_up->SetLineColor(42);
         h_dn->SetLineColor(42);
     }
-    else if (label == "Decay_pipe_Bfield"){
+    else if (label == "Decay_pipe_Bfield" || label == "LYDown"){
         h_up->SetLineColor(kGreen+2);
         h_dn->SetLineColor(kGreen+2);
     }

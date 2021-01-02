@@ -122,17 +122,13 @@ class SystematicsHelper{
     void MakeTotUncertaintyPlot();
     // -------------------------------------------------------------------------
 
-
-
-
-
     std::string mode{"default"}; // what mode to run this class in
 
 
     enum enum_variations {
         k_CV,
-        // k_bnb_diffusion,
         k_LYRayleigh,
+        k_LYDown,
         // k_LYAttenuation,
         k_SCE,
         k_Recomb2,
@@ -153,8 +149,8 @@ class SystematicsHelper{
 
     std::vector<std::string> var_string = {
         "CV",
-        // "BNB_Diffusion",
         "LYRayleigh",
+        "LYDown",
         // "LYAttenuation",
         "SCE",
         "Recomb2",
@@ -169,8 +165,8 @@ class SystematicsHelper{
     // strings used for the legend of the plots of the detector variations
     std::vector<std::string> var_string_pretty = {
         "CV",
-        // "BNB Diffusion",
         "LY Rayleigh",
+        "LY Down",
         // "LY Attenuation",
         "SCE",
         "Recombination",
@@ -184,17 +180,17 @@ class SystematicsHelper{
 
     // colors used for the plots of the detector variations
     std::vector<int> var_string_pretty_color = {
-         1, // CV
-         //2, // BNB Diffusion
-         2, // LYRayleigh
-         6, // LYAttenuation
-         3, // SCE
-         9, // Recombination
+         1,  // CV
+         2,  // LYRayleigh
+         95, // LY Down
+         6,  // LYAttenuation
+         3,  // SCE
+         9,  // Recombination
          30, // WM X
-         4, // WM YZ
+         4,  // WM YZ
          53, // WM Theta XZ
-         8, // WM Theta YZ w/ Spl.
-        //  95, // WM Theta YZ w/o Spl.
+         8,  // WM Theta YZ w/ Spl.
+        //  8, // WM Theta YZ w/o Spl.
         //  7 // WM dE/dX
     };
 
