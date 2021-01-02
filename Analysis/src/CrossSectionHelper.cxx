@@ -122,7 +122,7 @@ void CrossSectionHelper::LoopEvents(){
 
         tree->GetEntry(ievent); 
 
-        if (shr_energy_cali > 4.0 && *classification == "data" ) std::cout << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins " << run << " " << subrun << " " << event <<std::endl;
+        if (shr_energy_cali > 6.0 && *classification == "data" ) std::cout << _util.red << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins " << run << " " << subrun << " " << event  << _util.reset<<std::endl;
 
         double cv_weight = weight; // SplinetimesTune * PPFX CV * Pi0 Tune
 
@@ -322,7 +322,7 @@ void CrossSectionHelper::LoopEvents(){
 
     std::cout <<
     "GENIE X-Sec:           " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sig) ->Integral() / (h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_eff)->Integral() *integrated_flux * mc_flux_scale_factor * N_target_MC) << "  cm2/nucleon" << "\n" << 
-    "MC CC Cross Section:   "   << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_mcxsec)  ->Integral() << "  cm2/nucleon" << "\n" << 
+    "MC CC Cross Section:   " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_mcxsec)  ->Integral() << "  cm2/nucleon" << "\n" << 
     "Data CC Cross Section: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dataxsec)->Integral() << "  cm2/nucleon      \n"
     << std::endl;
 
