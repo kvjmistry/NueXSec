@@ -180,7 +180,7 @@ void CrossSectionHelper::LoopEvents(){
                     
                     // Fill histograms
                     FillHists(label, uni, k_xsec_gen, weight_uni, shr_energy_cali, elec_e);
-
+                    FillHists(label, uni, k_xsec_gen_smear, weight_uni, shr_energy_cali, elec_e);
                 }
                 
                 // Data event
@@ -259,12 +259,18 @@ void CrossSectionHelper::LoopEvents(){
 
                 // Calculate the efficiency histogram with smearing of the truth
                 if (var == k_var_reco_el_E){
-                    Smear(h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_gen),
-                          h_smear.at(label).at(uni), h_cross_sec.at(label).at(uni).at(k_var_reco_el_E).at(k_xsec_eff));
+                    // Smear(h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_gen),
+                    //       h_smear.at(label).at(uni).at(k_var_reco_el_E), h_cross_sec.at(label).at(uni).at(k_var_reco_el_E).at(k_xsec_eff));
                 }
                 // Calculate the efficiency histogram by dividing the sig and gen
                 else{ 
                     h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff)->Divide(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(var).at(k_xsec_gen));
+                }
+
+                // For the x-sec in true space, appy a response matrix to the generated events
+                if (var == k_var_true_el_E){
+                    ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_gen_smear),
+                     h_smear.at(label).at(uni).at(k_var_true_el_E));
                 }
 
                 // MC Cross section -- currently using eventrate
@@ -956,9 +962,9 @@ void CrossSectionHelper::WriteHists(){
                     }
 
                     // Write the smearing matrix to the reco folder
-                    if (var == k_var_reco_el_E){
-                        h_smear.at(label).at(uni)->SetOption("colz,text00");
-                        h_smear.at(label).at(uni)->Write("",TObject::kOverwrite);
+                    if (var == k_var_reco_el_E || var == k_var_true_el_E){
+                        h_smear.at(label).at(uni).at(var)->SetOption("col,text00");
+                        h_smear.at(label).at(uni).at(var)->Write(Form("h_run%s_%s_%i_smearing",_util.run_period, reweighter_labels.at(label).c_str(), uni),TObject::kOverwrite);
                     }
                 
                 } // End loop over the variables
@@ -1423,6 +1429,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
         for (unsigned int uni = 0; uni < h_cross_sec.at(label).size(); uni++){
             // Resize the histogram vector. plot var, cuts, classifications
             h_cross_sec.at(label).at(uni).resize(vars.size());
+            h_smear.at(label).at(uni).resize(vars.size());
         }
 
     }
@@ -1476,13 +1483,13 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
 
                 // loop over and create the histograms
                 for (unsigned int i=0; i < xsec_types.size();i++){    
-                    if (i == k_xsec_sel || i == k_xsec_bkg || i == k_xsec_gen || i == k_xsec_sig || i == k_xsec_ext || i == k_xsec_dirt || i == k_xsec_data){
+                    if (i == k_xsec_sel || i == k_xsec_bkg || i == k_xsec_gen || i == k_xsec_gen_smear || i == k_xsec_sig || i == k_xsec_ext || i == k_xsec_dirt || i == k_xsec_data){
                         h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels_events.at(var).c_str()), nbins, edges);
                     }
                     else if (i == k_xsec_eff){
                         h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels_eff.at(var).c_str()), nbins, edges);
                     }
-                    else if (i == k_xsec_dataxsec || i == k_xsec_mcxsec){
+                    else if (i == k_xsec_dataxsec || i == k_xsec_mcxsec || i == k_xsec_mcxsec_smear){
                         h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels_xsec.at(var).c_str()), nbins, edges);
                     }
                     else {
@@ -1490,9 +1497,19 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                         std::cout << "Houston we have a problem!" << std::endl;
                     }
                 }
+
+                // We dont care about the integrated smearing, so set it to some arbitary value
+                if (var == k_var_integrated){
+                    h_smear.at(label).at(uni).at(var) = new TH2D ( Form("h_run%s_%s_%i_%s_smearing",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str()) ,";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]", 1, 0, 1, 1, 0, 1);
+                }
+                // Set the reco and true bins
+                else {
+                    h_smear.at(label).at(uni).at(var) = new TH2D ( Form("h_run%s_%s_%i_%s_smearing",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str()) ,";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]", nbins_smear, edges_smear, nbins_smear, edges_smear);
+                }
+                
+
             } // End loop over the variables
 
-            h_smear.at(label).at(uni) = new TH2D ( Form("h_run%s_%s_%i_smearing",_util.run_period, reweighter_labels.at(label).c_str(), uni) ,";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]", nbins_smear, edges_smear, nbins_smear, edges_smear);
         
         } // End loop over the universes
     
@@ -1616,8 +1633,10 @@ void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double wei
     h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(xsec_type)->Fill(elec_e, weight_uni);
 
     // Smearing Matrix -- only fill for selected signal events
-    if (xsec_type == k_xsec_sig)
-        h_smear.at(label).at(uni)->Fill(elec_e, shr_energy_cali, weight_uni);
+    if (xsec_type == k_xsec_sig){
+        h_smear.at(label).at(uni).at(k_var_reco_el_E)->Fill(elec_e, shr_energy_cali, weight_uni);
+        h_smear.at(label).at(uni).at(k_var_true_el_E)->Fill(elec_e, shr_energy_cali, weight_uni);
+    }
 
 }
 // -----------------------------------------------------------------------------
@@ -1901,6 +1920,69 @@ void CrossSectionHelper::Smear(TH1D* h_sig, TH1D* h_gen, TH2D* h_smear, TH1D* h_
     
 }
 // -----------------------------------------------------------------------------
+void CrossSectionHelper::ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH2D* h_smear){
+
+    // Change this bool to print info
+    bool debug = false;
+
+    //  ------ First normalise the smearing matrix ------
+    // Loop over cols
+    for (int col=1; col<h_smear->GetXaxis()->GetNbins()+2; col++){
+        double integral = 0;
+
+        // Now normalise the column entries by the number of events in the 1D generated histogram
+        for (int row=1; row<h_smear->GetYaxis()->GetNbins()+2; row++) { 
+            h_smear->SetBinContent(row,col, h_smear->GetBinContent(row, col)/ h_gen->GetBinContent(col) );
+            std::cout << row << " " << col << " "<<    h_smear->GetBinContent(row, col) << " "  <<  h_gen->GetBinContent(col)<<  std::endl;
+            
+        }
+    } 
+
+    for (int row=1; row<h_smear->GetYaxis()->GetNbins()+2; row++) { 
+        double val = 0;
+        for (int col=1; col<h_smear->GetXaxis()->GetNbins()+2; col++){
+            val+=h_smear->GetBinContent(row, col)*h_gen->GetBinContent(col);
+        }
+
+        h_gen_smear->SetBinContent(row, val);
+    
+    }
+
+    
+
+    // h_gen_smear->Scale(1.0, "width");
+
+    // for (int col=0; col<h_smear->GetYaxis()->GetNbins()+2; col++){
+    //     std::cout << "Bin: " << col<< " NGen: " <<  h_gen->GetBinContent(col) << " N Gen Smear: " << h_gen_smear->GetBinContent(col) << std::endl;
+    // }
+    
+
+    // Convert the response matrix and histograms to a Matrix
+    // TMatrixD RMatrix(_util.reco_shr_bins.size()+1,_util.reco_shr_bins.size()+1,h_smear->GetArray(), "F");
+    // TMatrixD GenMatrix(_util.reco_shr_bins.size()+1,1,h_gen->GetArray(), "F");
+    
+
+    // // Apply the response matrix to the generated events
+    // TMatrixD GenMatrixSmear(_util.reco_shr_bins.size()+1,1);
+    // RMatrix.Transpose(RMatrix);
+    // GenMatrixSmear.Mult(RMatrix,GenMatrix);
+
+    // if (debug){
+    //     RMatrix.Print();
+    //     GenMatrix.Print();
+    //     GenMatrixSmear.Print();
+    // }
+
+    // // Set the efficiency bins
+    // for (int bin = 1; bin < h_gen_smear->GetNbinsX()+1; bin++){
+    //     h_gen_smear->SetBinContent(bin, GenMatrixSmear(bin,0));
+    //     h_gen_smear->SetBinError(bin, 0);
+        
+    //     if (debug)
+    //         std::cout << GenMatrix(bin,0) << "  "<< GenMatrixSmear(bin,0) << std::endl;
+    // }
+    
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

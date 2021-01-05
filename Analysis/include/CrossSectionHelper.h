@@ -103,23 +103,25 @@ class CrossSectionHelper{
     std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_cross_sec; // Label -- Universe -- variable -- xsec_type
 
     // define vector of smearing matrices
-    std::vector<std::vector<TH2D*>> h_smear; // Label -- Universe
+    std::vector<std::vector<std::vector<TH2D*>>> h_smear; // Label -- Universe -- variable
 
     // Define histograms for the reweighting by cut
     std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_cut_v; // Label -- Cut -- variable -- Universe
 
     // enum for histogram types
     enum TH1D_xsec_hist_vars {
-        k_xsec_sel,     // Selected event histogram binned in energy
-        k_xsec_bkg,     // Bkg event histogram binned in energy
-        k_xsec_gen,     // Gen event histogram binned in energy
-        k_xsec_sig,     // Sig event histogram binned in energy
-        k_xsec_eff,     // Efficiency histogram binned in energy
-        k_xsec_ext,     // EXT event histogram binned in energy
-        k_xsec_dirt,    // Dirt event histogram binned in energy
-        k_xsec_data,    // Data event histogram binned in energy
-        k_xsec_mcxsec,  // MC Cross Section
-        k_xsec_dataxsec,// Data Cross Section
+        k_xsec_sel,          // Selected event histogram binned in energy
+        k_xsec_bkg,          // Bkg event histogram binned in energy
+        k_xsec_gen,          // Gen event histogram binned in energy
+        k_xsec_gen_smear,    // Gen event histogram binned in energy with smeared truth
+        k_xsec_sig,          // Sig event histogram binned in energy
+        k_xsec_eff,          // Efficiency histogram binned in energy
+        k_xsec_ext,          // EXT event histogram binned in energy
+        k_xsec_dirt,         // Dirt event histogram binned in energy
+        k_xsec_data,         // Data event histogram binned in energy
+        k_xsec_mcxsec,       // MC Cross Section
+        k_xsec_mcxsec_smear, // MC Cross Section smeared truth
+        k_xsec_dataxsec,     // Data Cross Section
         k_TH1D_xsec_MAX
     };
 
@@ -132,7 +134,7 @@ class CrossSectionHelper{
     };
 
     // Names for cross section histograms
-    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "data_xsec"};
+    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "data_xsec"};
 
     std::vector<std::string> vars = {"integrated", "reco_el_E", "true_el_E"
                                     //  "true_nu_E", "reco_nu_e"
@@ -356,6 +358,10 @@ class CrossSectionHelper{
     // Normalise the smearing matrix and then use it to get a smeared efficiency
     void Smear(TH1D* h_sig, TH1D* h_gen, TH2D* h_smear, TH1D* h_eff);
     // -------------------------------------------------------------------------
+    // Create a response matrix and smear the generated events in truth to sig events in reco
+    void ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH2D* h_smear);
+    // -------------------------------------------------------------------------
+
 
 
 
