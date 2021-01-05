@@ -474,18 +474,17 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Here we apply the Selection cuts ----------------------------------------
     bool pass; // A flag to see if an event passes an event
 
-    
-    // Set derived variables in the slice container
-    SC.SetSignal();                // Set the event as either signal or other
-    SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
-    SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
-    SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
-
     // Classify the event -- sets variable in the slice contianer
     SC.SliceClassifier(type);      // Classification of the event
     SC.SliceInteractionType(type); // Genie interaction type
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
     SC.Pi0Classifier(type); 
+
+    // Set derived variables in the slice container
+    SC.SetSignal();                // Set the event as either signal or other
+    SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
+    SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
+    SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------

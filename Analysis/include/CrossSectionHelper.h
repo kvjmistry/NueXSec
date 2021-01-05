@@ -21,11 +21,6 @@ class CrossSectionHelper{
     // Class instances
     Utility _util;
 
-    // Set threshold to integrate the flux from [GeV]
-    // Remember to make sure you set this number past the bin boundary or it wont work
-    // Current flux bins are 0.00 ,0.06, 0.125, 0.25, 0.5... GeV
-    double energy_threshold = 0.130; 
-
     // Variables
     int run{0}, subrun{0}, event{0};
     std::string *classification = NULL; // The classification of the event
@@ -108,23 +103,25 @@ class CrossSectionHelper{
     std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_cross_sec; // Label -- Universe -- variable -- xsec_type
 
     // define vector of smearing matrices
-    std::vector<std::vector<TH2D*>> h_smear; // Label -- Universe
+    std::vector<std::vector<std::vector<TH2D*>>> h_smear; // Label -- Universe -- variable
 
     // Define histograms for the reweighting by cut
     std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_cut_v; // Label -- Cut -- variable -- Universe
 
     // enum for histogram types
     enum TH1D_xsec_hist_vars {
-        k_xsec_sel,     // Selected event histogram binned in energy
-        k_xsec_bkg,     // Bkg event histogram binned in energy
-        k_xsec_gen,     // Gen event histogram binned in energy
-        k_xsec_sig,     // Sig event histogram binned in energy
-        k_xsec_eff,     // Efficiency histogram binned in energy
-        k_xsec_ext,     // EXT event histogram binned in energy
-        k_xsec_dirt,    // Dirt event histogram binned in energy
-        k_xsec_data,    // Data event histogram binned in energy
-        k_xsec_mcxsec,  // MC Cross Section
-        k_xsec_dataxsec,// Data Cross Section
+        k_xsec_sel,          // Selected event histogram binned in energy
+        k_xsec_bkg,          // Bkg event histogram binned in energy
+        k_xsec_gen,          // Gen event histogram binned in energy
+        k_xsec_gen_smear,    // Gen event histogram binned in energy with smeared truth
+        k_xsec_sig,          // Sig event histogram binned in energy
+        k_xsec_eff,          // Efficiency histogram binned in energy
+        k_xsec_ext,          // EXT event histogram binned in energy
+        k_xsec_dirt,         // Dirt event histogram binned in energy
+        k_xsec_data,         // Data event histogram binned in energy
+        k_xsec_mcxsec,       // MC Cross Section
+        k_xsec_mcxsec_smear, // MC Cross Section smeared truth
+        k_xsec_dataxsec,     // Data Cross Section
         k_TH1D_xsec_MAX
     };
 
@@ -137,37 +134,46 @@ class CrossSectionHelper{
     };
 
     // Names for cross section histograms
-    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "data_xsec"};
+    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "data_xsec"};
 
     std::vector<std::string> vars = {"integrated", "reco_el_E", "true_el_E"
                                     //  "true_nu_E", "reco_nu_e"
                                      };
     
-    // Use these for when we do the cross-section
-    // std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Cross-Section [10^{-39} cm^{2}]",
-    //                                     ";Reco Leading Shower Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{reco}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]",
-    //                                     ";True Electron Energy [GeV];#frac{d#sigma_{#nu_{e} + #bar{#nu}_{e}}}{dE^{true}_{e}} CC Cross-Section [10^{-39} cm^{2}/GeV]"
+    // Use these for when we do the flux normalised event rate
+    // std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",
+    //                                     ";Reco. Leading Shower Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]",
+    //                                     ";True Electron Energy [GeV]; #nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
     //                                     };
     
-    // Use these for when we do the flux normalised event rate
-    std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",
-                                        ";Reco. Leading Shower Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]",
-                                        ";True Electron Energy [GeV]; #nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
+    std::vector<std::string> var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
+                                           ";Reco. Leading Shower Energy [GeV];#frac{d#sigma}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon]",
+                                           ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];#frac{d#sigma}{dE^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon"
                                         };
-    
+
+
+    std::vector<std::string> var_labels_events = {";;Entries",
+                                        ";Reco. Leading Shower Energy [GeV]; Entries / GeV",
+                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries / GeV"
+                                        };
+
+    std::vector<std::string> var_labels_eff = {";;Efficiency",
+                                        ";Reco. Leading Shower Energy [GeV]; Efficiency",
+                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency"
+                                        };
 
     std::vector<std::string> reweighter_labels = {
         "CV",    // Dont comment this out
         "Horn_p2kA",
         "Horn_m2kA",
         "Horn1_x_p3mm",
-        "Horm1_x_m3mm",
+        "Horn1_x_m3mm",
         "Horn1_y_p3mm",
         "Horn1_y_m3mm",
         "Beam_spot_1_1mm",
         "Beam_spot_1_5mm",
         "Horn2_x_p3mm",
-        "Horm2_x_m3mm",
+        "Horn2_x_m3mm",
         "Horn2_y_p3mm",
         "Horn2_y_m3mm",
         "Horns_0mm_water",
@@ -228,13 +234,13 @@ class CrossSectionHelper{
         {"Horn_p2kA",           1}, 
         {"Horn_m2kA",           2}, 
         {"Horn1_x_p3mm",        3},
-        {"Horm1_x_m3mm",        4},
+        {"Horn1_x_m3mm",        4},
         {"Horn1_y_p3mm",        5},
         {"Horn1_y_m3mm",        6},
         {"Beam_spot_1_1mm",     7},
         {"Beam_spot_1_5mm",     8},
         {"Horn2_x_p3mm",        9},
-        {"Horm2_x_m3mm",        10},
+        {"Horn2_x_m3mm",        10},
         {"Horn2_y_p3mm",        11},
         {"Horn2_y_m3mm",        12},
         {"Horns_0mm_water",     13},
@@ -254,13 +260,13 @@ class CrossSectionHelper{
         k_Horn_p2kA,
         k_Horn_m2kA,
         k_Horn1_x_p3mm,
-        k_Horm1_x_m3mm,
+        k_Horn1_x_m3mm,
         k_Horn1_y_p3mm,
         k_Horn1_y_m3mm,
         k_Beam_spot_1_1mm,
         k_Beam_spot_1_5mm,
         k_Horn2_x_p3mm,
-        k_Horm2_x_m3mm,
+        k_Horn2_x_m3mm,
         k_Horn2_y_p3mm,
         k_Horn2_y_m3mm,
         k_Horns_0mm_water,
@@ -292,20 +298,20 @@ class CrossSectionHelper{
     void LoopEventsbyCut();
     // -------------------------------------------------------------------------
     // Apply the selection cuts -- so we can reweight events at differnt points in the selection
-    bool ApplyCuts(int type, SliceContainer &SC, SelectionCuts _scuts);
+    bool ApplyCuts(int type, SliceContainer &SC, SelectionCuts _scuts, int treeNum);
     // -------------------------------------------------------------------------
     // Fill histograms for each variable for all universes
     void FillCutHists(int type, SliceContainer &SC, std::pair<std::string, int> classification, int cut_index);
     // -------------------------------------------------------------------------
     // Set the weight for universe i depending on the variation 
-    void SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double &weight_ext,  double _weightSplineTimesTune,
+    void SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double _weightSplineTimesTune,
                            std::string _classification, double cv_weight, int uni, int _nu_pdg, double _true_energy, double _numi_ang, int _npi0, double _pi0_e);
     // -------------------------------------------------------------------------
     // Function to calculate the cross section
     double CalcCrossSec(double sel, double gen, double sig, double bkg, double flux, double ext, double dirt, double targ);
     // -------------------------------------------------------------------------
     // Function to calculate the cross section using binned histograms
-    void CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double ext_scale_factor, TH1D* h_ext, double dirt_scale_factor, TH1D* h_dirt, TH1D* h_xsec, double targ, std::string mcdata);
+    void CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double ext_scale_factor, TH1D* h_ext, double dirt_scale_factor, TH1D* h_dirt, TH1D* h_xsec, TH1D* h_sig, double targ, std::string mcdata, int _var);
     // -------------------------------------------------------------------------
     // Function to get the integrated flux OR a weight
     double GetIntegratedFlux(int uni, std::string value, std::string label, std::string variation, int _nu_pdg, double _true_energy, double _numi_ang);
@@ -352,6 +358,10 @@ class CrossSectionHelper{
     // Normalise the smearing matrix and then use it to get a smeared efficiency
     void Smear(TH1D* h_sig, TH1D* h_gen, TH2D* h_smear, TH1D* h_eff);
     // -------------------------------------------------------------------------
+    // Create a response matrix and smear the generated events in truth to sig events in reco
+    void ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH2D* h_smear);
+    // -------------------------------------------------------------------------
+
 
 
 

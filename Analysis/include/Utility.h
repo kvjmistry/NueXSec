@@ -36,6 +36,7 @@
 #include "TRandom3.h"
 #include "TColor.h"
 #include "TMatrixD.h"
+#include "TChain.h"
 
 /*
 
@@ -68,11 +69,8 @@ public:
     // Get a 2D histogram from a file
     bool GetHist(TFile* f, TH2D* &h, TString string);
     // -------------------------------------------------------------------------
-    // Check whether a weight has a suitable value
-    void CheckWeight(double &weight);
-    // -------------------------------------------------------------------------
-    // Check whether a weight has a suitable value
-    void CheckWeight(float &weight);
+    // Check whether a weight has a suitable value, templated with double and float
+    template<typename T> void CheckWeight(T &weight);
     // -------------------------------------------------------------------------
     // Get the CV weight correction
     double GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv);
@@ -122,6 +120,22 @@ public:
     // Check if a specific histogram exists in the given vector of strings
     bool CheckHistogram(std::vector<std::string> vector, TString hist_name);
     // -------------------------------------------------------------------------
+    // Turn off the intrinsic nue mode
+    void TurnoffIntrinsicMode(){intrinsic_mode = (char*)"empty";};
+    // -------------------------------------------------------------------------
+    // Calculate a covariance matrix
+    void CalcCovariance(std::vector<TH1D*> h_universe, TH1D *h_CV, TH2D *h_cov);
+    // -------------------------------------------------------------------------
+    // Calculate a correlation matrix
+    void CalcCorrelation(TH1D *h_CV, TH2D  *h_cov, TH2D *h_cor);
+    // -------------------------------------------------------------------------
+    // Calculate a fractional covariance matrix
+    // ** Requires the input frac cov to be a cloned version of the covariance matrix **
+    void CalcCFracCovariance(TH1D *h_CV, TH2D *h_frac_cov);
+    // -------------------------------------------------------------------------
+    // Calulate a chi squared using a covarinace matrix, for a model to data
+    void CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov);
+    // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 
     // Variables
@@ -135,6 +149,9 @@ public:
 
     // Bins for the reconstructed shower energy
     std::vector<double> reco_shr_bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 6.0};
+
+    // Neutrino Energy Threshold to integrate from
+    double energy_threshold = 0.125; // GeV
     
     bool slim                      = false;
     bool make_histos               = false;
@@ -174,6 +191,7 @@ public:
     char * uplotmode             = (char *)"default";
     char * intrinsic_mode        = (char *)"default"; // choose whether to override the nue component to accomodate the intrinsic nue sample
     char * sysplot               = (char *)"tot";     // what systematic uncertainty to plot on the CV histograms
+    char * xsec_smear_mode       = (char *)"mcc8";    // what smearing do we want to apply to the measurement? mcc8 = Marco's smearing, response = smearing using a response matrix and compare event rates
     int num_events{-1};
     int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
     int _weight_tune{1}; // Use the GENIE Tune
@@ -532,6 +550,8 @@ public:
         k_cut_shower_energy_cali_rebin,
         k_cut_flash_time,
         k_cut_flash_pe,
+        k_cut_effective_angle,
+        k_cut_effective_cosangle,
         k_cut_vars_max
     };
 
@@ -560,7 +580,9 @@ public:
         "h_reco_shower_energy_cali",
         "h_reco_shower_energy_cali_rebin",
         "h_reco_flash_time",
-        "h_reco_flash_pe"
+        "h_reco_flash_pe",
+        "h_reco_effective_angle",
+        "h_reco_effective_cosangle"
     };
  
     // x axis label for those plots
@@ -581,13 +603,15 @@ public:
         "Hit Ratio",
         "Pandora Cosmic Impact Parameter 3D [cm]",
         "Contained Fraction (PFP hits in FV / hits in slice)",
-        "Leading Shower Moliere Average [degrees]",
-        "Leading Shower Theta [degrees]",
-        "Leading Shower Phi [degrees]",
+        "Leading Shower Moliere Average [deg]",
+        "Leading Shower Theta [deg]",
+        "Leading Shower Phi [deg]",
         "Reconstructed Leading Shower Energy [GeV]",
         "Reconstructed Leading Shower Energy [GeV]",
         "Largest Flash Time [#mus]",
-        "Largest Flash Intensity [PE]"
+        "Largest Flash Intensity [PE]",
+        "Leading Shower Effective Angle [deg]",
+        "Leading Shower Cosine Effective Angle [deg]"
     };
 
     // list of detector variations

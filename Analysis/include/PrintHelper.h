@@ -85,6 +85,18 @@ class PrintHelper{
     double count_nuebar_cc_dis{0.0};
     double count_nuebar_cc_coh{0.0};
     double count_nuebar_cc_mec{0.0};
+
+    double init_count_nue_cc_qe{0.0};
+    double init_count_nue_cc_res{0.0};
+    double init_count_nue_cc_dis{0.0};
+    double init_count_nue_cc_coh{0.0};
+    double init_count_nue_cc_mec{0.0};
+
+    double init_count_nuebar_cc_qe{0.0};
+    double init_count_nuebar_cc_res{0.0};
+    double init_count_nuebar_cc_dis{0.0};
+    double init_count_nuebar_cc_coh{0.0};
+    double init_count_nuebar_cc_mec{0.0};
     
     double count_nue_cc_infv{0.0};
     double count_nuebar_cc_infv{0.0};

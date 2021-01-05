@@ -27,7 +27,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
 
         // XSec mode
         if (strcmp(arg, "--xsec") == 0) {
-            std::cout << yellow << "Calculating the Cross Section with input file name: " << argv[i+1] << yellow << std::endl;
+            std::cout << yellow << "Calculating the Cross Section with input file name: " << argv[i+1] << reset << std::endl;
             calc_cross_sec = true;
             run_selection = false; // switch this bool out
             tree_file_name = argv[i+1];
@@ -405,6 +405,9 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         std::cout << "-------------------------------" << reset << std::endl;
     }
 
+    std::cout << "Using Energy Threshold of: " << red << energy_threshold * 1000 << " MeV" << reset <<  std::endl;
+    std::cout << green << "-------------------------------" << reset << std::endl;
+
     if (use_gpvm)
         std::cout << red << "Using gpvm environment, all paths will be set compatible with running on a gpvm"<< reset << std::endl;
     else 
@@ -465,7 +468,7 @@ bool Utility::GetHist(TFile* f, TH2D* &h, TString string){
     }
 }
 // -----------------------------------------------------------------------------
-void Utility::CheckWeight(double &weight){
+template<typename T> void Utility::CheckWeight(T &weight){
 
     // Infinate weight
     if (std::isinf(weight))           weight = 1.0;
@@ -474,36 +477,18 @@ void Utility::CheckWeight(double &weight){
     else if (std::isnan(weight) == 1) weight = 1.0;
     
     // Large weight
-    else if (weight > 30)             weight = 1.0;
+    else if (weight > 30.)             weight = 1.0;
     
     // Negative weight
-    else if (weight < 0)              weight = 1.0;
+    else if (weight < 0.)              weight = 1.0;
     
     else {
         // Do nothing to the weight
     }
 
 }
-// -----------------------------------------------------------------------------
-void Utility::CheckWeight(float &weight){
-
-    // Infinate weight
-    if (std::isinf(weight))           weight = 1.0;
-    
-    // NAN weight 
-    else if (std::isnan(weight) == 1) weight = 1.0;
-    
-    // Large weight
-    else if (weight > 30)             weight = 1.0;
-    
-    // Negative weight
-    else if (weight < 0)              weight = 1.0;
-    
-    else {
-        // Do nothing to the weight
-    }
-
-}
+template void Utility::CheckWeight<double>(double &weight);
+template void Utility::CheckWeight<float>(float   &weight);
 // -----------------------------------------------------------------------------
 double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv){
 
@@ -527,7 +512,7 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
     if (weight_ppfx) weight = weight * weight_flux;
 
     // Weight the below threshold events to zero. Current threhsold is 125 MeV
-    if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12) && nu_e <= 0.125) weight = 0.0;
+    if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12) && nu_e <= energy_threshold) weight = 0.0;
 
     // This is the intrinsic nue weight that scales it to the standard overlay sample
     if (std::string(intrinsic_mode) == "intrinsic" && type == k_mc){
@@ -539,7 +524,7 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
     }
 
     // Create a random energy dependent nue weight for testing model dependence
-    // if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12)) weight *= (1.0 + (nu_e * nu_e * nu_e)/6.0);
+    // if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12)) weight *= nu_e*nu_e;
 
 
     return weight;
@@ -549,7 +534,9 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
 void Utility::GetPiZeroWeight(double &weight, int pizero_mode, int nu_pdg, int ccnc, int npi0, double pi0_e){
 
     // Dont weight the nuecc events
-    // if ( (nu_pdg == 12 || nu_pdg == -12) && ccnc == k_CC) return; // Actually I think we should
+    if ( (nu_pdg == 12 || nu_pdg == -12) && ccnc == k_CC) {
+        // return; // Commented out because we actually I think we should
+    }
 
 
     // Fix the normalisation
@@ -991,7 +978,137 @@ bool Utility::CheckHistogram(std::vector<std::string> vector, TString hist_name)
 
 }
 // -----------------------------------------------------------------------------
+void Utility::CalcCovariance(std::vector<TH1D*> h_universe, TH1D *h_CV, TH2D *h_cov){
+
+    for (unsigned int uni = 0; uni < h_universe.size(); uni++){
+        
+        // Loop over the rows
+        for (int row = 1; row < h_CV->GetNbinsX()+1; row++){
+            
+            double uni_row = h_universe.at(uni)->GetBinContent(row);
+            double cv_row  = h_CV->GetBinContent(row);
+
+            // Loop over the columns
+            for (int col = 1; col < h_CV->GetNbinsX()+1; col++){
+
+                double uni_col = h_universe.at(uni)->GetBinContent(col);
+                double cv_col  = h_CV->GetBinContent(col);
+                
+                double c = (uni_row - cv_row) * (uni_col - cv_col);
+
+                if (uni != h_universe.size()-1)    h_cov->SetBinContent(row, col, h_cov->GetBinContent(row, col) + c ); // Fill with variance 
+                else h_cov->SetBinContent(row, col, (h_cov->GetBinContent(row, col) + c) / h_universe.size());          // Fill with variance and divide by nuni
+            
+            } // end loop over columns
+
+        } // end loop over rows
+    
+    } // end loop over universes
+
+}
 // -----------------------------------------------------------------------------
+void Utility::CalcCorrelation(TH1D *h_CV, TH2D *h_cov, TH2D *h_cor){
+
+    double cor_bini;
+    
+    // loop over rows
+    for (int row = 1; row < h_CV->GetNbinsX()+1; row++) {
+        
+        double cii = h_cov->GetBinContent(row, row);
+
+        // Loop over columns
+        for (int col = 1; col < h_CV->GetNbinsX()+1; col++) {
+            
+            double cjj = h_cov->GetBinContent(col, col);
+            
+            double n = sqrt(cii * cjj);
+
+            // Catch Zeros, set to arbitary 1.0
+            if (n == 0) cor_bini = 0;
+            else cor_bini = h_cov->GetBinContent(row, col) / n;
+
+            h_cor->SetBinContent(row, col, cor_bini );
+        
+        } // end loop over rows
+
+    } // end loop over columns
+
+}
 // -----------------------------------------------------------------------------
+void Utility::CalcCFracCovariance(TH1D *h_CV, TH2D *h_frac_cov){
+
+    // ** Requires the input frac cov to be a cloned version of the covariance matrix **
+
+    double setbin;
+   
+    // loop over rows
+    for (int row = 1; row < h_CV->GetNbinsX()+1; row++) {
+       
+       double cii = h_CV->GetBinContent(row);
+
+        // Loop over columns
+        for (int col = 1; col < h_CV->GetNbinsX()+1; col++) {
+            double cjj = h_CV->GetBinContent(col);
+            double n = cii * cjj;
+
+            // Catch Zeros, set to arbitary 0
+            if (n == 0) setbin = 0;
+            else setbin = h_frac_cov->GetBinContent(row, col) / n;
+
+            h_frac_cov->SetBinContent(row, col, setbin );
+        
+        } // end loop over the columns
+    
+    } // end loop over the rows
+
+}
 // -----------------------------------------------------------------------------
+void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov){
+
+    // Clone them so we can scale them 
+    TH1D* h_model_clone = (TH1D*)h_model->Clone();
+    TH1D* h_data_clone  = (TH1D*)h_data->Clone();
+    TH2D* h_cov_clone   = (TH2D*)cov->Clone();
+
+    // We need to scale the histograms because the matrix inversion has problems
+    // with the small numbers
+    h_model_clone->Scale(1.0e39);
+    h_data_clone->Scale(1.0e39);
+    h_cov_clone->Scale(1.0e78);
+
+    // Getting covariance matrix in TMatrix form
+    TMatrix cov_m;
+    cov_m.Clear();
+    cov_m.ResizeTo(h_cov_clone->GetNbinsX(), h_cov_clone->GetNbinsX());
+
+    // loop over rows
+    for (int i = 0; i < h_cov_clone->GetNbinsX(); i++) {
+
+        // loop over columns
+        for (int j = 0; j < h_cov_clone->GetNbinsX(); j++) {
+            cov_m[i][j] = h_cov_clone->GetBinContent(i+1, j+1);
+        }
+    
+    }
+
+    // Inverting the covariance matrix
+    TMatrix inverse_cov_m = cov_m.Invert();
+
+    // Calculating the chi2 = Summation_ij{ (x_i - mu_j)*E_ij^(-1)*(x_j - mu_j)  }
+    // x = data, mu = model, E^(-1) = inverted covariance matrix 
+    double chi2 = 0;
+    for (int i = 0; i < h_cov_clone->GetNbinsX(); i++) {
+        for (int j = 0; j < h_cov_clone->GetNbinsX(); j++) {
+            chi2 += (h_data_clone->GetBinContent(i+1) - h_model_clone->GetBinContent(i+1)) * inverse_cov_m[i][j] * (h_data_clone->GetBinContent(j+1) - h_model_clone->GetBinContent(j+1));
+        }
+    }
+
+    std::cout << blue << "Chi2/dof: " << chi2 << "/" << h_data_clone->GetNbinsX() << " = " << chi2/double(h_data_clone->GetNbinsX())  << reset <<  std::endl;
+    std::cout << red << "p-value: " << TMath::Prob(chi2, h_data_clone->GetNbinsX())  << reset <<  std::endl;
+
+    delete h_model_clone;
+    delete h_data_clone;
+    delete h_cov_clone;
+
+}
 // -----------------------------------------------------------------------------

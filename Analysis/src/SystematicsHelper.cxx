@@ -705,20 +705,21 @@ void SystematicsHelper::InitialiseReweightingMode(){
 
         // Detector Variations
         PlotReweightingModeDetVar("LYRayleigh",                         var, k_LYRayleigh,                         var_string_pretty.at(k_LYRayleigh));
+        PlotReweightingModeDetVar("LYDown",                             var, k_LYDown,                             var_string_pretty.at(k_LYDown));
         PlotReweightingModeDetVar("SCE",                                var, k_SCE,                                var_string_pretty.at(k_SCE));
         // PlotReweightingModeDetVar("LYAttenuation",                      var, k_LYAttenuation,                      var_string_pretty.at(k_LYAttenuation));
         PlotReweightingModeDetVar("Recomb2",                            var, k_Recomb2,                            var_string_pretty.at(k_Recomb2));
         PlotReweightingModeDetVar("WireModX",                           var, k_WireModX,                           var_string_pretty.at(k_WireModX));
-        PlotReweightingModeDetVar("WireModYZ",                          var, k_WireModYZ,                          var_string_pretty.at(k_WireModYZ));
-        PlotReweightingModeDetVar("WireModThetaXZ",                     var, k_WireModThetaXZ,                     var_string_pretty.at(k_WireModThetaXZ));
-        PlotReweightingModeDetVar("WireModThetaYZ_withSigmaSplines",    var, k_WireModThetaYZ_withSigmaSplines,    var_string_pretty.at(k_WireModThetaYZ_withSigmaSplines));
+        // PlotReweightingModeDetVar("WireModYZ",                          var, k_WireModYZ,                          var_string_pretty.at(k_WireModYZ));
+        // PlotReweightingModeDetVar("WireModThetaXZ",                     var, k_WireModThetaXZ,                     var_string_pretty.at(k_WireModThetaXZ));
+        // PlotReweightingModeDetVar("WireModThetaYZ_withSigmaSplines",    var, k_WireModThetaYZ_withSigmaSplines,    var_string_pretty.at(k_WireModThetaYZ_withSigmaSplines));
         // PlotReweightingModeDetVar("WireModThetaYZ_withoutSigmaSplines", var, k_WireModThetaYZ_withoutSigmaSplines, var_string_pretty.at(k_WireModThetaYZ_withoutSigmaSplines));
         // PlotReweightingModeDetVar("WireModdEdX",                        var, k_WireModdEdX,                        var_string_pretty.at(k_WireModdEdX));
 
         // Plot the multisims
-        PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 600);
+        PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 500);
         PlotReweightingModeMultisim("weightsReint", var,  "Geant Reinteractions", 1000);
-        PlotReweightingModeMultisim("weightsPPFX",  var,  "PPFX", 600);
+        PlotReweightingModeMultisim("weightsPPFX",  var,  "PPFX", 500);
         PlotReweightingModeMultisim("MCStats",      var,  "MC Stats", 1000);
         
     }
@@ -753,6 +754,9 @@ void SystematicsHelper::InitialiseReweightingMode(){
     // Plot the systematic uncertainty
     MakeTotUncertaintyPlot();
 
+    // Calculate a chi-squared using the total covariance matrix
+    _util.CalcChiSquared(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_err_tot));
+
     // Print the sqrt of the diagonals of the covariance matrix
     // loop over rows
     for (int row = 1; row < h_cov_v.at(k_err_sys)->GetNbinsX()+1; row++) {
@@ -779,7 +783,7 @@ void SystematicsHelper::SetLabelName(std::string label, std::string &label_up, s
     }
     else if  (label == "Horn1_x"       ){
         label_up = label + "_p3mm";
-        label_dn = "Horm1_x_m3mm";
+        label_dn = label + "_m3mm";
     }
     else if  (label == "Horn1_y"       ){
         label_up = label + "_p3mm";
@@ -791,7 +795,7 @@ void SystematicsHelper::SetLabelName(std::string label, std::string &label_up, s
     }
     else if  (label == "Horn2_x"       ){
         label_up = label + "_p3mm";
-        label_dn = "Horm2_x_m3mm";
+        label_dn = label + "_m3mm";
     }
     else if  (label == "Horn2_y"       ){
         label_up = label + "_p3mm";
@@ -813,10 +817,10 @@ void SystematicsHelper::SetLabelName(std::string label, std::string &label_up, s
         label_up = label + "_p7mm";
         label_dn = label + "_m7mm";
     }
-    else if  (label == "Horn1_refined_descr" || label == "Decay_pipe_Bfield" || label == "Old_Horn_Geometry" ||
-              label == "LYRayleigh" || label == "LYAttenuation" || label == "SCE" || label == "Recomb2" || 
-              label == "WireModX" || label == "WireModYZ" || label == "WireModThetaXZ" || label == "WireModThetaYZ_withSigmaSplines" || 
-              label == "WireModThetaYZ_withoutSigmaSplines" || label == "WireModdEdX" || label == "pi0"){
+    else if  (label == "Horn1_refined_descr"                || label == "Decay_pipe_Bfield" || label == "Old_Horn_Geometry" ||
+              label == "LYRayleigh"                         || label == "LYDown"            || label == "LYAttenuation"     || label == "SCE" || label == "Recomb2"       || 
+              label == "WireModX"                           || label == "WireModYZ"         || label == "WireModThetaXZ"    || label == "WireModThetaYZ_withSigmaSplines" || 
+              label == "WireModThetaYZ_withoutSigmaSplines" || label == "WireModdEdX"       || label == "pi0"){
         label_up = label;
         label_dn = label;
     }
@@ -1459,7 +1463,7 @@ void SystematicsHelper::CompareCVXSec(){
             h_mcxsec  ->SetLineColor(kRed+2);
 
             // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
-            if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(0.5e-39, 2.5e-39);
+            if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(3.5e-39, 10.5e-39);
             else h_dataxsec->GetYaxis()->SetRangeUser(0.0e-39, xsec_scale);
 
             h_dataxsec->GetYaxis()->SetLabelSize(0.04);
@@ -1586,7 +1590,7 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             h_mcxsec  ->SetLineColor(kRed+2);
 
             // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
-            if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(0.5e-39, 2.5e-39);
+            if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(3.5e-39, 10.5e-39);
             else h_dataxsec->GetYaxis()->SetRangeUser(0.0e-39, xsec_scale);
 
             _util.IncreaseLabelSize(h_dataxsec, c);
@@ -1895,49 +1899,13 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
     }
 
 
-    // ------------ Now calculate the correlation matrix ------------
-    double cor_bini;
-    // loop over rows
-    for (int row = 1; row < cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetNbinsX()+1; row++) {
-        
-        double cii = cov->GetBinContent(row, row);
-
-        // Loop over columns
-        for (int col = 1; col < cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetNbinsX()+1; col++) {
-            
-            double cjj = cov->GetBinContent(col, col);
-            
-            double n = sqrt(cii * cjj);
-
-            // Catch Zeros, set to arbitary 1.0
-            if (n == 0) cor_bini = 0;
-            else cor_bini = cov->GetBinContent(row, col) / n;
-
-            cor->SetBinContent(row, col, cor_bini );
-        }
-    }
-
+    // Correlation Matrix
+    _util.CalcCorrelation(cv_hist_vec.at(var).at(k_xsec_mcxsec), cov, cor);
+    
+    // Fractional Covariance Matrix
     TH2D *frac_cov = (TH2D*) cov->Clone("h_frac_cov");
+    _util.CalcCFracCovariance(cv_hist_vec.at(var).at(k_xsec_mcxsec), frac_cov);
 
-    // ------------ Now calculate the fractional covariance matrix ------------
-    double setbin;
-    // loop over rows
-    for (int row = 1; row < cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetNbinsX()+1; row++) {
-       
-       double cii = cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(row);
-
-        // Loop over columns
-        for (int col = 1; col < cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetNbinsX()+1; col++) {
-            double cjj = cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(col);
-            double n = cii * cjj;
-
-            // Catch Zeros, set to arbitary 0
-            if (n == 0) setbin = 0;
-            else setbin = frac_cov->GetBinContent(row, col) / n;
-
-            frac_cov->SetBinContent(row, col, setbin );
-        }
-    }
 
     gStyle->SetPalette(kBlueGreenYellow);
 
@@ -1960,6 +1928,7 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
                 h_cov_v.at(k_err_sys)->Add(cov);
 
         }
+        // Beamline
         else if (label == "Horn_curr" ||
                 label == "Horn1_x" ||
                 label == "Horn1_y" ||
@@ -1972,6 +1941,23 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
                 label == "Target_z" ||
                 label == "Decay_pipe_Bfield"){
                 h_cov_v.at(k_err_beamline)->Add(cov);
+                h_cov_v.at(k_err_tot)->Add(cov);
+                h_cov_v.at(k_err_sys)->Add(cov);
+        }
+        // Detector Variation
+        else if (
+                label == "LYRayleigh" ||
+                label == "LYDown"     ||
+                label == "LYAttenuation" ||
+                label == "SCE" ||
+                label == "Recomb2" ||
+                label == "WireModX" ||
+                label == "WireModYZ" ||
+                label == "WireModThetaXZ" ||
+                label == "WireModThetaYZ_withSigmaSplines" ||
+                label == "WireModThetaYZ_withoutSigmaSplines" ||
+                label == "WireModdEdX" ){
+                h_cov_v.at(k_err_detvar)->Add(cov);
                 h_cov_v.at(k_err_tot)->Add(cov);
                 h_cov_v.at(k_err_sys)->Add(cov);
         }
@@ -2146,6 +2132,7 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
     // This is a detector variation
     else if (
         variation == "LYRayleigh" ||
+        variation == "LYDown"     ||
         variation == "LYAttenuation" ||
         variation == "SCE" ||
         variation == "Recomb2" ||
@@ -2796,7 +2783,7 @@ void SystematicsHelper::SetUnisimColours(std::string label, TH1D* h_up, TH1D* h_
         h_up->SetLineColor(42);
         h_dn->SetLineColor(42);
     }
-    else if (label == "Decay_pipe_Bfield"){
+    else if (label == "Decay_pipe_Bfield" || label == "LYDown"){
         h_up->SetLineColor(kGreen+2);
         h_dn->SetLineColor(kGreen+2);
     }
@@ -2845,9 +2832,9 @@ void SystematicsHelper::InitialiseReweightingModeCut(){
             GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Beam_shift_y",     2, "unisim");
             GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Target_z",         2, "unisim");
             GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Decay_pipe_Bfield",2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsGenie",600,  "multisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsGenie",500,  "multisim");
             GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsReint",1000,  "multisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsPPFX", 600, "multisim");
+            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsPPFX", 500, "multisim");
         }
     }
         
