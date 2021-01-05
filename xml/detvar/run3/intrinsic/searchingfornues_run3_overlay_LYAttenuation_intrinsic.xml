@@ -39,22 +39,22 @@
   
   <!-- Project stages -->
   <stage name="ntuple">
-    <fcl>run_redk2nu_fhc.fcl</fcl>
-    <fcl>standard_overlay_optical_numi_uboone_updated.fcl</fcl>
-    <fcl>run_eventweight_microboone_sept24_numi_fhc_slim.fcl</fcl>
-    <fcl>run_neutrinoselectionfilter_run1_overlay_cc0pinp_numi.fcl</fcl>
+    <fcl>run_redk2nu_rhc.fcl</fcl>
+    <fcl>standard_overlay_notpc_numi_uboone_updated.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_numi_rhc_slim.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run3_overlay_cc0pinp_numi.fcl</fcl>
     <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</outdir>
     <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</logdir>
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <maxfilesperjob>5</maxfilesperjob>
-    <numjobs>788</numjobs> <!-- 788 -->
+    <numjobs></numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <disk>25GB</disk>
     <schema>root</schema>
-    <inputdef>prodgenie_numi_intrinsic_nue_Reco2_run1_LYAttenuation_v08_00_00_48_reco2_run1_reco2</inputdef>
-    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/FHC/flux_cached_entries.root</jobsub>
+    <inputdef></inputdef>
+    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/RHC/flux_cached_entries.root</jobsub>
     <jobsub_start>  --expected-lifetime=short</jobsub_start>
   </stage>
   
