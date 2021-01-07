@@ -710,9 +710,9 @@ void SystematicsHelper::InitialiseReweightingMode(){
         // PlotReweightingModeDetVar("LYAttenuation",                      var, k_LYAttenuation,                      var_string_pretty.at(k_LYAttenuation));
         PlotReweightingModeDetVar("Recomb2",                            var, k_Recomb2,                            var_string_pretty.at(k_Recomb2));
         PlotReweightingModeDetVar("WireModX",                           var, k_WireModX,                           var_string_pretty.at(k_WireModX));
-        // PlotReweightingModeDetVar("WireModYZ",                          var, k_WireModYZ,                          var_string_pretty.at(k_WireModYZ));
-        // PlotReweightingModeDetVar("WireModThetaXZ",                     var, k_WireModThetaXZ,                     var_string_pretty.at(k_WireModThetaXZ));
-        // PlotReweightingModeDetVar("WireModThetaYZ_withSigmaSplines",    var, k_WireModThetaYZ_withSigmaSplines,    var_string_pretty.at(k_WireModThetaYZ_withSigmaSplines));
+        PlotReweightingModeDetVar("WireModYZ",                          var, k_WireModYZ,                          var_string_pretty.at(k_WireModYZ));
+        PlotReweightingModeDetVar("WireModThetaXZ",                     var, k_WireModThetaXZ,                     var_string_pretty.at(k_WireModThetaXZ));
+        PlotReweightingModeDetVar("WireModThetaYZ_withSigmaSplines",    var, k_WireModThetaYZ_withSigmaSplines,    var_string_pretty.at(k_WireModThetaYZ_withSigmaSplines));
         // PlotReweightingModeDetVar("WireModThetaYZ_withoutSigmaSplines", var, k_WireModThetaYZ_withoutSigmaSplines, var_string_pretty.at(k_WireModThetaYZ_withoutSigmaSplines));
         // PlotReweightingModeDetVar("WireModdEdX",                        var, k_WireModdEdX,                        var_string_pretty.at(k_WireModdEdX));
 
@@ -1066,7 +1066,9 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
     }
 
     // Get the covariance matrices
-    // CalcMatrices(label, var, h_universe);
+    std::vector<std::vector<TH1D*>> h_universe_uni;
+    h_universe_uni.push_back(h_universe);
+    CalcMatrices(label, var, h_universe_uni);
 
     TPad *topPad;
     TPad *bottomPad;

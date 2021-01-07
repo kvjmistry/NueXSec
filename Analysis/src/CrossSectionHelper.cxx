@@ -259,8 +259,8 @@ void CrossSectionHelper::LoopEvents(){
 
                 // Calculate the efficiency histogram with smearing of the truth
                 if (var == k_var_reco_el_E){
-                    // Smear(h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_gen),
-                    //       h_smear.at(label).at(uni).at(k_var_reco_el_E), h_cross_sec.at(label).at(uni).at(k_var_reco_el_E).at(k_xsec_eff));
+                    Smear(h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_gen),
+                          h_smear.at(label).at(uni).at(k_var_reco_el_E), h_cross_sec.at(label).at(uni).at(k_var_reco_el_E).at(k_xsec_eff));
                 }
                 // Calculate the efficiency histogram by dividing the sig and gen
                 else{ 
@@ -953,6 +953,7 @@ void CrossSectionHelper::WriteHists(){
                 
                     // Now write the histograms, 
                     for (unsigned int p = 0; p < h_cross_sec.at(label).at(uni).at(var).size(); p++){
+
                         // Certain histograms we want to divide out by the bin width
                         if ((var == k_var_reco_el_E || var == k_var_true_el_E) && p != k_xsec_eff )
                             h_cross_sec.at(label).at(uni).at(var).at(p)->Scale(1.0, "width");
@@ -1932,56 +1933,37 @@ void CrossSectionHelper::ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH2
 
         // Now normalise the column entries by the number of events in the 1D generated histogram
         for (int row=1; row<h_smear->GetYaxis()->GetNbins()+2; row++) { 
-            h_smear->SetBinContent(row,col, h_smear->GetBinContent(row, col)/ h_gen->GetBinContent(col) );
-            std::cout << row << " " << col << " "<<    h_smear->GetBinContent(row, col) << " "  <<  h_gen->GetBinContent(col)<<  std::endl;
-            
+            h_smear->SetBinContent(row,col, h_smear->GetBinContent(row, col)/ h_gen->GetBinContent(row) );
         }
     } 
 
-    for (int row=1; row<h_smear->GetYaxis()->GetNbins()+2; row++) { 
-        double val = 0;
-        for (int col=1; col<h_smear->GetXaxis()->GetNbins()+2; col++){
-            val+=h_smear->GetBinContent(row, col)*h_gen->GetBinContent(col);
-        }
-
-        h_gen_smear->SetBinContent(row, val);
-    
+    // Clear the Bins
+    for (int bin = 0; bin < h_gen_smear->GetNbinsX()+2; bin++){
+        h_gen_smear->SetBinContent(bin, 0);
     }
 
-    
+    // --- Do the matrix multiplication --- 
+    // Loop over cols
+    for (int i=1; i<h_smear->GetXaxis()->GetNbins()+2; i++){
+        double integral = 0;
 
-    // h_gen_smear->Scale(1.0, "width");
+        // Now normalise the column entries by the number of events in the 1D generated histogram
+        for (int j=1; j<h_smear->GetYaxis()->GetNbins()+2; j++) { 
 
-    // for (int col=0; col<h_smear->GetYaxis()->GetNbins()+2; col++){
-    //     std::cout << "Bin: " << col<< " NGen: " <<  h_gen->GetBinContent(col) << " N Gen Smear: " << h_gen_smear->GetBinContent(col) << std::endl;
-    // }
-    
+            if (debug)
+                std::cout <<  "R_" << j << i << " * " << j << "  " << h_smear->GetBinContent(j, i) << " * " << h_gen->GetBinContent(j) << std::endl;
+            
+            h_gen_smear->SetBinContent(i, h_gen_smear->GetBinContent(i) + h_smear->GetBinContent(j, i) * h_gen->GetBinContent(j));
+        }
 
-    // Convert the response matrix and histograms to a Matrix
-    // TMatrixD RMatrix(_util.reco_shr_bins.size()+1,_util.reco_shr_bins.size()+1,h_smear->GetArray(), "F");
-    // TMatrixD GenMatrix(_util.reco_shr_bins.size()+1,1,h_gen->GetArray(), "F");
-    
+        if (debug)
+            std::cout << std::endl;
+    } 
 
-    // // Apply the response matrix to the generated events
-    // TMatrixD GenMatrixSmear(_util.reco_shr_bins.size()+1,1);
-    // RMatrix.Transpose(RMatrix);
-    // GenMatrixSmear.Mult(RMatrix,GenMatrix);
-
-    // if (debug){
-    //     RMatrix.Print();
-    //     GenMatrix.Print();
-    //     GenMatrixSmear.Print();
-    // }
-
-    // // Set the efficiency bins
-    // for (int bin = 1; bin < h_gen_smear->GetNbinsX()+1; bin++){
-    //     h_gen_smear->SetBinContent(bin, GenMatrixSmear(bin,0));
-    //     h_gen_smear->SetBinError(bin, 0);
-        
-    //     if (debug)
-    //         std::cout << GenMatrix(bin,0) << "  "<< GenMatrixSmear(bin,0) << std::endl;
-    // }
-    
+    // Set the bin errors to zero
+    for (int bin = 1; bin < h_gen_smear->GetNbinsX()+1; bin++){
+        h_gen_smear->SetBinError(bin, 0);
+    }
 }
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
