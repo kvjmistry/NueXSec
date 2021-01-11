@@ -2935,8 +2935,11 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
         // Loop over the types
         for (unsigned int type = 0; type < xsec_types.size(); type++){
             
-            // Only look at the true efficeincy or the reco x-section
-            if ( (vars.at(var) == "true_el_E" && xsec_types.at(type) == "eff") || (vars.at(var) == "reco_el_E" && xsec_types.at(type) == "mc_xsec")   ){
+            // Only look at the true efficeincy or select variables in reco space
+            if ( (vars.at(var) == "true_el_E" && xsec_types.at(type) == "eff") || 
+                 (vars.at(var) == "reco_el_E" && (xsec_types.at(type) == "mc_xsec" || xsec_types.at(type) == "data_xsec" ||
+                                                  xsec_types.at(type) == "eff" || xsec_types.at(type) == "sig" || 
+                                                  xsec_types.at(type) == "bkg" || xsec_types.at(type) == "sel" ))){
 
                 // Resize the vector for new loop
                 if (h_uncertainty.size() == 0) 

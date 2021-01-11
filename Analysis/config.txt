@@ -184,10 +184,16 @@ Run3_EXT_trig 32878305.25 // v5
 // Run3_EXT_trig 1677886.350000 // Set 1
 // Run3_EXT_trig 2424501.800000 // Set 0 and Set 1 > 16880
 // Run3_EXT_trig 803615.575 // Set 0 and Set 1 < 16880 (pre)
+-
+// Run3 intrinsic sample
+Run3_Intrinsic_POT 2.5392e+22 //  new Genie tune
 // ------- Additional Run 3 POT Definitions -----
 -
 // Run 3 with event weights
 Run3_MC_POT_weight 1.57761e+21
+-
+// Run 3 with event weights
+Run3_Intrinsic_POT_weight 2.5392e+22
 // ---------------------------------------------
 // -------------- Selection Cuts ---------------
 // Fiducial Volume

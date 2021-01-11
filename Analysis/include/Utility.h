@@ -229,6 +229,7 @@ public:
         "Run3_Data_POT",
         "Run3_Data_trig",
         "Run3_EXT_trig",
+        "Run3_Intrinsic_POT",
         "x1", "x2", "y1", "y2", "z1", "z2"
     };
 
@@ -245,6 +246,7 @@ public:
                 k_Run3_Data_POT,
                 k_Run3_Data_trig,
                 k_Run3_EXT_trig,
+                k_Run3_Intrinsic_POT,
                 k_config_x1,
                 k_config_x2,
                 k_config_y1,
