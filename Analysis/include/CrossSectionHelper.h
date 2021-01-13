@@ -42,6 +42,10 @@ class CrossSectionHelper{
     int nu_pdg{0};
     int npi0{0};
     double pi0_e{0.0};
+    double effective_angle{0.0};     // The angle between the vector from the target to nu vtx compared to the reconstructed shower direction.
+    double cos_effective_angle{0.0}; // The cosine of the angle between the vector from the target to nu vtx compared to the reconstructed shower direction.
+    double true_effective_angle{0.0};     // True angle between electron and neutrino vectors
+    double cos_true_effective_angle{0.0}; // True angle between electron and neutrino vectors
 
     // Weights
     std::vector<unsigned short> *weightsGenie = NULL;
@@ -127,16 +131,16 @@ class CrossSectionHelper{
 
     // enum for histogram vars
     enum TH1D_xsec_var_vars {
-        k_var_integrated,     // Integrated X-Section
-        k_var_reco_el_E,      // Reconstructed electron energy
-        k_var_true_el_E,      // True electron energy
+        k_var_integrated,     // Total X-Section
+        k_var_recoX,          // X-Sec as a function of a Reconstructed variable
+        k_var_trueX,          // X-Sec as a function of a True variable
         k_TH1D_xsec_var_MAX
     };
 
     // Names for cross section histograms
     std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "data_xsec"};
 
-    std::vector<std::string> vars = {"integrated", "reco_el_E", "true_el_E"
+    std::vector<std::string> vars = {"integrated", "recoX", "trueX"
                                     //  "true_nu_E", "reco_nu_e"
                                      };
     
@@ -146,21 +150,15 @@ class CrossSectionHelper{
     //                                     ";True Electron Energy [GeV]; #nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
     //                                     };
     
-    std::vector<std::string> var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                                           ";Reco. Leading Shower Energy [GeV];#frac{d#sigma}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon]",
-                                           ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];#frac{d#sigma}{dE^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon"
-                                        };
+    std::vector<std::string> var_labels_xsec = {};
 
+    std::vector<std::string> var_labels_events = {};
 
-    std::vector<std::string> var_labels_events = {";;Entries",
-                                        ";Reco. Leading Shower Energy [GeV]; Entries / GeV",
-                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries / GeV"
-                                        };
+    std::vector<std::string> var_labels_eff = {};
 
-    std::vector<std::string> var_labels_eff = {";;Efficiency",
-                                        ";Reco. Leading Shower Energy [GeV]; Efficiency",
-                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency"
-                                        };
+    std::string smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]";
+
+    std::vector<double> hist_bins;
 
     std::vector<std::string> reweighter_labels = {
         "CV",    // Dont comment this out
@@ -306,6 +304,9 @@ class CrossSectionHelper{
     bool isData, isSignal, isSelected; 
     float xTrue, xReco;
     double integrated_flux_tree{0.0};
+
+    double recoX{0.0};
+    double trueX{0.0};
 
     // -------------------------------------------------------------------------
     // Initialiser function

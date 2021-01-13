@@ -96,6 +96,8 @@ void CrossSectionHelper::Initialise(Utility _utility){
     std::cout << "Number of Target Nucleons in Data: " << N_target_Data << std::endl;
     std::cout << "  "<< std::endl;
 
+    // Set the names of the histograms
+    _util.SetAxesNames(var_labels_xsec, var_labels_events, var_labels_eff, smear_hist_name);
 
     // Create and initialise vector of histograms -- dont do this in the case we want to just write out the file lists
     InitialiseHistograms(std::string(_util.xsecmode));
@@ -117,7 +119,7 @@ void CrossSectionHelper::Initialise(Utility _utility){
         evt_dist_bkg.open(Form("files/run%s_evt_dist_bkg.txt",_util.run_period));
 
         evt_dist_data.open(Form("files/run%s_evt_dist_data.txt",_util.run_period));
-        evt_dist_data << "reco_E" << "\n";
+        evt_dist_data << "recoX" << "\n";
 
         f_out = TFile::Open("files/trees/krish_test.root", "UPDATE");
 
@@ -157,10 +159,26 @@ void CrossSectionHelper::LoopEvents(){
         
         tree->GetEntry(ievent); 
 
+        // Set the reco and true variables to bin in
+        
+        // Electron/Shower Energy
+        if (std::string(_util.xsec_var) =="elec_E"){
+            recoX = shr_energy_cali;
+            trueX = elec_e;
+        }
+        // Electron/Shower effective angle
+        else if (std::string(_util.xsec_var) =="elec_ang"){
+            recoX = effective_angle;
+            trueX = true_effective_angle;
+        }
+        else {
+            std::cout << "Unsupported parameter...exiting!" << std::endl;
+            return;
+        }
+
         if (shr_energy_cali > 6.0 && *classification == "data" ) std::cout << _util.red << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins " << run << " " << subrun << " " << event  << _util.reset<<std::endl;
 
         double cv_weight = weight; // SplinetimesTune * PPFX CV * Pi0 Tune
-
         double weight_dirt = weight; // Use this for estimating dirt and POT sys
         double weight_ext  = weight;  // Use this for estimating pot sys
 
@@ -194,8 +212,8 @@ void CrossSectionHelper::LoopEvents(){
                     // Fill histograms
                     if (std::string(_util.xsecmode) != "txtlist"){
                            
-                        FillHists(label, uni, k_xsec_sig, weight_uni, shr_energy_cali, elec_e);
-                        FillHists(label, uni, k_xsec_sel, cv_weight, shr_energy_cali, elec_e);  // Selected events (N term) we dont weight
+                        FillHists(label, uni, k_xsec_sig, weight_uni, recoX, trueX);
+                        FillHists(label, uni, k_xsec_sel, cv_weight, recoX, trueX);  // Selected events (N term) we dont weight
                     
                     }
                     // Just save the event weights
@@ -213,8 +231,8 @@ void CrossSectionHelper::LoopEvents(){
                     // Fill histograms
                     if (std::string(_util.xsecmode) != "txtlist"){
                         
-                        FillHists(label, uni, k_xsec_bkg, weight_uni, shr_energy_cali, elec_e);
-                        FillHists(label, uni, k_xsec_sel, cv_weight, shr_energy_cali, elec_e);  // Selected events (N term) we dont weight
+                        FillHists(label, uni, k_xsec_bkg, weight_uni, recoX, trueX);
+                        FillHists(label, uni, k_xsec_sel, cv_weight, recoX, trueX);  // Selected events (N term) we dont weight
                     
                     }
                     // Just save the event weights
@@ -232,8 +250,8 @@ void CrossSectionHelper::LoopEvents(){
                     // Fill histograms
                     if (std::string(_util.xsecmode) != "txtlist"){
                         
-                        FillHists(label, uni, k_xsec_gen, weight_uni, shr_energy_cali, elec_e);
-                        FillHists(label, uni, k_xsec_gen_smear, weight_uni, shr_energy_cali, elec_e);
+                        FillHists(label, uni, k_xsec_gen, weight_uni, recoX, trueX);
+                        FillHists(label, uni, k_xsec_gen_smear, weight_uni, recoX, trueX);
                     
                     }
                     // Just save the event weights
@@ -251,7 +269,7 @@ void CrossSectionHelper::LoopEvents(){
                     // Fill histograms
                     if (std::string(_util.xsecmode) != "txtlist"){
                     
-                        FillHists(label, uni, k_xsec_data, cv_weight, shr_energy_cali, elec_e);
+                        FillHists(label, uni, k_xsec_data, cv_weight, recoX, trueX);
 
                     }
                     // Just save the event weights
@@ -266,10 +284,10 @@ void CrossSectionHelper::LoopEvents(){
                     // Fill histograms
                     if (std::string(_util.xsecmode) != "txtlist"){
                         
-                        FillHists(label, uni, k_xsec_ext, cv_weight, shr_energy_cali, elec_e);
+                        FillHists(label, uni, k_xsec_ext, cv_weight, recoX, trueX);
 
                         // Apply additional weight to the ext events to get the N selected number correct
-                        FillHists(label, uni, k_xsec_sel, cv_weight*(_util.ext_scale_factor / _util.mc_scale_factor), shr_energy_cali, elec_e);
+                        FillHists(label, uni, k_xsec_sel, cv_weight*(_util.ext_scale_factor / _util.mc_scale_factor), recoX, trueX);
 
                     }
                     // Just save the event weights
@@ -284,10 +302,10 @@ void CrossSectionHelper::LoopEvents(){
                     // Fill histograms
                     if (std::string(_util.xsecmode) != "txtlist"){
                         
-                        FillHists(label, uni, k_xsec_dirt, weight_dirt, shr_energy_cali, elec_e);
+                        FillHists(label, uni, k_xsec_dirt, weight_dirt, recoX, trueX);
 
                         // Apply additional weight to the dirt events to get the N selected number correct
-                        FillHists(label, uni, k_xsec_sel, cv_weight*(_util.dirt_scale_factor / _util.mc_scale_factor), shr_energy_cali, elec_e);
+                        FillHists(label, uni, k_xsec_sel, cv_weight*(_util.dirt_scale_factor / _util.mc_scale_factor), recoX, trueX);
                     }
                     // Just save the event weights
                     else {
@@ -300,7 +318,7 @@ void CrossSectionHelper::LoopEvents(){
 
         // Call the function to save the events and weights to a file
         if (std::string(_util.xsecmode) == "txtlist"){
-            SaveEvent(*classification, passed_selection, ev_weight, shr_energy_cali, elec_e);
+            SaveEvent(*classification, passed_selection, ev_weight, recoX, trueX);
         }
 
         // Clear vector to store the weights
@@ -360,9 +378,9 @@ void CrossSectionHelper::LoopEvents(){
                 if (reweighter_labels.at(label) == "POTdn") weight_POT =1.0/0.98;
 
                 // Calculate the efficiency histogram with smearing of the truth
-                if (var == k_var_reco_el_E){
-                    Smear(h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_gen),
-                          h_smear.at(label).at(uni).at(k_var_reco_el_E), h_cross_sec.at(label).at(uni).at(k_var_reco_el_E).at(k_xsec_eff));
+                if (var == k_var_recoX){
+                    Smear(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen),
+                          h_smear.at(label).at(uni).at(k_var_recoX), h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_eff));
                 }
                 // Calculate the efficiency histogram by dividing the sig and gen
                 else{ 
@@ -370,9 +388,9 @@ void CrossSectionHelper::LoopEvents(){
                 }
 
                 // For the x-sec in true space, appy a response matrix to the generated events
-                if (var == k_var_true_el_E){
-                    ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_gen_smear),
-                    h_cross_sec.front().front().at(k_var_true_el_E).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_true_el_E));
+                if (var == k_var_trueX){
+                    ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
+                    h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_trueX));
                 }
 
                 // MC Cross section -- currently using eventrate
@@ -850,7 +868,7 @@ void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg,
     // (N - B) / (eff * targ * flux)
     h_xsec->Sumw2();
     
-    if (_var == k_var_true_el_E){
+    if (_var == k_var_trueX){
         h_xsec->Add(h_sig,         1);
     }
     else {
@@ -858,7 +876,7 @@ void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg,
     }
     
     
-    if (_var != k_var_true_el_E){
+    if (_var != k_var_trueX){
         h_xsec->Add(h_bkg_clone,  -1);
         h_xsec->Add(h_ext_clone,  -1);
         h_xsec->Add(h_dirt_clone, -1);
@@ -1057,7 +1075,7 @@ void CrossSectionHelper::WriteHists(){
                     for (unsigned int p = 0; p < h_cross_sec.at(label).at(uni).at(var).size(); p++){
 
                         // Certain histograms we want to divide out by the bin width
-                        if ((var == k_var_reco_el_E || var == k_var_true_el_E) && p != k_xsec_eff )
+                        if ((var == k_var_recoX || var == k_var_trueX) && p != k_xsec_eff )
                             h_cross_sec.at(label).at(uni).at(var).at(p)->Scale(1.0, "width");
 
                         h_cross_sec.at(label).at(uni).at(var).at(p)->SetOption("hist");
@@ -1065,7 +1083,7 @@ void CrossSectionHelper::WriteHists(){
                     }
 
                     // Write the smearing matrix to the reco folder
-                    if (var == k_var_reco_el_E || var == k_var_true_el_E){
+                    if (var == k_var_recoX || var == k_var_trueX){
                         h_smear.at(label).at(uni).at(var)->SetOption("col,text00");
                         h_smear.at(label).at(uni).at(var)->Write(Form("h_run%s_%s_%i_smearing",_util.run_period, reweighter_labels.at(label).c_str(), uni),TObject::kOverwrite);
                     }
@@ -1135,6 +1153,10 @@ void CrossSectionHelper::InitTree(){
     tree->SetBranchAddress("nu_pdg",  &nu_pdg);
     tree->SetBranchAddress("npi0",  &npi0);
     tree->SetBranchAddress("pi0_e",  &pi0_e);
+    tree->SetBranchAddress("effective_angle",            &effective_angle);
+    tree->SetBranchAddress("cos_effective_angle",        &cos_effective_angle);
+    tree->SetBranchAddress("true_effective_angle",       &true_effective_angle);
+    tree->SetBranchAddress("cos_true_effective_angle",   &cos_true_effective_angle);
     
     tree->SetBranchAddress("weightsGenie",          &weightsGenie);
     tree->SetBranchAddress("weightsReint",          &weightsReint);
@@ -1473,6 +1495,21 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
         }
     }
 
+    // Set the histogram bins
+
+    // Electron/Shower Energy
+    if (std::string(_util.xsec_var) =="elec_E"){
+        hist_bins = _util.reco_shr_bins;
+    }
+    // Electron/Shower effective angle
+    else if (std::string(_util.xsec_var) =="elec_ang"){
+        hist_bins = _util.reco_shr_bins_ang;
+    }
+    else {
+        std::cout << "Unsupported parameter...exiting!" << std::endl;
+        return;
+    }
+
     // Set the bins here
     bins.resize(vars.size());
 
@@ -1480,10 +1517,10 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
     bins.at(k_var_integrated) = { 0.0, 1.1 };
 
     // Reconstructed electron energy Bin definition
-    bins.at(k_var_reco_el_E) = _util.reco_shr_bins;
+    bins.at(k_var_recoX) = hist_bins;
 
     // True electron energy Bin definition
-    bins.at(k_var_true_el_E) = _util.reco_shr_bins;
+    bins.at(k_var_trueX) = hist_bins;
 
     // Resize to the number of reweighters
     h_cross_sec.resize(reweighter_labels.size());
@@ -1582,7 +1619,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 temp_bins = bins.at(var);
                 double* edges = &temp_bins[0]; // Cast to an array 
 
-                if (var == k_var_reco_el_E){
+                if (var == k_var_recoX){
                     nbins_smear = nbins;
                     edges_smear = edges;
                 }
@@ -1606,11 +1643,11 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
 
                 // We dont care about the integrated smearing, so set it to some arbitary value
                 if (var == k_var_integrated){
-                    h_smear.at(label).at(uni).at(var) = new TH2D ( Form("h_run%s_%s_%i_%s_smearing",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str()) ,";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]", 1, 0, 1, 1, 0, 1);
+                    h_smear.at(label).at(uni).at(var) = new TH2D ( Form("h_run%s_%s_%i_%s_smearing",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str()), smear_hist_name.c_str(), 1, 0, 1, 1, 0, 1);
                 }
                 // Set the reco and true bins
                 else {
-                    h_smear.at(label).at(uni).at(var) = new TH2D ( Form("h_run%s_%s_%i_%s_smearing",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str()) ,";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]", nbins_smear, edges_smear, nbins_smear, edges_smear);
+                    h_smear.at(label).at(uni).at(var) = new TH2D ( Form("h_run%s_%s_%i_%s_smearing",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str()), smear_hist_name.c_str(), nbins_smear, edges_smear, nbins_smear, edges_smear);
                 }
                 
 
@@ -1727,21 +1764,21 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
 
 }
 // -----------------------------------------------------------------------------
-void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double weight_uni, float shr_energy_cali, float elec_e){
+void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double weight_uni, float _recoX, float _trueX){
 
     // Integrated
     h_cross_sec.at(label).at(uni).at(k_var_integrated).at(xsec_type)->Fill(1.0, weight_uni);
 
     // Reco Electron Energy
-    h_cross_sec.at(label).at(uni).at(k_var_reco_el_E).at(xsec_type)->Fill(shr_energy_cali, weight_uni);
+    h_cross_sec.at(label).at(uni).at(k_var_recoX).at(xsec_type)->Fill(_recoX, weight_uni);
 
     // True Electron Energy
-    h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(xsec_type)->Fill(elec_e, weight_uni);
+    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(xsec_type)->Fill(_trueX, weight_uni);
 
     // Smearing Matrix -- only fill for selected signal events
     if (xsec_type == k_xsec_sig){
-        h_smear.at(label).at(uni).at(k_var_reco_el_E)->Fill(elec_e, shr_energy_cali, weight_uni);
-        h_smear.at(label).at(uni).at(k_var_true_el_E)->Fill(elec_e, shr_energy_cali, weight_uni);
+        h_smear.at(label).at(uni).at(k_var_recoX)->Fill(_trueX, _recoX, weight_uni);
+        h_smear.at(label).at(uni).at(k_var_trueX)->Fill(_trueX, _recoX, weight_uni);
     }
 
 }
@@ -2038,7 +2075,11 @@ void CrossSectionHelper::ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH1
 
         // Now normalise the column entries by the number of events in the 1D generated histogram
         for (int row=1; row<h_smear->GetYaxis()->GetNbins()+2; row++) { 
-            h_smear->SetBinContent(row,col, h_smear->GetBinContent(row, col)/ h_gen->GetBinContent(row) );
+            
+            if (h_gen->GetBinContent(row) == 0)
+                h_smear->SetBinContent(row,col, 0.0 );
+            else
+                h_smear->SetBinContent(row,col, h_smear->GetBinContent(row, col)/ h_gen->GetBinContent(row) );
         }
     } 
 
@@ -2071,7 +2112,7 @@ void CrossSectionHelper::ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH1
     }
 }
 // -----------------------------------------------------------------------------
-void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_selection, std::vector<float> _ev_weight, double reco_E, double true_E){
+void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_selection, std::vector<float> _ev_weight, double recoX, double trueX){
 
     // Get rid of the CV
     _ev_weight.erase(_ev_weight.begin());
@@ -2084,7 +2125,7 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
 
         // Initialise the file 
         if (!filled_sig){
-            evt_dist_sig << "true_E," << "reco_E, " <<"w";
+            evt_dist_sig << "trueX," << "recoX, " <<"w";
         
             for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
                 evt_dist_sig << "," << "w_" << _uni;
@@ -2094,7 +2135,7 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
             filled_sig = true;
         }
     
-        evt_dist_sig << true_E << "," << reco_E << "," << weight;
+        evt_dist_sig << trueX << "," << recoX << "," << weight;
         
         for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
             evt_dist_sig << "," << _ev_weight.at(_uni);
@@ -2110,7 +2151,7 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
 
         // Initialise the file 
         if (!filled_bkg){
-            evt_dist_bkg << "reco_E," << "w";
+            evt_dist_bkg << "recoX," << "w";
         
             for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
                 evt_dist_bkg << "," << "w_" << _uni;
@@ -2120,7 +2161,7 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
             filled_bkg = true;
         }
 
-        evt_dist_bkg << reco_E << "," << weight;
+        evt_dist_bkg << recoX << "," << weight;
         
         for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
             evt_dist_bkg << "," << _ev_weight.at(_uni);
@@ -2139,7 +2180,7 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
 
         // Initialise the file 
         if (!filled_gen){
-            evt_dist_gen << "true_E," <<"w";
+            evt_dist_gen << "trueX," <<"w";
         
             for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
                 evt_dist_gen << "," << "w_" << _uni;
@@ -2150,7 +2191,7 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
             filled_gen = true;
         }
 
-        evt_dist_gen << true_E << "," << reco_E << "," << weight;
+        evt_dist_gen << trueX << "," << recoX << "," << weight;
         
         for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
             evt_dist_gen << "," << _ev_weight.at(_uni);
@@ -2164,7 +2205,7 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
     if (_classification == "data"){
         isData = true;
         isSelected = true;
-        evt_dist_data << reco_E << "\n";
+        evt_dist_data << recoX << "\n";
     }
 
     // Other background event
@@ -2173,7 +2214,7 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
 
         // Initialise the file 
         if (!filled_bkg){
-            evt_dist_bkg << "reco_E," << "w";
+            evt_dist_bkg << "recoX," << "w";
         
             for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
                 evt_dist_bkg << "," << "w_" << _uni;
@@ -2184,7 +2225,7 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
             filled_bkg = true;
         }
 
-        evt_dist_bkg << reco_E << "," << weight;
+        evt_dist_bkg << recoX << "," << weight;
         
         for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
             evt_dist_bkg << "," << _ev_weight.at(_uni);
@@ -2193,8 +2234,8 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
         evt_dist_bkg << "\n";
     }
 
-    xTrue = true_E;
-    xReco = reco_E;
+    xTrue = trueX;
+    xReco = recoX;
 
     event_tree->Fill();
 
