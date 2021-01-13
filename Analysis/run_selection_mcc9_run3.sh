@@ -3,7 +3,7 @@
 if [ -z "$1" ]; then
 
   # # Parallel processing version
-  # mc="./nuexsec --run 3 --mc ../ntuples/neutrinoselection_filt_run3b_overlay_weight.root"
+  # mc="./nuexsec --run 3 --mc ../ntuples/neutrinoselection_filt_run3b_overlay_newtune.root"
   # data="./nuexsec --run 3 --data ../ntuples/neutrinoselection_filt_run3b_beamon_beamgood.root"
   # ext="./nuexsec --run 3 --ext ../ntuples/neutrinoselection_filt_run3b_beamoff.root"
   # dirt="./nuexsec --run 3 --dirt ../ntuples/neutrinoselection_filt_run3b_dirt_overlay.root"
@@ -24,7 +24,7 @@ if [ -z "$1" ]; then
   # done
 
   # # Overwrite the Nue cc events with a higher stats version
-  # ./nuexsec --run 3 --mc ../ntuples/neutrinoselection_filt_run3b_overlay_intrinsic.root --intrinsic intrinsic
+  # ./nuexsec --run 3 --mc ../ntuples/neutrinoselection_filt_run3b_overlay_intrinsic_newtune.root --intrinsic intrinsic
   
   # Print the selection
   ./nuexsec --run 3 --printonly --printall | tee -a log/run3.log 

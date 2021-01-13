@@ -164,58 +164,58 @@ class CrossSectionHelper{
 
     std::vector<std::string> reweighter_labels = {
         "CV",    // Dont comment this out
-        "Horn_p2kA",
-        "Horn_m2kA",
-        "Horn1_x_p3mm",
-        "Horn1_x_m3mm",
-        "Horn1_y_p3mm",
-        "Horn1_y_m3mm",
-        "Beam_spot_1_1mm",
-        "Beam_spot_1_5mm",
-        "Horn2_x_p3mm",
-        "Horn2_x_m3mm",
-        "Horn2_y_p3mm",
-        "Horn2_y_m3mm",
-        "Horns_0mm_water",
-        "Horns_2mm_water",
-        "Beam_shift_x_p1mm",
-        "Beam_shift_x_m1mm",
-        "Beam_shift_y_p1mm",
-        "Beam_shift_y_m1mm",
-        "Target_z_p7mm",
-        "Target_z_m7mm",
-        "Horn1_refined_descr",
-        "Decay_pipe_Bfield",
-        "Old_Horn_Geometry",
-        "RPAup",
-        "CCMECup",
-        "AxFFCCQEup",
-        "VecFFCCQEup",
-        "DecayAngMECup",
-        "ThetaDelta2Npiup",
-        "ThetaDelta2NRadup",
-        "RPA_CCQE_Reducedup",
-        "NormCCCOHup",
-        "NormNCCOHup",
-        "RPAdn",
-        "CCMECdn",
-        "AxFFCCQEdn",
-        "VecFFCCQEdn",
-        "DecayAngMECdn",
-        "ThetaDelta2Npidn",
-        "ThetaDelta2NRaddn",
-        "RPA_CCQE_Reduceddn",
-        "NormCCCOHdn",
-        "NormNCCOHdn",
-        "Dirtup",
-        "Dirtdn",
-        "POTup",
-        "POTdn",
-        "pi0",
-        "weightsGenie",
-        "weightsReint",
-        "weightsPPFX",
-        "MCStats"
+        // "Horn_p2kA",
+        // "Horn_m2kA",
+        // "Horn1_x_p3mm",
+        // "Horn1_x_m3mm",
+        // "Horn1_y_p3mm",
+        // "Horn1_y_m3mm",
+        // "Beam_spot_1_1mm",
+        // "Beam_spot_1_5mm",
+        // "Horn2_x_p3mm",
+        // "Horn2_x_m3mm",
+        // "Horn2_y_p3mm",
+        // "Horn2_y_m3mm",
+        // "Horns_0mm_water",
+        // "Horns_2mm_water",
+        // "Beam_shift_x_p1mm",
+        // "Beam_shift_x_m1mm",
+        // "Beam_shift_y_p1mm",
+        // "Beam_shift_y_m1mm",
+        // "Target_z_p7mm",
+        // "Target_z_m7mm",
+        // "Horn1_refined_descr",
+        // "Decay_pipe_Bfield",
+        // "Old_Horn_Geometry",
+        // "RPAup",
+        // "CCMECup",
+        // "AxFFCCQEup",
+        // "VecFFCCQEup",
+        // "DecayAngMECup",
+        // "ThetaDelta2Npiup",
+        // "ThetaDelta2NRadup",
+        // "RPA_CCQE_Reducedup",
+        // "NormCCCOHup",
+        // "NormNCCOHup",
+        // "RPAdn",
+        // "CCMECdn",
+        // "AxFFCCQEdn",
+        // "VecFFCCQEdn",
+        // "DecayAngMECdn",
+        // "ThetaDelta2Npidn",
+        // "ThetaDelta2NRaddn",
+        // "RPA_CCQE_Reduceddn",
+        // "NormCCCOHdn",
+        // "NormNCCOHdn",
+        // "Dirtup",
+        // "Dirtdn",
+        // "POTup",
+        // "POTdn",
+        // "pi0"
+        // "weightsGenie"
+        // "weightsReint",
+        "weightsPPFX"
+        // "MCStats"
     };
 
     std::vector<std::vector<TH2D*>> beamline_hists;
@@ -284,7 +284,28 @@ class CrossSectionHelper{
     };
 
 
+    // Filelists
+    // Create a file for the selected events and their properties
+    std::ofstream evt_dist_sig, evt_dist_gen, evt_dist_bkg, evt_dist_data;
 
+    // Vector for storing event weights
+    std::vector<float> ev_weight;
+
+    // To initialise file names for event list readout
+    bool filled_sig = false, filled_bkg = false, filled_gen = false;
+
+    // For Filling TTree in Andy's analysis format
+    TFile *f_out;
+    TTree *event_tree;
+    TTree *meta_tree;
+
+    float potData = 2.0;
+    float potMC   = 23.2136;
+    float n_targ  = 4.31247;
+    float nUniverses = 600;
+    bool isData, isSignal, isSelected; 
+    float xTrue, xReco;
+    double integrated_flux_tree{0.0};
 
     // -------------------------------------------------------------------------
     // Initialiser function
@@ -359,7 +380,10 @@ class CrossSectionHelper{
     void Smear(TH1D* h_sig, TH1D* h_gen, TH2D* h_smear, TH1D* h_eff);
     // -------------------------------------------------------------------------
     // Create a response matrix and smear the generated events in truth to sig events in reco
-    void ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH2D* h_smear);
+    void ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH1D* h_gen_CV, TH2D* h_smear);
+    // -------------------------------------------------------------------------
+    // Save the event to file
+    void SaveEvent(std::string _classification, bool _passed_selection, std::vector<float> ev_weight, double reco_E, double true_E);
     // -------------------------------------------------------------------------
 
 

@@ -97,7 +97,7 @@ void CrossSectionHelper::Initialise(Utility _utility){
     std::cout << "  "<< std::endl;
 
 
-    // Create and initialise vector of histograms
+    // Create and initialise vector of histograms -- dont do this in the case we want to just write out the file lists
     InitialiseHistograms(std::string(_util.xsecmode));
 
     // Reweight the events by cut to get the sys uncertainty for certain plots in the selection
@@ -106,6 +106,41 @@ void CrossSectionHelper::Initialise(Utility _utility){
         LoopEventsbyCut();
         return;
     }
+
+    // Initialise the file lists
+    if (std::string(_util.xsecmode) == "txtlist"){
+        // Initialise output file lists
+        evt_dist_sig.open(Form("files/run%s_evt_dist_sig.txt",_util.run_period));
+        
+        evt_dist_gen.open(Form("files/run%s_evt_dist_gen.txt",_util.run_period));
+        
+        evt_dist_bkg.open(Form("files/run%s_evt_dist_bkg.txt",_util.run_period));
+
+        evt_dist_data.open(Form("files/run%s_evt_dist_data.txt",_util.run_period));
+        evt_dist_data << "reco_E" << "\n";
+
+        f_out = TFile::Open("files/trees/krish_test.root", "UPDATE");
+
+        // Also init the TTrees
+        event_tree = new TTree("events", "events");
+        event_tree->Branch("isData",     &isData);
+        event_tree->Branch("isSignal",   &isSignal);
+        event_tree->Branch("isSelected", &isSelected);
+        event_tree->Branch("xTrue",      &xTrue);
+        event_tree->Branch("xReco",      &xReco);
+        event_tree->Branch("cv_weight",  &weight);
+        event_tree->Branch("weights", "std::vector<float>", &ev_weight);
+        meta_tree  = new TTree("metadata", "metadata");
+        integrated_flux_tree = integrated_flux*flux_scale_factor;
+        meta_tree->Branch("flux",       &integrated_flux_tree);
+        meta_tree->Branch("nTargets",   &n_targ);
+        meta_tree->Branch("potData",    &potData);
+        meta_tree->Branch("potMC",      &potMC);
+        meta_tree->Branch("nUniverses", &nUniverses);
+        meta_tree->Fill();
+    }
+
+
 
     // Now loop over events and caluclate the cross section
     LoopEvents();
@@ -119,7 +154,7 @@ void CrossSectionHelper::LoopEvents(){
 
     // Loop over the tree entries and weight the events in each universe
     for (unsigned int ievent = 0; ievent < tree->GetEntries(); ievent++){
-
+        
         tree->GetEntry(ievent); 
 
         if (shr_energy_cali > 6.0 && *classification == "data" ) std::cout << _util.red << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins " << run << " " << subrun << " " << event  << _util.reset<<std::endl;
@@ -157,8 +192,16 @@ void CrossSectionHelper::LoopEvents(){
                 if ((*classification == "nue_cc" || *classification == "nuebar_cc" || *classification == "unmatched_nue" || *classification == "unmatched_nuebar") && passed_selection) {
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_sig, weight_uni, shr_energy_cali, elec_e);
-                    FillHists(label, uni, k_xsec_sel, cv_weight, shr_energy_cali, elec_e);  // Selected events (N term) we dont weight
+                    if (std::string(_util.xsecmode) != "txtlist"){
+                           
+                        FillHists(label, uni, k_xsec_sig, weight_uni, shr_energy_cali, elec_e);
+                        FillHists(label, uni, k_xsec_sel, cv_weight, shr_energy_cali, elec_e);  // Selected events (N term) we dont weight
+                    
+                    }
+                    // Just save the event weights
+                    else {
+                        ev_weight.push_back(weight_uni);
+                    }
 
                 }
 
@@ -168,8 +211,16 @@ void CrossSectionHelper::LoopEvents(){
                      *classification == "nc_pi0"     || ((*classification == "cosmic_nue" || *classification == "cosmic_nuebar") && passed_selection)  ) {
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_bkg, weight_uni, shr_energy_cali, elec_e);
-                    FillHists(label, uni, k_xsec_sel, cv_weight, shr_energy_cali, elec_e);  // Selected events (N term) we dont weight
+                    if (std::string(_util.xsecmode) != "txtlist"){
+                        
+                        FillHists(label, uni, k_xsec_bkg, weight_uni, shr_energy_cali, elec_e);
+                        FillHists(label, uni, k_xsec_sel, cv_weight, shr_energy_cali, elec_e);  // Selected events (N term) we dont weight
+                    
+                    }
+                    // Just save the event weights
+                    else {
+                        ev_weight.push_back(weight_uni);
+                    }
                     
                 }
 
@@ -179,8 +230,17 @@ void CrossSectionHelper::LoopEvents(){
                       *classification == "unmatched_nuebar" || *classification == "cosmic_nuebar") {
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_gen, weight_uni, shr_energy_cali, elec_e);
-                    FillHists(label, uni, k_xsec_gen_smear, weight_uni, shr_energy_cali, elec_e);
+                    if (std::string(_util.xsecmode) != "txtlist"){
+                        
+                        FillHists(label, uni, k_xsec_gen, weight_uni, shr_energy_cali, elec_e);
+                        FillHists(label, uni, k_xsec_gen_smear, weight_uni, shr_energy_cali, elec_e);
+                    
+                    }
+                    // Just save the event weights
+                    else {
+                        if (!passed_selection)
+                            ev_weight.push_back(weight_uni);
+                    }
                 }
                 
                 // Data event
@@ -189,33 +249,75 @@ void CrossSectionHelper::LoopEvents(){
                     if (cv_weight != 1.0) std::cout << "Error weight for data is not 1, this means your weighting the data... bad!"<< std::endl;
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_data, cv_weight, shr_energy_cali, elec_e);
+                    if (std::string(_util.xsecmode) != "txtlist"){
+                    
+                        FillHists(label, uni, k_xsec_data, cv_weight, shr_energy_cali, elec_e);
+
+                    }
+                    // Just save the event weights
+                    else {
+                        ev_weight.push_back(1.0);
+                    }
                 }
 
                 // Off beam event
                 if (*classification == "ext"){
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_ext, cv_weight, shr_energy_cali, elec_e);
+                    if (std::string(_util.xsecmode) != "txtlist"){
+                        
+                        FillHists(label, uni, k_xsec_ext, cv_weight, shr_energy_cali, elec_e);
 
-                    // Apply additional weight to the ext events to get the N selected number correct
-                    FillHists(label, uni, k_xsec_sel, cv_weight*(_util.ext_scale_factor / _util.mc_scale_factor), shr_energy_cali, elec_e);
+                        // Apply additional weight to the ext events to get the N selected number correct
+                        FillHists(label, uni, k_xsec_sel, cv_weight*(_util.ext_scale_factor / _util.mc_scale_factor), shr_energy_cali, elec_e);
+
+                    }
+                    // Just save the event weights
+                    else {
+                        ev_weight.push_back(cv_weight*(_util.ext_scale_factor / _util.mc_scale_factor));
+                    }
                 }
 
                 // Dirt event
                 if (*classification == "dirt"){
                     
                     // Fill histograms
-                    FillHists(label, uni, k_xsec_dirt, weight_dirt, shr_energy_cali, elec_e);
+                    if (std::string(_util.xsecmode) != "txtlist"){
+                        
+                        FillHists(label, uni, k_xsec_dirt, weight_dirt, shr_energy_cali, elec_e);
 
-                    // Apply additional weight to the dirt events to get the N selected number correct
-                    FillHists(label, uni, k_xsec_sel, cv_weight*(_util.dirt_scale_factor / _util.mc_scale_factor), shr_energy_cali, elec_e);
+                        // Apply additional weight to the dirt events to get the N selected number correct
+                        FillHists(label, uni, k_xsec_sel, cv_weight*(_util.dirt_scale_factor / _util.mc_scale_factor), shr_energy_cali, elec_e);
+                    }
+                    // Just save the event weights
+                    else {
+                        ev_weight.push_back(cv_weight*(_util.dirt_scale_factor / _util.mc_scale_factor));
+                    }
                 }
             } // End loop over uni
 
         } // End loop over labels
+
+        // Call the function to save the events and weights to a file
+        if (std::string(_util.xsecmode) == "txtlist"){
+            SaveEvent(*classification, passed_selection, ev_weight, shr_energy_cali, elec_e);
+        }
+
+        // Clear vector to store the weights
+        ev_weight.clear();
         
     } // End loop over events
+
+    // If we want to just write out the event numbers to a txt file
+    if (std::string(_util.xsecmode) == "txtlist"){
+        std::cout << "Writing out event list to text file..."<< std::endl;
+        f_out->cd();
+        event_tree->Write("", TObject::kOverwrite);
+        meta_tree ->Write("", TObject::kOverwrite);
+
+        return;
+    }
+
 
     std::cout << "\n\nFinished Event Loop, now calculating the cross-sections\n\n"<< std::endl;
 
@@ -270,7 +372,7 @@ void CrossSectionHelper::LoopEvents(){
                 // For the x-sec in true space, appy a response matrix to the generated events
                 if (var == k_var_true_el_E){
                     ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_true_el_E).at(k_xsec_gen_smear),
-                     h_smear.at(label).at(uni).at(k_var_true_el_E));
+                    h_cross_sec.front().front().at(k_var_true_el_E).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_true_el_E));
                 }
 
                 // MC Cross section -- currently using eventrate
@@ -1471,6 +1573,9 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
             // Loop over the variables
             for (unsigned int var = 0; var < h_cross_sec.at(label).at(uni).size(); var ++){
 
+                if (std::string(_util.xsecmode) == "txtlist")
+                    continue;
+
                 // Get the number of bins and the right vector
                 int const nbins = bins.at(var).size()-1;
                 temp_bins.clear();
@@ -1921,7 +2026,7 @@ void CrossSectionHelper::Smear(TH1D* h_sig, TH1D* h_gen, TH2D* h_smear, TH1D* h_
     
 }
 // -----------------------------------------------------------------------------
-void CrossSectionHelper::ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH2D* h_smear){
+void CrossSectionHelper::ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH1D* h_gen_CV, TH2D* h_smear){
 
     // Change this bool to print info
     bool debug = false;
@@ -1942,7 +2047,7 @@ void CrossSectionHelper::ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH2
         h_gen_smear->SetBinContent(bin, 0);
     }
 
-    // --- Do the matrix multiplication --- 
+    // --- Do the matrix multiplication with the CV gen events --- 
     // Loop over cols
     for (int i=1; i<h_smear->GetXaxis()->GetNbins()+2; i++){
         double integral = 0;
@@ -1951,9 +2056,9 @@ void CrossSectionHelper::ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH2
         for (int j=1; j<h_smear->GetYaxis()->GetNbins()+2; j++) { 
 
             if (debug)
-                std::cout <<  "R_" << j << i << " * " << j << "  " << h_smear->GetBinContent(j, i) << " * " << h_gen->GetBinContent(j) << std::endl;
+                std::cout <<  "R_" << j << i << " * " << j << "  " << h_smear->GetBinContent(j, i) << " * " << h_gen_CV->GetBinContent(j) << std::endl;
             
-            h_gen_smear->SetBinContent(i, h_gen_smear->GetBinContent(i) + h_smear->GetBinContent(j, i) * h_gen->GetBinContent(j));
+            h_gen_smear->SetBinContent(i, h_gen_smear->GetBinContent(i) + h_smear->GetBinContent(j, i) * h_gen_CV->GetBinContent(j));
         }
 
         if (debug)
@@ -1966,6 +2071,140 @@ void CrossSectionHelper::ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH2
     }
 }
 // -----------------------------------------------------------------------------
+void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_selection, std::vector<float> _ev_weight, double reco_E, double true_E){
+
+    // Get rid of the CV
+    _ev_weight.erase(_ev_weight.begin());
+
+    // Signal event
+    if ((_classification == "nue_cc" || _classification == "nuebar_cc" || _classification == "unmatched_nue" || _classification == "unmatched_nuebar") && _passed_selection) {
+        
+        isSignal = true;
+        isSelected = true;
+
+        // Initialise the file 
+        if (!filled_sig){
+            evt_dist_sig << "true_E," << "reco_E, " <<"w";
+        
+            for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
+                evt_dist_sig << "," << "w_" << _uni;
+            }
+        
+            evt_dist_sig << "\n";
+            filled_sig = true;
+        }
+    
+        evt_dist_sig << true_E << "," << reco_E << "," << weight;
+        
+        for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
+            evt_dist_sig << "," << _ev_weight.at(_uni);
+        }
+
+        evt_dist_sig << "\n";
+    }
+    
+    // Background event
+    if ( _classification == "nu_out_fv"  || _classification == "cosmic"       ||
+         _classification == "numu_cc"    || _classification == "numu_cc_pi0"  || _classification == "nc" || 
+         _classification == "nc_pi0"     || ((_classification == "cosmic_nue" || _classification == "cosmic_nuebar") && _passed_selection)  ) {
+
+        // Initialise the file 
+        if (!filled_bkg){
+            evt_dist_bkg << "reco_E," << "w";
+        
+            for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
+                evt_dist_bkg << "," << "w_" << _uni;
+            }
+        
+            evt_dist_bkg << "\n";
+            filled_bkg = true;
+        }
+
+        evt_dist_bkg << reco_E << "," << weight;
+        
+        for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
+            evt_dist_bkg << "," << _ev_weight.at(_uni);
+        }
+
+        evt_dist_bkg << "\n";
+
+    }
+   
+    // Generated event
+    if (  _classification == "nue_cc"           || _classification == "nuebar_cc" || 
+          _classification == "unmatched_nue"    || _classification == "cosmic_nue" ||
+          _classification == "unmatched_nuebar" || _classification == "cosmic_nuebar") {
+        
+        isSignal = true;
+
+        // Initialise the file 
+        if (!filled_gen){
+            evt_dist_gen << "true_E," <<"w";
+        
+            for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
+                evt_dist_gen << "," << "w_" << _uni;
+            }
+        
+            evt_dist_gen << "\n";
+
+            filled_gen = true;
+        }
+
+        evt_dist_gen << true_E << "," << reco_E << "," << weight;
+        
+        for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
+            evt_dist_gen << "," << _ev_weight.at(_uni);
+        }
+
+        evt_dist_gen << "\n";
+
+    }
+    
+    // Data
+    if (_classification == "data"){
+        isData = true;
+        isSelected = true;
+        evt_dist_data << reco_E << "\n";
+    }
+
+    // Other background event
+    if (_classification == "ext" || _classification == "dirt"){
+        isSelected = true;
+
+        // Initialise the file 
+        if (!filled_bkg){
+            evt_dist_bkg << "reco_E," << "w";
+        
+            for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
+                evt_dist_bkg << "," << "w_" << _uni;
+            }
+        
+            evt_dist_bkg << "\n";
+
+            filled_bkg = true;
+        }
+
+        evt_dist_bkg << reco_E << "," << weight;
+        
+        for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
+            evt_dist_bkg << "," << _ev_weight.at(_uni);
+        }
+
+        evt_dist_bkg << "\n";
+    }
+
+    xTrue = true_E;
+    xReco = reco_E;
+
+    event_tree->Fill();
+
+    // Reset TTree vars
+    isData = false;
+    isSignal = false;
+    isSelected = false;
+    
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

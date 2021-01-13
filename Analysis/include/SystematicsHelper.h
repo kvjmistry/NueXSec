@@ -199,6 +199,7 @@ class SystematicsHelper{
         k_xsec_sel,     // Selected event histogram binned in energy
         k_xsec_bkg,     // Bkg event histogram binned in energy
         k_xsec_gen,     // Gen event histogram binned in energy
+        k_xsec_gen_smear,    // Gen event histogram binned in energy with smeared truth
         k_xsec_sig,     // Sig event histogram binned in energy
         k_xsec_eff,     // Efficiency histogram binned in energy
         k_xsec_ext,     // EXT event histogram binned in energy
@@ -218,8 +219,8 @@ class SystematicsHelper{
     };
 
     // Names for cross section histograms
-    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "data_xsec"};
-    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC", "Data"};
+    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "data_xsec"};
+    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Smeared Prediction", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC", "Data"};
 
     std::vector<std::string> vars = {"integrated",
                                      "reco_el_E",

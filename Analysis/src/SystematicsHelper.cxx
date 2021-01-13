@@ -1189,6 +1189,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_universe_2D.at(k_xsec_sel)           = new TH2D("h_2D_sel",      "", nbins, edges, 100, 2000, 3000);
         h_universe_2D.at(k_xsec_bkg)           = new TH2D("h_2D_bkg",      "", nbins, edges, 100, 200, 1000);
         h_universe_2D.at(k_xsec_gen)           = new TH2D("h_2D_gen",      "", nbins, edges, 100, 4000, 12000);
+        h_universe_2D.at(k_xsec_gen_smear)     = new TH2D("h_2D_gen_smear","", nbins, edges, 100, 1000, 3000);
         h_universe_2D.at(k_xsec_sig)           = new TH2D("h_2D_sig",      "", nbins, edges, 100, 1000, 3000);
         h_universe_2D.at(k_xsec_eff)           = new TH2D("h_2D_eff",      "", nbins, edges, 100, 0.15, 0.3);
         h_universe_2D.at(k_xsec_ext)           = new TH2D("h_2D_ext",      "", nbins, edges, 10, 0, 10);
@@ -1203,6 +1204,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_universe_2D.at(k_xsec_sel)           = new TH2D("h_2D_sel",      "", nbins, edges, 100, 0, 2500);
         h_universe_2D.at(k_xsec_bkg)           = new TH2D("h_2D_bkg",      "", nbins, edges, 100, 0, 1200);
         h_universe_2D.at(k_xsec_gen)           = new TH2D("h_2D_gen",      "", nbins, edges, 100, 0, 16000);
+        h_universe_2D.at(k_xsec_gen_smear)     = new TH2D("h_2D_gen_smear","", nbins, edges, 100, 0, 2700);
         h_universe_2D.at(k_xsec_sig)           = new TH2D("h_2D_sig",      "", nbins, edges, 100, 0, 2700);
         h_universe_2D.at(k_xsec_eff)           = new TH2D("h_2D_eff",      "", nbins, edges, 100, 0, 0.5);
         h_universe_2D.at(k_xsec_ext)           = new TH2D("h_2D_ext",      "", nbins, edges, 30, 0, 30);
@@ -2936,7 +2938,7 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
         for (unsigned int type = 0; type < xsec_types.size(); type++){
             
             // Only look at the true efficeincy or select variables in reco space
-            if ( (vars.at(var) == "true_el_E" && xsec_types.at(type) == "eff") || 
+            if ( (vars.at(var) == "true_el_E" && (xsec_types.at(type) == "eff" || xsec_types.at(type) == "gen_smear") ) || 
                  (vars.at(var) == "reco_el_E" && (xsec_types.at(type) == "mc_xsec" || xsec_types.at(type) == "data_xsec" ||
                                                   xsec_types.at(type) == "eff" || xsec_types.at(type) == "sig" || 
                                                   xsec_types.at(type) == "bkg" || xsec_types.at(type) == "sel" ))){

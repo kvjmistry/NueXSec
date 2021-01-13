@@ -143,4 +143,7 @@ if [ "$1" == "allvar" ]; then
 fi
 
 
+# To generate the file lists with all event weights then use this command
+# ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode txtlist all dummy
+
 
