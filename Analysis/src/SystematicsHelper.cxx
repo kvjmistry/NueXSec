@@ -24,6 +24,9 @@ void SystematicsHelper::Initialise(Utility _utility){
     // Get the POT of the variations from the file
     GetPOT();
 
+    // Set the names of the histograms
+    _util.SetAxesNames(var_labels_xsec, var_labels_events, var_labels_eff, smear_hist_name, vars);
+
     // Off beam mode to compare bnb and numi off beam samples
     if (std::string(_util.sysmode) == "ext"){
         var_string = { "NuMI", "BNB" };
@@ -2938,10 +2941,10 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
         for (unsigned int type = 0; type < xsec_types.size(); type++){
             
             // Only look at the true efficeincy or select variables in reco space
-            if ( (vars.at(var) == "true_el_E" && (xsec_types.at(type) == "eff" || xsec_types.at(type) == "gen_smear") ) || 
-                 (vars.at(var) == "reco_el_E" && (xsec_types.at(type) == "mc_xsec" || xsec_types.at(type) == "data_xsec" ||
-                                                  xsec_types.at(type) == "eff" || xsec_types.at(type) == "sig" || 
-                                                  xsec_types.at(type) == "bkg" || xsec_types.at(type) == "sel" ))){
+            if ( (var == k_var_true_el_E && (xsec_types.at(type) == "eff" || xsec_types.at(type) == "gen_smear") ) || 
+                 (var == k_var_reco_el_E && (xsec_types.at(type) == "mc_xsec" || xsec_types.at(type) == "data_xsec" ||
+                                             xsec_types.at(type) == "eff" || xsec_types.at(type) == "sig" || 
+                                             xsec_types.at(type) == "bkg" || xsec_types.at(type) == "sel" ))){
 
                 // Resize the vector for new loop
                 if (h_uncertainty.size() == 0) 

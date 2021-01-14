@@ -222,10 +222,7 @@ class SystematicsHelper{
     std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "data_xsec"};
     std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Smeared Prediction", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC", "Data"};
 
-    std::vector<std::string> vars = {"integrated",
-                                     "reco_el_E",
-                                     "true_el_E"
-                                     };
+    std::vector<std::string> vars = {"integrated","recoX", "trueX" };
 
     // Choose the cross section scale to set the histogram
     double xsec_scale = 13.0e-39;
@@ -237,21 +234,13 @@ class SystematicsHelper{
     //                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
                                         // };
     
-    std::vector<std::string> var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                                           ";Reco. Leading Shower Energy [GeV];#frac{d#sigma}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon]",
-                                           ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];#frac{d#sigma}{dE^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon"
-                                        };
+    std::vector<std::string> var_labels_xsec = {};
 
+    std::vector<std::string> var_labels_events = {};
 
-    std::vector<std::string> var_labels_events = {";;Entries",
-                                        ";Reco. Leading Shower Energy [GeV]; Entries / GeV",
-                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries / GeV"
-                                        };
+    std::vector<std::string> var_labels_eff = {};
 
-    std::vector<std::string> var_labels_eff = {";;Efficiency",
-                                        ";Reco. Leading Shower Energy [GeV]; Efficiency",
-                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency"
-                                        };
+    std::string smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]";
 
     // Containter for the central value histograms
     std::vector<std::vector<TH1D*>> cv_hist_vec; // reco elec e, <gen, sig, etc>

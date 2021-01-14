@@ -97,7 +97,7 @@ void CrossSectionHelper::Initialise(Utility _utility){
     std::cout << "  "<< std::endl;
 
     // Set the names of the histograms
-    _util.SetAxesNames(var_labels_xsec, var_labels_events, var_labels_eff, smear_hist_name);
+    _util.SetAxesNames(var_labels_xsec, var_labels_events, var_labels_eff, smear_hist_name, vars);
 
     // Create and initialise vector of histograms -- dont do this in the case we want to just write out the file lists
     InitialiseHistograms(std::string(_util.xsecmode));

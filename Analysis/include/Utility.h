@@ -138,7 +138,7 @@ public:
     // -------------------------------------------------------------------------
     // Set the axes names of the cross section plots
     void SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vector<std::string> &var_labels_events,
-                      std::vector<std::string> &var_labels_eff,  std::string &smear_hist_name);
+                      std::vector<std::string> &var_labels_eff,  std::string &smear_hist_name, std::vector<std::string> &vars);
     // -------------------------------------------------------------------------
 
     // Variables

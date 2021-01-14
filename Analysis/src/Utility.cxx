@@ -1135,7 +1135,7 @@ void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov){
 }
 // -----------------------------------------------------------------------------
 void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vector<std::string> &var_labels_events,
-                           std::vector<std::string> &var_labels_eff,  std::string &smear_hist_name){
+                           std::vector<std::string> &var_labels_eff,  std::string &smear_hist_name, std::vector<std::string> &vars){
 
     // Electron/Shower Energy
     if (std::string(xsec_var) =="elec_E"){
@@ -1157,6 +1157,8 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
                          };
 
         smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]";
+
+        vars = {"integrated", "reco_el_E", "true_el_E" };
     
     }
     // Electron/Shower effective angle
@@ -1179,6 +1181,8 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
                          };
 
         smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Effective Angle [deg];Leading Shower Effective Angle [deg]";
+
+        vars = {"integrated", "reco_el_ang", "true_el_ang" };
     }
     else {
         std::cout << "Unsupported parameter...exiting!" << std::endl;

@@ -140,9 +140,7 @@ class CrossSectionHelper{
     // Names for cross section histograms
     std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "data_xsec"};
 
-    std::vector<std::string> vars = {"integrated", "recoX", "trueX"
-                                    //  "true_nu_E", "reco_nu_e"
-                                     };
+    std::vector<std::string> vars = {"integrated", "recoX", "trueX"};
     
     // Use these for when we do the flux normalised event rate
     // std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",
