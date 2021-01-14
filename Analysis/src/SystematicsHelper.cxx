@@ -1177,8 +1177,24 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
 
     // Set the X Bins
     std::vector<double> bins;
-    if (vars.at(var) == "integrated") bins  = { 0.0, 1.1 };
-    else bins = _util.reco_shr_bins;
+    if
+        (vars.at(var) == "integrated") bins  = { 0.0, 1.1 };
+    else {
+        // Electron/Shower Energy
+        if (std::string(_util.xsec_var) =="elec_E"){
+            bins = _util.reco_shr_bins;
+        }
+        // Electron/Shower effective angle
+        else if (std::string(_util.xsec_var) =="elec_ang"){
+            bins = _util.reco_shr_bins_ang;
+        }
+        else {
+            std::cout << "Unsupported parameter...exiting!" << std::endl;
+            return;
+        }
+        
+    }
+    
     // Get the number of bins and the right vector
     int const nbins = bins.size()-1;
     double* edges = &bins[0]; // Cast to an array 

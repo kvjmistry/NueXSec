@@ -435,7 +435,8 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     else 
         std::cout << red << "Using local environment, all paths will be set compatible with running on Krish's computer"<< reset << std::endl;
     
-    
+    // Create txt file list directory
+    gSystem->Exec("if [ ! -d \"files/txt/\" ]; then echo \"\ntxt folder does not exist... creating\"; mkdir -p files/txt; fi"); 
 }
 // -----------------------------------------------------------------------------
 bool Utility::GetFile(TFile* &f, TString string){

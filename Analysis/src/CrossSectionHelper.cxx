@@ -112,14 +112,14 @@ void CrossSectionHelper::Initialise(Utility _utility){
     // Initialise the file lists
     if (std::string(_util.xsecmode) == "txtlist"){
         // Initialise output file lists
-        evt_dist_sig.open(Form("files/run%s_evt_dist_sig.txt",_util.run_period));
+        evt_dist_sig.open(Form("files/txt/run%s_evt_dist_sig.txt",_util.run_period));
         
-        evt_dist_gen.open(Form("files/run%s_evt_dist_gen.txt",_util.run_period));
+        evt_dist_gen.open(Form("files/txt/run%s_evt_dist_gen.txt",_util.run_period));
         
-        evt_dist_bkg.open(Form("files/run%s_evt_dist_bkg.txt",_util.run_period));
+        evt_dist_bkg.open(Form("files/txt/run%s_evt_dist_bkg.txt",_util.run_period));
 
-        evt_dist_data.open(Form("files/run%s_evt_dist_data.txt",_util.run_period));
-        evt_dist_data << "recoX" << "\n";
+        evt_dist_data.open(Form("files/txt/run%s_evt_dist_data.txt",_util.run_period));
+        evt_dist_data << vars.at(k_var_recoX) << "\n";
 
         f_out = TFile::Open("files/trees/krish_test.root", "UPDATE");
 
@@ -2117,6 +2117,10 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
     // Get rid of the CV
     _ev_weight.erase(_ev_weight.begin());
 
+    // If the CV weight is zero then lets not fill the event (which is all zeros)
+    if (weight == 0)
+        return;
+
     // Signal event
     if ((_classification == "nue_cc" || _classification == "nuebar_cc" || _classification == "unmatched_nue" || _classification == "unmatched_nuebar") && _passed_selection) {
         
@@ -2125,7 +2129,7 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
 
         // Initialise the file 
         if (!filled_sig){
-            evt_dist_sig << "trueX," << "recoX, " <<"w";
+            evt_dist_sig << vars.at(k_var_trueX)<< "," << vars.at(k_var_recoX) << ", " <<"w";
         
             for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
                 evt_dist_sig << "," << "w_" << _uni;
@@ -2151,7 +2155,7 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
 
         // Initialise the file 
         if (!filled_bkg){
-            evt_dist_bkg << "recoX," << "w";
+            evt_dist_bkg << vars.at(k_var_recoX) << "," << "w";
         
             for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
                 evt_dist_bkg << "," << "w_" << _uni;
@@ -2180,7 +2184,7 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
 
         // Initialise the file 
         if (!filled_gen){
-            evt_dist_gen << "trueX," <<"w";
+            evt_dist_gen << vars.at(k_var_trueX) <<"," <<"w";
         
             for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
                 evt_dist_gen << "," << "w_" << _uni;
@@ -2214,7 +2218,7 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
 
         // Initialise the file 
         if (!filled_bkg){
-            evt_dist_bkg << "recoX," << "w";
+            evt_dist_bkg << vars.at(k_var_recoX) << "," << "w";
         
             for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
                 evt_dist_bkg << "," << "w_" << _uni;

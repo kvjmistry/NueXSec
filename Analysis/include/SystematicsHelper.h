@@ -225,7 +225,8 @@ class SystematicsHelper{
     std::vector<std::string> vars = {"integrated","recoX", "trueX" };
 
     // Choose the cross section scale to set the histogram
-    double xsec_scale = 13.0e-39;
+    // double xsec_scale = 13.0e-39;
+    double xsec_scale = 0.15e-39;
     // double xsec_scale = 0.5e-39;
     
     // Use these for when we do the flux normalised event rate
