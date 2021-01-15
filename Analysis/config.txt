@@ -96,7 +96,7 @@ Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 3.69422e+20 // new tune
 Run1_MC_POT_WireModdEdX 3.66871e+20 // new tune
 -
 // Run 1 Det Var for flugg -- this is actually dk2nu for now
-Run1_MC_POT_FLUGG 3.65214e+20
+Run1_MC_POT_FLUGG 3.68983e+20
 -
 // Run 1 Det var CV intrinsic nue sample
 // Run1_Intrinsic_POT_CV 2.68294e+22
@@ -163,7 +163,8 @@ Run1_EXT_trig_BNB 33580525.000000
 Run3_MC_POT 1.99076e+21 // new tune
 -
 // Run 3 dirt POT
-Run3_Dirt_POT 4.32295e+20
+// Run3_Dirt_POT 4.32295e+20
+Run3_Dirt_POT 1.03226e+21 // new Tune
 -
 // Run 3 Data POT (tortgt) beam good, bad runs removed
 Run3_Data_POT 5e20

@@ -185,7 +185,7 @@ void Selection::MakeSelection(){
 
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_mc;
-        run_subrun_file_mc.open(Form("files/run%s_run_subrun_list_mc.txt",_util.run_period));
+        run_subrun_file_mc.open(Form("files/txt/run%s_run_subrun_list_mc.txt",_util.run_period));
 
         // Event loop
         for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
@@ -230,7 +230,7 @@ void Selection::MakeSelection(){
 
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_data;
-        run_subrun_file_data.open(Form("files/run%s_run_subrun_list_data.txt",_util.run_period));
+        run_subrun_file_data.open(Form("files/txt/run%s_run_subrun_list_data.txt",_util.run_period));
 
         for (int ievent = 0; ievent < data_tree_total_entries; ievent++){
 
@@ -273,7 +273,7 @@ void Selection::MakeSelection(){
             if (pass) _thelper.at(_util.k_data).FillVars(data_SC, pass);
             
             // If the event passed the selection then save the run subrun event to file
-            if (pass) run_subrun_file_data << data_SC.run << " " << data_SC.sub << " " << data_SC.evt << '\n';
+            if (pass && data_SC.effective_angle >=90 && data_SC.effective_angle <= 105) run_subrun_file_data << data_SC.run << " " << data_SC.sub << " " << data_SC.evt << '\n';
 
         }
 
@@ -287,7 +287,7 @@ void Selection::MakeSelection(){
 
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_ext;
-        run_subrun_file_ext.open(Form("files/run%s_run_subrun_list_ext.txt",_util.run_period));
+        run_subrun_file_ext.open(Form("files/txt/run%s_run_subrun_list_ext.txt",_util.run_period));
 
         for (int ievent = 0; ievent < ext_tree_total_entries; ievent++){
 
@@ -349,7 +349,7 @@ void Selection::MakeSelection(){
 
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_dirt;
-        run_subrun_file_dirt.open(Form("files/run%s_run_subrun_list_dirt.txt",_util.run_period));
+        run_subrun_file_dirt.open(Form("files/txt/run%s_run_subrun_list_dirt.txt",_util.run_period));
 
         for (int ievent = 0; ievent < dirt_tree_total_entries; ievent++){
 
@@ -538,6 +538,7 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
 
     if(!pass) return false; // Failed the cut!
     
+    
     SelectionFill(type, SC, _util.k_dEdx_max_no_tracks, counter_v );
 
     // Skip unnaturally high shower energies?
@@ -546,6 +547,12 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
 
     // if (SC.is_signal && SC.nu_e < 0.3) std::cout<<"Low elec E!: " <<SC.elec_e*1000 << " MeV" << "  | E Nu: "<< SC.nu_e*1000 << " MeV" <<  std::endl; 
     // if (type == _util.k_mc && (SC.nu_pdg == -12 || SC.nu_pdg == 12) && SC.nu_e <= 0.125 && SC.ccnc == _util.k_NC) std::cout << "Got nue NC event selected thats below th: " << SC.nu_e << std::endl;
+
+
+    // Future versions of this code needs to add the CRT veto to run 3 
+    // improves the purity by about 5% with a small drop in efficiency
+    // It will bring the purity and efficiency to a similar level to Run 1
+    if (SC.crtveto == 1) return false;
 
     // **************************************************************************
     return true;

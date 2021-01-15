@@ -404,7 +404,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     }
     else if (strcmp(run_period, "3") == 0){
         mc_scale_factor     = config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_MC_POT);
-        dirt_scale_factor   = 0.75*config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_Dirt_POT);
+        dirt_scale_factor   = 0.35*config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_Dirt_POT);
         ext_scale_factor    = 0.98*config_v.at(k_Run3_Data_trig) / config_v.at(k_Run3_EXT_trig);
         intrinsic_weight    = config_v.at(k_Run3_MC_POT)    / config_v.at(k_Run3_Intrinsic_POT);
     }
