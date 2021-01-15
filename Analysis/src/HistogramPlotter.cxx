@@ -1267,6 +1267,12 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               Form("cuts/%s/reco_shower_multiplicity_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, true, false);
 
     // Leading track multiplicity
+    MakeStack("h_reco_n_track_contained", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.5, "Num Track Contained",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_n_track_contained.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, true, true);
+
+
+    // Leading track multiplicity
     MakeStack("h_reco_track_multiplicity", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.5, "Track Multiplicty",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_track_multiplicity.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, true, true);
