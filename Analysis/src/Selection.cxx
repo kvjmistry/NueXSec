@@ -552,7 +552,7 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Future versions of this code needs to add the CRT veto to run 3 
     // improves the purity by about 5% with a small drop in efficiency
     // It will bring the purity and efficiency to a similar level to Run 1
-    if (SC.crtveto == 1) return false;
+    // if (SC.crtveto == 1) return false;
 
     // **************************************************************************
     return true;
