@@ -635,7 +635,6 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
 
     // Get the Central Value weight
     double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv);
-
     double weight_norm = weight;
     double weight_Escale = weight;
 
