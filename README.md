@@ -37,7 +37,7 @@ Compilation of the code can be done by simply entering `make` in the Analysis fo
 
 The analysis code lives in the Analysis folder. To compile, type `make` in the directory. 
 
-A full list of commands that are being run in the analysis is listed in the run_selection_mcc9_run{1,3}.sh files. There are for running on Krish's local computer. If you want to run on the gpvm, then there should be a `_gpvm` version of the file.
+A full list of commands that are being run in the analysis is listed in the run_selection_mcc9_run1.sh files. There are for running on Krish's local computer. If you want to run on the gpvm, then there should be a `_gpvm` version of the file.
 
 In this instructions, I show you how to run over Run1. Hopefully its obvious how you can adapt this to run Run3.
 
@@ -62,7 +62,7 @@ To print the selection results (which read the files in the `files/trees` folder
 `./nuexsec --run 1 --printonly --printall`
 additional options for only printing data, ext etc are available too.
 # Configuration and Options
-Configuration quantities such as the POT and fiducial volume boundary can be found in `config.txt`. The Utility class `Initialize` function reads in these values along with other options you give. These parameters are then inherited across all classes in the code which you can use. 
+Configuration quantities such as the POT and fiducial volume boundary can be found in `config.txt`. The Utility class `Initialise` function reads in these values along with other options you give. These parameters are then inherited across all classes in the code which you can use. 
 
 Full options and more documentation is available by doing `./nuexsec --h`. 
 
@@ -70,7 +70,6 @@ Full options and more documentation is available by doing `./nuexsec --h`.
 To make plots from the output of the selection, we need to merge the individual files we produced in the selection stage. I have wrote a merge script to combine these files to one and can be run like:
 
 `source merge/merge_run1_files.sh files/nuexsec_mc_run1.root files/nuexsec_run1_merged.root`
-Use the run3 script to merge the run3 files. 
 
 This merged file is what we use for the histogram plotter.
 
@@ -116,7 +115,7 @@ source merge/merge_run1_files.sh files/nuexsec_mc_run1_LY_Down.root files/nuexse
 root -l -b -q 'merge/merge_uneaventrees.C("1", true, "files/trees/nuexsec_selected_tree_mc_run1_'"LY_Down"'.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "'"LY_Down"'")'
 
 # Run the xsec code
-./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$2.root --var dummy LY_Down --xsecmode default --xsecvar elec_E
+./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_LY_Down.root --var dummy LY_Down --xsecmode default --xsecvar elec_E
 ```
 
 Thankfully we have wrote an automation of this process which can be run by doing:
