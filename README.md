@@ -43,10 +43,10 @@ In this instructions, I show you how to run over Run1. Hopefully its obvious how
 
 To run the selection over a searchingfornues NuMI ntuple, you can do:
 ```
-./nuexsec --run 1 [--mc path_to_overlay_file] 
-./nuexsec --run 1 [--ext path_to_ext_file]
-./nuexsec --run 1 [--data path_to_on_beam_data_file]
-./nuexsec --run 1 [--dirt path_to_dirt_overlay_file]
+./nuexsec --run 1 [--mc   <path_to_overlay_file>     ] 
+./nuexsec --run 1 [--ext  <path_to_ext_file>         ]
+./nuexsec --run 1 [--data <path_to_on_beam_data_file>]
+./nuexsec --run 1 [--dirt <path_to_dirt_overlay_file>]
 ```
 This will produce a histogram file in the `files` folder with the output of the selection at each selection stage (amongst other plots) and another root file in `files/trees/` with variables that passed the selection. One file for mc, dirt, ext and data is produced in each of these cases. 
 
@@ -54,7 +54,7 @@ Note that mc is configuring an overlay file, same for dirt.
 
 In general, there are not as many nue events in the standard MC file. We can replace these events by running over the intrinsic nue file:
 
-`./nuexsec --run 1 --mc [--mc path_to_intrinsic_nue_file]  --intrinsic intrinsic` 
+`./nuexsec --run 1 --mc [--mc <path_to_intrinsic_nue_file>]  --intrinsic intrinsic` 
 
 # Printing the Selection
 To print the selection results (which read the files in the `files/trees` folder) we can run the command:
@@ -71,7 +71,16 @@ To make plots from the output of the selection, we need to merge the individual 
 
 `source merge/merge_run1_files.sh files/nuexsec_mc_run1.root files/nuexsec_run1_merged.root`
 
-This merged file is what we use for the histogram plotter.
+This merged file is what we use for the histogram plotter. We can now run:
+
+`./nuexsec --run 1 --hist files/nuexsec_run1_merged.root`
+to make the plots.
+
+You can additionally run this code with area normalised plots by adding `--area` to this command.
+
+If you have a file with the systematic uncertainties stored, you can run this like:
+`./nuexsec --run 1 --hist files/nuexsec_run1_merged.root --plotsys tot`
+which will draw the stat plus sys uncertainty on the plots. To find out how to make the file with these systematics see the section "Creating Systematics by Selection Stage" below.
 
 # Running the Cross Section Code
 
@@ -141,6 +150,14 @@ This is running the so called rw_cuts stage and adds a cut folder in `files/cros
 ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --mc ../ntuples/neutrinoselection_filt_run1_overlay.root --xsecmode reweight --xseclabel genie  --xsecplot rw_cuts --intrinsic intrinsic
 ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --mc ../ntuples/neutrinoselection_filt_run1_overlay.root --xsecmode reweight --xseclabel reint  --xsecplot rw_cuts --intrinsic intrinsic
 ```
+
+Once you have done this, we need to store the total uncertainties to a file so we can plot them. We can do this by running a function in the systematics helper class:
+`./nuexsec --run 1 --sys reweightcuts`
+Warning this is a bit buggy and so may seg fault. This issue still needs to be resolved. 
+
+We can additionally store the detector variations to the file by running the default mode of the systematics helper class:
+`./nuexsec --run 1 --sys default`
+This might need to be run before the `reweightcuts` mode.
 
 # Creating File Lists for Events
 We might want to save the selected events with their weights in a txt file so we can use with a package like ReMu or give to someone else to test. You can do this by running the cross section code in a different mode:
