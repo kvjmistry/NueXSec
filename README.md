@@ -88,6 +88,66 @@ Now we have the merged file, we can calculate the cross section by running:
 
 This will print a bunch of stuff and also make a file: `files/crosssec_run1.root` with the final output histograms.
 
+# Running the Systematics and Reweighting Events
+
+To run the systematics code, we run the cross section helper in `reweight` mode. We specify the type of systematic to run by and the variable to bin the cross section in:
+```
+./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel unisim  --xsecvar elec_E
+./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel ppfx    --xsecvar elec_E
+./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel genie   --xsecvar elec_E
+./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel reint   --xsecvar elec_E
+./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel mcstats --xsecvar elec_E
+```
+This creates a new folder in `files/crosssec_run1.root` with the systematic plots you have just ran.
+
+# Running the Systematics: Detector Variations
+Detector variations are made in different samples so we cant use the CV file. We need to run the selection, create a unique file and then run the xsec code over it like it was a CV. E.g. in the case of `LY_Down`, this can be done by:
+
+```
+./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_LY_Down.root LY_Down
+
+# Overwrite the true nue information
+./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_LY_Down_intrinsic.root LY_Down --intrinsic intrinsic
+
+# Merge and plot histograms
+source merge/merge_run1_files.sh files/nuexsec_mc_run1_LY_Down.root files/nuexsec_run1_LY_Down_merged.root
+./nuexsec --run 1 --hist files/nuexsec_run1_LY_Down_merged.root --var dummy LY_Down
+
+root -l -b -q 'merge/merge_uneaventrees.C("1", true, "files/trees/nuexsec_selected_tree_mc_run1_'"LY_Down"'.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "'"LY_Down"'")'
+
+# Run the xsec code
+./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$2.root --var dummy LY_Down --xsecmode default --xsecvar elec_E
+```
+
+Thankfully we have wrote an automation of this process which can be run by doing:
+`source run_selection_mcc9_run1.sh var <variation name>`
+
+or to run all of them in one go:
+`source run_selection_mcc9_run1.sh allvar`
+
+Note, this overwrites the CV name with `detvar_CV` in `files/crosssec_run1.root` so we can compare the variation to the right CV when we plot etc.
+
+# Plotting the Systematics and Final Cross Section
+
+We now need to plot the cross section and calculate the uncertainties along with the covariance matrices etc. You can do this by running 
+`./nuexsec --run 1 --sys reweight --xsecvar elec_E`
+This reads in all the stuff in `files/crosssec_run1.root`, and creates all the final plots.
+
+# Creating Systematics by Selection Stage
+This is pretty cpu intensive, so try to minise how often you run this. But basically to calculate the systematics for select plots at each cut stage, we can use a different mode of the cross section helper:
+This is running the so called rw_cuts stage and adds a cut folder in `files/crosssec_run1.root`. *This can take hours to run*.
+```
+./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --mc ../ntuples/neutrinoselection_filt_run1_overlay.root --xsecmode reweight --xseclabel unisim --xsecplot rw_cuts --intrinsic intrinsic
+./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --mc ../ntuples/neutrinoselection_filt_run1_overlay.root --xsecmode reweight --xseclabel ppfx   --xsecplot rw_cuts --intrinsic intrinsic
+./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --mc ../ntuples/neutrinoselection_filt_run1_overlay.root --xsecmode reweight --xseclabel genie  --xsecplot rw_cuts --intrinsic intrinsic
+./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --mc ../ntuples/neutrinoselection_filt_run1_overlay.root --xsecmode reweight --xseclabel reint  --xsecplot rw_cuts --intrinsic intrinsic
+```
+
+# Creating File Lists for Events
+We might want to save the selected events with their weights in a txt file so we can use with a package like ReMu or give to someone else to test. You can do this by running the cross section code in a different mode:
+`./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode txtlist --xseclabel all --xsecvar elec_E`
+This prints all systematics and weights to file (incl all universes!). If you want to just look at the unisim weights in each event, then use `--xseclabel unisim` etc.
+
 ## Other Modules
 
 FlashValidation contains a LArSoft Module for analysing the flash information in the events. EventRate contains a LArSoft module to make the eventrate distribution. If you need to use these then ask me and I will document this further. 
