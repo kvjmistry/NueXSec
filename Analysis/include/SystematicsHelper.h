@@ -89,7 +89,7 @@ class SystematicsHelper{
     void CalcMatrices(std::string label, int var, std::vector<std::vector<TH1D*>> h_universe, int _type, TH1D* h_CV  );
     // -------------------------------------------------------------------------
     // Fill the total systematic vector with the square sum of the uncertainty
-    void FillSysVector(std::string variation, int var, int type, TH1D *h_up, TH1D *h_dn);
+    void FillSysVector(std::string variation, int var, int type, TH1D *h_up, TH1D *h_dn, TH1D* h_CV);
     // -------------------------------------------------------------------------
     // Fill vector with the statistical uncertainties
     void FillStatVector();
