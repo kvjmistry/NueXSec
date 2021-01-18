@@ -27,7 +27,7 @@ if data file is given then zarko's script will be called into action.
 Please see this wiki for how to read these numbers:
 https://cdcvs.fnal.gov/redmine/projects/uboone-physics-analysis/wiki/NuMI_Documentation#How-to-do-NuMI-POT-counting
 
-Make sure to update the POT numbers in the main.h header when running the selection next.
+Make sure to update the POT numbers in the `config.txt` file when running the selection next.
 
 
 ## Running the Selection Code
