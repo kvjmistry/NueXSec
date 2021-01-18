@@ -86,7 +86,7 @@ class SystematicsHelper{
     void SetLabelName(std::string label, std::string &label_up, std::string &label_dn);
     // -------------------------------------------------------------------------
     // Calculate the covariance, correlation and fractional covariance matrices
-    void CalcMatrices(std::string label, int var, std::vector<std::vector<TH1D*>> h_universe );
+    void CalcMatrices(std::string label, int var, std::vector<std::vector<TH1D*>> h_universe, int _type, TH1D* h_CV  );
     // -------------------------------------------------------------------------
     // Fill the total systematic vector with the square sum of the uncertainty
     void FillSysVector(std::string variation, int var, int type, TH1D *h_up, TH1D *h_dn);
@@ -225,8 +225,8 @@ class SystematicsHelper{
     std::vector<std::string> vars = {"integrated","recoX", "trueX" };
 
     // Choose the cross section scale to set the histogram
-    // double xsec_scale = 13.0e-39;
-    double xsec_scale = 0.15e-39;
+    double xsec_scale = 13.0e-39;
+    // double xsec_scale = 0.15e-39;
     // double xsec_scale = 0.5e-39;
     
     // Use these for when we do the flux normalised event rate

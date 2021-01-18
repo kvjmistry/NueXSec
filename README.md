@@ -54,7 +54,7 @@ Note that mc is configuring an overlay file, same for dirt.
 
 In general, there are not as many nue events in the standard MC file. We can replace these events by running over the intrinsic nue file:
 
-`./nuexsec --run 1 --mc [--mc <path_to_intrinsic_nue_file>]  --intrinsic intrinsic` 
+`./nuexsec --run 1 [--mc <path_to_intrinsic_nue_file>]  --intrinsic intrinsic` 
 
 # Printing the Selection
 To print the selection results (which read the files in the `files/trees` folder) we can run the command:
@@ -66,7 +66,7 @@ Configuration quantities such as the POT and fiducial volume boundary can be fou
 
 Full options and more documentation is available by doing `./nuexsec --h`. 
 
-# Making Histograms
+# Making Plots
 To make plots from the output of the selection, we need to merge the individual files we produced in the selection stage. I have wrote a merge script to combine these files to one and can be run like:
 
 `source merge/merge_run1_files.sh files/nuexsec_mc_run1.root files/nuexsec_run1_merged.root`

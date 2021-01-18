@@ -1204,6 +1204,12 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         c->Print(Form("plots/run%s/detvar/%s/%s", _util.run_period, _util.variation, print_name_str.c_str()));
 
     delete c;
+
+    // clear up some memory
+    for (unsigned int h = 0 ; h < hist.size(); h++){
+        delete hist.at(h);
+    }
+    
 }
 // -----------------------------------------------------------------------------
 void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
