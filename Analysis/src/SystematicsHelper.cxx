@@ -6,8 +6,12 @@ void SystematicsHelper::Initialise(Utility _utility){
     std::cout << "Initalising Systematics Helper..." << std::endl;
     _util = _utility;
 
+
+    // The output file with the systematic uncertainties
+    TFile *file_sys_var;
     // Open the outoput systematics file
-    file_sys_var = TFile::Open(Form("files/run%s_sys_var.root", _util.run_period),"UPDATE");
+    // file_sys_var = TFile::Open(Form("files/run%s_sys_var.root", _util.run_period),"UPDATE");
+    
 
     // Set the scale factors
     if (strcmp(_util.run_period, "1") == 0){
@@ -393,7 +397,7 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
     // calculate and save the total detector systematics uncertainty 
 
     // create a temporary histogram that will be used to calculate the total detector sys
-    file_sys_var->cd();
+    // file_sys_var->cd();
     TH1D *h_det_sys_tot;
     
     // loop over variations for a given variable
@@ -401,14 +405,14 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
         
         // ---- save the histograms into different directories inside the root file
 
-        if(!file_sys_var->GetDirectory(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str()))) {
-            file_sys_var->mkdir(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // if the directory does not exist, create it
-        }
+        // if(!file_sys_var->GetDirectory(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str()))) {
+        //     file_sys_var->mkdir(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // if the directory does not exist, create it
+        // }
 
-        file_sys_var->cd(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // open the directory
+        // file_sys_var->cd(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // open the directory
     
-        hist_ratio.at(k)->SetDirectory(gDirectory); // set in which dir the hist_ratio.at(k) is going to be written
-        hist_ratio.at(k)->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite);  // write the histogram to the file
+        // hist_ratio.at(k)->SetDirectory(gDirectory); // set in which dir the hist_ratio.at(k) is going to be written
+        // hist_ratio.at(k)->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite);  // write the histogram to the file
     
         // ---- on the same go, calculate the total detector sys uncertainty
 
@@ -433,13 +437,13 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
 
     // save the total detector sys uncertainty in the file
     
-    if(!file_sys_var->GetDirectory(Form("%s/TotalDetectorSys", folder_name.c_str()))) {
-                file_sys_var->mkdir(Form("%s/TotalDetectorSys", folder_name.c_str())); // if the directory does not exist, create it
-    }
+    // if(!file_sys_var->GetDirectory(Form("%s/TotalDetectorSys", folder_name.c_str()))) {
+    //             file_sys_var->mkdir(Form("%s/TotalDetectorSys", folder_name.c_str())); // if the directory does not exist, create it
+    // }
 
-    file_sys_var->cd(Form("%s/TotalDetectorSys", folder_name.c_str())); // open the directory
-    h_det_sys_tot->SetDirectory(gDirectory);
-    h_det_sys_tot->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite); 
+    // file_sys_var->cd(Form("%s/TotalDetectorSys", folder_name.c_str())); // open the directory
+    // h_det_sys_tot->SetDirectory(gDirectory);
+    // h_det_sys_tot->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite); 
 
     // -----------------------------------------------------------------
     
@@ -2867,48 +2871,76 @@ void SystematicsHelper::InitialiseReweightingModeCut(){
     // Should we add more protection to this command??
     f_nuexsec = TFile::Open( Form("files/crosssec_run%s.root", _util.run_period ), "READ");
 
+    // Define the uncertainties
+    std::vector<std::tuple<std::string, int, std::string>> tuple_label = {
+        std::make_tuple("RPA",              2,   "unisim"),
+        std::make_tuple("CCMEC",            2,   "unisim"),
+        std::make_tuple("AxFFCCQE",         2,   "unisim"),
+        std::make_tuple("VecFFCCQE",        2,   "unisim"),
+        std::make_tuple("DecayAngMEC",      2,   "unisim"),
+        std::make_tuple("ThetaDelta2Npi",   2,   "unisim"),
+        std::make_tuple("ThetaDelta2NRad",  2,   "unisim"),
+        std::make_tuple("RPA_CCQE_Reduced", 2,   "unisim"),
+        std::make_tuple("NormCCCOH",        2,   "unisim"),
+        std::make_tuple("NormNCCOH",        2,   "unisim"),
+        std::make_tuple("Horn1_x",          2,   "unisim"),
+        std::make_tuple("Horn_curr",        2,   "unisim"),
+        std::make_tuple("Horn1_y",          2,   "unisim"),
+        std::make_tuple("Beam_spot",        2,   "unisim"),
+        std::make_tuple("Horn2_x",          2,   "unisim"),
+        std::make_tuple("Horn2_y",          2,   "unisim"),
+        std::make_tuple("Horn_Water",       2,   "unisim"),
+        std::make_tuple("Beam_shift_x",     2,   "unisim"),
+        std::make_tuple("Beam_shift_y",     2,   "unisim"),
+        std::make_tuple("Target_z",         2,   "unisim"),
+        std::make_tuple("Decay_pipe_Bfield",2,   "unisim"),
+        std::make_tuple("weightsGenie",     500, "multisim"),
+        std::make_tuple("weightsReint",     1000,"multisim"),
+        std::make_tuple("weightsPPFX",      500, "multisim")
+    };
+
+
+    // Resize the vector to store the systematics
+    h_cut_err.resize(tuple_label.size()); // label -- cut -- variable
+
+    for (unsigned int label = 0; label < tuple_label.size(); label++){
+        h_cut_err.at(label).resize(_util.k_cuts_MAX);
+    }
+
+    for (unsigned int label = 0; label < tuple_label.size(); label++){
+        
+        for (unsigned int cut = 0; cut < h_cut_err.at(label).size(); cut++){
+            h_cut_err.at(label).at(cut).resize(_util.k_cut_vars_max);
+        }
+    }
+
+
     // Loop over cuts
     for (int cut = 0; cut < _util.k_cuts_MAX ; cut++){
         
         // Loop over the variables
         for (int var = 0; var < _util.k_cut_vars_max; var++){
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "RPA",              2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "CCMEC",            2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "AxFFCCQE",         2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "VecFFCCQE",        2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "DecayAngMEC",      2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "ThetaDelta2Npi",   2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "ThetaDelta2NRad",  2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "RPA_CCQE_Reduced", 2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "NormCCCOH",        2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "NormNCCOH",        2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn1_x",          2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn_curr",        2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn1_y",          2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Beam_spot",        2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn2_x",          2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn2_y",          2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn_Water",       2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Beam_shift_x",     2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Beam_shift_y",     2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Target_z",         2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Decay_pipe_Bfield",2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsGenie",500,  "multisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsReint",1000,  "multisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsPPFX", 500, "multisim");
+            
+            for (unsigned int label = 0; label < tuple_label.size(); label++){
+                TH1D* h_err;
+                GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, std::get<0>(tuple_label.at(label)), std::get<1>(tuple_label.at(label)), std::get<2>(tuple_label.at(label)), h_err);
+                
+                // Save the hist in the master vector
+                h_cut_err.at(label).at(cut).at(var) = (TH1D*)h_err->Clone();
+                // delete h_err;
+            }
         }
     }
-        
-    std::cout <<  "Now closing file and exiting" << std::endl; 
-    // file_sys_var->cd();
-    // file_sys_var->Close();
 
+    // Save the histograms to file
+    SaveCutHistograms(tuple_label);
+        
 }
 // -----------------------------------------------------------------------------
-void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index, std::string label, int num_uni, std::string var_type){
+void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index, std::string label, int num_uni, std::string var_type, TH1D* &h_err){
 
-    if (cut_index == _util.k_cuts_MAX-1)
-        std::cout << "Saving uncertainties for: " << label  << "  " << histname << std::endl;
+    // if (cut_index == _util.k_cuts_MAX-1)
+        // std::cout << "Saving uncertainties for: " << label  << "  " << histname << std::endl;
 
     // Declare the histogram vector for the cut
     std::vector<TH1D*> h_universe;
@@ -2941,7 +2973,7 @@ void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index
     _util.GetHist(f_nuexsec, h_cv, Form( "CV/Cuts/%s/%s/%s_CV_%s_0", _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(),_util.cut_dirs.at(cut_index).c_str()));
 
     // Now we got the histograms, we loop over an get the uncertainties
-    TH1D* h_err = (TH1D*)h_universe.at(k_up)->Clone(); // clone it to get the binning right
+    h_err = (TH1D*)h_universe.at(k_up)->Clone(); // clone it to get the binning right
 
     // Clear the bins
     for (int bin = 1; bin < h_universe.at(k_up)->GetNbinsX()+1; bin++){
@@ -2954,13 +2986,14 @@ void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index
         // Loop over the bins 
         for (int bin = 1; bin < h_universe.at(k_up)->GetNbinsX()+1; bin++){
             double deviate = h_cv->GetBinContent(bin) - h_universe.at(uni)->GetBinContent(bin); // CV - Uni in bin i
-            h_err->SetBinContent(bin, h_err->GetBinContent(bin) + deviate*deviate); // difference squared summed    
-        }
+            h_err->SetBinContent(bin, h_err->GetBinContent(bin) + deviate*deviate); // difference squared summed   
         
+        }
+
     }
 
     // Sqrt all bins/N
-    for (int bin = 1; bin < h_universe.at(k_up)->GetNbinsX()+1; bin++){
+    for (int bin = 1; bin < h_err->GetNbinsX()+1; bin++){
         double err = std::sqrt(h_err->GetBinContent(bin)/num_uni) / h_cv->GetBinContent(bin);
         if (h_cv->GetBinContent(bin) == 0) 
             h_err->SetBinContent(bin, 0.0);
@@ -2968,17 +3001,63 @@ void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index
             h_err->SetBinContent(bin, err);        
     }
 
+
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::SaveCutHistograms(std::vector<std::tuple<std::string, int, std::string>> tuple_label){
+
+    std::cout <<  "Now writing histograms to file..." << std::endl; 
+
     // ---- save the histograms into different directories inside the root file
+    TFile *file_sys_var = TFile::Open(Form("files/run%s_sys_var.root", _util.run_period),"UPDATE");
     file_sys_var->cd();
 
-    if(!file_sys_var->GetDirectory(Form("%s/%s", _util.cut_dirs.at(cut_index).c_str(), label.c_str()))) {
-        file_sys_var->mkdir(Form("%s/%s", _util.cut_dirs.at(cut_index).c_str(), label.c_str())); // if the directory does not exist, create it
+     // Create subdirectory for each reweighter
+    TDirectory *dir_labels[tuple_label.size()];
+
+    // Create subdirectory for each variable
+    TDirectory *dir_labels_cut[_util.k_cuts_MAX];
+
+    // Loop over cuts
+    for (int cut = 0; cut < _util.k_cuts_MAX ; cut++){
+
+        // See if the directory already exists
+        bool bool_dir = _util.GetDirectory(file_sys_var, dir_labels_cut[cut], _util.cut_dirs.at(cut).c_str());
+
+        // If it doesnt exist then create it
+        if (!bool_dir) file_sys_var->mkdir(_util.cut_dirs.at(cut).c_str());
+
+        _util.GetDirectory(file_sys_var, dir_labels_cut[cut], _util.cut_dirs.at(cut).c_str());
+
+        dir_labels_cut[cut]->cd();
+
+        for (unsigned int label = 0; label < tuple_label.size(); label++){
+            
+            // See if the directory already exists
+            bool bool_dir = _util.GetDirectory(file_sys_var, dir_labels[label], Form("%s/%s", _util.cut_dirs.at(cut).c_str(), std::get<0>(tuple_label.at(label)).c_str()));
+    
+            // If it doesnt exist then create it
+            if (!bool_dir) file_sys_var->mkdir(Form("%s/%s", _util.cut_dirs.at(cut).c_str(), std::get<0>(tuple_label.at(label)).c_str()));
+
+            _util.GetDirectory(file_sys_var, dir_labels[label], Form("%s/%s", _util.cut_dirs.at(cut).c_str(), std::get<0>(tuple_label.at(label)).c_str()));
+
+            // Go into the directory
+            dir_labels[label]->cd();
+            
+            // Loop over the variables
+            for (int var = 0; var < _util.k_cut_vars_max; var++){
+                h_cut_err.at(label).at(cut).at(var)->Write(_util.vec_hist_name.at(var).c_str(), TObject::kOverwrite);  // write the histogram to the file
+            }
+            
+            file_sys_var->cd();
+
+        }
+
+        file_sys_var->cd();
     }
 
-    file_sys_var->cd(Form("%s/%s", _util.cut_dirs.at(cut_index).c_str(), label.c_str())); // open the directory
-
-    h_err->SetDirectory(gDirectory); // set in which dir the hist_ratio.at(k) is going to be written
-    h_err->Write(histname.c_str(), TObject::kOverwrite);  // write the histogram to the file
+    file_sys_var->cd();
+    file_sys_var->Close();
 
 }
 // -----------------------------------------------------------------------------

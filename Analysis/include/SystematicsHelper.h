@@ -16,9 +16,6 @@ class SystematicsHelper{
     // Input reweigted histogram file
     TFile *f_nuexsec;
 
-    // The output file with the systematic uncertainties
-    TFile *file_sys_var;
-
     // Class instances
     Utility _util;
 
@@ -30,8 +27,6 @@ class SystematicsHelper{
     std::vector<double> POT_v; // vector of POT for each variation 
 
     double Data_POT;
-
-
     // -------------------------------------------------------------------------
     // Initialiser function
     void Initialise( Utility _utility);
@@ -113,10 +108,13 @@ class SystematicsHelper{
     void SetUnisimColours(std::string label, TH1D* h_up, TH1D* h_dn);
     // -------------------------------------------------------------------------
     // Get the systematic uncertainty for each cut for a specific set of variables
-    void GetCutSysUncertainty(std::string histname, int cut_index, std::string label, int num_uni, std::string var_type);
+    void GetCutSysUncertainty(std::string histname, int cut_index, std::string label, int num_uni, std::string var_type, TH1D* &h_err);
     // -------------------------------------------------------------------------
     // Plot detector variation histograms for the cross section variables
     void PlotReweightingModeDetVar(std::string label, int var, int detvar_index, std::string label_pretty);
+    // -------------------------------------------------------------------------
+    // Write the cut histograms to file
+    void SaveCutHistograms(std::vector<std::tuple<std::string, int, std::string>> tuple_label);
     // -------------------------------------------------------------------------
     // Make a plot of the systematics in one plot
     void MakeTotUncertaintyPlot();
@@ -288,6 +286,9 @@ class SystematicsHelper{
     // Vector to store all the final covariance matrices
     std::vector<TH2D*> h_cov_v;
 
+
+    // Vector to store total uncertainty histograms
+    std::vector<std::vector<std::vector<TH1D*>>> h_cut_err; // label -- cut -- variable
 
 
 }; // End Class SystematicsHelper

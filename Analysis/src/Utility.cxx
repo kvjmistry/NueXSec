@@ -599,6 +599,7 @@ bool Utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
         return false;
     }
     else {
+        // std::cout << "Directory: " << string << std::endl;
         return true;
     }
 }
