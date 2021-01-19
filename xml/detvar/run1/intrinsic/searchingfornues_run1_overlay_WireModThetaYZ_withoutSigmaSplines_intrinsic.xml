@@ -48,7 +48,8 @@
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <maxfilesperjob>5</maxfilesperjob>
-    <numjobs>770</numjobs> <!-- 770 -->
+    <numjobs>16</numjobs> <!-- 770 -->
+    <prestagefraction>1</prestagefraction>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <disk>25GB</disk>
