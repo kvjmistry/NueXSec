@@ -1,13 +1,12 @@
 # Example for running over a overlay file with the pandora n-tuples
 
 if [ -z "$1" ]; then
-  #./nuexsec --run 3 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files/neutrinoselection_filt_run3b_overlay.root --data /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v2/neutrinoselection_filt_run3b_beamon_beamgood.root --ext /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v2/neutrinoselection_filt_run3b_beamoff.root --dirt /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files/neutrinoselection_filt_run3b_dirt_overlay.root 2> /dev/null | tee log/run3.log
 
   # Parallel processing version
-  mc="./nuexsec --run 3 --mc ../ntuples/neutrinoselection_filt_run3b_overlay_weight.root"
+  mc="./nuexsec --run 3 --mc ../ntuples/neutrinoselection_filt_run3b_overlay_newtune.root"
   data="./nuexsec --run 3 --data ../ntuples/neutrinoselection_filt_run3b_beamon_beamgood.root"
   ext="./nuexsec --run 3 --ext ../ntuples/neutrinoselection_filt_run3b_beamoff.root"
-  dirt="./nuexsec --run 3 --dirt ../ntuples/neutrinoselection_filt_run3b_dirt_overlay.root"
+  dirt="./nuexsec --run 3 --dirt ../ntuples/neutrinoselection_filt_run3b_dirt_overlay_newtune.root"
 
   eval $mc | tee log/run3_mc.log | sed -e 's/^/[MC] /' &
   eval $data | tee log/run3_data.log | sed -e 's/^/[Data] /' &
@@ -23,17 +22,21 @@ if [ -z "$1" ]; then
   for i in "${arr[@]}"; do
     cat "$i" >> log/run3.log 
   done
+
+  # Overwrite the Nue cc events with a higher stats version
+  ./nuexsec --run 3 --mc ../ntuples/neutrinoselection_filt_run3b_overlay_intrinsic_newtune.root --intrinsic intrinsic
   
+  # Print the selection
   ./nuexsec --run 3 --printonly --printall | tee -a log/run3.log 
 
-
+  # Merge the files
   source merge/merge_run3_files.sh files/nuexsec_mc_run3.root files/nuexsec_run3_merged.root
 
-  ./nuexsec --run 3 --hist files/nuexsec_run3_merged.root &
-  wait
+  # Run the histogram plotter
+  ./nuexsec --run 3 --hist files/nuexsec_run3_merged.root
 
   # Merge the ttrees to one file
-  root -l -b -q 'merge/merge_uneaventrees.C("3","files/trees/nuexsec_selected_tree_mc_run3.root", "files/trees/nuexsec_selected_tree_data_run3.root", "files/trees/nuexsec_selected_tree_ext_run3.root","files/trees/nuexsec_selected_tree_dirt_run3.root", "")'
+  root -l -b -q 'merge/merge_uneaventrees.C("3", true, "files/trees/nuexsec_selected_tree_mc_run3.root", "files/trees/nuexsec_selected_tree_data_run3.root", "files/trees/nuexsec_selected_tree_ext_run3.root","files/trees/nuexsec_selected_tree_dirt_run3.root", "")'
 
   # Now run the cross section calculator
   # Not running this until happy its working...
@@ -41,5 +44,36 @@ if [ -z "$1" ]; then
 
 fi
 
+# Running slimmed down version of pelee ntuples with event weights
+if [ "$1" == "weight" ]; then
+
+  # Electron Energy
+  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel unisim
+  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel ppfx
+  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel genie
+  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel reint
+  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel mcstats
+
+  # ./nuexsec --run 3 --sys reweight
+
+  # Electron Angle
+  # ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel unisim  --xsecvar elec_ang
+  # ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel ppfx    --xsecvar elec_ang
+  # ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel genie   --xsecvar elec_ang
+  # ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel reint   --xsecvar elec_ang
+  # ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel mcstats --xsecvar elec_ang
+
+  # ./nuexsec --run 3 --sys reweight --xsecvar elec_ang
+
+  # -- 
+
+  # for running reweighting by cut -- these are slow, so dont run them by default for now
+  #./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --mc ../ntuples/neutrinoselection_filt_run3_overlay.root --xsecmode reweight --xseclabel unisim --xsecplot rw_cuts --intrinsic intrinsic
+  #./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --mc ../ntuples/neutrinoselection_filt_run3_overlay.root --xsecmode reweight --xseclabel ppfx   --xsecplot rw_cuts --intrinsic intrinsic
+  #./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --mc ../ntuples/neutrinoselection_filt_run3_overlay.root --xsecmode reweight --xseclabel genie  --xsecplot rw_cuts --intrinsic intrinsic
+  #./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --mc ../ntuples/neutrinoselection_filt_run3_overlay.root --xsecmode reweight --xseclabel reint  --xsecplot rw_cuts --intrinsic intrinsic
+
+
+fi
 
 

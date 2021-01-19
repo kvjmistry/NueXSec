@@ -136,6 +136,9 @@ public:
     // Calulate a chi squared using a covarinace matrix, for a model to data
     void CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov);
     // -------------------------------------------------------------------------
+    // Set the axes names of the cross section plots
+    void SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vector<std::string> &var_labels_events,
+                      std::vector<std::string> &var_labels_eff,  std::string &smear_hist_name, std::vector<std::string> &vars);
     // -------------------------------------------------------------------------
 
     // Variables
@@ -149,6 +152,9 @@ public:
 
     // Bins for the reconstructed shower energy
     std::vector<double> reco_shr_bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 6.0};
+
+    // Bins for reco shr effective angle
+    std::vector<double> reco_shr_bins_ang = { 0.0, 15, 30, 45, 60, 75, 90, 105, 180};
 
     // Neutrino Energy Threshold to integrate from
     double energy_threshold = 0.125; // GeV
@@ -187,6 +193,7 @@ public:
     char * sysmode               = (char *)"default";
     char * xsecmode              = (char *)"default";
     char * xsec_rw_mode          = (char *)"default"; // choose whether to reweight by cut or the final selection
+    char * xsec_var              = (char *)"elec_E"; // What variable to do the cross section as a function of
     char * xsec_labels           = (char *)"all";
     char * uplotmode             = (char *)"default";
     char * intrinsic_mode        = (char *)"default"; // choose whether to override the nue component to accomodate the intrinsic nue sample
@@ -229,6 +236,7 @@ public:
         "Run3_Data_POT",
         "Run3_Data_trig",
         "Run3_EXT_trig",
+        "Run3_Intrinsic_POT",
         "x1", "x2", "y1", "y2", "z1", "z2"
     };
 
@@ -245,6 +253,7 @@ public:
                 k_Run3_Data_POT,
                 k_Run3_Data_trig,
                 k_Run3_EXT_trig,
+                k_Run3_Intrinsic_POT,
                 k_config_x1,
                 k_config_x2,
                 k_config_y1,

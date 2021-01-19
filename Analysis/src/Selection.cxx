@@ -70,13 +70,6 @@ void Selection::Initialise(Utility _utility){
         mc_tree_total_entries = mc_tree->GetEntries();
         std::cout << "Total MC Events:         " << mc_tree_total_entries << std::endl;
 
-        // Resize the Passed vector
-        mc_passed_v.resize(mc_tree_total_entries);
-
-        for (unsigned int y = 0; y < mc_passed_v.size(); y++ ){
-            mc_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
-        }
-
         std::cout << "Initialisation of MC Complete!" << std::endl;
     } // End getting MC variables
 
@@ -97,13 +90,6 @@ void Selection::Initialise(Utility _utility){
 
         data_tree_total_entries = data_tree->GetEntries();
         std::cout << "Total Data Events:         " << data_tree_total_entries << std::endl;
-
-        // Resize the Passed vector
-        data_passed_v.resize(data_tree_total_entries);
-        
-        for (unsigned int y = 0; y < data_passed_v.size(); y++ ){
-            data_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
-        }
 
         std::cout << "Initialisation of Data Complete!" << std::endl;
 
@@ -128,13 +114,6 @@ void Selection::Initialise(Utility _utility){
         ext_tree_total_entries = ext_tree->GetEntries();
         std::cout << "Total EXT Events:        " << ext_tree_total_entries << std::endl;
 
-        // Resize the Passed vector
-        ext_passed_v.resize(ext_tree_total_entries);
-
-        for (unsigned int y = 0; y < ext_passed_v.size(); y++ ){
-            ext_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
-        }
-
         std::cout << "Initialisation of EXT Complete!" << std::endl;
 
     } // End intialisation of ext variables
@@ -158,13 +137,6 @@ void Selection::Initialise(Utility _utility){
         dirt_tree_total_entries = dirt_tree->GetEntries();
         std::cout << "Total Dirt Events:         " << dirt_tree_total_entries << std::endl;
 
-        // Resize the Passed vector
-        dirt_passed_v.resize(dirt_tree_total_entries);
-        
-        for (unsigned int y = 0; y < dirt_passed_v.size(); y++ ){
-            dirt_passed_v.at(y).cut_v.resize(_util.k_cuts_MAX, false);
-        }
-
         std::cout << "Initialisation of Dirt Complete!" << std::endl;
 
 
@@ -185,22 +157,7 @@ void Selection::MakeSelection(){
 
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_mc;
-        run_subrun_file_mc.open(Form("files/run%s_run_subrun_list_mc.txt",_util.run_period));
-
-        // Create a file for the selected events and their properties
-        std::ofstream evt_dist_sig;
-        evt_dist_sig.open(Form("files/run%s_evt_dist_sig.txt",_util.run_period));
-        evt_dist_sig << "true_E," << "reco_E," << "w" << "\n";
-
-        // Create a file for the generated events and their properties
-        std::ofstream evt_dist_gen;
-        evt_dist_gen.open(Form("files/run%s_evt_dist_gen.txt",_util.run_period));
-        evt_dist_gen << "true_E,"<< "w" << "\n";
-
-        // Create a file for the generated events and their properties
-        std::ofstream evt_dist_bkg;
-        evt_dist_bkg.open(Form("files/run%s_evt_dist_bkg.txt",_util.run_period));
-        evt_dist_bkg << "reco_E," << "w" << "\n";
+        run_subrun_file_mc.open(Form("files/txt/run%s_run_subrun_list_mc.txt",_util.run_period));
 
         // Event loop
         for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
@@ -225,7 +182,7 @@ void Selection::MakeSelection(){
             ApplyNuMuSelection(_util.k_mc, mc_SC);
             
             // Apply the Selection cuts 
-            bool pass = ApplyCuts(_util.k_mc, ievent, counter_v, mc_passed_v, mc_SC);
+            bool pass = ApplyCuts(_util.k_mc, counter_v, mc_SC);
 
             // Fill the output tree if the event passed or it was signal
             if (pass || mc_SC.is_signal) _thelper.at(_util.k_mc).FillVars(mc_SC, pass);
@@ -233,31 +190,9 @@ void Selection::MakeSelection(){
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_mc << mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt << '\n';
 
-            // if passed ans is a signal the write events to the file
-            if (pass && mc_SC.is_signal && mc_SC.cv_weight != 0.0) {
-                // evt_dist_sig << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.shr_energy_cali << "," << mc_SC.cv_weight*_util.mc_scale_factor << "\n";
-                evt_dist_sig << mc_SC.elec_e << "," << mc_SC.shr_energy_cali << "," << mc_SC.cv_weight<< "\n";
-            }
-
-            // Generated events
-            if (mc_SC.is_signal && mc_SC.cv_weight != 0.0) {
-                // evt_dist_gen << mc_SC.elec_e << "," << mc_SC.elec_theta << "," << mc_SC.elec_phi << "," << mc_SC.cv_weight*_util.mc_scale_factor << "\n";
-                evt_dist_gen << mc_SC.elec_e << "," << mc_SC.cv_weight << "\n";
-            }
-
-            // if passed and is a background the write events to the file
-            if (pass && !mc_SC.is_signal && mc_SC.cv_weight != 0.0) {
-                evt_dist_bkg << mc_SC.shr_energy_cali << "," << mc_SC.cv_weight*_util.mc_scale_factor << "\n";
-            }
-
-
         } // End Event loop
 
         run_subrun_file_mc.close();
-        evt_dist_sig.close();
-        evt_dist_gen.close();
-        evt_dist_bkg.close();
-
         std::cout << "Ending Selection over MC" << std::endl;
 
     }
@@ -267,13 +202,7 @@ void Selection::MakeSelection(){
 
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_data;
-        run_subrun_file_data.open(Form("files/run%s_run_subrun_list_data.txt",_util.run_period));
-
-        // Create a file for the selected events
-        std::ofstream evt_dist_data;
-        evt_dist_data.open(Form("files/run%s_evt_dist_data.txt",_util.run_period));
-        evt_dist_data << "reco_E" << "\n";
-
+        run_subrun_file_data.open(Form("files/txt/run%s_run_subrun_list_data.txt",_util.run_period));
 
         for (int ievent = 0; ievent < data_tree_total_entries; ievent++){
 
@@ -310,7 +239,7 @@ void Selection::MakeSelection(){
             // Apply NuMu Selection
             ApplyNuMuSelection(_util.k_data, data_SC);
 
-            bool pass = ApplyCuts(_util.k_data, ievent, counter_v, data_passed_v, data_SC);
+            bool pass = ApplyCuts(_util.k_data, counter_v, data_SC);
 
             // Fill the output tree if the event passed the selection
             if (pass) _thelper.at(_util.k_data).FillVars(data_SC, pass);
@@ -318,11 +247,9 @@ void Selection::MakeSelection(){
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_data << data_SC.run << " " << data_SC.sub << " " << data_SC.evt << '\n';
 
-            if (pass) evt_dist_data << data_SC.shr_energy_cali << "\n";
         }
 
         run_subrun_file_data.close();
-        evt_dist_data.close();
         
         std::cout << "Ending Selection over Data" << std::endl;
     }
@@ -332,11 +259,7 @@ void Selection::MakeSelection(){
 
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_ext;
-        run_subrun_file_ext.open(Form("files/run%s_run_subrun_list_ext.txt",_util.run_period));
-
-        // Create a file for the bkg events and their properties
-        std::ofstream evt_dist_ext;
-        evt_dist_ext.open(Form("files/run%s_evt_dist_ext.txt",_util.run_period));
+        run_subrun_file_ext.open(Form("files/txt/run%s_run_subrun_list_ext.txt",_util.run_period));
 
         for (int ievent = 0; ievent < ext_tree_total_entries; ievent++){
 
@@ -376,7 +299,7 @@ void Selection::MakeSelection(){
             // Apply NuMu Selection
             ApplyNuMuSelection(_util.k_ext, ext_SC);
 
-            bool pass = ApplyCuts(_util.k_ext, ievent, counter_v, ext_passed_v, ext_SC);
+            bool pass = ApplyCuts(_util.k_ext, counter_v, ext_SC);
             
             // Fill the output tree if the event passed the selection
             if (pass) _thelper.at(_util.k_ext).FillVars(ext_SC, pass);
@@ -384,14 +307,9 @@ void Selection::MakeSelection(){
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_ext << ext_SC.run << " " << ext_SC.sub << " " << ext_SC.evt << '\n';
 
-            // if passed and is a background the write events to the file
-            if (pass) {
-                evt_dist_ext << ext_SC.shr_energy_cali << "," << ext_SC.cv_weight*_util.ext_scale_factor << "\n";
-            }
         }
          
         run_subrun_file_ext.close();
-        evt_dist_ext.close();
 
         std::cout << "Ending Selection over EXT" << std::endl;
 
@@ -403,11 +321,7 @@ void Selection::MakeSelection(){
 
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_dirt;
-        run_subrun_file_dirt.open(Form("files/run%s_run_subrun_list_dirt.txt",_util.run_period));
-
-        // Create a file for the bkg events and their properties
-        std::ofstream evt_dist_dirt;
-        evt_dist_dirt.open(Form("files/run%s_evt_dist_dirt.txt",_util.run_period));
+        run_subrun_file_dirt.open(Form("files/txt/run%s_run_subrun_list_dirt.txt",_util.run_period));
 
         for (int ievent = 0; ievent < dirt_tree_total_entries; ievent++){
 
@@ -428,7 +342,7 @@ void Selection::MakeSelection(){
             // Apply NuMu Selection
             ApplyNuMuSelection(_util.k_dirt, dirt_SC);
 
-            bool pass = ApplyCuts(_util.k_dirt, ievent, counter_v, dirt_passed_v, dirt_SC);
+            bool pass = ApplyCuts(_util.k_dirt, counter_v, dirt_SC);
 
             // Fill the output tree if the event passed the selection
             if (pass) _thelper.at(_util.k_dirt).FillVars(dirt_SC, pass);
@@ -436,14 +350,9 @@ void Selection::MakeSelection(){
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_dirt << dirt_SC.run << " " << dirt_SC.sub << " " << dirt_SC.evt << '\n';
 
-            // if passed and is a background the write events to the file
-            if (pass) {
-                evt_dist_dirt << dirt_SC.shr_energy_cali << "," << dirt_SC.cv_weight*_util.dirt_scale_factor << "\n";
-            }
         }
 
         run_subrun_file_dirt.close();
-        evt_dist_dirt.close();
          
         std::cout << "Ending Selection over Dirt" << std::endl;
 
@@ -468,8 +377,7 @@ void Selection::MakeSelection(){
     return;
 } // End Selection
 // -----------------------------------------------------------------------------
-bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> &counter_v,
-                           std::vector<PassedContainer> &passed_v, SliceContainer &SC){
+bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, SliceContainer &SC){
 
     // Here we apply the Selection cuts ----------------------------------------
     bool pass; // A flag to see if an event passes an event
@@ -495,8 +403,6 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Software Trigger -- MC Only  --------------------------------------------
     // *************************************************************************
     pass = _scuts.swtrig(SC, type);
-    passed_v.at(ievent).cut_v.at(_util.k_swtrig) = pass;
-    // if (type == _util.k_mc && !pass && classification.first == "nu_out_fv") std::cout<< SC.run << " " << SC.sub << " " << SC.evt << std::endl; // Spit out the run subrun event numbers of failed events for an event display
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, _util.k_swtrig, counter_v );
@@ -505,7 +411,6 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Slice ID ----------------------------------------------------------------
     // *************************************************************************
     pass = _scuts.slice_id(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_slice_id) = pass;
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, _util.k_slice_id, counter_v );
@@ -514,7 +419,6 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Electron Candidate ------------------------------------------------------
     // *************************************************************************
     pass = _scuts.e_candidate(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_e_candidate) = pass;
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, _util.k_e_candidate, counter_v );
@@ -523,7 +427,6 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // In FV -------------------------------------------------------------------
     // *************************************************************************
     pass = _scuts.in_fv(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_in_fv) = pass;
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, _util.k_in_fv, counter_v );
@@ -532,7 +435,6 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Slice Contained Fraction ------------------------------------------------
     // *************************************************************************
     pass = _scuts.contained_frac(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_contained_frac) = pass;
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, _util.k_contained_frac, counter_v );
@@ -541,7 +443,6 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Topological Score -------------------------------------------------------
     // *************************************************************************
     pass = _scuts.topo_score(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_topo_score) = pass;
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, _util.k_topo_score, counter_v );
@@ -550,7 +451,6 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Cosmic Impact Parameter -------------------------------------------------
     // *************************************************************************
     pass = _scuts.shr_cosmic_IP(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_cosmic_ip) = pass;
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, _util.k_cosmic_ip, counter_v );
@@ -559,7 +459,6 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Shower Score ------------------------------------------------------------
     // *************************************************************************
     pass = _scuts.shower_score(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_shower_score) = pass;
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, _util.k_shower_score, counter_v );
@@ -568,7 +467,6 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Shower Hit Ratio  -------------------------------------------------------
     // *************************************************************************
     pass = _scuts.shr_hitratio(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_hit_ratio) = pass;
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, _util.k_hit_ratio, counter_v );
@@ -577,7 +475,6 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // Shower Moliere Average --------------------------------------------------
     // *************************************************************************
     pass = _scuts.shr_moliere_avg(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_shr_moliere_avg) = pass;
 
     // if (!pass && SC.shrmoliereavg >= 7) std::cout << SC.run << " " << SC.sub << " " << SC.evt << std::endl;
     if(!pass) return false; // Failed the cut!
@@ -588,7 +485,6 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // 2D cut for Shower to Vertex Distance and dEdx ---------------------------
     // *************************************************************************
     pass = _scuts.shr_dist_dEdx_max(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_vtx_dist_dedx) = pass;
     if(!pass) return false; // Failed the cut!
     
     SelectionFill(type, SC, _util.k_vtx_dist_dedx, counter_v );
@@ -597,9 +493,9 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
     // dEdx in all planes for 0 track events -----------------------------------
     // *************************************************************************
     pass = _scuts.dEdx_max_no_tracks(SC);
-    passed_v.at(ievent).cut_v.at(_util.k_dEdx_max_no_tracks) = pass;
 
     if(!pass) return false; // Failed the cut!
+    
     
     SelectionFill(type, SC, _util.k_dEdx_max_no_tracks, counter_v );
 
@@ -609,6 +505,12 @@ bool Selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
 
     // if (SC.is_signal && SC.nu_e < 0.3) std::cout<<"Low elec E!: " <<SC.elec_e*1000 << " MeV" << "  | E Nu: "<< SC.nu_e*1000 << " MeV" <<  std::endl; 
     // if (type == _util.k_mc && (SC.nu_pdg == -12 || SC.nu_pdg == 12) && SC.nu_e <= 0.125 && SC.ccnc == _util.k_NC) std::cout << "Got nue NC event selected thats below th: " << SC.nu_e << std::endl;
+
+
+    // Future versions of this code needs to add the CRT veto to run 3 
+    // improves the purity by about 5% with a small drop in efficiency
+    // It will bring the purity and efficiency to a similar level to Run 1
+    // if (SC.crtveto == 1) return false;
 
     // **************************************************************************
     return true;
@@ -733,7 +635,6 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
 
     // Get the Central Value weight
     double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv);
-
     double weight_norm = weight;
     double weight_Escale = weight;
 

@@ -6,7 +6,6 @@
 #include "HistogramHelper.h"
 #include "HistogramPlotter.h"
 #include "SliceContainer.h"
-#include "PassedContainer.h"
 #include "TreeHelper.h"
 
 #include "TThread.h"
@@ -71,12 +70,6 @@ namespace xsecSelection {
             // Selection Cut Values
             bool   detector_variations;
 
-            // Passed Containers
-            std::vector<PassedContainer> mc_passed_v;   // MC Passed Container
-            std::vector<PassedContainer> data_passed_v; // Data Passed Container
-            std::vector<PassedContainer> ext_passed_v;  // EXT Passed Container
-            std::vector<PassedContainer> dirt_passed_v; // Dirt Passed Container
-            
             // Counter Container
             std::vector<std::vector<double>> counter_v;
             
@@ -103,8 +96,7 @@ namespace xsecSelection {
             void MakeSelection();
             // -----------------------------------------------------------------
             // Template code to apply selection cuts
-            bool ApplyCuts(int type, int ievent,std::vector<std::vector<double>> &counter_v,
-                           std::vector<PassedContainer> &passed_v, SliceContainer &SC);
+            bool ApplyCuts(int type, std::vector<std::vector<double>> &counter_v, SliceContainer &SC);
             // -----------------------------------------------------------------
             // Function to save all written histograms to file
             void SavetoFile();

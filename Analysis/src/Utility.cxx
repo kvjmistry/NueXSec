@@ -176,8 +176,29 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         if (strcmp(arg, "--xsecmode") == 0){
             std::cout << "Using Cross-Section code with mode: " << argv[i+1] << std::endl;
             xsecmode = argv[i+1];
-            xsec_labels = argv[i+2];
-            xsec_rw_mode = argv[i+3];
+        }
+
+        // Cross Section Systematic type
+        if (strcmp(arg, "--xseclabel") == 0){
+            std::cout << "Using Cross-Section systematics: " << argv[i+1] << std::endl;
+            xsec_labels = argv[i+1];
+        }
+
+        // Choose whether to make x sec plots or reweight by cuts
+        if (strcmp(arg, "--xsecplot") == 0){
+            std::cout << "Using Cross-Section code that will do: " << argv[i+1] << std::endl;
+            xsec_rw_mode = argv[i+1];
+        }
+
+        // What variable to do the cross section as a function of
+        if (strcmp(arg, "--xsecvar") == 0){
+            std::cout << "Calculating a Cross-Section as function of: " << argv[i+1] << std::endl;
+            xsec_var = argv[i+1];
+
+            if (std::string(xsec_var) != "elec_E" && std::string(xsec_var) != "elec_ang" ){
+                std::cout << red << "Error specified variable which is not supported! You can use: elec_E or elec_ang" << reset << std::endl;
+                exit(5);
+            }
         }
 
         // Utility Plotter
@@ -383,8 +404,9 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     }
     else if (strcmp(run_period, "3") == 0){
         mc_scale_factor     = config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_MC_POT);
-        dirt_scale_factor   = 0.75*config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_Dirt_POT);
+        dirt_scale_factor   = 0.35*config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_Dirt_POT);
         ext_scale_factor    = 0.98*config_v.at(k_Run3_Data_trig) / config_v.at(k_Run3_EXT_trig);
+        intrinsic_weight    = config_v.at(k_Run3_MC_POT)    / config_v.at(k_Run3_Intrinsic_POT);
     }
     else {
         std::cout << "Error Krish... You havent specified the run period!" << std::endl;
@@ -413,7 +435,8 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     else 
         std::cout << red << "Using local environment, all paths will be set compatible with running on Krish's computer"<< reset << std::endl;
     
-    
+    // Create txt file list directory
+    gSystem->Exec("if [ ! -d \"files/txt/\" ]; then echo \"\ntxt folder does not exist... creating\"; mkdir -p files/txt; fi"); 
 }
 // -----------------------------------------------------------------------------
 bool Utility::GetFile(TFile* &f, TString string){
@@ -576,6 +599,7 @@ bool Utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
         return false;
     }
     else {
+        // std::cout << "Directory: " << string << std::endl;
         return true;
     }
 }
@@ -1109,6 +1133,63 @@ void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov){
     delete h_model_clone;
     delete h_data_clone;
     delete h_cov_clone;
+
+}
+// -----------------------------------------------------------------------------
+void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vector<std::string> &var_labels_events,
+                           std::vector<std::string> &var_labels_eff,  std::string &smear_hist_name, std::vector<std::string> &vars){
+
+    // Electron/Shower Energy
+    if (std::string(xsec_var) =="elec_E"){
+        
+        var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
+                           ";Reco. Leading Shower Energy [GeV];#frac{d#sigma}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon]",
+                           ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];#frac{d#sigma}{dE^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon"
+                          };
+
+
+        var_labels_events = {";;Entries",
+                             ";Reco. Leading Shower Energy [GeV]; Entries / GeV",
+                             ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries / GeV"
+                            };
+
+        var_labels_eff = {";;Efficiency",
+                          ";Reco. Leading Shower Energy [GeV]; Efficiency",
+                          ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency"
+                         };
+
+        smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]";
+
+        vars = {"integrated", "reco_el_E", "true_el_E" };
+    
+    }
+    // Electron/Shower effective angle
+    else if (std::string(xsec_var) =="elec_ang"){
+        
+        var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
+                           ";Reco. Leading Effective Angle [deg];#frac{d#sigma}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/deg/nucleon]",
+                           ";True e#lower[-0.5]{-} + e^{+} Effective Angle [deg];#frac{d#sigma}{dE^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/deg/nucleon"
+                          };
+
+
+        var_labels_events = {";;Entries",
+                             ";Reco. Leading Shower Effective Angle [deg]; Entries / deg",
+                             ";True e#lower[-0.5]{-} + e^{+} Effective Angle [deg]; Entries / deg"
+                            };
+
+        var_labels_eff = {";;Efficiency",
+                          ";Reco. Leading Shower Effective Angle [deg]]; Efficiency",
+                          ";True e#lower[-0.5]{-} + e^{+} Effective Angle [deg]; Efficiency"
+                         };
+
+        smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Effective Angle [deg];Leading Shower Effective Angle [deg]";
+
+        vars = {"integrated", "reco_el_ang", "true_el_ang" };
+    }
+    else {
+        std::cout << "Unsupported parameter...exiting!" << std::endl;
+        return;
+    }
 
 }
 // -----------------------------------------------------------------------------

@@ -96,7 +96,7 @@ Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 3.69422e+20 // new tune
 Run1_MC_POT_WireModdEdX 3.66871e+20 // new tune
 -
 // Run 1 Det Var for flugg -- this is actually dk2nu for now
-Run1_MC_POT_FLUGG 3.65214e+20
+Run1_MC_POT_FLUGG 3.68983e+20
 -
 // Run 1 Det var CV intrinsic nue sample
 // Run1_Intrinsic_POT_CV 2.68294e+22
@@ -130,16 +130,20 @@ Run1_Intrinsic_POT_WireModX 2.38318e+22 // new tune
 Run1_Intrinsic_POT_WireModYZ 2.38416e+22 // new tune
 -
 // Run 1 Det var WireModThetaXZ intrinsic nue sample
-Run1_Intrinsic_POT_WireModThetaXZ 2.65175e+22
+// Run1_Intrinsic_POT_WireModThetaXZ 2.65175e+22
+Run1_Intrinsic_POT_WireModThetaXZ 2.31518e+22 // new tune
 -
 // Run 1 Det var WireModThetaYZ_withSigmaSplines intrinsic nue sample
-Run1_Intrinsic_POT_WireModThetaYZ_withSigmaSplines 2.63394e+22
+// Run1_Intrinsic_POT_WireModThetaYZ_withSigmaSplines 2.63394e+22
+Run1_Intrinsic_POT_WireModThetaYZ_withSigmaSplines 2.31421e+22 // new tune
 -
 // Run 1 Det var WireModThetaYZ_withoutSigmaSplines intrinsic nue sample
-Run1_Intrinsic_POT_WireModThetaYZ_withoutSigmaSplines 2.66734e+22
+// Run1_Intrinsic_POT_WireModThetaYZ_withoutSigmaSplines 2.66734e+22 
+Run1_Intrinsic_POT_WireModThetaYZ_withoutSigmaSplines 2.31755e+22 // new tune
 -
 // Run 1 Det var WireModdEdX intrinsic nue sample
-Run1_Intrinsic_POT_WireModdEdX 2.66806e+22
+// Run1_Intrinsic_POT_WireModdEdX 2.66806e+22
+Run1_Intrinsic_POT_WireModdEdX 2.37849e+22 // new tune
 -
 // Run 1 Det var CV intrinsic nue sample FLUGG flux
 Run1_Intrinsic_POT_FLUGG 2.87356e+22
@@ -155,10 +159,12 @@ Run1_EXT_trig_BNB 33580525.000000
 -
 // ---------------- Run 3 ----------------------
 // Run 3 MC POT
-Run3_MC_POT 1.57761e+21
+// Run3_MC_POT 1.57761e+21
+Run3_MC_POT 1.99076e+21 // new tune
 -
 // Run 3 dirt POT
-Run3_Dirt_POT 4.32295e+20
+// Run3_Dirt_POT 4.32295e+20
+Run3_Dirt_POT 1.03226e+21 // new Tune
 -
 // Run 3 Data POT (tortgt) beam good, bad runs removed
 Run3_Data_POT 5e20
@@ -180,10 +186,17 @@ Run3_EXT_trig 32878305.25 // v5
 // Run3_EXT_trig 1677886.350000 // Set 1
 // Run3_EXT_trig 2424501.800000 // Set 0 and Set 1 > 16880
 // Run3_EXT_trig 803615.575 // Set 0 and Set 1 < 16880 (pre)
+-
+// Run3 intrinsic sample
+Run3_Intrinsic_POT 2.5392e+22 //  new Genie tune
 // ------- Additional Run 3 POT Definitions -----
 -
 // Run 3 with event weights
-Run3_MC_POT_weight 1.57761e+21
+// Run3_MC_POT_weight 1.57761e+21
+Run3_MC_POT_weight 1.99076e+21 // new tune
+-
+// Run 3 with event weights
+Run3_Intrinsic_POT_weight 2.5392e+22
 // ---------------------------------------------
 // -------------- Selection Cuts ---------------
 // Fiducial Volume

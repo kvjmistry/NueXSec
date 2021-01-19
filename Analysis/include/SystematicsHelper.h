@@ -16,9 +16,6 @@ class SystematicsHelper{
     // Input reweigted histogram file
     TFile *f_nuexsec;
 
-    // The output file with the systematic uncertainties
-    TFile *file_sys_var;
-
     // Class instances
     Utility _util;
 
@@ -30,8 +27,6 @@ class SystematicsHelper{
     std::vector<double> POT_v; // vector of POT for each variation 
 
     double Data_POT;
-
-
     // -------------------------------------------------------------------------
     // Initialiser function
     void Initialise( Utility _utility);
@@ -45,7 +40,7 @@ class SystematicsHelper{
     void PlotVariationsEXT(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name);
     // -------------------------------------------------------------------------
     // Plots the Sys Variations
-    void SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name, std::string cut_name_pretty);
+    void SysVariations(int hist_index, const char* print_name, int cut, const char* x_axis_name);
     // -------------------------------------------------------------------------
     void SetVariationProperties(TH1D* h, int index);
     // -------------------------------------------------------------------------
@@ -86,10 +81,10 @@ class SystematicsHelper{
     void SetLabelName(std::string label, std::string &label_up, std::string &label_dn);
     // -------------------------------------------------------------------------
     // Calculate the covariance, correlation and fractional covariance matrices
-    void CalcMatrices(std::string label, int var, std::vector<std::vector<TH1D*>> h_universe );
+    void CalcMatrices(std::string label, int var, std::vector<std::vector<TH1D*>> h_universe, int _type, TH1D* h_CV  );
     // -------------------------------------------------------------------------
     // Fill the total systematic vector with the square sum of the uncertainty
-    void FillSysVector(std::string variation, int var, int type, TH1D *h_up, TH1D *h_dn);
+    void FillSysVector(std::string variation, int var, int type, TH1D *h_up, TH1D *h_dn, TH1D* h_CV);
     // -------------------------------------------------------------------------
     // Fill vector with the statistical uncertainties
     void FillStatVector();
@@ -113,10 +108,16 @@ class SystematicsHelper{
     void SetUnisimColours(std::string label, TH1D* h_up, TH1D* h_dn);
     // -------------------------------------------------------------------------
     // Get the systematic uncertainty for each cut for a specific set of variables
-    void GetCutSysUncertainty(std::string histname, int cut_index, std::string label, int num_uni, std::string var_type);
+    void GetCutSysUncertainty(std::string histname, int cut_index, std::string label, int num_uni, std::string var_type, TH1D* &h_err);
     // -------------------------------------------------------------------------
     // Plot detector variation histograms for the cross section variables
     void PlotReweightingModeDetVar(std::string label, int var, int detvar_index, std::string label_pretty);
+    // -------------------------------------------------------------------------
+    // Write the cut histograms to file
+    void SaveCutHistograms(std::vector<std::tuple<std::string, int, std::string>> tuple_label);
+    // -------------------------------------------------------------------------
+    // Write the cut histograms to file for detector variations
+    void SaveCutHistogramsDetVar();
     // -------------------------------------------------------------------------
     // Make a plot of the systematics in one plot
     void MakeTotUncertaintyPlot();
@@ -199,6 +200,7 @@ class SystematicsHelper{
         k_xsec_sel,     // Selected event histogram binned in energy
         k_xsec_bkg,     // Bkg event histogram binned in energy
         k_xsec_gen,     // Gen event histogram binned in energy
+        k_xsec_gen_smear,    // Gen event histogram binned in energy with smeared truth
         k_xsec_sig,     // Sig event histogram binned in energy
         k_xsec_eff,     // Efficiency histogram binned in energy
         k_xsec_ext,     // EXT event histogram binned in energy
@@ -218,16 +220,14 @@ class SystematicsHelper{
     };
 
     // Names for cross section histograms
-    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "data_xsec"};
-    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC", "Data"};
+    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "data_xsec"};
+    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Smeared Prediction", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC", "Data"};
 
-    std::vector<std::string> vars = {"integrated",
-                                     "reco_el_E",
-                                     "true_el_E"
-                                     };
+    std::vector<std::string> vars = {"integrated","recoX", "trueX" };
 
     // Choose the cross section scale to set the histogram
     double xsec_scale = 13.0e-39;
+    // double xsec_scale = 0.15e-39;
     // double xsec_scale = 0.5e-39;
     
     // Use these for when we do the flux normalised event rate
@@ -236,21 +236,13 @@ class SystematicsHelper{
     //                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
                                         // };
     
-    std::vector<std::string> var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                                           ";Reco. Leading Shower Energy [GeV];#frac{d#sigma}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon]",
-                                           ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];#frac{d#sigma}{dE^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon"
-                                        };
+    std::vector<std::string> var_labels_xsec = {};
 
+    std::vector<std::string> var_labels_events = {};
 
-    std::vector<std::string> var_labels_events = {";;Entries",
-                                        ";Reco. Leading Shower Energy [GeV]; Entries / GeV",
-                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries / GeV"
-                                        };
+    std::vector<std::string> var_labels_eff = {};
 
-    std::vector<std::string> var_labels_eff = {";;Efficiency",
-                                        ";Reco. Leading Shower Energy [GeV]; Efficiency",
-                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency"
-                                        };
+    std::string smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]";
 
     // Containter for the central value histograms
     std::vector<std::vector<TH1D*>> cv_hist_vec; // reco elec e, <gen, sig, etc>
@@ -297,6 +289,9 @@ class SystematicsHelper{
     // Vector to store all the final covariance matrices
     std::vector<TH2D*> h_cov_v;
 
+
+    // Vector to store total uncertainty histograms
+    std::vector<std::vector<std::vector<TH1D*>>> h_cut_err; // label -- cut -- variable
 
 
 }; // End Class SystematicsHelper

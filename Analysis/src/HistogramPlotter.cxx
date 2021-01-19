@@ -1204,6 +1204,12 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         c->Print(Form("plots/run%s/detvar/%s/%s", _util.run_period, _util.variation, print_name_str.c_str()));
 
     delete c;
+
+    // clear up some memory
+    for (unsigned int h = 0 ; h < hist.size(); h++){
+        delete hist.at(h);
+    }
+    
 }
 // -----------------------------------------------------------------------------
 void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
@@ -1265,6 +1271,12 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
     MakeStack("h_reco_shower_multiplicity", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, true, 80, "Shower Multiplicty",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shower_multiplicity_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, true, false);
+
+    // Leading track multiplicity
+    MakeStack("h_reco_n_track_contained", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.5, "Num Track Contained",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_n_track_contained.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, true, true);
+
 
     // Leading track multiplicity
     MakeStack("h_reco_track_multiplicity", _util.cut_dirs.at(cut_index).c_str(),

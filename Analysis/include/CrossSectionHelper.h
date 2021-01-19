@@ -42,6 +42,10 @@ class CrossSectionHelper{
     int nu_pdg{0};
     int npi0{0};
     double pi0_e{0.0};
+    double effective_angle{0.0};     // The angle between the vector from the target to nu vtx compared to the reconstructed shower direction.
+    double cos_effective_angle{0.0}; // The cosine of the angle between the vector from the target to nu vtx compared to the reconstructed shower direction.
+    double true_effective_angle{0.0};     // True angle between electron and neutrino vectors
+    double cos_true_effective_angle{0.0}; // True angle between electron and neutrino vectors
 
     // Weights
     std::vector<unsigned short> *weightsGenie = NULL;
@@ -127,18 +131,16 @@ class CrossSectionHelper{
 
     // enum for histogram vars
     enum TH1D_xsec_var_vars {
-        k_var_integrated,     // Integrated X-Section
-        k_var_reco_el_E,      // Reconstructed electron energy
-        k_var_true_el_E,      // True electron energy
+        k_var_integrated,     // Total X-Section
+        k_var_recoX,          // X-Sec as a function of a Reconstructed variable
+        k_var_trueX,          // X-Sec as a function of a True variable
         k_TH1D_xsec_var_MAX
     };
 
     // Names for cross section histograms
     std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "data_xsec"};
 
-    std::vector<std::string> vars = {"integrated", "reco_el_E", "true_el_E"
-                                    //  "true_nu_E", "reco_nu_e"
-                                     };
+    std::vector<std::string> vars = {"integrated", "recoX", "trueX"};
     
     // Use these for when we do the flux normalised event rate
     // std::vector<std::string> var_labels = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",
@@ -146,21 +148,15 @@ class CrossSectionHelper{
     //                                     ";True Electron Energy [GeV]; #nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
     //                                     };
     
-    std::vector<std::string> var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                                           ";Reco. Leading Shower Energy [GeV];#frac{d#sigma}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon]",
-                                           ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];#frac{d#sigma}{dE^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon"
-                                        };
+    std::vector<std::string> var_labels_xsec = {};
 
+    std::vector<std::string> var_labels_events = {};
 
-    std::vector<std::string> var_labels_events = {";;Entries",
-                                        ";Reco. Leading Shower Energy [GeV]; Entries / GeV",
-                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries / GeV"
-                                        };
+    std::vector<std::string> var_labels_eff = {};
 
-    std::vector<std::string> var_labels_eff = {";;Efficiency",
-                                        ";Reco. Leading Shower Energy [GeV]; Efficiency",
-                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency"
-                                        };
+    std::string smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]";
+
+    std::vector<double> hist_bins;
 
     std::vector<std::string> reweighter_labels = {
         "CV",    // Dont comment this out
@@ -214,8 +210,8 @@ class CrossSectionHelper{
         "pi0",
         "weightsGenie",
         "weightsReint",
-        "weightsPPFX",
-        "MCStats"
+        "weightsPPFX"
+        // "MCStats"
     };
 
     std::vector<std::vector<TH2D*>> beamline_hists;
@@ -284,7 +280,31 @@ class CrossSectionHelper{
     };
 
 
+    // Filelists
+    // Create a file for the selected events and their properties
+    std::ofstream evt_dist_sig, evt_dist_gen, evt_dist_bkg, evt_dist_data;
 
+    // Vector for storing event weights
+    std::vector<float> ev_weight;
+
+    // To initialise file names for event list readout
+    bool filled_sig = false, filled_bkg = false, filled_gen = false;
+
+    // For Filling TTree in Andy's analysis format
+    TFile *f_out;
+    TTree *event_tree;
+    TTree *meta_tree;
+
+    float potData = 2.0;
+    float potMC   = 23.2136;
+    float n_targ  = 4.31247;
+    float nUniverses = 600;
+    bool isData, isSignal, isSelected; 
+    float xTrue, xReco;
+    double integrated_flux_tree{0.0};
+
+    double recoX{0.0};
+    double trueX{0.0};
 
     // -------------------------------------------------------------------------
     // Initialiser function
@@ -359,7 +379,10 @@ class CrossSectionHelper{
     void Smear(TH1D* h_sig, TH1D* h_gen, TH2D* h_smear, TH1D* h_eff);
     // -------------------------------------------------------------------------
     // Create a response matrix and smear the generated events in truth to sig events in reco
-    void ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH2D* h_smear);
+    void ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH1D* h_gen_CV, TH2D* h_smear);
+    // -------------------------------------------------------------------------
+    // Save the event to file
+    void SaveEvent(std::string _classification, bool _passed_selection, std::vector<float> ev_weight, double reco_E, double true_E);
     // -------------------------------------------------------------------------
 
 

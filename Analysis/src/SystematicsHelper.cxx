@@ -6,8 +6,12 @@ void SystematicsHelper::Initialise(Utility _utility){
     std::cout << "Initalising Systematics Helper..." << std::endl;
     _util = _utility;
 
+
+    // The output file with the systematic uncertainties
+    TFile *file_sys_var;
     // Open the outoput systematics file
-    file_sys_var = TFile::Open(Form("files/run%s_sys_var.root", _util.run_period),"UPDATE");
+    // file_sys_var = TFile::Open(Form("files/run%s_sys_var.root", _util.run_period),"UPDATE");
+    
 
     // Set the scale factors
     if (strcmp(_util.run_period, "1") == 0){
@@ -23,6 +27,9 @@ void SystematicsHelper::Initialise(Utility _utility){
     
     // Get the POT of the variations from the file
     GetPOT();
+
+    // Set the names of the histograms
+    _util.SetAxesNames(var_labels_xsec, var_labels_events, var_labels_eff, smear_hist_name, vars);
 
     // Off beam mode to compare bnb and numi off beam samples
     if (std::string(_util.sysmode) == "ext"){
@@ -178,7 +185,22 @@ void SystematicsHelper::SetRatioOptions(TH1D* hist ){
 // -----------------------------------------------------------------------------
 void SystematicsHelper::MakeHistograms(){
     
-    for (unsigned int i = 0 ; i < _util.k_cuts_MAX; i++){        
+    // Initialise histogram vector to store the uncertainties
+    h_cut_err.clear();
+    h_cut_err.resize(k_vars_MAX+1); // label -- cut -- variable // plus one to get the total
+
+    for (unsigned int label = 0; label < h_cut_err.size(); label++){
+        h_cut_err.at(label).resize(_util.k_cuts_MAX);
+    }
+
+    for (unsigned int label = 0; label < h_cut_err.size(); label++){
+        
+        for (unsigned int cut = 0; cut < h_cut_err.at(label).size(); cut++){
+            h_cut_err.at(label).at(cut).resize(_util.k_cut_vars_max);
+        }
+    }
+
+    for (unsigned int i = 0 ; i < _util.k_cuts_MAX; i++){       
        
         // Default detector systematics mode
         if (mode == "default"){
@@ -186,13 +208,9 @@ void SystematicsHelper::MakeHistograms(){
             // Create the directory
             _util.CreateDirectory("/detvar/comparisons/cuts/" + _util.cut_dirs.at(i));
 
-            // Create the directory for sysvar
-            //_util.CreateDirectory("/systvar/comparisons/cuts/" + _util.cut_dirs.at(i));
-
             for(unsigned int j=0; j < _util.vec_hist_name.size(); j++){
-
-                SysVariations(Form("%s", _util.vec_hist_name.at(j).c_str()), Form("plots/run%s/detvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()),
-                            _util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str(), _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str(), _util.cut_dirs_pretty.at(i).c_str());
+                    
+                SysVariations(j, Form("plots/run%s/detvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()), i, _util.vec_axis_label.at(j).c_str());
 
             }
         }
@@ -262,10 +280,16 @@ void SystematicsHelper::MakeHistograms(){
         
     }
 
+    // Here call a function to write the histograms to file
+    if (mode == "default"){
+        // Call write function
+        SaveCutHistogramsDetVar();
+    }
+
 
 }
 // ----------------------------------------------------------------------------
-void SystematicsHelper::SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name, std::string cut_name_pretty){
+void SystematicsHelper::SysVariations(int hist_index, const char* print_name, int cut, const char* x_axis_name){
 
     // ------------------------------------------------------------
     // Some initial configurations and work around fixes
@@ -302,7 +326,7 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
             // Get all the MC histograms and add them together
             TH1D *h_temp;
 
-            _util.GetHist(f_vars.at(k), h_temp, Form("Stack/%s/%s/%s_%s_%s", cut_name.c_str(), _util.classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.classification_dirs.at(i).c_str()));
+            _util.GetHist(f_vars.at(k), h_temp, Form("Stack/%s/%s/%s_%s_%s", _util.cut_dirs.at(cut).c_str(), _util.classification_dirs.at(i).c_str(),  _util.vec_hist_name.at(hist_index).c_str(), _util.cut_dirs.at(cut).c_str(), _util.classification_dirs.at(i).c_str()));
             
             // First case so clone the histogram
             if (i == 0) hist.at(k) = (TH1D*) h_temp->Clone("h_sum_hist");
@@ -390,62 +414,46 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
     // calculate and save the total detector systematics uncertainty 
 
     // create a temporary histogram that will be used to calculate the total detector sys
-    file_sys_var->cd();
     TH1D *h_det_sys_tot;
     
     // loop over variations for a given variable
-    for (unsigned int k = 0; k < f_vars.size(); k++){
+    for (unsigned int label = 0; label < f_vars.size(); label++){
         
         // ---- save the histograms into different directories inside the root file
-
-        if(!file_sys_var->GetDirectory(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str()))) {
-            file_sys_var->mkdir(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // if the directory does not exist, create it
-        }
-
-        file_sys_var->cd(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // open the directory
-    
-        hist_ratio.at(k)->SetDirectory(gDirectory); // set in which dir the hist_ratio.at(k) is going to be written
-        hist_ratio.at(k)->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite);  // write the histogram to the file
+        h_cut_err.at(label).at(cut).at(hist_index) = (TH1D*) hist_ratio.at(label)->Clone();
     
         // ---- on the same go, calculate the total detector sys uncertainty
 
-        if( k == 0 ){
+        if( label == 0 ){
             // this is the first histogram, just square it and write it to file
-            h_det_sys_tot = (TH1D*) hist_ratio.at(k)->Clone();
+            h_det_sys_tot = (TH1D*) hist_ratio.at(label)->Clone();
             h_det_sys_tot->Multiply(h_det_sys_tot); // square the histogram
         }
 
         else{
             // this is not the first histogram
-            hist_ratio.at(k)->Multiply(hist_ratio.at(k)); // first square the histogram
-            h_det_sys_tot->Add(hist_ratio.at(k)); // add it to the existing histogram
+            hist_ratio.at(label)->Multiply(hist_ratio.at(label)); // first square the histogram
+            h_det_sys_tot->Add(hist_ratio.at(label)); // add it to the existing histogram
         }
 
     }
 
     // calculate the square root of the histogram before saving it to the file
-    for(int k = 1; k <= h_det_sys_tot->GetNbinsX(); k++){
-        h_det_sys_tot->SetBinContent( k , TMath::Sqrt(h_det_sys_tot->GetBinContent(k)) );
+    for(int bin = 1; bin <= h_det_sys_tot->GetNbinsX(); bin++){
+        h_det_sys_tot->SetBinContent( bin , TMath::Sqrt(h_det_sys_tot->GetBinContent(bin)) );
     }
 
-    // save the total detector sys uncertainty in the file
-    
-    if(!file_sys_var->GetDirectory(Form("%s/TotalDetectorSys", folder_name.c_str()))) {
-                file_sys_var->mkdir(Form("%s/TotalDetectorSys", folder_name.c_str())); // if the directory does not exist, create it
-    }
-
-    file_sys_var->cd(Form("%s/TotalDetectorSys", folder_name.c_str())); // open the directory
-    h_det_sys_tot->SetDirectory(gDirectory);
-    h_det_sys_tot->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite); 
+    // store the total detector sys uncertainty in an additional histogram
+    h_cut_err.back().at(cut).at(hist_index) = (TH1D*) h_det_sys_tot->Clone();
 
     // -----------------------------------------------------------------
     
     // Setting the systematic error
-    for(int k = 1; k <= h_error_hist->GetNbinsX(); k++){
+    for(int bin = 1; bin <= h_error_hist->GetNbinsX(); bin++){
         
         // Set the systematic error to be the total det sys error * the bin content
-        double sys_err = h_det_sys_tot->GetBinContent(k) * h_error_hist->GetBinContent(k);
-        h_error_hist->SetBinError(k, sys_err);
+        double sys_err = h_det_sys_tot->GetBinContent(bin) * h_error_hist->GetBinContent(bin);
+        h_error_hist->SetBinError(bin, sys_err);
     }
 
     h_error_hist->Draw("E2, same");
@@ -489,7 +497,7 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
 
     // do you want to print the selection cut stage on your canvas?
     c->cd();
-    TLatex *lat = new TLatex(0.15, 0.91, Form("Selection stage: %s", cut_name_pretty.c_str()));
+    TLatex *lat = new TLatex(0.15, 0.91, Form("Selection stage: %s", _util.cut_dirs_pretty.at(cut).c_str()));
     lat->SetTextSize(0.03);
     lat->Draw();
     c->Modified();
@@ -701,7 +709,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeUnisim("Beam_shift_x",       var, "Beam shift x" );
         PlotReweightingModeUnisim("Beam_shift_y",       var, "Beam shift y" );
         PlotReweightingModeUnisim("Target_z",           var, "Target z" );
-        PlotReweightingModeUnisim("Decay_pipe_Bfield",  var, "Decay pipe Bfield" );
+        // PlotReweightingModeUnisim("Decay_pipe_Bfield",  var, "Decay pipe Bfield" );
 
         // Detector Variations
         PlotReweightingModeDetVar("LYRayleigh",                         var, k_LYRayleigh,                         var_string_pretty.at(k_LYRayleigh));
@@ -710,10 +718,10 @@ void SystematicsHelper::InitialiseReweightingMode(){
         // PlotReweightingModeDetVar("LYAttenuation",                      var, k_LYAttenuation,                      var_string_pretty.at(k_LYAttenuation));
         PlotReweightingModeDetVar("Recomb2",                            var, k_Recomb2,                            var_string_pretty.at(k_Recomb2));
         PlotReweightingModeDetVar("WireModX",                           var, k_WireModX,                           var_string_pretty.at(k_WireModX));
-        // PlotReweightingModeDetVar("WireModYZ",                          var, k_WireModYZ,                          var_string_pretty.at(k_WireModYZ));
-        // PlotReweightingModeDetVar("WireModThetaXZ",                     var, k_WireModThetaXZ,                     var_string_pretty.at(k_WireModThetaXZ));
-        // PlotReweightingModeDetVar("WireModThetaYZ_withSigmaSplines",    var, k_WireModThetaYZ_withSigmaSplines,    var_string_pretty.at(k_WireModThetaYZ_withSigmaSplines));
-        // PlotReweightingModeDetVar("WireModThetaYZ_withoutSigmaSplines", var, k_WireModThetaYZ_withoutSigmaSplines, var_string_pretty.at(k_WireModThetaYZ_withoutSigmaSplines));
+        PlotReweightingModeDetVar("WireModYZ",                          var, k_WireModYZ,                          var_string_pretty.at(k_WireModYZ));
+        PlotReweightingModeDetVar("WireModThetaXZ",                     var, k_WireModThetaXZ,                     var_string_pretty.at(k_WireModThetaXZ));
+        PlotReweightingModeDetVar("WireModThetaYZ_withSigmaSplines",    var, k_WireModThetaYZ_withSigmaSplines,    var_string_pretty.at(k_WireModThetaYZ_withSigmaSplines));
+        // // PlotReweightingModeDetVar("WireModThetaYZ_withoutSigmaSplines", var, k_WireModThetaYZ_withoutSigmaSplines, var_string_pretty.at(k_WireModThetaYZ_withoutSigmaSplines));
         // PlotReweightingModeDetVar("WireModdEdX",                        var, k_WireModdEdX,                        var_string_pretty.at(k_WireModdEdX));
 
         // Plot the multisims
@@ -768,7 +776,9 @@ void SystematicsHelper::InitialiseReweightingMode(){
             double bin_diag = cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->GetBinContent(row);
 
             // 0.01 converts each percentage back to a number. We multiply this by the cv to get the deviate
-            if (row == col) std::cout << 100 * std::sqrt(h_cov_v.at(k_err_sys)->GetBinContent(row, col)) / bin_diag << std::endl;  
+            if (row == col) {
+                    std::cout << 100 * std::sqrt(h_cov_v.at(k_err_sys)->GetBinContent(row, col)) / bin_diag << std::endl;
+            }
         }
     }
 
@@ -824,6 +834,42 @@ void SystematicsHelper::SetLabelName(std::string label, std::string &label_up, s
         label_up = label;
         label_dn = label;
     }
+    else if  (label == "RPA"           ){
+        label_up = label + "up";
+        label_dn = label + "dn";
+    }
+    else if  (label == "CCMEC"         ){
+        label_up = label + "dn";
+        label_dn = label + "dn";
+    }
+    else if  (label == "AxFFCCQE"      ){
+        label_up = label + "up";
+        label_dn = label + "up";
+    }
+    else if  (label == "VecFFCCQE"     ){
+        label_up = label + "up";
+        label_dn = label + "up";
+    }
+    else if  (label == "DecayAngMEC"   ){
+        label_up = label + "up";
+        label_dn = label + "up";
+    }
+    else if  (label == "ThetaDelta2Npi"){
+        label_up = label + "up";
+        label_dn = label + "up";
+    }
+    else if  (label == "ThetaDelta2NRad"){
+        label_up = label + "up";
+        label_dn = label + "up";
+    }
+    else if  (label == "NormCCCOH"      ){
+        label_up = label + "up";
+        label_dn = label + "up";
+    }
+    else if  (label == "NormNCCOH"      ){
+        label_up = label + "up";
+        label_dn = label + "up";
+    }
     // Other variation
     else {
         label_up = label + "up";
@@ -876,9 +922,20 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         h_universe.at(k_up).at(k)->SetLineColor(kGreen+2);
     }
 
+    std::vector<std::vector<TH1D*>> h_universe_uni;
+    
     // Get the covariance matrices
-    CalcMatrices(label, var, h_universe);
-
+    
+    // Single var so only 1 universe which we store in "up"
+    if (single_var){
+        h_universe_uni.push_back(h_universe.at(k_up));
+        CalcMatrices(label, var, h_universe_uni, k_xsec_mcxsec, cv_hist_vec.at(var).at(k_xsec_mcxsec) );
+    }
+    // Double var, so use up and down
+    else {
+        CalcMatrices(label, var, h_universe, k_xsec_mcxsec, cv_hist_vec.at(var).at(k_xsec_mcxsec) );
+    }
+    
     TPad *topPad;
     TPad *bottomPad;
     TCanvas *c;
@@ -941,11 +998,25 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         // Up ratio to CV
         TH1D* h_err_up = (TH1D *)h_universe.at(k_up).at(k)->Clone("h_ratio_up");
         h_err_up->Add(cv_hist_vec.at(var).at(k), -1);
+        
+        // Down ratio to CV
+        TH1D* h_err_dn = (TH1D *)h_universe.at(k_dn).at(k)->Clone("h_ratio_dn");
+        h_err_dn->Add(cv_hist_vec.at(var).at(k), -1);
+
+        // Store the uncertainty
+        FillSysVector(label, var, k, h_err_up, h_err_dn, cv_hist_vec.at(var).at(k));
+
         h_err_up->Divide(cv_hist_vec.at(var).at(k));
         h_err_up->SetLineWidth(2);
         h_err_up->SetLineColor(kGreen+2);
         h_err_up->Scale(100);
 
+        h_err_dn->Divide(cv_hist_vec.at(var).at(k));
+        h_err_dn->SetLineWidth(2);
+        h_err_dn->SetLineColor(kRed+2);
+        h_err_dn->Scale(100);
+
+        
 
         // Set the Titles
         if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
@@ -953,18 +1024,8 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         else if (k == k_xsec_eff)
             h_err_up->SetTitle(var_labels_eff.at(var).c_str());
         else
-            h_err_up->SetTitle(var_labels_events.at(var).c_str());
-
-        // h_err_up->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+            h_err_up->SetTitle(var_labels_events.at(var).c_str());        
         
-        // Down ratio to CV
-        TH1D* h_err_dn = (TH1D *)h_universe.at(k_dn).at(k)->Clone("h_ratio_dn");
-        h_err_dn->Add(cv_hist_vec.at(var).at(k), -1);
-        h_err_dn->Divide(cv_hist_vec.at(var).at(k));
-        h_err_dn->SetLineWidth(2);
-        h_err_dn->SetLineColor(kRed+2);
-        h_err_dn->Scale(100);
-
         SetRatioOptions(h_err_up);
         h_err_up->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
         h_err_up->GetYaxis()->SetTitle("\% change from CV");
@@ -1009,9 +1070,6 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
 
         }
         
-
-        FillSysVector(label, var, k, h_err_up, h_err_dn);
-
         c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(), _util.run_period, label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
         delete c;
@@ -1066,7 +1124,9 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
     }
 
     // Get the covariance matrices
-    // CalcMatrices(label, var, h_universe);
+    std::vector<std::vector<TH1D*>> h_universe_uni;
+    h_universe_uni.push_back(h_universe);
+    CalcMatrices(label, var, h_universe_uni, k_xsec_mcxsec, h_CV.at(k_xsec_mcxsec));
 
     TPad *topPad;
     TPad *bottomPad;
@@ -1110,6 +1170,10 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
         // Up ratio to CV
         TH1D* h_err = (TH1D *)h_universe.at(k)->Clone("h_ratio");
         h_err->Add(h_CV.at(k), -1);
+
+        // Store the sys error
+        FillSysVector(label, var, k, h_err, h_err, h_CV.at(k));
+
         h_err->Divide(h_CV.at(k));
         h_err->SetLineWidth(2);
         h_err->SetLineColor(kGreen+2);
@@ -1151,9 +1215,6 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
             text_up->Draw();
         }
         
-
-        FillSysVector(label, var, k, h_err, h_err);
-
         c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(), _util.run_period, label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
         delete c;
@@ -1172,8 +1233,24 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
 
     // Set the X Bins
     std::vector<double> bins;
-    if (vars.at(var) == "integrated") bins  = { 0.0, 1.1 };
-    else bins = _util.reco_shr_bins;
+    if
+        (vars.at(var) == "integrated") bins  = { 0.0, 1.1 };
+    else {
+        // Electron/Shower Energy
+        if (std::string(_util.xsec_var) =="elec_E"){
+            bins = _util.reco_shr_bins;
+        }
+        // Electron/Shower effective angle
+        else if (std::string(_util.xsec_var) =="elec_ang"){
+            bins = _util.reco_shr_bins_ang;
+        }
+        else {
+            std::cout << "Unsupported parameter...exiting!" << std::endl;
+            return;
+        }
+        
+    }
+    
     // Get the number of bins and the right vector
     int const nbins = bins.size()-1;
     double* edges = &bins[0]; // Cast to an array 
@@ -1187,6 +1264,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_universe_2D.at(k_xsec_sel)           = new TH2D("h_2D_sel",      "", nbins, edges, 100, 2000, 3000);
         h_universe_2D.at(k_xsec_bkg)           = new TH2D("h_2D_bkg",      "", nbins, edges, 100, 200, 1000);
         h_universe_2D.at(k_xsec_gen)           = new TH2D("h_2D_gen",      "", nbins, edges, 100, 4000, 12000);
+        h_universe_2D.at(k_xsec_gen_smear)     = new TH2D("h_2D_gen_smear","", nbins, edges, 100, 1000, 3000);
         h_universe_2D.at(k_xsec_sig)           = new TH2D("h_2D_sig",      "", nbins, edges, 100, 1000, 3000);
         h_universe_2D.at(k_xsec_eff)           = new TH2D("h_2D_eff",      "", nbins, edges, 100, 0.15, 0.3);
         h_universe_2D.at(k_xsec_ext)           = new TH2D("h_2D_ext",      "", nbins, edges, 10, 0, 10);
@@ -1201,6 +1279,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_universe_2D.at(k_xsec_sel)           = new TH2D("h_2D_sel",      "", nbins, edges, 100, 0, 2500);
         h_universe_2D.at(k_xsec_bkg)           = new TH2D("h_2D_bkg",      "", nbins, edges, 100, 0, 1200);
         h_universe_2D.at(k_xsec_gen)           = new TH2D("h_2D_gen",      "", nbins, edges, 100, 0, 16000);
+        h_universe_2D.at(k_xsec_gen_smear)     = new TH2D("h_2D_gen_smear","", nbins, edges, 100, 0, 2700);
         h_universe_2D.at(k_xsec_sig)           = new TH2D("h_2D_sig",      "", nbins, edges, 100, 0, 2700);
         h_universe_2D.at(k_xsec_eff)           = new TH2D("h_2D_eff",      "", nbins, edges, 100, 0, 0.5);
         h_universe_2D.at(k_xsec_ext)           = new TH2D("h_2D_ext",      "", nbins, edges, 30, 0, 30);
@@ -1227,13 +1306,13 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
     h_universe.resize(universes);
     
     // Resize each universe
-    for (unsigned int uni = 0; uni < h_universe.size(); uni++){
+    for (int uni = 0; uni < universes; uni++){
         h_universe.at(uni).resize(xsec_types.size());
     }
     
     
     // Get the histograms and customise a bit
-    for (unsigned int uni = 0; uni < h_universe.size(); uni++){
+    for (int uni = 0; uni < universes; uni++){
         for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
             _util.GetHist(f_nuexsec, h_universe.at(uni).at(k), Form( "%s/%s/h_run%s_%s_%i_%s_%s", label.c_str(), vars.at(var).c_str(), _util.run_period, label.c_str(), uni ,vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
@@ -1250,7 +1329,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
     }
 
     // Get the covariance, correlation, fractional cov matrices
-    CalcMatrices(label, var, h_universe );
+    CalcMatrices(label, var, h_universe, k_xsec_mcxsec, cv_hist_vec.at(var).at(k_xsec_mcxsec));
 
     // Create vector of systematic error for each histogram
     std::vector<std::vector<double>> sys_err;
@@ -1262,7 +1341,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
     }
 
     // Loop over universes
-    for (unsigned int uni = 0; uni < h_universe.size(); uni++){
+    for (int uni = 0; uni < universes; uni++){
         
         // Loop over histograms
         for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
@@ -1275,6 +1354,8 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
                 sys_err.at(k).at(bin-1) += ( uni_x_content - cv_x_content) * ( uni_x_content - cv_x_content);
             }
             
+            // Done with the universes, so clean up and speed up
+            delete h_universe.at(uni).at(k);
         }
     }
 
@@ -1283,13 +1364,13 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         
         // loop over the bins
         for (unsigned int bin = 0; bin < sys_err.at(k).size(); bin ++){
-            sys_err.at(k).at(bin) = std::sqrt(sys_err.at(k).at(bin) / h_universe.size());
+            sys_err.at(k).at(bin) = std::sqrt(sys_err.at(k).at(bin) / universes);
         }
     }
 
     // Now we have the systematic error computed we should now set the bin error of the CV clone to the std
     // Loop over universes
-    for (unsigned int uni = 0; uni < h_universe.size(); uni++){
+    for (int uni = 0; uni < universes; uni++){
         
         // Loop over histograms
         for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
@@ -1316,17 +1397,6 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
         _util.SetTPadOptions(topPad, bottomPad);
 
-        h_universe.at(0).at(k)->SetTitle(Form("%s", xsec_types_pretty.at(k).c_str() ));
-
-        double scale_val = h_universe.at(0).at(k)->GetMaximum();
-        
-        if (scale_val <  h_universe.at(k_dn).at(k)->GetMaximum()) scale_val =  h_universe.at(k_dn).at(k)->GetMaximum();
-
-        // if (scale_val < h_universe.at(uni).at(k)->GetMaximum()) scale_val = h_universe.at(uni).at(k)->GetMaximum();
-        // if (k == k_xsec_mcxsec || k == k_xsec_dataxsec) h_universe_2D.at(k)->SetTitle(Form("%s", var_labels.at(var).c_str()));
-        // else if (k == k_xsec_eff) h_universe_2D.at(k)->GetYaxis()->SetTitle("Efficiency");
-        // else h_universe_2D.at(k)->GetYaxis()->SetTitle("Entries");
-
         // Set the Titles
         if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
             h_universe_2D.at(k)->SetTitle(var_labels_xsec.at(var).c_str());
@@ -1344,7 +1414,6 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_universe_2D.at(k)->GetYaxis()->SetLabelSize(0.05);
 
 
-
         if (xsec_types.at(k) != "data_xsec") {
             cv_hist_vec_clone.at(k)->SetLineColor(kRed+1);
             cv_hist_vec_clone.at(k)->SetLineWidth(2);
@@ -1356,12 +1425,6 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         else { 
             cv_hist_vec_clone.at(k)->SetLineColor(kRed+1);
             cv_hist_vec_clone.at(k)->Draw("E,same");
-        }
-
-        h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, scale_val*1.2);
-
-        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec){
-            // h_universe.at(0).at(k)->GetYaxis()->SetRangeUser(0, 0.5e-39);
         }
 
         TLegend *leg;
@@ -1417,7 +1480,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         if (k != k_xsec_dirt && k != k_xsec_ext) h_err->Draw("hist, text00");
         gStyle->SetPaintTextFormat("4.1f");
 
-        FillSysVector(label, var, k, h_err, h_err);
+        FillSysVector(label, var, k, h_err, h_err, h_err);
 
         gStyle->SetPalette(56);
         gStyle->SetPalette(kBlueGreenYellow);
@@ -1430,10 +1493,9 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         delete c;
         delete leg;
         delete h_universe_2D.at(k);
+        delete h_err;
 
     }
-
-        
     
 }
 // -----------------------------------------------------------------------------
@@ -1863,7 +1925,8 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
     delete c;
 }
 // -----------------------------------------------------------------------------
-void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std::vector<TH1D*>> h_universe ){
+void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std::vector<TH1D*>> h_universe, int _type, TH1D* h_CV ){
+
 
     int n_bins = cv_hist_vec.at(var).at(0)->GetNbinsX();
 
@@ -1876,16 +1939,16 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
     for (unsigned int uni = 0; uni < h_universe.size(); uni++){
         
         // Loop over the rows
-        for (int row = 1; row < cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetNbinsX()+1; row++){
+        for (int row = 1; row < h_CV->GetNbinsX()+1; row++){
             
-            double uni_row = h_universe.at(uni).at(k_xsec_mcxsec)->GetBinContent(row);
-            double cv_row  = cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(row);
+            double uni_row = h_universe.at(uni).at(_type)->GetBinContent(row);
+            double cv_row  = h_CV->GetBinContent(row);
 
             // Loop over the columns
-            for (int col = 1; col < cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetNbinsX()+1; col++){
+            for (int col = 1; col < h_CV->GetNbinsX()+1; col++){
 
-                double uni_col = h_universe.at(uni).at(k_xsec_mcxsec)->GetBinContent(col);
-                double cv_col  = cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(col);
+                double uni_col = h_universe.at(uni).at(_type)->GetBinContent(col);
+                double cv_col  = h_CV->GetBinContent(col);
                 
                 double c = (uni_row - cv_row) * (uni_col - cv_col);
 
@@ -1900,11 +1963,11 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
 
 
     // Correlation Matrix
-    _util.CalcCorrelation(cv_hist_vec.at(var).at(k_xsec_mcxsec), cov, cor);
+    _util.CalcCorrelation(h_CV, cov, cor);
     
     // Fractional Covariance Matrix
     TH2D *frac_cov = (TH2D*) cov->Clone("h_frac_cov");
-    _util.CalcCFracCovariance(cv_hist_vec.at(var).at(k_xsec_mcxsec), frac_cov);
+    _util.CalcCFracCovariance(h_CV, frac_cov);
 
 
     gStyle->SetPalette(kBlueGreenYellow);
@@ -2066,7 +2129,7 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
 
 }
 // -----------------------------------------------------------------------------
-void SystematicsHelper::FillSysVector(std::string variation, int var, int type, TH1D *h_up, TH1D *h_dn){
+void SystematicsHelper::FillSysVector(std::string variation, int var, int type, TH1D *h_up, TH1D *h_dn, TH1D* h_CV){
 
     // This is a Genie Unisim
     if (variation == "RPA"              ||
@@ -2084,10 +2147,20 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
             double av_err = 0;
-            // Get the average error in each bin, then add the square
-            av_err += std::abs(h_up->GetBinContent(bin+1));
-            av_err += std::abs(h_dn->GetBinContent(bin+1));
-            av_err /= std::sqrt(2.0); // sqrt 2 since we are using the covariance matrix formalism (cov matrix with 2 universes) -- error is sqrt diag
+            // Error is given as the square uncertainty in percent
+
+            // Note only RPA is a two univerese unisim, the others are single variations
+            if (variation == "RPA"){
+                av_err += h_up->GetBinContent(bin+1) * h_up->GetBinContent(bin+1);
+                av_err += h_dn->GetBinContent(bin+1) * h_dn->GetBinContent(bin+1);
+                av_err = std::sqrt(av_err / 2.0 );
+            }
+            else {
+                av_err += std::sqrt(h_up->GetBinContent(bin+1) * h_up->GetBinContent(bin+1));
+            }
+
+            av_err = 100 * av_err / h_CV->GetBinContent(bin+1);
+
             v_err.at(k_err_genie_uni).at(var).at(type).at(bin) += av_err*av_err;
             v_err.at(k_err_sys).at(var).at(type).at(bin)       += av_err*av_err;
             
@@ -2111,19 +2184,21 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
             double av_err = 0;
-            // Get the max error in each bin, then add the square
+            // Error is given as the square uncertainty in percent
             
             // Singular variation
             if (variation == "Decay_pipe_Bfield"){
-                av_err += std::abs(h_up->GetBinContent(bin+1));
+                av_err += std::sqrt(h_up->GetBinContent(bin+1) * h_up->GetBinContent(bin+1));
             }
             // Two sided variation
             else {
-                av_err += std::abs(h_up->GetBinContent(bin+1));
-                av_err += std::abs(h_dn->GetBinContent(bin+1));
-                av_err /= std::sqrt(2.0); // sqrt 2 since we are using the covariance matrix formalism (cov matrix with 2 universes) -- error is sqrt diag
+                av_err += h_up->GetBinContent(bin+1) * h_up->GetBinContent(bin+1);
+                av_err += h_dn->GetBinContent(bin+1) * h_dn->GetBinContent(bin+1);
+                av_err = std::sqrt(av_err / 2.0 );
             }
-            
+
+            av_err = 100 * av_err / h_CV->GetBinContent(bin+1);
+
             v_err.at(k_err_beamline).at(var).at(type).at(bin) += av_err*av_err;
             v_err.at(k_err_sys).at(var).at(type).at(bin)      += av_err*av_err;
             
@@ -2148,8 +2223,10 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
             double av_err = 0;
-            // Get the max error in each bin, then add the square
-            av_err += std::abs(h_up->GetBinContent(bin+1));
+            
+            // Error is given as the square uncertainty in percent
+            av_err += std::sqrt(h_up->GetBinContent(bin+1) * h_up->GetBinContent(bin+1));
+            av_err = 100 * av_err / h_CV->GetBinContent(bin+1);
             v_err.at(k_err_detvar).at(var).at(type).at(bin)   += av_err*av_err;
             v_err.at(k_err_sys).at(var).at(type).at(bin)      += av_err*av_err;
             
@@ -2160,10 +2237,8 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
             double av_err = 0;
-            // Get the average error in each bin, then add the square
+            // Get the error in each bin, then add the square
             av_err += std::abs(h_up->GetBinContent(bin+1));
-            // av_err += std::abs(h_dn->GetBinContent(bin+1));
-            // av_err /= 2.0;
             v_err.at(k_err_genie_multi).at(var).at(type).at(bin) += av_err*av_err;
             v_err.at(k_err_sys).at(var).at(type).at(bin) += av_err*av_err;
             
@@ -2175,10 +2250,8 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
             double av_err = 0;
-            // Get the average error in each bin, then add the square
+            // Error is given as the square uncertainty in percent
             av_err += std::abs(h_up->GetBinContent(bin+1));
-            // av_err += std::abs(h_dn->GetBinContent(bin+1));
-            // av_err /= 2.0;
             v_err.at(k_err_reint).at(var).at(type).at(bin) += av_err*av_err;
             v_err.at(k_err_sys).at(var).at(type).at(bin) += av_err*av_err;
             
@@ -2190,10 +2263,8 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
             double av_err = 0;
-            // Get the average error in each bin, then add the square
+            // Error is given as the square uncertainty in percent
             av_err += std::abs(h_up->GetBinContent(bin+1));
-            // av_err += std::abs(h_dn->GetBinContent(bin+1));
-            // av_err /= 2.0;
             v_err.at(k_err_hp).at(var).at(type).at(bin) += av_err*av_err;
             v_err.at(k_err_sys).at(var).at(type).at(bin) += av_err*av_err;
             
@@ -2205,10 +2276,8 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
             double av_err = 0;
-            // Get the average error in each bin, then add the square
+            // Error is given as the square uncertainty in percent
             av_err += std::abs(h_up->GetBinContent(bin+1));
-            // av_err += std::abs(h_dn->GetBinContent(bin+1));
-            // av_err /= 2.0;
             v_err.at(k_err_mcstats).at(var).at(type).at(bin) += av_err*av_err;
             v_err.at(k_err_sys).at(var).at(type).at(bin) += av_err*av_err;
             
@@ -2220,10 +2289,9 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
             double av_err = 0;
-            // Get the average error in each bin, then add the square
+            // Error is given as the square uncertainty in percent
             av_err += std::abs(h_up->GetBinContent(bin+1));
-            // av_err += std::abs(h_dn->GetBinContent(bin+1));
-            // av_err /= 2.0;
+            av_err = 100 * av_err / h_CV->GetBinContent(bin+1);
             v_err.at(k_err_dirt).at(var).at(type).at(bin) += av_err*av_err;
             v_err.at(k_err_sys).at(var).at(type).at(bin)  += av_err*av_err;
             
@@ -2235,10 +2303,9 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
             double av_err = 0;
-            // Get the average error in each bin, then add the square
+           // Error is given as the square uncertainty in percent
             av_err += std::abs(h_up->GetBinContent(bin+1));
-            // av_err += std::abs(h_dn->GetBinContent(bin+1));
-            // av_err /= 2.0;
+            av_err = 100 * av_err / h_CV->GetBinContent(bin+1);
             v_err.at(k_err_pot).at(var).at(type).at(bin) += av_err*av_err;
             v_err.at(k_err_sys).at(var).at(type).at(bin) += av_err*av_err;
             
@@ -2250,10 +2317,9 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
             double av_err = 0;
-            // Get the average error in each bin, then add the square
+            // Error is given as the square uncertainty in percent
             av_err += std::abs(h_up->GetBinContent(bin+1));
-            // av_err += std::abs(h_dn->GetBinContent(bin+1));
-            // av_err /= 2.0;
+            av_err = 100 * av_err / h_CV->GetBinContent(bin+1);
             v_err.at(k_err_pi0).at(var).at(type).at(bin) += av_err*av_err;
             v_err.at(k_err_sys).at(var).at(type).at(bin) += av_err*av_err;
             
@@ -2806,48 +2872,76 @@ void SystematicsHelper::InitialiseReweightingModeCut(){
     // Should we add more protection to this command??
     f_nuexsec = TFile::Open( Form("files/crosssec_run%s.root", _util.run_period ), "READ");
 
+    // Define the uncertainties
+    std::vector<std::tuple<std::string, int, std::string>> tuple_label = {
+        std::make_tuple("RPA",              2,   "unisim"),
+        std::make_tuple("CCMEC",            2,   "unisim"),
+        std::make_tuple("AxFFCCQE",         2,   "unisim"),
+        std::make_tuple("VecFFCCQE",        2,   "unisim"),
+        std::make_tuple("DecayAngMEC",      2,   "unisim"),
+        std::make_tuple("ThetaDelta2Npi",   2,   "unisim"),
+        std::make_tuple("ThetaDelta2NRad",  2,   "unisim"),
+        std::make_tuple("RPA_CCQE_Reduced", 2,   "unisim"),
+        std::make_tuple("NormCCCOH",        2,   "unisim"),
+        std::make_tuple("NormNCCOH",        2,   "unisim"),
+        std::make_tuple("Horn1_x",          2,   "unisim"),
+        std::make_tuple("Horn_curr",        2,   "unisim"),
+        std::make_tuple("Horn1_y",          2,   "unisim"),
+        std::make_tuple("Beam_spot",        2,   "unisim"),
+        std::make_tuple("Horn2_x",          2,   "unisim"),
+        std::make_tuple("Horn2_y",          2,   "unisim"),
+        std::make_tuple("Horn_Water",       2,   "unisim"),
+        std::make_tuple("Beam_shift_x",     2,   "unisim"),
+        std::make_tuple("Beam_shift_y",     2,   "unisim"),
+        std::make_tuple("Target_z",         2,   "unisim"),
+        std::make_tuple("Decay_pipe_Bfield",2,   "unisim"),
+        std::make_tuple("weightsGenie",     500, "multisim"),
+        std::make_tuple("weightsReint",     1000,"multisim"),
+        std::make_tuple("weightsPPFX",      500, "multisim")
+    };
+
+
+    // Resize the vector to store the systematics
+    h_cut_err.resize(tuple_label.size()); // label -- cut -- variable
+
+    for (unsigned int label = 0; label < tuple_label.size(); label++){
+        h_cut_err.at(label).resize(_util.k_cuts_MAX);
+    }
+
+    for (unsigned int label = 0; label < tuple_label.size(); label++){
+        
+        for (unsigned int cut = 0; cut < h_cut_err.at(label).size(); cut++){
+            h_cut_err.at(label).at(cut).resize(_util.k_cut_vars_max);
+        }
+    }
+
+
     // Loop over cuts
     for (int cut = 0; cut < _util.k_cuts_MAX ; cut++){
         
         // Loop over the variables
         for (int var = 0; var < _util.k_cut_vars_max; var++){
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "RPA",              2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "CCMEC",            2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "AxFFCCQE",         2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "VecFFCCQE",        2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "DecayAngMEC",      2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "ThetaDelta2Npi",   2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "ThetaDelta2NRad",  2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "RPA_CCQE_Reduced", 2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "NormCCCOH",        2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "NormNCCOH",        2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn1_x",          2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn_curr",        2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn1_y",          2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Beam_spot",        2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn2_x",          2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn2_y",          2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Horn_Water",       2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Beam_shift_x",     2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Beam_shift_y",     2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Target_z",         2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "Decay_pipe_Bfield",2, "unisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsGenie",500,  "multisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsReint",1000,  "multisim");
-            GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, "weightsPPFX", 500, "multisim");
+            
+            for (unsigned int label = 0; label < tuple_label.size(); label++){
+                TH1D* h_err;
+                GetCutSysUncertainty(_util.vec_hist_name.at(var), cut, std::get<0>(tuple_label.at(label)), std::get<1>(tuple_label.at(label)), std::get<2>(tuple_label.at(label)), h_err);
+                
+                // Save the hist in the master vector
+                h_cut_err.at(label).at(cut).at(var) = (TH1D*)h_err->Clone();
+                // delete h_err;
+            }
         }
     }
-        
-    std::cout <<  "Now closing file and exiting" << std::endl; 
-    // file_sys_var->cd();
-    // file_sys_var->Close();
 
+    // Save the histograms to file
+    SaveCutHistograms(tuple_label);
+        
 }
 // -----------------------------------------------------------------------------
-void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index, std::string label, int num_uni, std::string var_type){
+void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index, std::string label, int num_uni, std::string var_type, TH1D* &h_err){
 
-    if (cut_index == _util.k_cuts_MAX-1)
-        std::cout << "Saving uncertainties for: " << label  << "  " << histname << std::endl;
+    // if (cut_index == _util.k_cuts_MAX-1)
+        // std::cout << "Saving uncertainties for: " << label  << "  " << histname << std::endl;
 
     // Declare the histogram vector for the cut
     std::vector<TH1D*> h_universe;
@@ -2880,7 +2974,7 @@ void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index
     _util.GetHist(f_nuexsec, h_cv, Form( "CV/Cuts/%s/%s/%s_CV_%s_0", _util.cut_dirs.at(cut_index).c_str(), histname.c_str(), histname.c_str(),_util.cut_dirs.at(cut_index).c_str()));
 
     // Now we got the histograms, we loop over an get the uncertainties
-    TH1D* h_err = (TH1D*)h_universe.at(k_up)->Clone(); // clone it to get the binning right
+    h_err = (TH1D*)h_universe.at(k_up)->Clone(); // clone it to get the binning right
 
     // Clear the bins
     for (int bin = 1; bin < h_universe.at(k_up)->GetNbinsX()+1; bin++){
@@ -2893,13 +2987,14 @@ void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index
         // Loop over the bins 
         for (int bin = 1; bin < h_universe.at(k_up)->GetNbinsX()+1; bin++){
             double deviate = h_cv->GetBinContent(bin) - h_universe.at(uni)->GetBinContent(bin); // CV - Uni in bin i
-            h_err->SetBinContent(bin, h_err->GetBinContent(bin) + deviate*deviate); // difference squared summed    
-        }
+            h_err->SetBinContent(bin, h_err->GetBinContent(bin) + deviate*deviate); // difference squared summed   
         
+        }
+
     }
 
     // Sqrt all bins/N
-    for (int bin = 1; bin < h_universe.at(k_up)->GetNbinsX()+1; bin++){
+    for (int bin = 1; bin < h_err->GetNbinsX()+1; bin++){
         double err = std::sqrt(h_err->GetBinContent(bin)/num_uni) / h_cv->GetBinContent(bin);
         if (h_cv->GetBinContent(bin) == 0) 
             h_err->SetBinContent(bin, 0.0);
@@ -2907,17 +3002,136 @@ void SystematicsHelper::GetCutSysUncertainty(std::string histname, int cut_index
             h_err->SetBinContent(bin, err);        
     }
 
+
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::SaveCutHistograms(std::vector<std::tuple<std::string, int, std::string>> tuple_label){
+
+    std::cout <<  "Now writing histograms to file..." << std::endl; 
+
     // ---- save the histograms into different directories inside the root file
+    TFile *file_sys_var = TFile::Open(Form("files/run%s_sys_var.root", _util.run_period),"UPDATE");
     file_sys_var->cd();
 
-    if(!file_sys_var->GetDirectory(Form("%s/%s", _util.cut_dirs.at(cut_index).c_str(), label.c_str()))) {
-        file_sys_var->mkdir(Form("%s/%s", _util.cut_dirs.at(cut_index).c_str(), label.c_str())); // if the directory does not exist, create it
+     // Create subdirectory for each reweighter
+    TDirectory *dir_labels[tuple_label.size()];
+
+    // Create subdirectory for each variable
+    TDirectory *dir_labels_cut[_util.k_cuts_MAX];
+
+    // Loop over cuts
+    for (int cut = 0; cut < _util.k_cuts_MAX ; cut++){
+
+        // See if the directory already exists
+        bool bool_dir = _util.GetDirectory(file_sys_var, dir_labels_cut[cut], _util.cut_dirs.at(cut).c_str());
+
+        // If it doesnt exist then create it
+        if (!bool_dir) file_sys_var->mkdir(_util.cut_dirs.at(cut).c_str());
+
+        _util.GetDirectory(file_sys_var, dir_labels_cut[cut], _util.cut_dirs.at(cut).c_str());
+
+        dir_labels_cut[cut]->cd();
+
+        for (unsigned int label = 0; label < tuple_label.size(); label++){
+            
+            // See if the directory already exists
+            bool bool_dir = _util.GetDirectory(file_sys_var, dir_labels[label], Form("%s/%s", _util.cut_dirs.at(cut).c_str(), std::get<0>(tuple_label.at(label)).c_str()));
+    
+            // If it doesnt exist then create it
+            if (!bool_dir) file_sys_var->mkdir(Form("%s/%s", _util.cut_dirs.at(cut).c_str(), std::get<0>(tuple_label.at(label)).c_str()));
+
+            _util.GetDirectory(file_sys_var, dir_labels[label], Form("%s/%s", _util.cut_dirs.at(cut).c_str(), std::get<0>(tuple_label.at(label)).c_str()));
+
+            // Go into the directory
+            dir_labels[label]->cd();
+            
+            // Loop over the variables
+            for (int var = 0; var < _util.k_cut_vars_max; var++){
+                h_cut_err.at(label).at(cut).at(var)->SetOption("hist");
+                h_cut_err.at(label).at(cut).at(var)->Write(_util.vec_hist_name.at(var).c_str(), TObject::kOverwrite);  // write the histogram to the file
+            }
+            
+            file_sys_var->cd();
+
+        }
+
+        file_sys_var->cd();
     }
 
-    file_sys_var->cd(Form("%s/%s", _util.cut_dirs.at(cut_index).c_str(), label.c_str())); // open the directory
+    file_sys_var->cd();
+    file_sys_var->Close();
 
-    h_err->SetDirectory(gDirectory); // set in which dir the hist_ratio.at(k) is going to be written
-    h_err->Write(histname.c_str(), TObject::kOverwrite);  // write the histogram to the file
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::SaveCutHistogramsDetVar(){
+
+    std::cout <<  "Now writing histograms to file..." << std::endl; 
+
+    // ---- save the histograms into different directories inside the root file
+    TFile *file_sys_var = TFile::Open(Form("files/run%s_sys_var.root", _util.run_period),"UPDATE");
+    file_sys_var->cd();
+
+     // Create subdirectory for each reweighter
+    TDirectory *dir_labels[k_vars_MAX+1];
+
+    // Create subdirectory for each variable
+    TDirectory *dir_labels_cut[_util.k_cuts_MAX];
+
+    // Loop over cuts
+    for (int cut = 0; cut < _util.k_cuts_MAX ; cut++){
+
+        // See if the directory already exists
+        bool bool_dir = _util.GetDirectory(file_sys_var, dir_labels_cut[cut], _util.cut_dirs.at(cut).c_str());
+
+        // If it doesnt exist then create it
+        if (!bool_dir) file_sys_var->mkdir(_util.cut_dirs.at(cut).c_str());
+
+        _util.GetDirectory(file_sys_var, dir_labels_cut[cut], _util.cut_dirs.at(cut).c_str());
+
+        dir_labels_cut[cut]->cd();
+
+        for (unsigned int label = 0; label < k_vars_MAX+1; label++){
+            
+            // See if the directory already exists
+            bool bool_dir;
+            
+            if (label !=  k_vars_MAX){
+                bool_dir = _util.GetDirectory(file_sys_var, dir_labels[label], Form("%s/%s", _util.cut_dirs.at(cut).c_str(), var_string.at(label).c_str()));
+
+                // If it doesnt exist then create it
+                if (!bool_dir)
+                    file_sys_var->mkdir(Form("%s/%s", _util.cut_dirs.at(cut).c_str(), var_string.at(label).c_str()));
+
+                _util.GetDirectory(file_sys_var, dir_labels[label], Form("%s/%s", _util.cut_dirs.at(cut).c_str(), var_string.at(label).c_str()));
+            }
+            else {
+                bool_dir = _util.GetDirectory(file_sys_var, dir_labels[label], Form("%s/TotalDetectorSys", _util.cut_dirs.at(cut).c_str()));
+
+                // If it doesnt exist then create it
+                if (!bool_dir)
+                    file_sys_var->mkdir(Form("%s/TotalDetectorSys", _util.cut_dirs.at(cut).c_str()));
+
+                _util.GetDirectory(file_sys_var, dir_labels[label], Form("%s/TotalDetectorSys", _util.cut_dirs.at(cut).c_str()));
+            }
+
+            // Go into the directory
+            dir_labels[label]->cd();
+            
+            // Loop over the variables
+            for (int var = 0; var < _util.k_cut_vars_max; var++){
+                h_cut_err.at(label).at(cut).at(var)->SetOption("hist");
+                h_cut_err.at(label).at(cut).at(var)->Write(_util.vec_hist_name.at(var).c_str(), TObject::kOverwrite);  // write the histogram to the file
+            }
+            
+            file_sys_var->cd();
+
+        }
+
+        file_sys_var->cd();
+    }
+
+    file_sys_var->cd();
+    file_sys_var->Close();
 
 }
 // -----------------------------------------------------------------------------
@@ -2933,8 +3147,11 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
         // Loop over the types
         for (unsigned int type = 0; type < xsec_types.size(); type++){
             
-            // Only look at the true efficeincy or the reco x-section
-            if ( (vars.at(var) == "true_el_E" && xsec_types.at(type) == "eff") || (vars.at(var) == "reco_el_E" && xsec_types.at(type) == "mc_xsec")   ){
+            // Only look at the true efficeincy or select variables in reco space
+            if ( (var == k_var_true_el_E && (xsec_types.at(type) == "eff" || xsec_types.at(type) == "gen_smear") ) || 
+                 (var == k_var_reco_el_E && (xsec_types.at(type) == "mc_xsec" || xsec_types.at(type) == "data_xsec" ||
+                                             xsec_types.at(type) == "eff" || xsec_types.at(type) == "sig" || 
+                                             xsec_types.at(type) == "bkg" || xsec_types.at(type) == "sel" ))){
 
                 // Resize the vector for new loop
                 if (h_uncertainty.size() == 0) 
