@@ -109,22 +109,22 @@ To run the systematics code, we run the cross section helper in `reweight` mode.
 This creates a new folder in `files/crosssec_run1.root` with the systematic plots you have just ran.
 
 # Running the Systematics: Detector Variations
-Detector variations are made in different samples so we cant use the CV file. We need to run the selection, create a unique file and then run the xsec code over it like it was a CV. E.g. in the case of `LY_Down`, this can be done by:
+Detector variations are made in different samples so we cant use the CV file. We need to run the selection, create a unique file and then run the xsec code over it like it was a CV. E.g. in the case of `LYDown`, this can be done by:
 
 ```
-./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_LY_Down.root LY_Down
+./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_LYDown.root LYDown
 
 # Overwrite the true nue information
-./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_LY_Down_intrinsic.root LY_Down --intrinsic intrinsic
+./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_LYDown_intrinsic.root LYDown --intrinsic intrinsic
 
 # Merge and plot histograms
-source merge/merge_run1_files.sh files/nuexsec_mc_run1_LY_Down.root files/nuexsec_run1_LY_Down_merged.root
-./nuexsec --run 1 --hist files/nuexsec_run1_LY_Down_merged.root --var dummy LY_Down
+source merge/merge_run1_files.sh files/nuexsec_mc_run1_LYDown.root files/nuexsec_run1_LYDown_merged.root
+./nuexsec --run 1 --hist files/nuexsec_run1_LYDown_merged.root --var dummy LYDown
 
-root -l -b -q 'merge/merge_uneaventrees.C("1", true, "files/trees/nuexsec_selected_tree_mc_run1_'"LY_Down"'.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "'"LY_Down"'")'
+root -l -b -q 'merge/merge_uneaventrees.C("1", true, "files/trees/nuexsec_selected_tree_mc_run1_'"LYDown"'.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "'"LYDown"'")'
 
 # Run the xsec code
-./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_LY_Down.root --var dummy LY_Down --xsecmode default --xsecvar elec_E
+./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_LYDown.root --var dummy LYDown --xsecmode default --xsecvar elec_E
 ```
 
 Thankfully we have wrote an automation of this process which can be run by doing:

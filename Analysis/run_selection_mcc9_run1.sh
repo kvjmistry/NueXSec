@@ -1,6 +1,4 @@
-# Example for running over a overlay file with the pandora n-tuples
-#./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files/neutrinoselection_filt_run1_overlay.root
-#./nuexsec --run 1 --mc /uboone/data/users/elenag/PeLEENtupleNuMI/neutrinoselection_filt_run1_NuMI_overlay.root
+# Script with commands to run the entire selection
 
 if [ ! -d "log" ]; then 
   echo
