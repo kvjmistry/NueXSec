@@ -40,7 +40,7 @@ class SystematicsHelper{
     void PlotVariationsEXT(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name);
     // -------------------------------------------------------------------------
     // Plots the Sys Variations
-    void SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name, std::string cut_name_pretty);
+    void SysVariations(int hist_index, const char* print_name, int cut, const char* x_axis_name);
     // -------------------------------------------------------------------------
     void SetVariationProperties(TH1D* h, int index);
     // -------------------------------------------------------------------------
@@ -115,6 +115,9 @@ class SystematicsHelper{
     // -------------------------------------------------------------------------
     // Write the cut histograms to file
     void SaveCutHistograms(std::vector<std::tuple<std::string, int, std::string>> tuple_label);
+    // -------------------------------------------------------------------------
+    // Write the cut histograms to file for detector variations
+    void SaveCutHistogramsDetVar();
     // -------------------------------------------------------------------------
     // Make a plot of the systematics in one plot
     void MakeTotUncertaintyPlot();

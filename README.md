@@ -153,11 +153,11 @@ This is running the so called rw_cuts stage and adds a cut folder in `files/cros
 
 Once you have done this, we need to store the total uncertainties to a file so we can plot them. We can do this by running a function in the systematics helper class:
 `./nuexsec --run 1 --sys reweightcuts`
-Warning this is a bit buggy and so may seg fault. This issue still needs to be resolved. 
 
 We can additionally store the detector variations to the file by running the default mode of the systematics helper class:
 `./nuexsec --run 1 --sys default`
-This might need to be run before the `reweightcuts` mode.
+
+The output of both these `--sys` commands creates a file called `files/run1_sys_var.root` which is then read in by the histogram plotter class. To then plot the uncertainties you should then use the `--plotsys tot` option.
 
 # Creating File Lists for Events
 We might want to save the selected events with their weights in a txt file so we can use with a package like ReMu or give to someone else to test. You can do this by running the cross section code in a different mode:

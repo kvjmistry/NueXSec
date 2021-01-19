@@ -185,7 +185,22 @@ void SystematicsHelper::SetRatioOptions(TH1D* hist ){
 // -----------------------------------------------------------------------------
 void SystematicsHelper::MakeHistograms(){
     
-    for (unsigned int i = 0 ; i < _util.k_cuts_MAX; i++){        
+    // Initialise histogram vector to store the uncertainties
+    h_cut_err.clear();
+    h_cut_err.resize(k_vars_MAX+1); // label -- cut -- variable // plus one to get the total
+
+    for (unsigned int label = 0; label < h_cut_err.size(); label++){
+        h_cut_err.at(label).resize(_util.k_cuts_MAX);
+    }
+
+    for (unsigned int label = 0; label < h_cut_err.size(); label++){
+        
+        for (unsigned int cut = 0; cut < h_cut_err.at(label).size(); cut++){
+            h_cut_err.at(label).at(cut).resize(_util.k_cut_vars_max);
+        }
+    }
+
+    for (unsigned int i = 0 ; i < _util.k_cuts_MAX; i++){       
        
         // Default detector systematics mode
         if (mode == "default"){
@@ -193,13 +208,9 @@ void SystematicsHelper::MakeHistograms(){
             // Create the directory
             _util.CreateDirectory("/detvar/comparisons/cuts/" + _util.cut_dirs.at(i));
 
-            // Create the directory for sysvar
-            //_util.CreateDirectory("/systvar/comparisons/cuts/" + _util.cut_dirs.at(i));
-
             for(unsigned int j=0; j < _util.vec_hist_name.size(); j++){
-
-                SysVariations(Form("%s", _util.vec_hist_name.at(j).c_str()), Form("plots/run%s/detvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()),
-                            _util.cut_dirs.at(i), _util.vec_axis_label.at(j).c_str(), _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str(), _util.cut_dirs_pretty.at(i).c_str());
+                    
+                SysVariations(j, Form("plots/run%s/detvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()), i, _util.vec_axis_label.at(j).c_str());
 
             }
         }
@@ -269,10 +280,16 @@ void SystematicsHelper::MakeHistograms(){
         
     }
 
+    // Here call a function to write the histograms to file
+    if (mode == "default"){
+        // Call write function
+        SaveCutHistogramsDetVar();
+    }
+
 
 }
 // ----------------------------------------------------------------------------
-void SystematicsHelper::SysVariations(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name, std::string folder_name, std::string plot_name, std::string cut_name_pretty){
+void SystematicsHelper::SysVariations(int hist_index, const char* print_name, int cut, const char* x_axis_name){
 
     // ------------------------------------------------------------
     // Some initial configurations and work around fixes
@@ -309,7 +326,7 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
             // Get all the MC histograms and add them together
             TH1D *h_temp;
 
-            _util.GetHist(f_vars.at(k), h_temp, Form("Stack/%s/%s/%s_%s_%s", cut_name.c_str(), _util.classification_dirs.at(i).c_str(), hist_name.c_str(), cut_name.c_str(), _util.classification_dirs.at(i).c_str()));
+            _util.GetHist(f_vars.at(k), h_temp, Form("Stack/%s/%s/%s_%s_%s", _util.cut_dirs.at(cut).c_str(), _util.classification_dirs.at(i).c_str(),  _util.vec_hist_name.at(hist_index).c_str(), _util.cut_dirs.at(cut).c_str(), _util.classification_dirs.at(i).c_str()));
             
             // First case so clone the histogram
             if (i == 0) hist.at(k) = (TH1D*) h_temp->Clone("h_sum_hist");
@@ -397,62 +414,46 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
     // calculate and save the total detector systematics uncertainty 
 
     // create a temporary histogram that will be used to calculate the total detector sys
-    // file_sys_var->cd();
     TH1D *h_det_sys_tot;
     
     // loop over variations for a given variable
-    for (unsigned int k = 0; k < f_vars.size(); k++){
+    for (unsigned int label = 0; label < f_vars.size(); label++){
         
         // ---- save the histograms into different directories inside the root file
-
-        // if(!file_sys_var->GetDirectory(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str()))) {
-        //     file_sys_var->mkdir(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // if the directory does not exist, create it
-        // }
-
-        // file_sys_var->cd(Form("%s/%s", folder_name.c_str(), var_string.at(k).c_str())); // open the directory
-    
-        // hist_ratio.at(k)->SetDirectory(gDirectory); // set in which dir the hist_ratio.at(k) is going to be written
-        // hist_ratio.at(k)->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite);  // write the histogram to the file
+        h_cut_err.at(label).at(cut).at(hist_index) = (TH1D*) hist_ratio.at(label)->Clone();
     
         // ---- on the same go, calculate the total detector sys uncertainty
 
-        if( k == 0 ){
+        if( label == 0 ){
             // this is the first histogram, just square it and write it to file
-            h_det_sys_tot = (TH1D*) hist_ratio.at(k)->Clone();
+            h_det_sys_tot = (TH1D*) hist_ratio.at(label)->Clone();
             h_det_sys_tot->Multiply(h_det_sys_tot); // square the histogram
         }
 
         else{
             // this is not the first histogram
-            hist_ratio.at(k)->Multiply(hist_ratio.at(k)); // first square the histogram
-            h_det_sys_tot->Add(hist_ratio.at(k)); // add it to the existing histogram
+            hist_ratio.at(label)->Multiply(hist_ratio.at(label)); // first square the histogram
+            h_det_sys_tot->Add(hist_ratio.at(label)); // add it to the existing histogram
         }
 
     }
 
     // calculate the square root of the histogram before saving it to the file
-    for(int k = 1; k <= h_det_sys_tot->GetNbinsX(); k++){
-        h_det_sys_tot->SetBinContent( k , TMath::Sqrt(h_det_sys_tot->GetBinContent(k)) );
+    for(int bin = 1; bin <= h_det_sys_tot->GetNbinsX(); bin++){
+        h_det_sys_tot->SetBinContent( bin , TMath::Sqrt(h_det_sys_tot->GetBinContent(bin)) );
     }
 
-    // save the total detector sys uncertainty in the file
-    
-    // if(!file_sys_var->GetDirectory(Form("%s/TotalDetectorSys", folder_name.c_str()))) {
-    //             file_sys_var->mkdir(Form("%s/TotalDetectorSys", folder_name.c_str())); // if the directory does not exist, create it
-    // }
-
-    // file_sys_var->cd(Form("%s/TotalDetectorSys", folder_name.c_str())); // open the directory
-    // h_det_sys_tot->SetDirectory(gDirectory);
-    // h_det_sys_tot->Write(Form("%s", plot_name.c_str()), TObject::kOverwrite); 
+    // store the total detector sys uncertainty in an additional histogram
+    h_cut_err.back().at(cut).at(hist_index) = (TH1D*) h_det_sys_tot->Clone();
 
     // -----------------------------------------------------------------
     
     // Setting the systematic error
-    for(int k = 1; k <= h_error_hist->GetNbinsX(); k++){
+    for(int bin = 1; bin <= h_error_hist->GetNbinsX(); bin++){
         
         // Set the systematic error to be the total det sys error * the bin content
-        double sys_err = h_det_sys_tot->GetBinContent(k) * h_error_hist->GetBinContent(k);
-        h_error_hist->SetBinError(k, sys_err);
+        double sys_err = h_det_sys_tot->GetBinContent(bin) * h_error_hist->GetBinContent(bin);
+        h_error_hist->SetBinError(bin, sys_err);
     }
 
     h_error_hist->Draw("E2, same");
@@ -496,7 +497,7 @@ void SystematicsHelper::SysVariations(std::string hist_name, const char* print_n
 
     // do you want to print the selection cut stage on your canvas?
     c->cd();
-    TLatex *lat = new TLatex(0.15, 0.91, Form("Selection stage: %s", cut_name_pretty.c_str()));
+    TLatex *lat = new TLatex(0.15, 0.91, Form("Selection stage: %s", _util.cut_dirs_pretty.at(cut).c_str()));
     lat->SetTextSize(0.03);
     lat->Draw();
     c->Modified();
@@ -3046,6 +3047,79 @@ void SystematicsHelper::SaveCutHistograms(std::vector<std::tuple<std::string, in
             
             // Loop over the variables
             for (int var = 0; var < _util.k_cut_vars_max; var++){
+                h_cut_err.at(label).at(cut).at(var)->SetOption("hist");
+                h_cut_err.at(label).at(cut).at(var)->Write(_util.vec_hist_name.at(var).c_str(), TObject::kOverwrite);  // write the histogram to the file
+            }
+            
+            file_sys_var->cd();
+
+        }
+
+        file_sys_var->cd();
+    }
+
+    file_sys_var->cd();
+    file_sys_var->Close();
+
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::SaveCutHistogramsDetVar(){
+
+    std::cout <<  "Now writing histograms to file..." << std::endl; 
+
+    // ---- save the histograms into different directories inside the root file
+    TFile *file_sys_var = TFile::Open(Form("files/run%s_sys_var.root", _util.run_period),"UPDATE");
+    file_sys_var->cd();
+
+     // Create subdirectory for each reweighter
+    TDirectory *dir_labels[k_vars_MAX+1];
+
+    // Create subdirectory for each variable
+    TDirectory *dir_labels_cut[_util.k_cuts_MAX];
+
+    // Loop over cuts
+    for (int cut = 0; cut < _util.k_cuts_MAX ; cut++){
+
+        // See if the directory already exists
+        bool bool_dir = _util.GetDirectory(file_sys_var, dir_labels_cut[cut], _util.cut_dirs.at(cut).c_str());
+
+        // If it doesnt exist then create it
+        if (!bool_dir) file_sys_var->mkdir(_util.cut_dirs.at(cut).c_str());
+
+        _util.GetDirectory(file_sys_var, dir_labels_cut[cut], _util.cut_dirs.at(cut).c_str());
+
+        dir_labels_cut[cut]->cd();
+
+        for (unsigned int label = 0; label < k_vars_MAX+1; label++){
+            
+            // See if the directory already exists
+            bool bool_dir;
+            
+            if (label !=  k_vars_MAX){
+                bool_dir = _util.GetDirectory(file_sys_var, dir_labels[label], Form("%s/%s", _util.cut_dirs.at(cut).c_str(), var_string.at(label).c_str()));
+
+                // If it doesnt exist then create it
+                if (!bool_dir)
+                    file_sys_var->mkdir(Form("%s/%s", _util.cut_dirs.at(cut).c_str(), var_string.at(label).c_str()));
+
+                _util.GetDirectory(file_sys_var, dir_labels[label], Form("%s/%s", _util.cut_dirs.at(cut).c_str(), var_string.at(label).c_str()));
+            }
+            else {
+                bool_dir = _util.GetDirectory(file_sys_var, dir_labels[label], Form("%s/TotalDetectorSys", _util.cut_dirs.at(cut).c_str()));
+
+                // If it doesnt exist then create it
+                if (!bool_dir)
+                    file_sys_var->mkdir(Form("%s/TotalDetectorSys", _util.cut_dirs.at(cut).c_str()));
+
+                _util.GetDirectory(file_sys_var, dir_labels[label], Form("%s/TotalDetectorSys", _util.cut_dirs.at(cut).c_str()));
+            }
+
+            // Go into the directory
+            dir_labels[label]->cd();
+            
+            // Loop over the variables
+            for (int var = 0; var < _util.k_cut_vars_max; var++){
+                h_cut_err.at(label).at(cut).at(var)->SetOption("hist");
                 h_cut_err.at(label).at(cut).at(var)->Write(_util.vec_hist_name.at(var).c_str(), TObject::kOverwrite);  // write the histogram to the file
             }
             
