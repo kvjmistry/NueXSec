@@ -76,4 +76,66 @@ if [ "$1" == "weight" ]; then
 
 fi
 
+# Running detector variation samples
+
+# To run the det var samples now do source run_selection_mcc9_run3.sh var <variation name>
+# The variation are:
+# CV, BNB_Diffusion, LYAttenuation, LYRayleigh, LYDown, SCE, Recomb2, WireModX, WireModYZ, WireModThetaXZ, WireModThetaYZ_withSigmaSplines, WireModThetaYZ_withoutSigmaSplines, WireModdEdX
+
+# Could loop these to make it easier to run them all!
+
+if [ "$1" == "var" ]; then
+  ./nuexsec --run 3 --var ../ntuples/detvar_newtune/run3/neutrinoselection_filt_run3_overlay_$2.root $2
+  
+  # Overwrite the true nue information
+  ./nuexsec --run 3 --var ../ntuples/detvar_newtune/run3/intrinsic/neutrinoselection_filt_run3_overlay_$2_intrinsic.root $2 --intrinsic intrinsic
+
+  source merge/merge_run3_files.sh files/nuexsec_mc_run3_$2.root files/nuexsec_run3_$2_merged.root
+
+  ./nuexsec --run 3 --hist files/nuexsec_run3_$2_merged.root --var dummy $2
+
+  root -l -b -q 'merge/merge_uneaventrees.C("3", true, "files/trees/nuexsec_selected_tree_mc_run3_'"$2"'.root", "files/trees/nuexsec_selected_tree_data_run3.root", "files/trees/nuexsec_selected_tree_ext_run3.root","files/trees/nuexsec_selected_tree_dirt_run3.root", "'"$2"'")'
+
+  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3_$2.root --var dummy $2 --xsecmode default --xsecvar elec_E
+
+fi
+
+
+#----------------------------------------------------------------------------------------------
+# Running the detector systematics
+
+# To run the det sys plotter now do source run_selection_mcc9_run3.sh allvar
+# This is just running the piece of code above, but for all the det variations at once, so you do not have to do it manually
+
+# This bit of code will run the piece of code above for all the detector variations, calculate deviation
+# the detector variations below are going to be taken into account, please make sure this list matches the _util.vec_var_string in Utility.h
+
+declare -a var=(
+  CV
+  LYRayleigh
+  LYAttenuation
+  LYDown
+  SCE
+  Recomb2
+  WireModX
+  WireModYZ
+  WireModThetaXZ
+  WireModThetaYZ_withSigmaSplines
+  WireModThetaYZ_withoutSigmaSplines
+  WireModdEdX
+)
+if [ "$1" == "allvar" ]; then
+
+  # run the above script for every det variation 
+  for i in "${var[@]}"
+  do
+    source run_selection_mcc9_run3.sh var "$i"
+  done
+
+fi
+
+
+# To generate the file lists with all event weights then use this command
+# ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode txtlist --xseclabel all --xsecvar elec_E
+
 

@@ -111,6 +111,14 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             _pi0_correction = atoi(argv[i+1]);
         }
 
+        // Turn off all tuning
+        if (strcmp(arg, "--notuning") == 0){
+            std::cout << "Turning off all tuning (using raw MC): " << std::endl;
+            _weight_tune = 0;
+            _weight_ppfx = 0;
+            _pi0_correction = 0;
+        }
+
         // Whats the verbose?
         if (strcmp(arg, "-v") == 0 || strcmp(arg, "--verbose") == 0 || strcmp(arg, "--v") == 0){
             std::cout << "Setting Verbose Level to : " << argv[i+1] << std::endl;

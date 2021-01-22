@@ -2139,10 +2139,10 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
             filled_sig = true;
         }
     
-        evt_dist_sig << trueX << "," << recoX << "," << weight;
+        evt_dist_sig << trueX << "," << recoX << "," << weight*_util.mc_scale_factor;
         
         for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
-            evt_dist_sig << "," << _ev_weight.at(_uni);
+            evt_dist_sig << "," << _ev_weight.at(_uni)*_util.mc_scale_factor;
         }
 
         evt_dist_sig << "\n";
@@ -2165,10 +2165,10 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
             filled_bkg = true;
         }
 
-        evt_dist_bkg << recoX << "," << weight;
+        evt_dist_bkg << recoX << "," << weight*_util.mc_scale_factor;
         
         for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
-            evt_dist_bkg << "," << _ev_weight.at(_uni);
+            evt_dist_bkg << "," << _ev_weight.at(_uni)*_util.mc_scale_factor;
         }
 
         evt_dist_bkg << "\n";
@@ -2195,10 +2195,10 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
             filled_gen = true;
         }
 
-        evt_dist_gen << trueX << "," << recoX << "," << weight;
+        evt_dist_gen << trueX << "," << weight*_util.mc_scale_factor;
         
         for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
-            evt_dist_gen << "," << _ev_weight.at(_uni);
+            evt_dist_gen << "," << _ev_weight.at(_uni)*_util.mc_scale_factor;
         }
 
         evt_dist_gen << "\n";
@@ -2212,8 +2212,8 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
         evt_dist_data << recoX << "\n";
     }
 
-    // Other background event
-    if (_classification == "ext" || _classification == "dirt"){
+    // EXT background event
+    if (_classification == "ext" ){
         isSelected = true;
 
         // Initialise the file 
@@ -2229,10 +2229,35 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
             filled_bkg = true;
         }
 
-        evt_dist_bkg << recoX << "," << weight;
+        evt_dist_bkg << recoX << "," << weight*_util.ext_scale_factor;
         
         for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
-            evt_dist_bkg << "," << _ev_weight.at(_uni);
+            evt_dist_bkg << "," << _ev_weight.at(_uni)*_util.ext_scale_factor;
+        }
+
+        evt_dist_bkg << "\n";
+    }
+    // Dirt background event
+    if (_classification == "dirt"){
+        isSelected = true;
+
+        // Initialise the file 
+        if (!filled_bkg){
+            evt_dist_bkg << vars.at(k_var_recoX) << "," << "w";
+        
+            for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
+                evt_dist_bkg << "," << "w_" << _uni;
+            }
+        
+            evt_dist_bkg << "\n";
+
+            filled_bkg = true;
+        }
+
+        evt_dist_bkg << recoX << "," << weight*_util.dirt_scale_factor;
+        
+        for (unsigned int _uni = 0; _uni <_ev_weight.size(); _uni++ ){
+            evt_dist_bkg << "," << _ev_weight.at(_uni)*_util.dirt_scale_factor;
         }
 
         evt_dist_bkg << "\n";
