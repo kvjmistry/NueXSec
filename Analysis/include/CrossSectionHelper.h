@@ -158,6 +158,8 @@ class CrossSectionHelper{
 
     std::vector<double> hist_bins;
 
+    double xsec_scale = 0.0; // not needed in this code
+
     std::vector<std::string> reweighter_labels = {
         "CV",    // Dont comment this out
         "Horn_p2kA",

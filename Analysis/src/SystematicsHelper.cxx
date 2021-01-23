@@ -29,7 +29,7 @@ void SystematicsHelper::Initialise(Utility _utility){
     GetPOT();
 
     // Set the names of the histograms
-    _util.SetAxesNames(var_labels_xsec, var_labels_events, var_labels_eff, smear_hist_name, vars);
+    _util.SetAxesNames(var_labels_xsec, var_labels_events, var_labels_eff, smear_hist_name, vars, xsec_scale);
 
     // Off beam mode to compare bnb and numi off beam samples
     if (std::string(_util.sysmode) == "ext"){
@@ -1261,32 +1261,63 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
     // Set 2D bins for integrated bins
     if (vars.at(var) == "integrated"){
 
-        h_universe_2D.at(k_xsec_sel)           = new TH2D("h_2D_sel",      "", nbins, edges, 100, 2000, 3000);
-        h_universe_2D.at(k_xsec_bkg)           = new TH2D("h_2D_bkg",      "", nbins, edges, 100, 200, 1000);
-        h_universe_2D.at(k_xsec_gen)           = new TH2D("h_2D_gen",      "", nbins, edges, 100, 4000, 12000);
-        h_universe_2D.at(k_xsec_gen_smear)     = new TH2D("h_2D_gen_smear","", nbins, edges, 100, 1000, 3000);
-        h_universe_2D.at(k_xsec_sig)           = new TH2D("h_2D_sig",      "", nbins, edges, 100, 1000, 3000);
-        h_universe_2D.at(k_xsec_eff)           = new TH2D("h_2D_eff",      "", nbins, edges, 100, 0.15, 0.3);
-        h_universe_2D.at(k_xsec_ext)           = new TH2D("h_2D_ext",      "", nbins, edges, 10, 0, 10);
-        h_universe_2D.at(k_xsec_dirt)          = new TH2D("h_2D_dirt",     "", nbins, edges, 15, 0, 15);
-        h_universe_2D.at(k_xsec_data)          = new TH2D("h_2D_data",     "", nbins, edges, 80, 0, 140);
-        h_universe_2D.at(k_xsec_mcxsec)        = new TH2D("h_2D_mcxsec",   "", nbins, edges, 100, 0.5, 3.0);
-        h_universe_2D.at(k_xsec_dataxsec)      = new TH2D("h_2D_dataxsec", "", nbins, edges, 100, 0.5, 3.0);
+        std::vector<int> int_bins_low;
+        
+        if (std::string(_util.xsec_smear_mode) == "mcc8" ){
+            //               sel - bkg -   gen - gen_smear - sig  - eff - ext - dirt - data - mcxsec - dataxsec
+            int_bins_low  = {2000, 200,   4000,       1000,  1000, 0.15,   0,     0,      0,     0.5,       0.5}; 
+            int_bins_high = {3000, 1000, 12000,       3000,  3000, 0.3,    10,    15,   140,     3.0,       3.0}; 
+        }
+        // Event Rate Binning
+        else {
+             //               sel - bkg -   gen - gen_smear - sig  - eff - ext - dirt - data - mcxsec - dataxsec
+            int_bins_low  = {2000, 200,   4000,       1000,  1000, 0.15,   0,     0,      0,     0.5,       0.5}; 
+            int_bins_high = {3000, 1000, 12000,       3000,  3000, 0.3,    10,    15,   140,     3.0,       3.0}; 
+
+        }
+
+        h_universe_2D.at(k_xsec_sel)           = new TH2D("h_2D_sel",      "", nbins, edges, 100, int_bins_low.at(k_xsec_sel),       int_bins_high.at(k_xsec_sel));
+        h_universe_2D.at(k_xsec_bkg)           = new TH2D("h_2D_bkg",      "", nbins, edges, 100, int_bins_low.at(k_xsec_bkg),       int_bins_high.at(k_xsec_bkg));
+        h_universe_2D.at(k_xsec_gen)           = new TH2D("h_2D_gen",      "", nbins, edges, 100, int_bins_low.at(k_xsec_gen),       int_bins_high.at(k_xsec_gen));
+        h_universe_2D.at(k_xsec_gen_smear)     = new TH2D("h_2D_gen_smear","", nbins, edges, 100, int_bins_low.at(k_xsec_gen_smear), int_bins_high.at(k_xsec_gen_smear));
+        h_universe_2D.at(k_xsec_sig)           = new TH2D("h_2D_sig",      "", nbins, edges, 100, int_bins_low.at(k_xsec_sig),       int_bins_high.at(k_xsec_sig));
+        h_universe_2D.at(k_xsec_eff)           = new TH2D("h_2D_eff",      "", nbins, edges, 100, int_bins_low.at(k_xsec_eff),       int_bins_high.at(k_xsec_eff));
+        h_universe_2D.at(k_xsec_ext)           = new TH2D("h_2D_ext",      "", nbins, edges, 10,  int_bins_low.at(k_xsec_ext),       int_bins_high.at(k_xsec_ext));
+        h_universe_2D.at(k_xsec_dirt)          = new TH2D("h_2D_dirt",     "", nbins, edges, 15,  int_bins_low.at(k_xsec_dirt),      int_bins_high.at(k_xsec_dirt));
+        h_universe_2D.at(k_xsec_data)          = new TH2D("h_2D_data",     "", nbins, edges, 80,  int_bins_low.at(k_xsec_data),      int_bins_high.at(k_xsec_data));
+        h_universe_2D.at(k_xsec_mcxsec)        = new TH2D("h_2D_mcxsec",   "", nbins, edges, 100, int_bins_low.at(k_xsec_mcxsec),    int_bins_high.at(k_xsec_mcxsec));
+        h_universe_2D.at(k_xsec_dataxsec)      = new TH2D("h_2D_dataxsec", "", nbins, edges, 100, int_bins_low.at(k_xsec_dataxsec),  int_bins_high.at(k_xsec_dataxsec));
         
     }
     // Set 2D bins for other
     else {
-        h_universe_2D.at(k_xsec_sel)           = new TH2D("h_2D_sel",      "", nbins, edges, 100, 0, 2500);
-        h_universe_2D.at(k_xsec_bkg)           = new TH2D("h_2D_bkg",      "", nbins, edges, 100, 0, 1200);
-        h_universe_2D.at(k_xsec_gen)           = new TH2D("h_2D_gen",      "", nbins, edges, 100, 0, 16000);
-        h_universe_2D.at(k_xsec_gen_smear)     = new TH2D("h_2D_gen_smear","", nbins, edges, 100, 0, 2700);
-        h_universe_2D.at(k_xsec_sig)           = new TH2D("h_2D_sig",      "", nbins, edges, 100, 0, 2700);
-        h_universe_2D.at(k_xsec_eff)           = new TH2D("h_2D_eff",      "", nbins, edges, 100, 0, 0.5);
-        h_universe_2D.at(k_xsec_ext)           = new TH2D("h_2D_ext",      "", nbins, edges, 30, 0, 30);
-        h_universe_2D.at(k_xsec_dirt)          = new TH2D("h_2D_dirt",     "", nbins, edges, 40, 0, 40);
-        h_universe_2D.at(k_xsec_data)          = new TH2D("h_2D_data",     "", nbins, edges, 100, 0, 250);
-        h_universe_2D.at(k_xsec_mcxsec)        = new TH2D("h_2D_mcxsec",   "", nbins, edges, 100, 0, xsec_scale);
-        h_universe_2D.at(k_xsec_dataxsec)      = new TH2D("h_2D_dataxsec", "", nbins, edges, 100, 0, xsec_scale);
+
+        std::vector<int> int_bins_low;
+        
+        if (std::string(_util.xsec_smear_mode) == "mcc8" ){
+            //               sel - bkg -   gen - gen_smear - sig  - eff - ext - dirt - data - mcxsec - dataxsec
+            diff_bins_low  = { 0,    0,      0,          0,    0,     0,    0,     0,      0,       0,         0}; 
+            diff_bins_high = {2500, 1200, 16000,      2700, 2700,     5,   30,    40,    250, xsec_scale, xsec_scale}; 
+        }
+        // Event Rate Binning
+        else {
+             //               sel - bkg -   gen - gen_smear - sig  - eff - ext - dirt - data - mcxsec - dataxsec
+            int_bins_low  = {2000, 200,   4000,       1000,  1000, 0.15,   0,     0,      0,     0.5,       0.5}; 
+            int_bins_high = {3000, 1000, 12000,       3000,  3000, 0.3,    10,    15,   140,     3.0,       3.0}; 
+
+        }
+
+        h_universe_2D.at(k_xsec_sel)           = new TH2D("h_2D_sel",      "", nbins, edges, 100, diff_bins_low.at(k_xsec_sel),       diff_bins_high.at(k_xsec_sel));
+        h_universe_2D.at(k_xsec_bkg)           = new TH2D("h_2D_bkg",      "", nbins, edges, 100, diff_bins_low.at(k_xsec_bkg),       diff_bins_high.at(k_xsec_bkg));
+        h_universe_2D.at(k_xsec_gen)           = new TH2D("h_2D_gen",      "", nbins, edges, 100, diff_bins_low.at(k_xsec_gen),       diff_bins_high.at(k_xsec_gen));
+        h_universe_2D.at(k_xsec_gen_smear)     = new TH2D("h_2D_gen_smear","", nbins, edges, 100, diff_bins_low.at(k_xsec_gen_smear), diff_bins_high.at(k_xsec_gen_smear));
+        h_universe_2D.at(k_xsec_sig)           = new TH2D("h_2D_sig",      "", nbins, edges, 100, diff_bins_low.at(k_xsec_sig),       diff_bins_high.at(k_xsec_sig));
+        h_universe_2D.at(k_xsec_eff)           = new TH2D("h_2D_eff",      "", nbins, edges, 100, diff_bins_low.at(k_xsec_eff),       diff_bins_high.at(k_xsec_eff));
+        h_universe_2D.at(k_xsec_ext)           = new TH2D("h_2D_ext",      "", nbins, edges, 30,  diff_bins_low.at(k_xsec_ext),       diff_bins_high.at(k_xsec_ext));
+        h_universe_2D.at(k_xsec_dirt)          = new TH2D("h_2D_dirt",     "", nbins, edges, 40,  diff_bins_low.at(k_xsec_dirt),      diff_bins_high.at(k_xsec_dirt));
+        h_universe_2D.at(k_xsec_data)          = new TH2D("h_2D_data",     "", nbins, edges, 100, diff_bins_low.at(k_xsec_data),      diff_bins_high.at(k_xsec_data));
+        h_universe_2D.at(k_xsec_mcxsec)        = new TH2D("h_2D_mcxsec",   "", nbins, edges, 100, diff_bins_low.at(k_xsec_mcxsec),    diff_bins_high.at(k_xsec_mcxsec));
+        h_universe_2D.at(k_xsec_dataxsec)      = new TH2D("h_2D_dataxsec", "", nbins, edges, 100, diff_bins_low.at(k_xsec_dataxsec),  diff_bins_high.at(k_xsec_dataxsec));
     }
     
     
@@ -1473,7 +1504,6 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
             h_err->SetTitle(var_labels_events.at(var).c_str());
 
         h_err->SetTitle(" ");
-        // h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
         h_err->SetMarkerColor(kBlack);
         h_err->SetLineStyle(1);
         h_err->SetLineColor(kBlack);

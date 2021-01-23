@@ -97,7 +97,7 @@ void CrossSectionHelper::Initialise(Utility _utility){
     std::cout << "  "<< std::endl;
 
     // Set the names of the histograms
-    _util.SetAxesNames(var_labels_xsec, var_labels_events, var_labels_eff, smear_hist_name, vars);
+    _util.SetAxesNames(var_labels_xsec, var_labels_events, var_labels_eff, smear_hist_name, vars, xsec_scale);
 
     // Create and initialise vector of histograms -- dont do this in the case we want to just write out the file lists
     InitialiseHistograms(std::string(_util.xsecmode));
@@ -423,6 +423,13 @@ void CrossSectionHelper::LoopEvents(){
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig),   // N Sig
                                 N_target_Data, "Data", var);
 
+                if (var == k_var_trueX){
+                    // Calculate the the smeared cross section prediction
+                    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_smear)->Add(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear), 1);
+                    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_smear)->Scale(1.0 / (weight_POT * temp_integrated_flux * mc_flux_scale_factor));
+                    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_smear)->Scale(1.0e39);
+                }
+
                 // Scale the histograms to avoid working with really small numbers
                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec)->Scale(1.0e39);
                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dataxsec)->Scale(1.0e39);
@@ -430,6 +437,8 @@ void CrossSectionHelper::LoopEvents(){
                 // if (var == 0) std::cout << reweighter_labels.at(label) << ": " << _util.red << h_cross_sec.at(label).at(uni).at(k_var_integrated).at(k_xsec_mcxsec)  ->Integral() << _util.reset<< " x10^-39 cm2/nucleon" << std::endl;
 
             } // End loop over the vars
+
+            
         
         } // End loop over universes
     

@@ -209,6 +209,18 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             }
         }
 
+        // What variable to do the cross section as a function of
+        if (strcmp(arg, "--xsec_smear") == 0){
+            std::cout << "Calculating a Cross-Section with smearing mode: " << argv[i+1] << std::endl;
+            xsec_smear_mode = argv[i+1];
+
+            // Modes must be mcc8 smearing or event rate
+            if (std::string(xsec_smear_mode) != "mcc8" && std::string(xsec_smear_mode) != "er" ){
+                std::cout << red << "Error specified variable which is not supported! You can use: mcc8 or er" << reset << std::endl;
+                exit(5);
+            }
+        }
+
         // Utility Plotter
         if (strcmp(arg, "--uplot") == 0){
             std::cout << "Using Utility plotting code with mode: " << argv[i+1] << std::endl;
@@ -1147,7 +1159,7 @@ void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov){
 }
 // -----------------------------------------------------------------------------
 void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vector<std::string> &var_labels_events,
-                           std::vector<std::string> &var_labels_eff,  std::string &smear_hist_name, std::vector<std::string> &vars){
+                           std::vector<std::string> &var_labels_eff,  std::string &smear_hist_name, std::vector<std::string> &vars, int &xsec_scale){
 
     // Electron/Shower Energy
     if (std::string(xsec_var) =="elec_E"){
@@ -1171,6 +1183,14 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
         smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]";
 
         vars = {"integrated", "reco_el_E", "true_el_E" };
+
+        if (xsec_smear_mode == "mcc8"){
+            xsec_scale = 13.0; // X-Section
+        }
+        else {
+            xsec_scale = 5.0; // Event Rate
+        }
+        
     
     }
     // Electron/Shower effective angle
@@ -1195,6 +1215,13 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
         smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Effective Angle [deg];Leading Shower Effective Angle [deg]";
 
         vars = {"integrated", "reco_el_ang", "true_el_ang" };
+
+        if (xsec_smear_mode == "mcc8"){
+            xsec_scale = 0.15; // X-Section
+        }
+        else {
+            xsec_scale = 0.05; // Event Rate
+        }
     }
     else {
         std::cout << "Unsupported parameter...exiting!" << std::endl;
