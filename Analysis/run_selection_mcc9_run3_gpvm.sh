@@ -94,10 +94,10 @@ fi
 # Could loop these to make it easier to run them all!
 
 if [ "$1" == "var" ]; then
-  ./nuexsec --run 3 --var /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_detvar_newtune/run3/neutrinoselection_filt_run3_overlay_$2.root $2 --gpvm
+  ./nuexsec --run 3 --var /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_detvar_newtune/run3/neutrinoselection_filt_run3_overlay_detvar_$2.root $2 --gpvm
   
   # Overwrite the true nue information 
-  ./nuexsec --run 3 --var /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_detvar_newtune/run3/intrinsic/neutrinoselection_filt_run3_overlay_$2_intrinsic.root $2 --intrinsic intrinsic --gpvm
+  ./nuexsec --run 3 --var /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_detvar_newtune/run3/intrinsic/neutrinoselection_filt_run3_overlay_detvar_$2_intrinsic.root $2 --intrinsic intrinsic --gpvm
 
   source merge/merge_run3_files.sh files/nuexsec_mc_run3_$2.root files/nuexsec_run3_$2_merged.root
 

@@ -512,6 +512,8 @@ template<typename T> void Utility::CheckWeight(T &weight){
     
     // Negative weight
     else if (weight < 0.)              weight = 1.0;
+
+    else if (weight > 0.0 && weight < 1.0e-4) weight = 0.0;
     
     else {
         // Do nothing to the weight
@@ -1104,9 +1106,9 @@ void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov){
 
     // We need to scale the histograms because the matrix inversion has problems
     // with the small numbers
-    h_model_clone->Scale(1.0e39);
-    h_data_clone->Scale(1.0e39);
-    h_cov_clone->Scale(1.0e78);
+    // h_model_clone->Scale(1.0e39);
+    // h_data_clone->Scale(1.0e39);
+    // h_cov_clone->Scale(1.0e78);
 
     // Getting covariance matrix in TMatrix form
     TMatrix cov_m;

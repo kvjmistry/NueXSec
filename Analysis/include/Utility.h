@@ -193,7 +193,7 @@ public:
     char * sysmode               = (char *)"default";
     char * xsecmode              = (char *)"default";
     char * xsec_rw_mode          = (char *)"default"; // choose whether to reweight by cut or the final selection
-    char * xsec_var              = (char *)"elec_E"; // What variable to do the cross section as a function of
+    char * xsec_var              = (char *)"elec_E";  // What variable to do the cross section as a function of
     char * xsec_labels           = (char *)"all";
     char * uplotmode             = (char *)"default";
     char * intrinsic_mode        = (char *)"default"; // choose whether to override the nue component to accomodate the intrinsic nue sample

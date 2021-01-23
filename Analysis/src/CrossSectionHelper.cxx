@@ -159,6 +159,8 @@ void CrossSectionHelper::LoopEvents(){
         
         tree->GetEntry(ievent); 
 
+        if (ievent % 20000 == 0 && ievent > 0) std::cout << "On entry " << ievent/10000.0 <<"0k " << std::endl;
+
         // Set the reco and true variables to bin in
         
         // Electron/Shower Energy
@@ -421,6 +423,12 @@ void CrossSectionHelper::LoopEvents(){
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig),   // N Sig
                                 N_target_Data, "Data", var);
 
+                // Scale the histograms to avoid working with really small numbers
+                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec)->Scale(1.0e39);
+                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dataxsec)->Scale(1.0e39);
+
+                // if (var == 0) std::cout << reweighter_labels.at(label) << ": " << _util.red << h_cross_sec.at(label).at(uni).at(k_var_integrated).at(k_xsec_mcxsec)  ->Integral() << _util.reset<< " x10^-39 cm2/nucleon" << std::endl;
+
             } // End loop over the vars
         
         } // End loop over universes
@@ -447,9 +455,9 @@ void CrossSectionHelper::LoopEvents(){
     << std::endl;
 
     std::cout <<
-    "GENIE X-Sec:           " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sig) ->Integral() / (h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_eff)->Integral() *integrated_flux * mc_flux_scale_factor * N_target_MC) << "  cm2/nucleon" << "\n" << 
-    "MC CC Cross Section:   " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_mcxsec)  ->Integral() << "  cm2/nucleon" << "\n" << 
-    "Data CC Cross Section: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dataxsec)->Integral() << "  cm2/nucleon      \n"
+    "GENIE X-Sec:           " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sig) ->Integral() / (h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_eff)->Integral() *integrated_flux * mc_flux_scale_factor * N_target_MC) * 1.0e39 << " x10^-39 cm2/nucleon" << "\n" << 
+    "MC CC Cross Section:   " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_mcxsec)  ->Integral() << " x10^-39 cm2/nucleon" << "\n" << 
+    "Data CC Cross Section: " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dataxsec)->Integral() << " x10^-39 cm2/nucleon      \n"
     << std::endl;
 
     // Write the histograms to file for inspection
@@ -813,11 +821,8 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
             vec_universes.at(uni)   = _weightSplineTimesTune;
         }
 
-        if (_weightSplineTimesTune == 0) weight_uni = 0.0; // Special case where the genie tune or we have thresholded events are zero
+        if (_weightSplineTimesTune == 0) weight_uni = cv_weight; // Special case where the genie tune or we have thresholded events are zero
         else weight_uni = (cv_weight * vec_universes[uni]) / _weightSplineTimesTune;
-
-        // std::cout << vec_universes.at(uni) << " " << weight_uni << "   "<< weightSplineTimesTune<< std::endl;
-
     }
 
 }
@@ -882,7 +887,10 @@ void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg,
         h_xsec->Add(h_dirt_clone, -1);
     }
     
-    h_xsec->Divide(h_eff) ; // For flux normalised event rate we dont do anything to the efficiency
+    // If using Marco's Method we correct by the efficiency
+    if (std::string(_util.xsec_smear_mode) == "mcc8"){
+        h_xsec->Divide(h_eff) ;
+    }
 
     h_xsec->Scale(1.0 / (targ*flux) );
 

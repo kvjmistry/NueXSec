@@ -54,7 +54,7 @@ if [ "$1" == "weight" ]; then
   ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel reint
   ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel mcstats
 
-  # ./nuexsec --run 3 --sys reweight
+  ./nuexsec --run 3 --sys reweight
 
   # Electron Angle
   # ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel unisim  --xsecvar elec_ang
@@ -85,10 +85,10 @@ fi
 # Could loop these to make it easier to run them all!
 
 if [ "$1" == "var" ]; then
-  ./nuexsec --run 3 --var ../ntuples/detvar_newtune/run3/neutrinoselection_filt_run3_overlay_$2.root $2
+  ./nuexsec --run 3 --var ../ntuples/detvar_newtune/run3/neutrinoselection_filt_run3_overlay_detvar_$2.root $2
   
   # Overwrite the true nue information
-  ./nuexsec --run 3 --var ../ntuples/detvar_newtune/run3/intrinsic/neutrinoselection_filt_run3_overlay_$2_intrinsic.root $2 --intrinsic intrinsic
+  ./nuexsec --run 3 --var ../ntuples/detvar_newtune/run3/intrinsic/neutrinoselection_filt_run3_overlay_detvar_$2_intrinsic.root $2 --intrinsic intrinsic
 
   source merge/merge_run3_files.sh files/nuexsec_mc_run3_$2.root files/nuexsec_run3_$2_merged.root
 

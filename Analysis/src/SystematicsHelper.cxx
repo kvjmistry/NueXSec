@@ -653,14 +653,8 @@ void SystematicsHelper::InitialiseReweightingMode(){
     // Now lets initialse the vectors which will store the total uncertainties
     InitialiseUncertaintyVectors();
 
-    // Initialise the covariance matrices -- this needs to be vectorized
-    int n_bins = cv_hist_vec.at(k_var_reco_el_E).at(0)->GetNbinsX();
-    h_cov_v.resize(k_ERR_MAX);
-    for (unsigned int cov = 0; cov < h_cov_v.size(); cov++){
-        h_cov_v.at(cov) = new TH2D(Form("h_cov_%s", systematic_names.at(cov).c_str()),         "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
-    }
-
-    
+    // Initialise the covariance matrix vector
+    InitialseCovarianceVector();
 
     // Loop over the cross-section variables
     for (unsigned int var = 0; var <  vars.size(); var++){
@@ -741,8 +735,8 @@ void SystematicsHelper::InitialiseReweightingMode(){
 
     // Save the total covariance matrices
     _util.CreateDirectory("/Systematics/Covariance");
-    for (unsigned int cov = 0; cov < h_cov_v.size(); cov++){
-        SaveCovMatrix(h_cov_v.at(cov),         Form("plots/run%s/Systematics/Covariance/run%s_%s_cov.pdf",         _util.run_period, _util.run_period,systematic_names.at(cov).c_str()));
+    for (unsigned int cov = 0; cov < h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).size(); cov++){
+        SaveCovMatrix(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(cov),         Form("plots/run%s/Systematics/Covariance/run%s_%s_cov.pdf",         _util.run_period, _util.run_period,systematic_names.at(cov).c_str()));
 
     }
 
@@ -763,24 +757,24 @@ void SystematicsHelper::InitialiseReweightingMode(){
     MakeTotUncertaintyPlot();
 
     // Calculate a chi-squared using the total covariance matrix
-    _util.CalcChiSquared(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_err_tot));
+    _util.CalcChiSquared(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot));
 
-    // Print the sqrt of the diagonals of the covariance matrix
-    // loop over rows
-    for (int row = 1; row < h_cov_v.at(k_err_sys)->GetNbinsX()+1; row++) {
+    // // Print the sqrt of the diagonals of the covariance matrix
+    // // loop over rows
+    // for (int row = 1; row < h_cov_v.at(k_err_sys)->GetNbinsX()+1; row++) {
         
-        // Loop over columns
-        for (int col = 1; col < h_cov_v.at(k_err_sys)->GetNbinsY()+1; col++) {
+    //     // Loop over columns
+    //     for (int col = 1; col < h_cov_v.at(k_err_sys)->GetNbinsY()+1; col++) {
             
-            // Only set the bin content of the diagonals
-            double bin_diag = cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->GetBinContent(row);
+    //         // Only set the bin content of the diagonals
+    //         double bin_diag = cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->GetBinContent(row);
 
-            // 0.01 converts each percentage back to a number. We multiply this by the cv to get the deviate
-            if (row == col) {
-                    std::cout << 100 * std::sqrt(h_cov_v.at(k_err_sys)->GetBinContent(row, col)) / bin_diag << std::endl;
-            }
-        }
-    }
+    //         // 0.01 converts each percentage back to a number. We multiply this by the cv to get the deviate
+    //         if (row == col) {
+    //                 std::cout << 100 * std::sqrt(h_cov_v.at(k_err_sys)->GetBinContent(row, col)) / bin_diag << std::endl;
+    //         }
+    //     }
+    // }
 
 
 }
@@ -929,11 +923,15 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
     // Single var so only 1 universe which we store in "up"
     if (single_var){
         h_universe_uni.push_back(h_universe.at(k_up));
-        CalcMatrices(label, var, h_universe_uni, k_xsec_mcxsec, cv_hist_vec.at(var).at(k_xsec_mcxsec) );
+        for (unsigned int type = 0; type < xsec_types.size(); type++) { 
+            CalcMatrices(label, var, h_universe_uni, type, cv_hist_vec.at(var).at(type) );
+        }
     }
     // Double var, so use up and down
     else {
-        CalcMatrices(label, var, h_universe, k_xsec_mcxsec, cv_hist_vec.at(var).at(k_xsec_mcxsec) );
+        for (unsigned int type = 0; type < xsec_types.size(); type++) { 
+            CalcMatrices(label, var, h_universe, type, cv_hist_vec.at(var).at(type) );
+        }
     }
     
     TPad *topPad;
@@ -1126,7 +1124,9 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
     // Get the covariance matrices
     std::vector<std::vector<TH1D*>> h_universe_uni;
     h_universe_uni.push_back(h_universe);
-    CalcMatrices(label, var, h_universe_uni, k_xsec_mcxsec, h_CV.at(k_xsec_mcxsec));
+    for (unsigned int type = 0; type < xsec_types.size(); type++) { 
+        CalcMatrices(label, var, h_universe_uni, type, h_CV.at(type));
+    }
 
     TPad *topPad;
     TPad *bottomPad;
@@ -1270,8 +1270,8 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_universe_2D.at(k_xsec_ext)           = new TH2D("h_2D_ext",      "", nbins, edges, 10, 0, 10);
         h_universe_2D.at(k_xsec_dirt)          = new TH2D("h_2D_dirt",     "", nbins, edges, 15, 0, 15);
         h_universe_2D.at(k_xsec_data)          = new TH2D("h_2D_data",     "", nbins, edges, 80, 0, 140);
-        h_universe_2D.at(k_xsec_mcxsec)        = new TH2D("h_2D_mcxsec",   "", nbins, edges, 100, 0.5e-39, 3.0e-39);
-        h_universe_2D.at(k_xsec_dataxsec)      = new TH2D("h_2D_dataxsec", "", nbins, edges, 100, 0.5e-39, 3.0e-39);
+        h_universe_2D.at(k_xsec_mcxsec)        = new TH2D("h_2D_mcxsec",   "", nbins, edges, 100, 0.5, 3.0);
+        h_universe_2D.at(k_xsec_dataxsec)      = new TH2D("h_2D_dataxsec", "", nbins, edges, 100, 0.5, 3.0);
         
     }
     // Set 2D bins for other
@@ -1329,7 +1329,11 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
     }
 
     // Get the covariance, correlation, fractional cov matrices
-    CalcMatrices(label, var, h_universe, k_xsec_mcxsec, cv_hist_vec.at(var).at(k_xsec_mcxsec));
+    std::cout << "Calculating Covariance Matrix" << std::endl;
+    for (unsigned int type = 0; type < xsec_types.size(); type++) {  
+        CalcMatrices(label, var, h_universe, type, cv_hist_vec.at(var).at(type));
+    }
+    std::cout << "Finished Calculating Covariance Matrix" << std::endl;
 
     // Create vector of systematic error for each histogram
     std::vector<std::vector<double>> sys_err;
@@ -1525,8 +1529,8 @@ void SystematicsHelper::CompareCVXSec(){
             h_mcxsec  ->SetLineColor(kRed+2);
 
             // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
-            if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(3.5e-39, 10.5e-39);
-            else h_dataxsec->GetYaxis()->SetRangeUser(0.0e-39, xsec_scale);
+            if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(3.5, 10.5);
+            else h_dataxsec->GetYaxis()->SetRangeUser(0.0, xsec_scale);
 
             h_dataxsec->GetYaxis()->SetLabelSize(0.04);
             h_dataxsec->GetYaxis()->SetTitleSize(14);
@@ -1652,8 +1656,8 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             h_mcxsec  ->SetLineColor(kRed+2);
 
             // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
-            if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(3.5e-39, 10.5e-39);
-            else h_dataxsec->GetYaxis()->SetRangeUser(0.0e-39, xsec_scale);
+            if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(3.5, 10.5);
+            else h_dataxsec->GetYaxis()->SetRangeUser(0.0, xsec_scale);
 
             _util.IncreaseLabelSize(h_dataxsec, c);
             if (vars.at(var) == "integrated")h_dataxsec->GetXaxis()->SetLabelSize(0);
@@ -1930,8 +1934,17 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
 
     int n_bins = cv_hist_vec.at(var).at(0)->GetNbinsX();
 
-    TH2D* cov  = new TH2D("h_cov",   ";Bin i; Bin j",n_bins, 1, n_bins+1, n_bins, 1, n_bins+1 ); // Create the covariance matrix
-    TH2D* cor  = new TH2D("h_cor",   ";Bin i; Bin j",n_bins, 1, n_bins+1, n_bins, 1, n_bins+1 ); // Create the correlation matrix
+    TH2D* cov; 
+    TH2D* cor;
+
+    if (var == k_var_integrated){
+        cov  = new TH2D("h_cov",   ";Bin i; Bin j",1, 1, 2, 1, 1, 2 ); // Create the covariance matrix
+        cor  = new TH2D("h_cor",   ";Bin i; Bin j",1, 1, 2, 1, 1, 2 ); // Create the correlation matrix
+    }
+    else { 
+        cov  = new TH2D("h_cov",   ";Bin i; Bin j",n_bins, 1, n_bins+1, n_bins, 1, n_bins+1 ); // Create the covariance matrix
+        cor  = new TH2D("h_cor",   ";Bin i; Bin j",n_bins, 1, n_bins+1, n_bins, 1, n_bins+1 ); // Create the correlation matrix
+    }
 
 
     // Loop over universes
@@ -1961,7 +1974,6 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
             
     }
 
-
     // Correlation Matrix
     _util.CalcCorrelation(h_CV, cov, cor);
     
@@ -1971,160 +1983,163 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
 
 
     gStyle->SetPalette(kBlueGreenYellow);
-
-    // For now only saving the reco electron cov matrices
-    if (var == k_var_reco_el_E){
-        // Store the covariance matrices so we can add them and get the total
-        // This is a Genie Unisim
-        if (label == "RPA"              ||
-            label == "CCMEC"            ||
-            label == "AxFFCCQE"         ||
-            label == "VecFFCCQE"        ||
-            label == "DecayAngMEC"      ||
-            label == "ThetaDelta2Npi"   ||
-            label == "ThetaDelta2NRad"  ||
-            label == "RPA_CCQE_Reduced" ||
-            label == "NormCCCOH"        ||
-            label == "NormNCCOH"){
-                h_cov_v.at(k_err_genie_uni)->Add(cov);
-                h_cov_v.at(k_err_tot)->Add(cov);
-                h_cov_v.at(k_err_sys)->Add(cov);
-
-        }
-        // Beamline
-        else if (label == "Horn_curr" ||
-                label == "Horn1_x" ||
-                label == "Horn1_y" ||
-                label == "Beam_spot" ||
-                label == "Horn2_x" ||
-                label == "Horn2_y" ||
-                label == "Horn_Water" ||
-                label == "Beam_shift_x" ||
-                label == "Beam_shift_y" ||
-                label == "Target_z" ||
-                label == "Decay_pipe_Bfield"){
-                h_cov_v.at(k_err_beamline)->Add(cov);
-                h_cov_v.at(k_err_tot)->Add(cov);
-                h_cov_v.at(k_err_sys)->Add(cov);
-        }
-        // Detector Variation
-        else if (
-                label == "LYRayleigh" ||
-                label == "LYDown"     ||
-                label == "LYAttenuation" ||
-                label == "SCE" ||
-                label == "Recomb2" ||
-                label == "WireModX" ||
-                label == "WireModYZ" ||
-                label == "WireModThetaXZ" ||
-                label == "WireModThetaYZ_withSigmaSplines" ||
-                label == "WireModThetaYZ_withoutSigmaSplines" ||
-                label == "WireModdEdX" ){
-                h_cov_v.at(k_err_detvar)->Add(cov);
-                h_cov_v.at(k_err_tot)->Add(cov);
-                h_cov_v.at(k_err_sys)->Add(cov);
-        }
-        else if (label == "weightsGenie"){
-            h_cov_v.at(k_err_genie_multi)->Add(cov);
-            h_cov_v.at(k_err_tot)->Add(cov);
-            h_cov_v.at(k_err_sys)->Add(cov);
-
-        }
-        else if (label == "weightsReint"){
-            h_cov_v.at(k_err_reint)->Add(cov);
-            h_cov_v.at(k_err_tot)->Add(cov);
-            h_cov_v.at(k_err_sys)->Add(cov);
-
-        }
-        else if (label == "weightsPPFX"){
-            h_cov_v.at(k_err_hp)->Add(cov);
-            h_cov_v.at(k_err_tot)->Add(cov);
-            h_cov_v.at(k_err_sys)->Add(cov);
-
-        }
-        else if (label == "Dirt"){
-            h_cov_v.at(k_err_dirt)->Add(cov);
-            h_cov_v.at(k_err_tot)->Add(cov);
-            h_cov_v.at(k_err_sys)->Add(cov);
-
-        }
-        else if (label == "POT"){
-            h_cov_v.at(k_err_pot)->Add(cov);
-            h_cov_v.at(k_err_tot)->Add(cov);
-            h_cov_v.at(k_err_sys)->Add(cov);
-
-        }
-        else if (label == "MCStats"){
-            h_cov_v.at(k_err_mcstats)->Add(cov);
-            h_cov_v.at(k_err_tot)->Add(cov);
-            h_cov_v.at(k_err_sys)->Add(cov);
-
-        }
-        else if (label == "pi0"){
-            h_cov_v.at(k_err_pi0)->Add(cov);
-            h_cov_v.at(k_err_tot)->Add(cov);
-            h_cov_v.at(k_err_sys)->Add(cov);
-
-        }
-        else {
-            std::cout << "Unknown variation specified: " << label << std::endl;
-            delete cov;
-            delete cor;
-            delete frac_cov;
-            return;
-        }
+    
+    // Store the covariance matrices so we can add them and get the total
+    // This is a Genie Unisim
+    if (label == "RPA"              ||
+        label == "CCMEC"            ||
+        label == "AxFFCCQE"         ||
+        label == "VecFFCCQE"        ||
+        label == "DecayAngMEC"      ||
+        label == "ThetaDelta2Npi"   ||
+        label == "ThetaDelta2NRad"  ||
+        label == "RPA_CCQE_Reduced" ||
+        label == "NormCCCOH"        ||
+        label == "NormNCCOH"){
+            h_cov_v.at(var).at(_type).at(k_err_genie_uni)->Add(cov);
+            h_cov_v.at(var).at(_type).at(k_err_tot)->Add(cov);
+            h_cov_v.at(var).at(_type).at(k_err_sys)->Add(cov);
 
     }
+    // Beamline
+    else if (label == "Horn_curr" ||
+            label == "Horn1_x" ||
+            label == "Horn1_y" ||
+            label == "Beam_spot" ||
+            label == "Horn2_x" ||
+            label == "Horn2_y" ||
+            label == "Horn_Water" ||
+            label == "Beam_shift_x" ||
+            label == "Beam_shift_y" ||
+            label == "Target_z" ||
+            label == "Decay_pipe_Bfield"){
+            h_cov_v.at(var).at(_type).at(k_err_beamline)->Add(cov);
+            h_cov_v.at(var).at(_type).at(k_err_tot)->Add(cov);
+            h_cov_v.at(var).at(_type).at(k_err_sys)->Add(cov);
+    }
+    // Detector Variation
+    else if (
+            label == "LYRayleigh" ||
+            label == "LYDown"     ||
+            label == "LYAttenuation" ||
+            label == "SCE" ||
+            label == "Recomb2" ||
+            label == "WireModX" ||
+            label == "WireModYZ" ||
+            label == "WireModThetaXZ" ||
+            label == "WireModThetaYZ_withSigmaSplines" ||
+            label == "WireModThetaYZ_withoutSigmaSplines" ||
+            label == "WireModdEdX" ){
+            h_cov_v.at(var).at(_type).at(k_err_detvar)->Add(cov);
+            h_cov_v.at(var).at(_type).at(k_err_tot)->Add(cov);
+            h_cov_v.at(var).at(_type).at(k_err_sys)->Add(cov);
+    }
+    else if (label == "weightsGenie"){
+        h_cov_v.at(var).at(_type).at(k_err_genie_multi)->Add(cov);
+        h_cov_v.at(var).at(_type).at(k_err_tot)->Add(cov);
+        h_cov_v.at(var).at(_type).at(k_err_sys)->Add(cov);
 
-    TCanvas *c = new TCanvas("c", "c", 500, 500);
-    cov->GetXaxis()->CenterLabels(kTRUE);
-    cov->GetYaxis()->CenterLabels(kTRUE);
-    cov->GetZaxis()->CenterTitle();
-    cov->SetTitle("Covariance Matrix");
-    cov->GetZaxis()->SetTitle("Covariance [cm^{4}GeV^{2}]");
-    cov->GetZaxis()->SetTitleOffset(1.45);
-    cov->Draw("colz");
-    _util.IncreaseLabelSize(cov, c);
-    _util.Draw_ubooneSim(c, 0.30, 0.915, 0.30, 0.915);
-    c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_cov.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(),  _util.run_period, label.c_str(), vars.at(var).c_str()));
+    }
+    else if (label == "weightsReint"){
+        h_cov_v.at(var).at(_type).at(k_err_reint)->Add(cov);
+        h_cov_v.at(var).at(_type).at(k_err_tot)->Add(cov);
+        h_cov_v.at(var).at(_type).at(k_err_sys)->Add(cov);
 
-    TCanvas *c2 = new TCanvas("c2", "c2", 500, 500);
-    cor->GetXaxis()->CenterLabels(kTRUE);
-    cor->GetYaxis()->CenterLabels(kTRUE);
-    cor->GetZaxis()->CenterTitle();
-    cor->GetZaxis()->SetTitle("Correlation");
-    cor->GetZaxis()->SetTitleOffset(1.3);
-    cor->SetTitle("Correlation Matrix");
-    // cor->SetMaximum(1);
-    // cor->SetMinimum(0);
-    cor->Draw("colz, text00");
-    _util.IncreaseLabelSize(cor, c2);
-    cor->SetMarkerSize(1.3);
-    cor->SetMarkerColor(kRed+1);
-    gStyle->SetPaintTextFormat("0.3f");
-    _util.Draw_ubooneSim(c2, 0.30, 0.915, 0.30, 0.915);
-    c2->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_cor.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(),  _util.run_period, label.c_str(), vars.at(var).c_str()));
+    }
+    else if (label == "weightsPPFX"){
+        h_cov_v.at(var).at(_type).at(k_err_hp)->Add(cov);
+        h_cov_v.at(var).at(_type).at(k_err_tot)->Add(cov);
+        h_cov_v.at(var).at(_type).at(k_err_sys)->Add(cov);
 
-    TCanvas *c3 = new TCanvas("c3", "c3", 500, 500);
-    frac_cov->GetXaxis()->CenterLabels(kTRUE);
-    frac_cov->GetYaxis()->CenterLabels(kTRUE);
-    frac_cov->GetZaxis()->CenterTitle();
-    frac_cov->Draw("colz, text00");
-    frac_cov->GetZaxis()->SetTitle("Frac. Covariance");
-    frac_cov->SetTitle("Fractional Covariance Matrix");
-    frac_cov->GetZaxis()->SetTitleOffset(1.52);
-    _util.IncreaseLabelSize(frac_cov, c3);
-    frac_cov->SetMarkerSize(1.3);
-    frac_cov->SetMarkerColor(kRed+1);
-    gStyle->SetPaintTextFormat("0.3f");
-    _util.Draw_ubooneSim(c3, 0.30, 0.915, 0.30, 0.915);
-    c3->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_frac_cov.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(),  _util.run_period, label.c_str(), vars.at(var).c_str()));
+    }
+    else if (label == "Dirt"){
+        h_cov_v.at(var).at(_type).at(k_err_dirt)->Add(cov);
+        h_cov_v.at(var).at(_type).at(k_err_tot)->Add(cov);
+        h_cov_v.at(var).at(_type).at(k_err_sys)->Add(cov);
+
+    }
+    else if (label == "POT"){
+        h_cov_v.at(var).at(_type).at(k_err_pot)->Add(cov);
+        h_cov_v.at(var).at(_type).at(k_err_tot)->Add(cov);
+        h_cov_v.at(var).at(_type).at(k_err_sys)->Add(cov);
+
+    }
+    else if (label == "MCStats"){
+        h_cov_v.at(var).at(_type).at(k_err_mcstats)->Add(cov);
+        h_cov_v.at(var).at(_type).at(k_err_tot)->Add(cov);
+        h_cov_v.at(var).at(_type).at(k_err_sys)->Add(cov);
+
+    }
+    else if (label == "pi0"){
+        h_cov_v.at(var).at(_type).at(k_err_pi0)->Add(cov);
+        h_cov_v.at(var).at(_type).at(k_err_tot)->Add(cov);
+        h_cov_v.at(var).at(_type).at(k_err_sys)->Add(cov);
+
+    }
+    else {
+        std::cout << "Unknown variation specified: " << label << std::endl;
+        delete cov;
+        delete cor;
+        delete frac_cov;
+        return;
+    }
+
+
+    if (var == k_var_reco_el_E && _type == k_xsec_mcxsec){
+
+        TCanvas *c = new TCanvas("c", "c", 500, 500);
+        cov->GetXaxis()->CenterLabels(kTRUE);
+        cov->GetYaxis()->CenterLabels(kTRUE);
+        cov->GetZaxis()->CenterTitle();
+        cov->SetTitle("Covariance Matrix");
+        cov->GetZaxis()->SetTitle("Covariance [cm^{4}GeV^{2}]");
+        cov->GetZaxis()->SetTitleOffset(1.45);
+        cov->Draw("colz");
+        _util.IncreaseLabelSize(cov, c);
+        _util.Draw_ubooneSim(c, 0.30, 0.915, 0.30, 0.915);
+        c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_cov.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(),  _util.run_period, label.c_str(), vars.at(var).c_str()));
+
+        TCanvas *c2 = new TCanvas("c2", "c2", 500, 500);
+        cor->GetXaxis()->CenterLabels(kTRUE);
+        cor->GetYaxis()->CenterLabels(kTRUE);
+        cor->GetZaxis()->CenterTitle();
+        cor->GetZaxis()->SetTitle("Correlation");
+        cor->GetZaxis()->SetTitleOffset(1.3);
+        cor->SetTitle("Correlation Matrix");
+        // cor->SetMaximum(1);
+        // cor->SetMinimum(0);
+        cor->Draw("colz, text00");
+        _util.IncreaseLabelSize(cor, c2);
+        cor->SetMarkerSize(1.3);
+        cor->SetMarkerColor(kRed+1);
+        gStyle->SetPaintTextFormat("0.3f");
+        _util.Draw_ubooneSim(c2, 0.30, 0.915, 0.30, 0.915);
+        c2->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_cor.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(),  _util.run_period, label.c_str(), vars.at(var).c_str()));
+
+        TCanvas *c3 = new TCanvas("c3", "c3", 500, 500);
+        frac_cov->GetXaxis()->CenterLabels(kTRUE);
+        frac_cov->GetYaxis()->CenterLabels(kTRUE);
+        frac_cov->GetZaxis()->CenterTitle();
+        frac_cov->Draw("colz, text00");
+        frac_cov->GetZaxis()->SetTitle("Frac. Covariance");
+        frac_cov->SetTitle("Fractional Covariance Matrix");
+        frac_cov->GetZaxis()->SetTitleOffset(1.52);
+        _util.IncreaseLabelSize(frac_cov, c3);
+        frac_cov->SetMarkerSize(1.3);
+        frac_cov->SetMarkerColor(kRed+1);
+        gStyle->SetPaintTextFormat("0.3f");
+        _util.Draw_ubooneSim(c3, 0.30, 0.915, 0.30, 0.915);
+        c3->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_frac_cov.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(),  _util.run_period, label.c_str(), vars.at(var).c_str()));
+
+        
+        delete c;
+        delete c2;
+        delete c3;
+        
+    }
 
     delete cov;
-    delete c;
-    delete c2;
     delete cor;
-    delete c3;
     delete frac_cov;
 
 }
@@ -2352,22 +2367,37 @@ void SystematicsHelper::FillStatVector(){
     }
 
     // Lets also fill the diagonals of the statistical covariance matrix
-    // loop over rows
-    for (int row = 1; row < h_cov_v.at(k_err_stat)->GetNbinsX()+1; row++) {
-        
-        // Loop over columns
-        for (int col = 1; col < h_cov_v.at(k_err_stat)->GetNbinsY()+1; col++) {
-            
-            // Only set the bin content of the diagonals
-            double bin_diag = cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->GetBinContent(row); // We use the MC value to fill the cov matrix, but use the data stat err for now. 
 
-            // 0.01 converts each percentage back to a number. We multiply this by the cv to get the deviate
-            if (row == col) h_cov_v.at(k_err_stat)->SetBinContent(row, col, 0.01*0.01*v_err.at(k_err_stat).at(k_var_reco_el_E).at(k_xsec_dataxsec).at(row-1)*bin_diag*bin_diag);  
+     // Loop over the differential variables
+    for (unsigned int var = 0; var < vars.size(); var++ ){
+        
+        // Loop over the types
+        for (unsigned int type = 0; type < xsec_types.size(); type++ ){
+
+            // loop over rows
+            for (int row = 1; row < h_cov_v.at(var).at(type).at(k_err_stat)->GetNbinsX()+1; row++) {
+                
+                // Loop over columns
+                for (int col = 1; col < h_cov_v.at(var).at(type).at(k_err_stat)->GetNbinsY()+1; col++) {
+                    
+                    // Only set the bin content of the diagonals
+                    double bin_diag = cv_hist_vec.at(var).at(type)->GetBinContent(row); // We use the MC value to fill the cov matrix, but use the data stat err for now. 
+
+                    // 0.01 converts each percentage back to a number. We multiply this by the cv to get the deviate
+                    if (row == col) h_cov_v.at(var).at(type).at(k_err_stat)->SetBinContent(row, col, 0.01*0.01*v_err.at(k_err_stat).at(var).at(type).at(row-1)*bin_diag*bin_diag);  
+                }
+            }
+
+            // Add the created stat diagonal cov matrix to the total 
+            h_cov_v.at(var).at(type).at(k_err_tot)->Add(h_cov_v.at(var).at(type).at(k_err_stat));
         }
     }
 
-    // Add the stat to the total
-    h_cov_v.at(k_err_tot)->Add(h_cov_v.at(k_err_stat));
+    // Add the data stat to the total mc cov matrix
+    h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_stat));
+
+    // Add the mc stat to the total data cov matrix
+    h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_stat));
 
 
 }
@@ -3231,3 +3261,45 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
 
 }
 // -----------------------------------------------------------------------------
+void SystematicsHelper::InitialseCovarianceVector(){
+
+    // Initialise the covariance matrices -- this needs to be vectorized
+    int n_bins = cv_hist_vec.at(k_var_reco_el_E).at(0)->GetNbinsX();
+    
+    // Resize to the number of variables
+    h_cov_v.resize(vars.size());
+
+    // Loop over vars and resize to the number of types
+    for (unsigned int var = 0; var < h_cov_v.size(); var++) {
+        h_cov_v.at(var).resize(xsec_types.size());
+    }
+    
+    // Loop over vars
+    for (unsigned int var = 0; var < h_cov_v.size(); var++) {
+        
+        // Loop over the types
+        for (unsigned int type = 0; type < xsec_types.size(); type++) {
+            // Resize to the number of systematics 
+            h_cov_v.at(var).at(type).resize(k_ERR_MAX);
+        }
+    
+    }
+
+    // Do the looping again and create the histograms
+    for (unsigned int var = 0; var < h_cov_v.size(); var++) {
+        for (unsigned int type = 0; type < h_cov_v.at(var).size(); type++) {
+            for (unsigned int cov = 0; cov < h_cov_v.at(var).at(type).size(); cov++){
+                
+                if (var == k_var_integrated){
+                    h_cov_v.at(var).at(type).at(cov) = new TH2D(Form("h_cov_%s_%s_%s", vars.at(var).c_str(), xsec_types.at(type).c_str(), systematic_names.at(cov).c_str()), "Covariance Matrix ;Bin i; Bin j", 1, 1, 2, 1, 1, 2);
+                }
+                else { 
+                    h_cov_v.at(var).at(type).at(cov) = new TH2D(Form("h_cov_%s_%s_%s", vars.at(var).c_str(), xsec_types.at(type).c_str(), systematic_names.at(cov).c_str()), "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
+                }
+                
+            }
+        }
+    }
+
+
+}

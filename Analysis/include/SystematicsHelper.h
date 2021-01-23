@@ -122,6 +122,10 @@ class SystematicsHelper{
     // Make a plot of the systematics in one plot
     void MakeTotUncertaintyPlot();
     // -------------------------------------------------------------------------
+    // Initialse the matrix of covariance matrices
+    void InitialseCovarianceVector();
+    // -------------------------------------------------------------------------
+
 
     std::string mode{"default"}; // what mode to run this class in
 
@@ -226,9 +230,9 @@ class SystematicsHelper{
     std::vector<std::string> vars = {"integrated","recoX", "trueX" };
 
     // Choose the cross section scale to set the histogram
-    double xsec_scale = 13.0e-39;
-    // double xsec_scale = 0.15e-39;
-    // double xsec_scale = 0.5e-39;
+    double xsec_scale = 13.0;
+    // double xsec_scale = 0.15;
+    // double xsec_scale = 0.5;
     
     // Use these for when we do the flux normalised event rate
     // std::vector<std::string> var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",
@@ -287,7 +291,7 @@ class SystematicsHelper{
     std::vector<std::vector<std::vector<std::vector<double>>>> v_err;
     
     // Vector to store all the final covariance matrices
-    std::vector<TH2D*> h_cov_v;
+    std::vector<std::vector<std::vector<TH2D*>>> h_cov_v; // var -- type -- label
 
 
     // Vector to store total uncertainty histograms
