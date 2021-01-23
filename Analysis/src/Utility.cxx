@@ -1159,7 +1159,7 @@ void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov){
 }
 // -----------------------------------------------------------------------------
 void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vector<std::string> &var_labels_events,
-                           std::vector<std::string> &var_labels_eff,  std::string &smear_hist_name, std::vector<std::string> &vars, int &xsec_scale){
+                           std::vector<std::string> &var_labels_eff,  std::string &smear_hist_name, std::vector<std::string> &vars, double &xsec_scale){
 
     // Electron/Shower Energy
     if (std::string(xsec_var) =="elec_E"){
@@ -1184,11 +1184,11 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
 
         vars = {"integrated", "reco_el_E", "true_el_E" };
 
-        if (xsec_smear_mode == "mcc8"){
+        if (std::string(xsec_smear_mode) == "mcc8"){
             xsec_scale = 13.0; // X-Section
         }
         else {
-            xsec_scale = 5.0; // Event Rate
+            xsec_scale = 2.0; // Event Rate
         }
         
     
@@ -1216,7 +1216,7 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
 
         vars = {"integrated", "reco_el_ang", "true_el_ang" };
 
-        if (xsec_smear_mode == "mcc8"){
+        if (std::string(xsec_smear_mode) == "mcc8"){
             xsec_scale = 0.15; // X-Section
         }
         else {

@@ -201,17 +201,18 @@ class SystematicsHelper{
 
     // enum for histogram types
     enum TH1D_xsec_hist_vars {
-        k_xsec_sel,     // Selected event histogram binned in energy
-        k_xsec_bkg,     // Bkg event histogram binned in energy
-        k_xsec_gen,     // Gen event histogram binned in energy
+        k_xsec_sel,          // Selected event histogram binned in energy
+        k_xsec_bkg,          // Bkg event histogram binned in energy
+        k_xsec_gen,          // Gen event histogram binned in energy
         k_xsec_gen_smear,    // Gen event histogram binned in energy with smeared truth
-        k_xsec_sig,     // Sig event histogram binned in energy
-        k_xsec_eff,     // Efficiency histogram binned in energy
-        k_xsec_ext,     // EXT event histogram binned in energy
-        k_xsec_dirt,    // Dirt event histogram binned in energy
-        k_xsec_data,    // Data event histogram binned in energy
-        k_xsec_mcxsec,  // MC Cross Section
-        k_xsec_dataxsec,// Data Cross Section
+        k_xsec_sig,          // Sig event histogram binned in energy
+        k_xsec_eff,          // Efficiency histogram binned in energy
+        k_xsec_ext,          // EXT event histogram binned in energy
+        k_xsec_dirt,         // Dirt event histogram binned in energy
+        k_xsec_data,         // Data event histogram binned in energy
+        k_xsec_mcxsec,       // MC Cross Section
+        k_xsec_mcxsec_smear, // MC Cross Section smeared truth
+        k_xsec_dataxsec,     // Data Cross Section
         k_TH1D_xsec_MAX
     };
 
@@ -224,15 +225,13 @@ class SystematicsHelper{
     };
 
     // Names for cross section histograms
-    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "data_xsec"};
-    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Smeared Prediction", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC", "Data"};
+    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "data_xsec"};
+    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Smeared Prediction", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC", "MC Smear",  "Data"};
 
     std::vector<std::string> vars = {"integrated","recoX", "trueX" };
 
     // Choose the cross section scale to set the histogram
     double xsec_scale = 13.0;
-    // double xsec_scale = 0.15;
-    // double xsec_scale = 0.5;
     
     // Use these for when we do the flux normalised event rate
     // std::vector<std::string> var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",

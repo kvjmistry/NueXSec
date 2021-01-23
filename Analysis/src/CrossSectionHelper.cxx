@@ -426,7 +426,7 @@ void CrossSectionHelper::LoopEvents(){
                 if (var == k_var_trueX){
                     // Calculate the the smeared cross section prediction
                     h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_smear)->Add(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear), 1);
-                    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_smear)->Scale(1.0 / (weight_POT * temp_integrated_flux * mc_flux_scale_factor));
+                    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_smear)->Scale(1.0 / (integrated_flux * mc_flux_scale_factor * N_target_MC));
                     h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_smear)->Scale(1.0e39);
                 }
 

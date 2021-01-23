@@ -40,7 +40,7 @@ if [ -z "$1" ]; then
 
   # Now run the cross section calculator
   # Not running this until happy its working...
-  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode default | tee -a log/run3.log 
+  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode default --xsec_smear mcc8 | tee -a log/run3.log 
 
 fi
 
@@ -48,20 +48,20 @@ fi
 if [ "$1" == "weight" ]; then
 
   # Electron Energy
-  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel unisim
-  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel ppfx
-  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel genie
-  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel reint
-  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel mcstats
+  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel unisim   --xsec_smear mcc8
+  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel ppfx     --xsec_smear mcc8
+  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel genie    --xsec_smear mcc8
+  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel reint    --xsec_smear mcc8
+  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel mcstats  --xsec_smear mcc8
 
   ./nuexsec --run 3 --sys reweight
 
   # Electron Angle
-  # ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel unisim  --xsecvar elec_ang
-  # ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel ppfx    --xsecvar elec_ang
-  # ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel genie   --xsecvar elec_ang
-  # ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel reint   --xsecvar elec_ang
-  # ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel mcstats --xsecvar elec_ang
+  # ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel unisim  --xsecvar elec_ang --xsec_smear mcc8
+  # ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel ppfx    --xsecvar elec_ang --xsec_smear mcc8
+  # ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel genie   --xsecvar elec_ang --xsec_smear mcc8
+  # ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel reint   --xsecvar elec_ang --xsec_smear mcc8
+  # ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel mcstats --xsecvar elec_ang --xsec_smear mcc8
 
   # ./nuexsec --run 3 --sys reweight --xsecvar elec_ang
 
@@ -96,7 +96,7 @@ if [ "$1" == "var" ]; then
 
   root -l -b -q 'merge/merge_uneaventrees.C("3", true, "files/trees/nuexsec_selected_tree_mc_run3_'"$2"'.root", "files/trees/nuexsec_selected_tree_data_run3.root", "files/trees/nuexsec_selected_tree_ext_run3.root","files/trees/nuexsec_selected_tree_dirt_run3.root", "'"$2"'")'
 
-  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3_$2.root --var dummy $2 --xsecmode default --xsecvar elec_E
+  ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3_$2.root --var dummy $2 --xsecmode default --xsecvar elec_E --xsec_smear mcc8
 
 fi
 
