@@ -215,8 +215,8 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             xsec_smear_mode = argv[i+1];
 
             // Modes must be mcc8 smearing or event rate
-            if (std::string(xsec_smear_mode) != "mcc8" && std::string(xsec_smear_mode) != "er" ){
-                std::cout << red << "Error specified variable which is not supported! You can use: mcc8 or er" << reset << std::endl;
+            if (std::string(xsec_smear_mode) != "mcc8" && std::string(xsec_smear_mode) != "er" && std::string(xsec_smear_mode) != "wiener" ){
+                std::cout << red << "Error specified variable which is not supported! You can use: mcc8 or er or wiener" << reset << std::endl;
                 exit(5);
             }
         }
@@ -1189,8 +1189,7 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
         }
         else {
             xsec_scale = 2.0; // Event Rate
-        }
-        
+        }        
     
     }
     // Electron/Shower effective angle
@@ -1222,6 +1221,7 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
         else {
             xsec_scale = 0.05; // Event Rate
         }
+
     }
     else {
         std::cout << "Unsupported parameter...exiting!" << std::endl;

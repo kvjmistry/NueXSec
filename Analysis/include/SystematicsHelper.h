@@ -125,6 +125,10 @@ class SystematicsHelper{
     // Initialse the matrix of covariance matrices
     void InitialseCovarianceVector();
     // -------------------------------------------------------------------------
+    // Write the results to a file for ease of storage
+    void ExportResult(TFile* f);
+    // -------------------------------------------------------------------------
+
 
 
     std::string mode{"default"}; // what mode to run this class in

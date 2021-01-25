@@ -47,7 +47,7 @@ if [ -z "$1" ]; then
   root -l -b -q 'merge/merge_uneaventrees.C("1", true, "files/trees/nuexsec_selected_tree_mc_run1.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "")'
 
   # Now run the cross section calculator
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode default --xsec_smear mcc8 | tee -a log/run1.log 
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode default --xsec_smear er | tee -a log/run1.log 
 fi
 # ---------------------
 
@@ -61,7 +61,10 @@ if [ "$1" == "weight" ]; then
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel reint   --xsec_smear er
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel mcstats --xsec_smear er
 
-  # ./nuexsec --run 1 --sys reweight --xsec_smear er
+  # Re-run the detvar xsec
+  source run_selection_mcc9_run1.sh allvarxsec
+
+  ./nuexsec --run 1 --sys reweight --xsec_smear er
 
   # Electron Angle
   # ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel unisim  --xsecvar elec_ang --xsec_smear mcc8
@@ -137,6 +140,16 @@ if [ "$1" == "allvar" ]; then
   for i in "${var[@]}"
   do
     source run_selection_mcc9_run1.sh var "$i"
+  done
+
+fi
+
+if [ "$1" == "allvarxsec" ]; then
+
+  # run the above script for every det variation 
+  for i in "${var[@]}"
+  do
+    ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$i.root --var dummy $i --xsecmode default --xsecvar elec_E --xsec_smear er
   done
 
 fi

@@ -758,6 +758,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
 
     // Calculate a chi-squared using the total covariance matrix
     _util.CalcChiSquared(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot));
+    _util.CalcChiSquared(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot));
 
     // // Print the sqrt of the diagonals of the covariance matrix
     // // loop over rows
@@ -775,6 +776,9 @@ void SystematicsHelper::InitialiseReweightingMode(){
     //         }
     //     }
     // }
+
+    // Export the results to file
+    ExportResult(f_nuexsec);
 
 
 }
@@ -2432,15 +2436,14 @@ void SystematicsHelper::FillStatVector(){
     // Add the data stat to the total mc cov matrix
     h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_stat));
 
-    // If we are using event rate mode, then we add the true mc xsec smeared covariance matrix (sys) to the total too
-    if (std::string(_util.xsec_smear_mode) == "er"){
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_sys));
-    }
-
     // Add the mc stat to the total data cov matrix
     h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_stat));
 
-   
+    // If we are using event rate mode, then we add the true mc xsec smeared covariance matrix (sys) to the total too
+    if (std::string(_util.xsec_smear_mode) == "er" || std::string(_util.xsec_smear_mode) == "wiener"){
+        h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_sys));
+        h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_sys));
+    }
 
 
 }
@@ -3083,7 +3086,7 @@ void SystematicsHelper::SaveCutHistograms(std::vector<std::tuple<std::string, in
     TFile *file_sys_var = TFile::Open(Form("files/run%s_sys_var.root", _util.run_period),"UPDATE");
     file_sys_var->cd();
 
-     // Create subdirectory for each reweighter
+    // Create subdirectory for each reweighter
     TDirectory *dir_labels[tuple_label.size()];
 
     // Create subdirectory for each variable
@@ -3341,5 +3344,174 @@ void SystematicsHelper::InitialseCovarianceVector(){
         }
     }
 
+
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::ExportResult(TFile* f){
+
+    std::cout << _util.blue << "Saving Results to File!!!" << _util.reset << std::endl;
+
+    // First get the CV/response matrix to store to the file
+    TH2D* h_response;
+
+    int _var = k_var_reco_el_E;
+    std::string folder_name = "electron_energy";
+    
+    // MCC8 so get the smearing matrix
+    if (std::string(_util.xsec_smear_mode) == "mcc8"){
+        h_response = (TH2D*)f->Get(Form("CV/%s/h_run%s_CV_0_smearing",vars.at(k_var_reco_el_E).c_str(),_util.run_period));
+    }
+    // Other modes we need the response matrix
+    else {
+        h_response = (TH2D*)f->Get(Form("CV/%s/h_run%s_CV_0_smearing",vars.at(k_var_true_el_E).c_str(),_util.run_period));
+        _var = k_var_true_el_E;
+    }
+
+    // Choose whichj folder to put the stuff in
+    if (std::string(_util.xsec_var) == "elec_ang"){
+        folder_name = "elec_ang";
+    }
+    else{
+        folder_name = "elec_E";
+    }
+
+    // Now we have the histograms we need, lets open a new file to store the systematics
+    TFile *f_sys_out = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "UPDATE");
+    f_sys_out->cd();
+
+    // Create subdirectory for each reweighter
+    TDirectory *dir_mode;
+
+    // Create subdirectory for each variable
+    TDirectory *dir_var;
+
+    // See if the directory already exists
+    bool bool_dir = _util.GetDirectory(f_sys_out, dir_var, folder_name.c_str());
+
+    // If it doesnt exist then create it
+    if (!bool_dir) f_sys_out->mkdir(folder_name.c_str());
+
+    _util.GetDirectory(f_sys_out, dir_var, folder_name.c_str());
+
+    dir_var->cd();
+
+    // See if the directory already exists
+    bool_dir = _util.GetDirectory(f_sys_out, dir_mode, Form("%s/%s", folder_name.c_str(), _util.xsec_smear_mode));
+
+    // If it doesnt exist then create it
+    if (!bool_dir) f_sys_out->mkdir(Form("%s/%s", folder_name.c_str(), _util.xsec_smear_mode));
+
+    _util.GetDirectory(f_sys_out, dir_mode, Form("%s/%s", folder_name.c_str(), _util.xsec_smear_mode));
+
+    // Go into the directory
+    dir_mode->cd();
+    
+    // MCC8 mode, so get the smearing matrix
+    if (std::string(_util.xsec_smear_mode) == "mcc8"){
+
+        // Smearing Matrix
+        h_response->SetOption("col,text00");
+        h_response->Write("h_smear", TObject::kOverwrite);
+
+        // MC XSec Covariance Matrix
+        h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->SetOption("col");
+        h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Write("h_cov_tot_mcxsec_reco", TObject::kOverwrite);
+
+        // MC XSec Reco
+        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->SetOption("hist");
+        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->Write("h_mc_xsec_reco", TObject::kOverwrite);
+
+    }
+    // Other modes we need the response matrix
+    else if (std::string(_util.xsec_smear_mode) == "er") {
+        
+        // Response Matrix
+        h_response->SetOption("col,text00");
+        h_response->Write("h_response", TObject::kOverwrite);
+
+        // MC XSec Covariance Matrix
+        h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->SetOption("col");
+        h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Write("h_cov_tot_mcxsec_reco", TObject::kOverwrite);
+    
+        // MC XSec Reco
+        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->SetOption("hist");
+        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->Write("h_mc_xsec_reco", TObject::kOverwrite);
+
+    }
+    // Weiner Mode
+    else {
+        
+        // Response Matrix
+        h_response->SetOption("col,text00");
+        
+        // Refelect the matrix along the x = y plane
+        TH2D* h_smear = (TH2D*)h_response->Clone();
+
+        // Loop over rows
+        for (int row=1; row<h_smear->GetXaxis()->GetNbins()+1; row++) {
+
+            // Loop over columns and get the integral
+            for (int col=1; col<h_smear->GetYaxis()->GetNbins()+1; col++){
+                h_smear->SetBinContent(col, row, h_response->GetBinContent(row, col));          
+            }
+        } 
+
+        h_smear->SetTitle("; Leading Shower Energy [GeV]; True e#lower[-0.5]{-} + e^{+} Energy [GeV]");
+        
+        h_smear->Write("h_response", TObject::kOverwrite);
+
+        // Data XSec Covariance Matrix
+        h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->SetOption("col");
+        h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->Write("h_cov_tot_dataxsec_reco", TObject::kOverwrite);
+    
+        // MC XSec True
+        cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->SetOption("hist");
+
+        TH1D* h_mc_xsec_true = (TH1D*)cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->Clone();
+
+        // undo the truth efficiency correction
+        h_mc_xsec_true->Divide(cv_hist_vec.at(k_var_true_el_E).at(k_xsec_eff));
+
+        // cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->Write("h_mc_xsec_true", TObject::kOverwrite);
+        h_mc_xsec_true->Write("h_mc_xsec_true", TObject::kOverwrite);
+        
+
+        // MC Efficiency True
+        cv_hist_vec.at(k_var_true_el_E).at(k_xsec_eff)->SetOption("hist");
+        cv_hist_vec.at(k_var_true_el_E).at(k_xsec_eff)->Write("h_mc_eff_true", TObject::kOverwrite);
+    }
+    
+
+    // Data XSec Reco (Stat Only)
+    cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetOption("E1,X0");
+    cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetLineColor(kRed+2);
+    cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_reco", TObject::kOverwrite);
+
+    // --
+
+    // Convert bin errors to sys
+    for (int bin = 0; bin < cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->GetNbinsX(); bin++){
+        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_sys).at(k_var_reco_el_E).at(k_xsec_mcxsec).at(bin)) * cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->GetBinContent(bin+1));
+    }
+
+    // Data XSec Reco (Sys Only)
+    cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetOption("E1,X0");
+    cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->Write("h_data_xsec_sys_reco", TObject::kOverwrite);
+
+    // --
+
+    // Convert bin errors to stat + sys
+    for (int bin = 0; bin < cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->GetNbinsX(); bin++){
+        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_sys).at(k_var_reco_el_E).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_stat).at(k_var_reco_el_E).at(k_xsec_dataxsec).at(bin)) * cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->GetBinContent(bin+1));
+    }
+
+    // Data XSec Reco (Stat + Sys)
+    cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetOption("E1,X0");
+    cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_sys_reco", TObject::kOverwrite);
+
+
+    // Close the file
+    f_sys_out->cd();
+    f_sys_out->Close();
 
 }
