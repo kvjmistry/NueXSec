@@ -504,6 +504,7 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     //     std::cout << "reco shr energy: "  << SC.shr_energy_cali << "  elec E: "<< SC.elec_e << "  nu E: " << SC.nu_e<< std::endl;
 
     // if (SC.is_signal && SC.nu_e < 0.3) std::cout<<"Low elec E!: " <<SC.elec_e*1000 << " MeV" << "  | E Nu: "<< SC.nu_e*1000 << " MeV" <<  std::endl; 
+    // if (SC.is_signal && SC.elec_e < 0.1) std::cout<<"Low elec E!: " <<SC.elec_e*1000 << " MeV" << "  | E Nu: "<< SC.nu_e*1000 << " MeV" << "  |Reco Shr Energy: " <<  SC.shr_energy_cali *1000<<  std::endl; 
     // if (type == _util.k_mc && (SC.nu_pdg == -12 || SC.nu_pdg == 12) && SC.nu_e <= 0.125 && SC.ccnc == _util.k_NC) std::cout << "Got nue NC event selected thats below th: " << SC.nu_e << std::endl;
 
 

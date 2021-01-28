@@ -102,12 +102,14 @@ class CrossSectionHelper{
 
     // Define the bins for each variable -- See InitialiseHistograms function to see the actual binning used
     std::vector<std::vector<double>> bins;
-    
+    std::vector<std::vector<double>> bins_fine;
+
     // Define histograms for the cross section calculation
     std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_cross_sec; // Label -- Universe -- variable -- xsec_type
 
     // define vector of smearing matrices
     std::vector<std::vector<std::vector<TH2D*>>> h_smear; // Label -- Universe -- variable
+    std::vector<std::vector<std::vector<TH2D*>>> h_smear_fine; // Label -- Universe -- variable
 
     // Define histograms for the reweighting by cut
     std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_cut_v; // Label -- Cut -- variable -- Universe
@@ -118,6 +120,7 @@ class CrossSectionHelper{
         k_xsec_bkg,          // Bkg event histogram binned in energy
         k_xsec_gen,          // Gen event histogram binned in energy
         k_xsec_gen_smear,    // Gen event histogram binned in energy with smeared truth
+        k_xsec_gen_fine,     // Generated events with a fine truth binning
         k_xsec_sig,          // Sig event histogram binned in energy
         k_xsec_eff,          // Efficiency histogram binned in energy
         k_xsec_ext,          // EXT event histogram binned in energy
@@ -125,6 +128,7 @@ class CrossSectionHelper{
         k_xsec_data,         // Data event histogram binned in energy
         k_xsec_mcxsec,       // MC Cross Section
         k_xsec_mcxsec_smear, // MC Cross Section smeared truth
+        k_xsec_mcxsec_fine, // MC Cross Section smeared truth
         k_xsec_dataxsec,     // Data Cross Section
         k_TH1D_xsec_MAX
     };
@@ -138,7 +142,7 @@ class CrossSectionHelper{
     };
 
     // Names for cross section histograms
-    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "data_xsec"};
+    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "gen_fine", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "mc_xsec_fine", "data_xsec"};
 
     std::vector<std::string> vars = {"integrated", "recoX", "trueX"};
     
@@ -157,6 +161,8 @@ class CrossSectionHelper{
     std::string smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]";
 
     std::vector<double> hist_bins;
+
+    std::vector<double> fine_bins;
 
     double xsec_scale = 0.0; // not needed in this code
 

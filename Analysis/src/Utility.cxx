@@ -209,6 +209,17 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             }
         }
 
+        // Use standard or fine bins to smear/unfold the cross section
+        if (strcmp(arg, "--xsecbins") == 0){
+            std::cout << "Using Truth Binning mode to build response matrix from: " << argv[i+1] << std::endl;
+            xsec_bin_mode = argv[i+1];
+
+            if (std::string(xsec_bin_mode) != "standard" && std::string(xsec_var) != "fine" ){
+                std::cout << red << "Error specified variable which is not supported! You can use: standard or fine" << reset << std::endl;
+                exit(5);
+            }
+        }
+
         // What variable to do the cross section as a function of
         if (strcmp(arg, "--xsec_smear") == 0){
             std::cout << "Calculating a Cross-Section with smearing mode: " << argv[i+1] << std::endl;
@@ -1230,3 +1241,18 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
 
 }
 // -----------------------------------------------------------------------------
+void Utility::UndoBinWidthScaling(TH1D* &hist){
+
+    for (int bin = 0; bin < hist->GetNbinsX()+1; bin++){
+        if ( hist->GetBinWidth(bin) == 0){
+            hist->SetBinContent(bin, 0.0);
+            hist->SetBinError(  bin, 0.0);
+        }
+        else {
+            hist->SetBinContent(bin, hist->GetBinContent(bin) * hist->GetBinWidth(bin));
+            hist->SetBinError(  bin, hist->GetBinError(bin)   * hist->GetBinWidth(bin));
+        }
+
+    }
+
+}

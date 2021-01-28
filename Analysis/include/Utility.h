@@ -140,6 +140,10 @@ public:
     void SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vector<std::string> &var_labels_events,
                       std::vector<std::string> &var_labels_eff,  std::string &smear_hist_name, std::vector<std::string> &vars, double  &xsec_scale);
     // -------------------------------------------------------------------------
+    // Undo a bin width scaling
+    void UndoBinWidthScaling(TH1D* &hist);
+    // -------------------------------------------------------------------------
+
 
     // Variables
     std::string red     = "\033[0;31m";
@@ -151,12 +155,27 @@ public:
     std::string reset   = "\033[0m";
 
     // Bins for the reconstructed shower energy
-    std::vector<double> reco_shr_bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 6.0};
+    // std::vector<double> reco_shr_bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 6.0};
+    std::vector<double> reco_shr_bins = { 0.0, 0.41, 0.65, 0.94, 1.35, 6.0};
 
     // Bins for reco shr effective angle
     std::vector<double> reco_shr_bins_ang = { 0.0, 15, 30, 45, 60, 75, 90, 105, 180};
 
+    // Fine truth Binning
+    std::vector<double> true_shr_bins = { 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
+                                          1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9,
+                                          2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9,
+                                          3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9,
+                                          4.0, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9,
+                                          5.0, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 6.0};
+    
+    std::vector<double> true_shr_bins_ang = {    5,  10,  15,  20,   25,  30,  35,  40,  45,  50,  55,  
+                                                60,  65,  70,  75,   80,  85,  90,  95, 100, 105, 110, 
+                                               115, 120, 125, 130,  135, 140, 145, 150, 155, 160, 165, 
+                                               170, 175, 180};
+
     // Neutrino Energy Threshold to integrate from
+    // Flux bins are 0.00 ,0.06, 0.125, 0.25, 0.5, 0.75, 1.00, 1.25, 1.50, 1.75, 2.00, 2.25, 2.50, 2.75, 3.00, 3.25, 3.50, 4.00, 5.00
     double energy_threshold = 0.125; // GeV
     
     bool slim                      = false;
@@ -199,6 +218,7 @@ public:
     char * intrinsic_mode        = (char *)"default"; // choose whether to override the nue component to accomodate the intrinsic nue sample
     char * sysplot               = (char *)"tot";     // what systematic uncertainty to plot on the CV histograms
     char * xsec_smear_mode       = (char *)"mcc8";    // what smearing do we want to apply to the measurement? mcc8 = Marco's smearing, response = smearing using a response matrix and compare event rates
+    char * xsec_bin_mode         = (char *)"standard"; // Choose whether to use standard binning (reco = truth) or fine truth binning 
     int num_events{-1};
     int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
     int _weight_tune{1}; // Use the GENIE Tune

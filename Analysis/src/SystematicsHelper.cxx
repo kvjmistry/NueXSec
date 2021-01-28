@@ -2437,12 +2437,12 @@ void SystematicsHelper::FillStatVector(){
     h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_stat));
 
     // Add the mc stat to the total data cov matrix
-    h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_stat));
+    // h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_stat));
 
     // If we are using event rate mode, then we add the true mc xsec smeared covariance matrix (sys) to the total too
     if (std::string(_util.xsec_smear_mode) == "er" || std::string(_util.xsec_smear_mode) == "wiener"){
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_sys));
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_sys));
+        // h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_sys));
     }
 
 
@@ -3353,6 +3353,7 @@ void SystematicsHelper::ExportResult(TFile* f){
 
     // First get the CV/response matrix to store to the file
     TH2D* h_response;
+    TH1D* h_mcxsec_fine;
 
     int _var = k_var_reco_el_E;
     std::string folder_name = "electron_energy";
@@ -3364,6 +3365,7 @@ void SystematicsHelper::ExportResult(TFile* f){
     // Other modes we need the response matrix
     else {
         h_response = (TH2D*)f->Get(Form("CV/%s/h_run%s_CV_0_smearing",vars.at(k_var_true_el_E).c_str(),_util.run_period));
+        h_mcxsec_fine = (TH1D*)f->Get(Form("CV/%s/h_run%s_CV_0_%s_mc_xsec_fine",vars.at(k_var_true_el_E).c_str(),_util.run_period, vars.at(k_var_true_el_E).c_str()));
         _var = k_var_true_el_E;
     }
 
@@ -3440,37 +3442,74 @@ void SystematicsHelper::ExportResult(TFile* f){
     }
     // Weiner Mode
     else {
-        
+        std::vector<double> temp_bins = { 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 6.0};
+        double* edges = &temp_bins[0]; // Cast to an array 
+
+        std::vector<double> bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 6.0};
+        double* edges2 = &bins[0]; // Cast to an array 
+
+        std::vector<double> bins_fine = _util.true_shr_bins;
+        double* edges_fine = &bins_fine[0]; // Cast to an array 
+
         // Response Matrix
         h_response->SetOption("col,text00");
         
-        // Refelect the matrix along the x = y plane
+        // Flip the response matrix x and y axes
+        // TH2D* h_smear = new TH2D("h_response","; Leading Shower Energy [GeV]; True e#lower[-0.5]{-} + e^{+} Energy [GeV]", bins.size(), edges2, bins_fine.size(), edges_fine);
         TH2D* h_smear = (TH2D*)h_response->Clone();
 
         // Loop over rows
-        for (int row=1; row<h_smear->GetXaxis()->GetNbins()+1; row++) {
+        for (int row=0; row<h_response->GetXaxis()->GetNbins()+2; row++) {
 
             // Loop over columns and get the integral
-            for (int col=1; col<h_smear->GetYaxis()->GetNbins()+1; col++){
+            for (int col=0; col<h_response->GetYaxis()->GetNbins()+2; col++){
                 h_smear->SetBinContent(col, row, h_response->GetBinContent(row, col));          
             }
         } 
 
-        h_smear->SetTitle("; Leading Shower Energy [GeV]; True e#lower[-0.5]{-} + e^{+} Energy [GeV]");
         
+
+        // TH2D* h_smear_reduced = new TH2D("h_response","; Leading Shower Energy [GeV]; True e#lower[-0.5]{-} + e^{+} Energy [GeV]", 8, edges2, 7, edges);
+        // // Loop over rows  8 bins
+        // for (int row=1; row<h_smear->GetXaxis()->GetNbins()+1; row++) {
+
+        //     // Loop over columns 7 bins
+        //     for (int col=2; col<h_smear->GetYaxis()->GetNbins()+1; col++){
+        //         h_smear_reduced->SetBinContent(row, col-1, h_smear->GetBinContent(row, col));          
+        //     }
+        // } 
+
+        // h_smear_reduced->SetOption("col,text00");
+        // h_smear_reduced->Write("h_response", TObject::kOverwrite);
+        
+        
+        
+        h_smear->SetTitle("; Leading Shower Energy [GeV]; True e#lower[-0.5]{-} + e^{+} Energy [GeV]");
         h_smear->Write("h_response", TObject::kOverwrite);
 
         // Data XSec Covariance Matrix
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->SetOption("col");
+        h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->SetOption("colz");
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->Write("h_cov_tot_dataxsec_reco", TObject::kOverwrite);
     
         // MC XSec True
         cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->SetOption("hist");
 
         TH1D* h_mc_xsec_true = (TH1D*)cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->Clone();
+        // TH1D* h_mc_xsec_true = (TH1D*)h_mcxsec_fine->Clone();
+
+        // Undo the bin width scaling 
+        // _util.UndoBinWidthScaling(h_mc_xsec_true);
 
         // undo the truth efficiency correction
         h_mc_xsec_true->Divide(cv_hist_vec.at(k_var_true_el_E).at(k_xsec_eff));
+
+        // TH1D *h_mc_xsec_true_reduced = new TH1D("h_mc_xsec_true", "MC xsec true", 7, edges);
+        
+        // // Loop over columns 7 bins
+        // for (int bin=2; bin<h_mc_xsec_true->GetXaxis()->GetNbins()+1; bin++){
+        //     h_mc_xsec_true_reduced->SetBinContent(bin-1, h_mc_xsec_true->GetBinContent(bin));          
+        // }
+        // h_mc_xsec_true_reduced->Write("h_mc_xsec_true", TObject::kOverwrite);
 
         // cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->Write("h_mc_xsec_true", TObject::kOverwrite);
         h_mc_xsec_true->Write("h_mc_xsec_true", TObject::kOverwrite);
@@ -3479,12 +3518,25 @@ void SystematicsHelper::ExportResult(TFile* f){
         // MC Efficiency True
         cv_hist_vec.at(k_var_true_el_E).at(k_xsec_eff)->SetOption("hist");
         cv_hist_vec.at(k_var_true_el_E).at(k_xsec_eff)->Write("h_mc_eff_true", TObject::kOverwrite);
+
+
+        TH2D* cor;
+        int n_bins = cv_hist_vec.at(k_var_reco_el_E).at(0)->GetNbinsX();
+        cor  = new TH2D("h_cor",   ";Bin i; Bin j",n_bins, 1, n_bins+1, n_bins, 1, n_bins+1 ); // Create the correlation matrix
+        _util.CalcCorrelation(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot), cor);
+
+        cor->SetOption("colz");
+        cor->Write("h_corr_tot_dataxsec_reco", TObject::kOverwrite);
     }
     
 
     // Data XSec Reco (Stat Only)
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetOption("E1,X0");
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetLineColor(kRed+2);
+
+    // Undo the bin width scaling 
+    // _util.UndoBinWidthScaling(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec));
+
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_reco", TObject::kOverwrite);
 
     // --
