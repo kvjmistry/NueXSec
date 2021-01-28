@@ -157,6 +157,7 @@ public:
     // Bins for the reconstructed shower energy
     // std::vector<double> reco_shr_bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 6.0};
     std::vector<double> reco_shr_bins = { 0.0, 0.41, 0.65, 0.94, 1.35, 6.0};
+    // std::vector<double> reco_shr_bins = { 0.0, 0.40, 0.56, 0.84, 1.14, 6.0};
 
     // Bins for reco shr effective angle
     std::vector<double> reco_shr_bins_ang = { 0.0, 15, 30, 45, 60, 75, 90, 105, 180};
@@ -165,9 +166,10 @@ public:
     std::vector<double> true_shr_bins = { 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
                                           1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9,
                                           2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9,
-                                          3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9,
-                                          4.0, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9,
-                                          5.0, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 6.0};
+                                          3.0, 3.5,
+                                          4.0, 4.5,
+                                          5.0, 5.5, 
+                                          6.0};
     
     std::vector<double> true_shr_bins_ang = {    5,  10,  15,  20,   25,  30,  35,  40,  45,  50,  55,  
                                                 60,  65,  70,  75,   80,  85,  90,  95, 100, 105, 110, 
@@ -176,7 +178,7 @@ public:
 
     // Neutrino Energy Threshold to integrate from
     // Flux bins are 0.00 ,0.06, 0.125, 0.25, 0.5, 0.75, 1.00, 1.25, 1.50, 1.75, 2.00, 2.25, 2.50, 2.75, 3.00, 3.25, 3.50, 4.00, 5.00
-    double energy_threshold = 0.125; // GeV
+    double energy_threshold = 0.06; // GeV
     
     bool slim                      = false;
     bool make_histos               = false;

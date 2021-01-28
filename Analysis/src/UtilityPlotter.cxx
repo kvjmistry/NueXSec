@@ -231,15 +231,18 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
     TCut generic_query = "(classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && !gen"; // This gets selected signal events
     TCut bin_query = Form("shr_energy_cali > %f && shr_energy_cali < %f", bin_lower_edge, bin_upper_edge);
     
+    TCut query = Form(" weight*(  ((classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && passed_selection) && shr_energy_cali > %f && shr_energy_cali < %f )", bin_lower_edge, bin_upper_edge); 
+
     TCanvas * c = new TCanvas(Form("c_%f_%f", bin_upper_edge, sigma), "c", 500, 500);
 
     // Get the histogram from the pad
     TH1D *htemp;
     
-    htemp = new TH1D("htemp","", 80, 0, 4.0); // Set the binnning
+    htemp = new TH1D("htemp","", 90, 0, 6.0); // Set the binnning
 
     // Draw the Query adn put into histogram
-    tree->Draw("elec_e >> htemp", generic_query && bin_query);
+    // tree->Draw("elec_e >> htemp", generic_query && bin_query);
+    tree->Draw("elec_e >> htemp", query);
     
     // Fit it with a Gaussian
     htemp->Fit("gaus");
@@ -304,7 +307,7 @@ void UtilityPlotter::OptimiseBins(){
     // Were do we want to start the fit iteraction from?
     // Generally choose the first bin width to be 0.25 GeV
     float lower_bin = 0.001;
-    // float lower_bin = 1.55;
+    // float lower_bin = 0.3;
     
     // Loop over the bins
     for (float bin = 0; bin < 8; bin++ ){
@@ -312,9 +315,14 @@ void UtilityPlotter::OptimiseBins(){
         converged = false;
 
         // Slide upper bin value till we get 2xthe STD of the fit
-        for (float i = lower_bin+0.1; i <= 4.0; i+=0.001) {
+        for (float i = lower_bin+0.1; i <= 6.0; i+=0.001) {
             std::cout << "\n\033[0;34mTrying Bin: " << i << "GeV\033[0m\n"<< std::endl;
 
+            if (bin == 0){
+                GetFitResult(mean, sigma, 0.0, 0.4, tree, true, converged, false);
+                lower_bin = 0.4;
+                break;
+            }
             // call function which draws the tree to a canvas, fits the tree and returns the fit parameter
             // If the fit has 2xSTD = the reco bin size then we have successfully optimised the bin
             GetFitResult(mean, sigma, lower_bin, i, tree, false, converged, false);
@@ -331,7 +339,7 @@ void UtilityPlotter::OptimiseBins(){
 
             // Since the fit doesnt want to converge for the last bin, lets jsut draw it anyway
             if (bin == 7){
-                GetFitResult(mean, sigma, 2.32, 4.0, tree, true, converged, false);
+                GetFitResult(mean, sigma, 2.32, 6.0, tree, true, converged, false);
                 break;
             }
 
