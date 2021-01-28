@@ -8,7 +8,7 @@ class PrintHelper{
 
     public:
     // Default constructor
-    PrintHelper(){};
+    // PrintHelper(){};
 
     // -------------------------------------------------------------------------
     // Initialiser function
@@ -17,9 +17,8 @@ class PrintHelper{
     // Function to print the selection
     void PrintResults();
     // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
+    // Get the histogram files we need to get the efficiency and purity uncertainties
+    void GetHists();
     // -------------------------------------------------------------------------
     
     // Destructor 
@@ -27,27 +26,47 @@ class PrintHelper{
 
     // The output file
     TFile* f_mc, *f_data, *f_ext, *f_dirt;
+    TFile* f_mc_hist, *f_data_hist, *f_ext_hist, *f_dirt_hist; // histogram files
 
     // Class instances
     Utility _util;
 
    
     TTree * mc_counter_tree; // MC Counter Tree
+    TTree * mc_nue_counter_tree; // MC Counter Tree for nues
     TTree * data_counter_tree; // Data Counter Tree
     TTree * ext_counter_tree; // EXT Counter Tree
     TTree * dirt_counter_tree; // Dirt Counter Tree
 
     TTree * eff_tree;   // Efficiency and Purity tree
 
+    // Histograms for getting the efficiency along with its uncertainty
+    std::vector<std::vector<TH1D*>> TEfficiency_hists; // nue/nuebar -- cut index
+
+    // For storing the errors on the efficiency
+    std::vector<std::vector<double>> vec_err;
+
+    // Define vectors for selected and generated events
+    std::vector<std::vector<double>> vec_n;
+    std::vector<std::vector<double>> vec_N;
+
 
     int tree_total_entries{0}; // Should equal number of cuts
+
+    // enum for plots by efficiency, we only care about the single bin efficiencies
+    enum TH1D_eff_vars {
+        k_eff_nu_E_single_bin,       // True Electron-neutrino energy, single bin
+        k_eff_nu_E_nue_single_bin,   // True Electron-neutrino energy single bin
+        k_eff_nu_E_nuebar_single_bin,// True anti Electron-neutrino energy single bin
+        k_TH1D_eff_MAX
+    };
 
     // Scale factors (everything is scaled to data)
     double mc_scale_factor     = 1.0;
     double ext_scale_factor    = 1.0;
     double dirt_scale_factor   = 1.0;
 
-    double efficiency{0.0}, purity{0.0};
+    double efficiency{0.0}, purity{0.0}, eff_err{0.0};
 
     double tot_true_infv_nues{1.0};
 
@@ -66,6 +85,18 @@ class PrintHelper{
     double count_nuebar_cc_dis{0.0};
     double count_nuebar_cc_coh{0.0};
     double count_nuebar_cc_mec{0.0};
+
+    double init_count_nue_cc_qe{0.0};
+    double init_count_nue_cc_res{0.0};
+    double init_count_nue_cc_dis{0.0};
+    double init_count_nue_cc_coh{0.0};
+    double init_count_nue_cc_mec{0.0};
+
+    double init_count_nuebar_cc_qe{0.0};
+    double init_count_nuebar_cc_res{0.0};
+    double init_count_nuebar_cc_dis{0.0};
+    double init_count_nuebar_cc_coh{0.0};
+    double init_count_nuebar_cc_mec{0.0};
     
     double count_nue_cc_infv{0.0};
     double count_nuebar_cc_infv{0.0};

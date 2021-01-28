@@ -6,7 +6,6 @@
 #include "HistogramHelper.h"
 #include "HistogramPlotter.h"
 #include "SliceContainer.h"
-#include "PassedContainer.h"
 #include "TreeHelper.h"
 
 #include "TThread.h"
@@ -45,7 +44,6 @@ namespace xsecSelection {
             TFile * f_data;      // The data file
             TFile * f_ext;       // The ext file
             TFile * f_dirt;      // The dirt file
-            TFile * f_flux_weights; // The file with the flux weights
 
             // TTrees
             TTree * mc_tree;      // MC   Tree
@@ -72,12 +70,6 @@ namespace xsecSelection {
             // Selection Cut Values
             bool   detector_variations;
 
-            // Passed Containers
-            std::vector<PassedContainer> mc_passed_v;   // MC Passed Container
-            std::vector<PassedContainer> data_passed_v; // Data Passed Container
-            std::vector<PassedContainer> ext_passed_v;  // EXT Passed Container
-            std::vector<PassedContainer> dirt_passed_v; // Dirt Passed Container
-            
             // Counter Container
             std::vector<std::vector<double>> counter_v;
             
@@ -104,23 +96,16 @@ namespace xsecSelection {
             void MakeSelection();
             // -----------------------------------------------------------------
             // Template code to apply selection cuts
-            bool ApplyCuts(int type, int ievent,std::vector<std::vector<double>> &counter_v,
-                           std::vector<PassedContainer> &passed_v, SliceContainer &SC);
+            bool ApplyCuts(int type, std::vector<std::vector<double>> &counter_v, SliceContainer &SC);
             // -----------------------------------------------------------------
             // Function to save all written histograms to file
             void SavetoFile();
             // -----------------------------------------------------------------
             // Function to implement counters and fillings of histograms for each cut
-            void SelectionFill(int type, SliceContainer &SC, std::pair<std::string, int> classification, std::string interaction, std::string pi0_classification, std::pair<std::string, int> par_type, int cut_index, std::vector<std::vector<double>> &counter_v);
-            // -----------------------------------------------------------------
-            // Get the CV weights for histograms
-            double GetCVWeight(int type, SliceContainer SC);
+            void SelectionFill(int type, SliceContainer &SC, int cut_index, std::vector<std::vector<double>> &counter_v);
             // -----------------------------------------------------------------
             // Apply the pi0 selection cuts
             void ApplyPiZeroSelection(int type, SliceContainer &SC);
-            // -----------------------------------------------------------------
-            // Get the Pi) correction weight
-            void GetPiZeroWeight(double &weight, int pizero_mode, SliceContainer &SC);
             // -----------------------------------------------------------------
             // Apply a NuMu Selection
             void ApplyNuMuSelection(int type, SliceContainer &SC);

@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
     "\n\nTo run the cross section calculation code, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --xsec <input merged nuexsec tree file> [options (see below)]\033[0m \n\n"
     "The <input merged nuexsec ttree file> corresponds to merged ttree file of the mc, data, ext and dirt. See the bash script merge_uneaventrees.C for more details\n\n"
-    "\033[0;34m[--xsecmode <cross-section mode>]\033[0m                      \033[0;32mThe input mode of xsec code to run. Options are default or reweight \033[0m\n\n"
+    "\033[0;34m[--xsecmode <cross-section mode> [labels] ]\033[0m                      \033[0;32mThe input mode of xsec code to run. Options are default or reweight. Labels are optional, but can be all/unisim/ppfx/genie/reint \033[0m\n\n"
     "-------------------------------------------------------\n\n";
 
     std::string usage3 = "\n\nTo run the detector systematics code, run: \n\n"
@@ -72,14 +72,6 @@ int main(int argc, char *argv[]){
     // Configure the utility class, this stores all the input configurations
     // that all classes will have access to
     _utility.Initalise(argc, argv, usage, usage2, usage3);
-
-
-    // Add catches for default input
-    if (std::string(_utility.run_period) == "empty" ){
-        std::cout << "\nError, must provide a run period as input!\n" << std::endl;
-        std::cout << "USAGE:" << usage << usage2 << usage3 << std::endl; 
-        exit(1);
-    }
 
     // -------------------------------------------------------------------------
 
@@ -109,6 +101,9 @@ int main(int argc, char *argv[]){
     auto duration_min = std::chrono::duration_cast<std::chrono::minutes>(stop - start); // time taken to run script
     std::cout << "Time taken by function: " << duration_sec.count() << " seconds" << std::endl; 
     std::cout << "Time taken by function: " << duration_min.count() << " minutes" << std::endl; 
+    
+    if (_utility.use_gpvm)
+        std::cout << _utility.red << "If your terminal is not returned to you after 20 seconds of seeing this message then hit crtl c" << _utility.reset << std::endl; 
     
     // exit(0);
     return 0;

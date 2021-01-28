@@ -18,21 +18,21 @@ class SliceContainer {
 public:
 
     // -------------------------------------------------------------------------
-    // Initialise the class
-    void Initialise(TTree* tree, int type, TFile *f_flux_weights, Utility util);
+    // Initialise the class with a template function
+    template<typename T> void Initialise(T *tree, int type, Utility util);
     // -------------------------------------------------------------------------
     // Function to classify the slice
-    std::pair<std::string, int>  SliceClassifier(int type);
+    void  SliceClassifier(int type);
     // -------------------------------------------------------------------------
     // Returns the Category defined by the pandora team 
     // (can be used as a cross check or making similar plots to them)
     std::string SliceCategory();
     // -------------------------------------------------------------------------
     // Function to return the genie interaction mode, e.g. ccqe, ccmec etc.
-    std::string SliceInteractionType(int type);
+    void SliceInteractionType(int type);
     // -------------------------------------------------------------------------
     // Function to classify the event by particle type of the leading shower
-    std::pair<std::string, int> ParticleClassifier(int type);
+    void ParticleClassifier(int type);
     // -------------------------------------------------------------------------
     // Function to Get the PPFX CV correction weight
     double GetPPFXCVWeight();
@@ -41,8 +41,26 @@ public:
     double GetdEdxMax();
     // -------------------------------------------------------------------------
     // Determine if there is a truth pi0 in the event
-    std::string Pi0Classifier(int type);
+    void Pi0Classifier(int type);
     // -------------------------------------------------------------------------
+    // Set the CV weight as member variable
+    void SetCVWeight(double weight);
+    // -------------------------------------------------------------------------
+    void SetSignal();
+    // -------------------------------------------------------------------------
+    // Set the theta and Phi angles for the electron
+    void SetTrueElectronThetaPhi();
+    // -------------------------------------------------------------------------
+    // Calculate and set the effective angle variable
+    void SetNuMIAngularVariables();
+    // -------------------------------------------------------------------------
+    // Apply the 0.83 calibration factor to the shower energy so it is applied universally
+    void CalibrateShowerEnergy();
+    // -------------------------------------------------------------------------
+
+
+
+
 
 
     Utility _util;
@@ -51,6 +69,18 @@ public:
     int   sub;                   // Subrun
     int   evt;                   // Event
     
+    std::pair<std::string, int> classification; // The event classification e.g nue cc
+    std::string genie_interaction;              // The interaction type e.g. nue cc qe
+    std::pair<std::string, int> particle_type;  // The truth matched particle of the leading shower
+    std::string pi0_classification;             // Stores whether the true interaction has a pi0 in or not e.g. nue cc pi0 or numu cc pi0
+
+    double cv_weight;
+
+    double effective_angle;     // The angle between the vector from the target to nu vtx compared to the reconstructed shower direction.
+    double cos_effective_angle; // The cosine of the angle between the vector from the target to nu vtx compared to the reconstructed shower direction.
+
+    bool is_signal{false}; // bool to check if the event is signal or not
+
     // Shower Properties 
     float shr_energy_tot;        // Shower: the energy of the showers (in GeV)
     float shr_energy;            // Shower: Energy of the shower with the largest number of hits (in GeV)
@@ -59,6 +89,7 @@ public:
     
     float shr_theta;             // Shower: Reconstructed theta angle for the leading shower
     float shr_phi;               // Shower: Reconstructed phi angle for the leading shower
+    double shr_ang_numi;         // Shower: angle of the reconstructed shower relative to the NuMI target to detector vector
     
     float shr_pca_0;             // Shower: First eigenvalue of the PCAxis of the leading shower
     float shr_pca_1;             // Shower: Second eigenvalue of the PCAxis of the leading shower
@@ -67,6 +98,7 @@ public:
     float shr_px;                // Shower: X component of the reconstructed momentum of the leading shower (in GeV/c)
     float shr_py;                // Shower: Y component of the reconstructed momentum of the leading shower (in GeV/c)
     float shr_pz;                // Shower: Z component of the reconstructed momentum of the leading shower (in GeV/c)
+    double shr_p;                // Shower: reconstructed momentum of the leading shower (in GeV/c)
     
     float shr_openangle;         // Shower: Opening angle of the shower -- variable does not work...
     
@@ -85,9 +117,9 @@ public:
     float shr_tkfit_dedx_V;      // Shower: dE/dx of the leading shower on the V plane with the track fitting
     float shr_tkfit_dedx_U;      // Shower: dE/dx of the leading shower on the U plane with the track fitting
     
-    int   shr_tkfit_nhits_Y;     // Shower: Number of hits in the 1x4 cm box on the Y plane with the track fitting
-    int   shr_tkfit_nhits_V;     // Shower: Number of hits in the 1x4 cm box on the V plane with the track fitting
-    int   shr_tkfit_nhits_U;     // Shower: Number of hits in the 1x4 cm box on the U plane with the track fitting
+    unsigned int   shr_tkfit_nhits_Y;     // Shower: Number of hits in the 1x4 cm box on the Y plane with the track fitting
+    unsigned int   shr_tkfit_nhits_V;     // Shower: Number of hits in the 1x4 cm box on the V plane with the track fitting
+    unsigned int   shr_tkfit_nhits_U;     // Shower: Number of hits in the 1x4 cm box on the U plane with the track fitting
         
     int   shr_tkfit_npoints;     // Shower: TrackFit Number of Points
     float shr_trkfitmedangle;    // Shower: TrackFit Median Angle
@@ -264,6 +296,13 @@ public:
     float nu_pt;       // True Neutrino Transverse Energy of Interaction
     float theta;       // True Neutrino Theta
     bool  isVtxInFiducial; // True Neutrino Vertex in FV
+    double nu_p;
+    double nu_theta;
+    double nu_phi;
+    double nu_angle;         // True nue angle from numi beamline 
+    double nu_angle_targ;    // True nue angle wrt numi target to uboone vector
+    double reco_true_nu_ang; // Angle between the effectve neutrino direction and the true neutrino direction
+    float reco_e;            // Reconstructed Neutrino energy 
     
     // Is the truth information contained? 
     // Require all track start/end point in FV and showers deposit > 60% of energy
@@ -280,6 +319,7 @@ public:
     float true_nu_px;            // True Neutrino Px
     float true_nu_py;            // True Neutrino Py
     float true_nu_pz;            // True Neutrino Pz
+    double true_effective_angle; // True angle between electron and neutrino vectors
     
     float reco_nu_vtx_x;         // Reco Neutrino Vtx x
     float reco_nu_vtx_y;         // Reco Neutrino Vtx y
@@ -304,6 +344,10 @@ public:
     float elec_px;   // Truth Electron Px
     float elec_py;   // Truth Electron Py
     float elec_pz;   // Truth Electron Pz
+    double elec_mom; // Truth Electron P
+    float elec_theta; // True electron theta
+    float elec_phi;  // True electron phi
+    double elec_ang_targ; // True electron angle wrt numi target to uboone vector
 
     int   npi0;     // Truth Number of Pi0
     float pi0_e;    // Truth Pi0 Energy
@@ -312,7 +356,7 @@ public:
     
     int   nneutron; // Truth Number of Neutrons
     
-    int   nproton;  // Truth Number of Protons
+    int   nproton;  // Truth Number of Protons with a kinetic energy (E - M_proton) > 40 MeV
     float proton_e; // Truth Proton Energy
     float proton_c; // Proton Completeness
     float proton_p; // Proton Purity

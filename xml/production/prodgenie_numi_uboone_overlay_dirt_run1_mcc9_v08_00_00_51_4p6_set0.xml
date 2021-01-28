@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+
+<!-- This xml will generate a new run 1 overlay dirt sample again -->
+
+<!-- Production Project -->
+<!DOCTYPE project [
+<!ENTITY release "v08_00_00_51">
+<!ENTITY file_type "mc">
+<!ENTITY run_type "physics">
+<!ENTITY user "kmistry">
+<!ENTITY name "prodgenie_numi_uboone_overlay_dirt_fhc_mcc9_run1_v51">
+<!ENTITY tag "mcc9_v08_00_00_51">
+<!ENTITY sample "set0">
+<!ENTITY indef "prod_extunbiased_swizzle_inclusive_v3_goodruns_mcc9_run1_high_lifetime_frozen_Set7">
+]>
+
+<job>
+
+<project name="&name;_&sample;">
+
+  <!-- Project size -->
+  <numevents>-1</numevents>
+
+  <!-- Operating System -->
+  <os>SL7</os>
+
+  <!-- Batch resources -->
+  <resource>DEDICATED,OPPORTUNISTIC</resource>
+
+  <!-- Larsoft information -->
+  <larsoft>
+    <tag>&release;</tag>
+    <qual>e17:prof</qual>
+    <local>/pnfs/uboone/resilient/users/kmistry/tars/uboonecode_mcc9_v08_00_00_51_sl7.tar</local>
+  </larsoft>
+
+  <copy>0</copy>
+  <check>0</check>
+
+  <!-- Project stages -->
+  <stage name="gen_reco1">
+    <initsource>/pnfs/uboone/resilient/users/kmistry/MCC9/slip_stacking_study/init_gen_numi_dirt_fhc_4p6.sh</initsource>
+    <fcl>dirt_overlay_gen_SimInfoMixer_prod.fcl</fcl>
+    <fcl>wirecell_detsim_overlay_numi_uboone.fcl</fcl>
+    <fcl>standard_overlay_numi_uboone.fcl</fcl>
+    <fcl>reco_uboone_mcc9_8_driver_overlay_stage1a.fcl</fcl>
+    <fcl>reco_uboone_mcc9_8_driver_overlay_stage1b.fcl</fcl>
+    <fcl>reco_uboone_mcc9_8_driver_overlay_numi_stage1c.fcl</fcl>
+    <inputdef>&indef;</inputdef>
+    <datafiletypes>root,pndr,local</datafiletypes>
+    <defname>&name;_&sample;</defname>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/gen_reco1/&sample;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/gen_reco1/&sample;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/work/MCC9/&name;/gen_reco1/&sample;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/gen_reco1/&sample;</bookdir>
+    <maxfilesperjob>1</maxfilesperjob>
+    <numjobs>4000</numjobs> <!-- to generate about 100k events set this to 1500 -->
+    <datatier>reconstructed</datatier>
+    <memory>4000</memory>
+    <disk>25GB</disk>
+    <jobsub>--expected-lifetime=28h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/kmistry/MCC9/slip_stacking_study/prodgenie_numi_dirt_nu_wirecell_g4_uboone_fhc_4p6.fcl</jobsub> <!--24h run time for 50 events -->
+    <jobsub_start> --expected-lifetime=short</jobsub_start>
+    <endscript>/uboone/app/users/guzowski/koto/xml/zip_logs.sh</endscript>
+  </stage>
+
+
+  <!-- Project stages -->
+  <stage name="reco2">
+    <fcl>wirecell_detsim_optical_overlay_numi_uboone.fcl</fcl>
+    <fcl>standard_overlay_optical_numi_uboone.fcl</fcl>
+    <fcl>reco_uboone_mcc9_8_driver_overlay_numi_optical.fcl</fcl>
+    <fcl>reco_uboone_mcc9_8_driver_overlay_numi_stage2.fcl</fcl>
+    <!--<fcl>reco_uboone_data_mcc9_1_8_driver_poststage2_filters_Overlay_numi.fcl</fcl>-->
+    <datafiletypes>root,pndr</datafiletypes>
+    <defname>&name;_&sample;</defname>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/reco2/&sample;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/reco2/&sample;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/work/MCC9/&name;/reco2/&sample;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/reco2/&sample;</bookdir>
+    <maxfilesperjob>1</maxfilesperjob>
+    <numjobs>3954</numjobs> <!-- to generate about 100k events set this to 1500 -->
+    <datatier>reconstructed</datatier>
+    <memory>4000</memory>
+    <disk>25GB</disk>
+    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1</jobsub> <!--24h run time for 50 events -->
+    <jobsub_start> --expected-lifetime=short</jobsub_start>
+    <endscript>/uboone/app/users/guzowski/koto/xml/zip_logs.sh</endscript>
+  </stage>
+
+
+  <!-- file type -->
+  <filetype>&file_type;</filetype>
+
+  <!-- run type -->
+  <runtype>&run_type;</runtype>
+
+</project>
+
+</job>

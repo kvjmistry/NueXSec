@@ -33,6 +33,10 @@
 #include "TCut.h"
 #include "TF1.h"
 #include "TLatex.h"
+#include "TRandom3.h"
+#include "TColor.h"
+#include "TMatrixD.h"
+#include "TChain.h"
 
 /*
 
@@ -65,11 +69,14 @@ public:
     // Get a 2D histogram from a file
     bool GetHist(TFile* f, TH2D* &h, TString string);
     // -------------------------------------------------------------------------
-    // Check whether a weight has a suitable value
-    void CheckWeight(double &weight);
+    // Check whether a weight has a suitable value, templated with double and float
+    template<typename T> void CheckWeight(T &weight);
     // -------------------------------------------------------------------------
-    // Check whether a weight has a suitable value
-    void CheckWeight(float &weight);
+    // Get the CV weight correction
+    double GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv);
+    // -------------------------------------------------------------------------
+    // Get the pi0 weight correction
+    void GetPiZeroWeight(double &weight, int pizero_mode, int nu_pdg, int ccnc, int npi0, double pi0_e);
     // -------------------------------------------------------------------------
     // Create another directory in the plots folder
     void CreateDirectory(std::string folder);
@@ -98,18 +105,59 @@ public:
     // Draw the Data POT on the plot
     void Draw_Data_POT(TCanvas *c, double pot, double x1, double y1, double x2, double y2);
     // -------------------------------------------------------------------------
+    // Draw MicroBooNE Simulation on canvas
+    void Draw_ubooneSim(TCanvas *c, double x1, double y1, double x2, double y2);
+    // -------------------------------------------------------------------------
     // Function to customise the TLatex
     void SetTextProperties(TLatex* text);
     // -------------------------------------------------------------------------
     // Initialise the TPad size for a ratio type of plot
     void SetTPadOptions(TPad *topPad, TPad *bottomPad);
     // -------------------------------------------------------------------------
+    // Check if POT from input file matches with the value in config.txt
     void CheckPOT();
+    // -------------------------------------------------------------------------
+    // Check if a specific histogram exists in the given vector of strings
+    bool CheckHistogram(std::vector<std::string> vector, TString hist_name);
+    // -------------------------------------------------------------------------
+    // Turn off the intrinsic nue mode
+    void TurnoffIntrinsicMode(){intrinsic_mode = (char*)"empty";};
+    // -------------------------------------------------------------------------
+    // Calculate a covariance matrix
+    void CalcCovariance(std::vector<TH1D*> h_universe, TH1D *h_CV, TH2D *h_cov);
+    // -------------------------------------------------------------------------
+    // Calculate a correlation matrix
+    void CalcCorrelation(TH1D *h_CV, TH2D  *h_cov, TH2D *h_cor);
+    // -------------------------------------------------------------------------
+    // Calculate a fractional covariance matrix
+    // ** Requires the input frac cov to be a cloned version of the covariance matrix **
+    void CalcCFracCovariance(TH1D *h_CV, TH2D *h_frac_cov);
+    // -------------------------------------------------------------------------
+    // Calulate a chi squared using a covarinace matrix, for a model to data
+    void CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov);
+    // -------------------------------------------------------------------------
+    // Set the axes names of the cross section plots
+    void SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vector<std::string> &var_labels_events,
+                      std::vector<std::string> &var_labels_eff,  std::string &smear_hist_name, std::vector<std::string> &vars, double  &xsec_scale);
+    // -------------------------------------------------------------------------
 
     // Variables
+    std::string red     = "\033[0;31m";
+    std::string green   = "\033[0;32m";
+    std::string yellow  = "\033[0;33m";
+    std::string blue    = "\033[0;34m";
+    std::string magenta = "\033[0;35m";
+    std::string cyan    = "\033[0;36m";
+    std::string reset   = "\033[0m";
 
     // Bins for the reconstructed shower energy
-    std::vector<double> reco_shr_bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 4.0};
+    std::vector<double> reco_shr_bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 6.0};
+
+    // Bins for reco shr effective angle
+    std::vector<double> reco_shr_bins_ang = { 0.0, 15, 30, 45, 60, 75, 90, 105, 180};
+
+    // Neutrino Energy Threshold to integrate from
+    double energy_threshold = 0.125; // GeV
     
     bool slim                      = false;
     bool make_histos               = false;
@@ -124,7 +172,8 @@ public:
     bool print_data                = false;
     bool print_ext                 = false;
     bool print_dirt                = false;
-    //bool check_pot                 = false;
+    bool plot_sys_uncertainty      = false;
+    bool use_gpvm                  = false; // choose whether you are on the gpvm or Krish's personal laptop
 
     // inputs 
     char * mc_file_name          = (char *)"empty";
@@ -143,7 +192,13 @@ public:
     char * run_period            = (char *)"empty";
     char * sysmode               = (char *)"default";
     char * xsecmode              = (char *)"default";
+    char * xsec_rw_mode          = (char *)"default"; // choose whether to reweight by cut or the final selection
+    char * xsec_var              = (char *)"elec_E";  // What variable to do the cross section as a function of
+    char * xsec_labels           = (char *)"all";
     char * uplotmode             = (char *)"default";
+    char * intrinsic_mode        = (char *)"default"; // choose whether to override the nue component to accomodate the intrinsic nue sample
+    char * sysplot               = (char *)"tot";     // what systematic uncertainty to plot on the CV histograms
+    char * xsec_smear_mode       = (char *)"mcc8";    // what smearing do we want to apply to the measurement? mcc8 = Marco's smearing, response = smearing using a response matrix and compare event rates
     int num_events{-1};
     int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
     int _weight_tune{1}; // Use the GENIE Tune
@@ -164,6 +219,7 @@ public:
     double mc_scale_factor     = 1.0;
     double ext_scale_factor    = 1.0;
     double dirt_scale_factor   = 1.0;
+    double intrinsic_weight    = 1.0;
 
     // POT 
     std::vector<double> config_v;
@@ -174,11 +230,13 @@ public:
         "Run1_Data_POT",
         "Run1_Data_trig",
         "Run1_EXT_trig",
+        "Run1_Intrinsic_POT",
         "Run3_MC_POT",
         "Run3_Dirt_POT",
         "Run3_Data_POT",
         "Run3_Data_trig",
         "Run3_EXT_trig",
+        "Run3_Intrinsic_POT",
         "x1", "x2", "y1", "y2", "z1", "z2"
     };
 
@@ -189,11 +247,13 @@ public:
                 k_Run1_Data_POT,
                 k_Run1_Data_trig,
                 k_Run1_EXT_trig,
+                k_Run1_Intrinsic_POT,
                 k_Run3_MC_POT,
                 k_Run3_Dirt_POT,
                 k_Run3_Data_POT,
                 k_Run3_Data_trig,
                 k_Run3_EXT_trig,
+                k_Run3_Intrinsic_POT,
                 k_config_x1,
                 k_config_x2,
                 k_config_y1,
@@ -261,15 +321,15 @@ public:
                 "nuebar_cc",
                 "nu_out_fv",
                 "cosmic",
+                "cosmic_nue",    // Another special category to separate standard nues from other cosmics. This category contains mis-reco'd nues as cosmics. We separate these out so we can count the efficency denominator properly
+                "cosmic_nuebar",
                 "numu_cc",
                 "numu_cc_pi0",
                 "nc",
                 "nc_pi0",
                 "unmatched",
                 "unmatched_nue", // This is a special category to count nue/nuebar cc interactions that occur inside the fv, but were not reconstructed at all (so purity ends up < 0!). We need these for the efficeicny denom. 
-                "cosmic_nue",    // Another special category to separate standard nues from other cosmics. This category contains mis-reco'd nues as cosmics. We separate these out so we can count the efficency denominator properly
                 "unmatched_nuebar",
-                "cosmic_nuebar",
                 "ext",
                 "data",
                 "dirt"
@@ -348,15 +408,15 @@ public:
                 k_nuebar_cc,
                 k_nu_out_fv,
                 k_cosmic,
+                k_cosmic_nue,
+                k_cosmic_nuebar,
                 k_numu_cc,
                 k_numu_cc_pi0,
                 k_nc,
                 k_nc_pi0,
                 k_unmatched,
                 k_unmatched_nue,
-                k_cosmic_nue,
                 k_unmatched_nuebar,
-                k_cosmic_nuebar,
                 k_leg_ext,
                 k_leg_data,
                 k_leg_dirt,
@@ -474,67 +534,110 @@ public:
         k_particles_MAX
     };
 
-
-
-
+    // Variables to get the systematic uncertainty by cut for
+    enum TH1D_cut_vars {
+        k_cut_softwaretrig,
+        k_cut_nslice,
+        k_cut_shower_multiplicity,
+        k_cut_track_multiplicity,
+        k_cut_topological_score,
+        k_cut_vtx_x_sce,
+        k_cut_vtx_y_sce,
+        k_cut_vtx_z_sce,
+        k_cut_shower_score,
+        k_cut_shr_tkfit_dedx_max,
+        k_cut_shr_tkfit_dedx_max_with_tracks,
+        k_cut_shr_tkfit_dedx_max_no_tracks,
+        k_cut_shower_to_vtx_dist,
+        k_cut_hits_ratio,
+        k_cut_CosmicIPAll3D,
+        k_cut_contained_fraction,
+        k_cut_shrmoliereavg,
+        k_cut_leading_shower_theta,
+        k_cut_leading_shower_phi,
+        k_cut_shower_energy_cali,
+        k_cut_shower_energy_cali_rebin,
+        k_cut_flash_time,
+        k_cut_flash_pe,
+        k_cut_effective_angle,
+        k_cut_effective_cosangle,
+        k_cut_vars_max
+    };
 
     // ------------------------------------------
     // variables to plot PlotVariations and SysVariations
-       std::vector<std::string> vec_hist_name = {"reco_vtx_x_sce",
-                                              "reco_vtx_y_sce",
-                                              "reco_vtx_z_sce",
-                                              "reco_flash_time",
-                                              "reco_leading_shower_phi",
-                                              "reco_leading_shower_theta",
-                                              "reco_shower_multiplicity",
-                                              "reco_track_multiplicity",
-                                              "reco_topological_score",
-                                              "reco_shr_tkfit_dedx_y",
-                                              "reco_nu_e",
-                                              "reco_shower_energy_tot_cali",
-                                              "reco_softwaretrig",
-                                              "reco_nslice",
-                                              "reco_shower_score",
-                                              "reco_shr_tkfit_dedx_max",
-                                              "reco_shr_tkfit_dedx_max_with_tracks",
-                                              "reco_shr_tkfit_dedx_max_no_tracks",
-                                              "reco_shower_to_vtx_dist",
-                                              "reco_hits_ratio",
-                                              "reco_CosmicIPAll3D",
-                                              "reco_contained_fraction",
-                                              "reco_shrmoliereavg",
-                                              "reco_shower_energy_cali",
-                                              "reco_flash_pe"};
+        std::vector<std::string> vec_hist_name = {
+        "h_reco_softwaretrig",
+        "h_reco_nslice",
+        "h_reco_shower_multiplicity",
+        "h_reco_track_multiplicity",
+        "h_reco_topological_score",
+        "h_reco_vtx_x_sce",
+        "h_reco_vtx_y_sce",
+        "h_reco_vtx_z_sce",
+        "h_reco_shower_score",
+        "h_reco_shr_tkfit_dedx_max",
+        "h_reco_shr_tkfit_dedx_max_with_tracks",
+        "h_reco_shr_tkfit_dedx_max_no_tracks",
+        "h_reco_shower_to_vtx_dist",
+        "h_reco_hits_ratio",
+        "h_reco_CosmicIPAll3D",
+        "h_reco_contained_fraction",
+        "h_reco_shrmoliereavg",
+        "h_reco_leading_shower_theta",
+        "h_reco_leading_shower_phi",
+        "h_reco_shower_energy_cali",
+        "h_reco_shower_energy_cali_rebin",
+        "h_reco_flash_time",
+        "h_reco_flash_pe",
+        "h_reco_effective_angle",
+        "h_reco_effective_cosangle"
+    };
+ 
+    // x axis label for those plots
+    std::vector<std::string> vec_axis_label = {
+        "Software Trigger",
+        "Pandora Slice ID",
+        "Shower Multiplicity",
+        "Track Multiplicity",
+        "Topological Score",
+        "Reco Vertex X [cm]",
+        "Reco Vertex Y [cm]",
+        "Reco Vertex Z [cm]",
+        "Shower Score",
+        "Leading Shower dE/dx (All Planes) [MeV/cm]",
+        "Leading Shower dE/dx (All Planes) (with tracks) [MeV/cm]",
+        "Leading Shower dE/dx (All Planes) (0 tracks) [MeV/cm]",
+        "Leading Shower to Vertex Distance [cm]",
+        "Hit Ratio",
+        "Pandora Cosmic Impact Parameter 3D [cm]",
+        "Contained Fraction (PFP hits in FV / hits in slice)",
+        "Leading Shower Moliere Average [deg]",
+        "Leading Shower Theta [deg]",
+        "Leading Shower Phi [deg]",
+        "Reconstructed Leading Shower Energy [GeV]",
+        "Reconstructed Leading Shower Energy [GeV]",
+        "Largest Flash Time [#mus]",
+        "Largest Flash Intensity [PE]",
+        "Leading Shower Effective Angle [deg]",
+        "Leading Shower Cosine Effective Angle [deg]"
+    };
 
-     // x axis label for those plots
-        std::vector<std::string> vec_axis_label = {"Reco Vertex X [cm]",
-                                               "Reco Vertex Y [cm]",
-                                               "Reco Vertex Z [cm]",
-                                               "Flash Time [#mus]",
-                                               "Leading Shower Phi [degrees]",
-                                               "Leading Shower Theta [degrees]",
-                                               "Shower Multiplicty",
-                                               "Track Multiplicity",
-                                               "Topological Score",
-                                               "Collection Plane dEdx (track fitter) [MeV/cm]",
-                                               "Reconstructed Neutrino Energy [GeV]",
-                                               "Reconstructed Leading Shower Energy [GeV]",
-                                               "Software Trigger",
-                                               "nslice",
-                                               "Shower Score",
-                                               "reco_shr_tkfit_dedx_max",
-                                               "reco_shr_tkfit_dedx_max_with_tracks",
-                                               "reco_shr_tkfit_dedx_max_no_tracks",
-                                               "reco_shower_to_vtx_dist",
-                                               "reco_hits_ratio",
-                                               "reco_CosmicIPAll3D",
-                                               "reco_contained_fraction",
-                                               "reco_shrmoliereavg",
-                                               "reco_shower_energy_cali",
-                                               "reco_flash_pe"};
-
-	// list of detector variations
-	std::vector<std::string> vec_var_string = {"CV","BNB_Diffusion"};
+    // list of detector variations
+    std::vector<std::string> vec_var_string = {
+        "CV",
+        //"BNB_Diffusion",
+        "LYRayleigh",
+        "LYAttenuation",
+        "SCE",
+        "Recomb2",
+        "WireModX",
+        "WireModYZ",
+        "WireModThetaXZ",
+        "WireModThetaYZ_withSigmaSplines",
+        "WireModThetaYZ_withoutSigmaSplines",
+        "WireModdEdX"
+   };
 
 }; // End Class Utility
 

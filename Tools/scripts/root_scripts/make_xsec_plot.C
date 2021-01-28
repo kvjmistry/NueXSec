@@ -323,21 +323,21 @@ void make_xsec_plot(){
 
     TPaveText *pt;
 
-    pt = new TPaveText(0.27, 0.92, 0.27, 0.92,"NDC");
-    pt->AddText("MicroBooNE");
+    pt = new TPaveText(0.34, 0.875, 0.34, 0.875,"NDC");
+    pt->AddText("MicroBooNE NuMI Data 2.4#times10^{20} POT");
     pt->SetTextColor(kBlack);
     pt->SetBorderSize(0);
     pt->SetFillColor(0);
     pt->SetFillStyle(0);
-    pt->SetTextSize(0.04);
+    pt->SetTextSize(0.038);
     pt->Draw();
 
     // summed_flux->GetXaxis()->SetTitle("test");
     // c->Modified();
 
 
-    if (!draw_averge)c->Print("../../Analysis/plots/flux_combo_morebins_v3.pdf");
-    if (draw_averge)c->Print("../../Analysis/plots/flux_combo_morebins_v3_average.pdf");
+    if (!draw_averge)c->Print("../../../Analysis/plots/flux_combo_morebins_v3.pdf");
+    if (draw_averge)c->Print("../../../Analysis/plots/flux_combo_morebins_v3_average.pdf");
 
 
     // Now create the other flux integrated cross sec plot
@@ -411,7 +411,7 @@ void make_xsec_plot(){
     leg2->SetFillStyle(0);
     leg2->AddEntry(g_xsec, "Data #nu_{e} + #bar{#nu}_{e} CC Cross-Section",      "l");
     leg2->AddEntry(g_xsec_sys,      "Stat. + Sys. Uncertainty",                  "f");
-    leg2->AddEntry(g_xsec_stat,     "Stat Uncertainty",                        "f");
+    leg2->AddEntry(g_xsec_stat,     "Stat. Uncertainty",                        "f");
     leg2->AddEntry(g_xsec_nue,      "GENIE #nu_{e} CC Cross-Section",          "l");
     leg2->AddEntry(g_xsec_nuebar,   "GENIE #bar{#nu}_{e} CC Cross-Section",    "l");
     leg2->AddEntry(g_xsec_nue_nuebar,   "GENIE #nu_{e} + #bar{#nu}_{e} CC Cross-Section",    "l");
@@ -420,6 +420,6 @@ void make_xsec_plot(){
    
     pt->Draw();   
 
-    c2->Print("../../Analysis/plots/flux_combo_2_with_data_v3.pdf");
+    c2->Print("../../../Analysis/plots/flux_combo_2_with_data_v3.pdf");
 
 }

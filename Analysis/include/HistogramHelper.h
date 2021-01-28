@@ -22,12 +22,6 @@ class HistogramHelper{
     SelectionCuts _scuts;
     int _type{1};
 
-    // weight variable (will equal multiple of all weights)
-    double weight{1.0};
-
-    bool weight_tune = true; // Apply genie tune weight
-    bool weight_ppfx = true; // Apply ppfx cv weight
-
     // -------------------------------------------------------------------------
     // Initialiser function
     void Initialise(int type, const char * file_out, Utility util );
@@ -87,6 +81,9 @@ class HistogramHelper{
     // vector of histograms to make, indexed by enums
     std::vector<std::vector<std::vector<TH1D*>>> TH1D_hists; 
 
+    // vector of 2D histograms to make, indexed by enums
+    std::vector<std::vector<std::vector<TH2D*>>> TH2D_hists_cuts; 
+
     // vector of histograms to make, indexed by enums -- for particle type
     std::vector<std::vector<std::vector<TH1D*>>> TH1D_hists_particle; 
 
@@ -107,7 +104,7 @@ class HistogramHelper{
     std::vector<TH1D*> TH1D_flash_hists;
 
     // Interaction Histograms
-    std::vector<std::vector<TH1D*>> TH1D_interaction_hists; // unselected/selected -- interaction type
+    std::vector<std::vector<std::vector<TH1D*>>> TH1D_interaction_hists; // sum/nue/nubar -- unselected/selected -- interaction type
 
     // 2D histograms for Signal and Background Rejection
     std::vector<std::vector<TH2D*>> TH2D_hists;
@@ -135,6 +132,9 @@ class HistogramHelper{
         k_reco_track_shower_dist,                                               // Track shower dist
         k_reco_track_shower_angle,                                              // Track shower angle
         k_reco_hits_ratio,                                                      // Ratio hits from showers to slice
+        k_reco_hits_ratio_th,                                                   // Ratio hits from showers to slice with a threshold
+        k_reco_hits_ratio_ldg,                                                  // Ratio hits from leading shower to slice
+        k_reco_hits_ratio_ldg_th,                                               // Ratio hits from leading shower to slice with a minimum hit requirement
         k_reco_shower_score,                                                    // Shower score
         k_reco_track_score,                                                     // Track score
         k_reco_shower_energy_tot_cali,                                          // Calibrated energy of all the showers
@@ -187,6 +187,10 @@ class HistogramHelper{
         k_reco_crtveto,                                                         // CRT veto
         k_reco_crthitpe,                                                        // CRT hit pe
         k_reco_shr_ang_numi,                                                    // Angle of the reconstructed leading shower relative to the numi beamline
+        k_reco_single_bin,                                                      // Just fill with weight. We need this to get the uncertainty on the purity
+        k_reco_effective_angle,                                                 // Angle between vector from target to vertex and shower direction.
+        k_reco_effective_cosangle,                                              // Cosine of the Angle between vector from target to vertex and shower direction.
+        k_reco_trk_pid_score,                                                   // The PID score for tracks in the event
         k_TH1D_MAX
     };
 
@@ -194,6 +198,7 @@ class HistogramHelper{
     enum TH1D_par_hist_vars {
         k_reco_shr_tkfit_dedx_max_par,  // dEdx in the plane with most hits with trackfit 1x4 cm box
         k_reco_shr_tkfit_dedx_y_par,    // dEdx in the collection plane with trackfit 1x4 cm box
+        k_reco_trk_pid_score_par,           // Track PID Score
         k_TH1D_par_MAX
     };
 
@@ -201,15 +206,36 @@ class HistogramHelper{
     enum TH1D_eff_vars {
         k_eff_nu_E,                  // True Electron-neutrino energy
         k_eff_elec_E,                // True Electron Energy
+        k_eff_elec_E_many_bins,      // True Electron Energy with many bins
         k_eff_elec_E_rebin,          // True energy of electron with binning scheme
+        k_eff_elec_E_rebin_nue,      // True energy of electron with binning scheme (nue only)
+        k_eff_elec_E_rebin_nuebar,   // True energy of positron with binning scheme (nuebar only)
+        k_eff_nu_E_nue,              // True Electron-neutrino energy
+        k_eff_nu_E_nuebar,           // True anti Electron-neutrino energy
+        k_eff_nu_E_single_bin,       // True Electron-neutrino energy, single bin
+        k_eff_nu_E_nue_single_bin,   // True Electron-neutrino energy single bin
+        k_eff_nu_E_nuebar_single_bin,// True anti Electron-neutrino energy single bin
+        k_eff_nu_flash_time,         // Efficiency as a function of flash time
+        k_eff_nu_theta,              // Efficiency as a function of nu theta
+        k_eff_nu_phi,                // Efficiency as a function of nu phi
+        k_eff_elec_theta,            // Efficiency as a function of electron theta
+        k_eff_elec_phi,              // Efficiency as a function of electron phi
+        k_eff_effective_ang,         // Efficiency as a function of the effective angle (angle between nu dir and elec dir)
+        k_eff_proton_multi,          // Efficiency as a function of the number of true protons in the interaction.
+        k_eff_proton_multi_nue,      // Efficiency as a function of the number of true protons in the interaction. Nue events only
+        k_eff_proton_multi_nuebar,   // Efficiency as a function of the number of true protons in the interaction. Nuebar events only
+        k_eff_pion_multi,            // Efficiency as a function of the number of true pions in the interaction.
+        k_eff_pion_multi_nue,        // Efficiency as a function of the number of true pions in the interaction. Nue events only
+        k_eff_pion_multi_nuebar,     // Efficiency as a function of the number of true pions in the interaction. Nuebar events only
+        k_eff_charg_par_multi,       // Efficiency as a function of the number of true charged particles (protons + pions) in the interaction.
+        k_eff_charg_par_multi_nue,   // Efficiency as a function of the number of true charged particles (protons + pions) in the interaction. Nue events only
+        k_eff_charg_par_multi_nuebar,// Efficiency as a function of the number of true charged particles (protons + pions) in the interaction. Nuebar events only
         k_TH1D_eff_MAX
     };
 
     enum TH1D_true_hist_vars {
         k_true_nue_theta,     // True nue theta in BNB coordinates (up from beam dir)
         k_true_nue_phi,       // True nue phi in BNB coordinates (around beam dir)
-        k_true_nue_theta_numi,// True nue theta in NuMI coordinates (up from beam dir)
-        k_true_nue_phi_numi,  // True nue phi in NuMI coordinates (around beam dir)
         k_true_nue_angle,     // True nue angle from numi beamline 
         k_true_nue_px,        // True nue px
         k_true_nue_py,        // True nue py
@@ -227,6 +253,7 @@ class HistogramHelper{
         k_true_elec_theta,    // True theta of electron in BNB coordinates
         k_true_elec_phi,      // True phi of electron in BNB coordinates
         k_true_nu_ang_targ,   // True angle of electron shower wrt target
+        k_reco_true_ang,      // Angle between the reco and true neutrino angle
         k_TH1D_true_MAX
     };
 
@@ -255,8 +282,8 @@ class HistogramHelper{
         k_true_nu_vtx_x_reco_nu_vtx_x,
         k_true_nu_vtx_y_reco_nu_vtx_y,
         k_true_nu_vtx_z_reco_nu_vtx_z,
-        k_true_shr_energy_purity,        // Actually purity as a function of reco shower
-        k_true_shr_energy_completeness,  // Actually completeness as a function of reco shower
+        k_true_shr_energy_purity,           // Actually purity as a function of reco shower
+        k_true_shr_energy_completeness,     // Actually completeness as a function of reco shower
         k_true_shr_energy_resolution_reco,  // Actually resolution normed to reco as a function of reco shower
         k_true_shr_energy_resolution_true,  // Actually resolution normed to true as a function of reco shower
         k_TH2D_true_MAX
@@ -269,24 +296,50 @@ class HistogramHelper{
         k_reco_shr_dEdx_max_shr_dist,        // Using max variable rather than just collection plane
         k_reco_shr_dEdx_max_shr_dist_post,   // after the cut
         k_reco_shr_dEdx_shr_dist_large_dedx, // for dedx values > 10 MeV/cm
-        k_reco_shr_dEdx_moliere,     // dedx y and moliere average
-        k_reco_shr_moliere_shr_dist, // moliere average and shr vertex distance
+        k_reco_shr_dEdx_moliere,             // dedx y and moliere average
+        k_reco_shr_moliere_shr_dist,         // moliere average and shr vertex distance
         k_TH2D_reco_MAX
     };
 
     enum TH1D_pi0_hist_vars {
-        k_pi0_mass,      // The pi0 mass peak no weighting 
-        k_pi0_mass_norm,      // The pi0 mass peak normalisation fix
+        k_pi0_mass,             // The pi0 mass peak no weighting 
+        k_pi0_mass_norm,        // The pi0 mass peak normalisation fix
         k_pi0_mass_EScale,      // The pi0 mass peak energy dependent scaling
+        k_pi0_energy,           // The pi0 energy dist no weighting 
+        k_pi0_energy_norm,      // The pi0 energy dist normalisation fix
+        k_pi0_energy_EScale,    // The pi0 energy dist energy dependent scaling
         k_TH1D_pi0_MAX
     };
 
     enum TH1D_numu_hist_vars {
         k_track_theta,      // Longest track theta 
-        k_track_cos_theta,      // Longest track cos theta
-        k_track_phi,      // Longest track phi
-        k_muon_topo_score,      // Topological score (after muon selection)
+        k_track_cos_theta,  // Longest track cos theta
+        k_track_phi,        // Longest track phi
+        k_muon_topo_score,  // Topological score (after muon selection)
         k_TH1D_numu_MAX
+    };
+
+    // Define the enums for 2D histograms broken down by cuts and classifications
+    enum TH2D_cut_vars {
+        k_2D_dedx_shower_energy,      // 2D plot of dedx and reconstrcted shower energy
+        k_TH2D_cut_MAX
+    };
+
+    enum TH1D_interaction_vars {
+        k_int_nu_E_nue,
+        k_int_nu_E_nuebar,
+        k_int_nu_E_nue_nuebar,
+        k_int_nu_E_single_bin,
+        k_int_nu_E_nue_single_bin,
+        k_int_nu_E_nuebar_single_bin,
+        k_int_elec_E,
+        k_int_elec_E_rebin,
+        k_int_elec_E_rebin_nue,
+        k_int_elec_E_rebin_nuebar,
+        k_int_elec_theta,
+        k_int_elec_phi,
+        k_int_effective_ang,
+        k_INTERACTION_MAX
     };
 
 }; // End Class Histogram Helper 

@@ -46,6 +46,7 @@ class UtilityPlotter{
     float shr_bkt_E{0.0}; // energy of truth matched particle to the leading shower
     std::vector<float> *all_shr_hits = NULL;
     std::vector<float> *all_shr_energies = NULL;
+    std::vector<unsigned short> *weightsPPFX = NULL ;
 
 
 
@@ -79,6 +80,30 @@ class UtilityPlotter{
     // Get the integrated flux, draw threshold line for technote
     void PlotIntegratedFluxwithThrehold();
     // -------------------------------------------------------------------------
+    // Function to plot a number of true variables at the start of the selection
+    // e.g. the hit purity and pion mommentum
+    void PlotTrueVar();
+    // -------------------------------------------------------------------------
+    // Similar function to the slice container classifier, just re-implement it here for easier use
+    std::pair<std::string, int> Classify(float true_nu_vtx_sce_x, float true_nu_vtx_sce_y, float true_nu_vtx_sce_z, int nu_pdg, int ccnc, float nu_purity_from_pfp, int npi0);
+    // -------------------------------------------------------------------------
+    // Function to save a few 2D histograms
+    void Save2DHists(const char* printname, TH2D* hist);
+    // -------------------------------------------------------------------------
+    // Column Normalise 2D histogram
+    void ColumnNorm(TH2D* hist);
+    // -------------------------------------------------------------------------
+    // Study the ppfx weights for each event classification
+    void StudyPPFXWeights();
+    // -------------------------------------------------------------------------
+    // Study the efficeincy for run 1 and run 3
+    void CompareEfficiency();
+    // -------------------------------------------------------------------------
+    // Get the efficiency from the ttree and set the errors
+    void PopulateEff(TH1D* h_eff, TH1D *h_pur, TH1D* h_eff_clone, const char* input_file);
+    // -------------------------------------------------------------------------
+    // Compare the efficiency in the standard det var CV and intrinsic nue det var sample
+    void CompareDetVarEfficiency();
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 

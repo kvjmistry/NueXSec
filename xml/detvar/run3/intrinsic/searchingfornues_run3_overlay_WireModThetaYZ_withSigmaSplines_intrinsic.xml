@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+
+<!-- WireModThetaYZ_withSigmaSplines Systematic-->
+
+<!-- Production Project -->
+<!DOCTYPE project [
+<!ENTITY release "v08_00_00_51">
+<!ENTITY file_type "mc">
+<!ENTITY run_type "physics">
+<!ENTITY user "kmistry">
+<!ENTITY name "searchingfornues_run1_overlay_detvar_WireModThetaYZ_withSigmaSplines_intrinsic">
+<!ENTITY version "v1">
+]>
+
+<job>
+
+<project name="&name;">
+
+  <!-- Project size -->
+  <numevents>-1</numevents>
+
+  <!-- Operating System -->
+  <os>SL7</os>
+
+  <!-- Batch resources -->
+  <resource>DEDICATED,OPPORTUNISTIC</resource>
+
+  <!-- Larsoft information -->
+  <larsoft>
+    <tag>&release;</tag>
+    <qual>e17:prof</qual>
+    <local>/pnfs/uboone/resilient/users/kmistry/tars/uboonecode_mcc9_v08_00_00_51_sl7.tar</local>
+  </larsoft>
+
+  <!-- <check>1</check> -->
+  <!-- <copy>1</copy> -->
+
+  <!-- <fcldir>/pnfs/uboone/persistent/users/kmistry/searchingfornues/</fcldir> -->
+  
+  <!-- Project stages -->
+  <stage name="ntuple">
+    <fcl>run_redk2nu_rhc.fcl</fcl>
+    <fcl>standard_overlay_notpc_numi_uboone_updated.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_numi_rhc_slim.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run3_overlay_cc0pinp_numi.fcl</fcl>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
+    <maxfilesperjob>5</maxfilesperjob>
+    <numjobs></numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <disk>25GB</disk>
+    <schema>root</schema>
+    <inputdef></inputdef>
+    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/RHC/flux_cached_entries.root</jobsub>
+    <jobsub_start>  --expected-lifetime=short</jobsub_start>
+  </stage>
+  
+  <!-- file type -->
+  <filetype>&file_type;</filetype>
+
+  <!-- run type -->
+  <runtype>&run_type;</runtype>
+
+</project>
+
+
+</job>
