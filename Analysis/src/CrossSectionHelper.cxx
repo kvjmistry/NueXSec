@@ -228,7 +228,8 @@ void CrossSectionHelper::LoopEvents(){
                 // Background event
                 if ( *classification == "nu_out_fv"  || *classification == "cosmic"       ||
                      *classification == "numu_cc"    || *classification == "numu_cc_pi0"  || *classification == "nc" || 
-                     *classification == "nc_pi0"     || ((*classification == "cosmic_nue" || *classification == "cosmic_nuebar") && passed_selection)  ) {
+                     *classification == "nc_pi0"     || ((*classification == "cosmic_nue" || *classification == "cosmic_nuebar" || 
+                     *classification == "thr_nue"    || *classification == "thr_nuebar") && passed_selection)  ) {
                     
                     // Fill histograms
                     if (std::string(_util.xsecmode) != "txtlist"){
@@ -559,6 +560,10 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     // Set derived variables in the slice container
     // Classify the event
     SC.SliceClassifier(type);      // Classification of the event
+
+    // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
+    SC.SetThresholdEvent();
+
     SC.SetSignal();                // Set the event as either signal or other
     SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
     SC.SetNuMIAngularVariables();  // Set the NuMI angular variables

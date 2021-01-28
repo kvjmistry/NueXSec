@@ -181,6 +181,8 @@ class TreeHelper{
     double count_cosmic_nue{0.0};
     double count_unmatched_nuebar{0.0};
     double count_cosmic_nuebar{0.0};
+    double count_thr_nue{0.0};
+    double count_thr_nuebar{0.0};
     double count_total_mc{0.0};
     double count_data{0.0};
     double count_ext{0.0};

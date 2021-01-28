@@ -458,7 +458,8 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         std::cout << "-------------------------------" << reset << std::endl;
     }
 
-    std::cout << "Using Energy Threshold of: " << red << energy_threshold * 1000 << " MeV" << reset <<  std::endl;
+    std::cout << "Using a Neutrino Energy Threshold of: " << red << energy_threshold * 1000 << " MeV" << reset <<  std::endl;
+    std::cout << "Using a Electron Energy Threshold of: " << red << elec_threshold * 1000 << " MeV" << reset <<  std::endl;
     std::cout << green << "-------------------------------" << reset << std::endl;
 
     if (use_gpvm)
@@ -568,7 +569,7 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
     if (weight_ppfx) weight = weight * weight_flux;
 
     // Weight the below threshold events to zero. Current threhsold is 125 MeV
-    if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12) && nu_e <= energy_threshold) weight = 0.0;
+    // if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12) && nu_e <= energy_threshold) weight = 0.0;
 
     // This is the intrinsic nue weight that scales it to the standard overlay sample
     if (std::string(intrinsic_mode) == "intrinsic" && type == k_mc){
@@ -717,6 +718,8 @@ void Utility::Tabulate(bool inFV, std::string interaction, std::string classific
         if (classification == "cosmic_nue")       counter_v.at(k_count_cosmic_nue)       += weight;
         if (classification == "unmatched_nuebar") counter_v.at(k_count_unmatched_nuebar) += weight;
         if (classification == "cosmic_nuebar")    counter_v.at(k_count_cosmic_nuebar)    += weight;
+        if (classification == "thr_nue")          counter_v.at(k_count_thr_nue)          += weight;
+        if (classification == "thr_nuebar")       counter_v.at(k_count_thr_nuebar)       += weight;
 
         // Total selected MC events
         counter_v.at(k_count_total_mc) += weight;

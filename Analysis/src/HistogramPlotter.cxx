@@ -646,6 +646,8 @@ void HistogramPlotter::SetFillColours(std::vector<TH1D *> &hist, std::string plo
         hist.at(_util.k_nu_out_fv)->SetFillColor(kViolet - 7);
         hist.at(_util.k_numu_cc_pi0)->SetFillColor(42);
         hist.at(_util.k_unmatched)->SetFillColor(12);
+        hist.at(_util.k_thr_nue)->SetFillColor(kOrange-3);
+        hist.at(_util.k_thr_nuebar)->SetFillColor(kOrange-3);
     }
     // By particle type
     else {
@@ -690,6 +692,7 @@ void HistogramPlotter::SetLegend(std::vector<TH1D *> hist, TLegend *leg_stack, s
         leg_stack->AddEntry(hist.at(_util.k_numu_cc),     Form("#nu_{#mu} CC (%2.1f)", hist_integrals.at(_util.k_numu_cc)), "f");
         leg_stack->AddEntry(hist.at(_util.k_cosmic),      Form("Cosmic (%2.1f)", hist_integrals.at(_util.k_cosmic) + hist_integrals.at(_util.k_cosmic_nue) + hist_integrals.at(_util.k_cosmic_nuebar)), "f");
         leg_stack->AddEntry(hist.at(_util.k_nu_out_fv),   Form("#nu OutFV (%2.1f)", hist_integrals.at(_util.k_nu_out_fv)), "f");
+        // leg_stack->AddEntry(hist.at(_util.k_thr_nue),     Form("Below Th. #nu_{e} CC (%2.1f)", hist_integrals.at(_util.k_thr_nue) + hist_integrals.at(_util.k_thr_nuebar)), "f");
         leg_stack->AddEntry(hist.at(_util.k_nuebar_cc),   Form("#bar{#nu}_{e} CC (%2.1f)", hist_integrals.at(_util.k_nuebar_cc)), "f");
         leg_stack->AddEntry(hist.at(_util.k_nue_cc),      Form("#nu_{e} CC (%2.1f)", hist_integrals.at(_util.k_nue_cc)), "f");
     }

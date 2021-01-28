@@ -57,6 +57,10 @@ public:
     // Apply the 0.83 calibration factor to the shower energy so it is applied universally
     void CalibrateShowerEnergy();
     // -------------------------------------------------------------------------
+    // Set events that are below threshold to a new category
+    void SetThresholdEvent();
+    // -------------------------------------------------------------------------
+
 
 
 

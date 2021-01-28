@@ -179,6 +179,7 @@ public:
     // Neutrino Energy Threshold to integrate from
     // Flux bins are 0.00 ,0.06, 0.125, 0.25, 0.5, 0.75, 1.00, 1.25, 1.50, 1.75, 2.00, 2.25, 2.50, 2.75, 3.00, 3.25, 3.50, 4.00, 5.00
     double energy_threshold = 0.06; // GeV
+    double elec_threshold   = 0.12; // GeV
     
     bool slim                      = false;
     bool make_histos               = false;
@@ -343,15 +344,17 @@ public:
                 "nuebar_cc",
                 "nu_out_fv",
                 "cosmic",
-                "cosmic_nue",    // Another special category to separate standard nues from other cosmics. This category contains mis-reco'd nues as cosmics. We separate these out so we can count the efficency denominator properly
+                "cosmic_nue", 
                 "cosmic_nuebar",
                 "numu_cc",
                 "numu_cc_pi0",
                 "nc",
                 "nc_pi0",
                 "unmatched",
-                "unmatched_nue", // This is a special category to count nue/nuebar cc interactions that occur inside the fv, but were not reconstructed at all (so purity ends up < 0!). We need these for the efficeicny denom. 
+                "unmatched_nue",
                 "unmatched_nuebar",
+                "thr_nue",    // below threshold nue 
+                "thr_nuebar", // below threshold nuebar  
                 "ext",
                 "data",
                 "dirt"
@@ -439,6 +442,8 @@ public:
                 k_unmatched,
                 k_unmatched_nue,
                 k_unmatched_nuebar,
+                k_thr_nue,
+                k_thr_nuebar,
                 k_leg_ext,
                 k_leg_data,
                 k_leg_dirt,
@@ -525,6 +530,8 @@ public:
         k_count_unmatched_nuebar,
         k_count_cosmic_nuebar,
         k_count_total_mc,
+        k_count_thr_nue,
+        k_count_thr_nuebar,
         
         k_count_data,
         k_count_ext,

@@ -384,6 +384,10 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
 
     // Classify the event -- sets variable in the slice contianer
     SC.SliceClassifier(type);      // Classification of the event
+
+    // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
+    SC.SetThresholdEvent();
+    
     SC.SliceInteractionType(type); // Genie interaction type
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
     SC.Pi0Classifier(type); 
@@ -623,6 +627,10 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
 
     // Classify the event
     SC.SliceClassifier(type);      // Classification of the event
+
+    // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
+    SC.SetThresholdEvent();
+
     SC.SliceInteractionType(type); // Genie interaction type
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
         
@@ -659,6 +667,10 @@ void Selection::ApplyNuMuSelection(int type, SliceContainer &SC){
 
     // Classify the event
     SC.SliceClassifier(type);      // Classification of the event
+
+    // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
+    SC.SetThresholdEvent();
+
     SC.SliceInteractionType(type); // Genie interaction type
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
     

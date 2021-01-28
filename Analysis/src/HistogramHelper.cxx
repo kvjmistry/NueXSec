@@ -879,7 +879,9 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
         if (cut_index == _util.k_cuts_MAX-1) index = 1; // If its the last cut index then we want to fill the second lot of histograms
         
         // Also require in FV
-        if ( (classification_index == _util.k_nue_cc || classification_index == _util.k_nuebar_cc || classification_index == _util.k_unmatched_nue || classification_index == _util.k_cosmic_nue || classification_index == _util.k_unmatched_nuebar || classification_index == _util.k_cosmic_nuebar) && true_in_fv ){
+        if ( (classification_index == _util.k_nue_cc || classification_index == _util.k_nuebar_cc ||
+              classification_index == _util.k_unmatched_nue || classification_index == _util.k_cosmic_nue || 
+              classification_index == _util.k_unmatched_nuebar || classification_index == _util.k_cosmic_nuebar) && true_in_fv ){
             
             // Just True histograms
             TH1D_true_hists.at(index).at(k_true_nue_theta)       ->Fill(SC.nu_theta, weight);
@@ -1234,7 +1236,10 @@ void HistogramHelper::WriteReco(int type){
 
                 // Skip the write for the backgrounds in intrinsic nue mode
                 // This overwrites the signal histograms
-                if (std::string(_util.intrinsic_mode) == "intrinsic" && j != _util.k_nue_cc && j != _util.k_nuebar_cc && j != _util.k_cosmic_nue && j != _util.k_cosmic_nuebar && j != _util.k_unmatched_nue && j != _util.k_unmatched_nuebar){
+                if (std::string(_util.intrinsic_mode) == "intrinsic" && j != _util.k_nue_cc && j != _util.k_nuebar_cc &&
+                                                                        j != _util.k_cosmic_nue && j != _util.k_cosmic_nuebar &&
+                                                                        j != _util.k_unmatched_nue && j != _util.k_unmatched_nuebar &&
+                                                                        j !=_util.k_thr_nue && j != _util.k_thr_nuebar){
                     continue;
                 }
 
@@ -1289,7 +1294,10 @@ void HistogramHelper::WriteReco(int type){
 
                 // Skip the write for the backgrounds in intrinsic nue mode
                 // This overwrites the signal histograms
-                if (std::string(_util.intrinsic_mode) == "intrinsic" && j != _util.k_nue_cc && j != _util.k_nuebar_cc && j != _util.k_cosmic_nue && j != _util.k_cosmic_nuebar && j != _util.k_unmatched_nue && j != _util.k_unmatched_nuebar){
+                if (std::string(_util.intrinsic_mode) == "intrinsic" && j != _util.k_nue_cc && j != _util.k_nuebar_cc && 
+                                                                        j != _util.k_cosmic_nue && j != _util.k_cosmic_nuebar && 
+                                                                        j != _util.k_unmatched_nue && j != _util.k_unmatched_nuebar && 
+                                                                        j != _util.k_thr_nue && j != _util.k_thr_nuebar  ){
                     continue;
                 }
 

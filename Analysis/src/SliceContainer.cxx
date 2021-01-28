@@ -906,7 +906,7 @@ void SliceContainer::SetSignal(){
 
     if (classification.second == _util.k_nue_cc           || classification.second == _util.k_nuebar_cc ||
         classification.second == _util.k_unmatched_nue    || classification.second == _util.k_cosmic_nue ||
-        classification.second == _util.k_unmatched_nuebar || classification.second == _util.k_cosmic_nuebar ){
+        classification.second == _util.k_unmatched_nuebar || classification.second == _util.k_cosmic_nuebar){
             is_signal = true;
     }
     else 
@@ -996,4 +996,17 @@ void SliceContainer::CalibrateShowerEnergy(){
     // Divide the shower energy by 0.83 to calibrate it properly. 
     shr_energy_cali= shr_energy_cali/0.83;
 
+}
+// -----------------------------------------------------------------------------
+void SliceContainer::SetThresholdEvent(){
+
+    // Below threshold of nue or electron energy
+    if (nu_e < _util.energy_threshold || elec_e < _util.elec_threshold){
+        if (nu_pdg == 12){
+            classification = std::make_pair("thr_nue",_util.k_thr_nue);
+        }
+        if (nu_pdg == -12){
+            classification = std::make_pair("thr_nuebar",_util.k_thr_nuebar);
+        }
+    }
 }
