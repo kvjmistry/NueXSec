@@ -232,6 +232,18 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             }
         }
 
+        // Should we scale the cross section bins by the bin width?
+        if (strcmp(arg, "--binscaling") == 0){
+            std::cout << "Calculating a Cross-Section bin with scaling mode of: " << argv[i+1] << std::endl;
+            scale_bins = argv[i+1];
+
+            // Modes must be mcc8 smearing or event rate
+            if (std::string(scale_bins) != "standard" && std::string(scale_bins) != "width" ){
+                std::cout << red << "Error specified variable which is not supported! You can use: standard or width " << reset << std::endl;
+                exit(5);
+            }
+        }
+
         // Utility Plotter
         if (strcmp(arg, "--uplot") == 0){
             std::cout << "Using Utility plotting code with mode: " << argv[i+1] << std::endl;

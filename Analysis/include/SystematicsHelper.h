@@ -29,6 +29,8 @@ class SystematicsHelper{
 
     std::vector<double> POT_v; // vector of POT for each variation 
 
+    bool scale_bins = false;
+
     double Data_POT;
     // -------------------------------------------------------------------------
     // Initialiser function

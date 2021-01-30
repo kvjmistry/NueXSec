@@ -9,12 +9,10 @@ void SystematicsHelper::Initialise(Utility _utility){
     // Initialise the Wiener SVD class
     _wSVD.Initialise(_utility);
 
-    // The output file with the systematic uncertainties
-    TFile *file_sys_var;
-    // Open the outoput systematics file
-    // file_sys_var = TFile::Open(Form("files/run%s_sys_var.root", _util.run_period),"UPDATE");
+    // Set the option to scale the bin widths
+    if (std::string(_util.scale_bins) == "width")
+        scale_bins = true;
     
-
     // Set the scale factors
     if (strcmp(_util.run_period, "1") == 0){
         Data_POT = _util.config_v.at(_util.k_Run1_Data_POT); // Define this variable here for easier reading
@@ -904,9 +902,16 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
     bool single_var = false;
     if (label_up == label_dn) single_var = true;
 
+    TH1D* htemp;
+
     // Get the histograms and customise a bit
     for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
-        _util.GetHist(f_nuexsec, h_universe.at(k_up).at(k), Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, label_up.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, label_up.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+
+        h_universe.at(k_up).at(k) = (TH1D*)htemp->Clone();
+
+        if (scale_bins)
+            h_universe.at(k_up).at(k)->Scale(1.0, "width");
 
         // Customise
         h_universe.at(k_up).at(k)->SetLineWidth(2);
@@ -916,7 +921,12 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         h_universe.at(k_up).at(k)->GetYaxis()->SetTitleFont(44);
         h_universe.at(k_up).at(k)->GetYaxis()->SetTitleOffset(1.5);
         
-        _util.GetHist(f_nuexsec, h_universe.at(k_dn).at(k), Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, label_dn.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, label_dn.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+
+        h_universe.at(k_dn).at(k) = (TH1D*)htemp->Clone();
+
+        if (scale_bins)
+            h_universe.at(k_dn).at(k)->Scale(1.0, "width");
 
         // Customise
         h_universe.at(k_dn).at(k)->SetLineWidth(2);
@@ -1082,6 +1092,8 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         delete leg;
         delete h_err_up;
         delete h_err_dn;
+        delete h_universe.at(k_up).at(k);
+        delete h_universe.at(k_dn).at(k);
     }
 }
 // -----------------------------------------------------------------------------
@@ -1107,13 +1119,20 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
         _util.GetHist(f_nuexsec, h_temp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label.c_str(), vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
         h_universe.at(k) = (TH1D*)h_temp->Clone();
 
+        if (scale_bins)
+            h_universe.at(k)->Scale(1.0, "width");
+
         double scale_fact = POT_v.at(k_CV) / POT_v.at(detvar_index);
         
         // Scale the histograms, but only in the case of MC variables
         if (xsec_types.at(k) != "ext" && xsec_types.at(k) != "dirt" && xsec_types.at(k) != "data") h_universe.at(k)->Scale(scale_fact);
 
         // Get the CV histograms
-        _util.GetHist(f_nuexsec, h_CV.at(k), Form( "detvar_CV/%s/h_run%s_CV_0_%s_%s", vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, h_temp, Form( "detvar_CV/%s/h_run%s_CV_0_%s_%s", vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
+        h_CV.at(k) = (TH1D*)h_temp->Clone();
+
+        if (scale_bins)
+            h_CV.at(k)->Scale(1.0, "width");
 
         // Customise
         h_universe.at(k)->SetLineWidth(2);
@@ -1228,6 +1247,8 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
         delete c;
         delete leg;
         delete h_err;
+        delete h_universe.at(k);
+        delete h_CV.at(k);
     }
 }
 // -----------------------------------------------------------------------------
@@ -1358,6 +1379,9 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
     for (int uni = 0; uni < universes; uni++){
         for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
             _util.GetHist(f_nuexsec, h_universe.at(uni).at(k), Form( "%s/%s/h_run%s_%s_%i_%s_%s", label.c_str(), vars.at(var).c_str(), _util.run_period, label.c_str(), uni ,vars.at(var).c_str(), xsec_types.at(k).c_str()));
+
+            if (scale_bins)
+                h_universe.at(uni).at(k)->Scale(1.0, "width");
 
             // Customise
             h_universe.at(uni).at(k)->SetLineWidth(1);
@@ -1798,6 +1822,9 @@ void SystematicsHelper::InitialsePlotCV(){
 
             if (cv_hist_vec.at(var).at(k) == NULL) std::cout << "Failed to get the histogram!" << std::endl;
 
+            if (scale_bins)
+                cv_hist_vec.at(var).at(k)->Scale(1.0, "width");
+
             // Customise
             cv_hist_vec.at(var).at(k)->SetLineWidth(2);
             cv_hist_vec.at(var).at(k)->SetLineColor(kBlack);
@@ -1866,10 +1893,16 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
     std::string label_up = label + "up";
     std::string label_dn = label + "dn";
     
+    TH1D* htemp;
 
     // Get the histograms and customise a bit
     for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
-        _util.GetHist(f_nuexsec, h_universe.at(k_up).at(k), Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, label_up.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, label_up.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+
+        h_universe.at(k_up).at(k) = (TH1D*)htemp->Clone();
+
+        if (scale_bins)
+            h_universe.at(k_up).at(k)->Scale(1.0, "width");
 
         // Customise
         h_universe.at(k_up).at(k)->SetLineWidth(2);
@@ -1880,7 +1913,12 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
         h_universe.at(k_up).at(k)->GetYaxis()->SetTitleFont(44);
         h_universe.at(k_up).at(k)->GetYaxis()->SetTitleOffset(1.5);
         
-        _util.GetHist(f_nuexsec, h_universe.at(k_dn).at(k), Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, label_dn.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, label_dn.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+
+        h_universe.at(k_dn).at(k) = (TH1D*)htemp->Clone();
+
+        if (scale_bins)
+            h_universe.at(k_dn).at(k)->Scale(1.0, "width");
 
         // Customise
         h_universe.at(k_dn).at(k)->SetLineWidth(2);
@@ -1969,6 +2007,12 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
     h_err->Draw("hist,same");
 
     c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_data_mc_comparison.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(), _util.run_period, label.c_str(), vars.at(var).c_str() ));
+
+    // Clear memory
+    for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
+        delete h_universe.at(k_up).at(k);
+        delete h_universe.at(k_dn).at(k);
+    }
 
     delete c;
 }
@@ -2673,9 +2717,15 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                 // Beamline have CV in the name because of the way the cross section helper works
                 if (!is_detvar){
                     _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, label_up.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+                    
+                    if (scale_bins)
+                        htemp->Scale(1.0, "width");
                 }
                 else {
                     _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
+
+                    if (scale_bins)
+                        htemp->Scale(1.0, "width");
                 
                     // Also need to Scale the beamline histograms to the right POT
                     double scale_fact = POT_v.at(k_CV) / POT_v.at(label);
@@ -2694,9 +2744,15 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                 // Beamline have CV in the name because of the way the cross section helper works
                 if (!is_detvar){
                     _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, label_dn.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+
+                    if (scale_bins)
+                        htemp->Scale(1.0, "width");
                 }
                 else {
                     _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
+
+                    if (scale_bins)
+                        htemp->Scale(1.0, "width");
                     
                     // Also need to Scale the beamline histograms to the right POT
                     double scale_fact = POT_v.at(k_CV) / POT_v.at(label);
@@ -2735,6 +2791,10 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             // For the beamline variations, we have a different CV
             else {
                 _util.GetHist(f_nuexsec, h_CV_clone, Form( "detvar_CV/%s/h_run%s_CV_0_%s_%s", vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(type).c_str()));
+                
+                if (scale_bins)
+                        h_CV_clone->Scale(1.0, "width");
+                
                 h_CV_clone->SetLineWidth(2);
                 h_CV_clone->SetLineColor(kBlack); 
             }
@@ -3455,7 +3515,7 @@ void SystematicsHelper::ExportResult(TFile* f){
         std::vector<double> bins_fine = _util.true_shr_bins;
         double* edges_fine = &bins_fine[0]; // Cast to an array 
 
-        // Response Matrix
+        // Response Matrix  ---------------------------------
         h_response->SetOption("col,text00");
         
         // Flip the response matrix x and y axes
@@ -3465,7 +3525,6 @@ void SystematicsHelper::ExportResult(TFile* f){
         // Loop over rows
         for (int row=0; row<h_response->GetXaxis()->GetNbins()+2; row++) {
 
-            // Loop over columns and get the integral
             for (int col=0; col<h_response->GetYaxis()->GetNbins()+2; col++){
                 h_smear->SetBinContent(col, row, h_response->GetBinContent(row, col));          
             }
@@ -3474,11 +3533,11 @@ void SystematicsHelper::ExportResult(TFile* f){
         h_smear->SetTitle("; Leading Shower Energy [GeV]; True e#lower[-0.5]{-} + e^{+} Energy [GeV]");
         h_smear->Write("h_response", TObject::kOverwrite);
 
-        // Data XSec Covariance Matrix
+        // Data XSec Covariance Matrix ---------------------------------
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->SetOption("colz");
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->Write("h_cov_tot_dataxsec_reco", TObject::kOverwrite);
     
-        // MC XSec True
+        // MC XSec True  ---------------------------------
         cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->SetOption("hist");
 
         TH1D* h_mc_xsec_true = (TH1D*)cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->Clone();
@@ -3494,11 +3553,12 @@ void SystematicsHelper::ExportResult(TFile* f){
         h_mc_xsec_true->Write("h_mc_xsec_true", TObject::kOverwrite);
         
 
-        // MC Efficiency True
+        // MC Efficiency True  ---------------------------------
         cv_hist_vec.at(k_var_true_el_E).at(k_xsec_eff)->SetOption("hist");
         cv_hist_vec.at(k_var_true_el_E).at(k_xsec_eff)->Write("h_mc_eff_true", TObject::kOverwrite);
 
 
+        // Data Correlation Matrix  ---------------------------------
         TH2D* cor;
         int n_bins = cv_hist_vec.at(k_var_reco_el_E).at(0)->GetNbinsX();
         cor  = new TH2D("h_cor",   ";Bin i; Bin j",n_bins, 1, n_bins+1, n_bins, 1, n_bins+1 ); // Create the correlation matrix
@@ -3507,12 +3567,13 @@ void SystematicsHelper::ExportResult(TFile* f){
         cor->SetOption("colz");
         cor->Write("h_corr_tot_dataxsec_reco", TObject::kOverwrite);
 
+        // Wiener SVD Unfolding  ---------------------------------
         _wSVD.DoUnfolding(2, 0, h_mc_xsec_true, cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_smear, h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot));
         _wSVD.CompareModel(h_mc_xsec_true);
     }
     
 
-    // Data XSec Reco (Stat Only)
+    // Data XSec Reco (Stat Only)  ---------------------------------
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetOption("E1,X0");
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetLineColor(kRed+2);
 
@@ -3521,25 +3582,21 @@ void SystematicsHelper::ExportResult(TFile* f){
 
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_reco", TObject::kOverwrite);
 
-    // --
-
-    // Convert bin errors to sys
+    // Data XSec Reco (Sys Only)  ---------------------------------
     for (int bin = 0; bin < cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->GetNbinsX(); bin++){
         cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_sys).at(k_var_reco_el_E).at(k_xsec_mcxsec).at(bin)) * cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->GetBinContent(bin+1));
     }
 
-    // Data XSec Reco (Sys Only)
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetOption("E1,X0");
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->Write("h_data_xsec_sys_reco", TObject::kOverwrite);
 
-    // --
 
-    // Convert bin errors to stat + sys
+    // Convert bin errors to stat + sys  ---------------------------------
     for (int bin = 0; bin < cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->GetNbinsX(); bin++){
         cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_sys).at(k_var_reco_el_E).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_stat).at(k_var_reco_el_E).at(k_xsec_dataxsec).at(bin)) * cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->GetBinContent(bin+1));
     }
 
-    // Data XSec Reco (Stat + Sys)
+    // Data XSec Reco (Stat + Sys)  ---------------------------------
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetOption("E1,X0");
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_sys_reco", TObject::kOverwrite);
 
