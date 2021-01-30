@@ -1113,7 +1113,7 @@ void CrossSectionHelper::WriteHists(){
 
                         // Certain histograms we want to divide out by the bin width
                         if ((var == k_var_recoX || var == k_var_trueX) && p != k_xsec_eff )
-                            h_cross_sec.at(label).at(uni).at(var).at(p)->Scale(1.0, "width");
+                            // h_cross_sec.at(label).at(uni).at(var).at(p)->Scale(1.0, "width");
 
                         h_cross_sec.at(label).at(uni).at(var).at(p)->SetOption("hist");
                         h_cross_sec.at(label).at(uni).at(var).at(p)->Write("",TObject::kOverwrite);

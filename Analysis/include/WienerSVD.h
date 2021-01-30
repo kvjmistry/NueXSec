@@ -13,8 +13,23 @@ class WienerSVD{
     // Default constructor
     WienerSVD(){};
 
+    TH2D* smear;
+    TH1D* wiener;
+    TH2D* unfcov;
+    TH1D* unf;
+    TH1D* diff;
+    TH1D* bias;
+    TH1D* bias2;
+    TH1D* fracError;
+    TH1D* absError;
+    TH1D* MSE;
+    TH1D* MSE2;
 
-    
+    Utility _util;
+
+    // -------------------------------------------------------------------------
+    // Initialise the Class
+    void Initialise(Utility _utility);
     // -------------------------------------------------------------------------
     /*
     Main function to run the Wiener Unfolding
@@ -27,6 +42,9 @@ class WienerSVD{
 
     */
     void DoUnfolding(Int_t C_type, Float_t Norm_type, TH1D *sig, TH1D *mes, TH2D* res, TH2D* cov);
+    // -------------------------------------------------------------------------
+    // Make a comparison of data to MC
+    void CompareModel(TH1D *sig);
     // -------------------------------------------------------------------------
     // converters for histrogram <---> matrix/vector
     // former is input, latter is output

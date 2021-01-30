@@ -1123,18 +1123,12 @@ void Utility::CalcCFracCovariance(TH1D *h_CV, TH2D *h_frac_cov){
 
 }
 // -----------------------------------------------------------------------------
-void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov){
+void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov, double &chi, int &ndof, double &pval){
 
     // Clone them so we can scale them 
     TH1D* h_model_clone = (TH1D*)h_model->Clone();
     TH1D* h_data_clone  = (TH1D*)h_data->Clone();
     TH2D* h_cov_clone   = (TH2D*)cov->Clone();
-
-    // We need to scale the histograms because the matrix inversion has problems
-    // with the small numbers
-    // h_model_clone->Scale(1.0e39);
-    // h_data_clone->Scale(1.0e39);
-    // h_cov_clone->Scale(1.0e78);
 
     // Getting covariance matrix in TMatrix form
     TMatrix cov_m;
@@ -1156,15 +1150,18 @@ void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov){
 
     // Calculating the chi2 = Summation_ij{ (x_i - mu_j)*E_ij^(-1)*(x_j - mu_j)  }
     // x = data, mu = model, E^(-1) = inverted covariance matrix 
-    double chi2 = 0;
+    chi = 0;
     for (int i = 0; i < h_cov_clone->GetNbinsX(); i++) {
         for (int j = 0; j < h_cov_clone->GetNbinsX(); j++) {
-            chi2 += (h_data_clone->GetBinContent(i+1) - h_model_clone->GetBinContent(i+1)) * inverse_cov_m[i][j] * (h_data_clone->GetBinContent(j+1) - h_model_clone->GetBinContent(j+1));
+            chi += (h_data_clone->GetBinContent(i+1) - h_model_clone->GetBinContent(i+1)) * inverse_cov_m[i][j] * (h_data_clone->GetBinContent(j+1) - h_model_clone->GetBinContent(j+1));
         }
     }
 
-    std::cout << blue << "Chi2/dof: " << chi2 << "/" << h_data_clone->GetNbinsX() << " = " << chi2/double(h_data_clone->GetNbinsX())  << reset <<  std::endl;
-    std::cout << red << "p-value: " << TMath::Prob(chi2, h_data_clone->GetNbinsX())  << reset <<  std::endl;
+    ndof = h_data_clone->GetNbinsX();
+    pval = TMath::Prob(chi, ndof);
+
+    std::cout << blue << "Chi2/dof: " << chi << "/" << h_data_clone->GetNbinsX() << " = " << chi/double(ndof)  << reset <<  std::endl;
+    std::cout << red << "p-value: " <<  pval << reset <<  std::endl;
 
     delete h_model_clone;
     delete h_data_clone;
@@ -1258,4 +1255,36 @@ void Utility::UndoBinWidthScaling(TH1D* &hist){
 
     }
 
+}
+// -----------------------------------------------------------------------------
+void Utility::Save1DHists(const char *print_name, TH1D* hist, const char* draw_option) {
+
+    TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
+    
+    c->SetTopMargin(0.11);
+    hist->SetStats(kFALSE);
+    hist->SetLineColor(kBlack);
+    IncreaseLabelSize(hist, c);
+    hist->SetLineWidth(2);
+    hist->Draw(draw_option);
+    
+    Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
+    c->Print(print_name);
+    
+    delete c;
+}
+// -----------------------------------------------------------------------------
+void Utility::Save2DHists(const char *print_name, TH2D* hist, const char* draw_option) {
+
+    TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
+    
+    c->SetTopMargin(0.11);
+    gStyle->SetPaintTextFormat("4.2f");
+    hist->SetStats(kFALSE);
+    IncreaseLabelSize(hist, c);
+    hist->Draw(draw_option);
+    Draw_Run_Period(c, 0.82, 0.915, 0.82, 0.915);
+    c->Print(print_name);
+    
+    delete c;
 }

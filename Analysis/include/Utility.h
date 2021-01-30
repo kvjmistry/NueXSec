@@ -36,7 +36,9 @@
 #include "TRandom3.h"
 #include "TColor.h"
 #include "TMatrixD.h"
+#include "TVectorD.h"
 #include "TChain.h"
+#include "TDecompSVD.h"
 
 /*
 
@@ -134,7 +136,7 @@ public:
     void CalcCFracCovariance(TH1D *h_CV, TH2D *h_frac_cov);
     // -------------------------------------------------------------------------
     // Calulate a chi squared using a covarinace matrix, for a model to data
-    void CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov);
+    void CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov, double &chi, int &ndof, double &pval);
     // -------------------------------------------------------------------------
     // Set the axes names of the cross section plots
     void SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vector<std::string> &var_labels_events,
@@ -142,6 +144,15 @@ public:
     // -------------------------------------------------------------------------
     // Undo a bin width scaling
     void UndoBinWidthScaling(TH1D* &hist);
+    // -------------------------------------------------------------------------
+    // Save a 1D hsitogram as a PDF
+    void Save1DHists(const char *print_name, TH1D* hist, const char* draw_option);
+    // -------------------------------------------------------------------------
+    // Save a 2D hsitogram as a PDF
+    void Save2DHists(const char *print_name, TH2D* hist, const char* draw_option);
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 
 

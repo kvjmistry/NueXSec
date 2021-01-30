@@ -1,6 +1,12 @@
 #include "../include/WienerSVD.h"
 
 // -----------------------------------------------------------------------------
+void WienerSVD::Initialise(Utility _utility){
+
+    std::cout << "Initalising The WienerSVD..." << std::endl;
+    _util = _utility;
+}
+// -----------------------------------------------------------------------------
 void WienerSVD::DoUnfolding(Int_t C_type, Float_t Norm_type, TH1D *sig, TH1D *mes, TH2D* res, TH2D* cov)
 {
     
@@ -34,18 +40,18 @@ void WienerSVD::DoUnfolding(Int_t C_type, Float_t Norm_type, TH1D *sig, TH1D *me
     TVectorD WF(n);
     TMatrixD UnfoldCov(n,n);
     
-    TH2D* smear     = new TH2D("smear",     "Additional Smearing Matirx",n,Nuedges,n,Nuedges);
-    TH1D* wiener    = new TH1D("wiener",    "Wiener Filter Vector",n,0,n);
-    TH2D* unfcov    = new TH2D("unfcov",    "Unfolded spectrum covariance", n, Nuedges, n, Nuedges);
-    TH1D* unf       = new TH1D("unf",       "unfolded spectrum",n,Nuedges);
-    TH1D* diff      = new TH1D("diff",      "Fractional difference of unf and signal model",n, Nuedges);
-    TH1D* bias      = new TH1D("bias",      "intrinsic bias w.r.t. model",n, Nuedges);
-    TH1D* bias2     = new TH1D("bias2",     "intrinsic bias2 w.r.t. unfolded result",n, Nuedges);
-    TH1D* fracError = new TH1D("fracError", "Fractional uncertainty", n, Nuedges);
-    TH1D* absError  = new TH1D("absError",  "Absolute uncertainty", n, Nuedges);
-    TH1D* MSE       = new TH1D("MSE",       "Mean Square Error: variance+bias^2", n, Nuedges);
-    TH1D* MSE2      = new TH1D("MSE2",      "Mean Square Error: variance", n, Nuedges);
-
+    // Create the histograms
+    smear     = new TH2D("smear",     "Additional Smearing Matirx;True e#lower[-0.5]{-} + e^{+} Energy [GeV];True e#lower[-0.5]{-} + e^{+} Energy [GeV]",n,Nuedges,n,Nuedges);
+    wiener    = new TH1D("wiener",    "Wiener Filter Vector",n,0,n);
+    unfcov    = new TH2D("unfcov",    "Unfolded spectrum covariance;True e#lower[-0.5]{-} + e^{+} Energy [GeV];True e#lower[-0.5]{-} + e^{+} Energy [GeV]", n, Nuedges, n, Nuedges);
+    unf       = new TH1D("unf",       "unfolded spectrum",n,Nuedges);
+    diff      = new TH1D("diff",      "Fractional difference of unf and signal model",n, Nuedges);
+    bias      = new TH1D("bias",      "intrinsic bias w.r.t. model",n, Nuedges);
+    bias2     = new TH1D("bias2",     "intrinsic bias2 w.r.t. unfolded result",n, Nuedges);
+    fracError = new TH1D("fracError", "Fractional uncertainty", n, Nuedges);
+    absError  = new TH1D("absError",  "Absolute uncertainty", n, Nuedges);
+    MSE       = new TH1D("MSE",       "Mean Square Error: variance+bias^2", n, Nuedges);
+    MSE2      = new TH1D("MSE2",      "Mean Square Error: variance", n, Nuedges);
 
     // Core implementation of Wiener-SVD
     // Input as names read. AddSmear and WF to record the core information in the unfolding.
@@ -104,7 +110,116 @@ void WienerSVD::DoUnfolding(Int_t C_type, Float_t Norm_type, TH1D *sig, TH1D *me
 
     return;
 }
+// -----------------------------------------------------------------------------
+void WienerSVD::CompareModel(TH1D *sig){
+    
+    // Get The unfolded spectrum
+    unf->SetLineColor(kBlack);
+    unf->SetMarkerStyle(20);
+    unf->SetMarkerSize(0.5);
+    unf->SetLineStyle(1);
 
+    for (int bin = 1; bin < unf->GetNbinsX()+1; bin++){
+        double err = unfcov->GetBinContent(bin, bin);
+        unf->SetBinError(bin, std::sqrt(err));
+    }
+
+    sig->SetLineColor(kRed+2);
+    sig->SetLineStyle(1);
+
+    TH1D* h_model_smear = (TH1D*)sig->Clone();
+    for (int bin = 0; bin < h_model_smear->GetNbinsX()+2; bin++){
+        h_model_smear->SetBinContent(bin, 0);
+        h_model_smear->SetBinError(bin, 0);
+    }
+
+    // Now Apply the smear matrix to the model
+    // Now do the multiplication
+    for (int i=1; i < smear->GetXaxis()->GetNbins()+1; i++){
+
+        for (int j=1; j < smear->GetYaxis()->GetNbins()+1; j++) { 
+            
+            h_model_smear->SetBinContent(i, h_model_smear->GetBinContent(i) + smear->GetBinContent(i, j) * sig->GetBinContent(j));
+            h_model_smear->SetBinError(i, h_model_smear->GetBinError(i) + smear->GetBinContent(i, j) * sig->GetBinError(j));
+        }
+
+    } 
+
+    // Now calculate the chi-squared
+    double chi, pval;
+    int ndof;
+    _util.CalcChiSquared(h_model_smear, unf, unfcov, chi, ndof, pval);
+
+    // Now scale the bin widths for plotting
+    h_model_smear->Scale(1.0, "width");
+    unf->Scale(1.0, "width");
+
+    // Make an error histogram
+    TH1D* h_model_smear_err = (TH1D*)h_model_smear->Clone();
+    h_model_smear_err->SetFillColorAlpha(12, 0.15);
+
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+    gPad->SetLeftMargin(0.20);
+    c->SetBottomMargin(0.15);
+
+    h_model_smear->SetMaximum(5);
+
+    h_model_smear->Draw("hist");
+    h_model_smear_err->Draw("E2,same");
+    unf->Draw("E1,X0,same");
+
+    TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(unf, "Data (Stat. + Sys.)", "ep");
+    leg->AddEntry(h_model_smear_err,   Form("MC (Stat.) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    leg->Draw();
+    
+    _util.CreateDirectory(Form("Systematics/CV/Unfolded/%s", _util.xsec_var));
+    c->Print(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unfolded_%s.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var));
+
+
+    // Now plot the diff and fractional bias
+    delete c;
+    delete leg;
+    c = new TCanvas("c", "c", 500, 500);
+    diff->SetTitle("; True e#lower[-0.5]{-} + e^{+} Energy [GeV];");
+    diff->GetYaxis()->SetRangeUser(-0.5, 0.5);
+    diff->SetLineWidth(2);
+    bias->SetLineColor(kRed+2);
+    bias->SetLineWidth(2);
+    diff->Draw("hist");
+    bias->Draw("hist,same");
+    TLine *line = new TLine(0, 0, 6.00, 0.0);
+    line->SetLineColor(kBlack);
+    line->SetLineStyle(kDotted);
+    line->Draw();
+    
+
+    
+    leg = new TLegend(0.5, 0.7, 0.85, 0.85);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(diff, "Fractional difference", "l");
+    leg->AddEntry(bias, "Intrinsic bias", "l");
+    leg->Draw();
+    c->Print(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_diff_bias_%s.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var));
+
+
+    // Histograms to be printed to pdf
+    _util.Save2DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_smear_%s.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), smear,    "colz");
+    _util.Save2DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unfold_cov_%s.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov,   "colz");
+
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_wiener_%s.pdf",    _util.run_period, _util.xsec_var ,_util.xsec_var), wiener,    "hist");
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unf_%s.pdf",       _util.run_period, _util.xsec_var ,_util.xsec_var), unf,       "hist");
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_diff_%s.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), diff,      "hist");
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_bias_%s.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), bias,      "hist");
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_bias2_%s.pdf",     _util.run_period, _util.xsec_var ,_util.xsec_var), bias2,     "hist");
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_fracError_%s.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), fracError, "hist");
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_absError_%s.pdf",  _util.run_period, _util.xsec_var ,_util.xsec_var), absError,  "hist");
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_MSE_%s.pdf",       _util.run_period, _util.xsec_var ,_util.xsec_var), MSE,       "hist");
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_MSE2_%s.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), MSE2,      "hist");
+}
 // -----------------------------------------------------------------------------
 TMatrixD WienerSVD::Matrix(Int_t row, Int_t column) {
     TMatrixD MMM(row, column);

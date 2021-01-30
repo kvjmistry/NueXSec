@@ -2,6 +2,7 @@
 #define SYSTEMATICSHELPER_H
 
 #include "Utility.h"
+#include "WienerSVD.h"
 
 // Class for making plots for systematic studies
 class SystematicsHelper{
@@ -23,6 +24,8 @@ class SystematicsHelper{
     int run{0}, subrun{0}, event{0};
     
     TTree * tree;
+
+    WienerSVD _wSVD;
 
     std::vector<double> POT_v; // vector of POT for each variation 
 

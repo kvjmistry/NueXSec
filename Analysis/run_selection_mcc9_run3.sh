@@ -54,7 +54,8 @@ if [ "$1" == "weight" ]; then
   ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel reint    --xsec_smear er
   ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3.root --xsecmode reweight --xseclabel mcstats  --xsec_smear er
 
-  source run_selection_mcc9_run3.sh allvar
+  # Re-run the detvar xsec
+  source run_selection_mcc9_run1.sh allvarxsec
 
   ./nuexsec --run 3 --sys reweight --xsec_smear er
 
@@ -132,6 +133,16 @@ if [ "$1" == "allvar" ]; then
   for i in "${var[@]}"
   do
     source run_selection_mcc9_run3.sh var "$i"
+  done
+
+fi
+
+if [ "$1" == "allvarxsec" ]; then
+
+  # run the above script for every det variation 
+  for i in "${var[@]}"
+  do
+    ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3_$i.root --var dummy $i --xsecmode default --xsecvar elec_E --xsec_smear er
   done
 
 fi

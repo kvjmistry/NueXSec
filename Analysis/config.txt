@@ -199,16 +199,16 @@ Run3_MC_POT_weight 1.99076e+21 // new tune
 Run3_Intrinsic_POT_weight 2.5392e+22
 -
 // Run 3 Det var CV
-Run3_MC_POT_CV 2.71543e+20 // newtune
+Run3_MC_POT_CV 2.87219e+20 // newtune
 -
 // Run 3 Det var LYAttenuation
 Run3_MC_POT_LYAttenuation 3.31177e+20 // new tune
 -
 // Run 3 Det var LYRayleigh
-Run3_MC_POT_LYRayleigh 2.8105e+20 // new tune
+Run3_MC_POT_LYRayleigh 3.15492e+20 // new tune
 -
 // Run 3 Det var LYDown
-Run3_MC_POT_LYDown 2.8097e+20 // new tune
+Run3_MC_POT_LYDown 3.23381e+20 // new tune
 -
 // Run 3 Det var SCE
 Run3_MC_POT_SCE 3.33283e+20 // new tune

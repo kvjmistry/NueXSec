@@ -6,6 +6,8 @@ void SystematicsHelper::Initialise(Utility _utility){
     std::cout << "Initalising Systematics Helper..." << std::endl;
     _util = _utility;
 
+    // Initialise the Wiener SVD class
+    _wSVD.Initialise(_utility);
 
     // The output file with the systematic uncertainties
     TFile *file_sys_var;
@@ -757,8 +759,10 @@ void SystematicsHelper::InitialiseReweightingMode(){
     MakeTotUncertaintyPlot();
 
     // Calculate a chi-squared using the total covariance matrix
-    _util.CalcChiSquared(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot));
-    _util.CalcChiSquared(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot));
+    double chi, pval;
+    int ndof;
+    _util.CalcChiSquared(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot), chi, ndof, pval);
+    _util.CalcChiSquared(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot), chi, ndof, pval);
 
     // // Print the sqrt of the diagonals of the covariance matrix
     // // loop over rows
@@ -3466,23 +3470,6 @@ void SystematicsHelper::ExportResult(TFile* f){
                 h_smear->SetBinContent(col, row, h_response->GetBinContent(row, col));          
             }
         } 
-
-        
-
-        // TH2D* h_smear_reduced = new TH2D("h_response","; Leading Shower Energy [GeV]; True e#lower[-0.5]{-} + e^{+} Energy [GeV]", 8, edges2, 7, edges);
-        // // Loop over rows  8 bins
-        // for (int row=1; row<h_smear->GetXaxis()->GetNbins()+1; row++) {
-
-        //     // Loop over columns 7 bins
-        //     for (int col=2; col<h_smear->GetYaxis()->GetNbins()+1; col++){
-        //         h_smear_reduced->SetBinContent(row, col-1, h_smear->GetBinContent(row, col));          
-        //     }
-        // } 
-
-        // h_smear_reduced->SetOption("col,text00");
-        // h_smear_reduced->Write("h_response", TObject::kOverwrite);
-        
-        
         
         h_smear->SetTitle("; Leading Shower Energy [GeV]; True e#lower[-0.5]{-} + e^{+} Energy [GeV]");
         h_smear->Write("h_response", TObject::kOverwrite);
@@ -3503,14 +3490,6 @@ void SystematicsHelper::ExportResult(TFile* f){
         // undo the truth efficiency correction
         h_mc_xsec_true->Divide(cv_hist_vec.at(k_var_true_el_E).at(k_xsec_eff));
 
-        // TH1D *h_mc_xsec_true_reduced = new TH1D("h_mc_xsec_true", "MC xsec true", 7, edges);
-        
-        // // Loop over columns 7 bins
-        // for (int bin=2; bin<h_mc_xsec_true->GetXaxis()->GetNbins()+1; bin++){
-        //     h_mc_xsec_true_reduced->SetBinContent(bin-1, h_mc_xsec_true->GetBinContent(bin));          
-        // }
-        // h_mc_xsec_true_reduced->Write("h_mc_xsec_true", TObject::kOverwrite);
-
         // cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->Write("h_mc_xsec_true", TObject::kOverwrite);
         h_mc_xsec_true->Write("h_mc_xsec_true", TObject::kOverwrite);
         
@@ -3527,6 +3506,9 @@ void SystematicsHelper::ExportResult(TFile* f){
 
         cor->SetOption("colz");
         cor->Write("h_corr_tot_dataxsec_reco", TObject::kOverwrite);
+
+        _wSVD.DoUnfolding(2, 0, h_mc_xsec_true, cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_smear, h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot));
+        _wSVD.CompareModel(h_mc_xsec_true);
     }
     
 
