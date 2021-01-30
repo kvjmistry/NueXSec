@@ -1212,6 +1212,9 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
         }
         else {
             xsec_scale = 2.0; // Event Rate
+
+            if (std::string(scale_bins) == "standard")
+                xsec_scale*=0.3;
         }        
     
     }
@@ -1243,6 +1246,9 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
         }
         else {
             xsec_scale = 0.05; // Event Rate
+
+            if (std::string(scale_bins) == "standard")
+                xsec_scale*=0.3;
         }
 
     }

@@ -1772,6 +1772,22 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
                 h_dataxsec->Draw("E1,same,X0,same");
 
             }
+
+            // Get the chi-squared
+            double chi, pval;
+            int ndof;
+            int index = 0;
+            if (error_type.at(err_lab) == "stat"){
+                index = k_err_stat;
+            }
+            else if (error_type.at(err_lab) == "sys"){
+                index = k_err_sys;
+            }
+            else{
+                index = index = k_err_tot;
+            }
+
+            _util.CalcChiSquared(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(index), chi, ndof, pval);
             
 
             TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
@@ -1780,7 +1796,7 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             if (error_type.at(err_lab) == "stat")     leg->AddEntry(h_dataxsec_tot, "Data (Stat.)", "ep");
             else if (error_type.at(err_lab) == "sys") leg->AddEntry(h_dataxsec_tot, "Data (Sys.)", "ep");
             else                                      leg->AddEntry(h_dataxsec_tot, "Data (Stat. + Sys.)", "ep");
-            leg->AddEntry(h_mcxsec_clone,   "MC (Stat.)", "lf");
+            leg->AddEntry(h_mcxsec_clone,   Form("MC (Stat.) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
             leg->Draw();
 
             // Draw the run period on the plot
@@ -3475,33 +3491,55 @@ void SystematicsHelper::ExportResult(TFile* f){
     // MCC8 mode, so get the smearing matrix
     if (std::string(_util.xsec_smear_mode) == "mcc8"){
 
-        // Smearing Matrix
+        // Smearing Matrix  ---------------------------------
         h_response->SetOption("col,text00");
         h_response->Write("h_smear", TObject::kOverwrite);
 
-        // MC XSec Covariance Matrix
+        // MC XSec Covariance Matrix  ---------------------------------
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->SetOption("col");
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Write("h_cov_tot_mcxsec_reco", TObject::kOverwrite);
 
-        // MC XSec Reco
+        // MC XSec Reco  ---------------------------------
         cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->SetOption("hist");
         cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->Write("h_mc_xsec_reco", TObject::kOverwrite);
+
+        // MC Efficiency Smear  ---------------------------------
+        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_eff)->SetOption("hist");
+        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_eff)->Write("h_mc_eff_reco", TObject::kOverwrite);
+
+        // MC Correlation Matrix  ---------------------------------
+        TH2D* cor;
+        int n_bins = cv_hist_vec.at(k_var_reco_el_E).at(0)->GetNbinsX();
+        cor  = new TH2D("h_cor",   ";Bin i; Bin j",n_bins, 1, n_bins+1, n_bins, 1, n_bins+1 ); // Create the correlation matrix
+        _util.CalcCorrelation(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot), cor);
+
+        cor->SetOption("colz");
+        cor->Write("h_corr_tot_mcxsec_reco", TObject::kOverwrite);
 
     }
     // Other modes we need the response matrix
     else if (std::string(_util.xsec_smear_mode) == "er") {
         
-        // Response Matrix
+        // Response Matrix  ---------------------------------
         h_response->SetOption("col,text00");
         h_response->Write("h_response", TObject::kOverwrite);
 
-        // MC XSec Covariance Matrix
+        // MC XSec Covariance Matrix  ---------------------------------
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->SetOption("col");
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Write("h_cov_tot_mcxsec_reco", TObject::kOverwrite);
     
-        // MC XSec Reco
+        // MC XSec Reco  ---------------------------------
         cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->SetOption("hist");
         cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->Write("h_mc_xsec_reco", TObject::kOverwrite);
+
+        // MC Correlation Matrix  ---------------------------------
+        TH2D* cor;
+        int n_bins = cv_hist_vec.at(k_var_reco_el_E).at(0)->GetNbinsX();
+        cor  = new TH2D("h_cor",   ";Bin i; Bin j",n_bins, 1, n_bins+1, n_bins, 1, n_bins+1 ); // Create the correlation matrix
+        _util.CalcCorrelation(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot), cor);
+
+        cor->SetOption("colz");
+        cor->Write("h_corr_tot_mcxsec_reco", TObject::kOverwrite);
 
     }
     // Weiner Mode
@@ -3543,8 +3581,6 @@ void SystematicsHelper::ExportResult(TFile* f){
         TH1D* h_mc_xsec_true = (TH1D*)cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->Clone();
         // TH1D* h_mc_xsec_true = (TH1D*)h_mcxsec_fine->Clone();
 
-        // Undo the bin width scaling 
-        // _util.UndoBinWidthScaling(h_mc_xsec_true);
 
         // undo the truth efficiency correction
         h_mc_xsec_true->Divide(cv_hist_vec.at(k_var_true_el_E).at(k_xsec_eff));
@@ -3576,10 +3612,6 @@ void SystematicsHelper::ExportResult(TFile* f){
     // Data XSec Reco (Stat Only)  ---------------------------------
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetOption("E1,X0");
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetLineColor(kRed+2);
-
-    // Undo the bin width scaling 
-    // _util.UndoBinWidthScaling(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec));
-
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_reco", TObject::kOverwrite);
 
     // Data XSec Reco (Sys Only)  ---------------------------------
@@ -3591,17 +3623,16 @@ void SystematicsHelper::ExportResult(TFile* f){
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->Write("h_data_xsec_sys_reco", TObject::kOverwrite);
 
 
-    // Convert bin errors to stat + sys  ---------------------------------
+    // Data XSec Reco (Stat + Sys)  ---------------------------------
     for (int bin = 0; bin < cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->GetNbinsX(); bin++){
         cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_sys).at(k_var_reco_el_E).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_stat).at(k_var_reco_el_E).at(k_xsec_dataxsec).at(bin)) * cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->GetBinContent(bin+1));
     }
 
-    // Data XSec Reco (Stat + Sys)  ---------------------------------
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetOption("E1,X0");
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_sys_reco", TObject::kOverwrite);
 
 
-    // Close the file
+    // Close the file ---------------------------------
     f_sys_out->cd();
     f_sys_out->Close();
 
