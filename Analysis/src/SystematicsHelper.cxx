@@ -910,7 +910,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
 
         h_universe.at(k_up).at(k) = (TH1D*)htemp->Clone();
 
-        if (scale_bins)
+        if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
             h_universe.at(k_up).at(k)->Scale(1.0, "width");
 
         // Customise
@@ -925,7 +925,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
 
         h_universe.at(k_dn).at(k) = (TH1D*)htemp->Clone();
 
-        if (scale_bins)
+        if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
             h_universe.at(k_dn).at(k)->Scale(1.0, "width");
 
         // Customise
@@ -1119,7 +1119,7 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
         _util.GetHist(f_nuexsec, h_temp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label.c_str(), vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
         h_universe.at(k) = (TH1D*)h_temp->Clone();
 
-        if (scale_bins)
+        if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
             h_universe.at(k)->Scale(1.0, "width");
 
         double scale_fact = POT_v.at(k_CV) / POT_v.at(detvar_index);
@@ -1131,7 +1131,7 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
         _util.GetHist(f_nuexsec, h_temp, Form( "detvar_CV/%s/h_run%s_CV_0_%s_%s", vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
         h_CV.at(k) = (TH1D*)h_temp->Clone();
 
-        if (scale_bins)
+        if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
             h_CV.at(k)->Scale(1.0, "width");
 
         // Customise
@@ -1380,7 +1380,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
             _util.GetHist(f_nuexsec, h_universe.at(uni).at(k), Form( "%s/%s/h_run%s_%s_%i_%s_%s", label.c_str(), vars.at(var).c_str(), _util.run_period, label.c_str(), uni ,vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
-            if (scale_bins)
+            if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
                 h_universe.at(uni).at(k)->Scale(1.0, "width");
 
             // Customise
@@ -1822,7 +1822,7 @@ void SystematicsHelper::InitialsePlotCV(){
 
             if (cv_hist_vec.at(var).at(k) == NULL) std::cout << "Failed to get the histogram!" << std::endl;
 
-            if (scale_bins)
+            if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
                 cv_hist_vec.at(var).at(k)->Scale(1.0, "width");
 
             // Customise
@@ -1901,7 +1901,7 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
 
         h_universe.at(k_up).at(k) = (TH1D*)htemp->Clone();
 
-        if (scale_bins)
+        if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
             h_universe.at(k_up).at(k)->Scale(1.0, "width");
 
         // Customise
@@ -1917,7 +1917,7 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
 
         h_universe.at(k_dn).at(k) = (TH1D*)htemp->Clone();
 
-        if (scale_bins)
+        if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
             h_universe.at(k_dn).at(k)->Scale(1.0, "width");
 
         // Customise
@@ -2718,13 +2718,13 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                 if (!is_detvar){
                     _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, label_up.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
                     
-                    if (scale_bins)
+                    if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
                         htemp->Scale(1.0, "width");
                 }
                 else {
                     _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
-                    if (scale_bins)
+                    if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
                         htemp->Scale(1.0, "width");
                 
                     // Also need to Scale the beamline histograms to the right POT
@@ -2745,13 +2745,13 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                 if (!is_detvar){
                     _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, label_dn.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
-                    if (scale_bins)
+                    if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
                         htemp->Scale(1.0, "width");
                 }
                 else {
                     _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
-                    if (scale_bins)
+                    if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
                         htemp->Scale(1.0, "width");
                     
                     // Also need to Scale the beamline histograms to the right POT
@@ -2792,7 +2792,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             else {
                 _util.GetHist(f_nuexsec, h_CV_clone, Form( "detvar_CV/%s/h_run%s_CV_0_%s_%s", vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(type).c_str()));
                 
-                if (scale_bins)
+                if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && type != k_xsec_eff ))
                         h_CV_clone->Scale(1.0, "width");
                 
                 h_CV_clone->SetLineWidth(2);
