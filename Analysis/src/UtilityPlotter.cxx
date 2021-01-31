@@ -57,6 +57,7 @@ void UtilityPlotter::Initialise(Utility _utility){
         TestModelDependence();
         CompareDataCrossSections();
         CompareSmearing();
+        CompareUnfoldedModels();
         return;
     }
     else {
@@ -1460,7 +1461,7 @@ void UtilityPlotter::TestModelDependence(){
     h_temp  = (TH1D*)fxsec->Get("CV/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
     TH1D* h_mcxsec_true = (TH1D*)h_temp->Clone();
     TH1D* h_mcxsec_reco = (TH1D*)h_temp->Clone();
-    h_mcxsec_reco->SetLineColor(kGreen+2);
+    h_mcxsec_reco->SetLineColor(kRed+2);
 
     _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco, h_response, "true_reco", true);
 
@@ -1468,7 +1469,7 @@ void UtilityPlotter::TestModelDependence(){
     h_temp  = (TH1D*)fxsec->Get("mec/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
     TH1D* h_mcxsec_true_mec = (TH1D*)h_temp->Clone();
     TH1D* h_mcxsec_reco_mec = (TH1D*)h_temp->Clone();
-    h_mcxsec_reco_mec->SetLineColor(kRed+2);
+    h_mcxsec_reco_mec->SetLineColor(kGreen+2);
 
     _util.MatrixMultiply(h_mcxsec_true_mec, h_mcxsec_reco_mec, h_response, "true_reco", true);
 
@@ -1485,11 +1486,12 @@ void UtilityPlotter::TestModelDependence(){
     c->SetLeftMargin(0.2);
     c->SetBottomMargin(0.15);
     h_dataxsec->GetYaxis()->SetTitleOffset(1.7);
-    h_dataxsec->Draw();
+    // h_mcxsec_reco->SetMaximum(1.5);
+    h_dataxsec->Draw("E1,X0,same");
     h_mcxsec_reco->Draw("hist,same");
     h_mcxsec_reco_mec->Draw("hist,same");
     h_mcxsec_reco_nogtune->Draw("hist,same");
-    h_dataxsec->Draw("E1,same,X0");
+    h_dataxsec->Draw("E1,X0,same");
 
     TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
     leg->SetBorderSize(0);
@@ -1654,4 +1656,119 @@ void UtilityPlotter::CompareSmearing(){
     delete c;
 
 }
+// -----------------------------------------------------------------------------
+void UtilityPlotter::CompareUnfoldedModels(){
+
+    gStyle->SetOptStat(0);
+
+    // Load in the cross section output
+    TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
+
+    TH2D* h_temp_2D;
+    TH1D* h_temp;
+
+    // The covariance matrix
+    h_temp_2D = (TH2D*)fxsec->Get("elec_E/wiener/h_data_cov_tot_unfolded");
+    TH2D* h_cov = (TH2D*)h_temp_2D->Clone();
+    h_cov->SetDirectory(0);
+
+    // Data XSec
+    h_temp  = (TH1D*)fxsec->Get("elec_E/wiener/h_data_xsec_unfolded");
+    TH1D* unf = (TH1D*)h_temp->Clone();
+    unf->SetDirectory(0);
+    unf->SetLineColor(kBlack);
+    unf->SetMarkerStyle(20);
+    unf->SetMarkerSize(0.5);
+    _util.UndoBinWidthScaling(unf);
+
+    // Additional Smearing matrix
+    h_temp_2D = (TH2D*)fxsec->Get("elec_E/wiener/h_ac");
+    TH2D* h_ac = (TH2D*)h_temp_2D->Clone();
+    h_ac->SetDirectory(0);
+
+    fxsec->Close();
+
+
+    for (int bin = 1; bin < unf->GetNbinsX()+1; bin++){
+        double err = h_cov->GetBinContent(bin, bin);
+        unf->SetBinError(bin, std::sqrt(err));
+    }
+    
+
+    // Now Get the Models
+    // Load in the cross section output
+    fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+    
+    // MC Xsec True
+    h_temp  = (TH1D*)fxsec->Get("CV/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
+    TH1D* h_mcxsec_true         = (TH1D*)h_temp->Clone();
+    TH1D* h_mcxsec_true_smear   = (TH1D*)h_temp->Clone();
+
+    _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_true_smear, h_ac, "reco_true",false);
+
+    // MC Xsec True MEC
+    h_temp  = (TH1D*)fxsec->Get("mec/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
+    TH1D* h_mcxsec_true_mec         = (TH1D*)h_temp->Clone();
+    TH1D* h_mcxsec_true_smear_mec   = (TH1D*)h_temp->Clone();
+
+    _util.MatrixMultiply(h_mcxsec_true_mec, h_mcxsec_true_smear_mec, h_ac, "reco_true",false);
+
+    // MC Xsec True no Genie Tune
+    h_temp  = (TH1D*)fxsec->Get("nogtune/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
+    TH1D* h_mcxsec_true_nogtune         = (TH1D*)h_temp->Clone();
+    TH1D* h_mcxsec_true_smear_nogtune   = (TH1D*)h_temp->Clone();
+
+    _util.MatrixMultiply(h_mcxsec_true_nogtune, h_mcxsec_true_smear_nogtune, h_ac, "reco_true",false);
+
+    TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(unf, "Data (Stat. + Sys.)", "ep");
+    
+    // Now calculate the chi-squared
+    double chi, pval;
+    int ndof;
+    _util.CalcChiSquared(h_mcxsec_true_smear, unf, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_true_smear,   Form("MC (CV) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    _util.CalcChiSquared(h_mcxsec_true_smear_mec, unf, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_true_smear_mec,   Form("MC (1.5 #times MEC) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    _util.CalcChiSquared(h_mcxsec_true_smear_nogtune, unf, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_true_smear_nogtune,   Form("MC (no gTune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+
+
+    h_mcxsec_true_smear->Scale(1.0, "width");
+    h_mcxsec_true_smear_mec->Scale(1.0, "width");
+    h_mcxsec_true_smear_nogtune->Scale(1.0, "width");
+    unf->Scale(1.0, "width");
+
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+
+    _util.IncreaseLabelSize(h_mcxsec_true_smear, c);
+    gPad->SetLeftMargin(0.20);
+    c->SetBottomMargin(0.15);
+    h_mcxsec_true_smear->GetYaxis()->SetTitleOffset(1.7);
+    h_mcxsec_true_smear->SetLineColor(kRed+2);
+    h_mcxsec_true_smear->SetMaximum(5);
+    h_mcxsec_true_smear->Draw("hist");
+
+    h_mcxsec_true_smear_mec->SetLineColor(kGreen+2);
+    h_mcxsec_true_smear_mec->Draw("hist,same");
+
+    h_mcxsec_true_smear_nogtune->SetLineColor(kBlue+2);
+    h_mcxsec_true_smear_nogtune->Draw("hist,same");
+    
+    unf->Draw("E1,X0,same");
+    
+
+    
+    
+    leg->Draw();
+    
+    c->Print(Form("plots/run%s/Models/DataModelUnfoldedComparison.pdf", _util.run_period));
+
+}
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

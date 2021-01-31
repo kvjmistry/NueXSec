@@ -1749,9 +1749,10 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
                 }
 
             }
-            
-            
-            
+
+            c->SetLeftMargin(0.2);
+            c->SetBottomMargin(0.15);
+            h_dataxsec->GetYaxis()->SetTitleOffset(1.8);
             h_dataxsec->Draw("E,X0");
             if (error_type.at(err_lab) == "tot"){
                 h_dataxsec_tot->Draw("E1,same,X0");
@@ -3587,7 +3588,7 @@ void SystematicsHelper::ExportResult(TFile* f){
 
 
         // undo the truth efficiency correction
-        h_mc_xsec_true->Divide(cv_hist_vec.at(k_var_true_el_E).at(k_xsec_eff));
+        // h_mc_xsec_true->Divide(cv_hist_vec.at(k_var_true_el_E).at(k_xsec_eff));
 
         // cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->Write("h_mc_xsec_true", TObject::kOverwrite);
         h_mc_xsec_true->Write("h_mc_xsec_true", TObject::kOverwrite);
@@ -3610,6 +3611,9 @@ void SystematicsHelper::ExportResult(TFile* f){
         // Wiener SVD Unfolding  ---------------------------------
         _wSVD.DoUnfolding(2, 0, h_mc_xsec_true, cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_smear, h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot));
         _wSVD.CompareModel(h_mc_xsec_true);
+        _wSVD.unf->Write("h_data_xsec_unfolded", TObject::kOverwrite);
+        _wSVD.unfcov->Write("h_data_cov_tot_unfolded", TObject::kOverwrite);
+        _wSVD.smear->Write("h_ac", TObject::kOverwrite);
     }
     
 
