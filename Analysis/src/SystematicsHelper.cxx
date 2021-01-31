@@ -3612,6 +3612,7 @@ void SystematicsHelper::ExportResult(TFile* f){
     // Data XSec Reco (Stat Only)  ---------------------------------
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetOption("E1,X0");
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetLineColor(kRed+2);
+    cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetTitle(var_labels_xsec.at(k_var_reco_el_E).c_str());
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_reco", TObject::kOverwrite);
 
     // Data XSec Reco (Sys Only)  ---------------------------------

@@ -151,6 +151,8 @@ public:
     // Save a 2D hsitogram as a PDF
     void Save2DHists(const char *print_name, TH2D* hist, const char* draw_option);
     // -------------------------------------------------------------------------
+    // Apply matrix to smear from true to reco space
+    void MatrixMultiply(TH1D* h_true, TH1D* &h_reco, TH2D* matrix, std::string option, bool norm);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

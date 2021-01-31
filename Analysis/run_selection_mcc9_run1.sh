@@ -174,6 +174,19 @@ if [ "$1" == "mec" ]; then
 
 fi
 
+# Make a new file with a reweighted MEC model
+if [ "$1" == "nogtune" ]; then
+
+  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root nogtune --weight_tune 0
+
+  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root nogtune --intrinsic intrinsic --weight_tune 0
+
+  root -l -b -q 'merge/merge_uneaventrees.C("1", true, "files/trees/nuexsec_selected_tree_mc_run1_nogtune.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "nogtune")'
+
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_nogtune.root --var dummy nogtune --xsecmode default --xsecvar elec_E --xsec_smear er
+
+fi
+
 
 # To generate the file lists with all event weights then use this command
 # ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode txtlist --xseclabel all --xsecvar elec_E

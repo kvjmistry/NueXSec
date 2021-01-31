@@ -105,6 +105,12 @@ class UtilityPlotter{
     // Compare the efficiency in the standard det var CV and intrinsic nue det var sample
     void CompareDetVarEfficiency();
     // -------------------------------------------------------------------------
+    // Function to compare how making a smearing matrix with a different model impacts
+    // the measured cross section.
+    void TestModelDependence();
+    // -------------------------------------------------------------------------
+    // Compare the extracted data cross section for different models
+    void CompareDataCrossSections();
     // -------------------------------------------------------------------------
 
 

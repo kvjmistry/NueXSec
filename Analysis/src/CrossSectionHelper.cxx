@@ -917,7 +917,7 @@ void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg,
     }
     
     // If using Marco's Method we correct by the efficiency
-    if (std::string(_util.xsec_smear_mode) == "mcc8" || _var == k_var_integrated){
+    if (std::string(_util.xsec_smear_mode) == "mcc8" || _var == k_var_integrated || _var == k_var_trueX){
         h_xsec->Divide(h_eff) ;
     }
 

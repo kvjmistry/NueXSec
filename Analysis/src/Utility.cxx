@@ -171,7 +171,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             overwritePOT = true;
 
             // If using an alternate CV model via reweighting then we dont want to overwrite the POT values
-            if (std::string(variation) == "weight" || std::string(variation) == "mec")
+            if (std::string(variation) == "weight" || std::string(variation) == "mec" || std::string(variation) == "nogtune")
                 overwritePOT = false;
         }
 
@@ -1321,4 +1321,35 @@ void Utility::Save2DHists(const char *print_name, TH2D* hist, const char* draw_o
     c->Print(print_name);
     
     delete c;
+}
+// -----------------------------------------------------------------------------
+void Utility::MatrixMultiply(TH1D* h_true, TH1D* &h_reco, TH2D* matrix, std::string option, bool norm){
+
+
+    // Smear the MC xsec through the response matrix
+    // Clear the Bins
+    for (int bin = 0; bin < h_reco->GetNbinsX()+2; bin++){
+        h_reco->SetBinContent(bin, 0);
+    }
+
+    // --- Do the matrix multiplication --- 
+    // Loop over cols
+    for (int i=1; i<h_reco->GetXaxis()->GetNbins()+2; i++){
+
+        // Now normalise the column entries by the number of events in the 1D generated histogram
+        for (int j=1; j<matrix->GetYaxis()->GetNbins()+2; j++) { 
+            
+            if (option == "reco_true")
+                h_reco->SetBinContent(i, h_reco->GetBinContent(i) + matrix->GetBinContent(j, i) * h_true->GetBinContent(j));
+            else if (option == "true_reco")
+                h_reco->SetBinContent(i, h_reco->GetBinContent(i) + matrix->GetBinContent(i, j) * h_true->GetBinContent(j));
+            else
+                std::cout << "Unknown Option Specified!!!" << std::endl;
+        }
+
+    } 
+
+    if (norm)
+        h_reco->Scale(1.0, "width");
+
 }
