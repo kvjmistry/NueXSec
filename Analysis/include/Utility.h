@@ -75,7 +75,7 @@ public:
     template<typename T> void CheckWeight(T &weight);
     // -------------------------------------------------------------------------
     // Get the CV weight correction
-    double GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv);
+    double GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv, int interaction);
     // -------------------------------------------------------------------------
     // Get the pi0 weight correction
     void GetPiZeroWeight(double &weight, int pizero_mode, int nu_pdg, int ccnc, int npi0, double pi0_e);
@@ -249,6 +249,7 @@ public:
     bool weight_dirt{true}; // Weight the Dirt events
     bool weight_ext{true};  // Weight the EXT events
     int  pi0_correction{1}; // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
+    bool tune_mec{false};
 
     // Scale factors to scale samples to data)
     double mc_scale_factor     = 1.0;

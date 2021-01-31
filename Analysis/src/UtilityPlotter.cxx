@@ -51,6 +51,10 @@ void UtilityPlotter::Initialise(Utility _utility){
         OptimiseBins();
         return;
     }
+    // This will call the code to optimise the bin widths
+    else if (std::string(_util.uplotmode) == "models"){ 
+        return;
+    }
     else {
         std::cout << "Error I dont know what mode you have configured..." << _util.uplotmode << std::endl;
         return;
@@ -531,7 +535,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     h_nue->GetYaxis()->SetLabelSize(0.04);
     h_nue->GetYaxis()->SetTitleSize(0.04);
 
-    h_nue->GetXaxis()->SetRangeUser(0,4);
+    h_nue->GetXaxis()->SetRangeUser(0,6);
     // h_nue->GetYaxis()->SetRangeUser(0,150.0e6);
     h_nue->SetLineColor(kBlue+2);
     h_nue->SetFillColor(17);
@@ -545,13 +549,13 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     
     // Nuebar flux
     h_nuebar->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu}_{e} / cm^{2} / 5 MeV / 0.9 #times 10^{20} POT");
-    h_nuebar->GetXaxis()->SetRangeUser(0,4);
+    h_nuebar->GetXaxis()->SetRangeUser(0,6);
     h_nuebar->SetLineColor(kGreen+2);
     h_nuebar->SetFillColor(16);
     if (!draw_averge)h_nuebar->Draw("hist,same");
 
     // Define the threshold 
-    double threshold_energy =  0.125; // Current threshold
+    double threshold_energy =  _util.energy_threshold; // Current threshold
     std::cout << "Theshold Energy: " << threshold_energy*1000 << " MeV" << std::endl;
     
     double xbin_th = h_nue->GetXaxis()->FindBin(threshold_energy); // find the x bin to integrate from (threshold)

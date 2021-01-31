@@ -119,6 +119,12 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             _pi0_correction = 0;
         }
 
+        // Tune the MEC events
+        if (strcmp(arg, "--tunemec") == 0){
+            std::cout << "Tuning the MEC events up by a factor of 1.5" << std::endl;
+            tune_mec = true;
+        }
+
         // Whats the verbose?
         if (strcmp(arg, "-v") == 0 || strcmp(arg, "--verbose") == 0 || strcmp(arg, "--v") == 0){
             std::cout << "Setting Verbose Level to : " << argv[i+1] << std::endl;
@@ -163,6 +169,10 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             std::cout <<yellow << "Output tree filename will be overwritten with name: " << mc_tree_file_name_out << reset <<  std::endl;
             
             overwritePOT = true;
+
+            // If using an alternate CV model via reweighting then we dont want to overwrite the POT values
+            if (std::string(variation) == "weight" || std::string(variation) == "mec")
+                overwritePOT = false;
         }
 
         // Systematics
@@ -559,7 +569,7 @@ template<typename T> void Utility::CheckWeight(T &weight){
 template void Utility::CheckWeight<double>(double &weight);
 template void Utility::CheckWeight<float>(float   &weight);
 // -----------------------------------------------------------------------------
-double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv){
+double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv, int interaction){
 
     // Always give weights of 1 to the data
     if (type == k_data || type == k_ext) return 1.0;
@@ -580,8 +590,10 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
 
     if (weight_ppfx) weight = weight * weight_flux;
 
-    // Weight the below threshold events to zero. Current threhsold is 125 MeV
-    // if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12) && nu_e <= energy_threshold) weight = 0.0;
+    // Weight the below threshold events to zero. Current threhsold is 125 MeV -- now moved to bkg so commented
+    if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12) && nu_e <= energy_threshold) {
+        // weight = 0.0;
+    }
 
     // This is the intrinsic nue weight that scales it to the standard overlay sample
     if (std::string(intrinsic_mode) == "intrinsic" && type == k_mc){
@@ -594,6 +606,10 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
 
     // Create a random energy dependent nue weight for testing model dependence
     // if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12)) weight *= nu_e*nu_e;
+
+    if (tune_mec && interaction == k_mec){
+        weight *=1.5;
+    }
 
 
     return weight;

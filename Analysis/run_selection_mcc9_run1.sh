@@ -1,8 +1,8 @@
 # Script with commands to run the entire selection
 
 # Set the smearing mode er = Event Rate, MCC8 = Marco
-# sm=er
-sm=mcc8
+sm=er
+# sm=mcc8
 
 if [ ! -d "log" ]; then 
   echo
@@ -156,6 +156,21 @@ if [ "$1" == "allvarxsec" ]; then
   do
     ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$i.root --var dummy $i --xsecmode default --xsecvar elec_E --xsec_smear $sm
   done
+
+fi
+
+# Make a new file with a reweighted MEC model
+if [ "$1" == "mec" ]; then
+
+  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root mec --tunemec
+
+  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root mec --intrinsic intrinsic --tunemec 
+
+  # source merge/merge_run1_files.sh files/nuexsec_mc_run1_mec.root files/nuexsec_run1_mec_merged.root
+
+  root -l -b -q 'merge/merge_uneaventrees.C("1", true, "files/trees/nuexsec_selected_tree_mc_run1_mec.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "mec")'
+
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_mec.root --var dummy mec --xsecmode default --xsecvar elec_E --xsec_smear er
 
 fi
 
