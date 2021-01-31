@@ -53,8 +53,10 @@ void UtilityPlotter::Initialise(Utility _utility){
     }
     // This will call the code to optimise the bin widths
     else if (std::string(_util.uplotmode) == "models"){ 
+        _util.CreateDirectory("Models");
         TestModelDependence();
         CompareDataCrossSections();
+        CompareSmearing();
         return;
     }
     else {
@@ -1449,9 +1451,9 @@ void UtilityPlotter::TestModelDependence(){
     fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
     
     // Response Matrix
-    // h_temp_2D  = (TH2D*)fxsec->Get("CV/true_el_E/h_run1_CV_0_smearing");
+    h_temp_2D  = (TH2D*)fxsec->Get("CV/true_el_E/h_run1_CV_0_smearing");
     // h_temp_2D  = (TH2D*)fxsec->Get("mec/true_el_E/h_run1_mec_0_smearing");
-    h_temp_2D  = (TH2D*)fxsec->Get("nogtune/true_el_E/h_run1_nogtune_0_smearing");
+    // h_temp_2D  = (TH2D*)fxsec->Get("nogtune/true_el_E/h_run1_nogtune_0_smearing");
     TH2D* h_response = (TH2D*)h_temp_2D->Clone();
 
     // MC xsec in True
@@ -1460,7 +1462,7 @@ void UtilityPlotter::TestModelDependence(){
     TH1D* h_mcxsec_reco = (TH1D*)h_temp->Clone();
     h_mcxsec_reco->SetLineColor(kGreen+2);
 
-    _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco, h_response, "reco_true", true);
+    _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco, h_response, "true_reco", true);
 
     // MC xsec MEC in True
     h_temp  = (TH1D*)fxsec->Get("mec/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
@@ -1468,7 +1470,7 @@ void UtilityPlotter::TestModelDependence(){
     TH1D* h_mcxsec_reco_mec = (TH1D*)h_temp->Clone();
     h_mcxsec_reco_mec->SetLineColor(kRed+2);
 
-    _util.MatrixMultiply(h_mcxsec_true_mec, h_mcxsec_reco_mec, h_response, "reco_true", true);
+    _util.MatrixMultiply(h_mcxsec_true_mec, h_mcxsec_reco_mec, h_response, "true_reco", true);
 
     // MC xsec no g tune in True
     h_temp  = (TH1D*)fxsec->Get("nogtune/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
@@ -1476,7 +1478,7 @@ void UtilityPlotter::TestModelDependence(){
     TH1D* h_mcxsec_reco_nogtune = (TH1D*)h_temp->Clone();
     h_mcxsec_reco_nogtune->SetLineColor(kBlue+2);
 
-    _util.MatrixMultiply(h_mcxsec_true_nogtune, h_mcxsec_reco_nogtune, h_response, "reco_true", true);
+    _util.MatrixMultiply(h_mcxsec_true_nogtune, h_mcxsec_reco_nogtune, h_response, "true_reco", true);
 
 
     TCanvas *c = new TCanvas("c", "c", 500, 500);
@@ -1504,7 +1506,7 @@ void UtilityPlotter::TestModelDependence(){
     leg->AddEntry(h_mcxsec_reco_nogtune,  Form("MC (no gTune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     leg->Draw();
 
-    c->Print("test.pdf");
+    c->Print(Form("plots/run%s/Models/DataModelComparison.pdf", _util.run_period));
 
     fxsec->Close();
 
@@ -1564,7 +1566,7 @@ void UtilityPlotter::CompareDataCrossSections(){
     leg->AddEntry(h_datasec_reco_nogtune, "Data with no gTune Model", "l");
     leg->Draw();
 
-    c->Print("test2.pdf");
+    c->Print(Form("plots/run%s/Models/ModelDataComparison.pdf", _util.run_period));
 
     fxsec->Close();
 
@@ -1572,4 +1574,79 @@ void UtilityPlotter::CompareDataCrossSections(){
 
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::CompareSmearing(){
+
+    gStyle->SetOptStat(0);
+
+    /// Load in the cross section output
+    TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
+
+    TH1D* h_temp;
+    TH2D* h_temp_2D;
+
+    // Get the MC covariance Matrix
+    h_temp_2D  = (TH2D*)fxsec->Get("elec_E/er/h_cov_tot_mcxsec_smear_true");
+    TH2D* h_cov_smear_tot = (TH2D*)h_temp_2D->Clone();
+    h_cov_smear_tot->SetDirectory(0);
+
+    // Get the reco xsec
+    h_temp = (TH1D*)fxsec->Get("elec_E/er/h_mc_xsec_reco");
+    TH1D* h_mcxsec_reco = (TH1D*)h_temp->Clone();
+    h_mcxsec_reco->SetDirectory(0);
+    h_mcxsec_reco->SetLineColor(kBlack);
+
+
+    fxsec->Close();
+
+    // Load in the cross section output
+    fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+    
+    // MC Xsec True
+    h_temp  = (TH1D*)fxsec->Get("CV/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
+    TH1D* h_mcxsec_true         = (TH1D*)h_temp->Clone();
+    TH1D* h_mcxsec_reco_mec     = (TH1D*)h_temp->Clone(); // clone to get the binning, these hists get reset
+    TH1D* h_mcxsec_reco_nogtune = (TH1D*)h_temp->Clone(); // clone to get the binning, these hists get reset
+
+    // Response Matrix MEC
+    h_temp_2D  = (TH2D*)fxsec->Get("mec/true_el_E/h_run1_mec_0_smearing");
+    TH2D* h_response_mec = (TH2D*)h_temp_2D->Clone();
+    
+    _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco_mec, h_response_mec, "true_reco", true);
+    h_mcxsec_reco_mec->SetLineColor(kRed+2);
+
+    // Response Matrix no gTune
+    h_temp_2D  = (TH2D*)fxsec->Get("nogtune/true_el_E/h_run1_nogtune_0_smearing");
+    TH2D* h_response_nogtune = (TH2D*)h_temp_2D->Clone();
+    
+    _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco_nogtune, h_response_nogtune, "true_reco", true);
+    h_mcxsec_reco_nogtune->SetLineColor(kBlue+2);
+
+    // Set the Bin errors for the MC truth
+    for (int bin = 1; bin < h_mcxsec_reco->GetNbinsX()+1; bin++){
+        h_mcxsec_reco->SetBinError(bin, std::sqrt(h_cov_smear_tot->GetBinContent(bin, bin)));
+    }
+
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+    c->SetLeftMargin(0.2);
+    c->SetBottomMargin(0.15);
+    h_mcxsec_reco->GetYaxis()->SetTitleOffset(1.7);
+    h_mcxsec_reco->Draw("hist,E");
+    h_mcxsec_reco_mec->Draw("hist,same");
+    h_mcxsec_reco_nogtune->Draw("hist,same");
+
+    TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(h_mcxsec_reco, "MC (Stat. + Sys.)", "el");
+    leg->AddEntry(h_mcxsec_reco_mec, "Smear MC CV with 1.5 #times MEC Model", "l");
+    leg->AddEntry(h_mcxsec_reco_nogtune, "Smear MC CV with no gTune Model", "l");
+    leg->Draw();
+
+    c->Print(Form("plots/run%s/Models/SmearingModelComparison.pdf", _util.run_period));
+
+    fxsec->Close();
+
+    delete c;
+
+}
 // -----------------------------------------------------------------------------

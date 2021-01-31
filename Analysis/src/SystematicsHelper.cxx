@@ -3527,6 +3527,10 @@ void SystematicsHelper::ExportResult(TFile* f){
         // MC XSec Covariance Matrix  ---------------------------------
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->SetOption("col");
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Write("h_cov_tot_mcxsec_reco", TObject::kOverwrite);
+
+        // MC XSec Smear Covariance Matrix  ---------------------------------
+        h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_tot)->SetOption("col");
+        h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_tot)->Write("h_cov_tot_mcxsec_smear_true", TObject::kOverwrite);
     
         // MC XSec Reco  ---------------------------------
         cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->SetOption("hist");

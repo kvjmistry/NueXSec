@@ -1339,9 +1339,11 @@ void Utility::MatrixMultiply(TH1D* h_true, TH1D* &h_reco, TH2D* matrix, std::str
         // Now normalise the column entries by the number of events in the 1D generated histogram
         for (int j=1; j<matrix->GetYaxis()->GetNbins()+2; j++) { 
             
-            if (option == "reco_true")
+            // x axis true, y axis reco
+            if (option == "true_reco")
                 h_reco->SetBinContent(i, h_reco->GetBinContent(i) + matrix->GetBinContent(j, i) * h_true->GetBinContent(j));
-            else if (option == "true_reco")
+            // x axis reco, y axis true
+            else if (option == "reco_true")
                 h_reco->SetBinContent(i, h_reco->GetBinContent(i) + matrix->GetBinContent(i, j) * h_true->GetBinContent(j));
             else
                 std::cout << "Unknown Option Specified!!!" << std::endl;
