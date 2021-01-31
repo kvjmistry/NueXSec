@@ -1204,22 +1204,22 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
     if (std::string(xsec_var) =="elec_E"){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                           ";Reco. Leading Shower Energy [GeV];#frac{d#sigma}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon]",
-                           ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];#frac{d#sigma}{dE^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon"
+                           ";E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV];#frac{d#sigma}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon]",
+                           ";E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV];#frac{d#sigma}{dE^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon"
                           };
 
 
         var_labels_events = {";;Entries",
-                             ";Reco. Leading Shower Energy [GeV]; Entries / GeV",
-                             ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries / GeV"
+                             ";E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV]; Entries / GeV",
+                             ";E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV]; Entries / GeV"
                             };
 
         var_labels_eff = {";;Efficiency",
-                          ";Reco. Leading Shower Energy [GeV]; Efficiency",
-                          ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency"
+                          ";E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV]; Efficiency",
+                          ";E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV]; Efficiency"
                          };
 
-        smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]";
+        smear_hist_name = ";E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV];E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV]";
 
         vars = {"integrated", "reco_el_E", "true_el_E" };
 

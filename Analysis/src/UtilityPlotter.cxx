@@ -1638,8 +1638,13 @@ void UtilityPlotter::CompareSmearing(){
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(h_mcxsec_reco, "MC (Stat. + Sys.)", "el");
-    leg->AddEntry(h_mcxsec_reco_mec, "Smear MC CV with 1.5 #times MEC Model", "l");
-    leg->AddEntry(h_mcxsec_reco_nogtune, "Smear MC CV with no gTune Model", "l");
+
+    double chi, pval;
+    int ndof;
+    _util.CalcChiSquared(h_mcxsec_reco_mec, h_mcxsec_reco, h_cov_smear_tot, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_mec, Form("Smear MC CV with 1.5 #times MEC Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    _util.CalcChiSquared(h_mcxsec_reco_nogtune, h_mcxsec_reco, h_cov_smear_tot, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_nogtune, Form("Smear MC CV with no gTune Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     leg->Draw();
 
     c->Print(Form("plots/run%s/Models/SmearingModelComparison.pdf", _util.run_period));
