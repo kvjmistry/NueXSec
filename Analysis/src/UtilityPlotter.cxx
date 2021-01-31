@@ -1446,6 +1446,13 @@ void UtilityPlotter::TestModelDependence(){
     h_dataxsec->SetMarkerStyle(20);
     h_dataxsec->SetMarkerSize(0.5);
 
+    h_temp  = (TH1D*)fxsec->Get("elec_E/er/h_data_xsec_stat_reco");
+    TH1D* h_dataxsec_stat = (TH1D*)h_temp->Clone();
+    h_dataxsec_stat->SetDirectory(0);
+    h_dataxsec_stat->SetLineColor(kBlack);
+    h_dataxsec_stat->SetMarkerStyle(20);
+    h_dataxsec_stat->SetMarkerSize(0.5);
+
     fxsec->Close();
 
     // Load in the cross section output
@@ -1492,6 +1499,7 @@ void UtilityPlotter::TestModelDependence(){
     h_mcxsec_reco_mec->Draw("hist,same");
     h_mcxsec_reco_nogtune->Draw("hist,same");
     h_dataxsec->Draw("E1,X0,same");
+    h_dataxsec_stat->Draw("E1,X0,same");
 
     TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
     leg->SetBorderSize(0);
