@@ -171,7 +171,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             overwritePOT = true;
 
             // If using an alternate CV model via reweighting then we dont want to overwrite the POT values
-            if (std::string(variation) == "weight" || std::string(variation) == "mec" || std::string(variation) == "nogtune")
+            if (std::string(variation) == "weight" || std::string(variation) == "mec" || std::string(variation) == "nogtune" || std::string(variation) == "nopi0tune")
                 overwritePOT = false;
         }
 

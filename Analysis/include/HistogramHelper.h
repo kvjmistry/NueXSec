@@ -333,6 +333,8 @@ class HistogramHelper{
         k_int_nu_E_nue_single_bin,
         k_int_nu_E_nuebar_single_bin,
         k_int_elec_E,
+        k_int_elec_E_nue,
+        k_int_elec_E_nuebar,
         k_int_elec_E_rebin,
         k_int_elec_E_rebin_nue,
         k_int_elec_E_rebin_nuebar,

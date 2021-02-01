@@ -387,6 +387,8 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     
     TCut generic_query = "(classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && !gen && elec_e > 0"; // This gets selected signal events in the MC
     TCut bin_query = Form("shr_energy_cali > %f && shr_energy_cali < %f", bin_lower_edge, bin_upper_edge); // Get the reconstructed shower energy range
+
+    TCut query = Form(" weight*(  ((classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && passed_selection) && shr_energy_cali > %f && shr_energy_cali < %f )", bin_lower_edge, bin_upper_edge); 
     
     TCanvas * c = new TCanvas(Form("c_%f_%f_%s", bin_upper_edge, bin_lower_edge, variable_str.c_str()), "c", 500, 500);
 
@@ -402,10 +404,10 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
      
 
     // Draw the Query -- adjust by query type
-    if      (variable_str == "reco_e") tree->Draw("(shr_energy_cali - elec_e) / shr_energy_cali >> htemp", generic_query && bin_query);
-    else if (variable_str == "true_e") tree->Draw("(shr_energy_cali - elec_e) / elec_e >> htemp", generic_query && bin_query);
-    else if (variable_str == "purity") tree->Draw("shr_bkt_purity >> htemp", generic_query && bin_query);
-    else if (variable_str == "completeness") tree->Draw("shr_bkt_completeness >> htemp", generic_query && bin_query);
+    if      (variable_str == "reco_e") tree->Draw("(shr_energy_cali - elec_e) / shr_energy_cali >> htemp", query);
+    else if (variable_str == "true_e") tree->Draw("(shr_energy_cali - elec_e) / elec_e >> htemp", query);
+    else if (variable_str == "purity") tree->Draw("shr_bkt_purity >> htemp", query);
+    else if (variable_str == "completeness") tree->Draw("shr_bkt_completeness >> htemp", query);
     else {
         std::cout << "incorrect variable input" << std::endl;
         return;
@@ -1488,6 +1490,14 @@ void UtilityPlotter::TestModelDependence(){
 
     _util.MatrixMultiply(h_mcxsec_true_nogtune, h_mcxsec_reco_nogtune, h_response, "true_reco", true);
 
+    // MC xsec no g pi0 tune in True
+    h_temp  = (TH1D*)fxsec->Get("nopi0tune/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
+    TH1D* h_mcxsec_true_nopi0tune = (TH1D*)h_temp->Clone();
+    TH1D* h_mcxsec_reco_nopi0tune = (TH1D*)h_temp->Clone();
+    h_mcxsec_reco_nopi0tune->SetLineColor(kPink+1);
+
+    _util.MatrixMultiply(h_mcxsec_true_nopi0tune, h_mcxsec_reco_nopi0tune, h_response, "true_reco", true);
+
 
     TCanvas *c = new TCanvas("c", "c", 500, 500);
     c->SetLeftMargin(0.2);
@@ -1498,6 +1508,7 @@ void UtilityPlotter::TestModelDependence(){
     h_mcxsec_reco->Draw("hist,same");
     h_mcxsec_reco_mec->Draw("hist,same");
     h_mcxsec_reco_nogtune->Draw("hist,same");
+    h_mcxsec_reco_nopi0tune->Draw("hist,same");
     h_dataxsec->Draw("E1,X0,same");
     h_dataxsec_stat->Draw("E1,X0,same");
 
@@ -1514,6 +1525,9 @@ void UtilityPlotter::TestModelDependence(){
     leg->AddEntry(h_mcxsec_reco_mec,  Form("MC (1.5 #times MEC) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     _util.CalcChiSquared(h_mcxsec_reco_nogtune, h_dataxsec, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_reco_nogtune,  Form("MC (no gTune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    leg->Draw();
+    _util.CalcChiSquared(h_mcxsec_reco_nopi0tune, h_dataxsec, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_nopi0tune,  Form("MC (no #pi^{0} Tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     leg->Draw();
 
     c->Print(Form("plots/run%s/Models/DataModelComparison.pdf", _util.run_period));
@@ -1622,7 +1636,7 @@ void UtilityPlotter::CompareSmearing(){
     TH2D* h_response_mec = (TH2D*)h_temp_2D->Clone();
     
     _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco_mec, h_response_mec, "true_reco", true);
-    h_mcxsec_reco_mec->SetLineColor(kRed+2);
+    h_mcxsec_reco_mec->SetLineColor(kGreen+2);
 
     // Response Matrix no gTune
     h_temp_2D  = (TH2D*)fxsec->Get("nogtune/true_el_E/h_run1_nogtune_0_smearing");

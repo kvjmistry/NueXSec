@@ -125,6 +125,8 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
             MakeInteractionPlot("h_int_nu_E_nue_single_bin",    true, "True #nu_{e};; Entries",                                 "nu_E_nue_single_bin",    cut_stage, 25000);
             MakeInteractionPlot("h_int_nu_E_nuebar_single_bin", true, "True #bar{#nu}_{e};; Entries",                           "nu_E_nuebar_single_bin", cut_stage, 5500);
             MakeInteractionPlot("h_int_elec_E",                 true, ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries",   "elec_E",                 cut_stage, 1600);
+            MakeInteractionPlot("h_int_elec_E_nue",             true, ";True e#lower[-0.5]{-} Energy [GeV]; Entries",           "elec_E_nue",             cut_stage, 1600);
+            MakeInteractionPlot("h_int_elec_E_nuebar",          true, ";True e^{+} Energy [GeV]; Entries",                      "elec_E_nuebar",          cut_stage, 1600);
             MakeInteractionPlot("h_int_elec_E_rebin",           true, ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries",   "elec_E_rebin",           cut_stage, 3000);
             MakeInteractionPlot("h_int_elec_E_rebin_nue",       true, ";True e#lower[-0.5]{-} Energy [GeV]; Entries",           "elec_E_rebin_nue",       cut_stage, 3000);
             MakeInteractionPlot("h_int_elec_E_rebin_nuebar",    true, ";True e^{+} Energy [GeV]; Entries",                      "elec_E_rebin_nuebar",    cut_stage, 300);
@@ -2327,7 +2329,7 @@ void HistogramPlotter::MakeInteractionPlot(std::string var, bool scale, const ch
     hist.at(_util.k_plot_res)->SetFillColor(38);
     hist.at(_util.k_plot_dis)->SetFillColor(28);
     hist.at(_util.k_plot_coh)->SetFillColor(42);
-    hist.at(_util.k_plot_mec)->SetFillColor(36);
+    hist.at(_util.k_plot_mec)->SetFillColor(kOrange-3);
     hist.at(_util.k_plot_nc) ->SetFillColor(1);
 
     // Add the histograms to the stack
@@ -2354,7 +2356,7 @@ void HistogramPlotter::MakeInteractionPlot(std::string var, bool scale, const ch
         h_stack->GetXaxis()->SetTickSize(0);
     }
 
-    if (scale) h_stack->SetMaximum(ax_scale);
+    // if (scale) h_stack->SetMaximum(ax_scale);
     // if (flav == "nuebar") h_stack->SetMaximum(200);
 
     // Get The sum so we can draw the stat err bar
@@ -2465,7 +2467,7 @@ void HistogramPlotter::MakeInteractionEfficiency(std::string var, bool mask_ax_l
             h_ratio.at(_util.k_plot_coh)->SetLineColor(42);
         }
         if (type == _util.k_plot_mec){
-            h_ratio.at(_util.k_plot_mec)->SetLineColor(36);
+            h_ratio.at(_util.k_plot_mec)->SetLineColor(kOrange-3);
         }
 
 
