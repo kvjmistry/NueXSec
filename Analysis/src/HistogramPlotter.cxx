@@ -1275,7 +1275,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               Form("cuts/%s/reco_shower_multiplicity.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, true, true);
     MakeStack("h_reco_shower_multiplicity", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, true, 80, "Shower Multiplicty",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shower_multiplicity_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, true, false);
+              Form("cuts/%s/reco_shower_multiplicity_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, true, true);
 
     // Leading track multiplicity
     MakeStack("h_reco_n_track_contained", _util.cut_dirs.at(cut_index).c_str(),
@@ -1294,7 +1294,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               Form("cuts/%s/reco_topological_score.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
     MakeStack("h_reco_topological_score", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, true, 50, "Topological Score",  0.3, 0.8, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_topological_score_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, false);
+              Form("cuts/%s/reco_topological_score_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Track shower dist
     MakeStack("h_reco_track_shower_dist", _util.cut_dirs.at(cut_index).c_str(),
@@ -1332,7 +1332,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               Form("cuts/%s/reco_shower_score.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
     MakeStack("h_reco_shower_score", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, true, 1.0, "Shower Score",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shower_score_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, false);
+              Form("cuts/%s/reco_shower_score_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Track score
     MakeStack("h_reco_track_score", _util.cut_dirs.at(cut_index).c_str(),
@@ -1376,7 +1376,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               Form("cuts/%s/reco_opfilter_beam.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
     MakeStack("h_reco_opfilter_beam", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, true, 1.0, "Common Optical Filter PE [PE]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_opfilter_beam_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, false);
+              Form("cuts/%s/reco_opfilter_beam_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Optical Filter Veto
     MakeStack("h_reco_opfilter_veto", _util.cut_dirs.at(cut_index).c_str(),
@@ -1384,7 +1384,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               Form("cuts/%s/reco_opfilter_veto.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
     MakeStack("h_reco_opfilter_veto", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, true, 1.0, "Common Optical Filter Michel Veto [PE]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_opfilter_veto_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, false);
+              Form("cuts/%s/reco_opfilter_veto_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Software trigger
     MakeStack("h_reco_softwaretrig", _util.cut_dirs.at(cut_index).c_str(),
@@ -1393,7 +1393,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
     // Software trigger
     MakeStack("h_reco_softwaretrig", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, true, 1.0, "Software Trigger",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_softwaretrig_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), true, "classifications", false, true, false);
+              Form("cuts/%s/reco_softwaretrig_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), true, "classifications", false, true, true);
 
     // Slice ID
     MakeStack("h_reco_nslice", _util.cut_dirs.at(cut_index).c_str(),
@@ -1401,7 +1401,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               Form("cuts/%s/reco_nslice.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
     MakeStack("h_reco_nslice", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, true, 10000, "Pandora Slice ID",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_nslice_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, false);
+              Form("cuts/%s/reco_nslice_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Slice Cluster Fraction
     MakeStack("h_reco_slclustfrac", _util.cut_dirs.at(cut_index).c_str(),
@@ -1499,7 +1499,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               Form("cuts/%s/reco_contained_fraction.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
     MakeStack("h_reco_contained_fraction", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, true, 10, "Contained Fraction (PFP hits in FV / hits in slice)",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_contained_fraction_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, false);
+              Form("cuts/%s/reco_contained_fraction_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Run number
     MakeStack("h_reco_run_number", _util.cut_dirs.at(cut_index).c_str(),
@@ -1512,7 +1512,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               Form("cuts/%s/reco_nu_purity_from_pfp.pdf", _util.cut_dirs.at(cut_index).c_str()), true, "classifications", false, false, true);
     MakeStack("h_reco_nu_purity_from_pfp", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, true, 1.0, "Neutrino Purity",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_nu_purity_from_pfp_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), true, "classifications", false, false, false);
+              Form("cuts/%s/reco_nu_purity_from_pfp_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), true, "classifications", false, false, true);
 
     // CRT Veto
     MakeStack("h_reco_crtveto", _util.cut_dirs.at(cut_index).c_str(),
@@ -1525,7 +1525,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               Form("cuts/%s/reco_crthitpe.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
     MakeStack("h_reco_crthitpe", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, true, 1.0, "CRT Hit Intensity [PE]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_crthitpe_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, false);
+              Form("cuts/%s/reco_crthitpe_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
 
     // Angle between vector from NuMI targ to shower direction

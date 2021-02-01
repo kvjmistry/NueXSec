@@ -19,7 +19,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
 
         // Histogram Mode
         if (strcmp(arg, "--hist") == 0) {
-            std::cout << yellow << "Making Histograms, file to make histograms with: "<< argv[i+1] << yellow <<std::endl;
+            std::cout << yellow << "Making Histograms, file to make histograms with: "<< argv[i+1] << reset <<std::endl;
             make_histos = true;
             run_selection = false; // switch this bool out
             hist_file_name = argv[i+1];

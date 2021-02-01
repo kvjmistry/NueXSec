@@ -328,7 +328,8 @@ void UtilityPlotter::OptimiseBins(){
             std::cout << "\n\033[0;34mTrying Bin: " << i << "GeV\033[0m\n"<< std::endl;
 
             if (bin == 0){
-                GetFitResult(mean, sigma, 0.0, 0.4, tree, true, converged, false);
+                bool fake =true;
+                GetFitResult(mean, sigma, 0.0, 0.4, tree, true, fake, true);
                 lower_bin = 0.4;
                 break;
             }
