@@ -169,7 +169,7 @@ public:
 
     // Bins for the reconstructed shower energy
     // std::vector<double> reco_shr_bins = { 0.0, 0.23, 0.41, 0.65, 0.94, 1.35, 1.87, 2.32, 6.0};
-    std::vector<double> reco_shr_bins = { 0.0, 0.41, 0.65, 0.94, 1.35, 6.0};
+    std::vector<double> reco_shr_bins = { 0.0, 0.40, 0.65, 0.95, 1.4, 6.0};
     // std::vector<double> reco_shr_bins = { 0.0, 0.40, 0.56, 0.84, 1.14, 6.0};
 
     // Bins for reco shr effective angle
@@ -178,10 +178,8 @@ public:
     // Fine truth Binning
     std::vector<double> true_shr_bins = { 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
                                           1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9,
-                                          2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9,
-                                          3.0, 3.5,
-                                          4.0, 4.5,
-                                          5.0, 5.5, 
+                                          2.0, 2.15, 2.3,
+                                          2.6, 3.2,
                                           6.0};
     
     std::vector<double> true_shr_bins_ang = {    5,  10,  15,  20,   25,  30,  35,  40,  45,  50,  55,  

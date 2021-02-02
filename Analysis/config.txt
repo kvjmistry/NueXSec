@@ -89,7 +89,10 @@ Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 3.69422e+20 // new tune
 Run1_MC_POT_WireModdEdX 3.66871e+20 // new tune
 -
 // Run 1 Det Var for flugg -- this is actually dk2nu for now
-Run1_MC_POT_FLUGG 3.68983e+20
+Run1_MC_POT_FLUGG 2.32136e+21 
+-
+// Run 1 Det Var for tune1 -- this is actually cv genie with dk2nu for now
+Run1_MC_POT_tune1 2.32136e+21 
 -
 // Run 1 Det var CV intrinsic nue sample
 // Run1_Intrinsic_POT_CV 2.68294e+22
@@ -139,7 +142,10 @@ Run1_Intrinsic_POT_WireModThetaYZ_withoutSigmaSplines 2.31755e+22 // new tune
 Run1_Intrinsic_POT_WireModdEdX 2.37849e+22 // new tune
 -
 // Run 1 Det var CV intrinsic nue sample FLUGG flux
-Run1_Intrinsic_POT_FLUGG 2.87356e+22
+Run1_Intrinsic_POT_FLUGG 3.00768e+22
+-
+// Run 1 Det var CV intrinsic nue sample genie tune1
+Run1_Intrinsic_POT_tune1 2.08494e+22
 -
 // Run 1 Det Var BNB diffusion -- unused now
 Run1_MC_POT_BNB_Diffusion 4.19732e+20

@@ -3302,7 +3302,7 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
         for (unsigned int type = 0; type < xsec_types.size(); type++){
             
             // Only look at the true efficeincy or select variables in reco space
-            if ( (var == k_var_true_el_E && (xsec_types.at(type) == "eff" || xsec_types.at(type) == "gen_smear") ) || 
+            if ( (var == k_var_true_el_E && (xsec_types.at(type) == "eff" || xsec_types.at(type) == "gen_smear" || xsec_types.at(type) == "mc_xsec_smear") ) || 
                  (var == k_var_reco_el_E && (xsec_types.at(type) == "mc_xsec" || xsec_types.at(type) == "data_xsec" ||
                                              xsec_types.at(type) == "eff" || xsec_types.at(type) == "sig" || 
                                              xsec_types.at(type) == "bkg" || xsec_types.at(type) == "sel" ))){
@@ -3335,6 +3335,7 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
                 h_uncertainty.at(k_err_dirt)->SetLineColor(46);
                 h_uncertainty.at(k_err_pot)->SetLineColor(42);
                 h_uncertainty.at(k_err_pi0)->SetLineColor(kSpring-1);
+                h_uncertainty.at(k_err_mcstats)->SetLineColor(7);
 
                 TCanvas *c = new TCanvas("c", "c", 500, 500);
                 c->SetLeftMargin(0.13);
@@ -3352,6 +3353,7 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
                 h_uncertainty.at(k_err_dirt)->Draw("hist,same");
                 h_uncertainty.at(k_err_pot)->Draw("hist,same");
                 h_uncertainty.at(k_err_pi0)->Draw("hist,same");
+                h_uncertainty.at(k_err_mcstats)->Draw("hist,same");
 
                 TLegend *leg = new TLegend(0.18, 0.55, 0.88, 0.85);
                 leg->SetNColumns(2);
@@ -3367,6 +3369,7 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
                 leg->AddEntry(h_uncertainty.at(k_err_pot),        "POT Counting", "l");
                 leg->AddEntry(h_uncertainty.at(k_err_dirt),       "Dirt", "l");
                 leg->AddEntry(h_uncertainty.at(k_err_pi0),        "Pi0 Tune", "l");
+                leg->AddEntry(h_uncertainty.at(k_err_mcstats),    "MC Stats", "l");
 
                 leg->Draw();
 
@@ -3445,7 +3448,7 @@ void SystematicsHelper::ExportResult(TFile* f){
     }
     // Other modes we need the response matrix
     else {
-        h_response = (TH2D*)f->Get(Form("CV/%s/h_run%s_CV_0_smearing",vars.at(k_var_true_el_E).c_str(),_util.run_period));
+        h_response = (TH2D*)f->Get(Form("CV/%s/h_run%s_CV_0_smearing_fine",vars.at(k_var_true_el_E).c_str(),_util.run_period));
         h_mcxsec_fine = (TH1D*)f->Get(Form("CV/%s/h_run%s_CV_0_%s_mc_xsec_fine",vars.at(k_var_true_el_E).c_str(),_util.run_period, vars.at(k_var_true_el_E).c_str()));
         _var = k_var_true_el_E;
     }

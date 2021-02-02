@@ -57,7 +57,7 @@ void UtilityPlotter::Initialise(Utility _utility){
         TestModelDependence();
         CompareDataCrossSections();
         CompareSmearing();
-        CompareUnfoldedModels();
+        // CompareUnfoldedModels();
         return;
     }
     else {
@@ -1470,7 +1470,7 @@ void UtilityPlotter::TestModelDependence(){
     // MC xsec in True
     h_temp  = (TH1D*)fxsec->Get("CV/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
     TH1D* h_mcxsec_true = (TH1D*)h_temp->Clone();
-    TH1D* h_mcxsec_reco = (TH1D*)h_temp->Clone();
+    TH1D* h_mcxsec_reco = (TH1D*)h_dataxsec->Clone();
     h_mcxsec_reco->SetLineColor(kRed+2);
 
     _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco, h_response, "true_reco", true);
@@ -1478,7 +1478,7 @@ void UtilityPlotter::TestModelDependence(){
     // MC xsec MEC in True
     h_temp  = (TH1D*)fxsec->Get("mec/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
     TH1D* h_mcxsec_true_mec = (TH1D*)h_temp->Clone();
-    TH1D* h_mcxsec_reco_mec = (TH1D*)h_temp->Clone();
+    TH1D* h_mcxsec_reco_mec = (TH1D*)h_dataxsec->Clone();
     h_mcxsec_reco_mec->SetLineColor(kGreen+2);
 
     _util.MatrixMultiply(h_mcxsec_true_mec, h_mcxsec_reco_mec, h_response, "true_reco", true);
@@ -1486,7 +1486,7 @@ void UtilityPlotter::TestModelDependence(){
     // MC xsec no g tune in True
     h_temp  = (TH1D*)fxsec->Get("nogtune/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
     TH1D* h_mcxsec_true_nogtune = (TH1D*)h_temp->Clone();
-    TH1D* h_mcxsec_reco_nogtune = (TH1D*)h_temp->Clone();
+    TH1D* h_mcxsec_reco_nogtune = (TH1D*)h_dataxsec->Clone();
     h_mcxsec_reco_nogtune->SetLineColor(kBlue+2);
 
     _util.MatrixMultiply(h_mcxsec_true_nogtune, h_mcxsec_reco_nogtune, h_response, "true_reco", true);
@@ -1494,10 +1494,18 @@ void UtilityPlotter::TestModelDependence(){
     // MC xsec no g pi0 tune in True
     h_temp  = (TH1D*)fxsec->Get("nopi0tune/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
     TH1D* h_mcxsec_true_nopi0tune = (TH1D*)h_temp->Clone();
-    TH1D* h_mcxsec_reco_nopi0tune = (TH1D*)h_temp->Clone();
+    TH1D* h_mcxsec_reco_nopi0tune = (TH1D*)h_dataxsec->Clone();
     h_mcxsec_reco_nopi0tune->SetLineColor(kPink+1);
 
     _util.MatrixMultiply(h_mcxsec_true_nopi0tune, h_mcxsec_reco_nopi0tune, h_response, "true_reco", true);
+
+    // MC xsec FLUGG flux True
+    h_temp  = (TH1D*)fxsec->Get("FLUGG/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
+    TH1D* h_mcxsec_true_FLUGG = (TH1D*)h_temp->Clone();
+    TH1D* h_mcxsec_reco_FLUGG = (TH1D*)h_dataxsec->Clone();
+    h_mcxsec_reco_FLUGG->SetLineColor(kYellow+2);
+
+    _util.MatrixMultiply(h_mcxsec_true_FLUGG, h_mcxsec_reco_FLUGG, h_response, "true_reco", true);
 
 
     TCanvas *c = new TCanvas("c", "c", 500, 500);
@@ -1510,10 +1518,11 @@ void UtilityPlotter::TestModelDependence(){
     h_mcxsec_reco_mec->Draw("hist,same");
     h_mcxsec_reco_nogtune->Draw("hist,same");
     h_mcxsec_reco_nopi0tune->Draw("hist,same");
+    h_mcxsec_reco_FLUGG->Draw("hist,same");
     h_dataxsec->Draw("E1,X0,same");
     h_dataxsec_stat->Draw("E1,X0,same");
 
-    TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
+    TLegend *leg = new TLegend(0.5, 0.6, 0.85, 0.85);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(h_dataxsec, "Data (Stat. + Sys.)", "ep");
@@ -1529,6 +1538,8 @@ void UtilityPlotter::TestModelDependence(){
     leg->Draw();
     _util.CalcChiSquared(h_mcxsec_reco_nopi0tune, h_dataxsec, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_reco_nopi0tune,  Form("MC (no #pi^{0} Tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    _util.CalcChiSquared(h_mcxsec_reco_FLUGG, h_dataxsec, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_FLUGG,  Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     leg->Draw();
 
     c->Print(Form("plots/run%s/Models/DataModelComparison.pdf", _util.run_period));
@@ -1629,8 +1640,12 @@ void UtilityPlotter::CompareSmearing(){
     // MC Xsec True
     h_temp  = (TH1D*)fxsec->Get("CV/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
     TH1D* h_mcxsec_true         = (TH1D*)h_temp->Clone();
-    TH1D* h_mcxsec_reco_mec     = (TH1D*)h_temp->Clone(); // clone to get the binning, these hists get reset
-    TH1D* h_mcxsec_reco_nogtune = (TH1D*)h_temp->Clone(); // clone to get the binning, these hists get reset
+    
+    TH1D* h_mcxsec_reco_mec       = (TH1D*)h_mcxsec_reco->Clone(); // clone to get the binning, these hists get reset
+    TH1D* h_mcxsec_reco_nogtune   = (TH1D*)h_mcxsec_reco->Clone(); // clone to get the binning, these hists get reset
+    TH1D* h_mcxsec_reco_nopi0tune = (TH1D*)h_mcxsec_reco->Clone(); // clone to get the binning, these hists get reset
+    TH1D* h_mcxsec_reco_FLUGG     = (TH1D*)h_mcxsec_reco->Clone(); // clone to get the binning, these hists get reset
+    TH1D* h_mcxsec_reco_tune1     = (TH1D*)h_mcxsec_reco->Clone(); // clone to get the binning, these hists get reset
 
     // Response Matrix MEC
     h_temp_2D  = (TH2D*)fxsec->Get("mec/true_el_E/h_run1_mec_0_smearing");
@@ -1646,9 +1661,32 @@ void UtilityPlotter::CompareSmearing(){
     _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco_nogtune, h_response_nogtune, "true_reco", true);
     h_mcxsec_reco_nogtune->SetLineColor(kBlue+2);
 
+    // Response Matrix no pi0 Tune
+    h_temp_2D  = (TH2D*)fxsec->Get("nopi0tune/true_el_E/h_run1_nopi0tune_0_smearing");
+    TH2D* h_response_nopi0tune = (TH2D*)h_temp_2D->Clone();
+    
+    _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco_nopi0tune, h_response_nopi0tune, "true_reco", true);
+    h_mcxsec_reco_nopi0tune->SetLineColor(kPink+1);
+
+    // Response Matrix FLUGG
+    h_temp_2D  = (TH2D*)fxsec->Get("FLUGG/true_el_E/h_run1_FLUGG_0_smearing");
+    TH2D* h_response_FLUGG = (TH2D*)h_temp_2D->Clone();
+    
+    _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco_FLUGG, h_response_FLUGG, "true_reco", true);
+    h_mcxsec_reco_FLUGG->SetLineColor(kYellow+2);
+
+    // Response Matrix Tune 1
+    h_temp_2D  = (TH2D*)fxsec->Get("tune1/true_el_E/h_run1_tune1_0_smearing");
+    TH2D* h_response_tune1 = (TH2D*)h_temp_2D->Clone();
+    
+    _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco_tune1, h_response_tune1, "true_reco", true);
+    h_mcxsec_reco_tune1->SetLineColor(kOrange-1);
+
+
     // Set the Bin errors for the MC truth
     for (int bin = 1; bin < h_mcxsec_reco->GetNbinsX()+1; bin++){
         h_mcxsec_reco->SetBinError(bin, std::sqrt(h_cov_smear_tot->GetBinContent(bin, bin)));
+        // h_mcxsec_reco_FLUGG->SetBinError(bin, 0.019*h_mcxsec_reco_FLUGG->GetBinContent(bin));
     }
 
     TCanvas *c = new TCanvas("c", "c", 500, 500);
@@ -1658,6 +1696,9 @@ void UtilityPlotter::CompareSmearing(){
     h_mcxsec_reco->Draw("hist,E");
     h_mcxsec_reco_mec->Draw("hist,same");
     h_mcxsec_reco_nogtune->Draw("hist,same");
+    h_mcxsec_reco_nopi0tune->Draw("hist,same");
+    h_mcxsec_reco_FLUGG->Draw("hist,same");
+    h_mcxsec_reco_tune1->Draw("hist,same");
 
     TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
     leg->SetBorderSize(0);
@@ -1670,6 +1711,13 @@ void UtilityPlotter::CompareSmearing(){
     leg->AddEntry(h_mcxsec_reco_mec, Form("Smear MC CV with 1.5 #times MEC Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     _util.CalcChiSquared(h_mcxsec_reco_nogtune, h_mcxsec_reco, h_cov_smear_tot, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_reco_nogtune, Form("Smear MC CV with no gTune Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    _util.CalcChiSquared(h_mcxsec_reco_nopi0tune, h_mcxsec_reco, h_cov_smear_tot, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_nopi0tune, Form("Smear MC CV with #pi^{0} Tune) Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    _util.CalcChiSquared(h_mcxsec_reco_FLUGG, h_mcxsec_reco, h_cov_smear_tot, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_FLUGG, Form("Smear MC CV with FLUGG  Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    _util.CalcChiSquared(h_mcxsec_reco_tune1, h_mcxsec_reco, h_cov_smear_tot, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_tune1, Form("Smear MC CV with Tune 1 Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    
     leg->Draw();
 
     c->Print(Form("plots/run%s/Models/SmearingModelComparison.pdf", _util.run_period));
@@ -1743,7 +1791,23 @@ void UtilityPlotter::CompareUnfoldedModels(){
 
     _util.MatrixMultiply(h_mcxsec_true_nogtune, h_mcxsec_true_smear_nogtune, h_ac, "reco_true",false);
 
-    TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
+    // MC Xsec True no pi0 Tune
+    h_temp  = (TH1D*)fxsec->Get("nopi0tune/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
+    TH1D* h_mcxsec_true_nopi0tune         = (TH1D*)h_temp->Clone();
+    TH1D* h_mcxsec_true_smear_nopi0tune   = (TH1D*)h_temp->Clone();
+
+    _util.MatrixMultiply(h_mcxsec_true_nopi0tune, h_mcxsec_true_smear_nopi0tune, h_ac, "reco_true",false);
+
+
+    // MC Xsec True FLUGG
+    h_temp  = (TH1D*)fxsec->Get("FLUGG/true_el_E/h_run1_CV_0_true_el_E_mc_xsec");
+    TH1D* h_mcxsec_true_FLUGG         = (TH1D*)h_temp->Clone();
+    TH1D* h_mcxsec_true_smear_FLUGG   = (TH1D*)h_temp->Clone();
+
+    _util.MatrixMultiply(h_mcxsec_true_FLUGG, h_mcxsec_true_smear_FLUGG, h_ac, "reco_true",false);
+
+
+    TLegend *leg = new TLegend(0.5, 0.6, 0.85, 0.85);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(unf, "Data (Stat. + Sys.)", "ep");
@@ -1757,11 +1821,17 @@ void UtilityPlotter::CompareUnfoldedModels(){
     leg->AddEntry(h_mcxsec_true_smear_mec,   Form("MC (1.5 #times MEC) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
     _util.CalcChiSquared(h_mcxsec_true_smear_nogtune, unf, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_true_smear_nogtune,   Form("MC (no gTune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    _util.CalcChiSquared(h_mcxsec_true_smear_nopi0tune, unf, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_true_smear_nopi0tune,   Form("MC (no #pi^{0} Tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    _util.CalcChiSquared(h_mcxsec_true_smear_FLUGG, unf, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_true_smear_FLUGG,   Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
 
     h_mcxsec_true_smear->Scale(1.0, "width");
     h_mcxsec_true_smear_mec->Scale(1.0, "width");
     h_mcxsec_true_smear_nogtune->Scale(1.0, "width");
+    h_mcxsec_true_smear_nopi0tune->Scale(1.0, "width");
+    h_mcxsec_true_smear_FLUGG->Scale(1.0, "width");
     unf->Scale(1.0, "width");
 
     TCanvas *c = new TCanvas("c", "c", 500, 500);
@@ -1779,6 +1849,12 @@ void UtilityPlotter::CompareUnfoldedModels(){
 
     h_mcxsec_true_smear_nogtune->SetLineColor(kBlue+2);
     h_mcxsec_true_smear_nogtune->Draw("hist,same");
+
+    h_mcxsec_true_smear_nopi0tune->SetLineColor(kPink+1);
+    h_mcxsec_true_smear_nopi0tune->Draw("hist,same");
+
+    h_mcxsec_true_smear_FLUGG->SetLineColor(kYellow+2);
+    h_mcxsec_true_smear_FLUGG->Draw("hist,same");
     
     unf->Draw("E1,X0,same");
     

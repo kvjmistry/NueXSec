@@ -224,7 +224,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             std::cout << "Using Truth Binning mode to build response matrix from: " << argv[i+1] << std::endl;
             xsec_bin_mode = argv[i+1];
 
-            if (std::string(xsec_bin_mode) != "standard" && std::string(xsec_var) != "fine" ){
+            if (std::string(xsec_bin_mode) != "standard" && std::string(xsec_bin_mode) != "fine" ){
                 std::cout << red << "Error specified variable which is not supported! You can use: standard or fine" << reset << std::endl;
                 exit(5);
             }
@@ -1334,10 +1334,10 @@ void Utility::MatrixMultiply(TH1D* h_true, TH1D* &h_reco, TH2D* matrix, std::str
 
     // --- Do the matrix multiplication --- 
     // Loop over cols
-    for (int i=1; i<h_reco->GetXaxis()->GetNbins()+2; i++){
+    for (int i=1; i<matrix->GetYaxis()->GetNbins()+2; i++){
 
         // Now normalise the column entries by the number of events in the 1D generated histogram
-        for (int j=1; j<matrix->GetYaxis()->GetNbins()+2; j++) { 
+        for (int j=1; j<matrix->GetXaxis()->GetNbins()+2; j++) { 
             
             // x axis true, y axis reco
             if (option == "true_reco")

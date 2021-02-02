@@ -2185,11 +2185,11 @@ void CrossSectionHelper::ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH1
 
     // --- Do the matrix multiplication with the CV gen events --- 
     // Loop over cols
-    for (int i=1; i<h_smear->GetXaxis()->GetNbins()+2; i++){
+    for (int i=1; i<h_smear->GetYaxis()->GetNbins()+2; i++){
         double integral = 0;
 
         // Now normalise the column entries by the number of events in the 1D generated histogram
-        for (int j=1; j<h_smear->GetYaxis()->GetNbins()+2; j++) { 
+        for (int j=1; j<h_smear->GetXaxis()->GetNbins()+2; j++) { 
 
             if (debug)
                 std::cout <<  "R_" << j << i << " * " << j << "  " << h_smear->GetBinContent(j, i) << " * " << h_gen_CV->GetBinContent(j) << std::endl;
