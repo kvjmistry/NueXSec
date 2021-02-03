@@ -55,9 +55,9 @@ void UtilityPlotter::Initialise(Utility _utility){
     else if (std::string(_util.uplotmode) == "models"){ 
         _util.CreateDirectory("Models");
         TestModelDependence();
-        CompareDataCrossSections();
+        // CompareDataCrossSections();
         CompareSmearing();
-        // CompareUnfoldedModels();
+        CompareUnfoldedModels();
         return;
     }
     else {
@@ -270,7 +270,7 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
     mean  = fit_gaus->GetParameter(1);
 	sigma = fit_gaus->GetParameter(2);
 
-    if (sigma*2 >= bin_upper_edge - bin_lower_edge - 0.01 && sigma*2 <= bin_upper_edge - bin_lower_edge + 0.01){
+    if ( (sigma*2 >= bin_upper_edge - bin_lower_edge - 0.01 && sigma*2 <= bin_upper_edge - bin_lower_edge + 0.01) && htemp->Integral() > 330){
         std::cout << "Fit has converged!: " << 2*sigma/(bin_upper_edge - bin_lower_edge) << std::endl;
         converged = true;
     }
@@ -298,6 +298,8 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
         c->Print(Form("plots/run%s/Binning/bins_%0.2fGeV_to_%0.2f_GeV.pdf",_util.run_period, bin_lower_edge, bin_upper_edge ));
     } 
 
+    std::cout << _util.red << "Integral: " <<htemp->Integral()  << _util.reset<< std::endl;
+
     delete htemp;
     delete c;
 
@@ -319,20 +321,44 @@ void UtilityPlotter::OptimiseBins(){
     // float lower_bin = 0.3;
     
     // Loop over the bins
-    for (float bin = 0; bin < 8; bin++ ){
+    for (float bin = 0; bin < 6; bin++ ){
         std::cout << "\n\033[0;34mTrying to optimise the next bin\033[0m\n"<< std::endl;
         converged = false;
 
         // Slide upper bin value till we get 2xthe STD of the fit
-        for (float i = lower_bin+0.1; i <= 6.0; i+=0.001) {
+        for (float i = lower_bin+0.1; i <= 5.0; i+=0.001) {
             std::cout << "\n\033[0;34mTrying Bin: " << i << "GeV\033[0m\n"<< std::endl;
 
             if (bin == 0){
                 bool fake =true;
-                GetFitResult(mean, sigma, 0.0, 0.4, tree, true, fake, true);
-                lower_bin = 0.4;
+                GetFitResult(mean, sigma, 0.0, 0.30, tree, true, fake, true);
+                lower_bin = 0.30;
                 break;
             }
+            // if (bin == 1){
+            //     bool fake =true;
+            //     GetFitResult(mean, sigma, 0.4, 0.65, tree, true, fake, true);
+            //     lower_bin = 0.65;
+            //     break;
+            // }
+            // if (bin == 2){
+            //     bool fake =true;
+            //     GetFitResult(mean, sigma, 0.65, 0.95, tree, true, fake, true);
+            //     lower_bin = 0.95;
+            //     break;
+            // }
+            // if (bin == 3){
+            //     bool fake =true;
+            //     GetFitResult(mean, sigma, 0.95, 1.4, tree, true, fake, true);
+            //     lower_bin = 1.4;
+            //     break;
+            // }
+            // if (bin == 4){
+            //     bool fake =true;
+            //     GetFitResult(mean, sigma, 1.4, 6.0, tree, true, fake, true);
+            //     lower_bin = 6.0;
+            //     break;
+            // }
             // call function which draws the tree to a canvas, fits the tree and returns the fit parameter
             // If the fit has 2xSTD = the reco bin size then we have successfully optimised the bin
             GetFitResult(mean, sigma, lower_bin, i, tree, false, converged, false);
@@ -348,8 +374,8 @@ void UtilityPlotter::OptimiseBins(){
             }
 
             // Since the fit doesnt want to converge for the last bin, lets jsut draw it anyway
-            if (bin == 7){
-                GetFitResult(mean, sigma, 2.32, 6.0, tree, true, converged, false);
+            if (bin == 5){
+                GetFitResult(mean, sigma, 1.47, 6.0, tree, true, converged, false);
                 break;
             }
 
@@ -1518,7 +1544,7 @@ void UtilityPlotter::TestModelDependence(){
     h_mcxsec_reco_mec->Draw("hist,same");
     h_mcxsec_reco_nogtune->Draw("hist,same");
     h_mcxsec_reco_nopi0tune->Draw("hist,same");
-    h_mcxsec_reco_FLUGG->Draw("hist,same");
+    // h_mcxsec_reco_FLUGG->Draw("hist,same");
     h_dataxsec->Draw("E1,X0,same");
     h_dataxsec_stat->Draw("E1,X0,same");
 
@@ -1538,8 +1564,8 @@ void UtilityPlotter::TestModelDependence(){
     leg->Draw();
     _util.CalcChiSquared(h_mcxsec_reco_nopi0tune, h_dataxsec, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_reco_nopi0tune,  Form("MC (no #pi^{0} Tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
-    _util.CalcChiSquared(h_mcxsec_reco_FLUGG, h_dataxsec, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_reco_FLUGG,  Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    // _util.CalcChiSquared(h_mcxsec_reco_FLUGG, h_dataxsec, h_cov, chi, ndof, pval);
+    // leg->AddEntry(h_mcxsec_reco_FLUGG,  Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     leg->Draw();
 
     c->Print(Form("plots/run%s/Models/DataModelComparison.pdf", _util.run_period));
@@ -1685,8 +1711,10 @@ void UtilityPlotter::CompareSmearing(){
 
     // Set the Bin errors for the MC truth
     for (int bin = 1; bin < h_mcxsec_reco->GetNbinsX()+1; bin++){
-        h_mcxsec_reco->SetBinError(bin, std::sqrt(h_cov_smear_tot->GetBinContent(bin, bin)));
-        // h_mcxsec_reco_FLUGG->SetBinError(bin, 0.019*h_mcxsec_reco_FLUGG->GetBinContent(bin));
+        // h_mcxsec_reco->SetBinError(bin, std::sqrt(h_cov_smear_tot->GetBinContent(bin, bin)));
+        h_mcxsec_reco->SetBinError(bin,  0.02*h_mcxsec_reco->GetBinContent(bin));
+        h_mcxsec_reco_tune1->SetBinError(bin, 0.02*h_mcxsec_reco_tune1->GetBinContent(bin));
+        // h_mcxsec_reco_FLUGG->SetBinError(bin, 0.02*h_mcxsec_reco_FLUGG->GetBinContent(bin));
     }
 
     TCanvas *c = new TCanvas("c", "c", 500, 500);
@@ -1697,8 +1725,9 @@ void UtilityPlotter::CompareSmearing(){
     h_mcxsec_reco_mec->Draw("hist,same");
     h_mcxsec_reco_nogtune->Draw("hist,same");
     h_mcxsec_reco_nopi0tune->Draw("hist,same");
-    h_mcxsec_reco_FLUGG->Draw("hist,same");
-    h_mcxsec_reco_tune1->Draw("hist,same");
+    // h_mcxsec_reco_FLUGG->Draw("hist,E,same");
+    h_mcxsec_reco_tune1->Draw("hist,E,same");
+    h_mcxsec_reco->Draw("hist,E,same");
 
     TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
     leg->SetBorderSize(0);
@@ -1713,8 +1742,8 @@ void UtilityPlotter::CompareSmearing(){
     leg->AddEntry(h_mcxsec_reco_nogtune, Form("Smear MC CV with no gTune Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     _util.CalcChiSquared(h_mcxsec_reco_nopi0tune, h_mcxsec_reco, h_cov_smear_tot, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_reco_nopi0tune, Form("Smear MC CV with #pi^{0} Tune) Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
-    _util.CalcChiSquared(h_mcxsec_reco_FLUGG, h_mcxsec_reco, h_cov_smear_tot, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_reco_FLUGG, Form("Smear MC CV with FLUGG  Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    // _util.CalcChiSquared(h_mcxsec_reco_FLUGG, h_mcxsec_reco, h_cov_smear_tot, chi, ndof, pval);
+    // leg->AddEntry(h_mcxsec_reco_FLUGG, Form("Smear MC CV with FLUGG  Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     _util.CalcChiSquared(h_mcxsec_reco_tune1, h_mcxsec_reco, h_cov_smear_tot, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_reco_tune1, Form("Smear MC CV with Tune 1 Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     
@@ -1823,15 +1852,15 @@ void UtilityPlotter::CompareUnfoldedModels(){
     leg->AddEntry(h_mcxsec_true_smear_nogtune,   Form("MC (no gTune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
     _util.CalcChiSquared(h_mcxsec_true_smear_nopi0tune, unf, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_true_smear_nopi0tune,   Form("MC (no #pi^{0} Tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
-    _util.CalcChiSquared(h_mcxsec_true_smear_FLUGG, unf, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_true_smear_FLUGG,   Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    // _util.CalcChiSquared(h_mcxsec_true_smear_FLUGG, unf, h_cov, chi, ndof, pval);
+    // leg->AddEntry(h_mcxsec_true_smear_FLUGG,   Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
 
     h_mcxsec_true_smear->Scale(1.0, "width");
     h_mcxsec_true_smear_mec->Scale(1.0, "width");
     h_mcxsec_true_smear_nogtune->Scale(1.0, "width");
     h_mcxsec_true_smear_nopi0tune->Scale(1.0, "width");
-    h_mcxsec_true_smear_FLUGG->Scale(1.0, "width");
+    // h_mcxsec_true_smear_FLUGG->Scale(1.0, "width");
     unf->Scale(1.0, "width");
 
     TCanvas *c = new TCanvas("c", "c", 500, 500);
@@ -1841,7 +1870,7 @@ void UtilityPlotter::CompareUnfoldedModels(){
     c->SetBottomMargin(0.15);
     h_mcxsec_true_smear->GetYaxis()->SetTitleOffset(1.7);
     h_mcxsec_true_smear->SetLineColor(kRed+2);
-    h_mcxsec_true_smear->SetMaximum(5);
+    h_mcxsec_true_smear->SetMaximum(7);
     h_mcxsec_true_smear->Draw("hist");
 
     h_mcxsec_true_smear_mec->SetLineColor(kGreen+2);
@@ -1853,8 +1882,8 @@ void UtilityPlotter::CompareUnfoldedModels(){
     h_mcxsec_true_smear_nopi0tune->SetLineColor(kPink+1);
     h_mcxsec_true_smear_nopi0tune->Draw("hist,same");
 
-    h_mcxsec_true_smear_FLUGG->SetLineColor(kYellow+2);
-    h_mcxsec_true_smear_FLUGG->Draw("hist,same");
+    // h_mcxsec_true_smear_FLUGG->SetLineColor(kYellow+2);
+    // h_mcxsec_true_smear_FLUGG->Draw("hist,same");
     
     unf->Draw("E1,X0,same");
     

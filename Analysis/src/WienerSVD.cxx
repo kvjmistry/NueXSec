@@ -162,7 +162,7 @@ void WienerSVD::CompareModel(TH1D *sig){
     gPad->SetLeftMargin(0.20);
     c->SetBottomMargin(0.15);
 
-    h_model_smear->SetMaximum(5);
+    h_model_smear->SetMaximum(7);
 
     h_model_smear->Draw("hist");
     h_model_smear_err->Draw("E2,same");

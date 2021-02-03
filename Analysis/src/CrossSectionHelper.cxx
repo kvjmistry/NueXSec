@@ -216,6 +216,11 @@ void CrossSectionHelper::LoopEvents(){
                            
                         FillHists(label, uni, k_xsec_sig, weight_uni, recoX, trueX);
                         FillHists(label, uni, k_xsec_sel, cv_weight, recoX, trueX);  // Selected events (N term) we dont weight
+
+                        // Fill 2D histo of true energy and angle only for the CV
+                        if (std::string(_util.xsec_bin_mode) == "e_ang" && reweighter_labels.at(label) == "CV" && uni == 0){
+                            h_2D_CV_binning->Fill(elec_e, true_effective_angle, cv_weight);
+                        }
                     
                     }
                     // Just save the event weights
@@ -1123,10 +1128,15 @@ void CrossSectionHelper::WriteHists(){
                     if (var == k_var_recoX || var == k_var_trueX){
                         h_smear.at(label).at(uni).at(var)->SetOption("col,text00");
                         h_smear.at(label).at(uni).at(var)->Write(Form("h_run%s_%s_%i_smearing",_util.run_period, reweighter_labels.at(label).c_str(), uni),TObject::kOverwrite);
-                        if (std::string(_util.xsec_bin_mode) == "fine"){
+                        if (std::string(_util.xsec_bin_mode) == "fine" || std::string(_util.xsec_bin_mode) == "e_ang"){
                             h_smear_fine.at(label).at(uni).at(var)->SetOption("col");
                             h_smear_fine.at(label).at(uni).at(var)->Write(Form("h_run%s_%s_%i_smearing_fine",_util.run_period, reweighter_labels.at(label).c_str(), uni),TObject::kOverwrite);
                         }
+                    }
+
+                    if (var == k_var_trueX && std::string(_util.xsec_bin_mode) == "e_ang" && reweighter_labels.at(label) == "CV" && uni == 0){
+                            h_2D_CV_binning->SetOption("colz");
+                            h_2D_CV_binning->Write("",TObject::kOverwrite);
                     }
                 
                 } // End loop over the variables
@@ -1573,7 +1583,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
     h_cross_sec.resize(reweighter_labels.size());
     h_smear.resize(reweighter_labels.size());
     
-    if (std::string(_util.xsec_bin_mode) == "fine")
+    if (std::string(_util.xsec_bin_mode) == "fine" || std::string(_util.xsec_bin_mode) == "e_ang")
         h_smear_fine.resize(reweighter_labels.size());
     
     // Resize each reweighter to their number of universes
@@ -1585,7 +1595,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
             h_cross_sec.at(j).resize(uni_genie);
             h_smear.at(j).resize(uni_genie);
             
-            if (std::string(_util.xsec_bin_mode) == "fine")
+            if (std::string(_util.xsec_bin_mode) == "fine" || std::string(_util.xsec_bin_mode) == "e_ang")
                 h_smear_fine.at(j).resize(uni_genie);
         }
         // Specific resizing -- hardcoded and may break in the future
@@ -1594,7 +1604,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
             h_cross_sec.at(j).resize(uni_ppfx);
             h_smear.at(j).resize(uni_ppfx);
             
-            if (std::string(_util.xsec_bin_mode) == "fine")
+            if (std::string(_util.xsec_bin_mode) == "fine" || std::string(_util.xsec_bin_mode) == "e_ang")
                 h_smear_fine.at(j).resize(uni_ppfx);
         }
         // Specific resizing -- hardcoded and may break in the future
@@ -1603,7 +1613,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
             h_cross_sec.at(j).resize(uni_reint);
             h_smear.at(j).resize(uni_reint);
             
-            if (std::string(_util.xsec_bin_mode) == "fine")
+            if (std::string(_util.xsec_bin_mode) == "fine" || std::string(_util.xsec_bin_mode) == "e_ang")
                 h_smear_fine.at(j).resize(uni_reint);
         }
          // Specific resizing -- hardcoded and may break in the future
@@ -1612,7 +1622,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
             h_cross_sec.at(j).resize(uni_mcstats);
             h_smear.at(j).resize(uni_mcstats);
             
-            if (std::string(_util.xsec_bin_mode) == "fine")
+            if (std::string(_util.xsec_bin_mode) == "fine" || std::string(_util.xsec_bin_mode) == "e_ang")
                 h_smear_fine.at(j).resize(uni_mcstats);
         }
         // Default size of 1
@@ -1620,7 +1630,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
             h_cross_sec.at(j).resize(1);
             h_smear.at(j).resize(1);
             
-            if (std::string(_util.xsec_bin_mode) == "fine")
+            if (std::string(_util.xsec_bin_mode) == "fine" || std::string(_util.xsec_bin_mode) == "e_ang")
                 h_smear_fine.at(j).resize(1);
         }
 
@@ -1636,7 +1646,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
             h_cross_sec.at(label).at(uni).resize(vars.size());
             h_smear.at(label).at(uni).resize(vars.size());
             
-            if (std::string(_util.xsec_bin_mode) == "fine")
+            if (std::string(_util.xsec_bin_mode) == "fine" || std::string(_util.xsec_bin_mode) == "e_ang")
                 h_smear_fine.at(label).at(uni).resize(vars.size());
         }
 
@@ -1708,10 +1718,24 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                         h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels_events.at(var).c_str()), nbins, edges);
                     }
                     else if (i == k_xsec_gen_fine){
-                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels_events.at(var).c_str()), nbins_fine, edges_fine);
+                        
+                        if (std::string(_util.xsec_bin_mode) == "e_ang"){
+                            int const nbins_E = _util.true_shr_bins.size()-1;
+                            int const nbins_ang = _util.true_shr_bins_ang.size()-1;
+                            h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels_events.at(var).c_str()), nbins_E*nbins_ang, 0, nbins_E*nbins_ang);
+                        }
+                        else 
+                            h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels_events.at(var).c_str()), nbins_fine, edges_fine);
                     }
                     else if (i == k_xsec_mcxsec_fine){
-                        h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels_xsec.at(var).c_str()), nbins_fine, edges_fine);
+                        
+                        if (std::string(_util.xsec_bin_mode) == "e_ang"){
+                            int const nbins_E = _util.true_shr_bins.size()-1;
+                            int const nbins_ang = _util.true_shr_bins_ang.size()-1;
+                            h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels_xsec.at(var).c_str()), nbins_E*nbins_ang, 0, nbins_E*nbins_ang);
+                        }
+                        else
+                            h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels_xsec.at(var).c_str()), nbins_fine, edges_fine);
                     }
                     else if (i == k_xsec_eff){
                         h_cross_sec.at(label).at(uni).at(var).at(i) = new TH1D ( Form("h_run%s_%s_%i_%s_%s",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str(), xsec_types.at(i).c_str()) ,Form("%s", var_labels_eff.at(var).c_str()), nbins, edges);
@@ -1729,7 +1753,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 if (var == k_var_integrated){
                     h_smear.at(label).at(uni).at(var)      = new TH2D ( Form("h_run%s_%s_%i_%s_smearing",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str()), smear_hist_name.c_str(), 1, 0, 1, 1, 0, 1);
                     
-                    if (std::string(_util.xsec_bin_mode) == "fine")
+                    if (std::string(_util.xsec_bin_mode) == "fine" || std::string(_util.xsec_bin_mode) == "e_ang")
                         h_smear_fine.at(label).at(uni).at(var) = new TH2D ( Form("h_run%s_%s_%i_%s_smearing_fine",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str()), smear_hist_name.c_str(), 1, 0, 1, 1, 0, 1);
                 }
                 // Set the reco and true bins
@@ -1738,6 +1762,13 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                     
                     if (std::string(_util.xsec_bin_mode) == "fine")
                         h_smear_fine.at(label).at(uni).at(var) = new TH2D ( Form("h_run%s_%s_%i_%s_smearing_fine",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str()), smear_hist_name.c_str(), nbins_smear_fine, edges_smear_fine, nbins_smear, edges_smear);
+                    else if (std::string(_util.xsec_bin_mode) == "e_ang"){
+                        int const nbins_E = _util.true_shr_bins.size()-1;
+                        int const nbins_ang = _util.true_shr_bins_ang.size()-1;
+                        h_smear_fine.at(label).at(uni).at(var) = new TH2D ( Form("h_run%s_%s_%i_%s_smearing_fine",_util.run_period, reweighter_labels.at(label).c_str(), uni, vars.at(var).c_str()), smear_hist_name.c_str(), nbins_E*nbins_ang, 0, nbins_E*nbins_ang, nbins_smear, edges_smear);
+                    }
+                
+                
                 }
                 
 
@@ -1747,6 +1778,19 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
         } // End loop over the universes
     
     } // End loop over the labels
+
+
+    // Create histogram for binning
+    if (std::string(_util.xsec_bin_mode) == "e_ang"){
+        // Get the number of bins and the right vector
+        int const nbins_E = _util.true_shr_bins.size()-1;
+        std::vector<double> temp_bins_E = _util.true_shr_bins;
+        double* edges_E = &temp_bins_E[0]; // Cast to an array 
+        int const nbins_ang = _util.true_shr_bins_ang.size()-1;
+        std::vector<double>temp_bins_ang = _util.true_shr_bins_ang;
+        double* edges_ang = &temp_bins_ang[0]; // Cast to an array 
+        h_2D_CV_binning = new TH2D( "h_2D_CV_binning", ";E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV]; #beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]", nbins_E, edges_E, nbins_ang, edges_ang );
+    }
 
 
     // Now lets create the hostogram vector for the cuts
@@ -1863,14 +1907,37 @@ void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double wei
     h_cross_sec.at(label).at(uni).at(k_var_recoX).at(xsec_type)->Fill(_recoX, weight_uni);
 
     // True Electron Energy
-    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(xsec_type)->Fill(_trueX, weight_uni);
+    if (xsec_type != k_xsec_gen_fine){
+        h_cross_sec.at(label).at(uni).at(k_var_trueX).at(xsec_type)->Fill(_trueX, weight_uni);
+    }
+    else { 
+
+        // In the case of a response matrix made from 2 variables, we need a bin index to fill
+        if (std::string(_util.xsec_bin_mode) == "e_ang"){
+            int index = GetBinIndex();
+            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(xsec_type)->Fill(index, weight_uni);
+        }
+        // Fill with truth variable for fine bins
+        else {
+            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(xsec_type)->Fill(_trueX, weight_uni);
+        }
+
+    }
+    
 
     // Smearing Matrix -- only fill for selected signal events
     if (xsec_type == k_xsec_sig){
         h_smear.at(label).at(uni).at(k_var_recoX)->Fill(_trueX, _recoX, weight_uni);
         h_smear.at(label).at(uni).at(k_var_trueX)->Fill(_trueX, _recoX, weight_uni);
         
-        if (std::string(_util.xsec_bin_mode) == "fine"){
+        // In the case of a response matrix made from 2 variables, we need a bin index to fill
+        if (std::string(_util.xsec_bin_mode) == "e_ang"){
+            int index = GetBinIndex();
+            h_smear_fine.at(label).at(uni).at(k_var_recoX)->Fill(index, _recoX, weight_uni);
+            h_smear_fine.at(label).at(uni).at(k_var_trueX)->Fill(index, _recoX, weight_uni);
+            
+        }
+        else if (std::string(_util.xsec_bin_mode) == "fine") {
             h_smear_fine.at(label).at(uni).at(k_var_recoX)->Fill(_trueX, _recoX, weight_uni);
             h_smear_fine.at(label).at(uni).at(k_var_trueX)->Fill(_trueX, _recoX, weight_uni);
         }
@@ -2371,6 +2438,14 @@ void CrossSectionHelper::SaveEvent(std::string _classification, bool _passed_sel
 
 }
 // -----------------------------------------------------------------------------
+int CrossSectionHelper::GetBinIndex(){
+
+    
+    int xbin = h_2D_CV_binning->GetXaxis()->FindBin(elec_e);
+    int ybin = h_2D_CV_binning->GetYaxis()->FindBin(true_effective_angle);
+
+    return xbin*ybin;
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

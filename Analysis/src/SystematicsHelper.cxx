@@ -3448,7 +3448,7 @@ void SystematicsHelper::ExportResult(TFile* f){
     }
     // Other modes we need the response matrix
     else {
-        h_response = (TH2D*)f->Get(Form("CV/%s/h_run%s_CV_0_smearing_fine",vars.at(k_var_true_el_E).c_str(),_util.run_period));
+        h_response = (TH2D*)f->Get(Form("CV/%s/h_run%s_CV_0_smearing",vars.at(k_var_true_el_E).c_str(),_util.run_period));
         h_mcxsec_fine = (TH1D*)f->Get(Form("CV/%s/h_run%s_CV_0_%s_mc_xsec_fine",vars.at(k_var_true_el_E).c_str(),_util.run_period, vars.at(k_var_true_el_E).c_str()));
         _var = k_var_true_el_E;
     }

@@ -224,8 +224,8 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             std::cout << "Using Truth Binning mode to build response matrix from: " << argv[i+1] << std::endl;
             xsec_bin_mode = argv[i+1];
 
-            if (std::string(xsec_bin_mode) != "standard" && std::string(xsec_bin_mode) != "fine" ){
-                std::cout << red << "Error specified variable which is not supported! You can use: standard or fine" << reset << std::endl;
+            if (std::string(xsec_bin_mode) != "standard" && std::string(xsec_bin_mode) != "fine" && std::string(xsec_bin_mode) != "e_ang"){
+                std::cout << red << "Error specified variable which is not supported! You can use: standard or fine or e_ang" << reset << std::endl;
                 exit(5);
             }
         }

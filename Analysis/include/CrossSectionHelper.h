@@ -114,6 +114,8 @@ class CrossSectionHelper{
     // Define histograms for the reweighting by cut
     std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_cut_v; // Label -- Cut -- variable -- Universe
 
+    TH2D* h_2D_CV_binning; // Histogram to define the bin indexes for a response matrix in energy and angle
+
     // enum for histogram types
     enum TH1D_xsec_hist_vars {
         k_xsec_sel,          // Selected event histogram binned in energy
@@ -392,7 +394,9 @@ class CrossSectionHelper{
     // Save the event to file
     void SaveEvent(std::string _classification, bool _passed_selection, std::vector<float> ev_weight, double reco_E, double true_E);
     // -------------------------------------------------------------------------
-
+    // Return the bin index from a 2D histogram
+    int GetBinIndex();
+    // -------------------------------------------------------------------------
 
 
 
