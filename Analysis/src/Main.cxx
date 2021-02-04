@@ -67,7 +67,7 @@ int main(int argc, char *argv[]){
     std::string usage3 = "\n\nTo run the detector systematics code, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --sys <systematics mode> [options (see below)]\033[0m \n\n"
     "\033[0;34m[--sys <systematics mode>]\033[0m                             \033[0;32mThe input mode of systematics to run. Options are default/ext/reweight \033[0m\n\n"
-    "\033[0;34m[--xsec_smear <cross-section smear mode> ]\033[0m             \033[0;32mChoose how to define the cross section. Default is mcc8. Options are mcc8 or er or wiener.\033[0m\n\n"
+    "\033[0;34m[--xsec_smear <cross-section smear mode> ]\033[0m             \033[0;32mChoose how to define the cross section. Default is er. Options are mcc8 or er or wiener.\033[0m\n\n"
     "\033[0;34m[--binscaling <bin scaling option> ]\033[0m                   \033[0;32mChoose whether we want to apply a bin width scaling to the histogram. Default is width. Options are standard or width. \033[0m\n\n"
     "-------------------------------------------------------\n\n"
     "\n\nTo run the utility plotter code, run: \n\n"

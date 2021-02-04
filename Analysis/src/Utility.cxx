@@ -1292,10 +1292,10 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
         vars = {"integrated", "reco_el_cang", "true_el_cang" };
 
         if (std::string(xsec_smear_mode) == "mcc8"){
-            xsec_scale = 0.15; // X-Section
+            xsec_scale = 100.0; // X-Section
         }
         else {
-            xsec_scale = 0.05; // Event Rate
+            xsec_scale = 10.0; // Event Rate
 
             if (std::string(scale_bins) == "standard")
                 xsec_scale*=0.3;

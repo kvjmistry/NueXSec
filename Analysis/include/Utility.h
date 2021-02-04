@@ -227,7 +227,7 @@ public:
     char * uplotmode             = (char *)"default";
     char * intrinsic_mode        = (char *)"default"; // choose whether to override the nue component to accomodate the intrinsic nue sample
     char * sysplot               = (char *)"tot";     // what systematic uncertainty to plot on the CV histograms
-    char * xsec_smear_mode       = (char *)"mcc8";    // what smearing do we want to apply to the measurement? mcc8 = Marco's smearing, response = smearing using a response matrix and compare event rates
+    char * xsec_smear_mode       = (char *)"er";    // what smearing do we want to apply to the measurement? mcc8 = Marco's smearing, response = smearing using a response matrix and compare event rates
     char * xsec_bin_mode         = (char *)"standard"; // Choose whether to use standard binning (reco = truth) or fine truth binning 
     char * scale_bins            = (char *)"width"; // Choose whether to use scale the histograms by bin width. Options are standard or width
     int num_events{-1};

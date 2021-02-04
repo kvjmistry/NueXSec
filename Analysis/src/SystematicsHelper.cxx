@@ -3583,7 +3583,17 @@ void SystematicsHelper::ExportResult(TFile* f){
             }
         } 
         
-        h_smear->SetTitle("; Leading Shower Energy [GeV]; True e#lower[-0.5]{-} + e^{+} Energy [GeV]");
+        if (std::string(_util.xsec_var) == "elec_ang"){
+            h_smear->SetTitle("; #beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]; #beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]");
+        }
+        else if (std::string(_util.xsec_var) == "elec_cang"){
+            h_smear->SetTitle("; cos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]; #beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]");
+        }
+        else{
+            h_smear->SetTitle("; E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV]; E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV]");
+        }
+        
+        
         h_smear->Write("h_response", TObject::kOverwrite);
 
         // Data XSec Covariance Matrix ---------------------------------

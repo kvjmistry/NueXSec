@@ -48,8 +48,25 @@ class UtilityPlotter{
     std::vector<float> *all_shr_energies = NULL;
     std::vector<unsigned short> *weightsPPFX = NULL ;
 
+    std::vector<std::string> var_labels_xsec = {};
 
+    std::vector<std::string> var_labels_events = {};
 
+    std::vector<std::string> var_labels_eff = {};
+
+    std::string smear_hist_name;
+    
+    std::vector<std::string> vars = {};
+
+    double xsec_scale;
+
+    // enum for histogram vars
+    enum TH1D_xsec_var_vars {
+        k_var_integrated,     // Total X-Section
+        k_var_recoX,          // X-Sec as a function of a Reconstructed variable
+        k_var_trueX,          // X-Sec as a function of a True variable
+        k_TH1D_xsec_var_MAX
+    };
 
     // -------------------------------------------------------------------------
     // Initialiser function
