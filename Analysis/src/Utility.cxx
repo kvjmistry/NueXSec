@@ -1238,22 +1238,22 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
     else if (std::string(xsec_var) =="elec_ang"){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                           ";Reco. Leading Effective Angle [deg];#frac{d#sigma}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/deg/nucleon]",
-                           ";True e#lower[-0.5]{-} + e^{+} Effective Angle [deg];#frac{d#sigma}{dE^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/deg/nucleon"
+                           ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg];#frac{d#sigma}{d#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-39} cm^{2}/deg/nucleon]",
+                           ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg];#frac{d#sigma}{d#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-39} cm^{2}/deg/nucleon"
                           };
 
 
         var_labels_events = {";;Entries",
-                             ";Reco. Leading Shower Effective Angle [deg]; Entries / deg",
-                             ";True e#lower[-0.5]{-} + e^{+} Effective Angle [deg]; Entries / deg"
+                             ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]; Entries / deg",
+                             ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]; Entries / deg"
                             };
 
         var_labels_eff = {";;Efficiency",
-                          ";Reco. Leading Shower Effective Angle [deg]]; Efficiency",
-                          ";True e#lower[-0.5]{-} + e^{+} Effective Angle [deg]; Efficiency"
+                          ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]; Efficiency",
+                          ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]; Efficiency"
                          };
 
-        smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Effective Angle [deg];Leading Shower Effective Angle [deg]";
+        smear_hist_name = ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg];#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]";
 
         vars = {"integrated", "reco_el_ang", "true_el_ang" };
 

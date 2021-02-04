@@ -235,24 +235,44 @@ void UtilityPlotter::CompareSignalPurity(){
 
 }
 // -----------------------------------------------------------------------------
-void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_edge, float bin_upper_edge, TTree* tree, bool save_hist, bool &converged, bool draw_fit_results){
+void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_edge, float bin_upper_edge, TTree* tree, bool save_hist, bool &converged, bool draw_fit_results, std::string var){
+        
+    TCut query;
     
-    TCut generic_query = "(classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && !gen"; // This gets selected signal events
-    TCut bin_query = Form("shr_energy_cali > %f && shr_energy_cali < %f", bin_lower_edge, bin_upper_edge);
-    
-    TCut query = Form(" weight*(  ((classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && passed_selection) && shr_energy_cali > %f && shr_energy_cali < %f )", bin_lower_edge, bin_upper_edge); 
+    if (var == "elec_e"){
+        query = Form(" weight*(  ((classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && passed_selection) && shr_energy_cali > %f && shr_energy_cali < %f )", bin_lower_edge, bin_upper_edge); 
+    }
+    else if (var == "elec_ang"){
+        query = Form(" weight*(  ((classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && passed_selection) && effective_angle > %f && effective_angle < %f )", bin_lower_edge, bin_upper_edge); 
+    }
+    else {
+        return;
+    }
+
 
     TCanvas * c = new TCanvas(Form("c_%f_%f", bin_upper_edge, sigma), "c", 500, 500);
 
     // Get the histogram from the pad
     TH1D *htemp;
     
-    htemp = new TH1D("htemp","", 90, 0, 6.0); // Set the binnning
+    if (var == "elec_e"){
+        htemp = new TH1D("htemp","", 90, 0, 6.0); // Set the binnning
+    }
+    else if (var == "elec_ang"){
+        htemp = new TH1D("htemp","", 90, 0, 180); // Set the binnning
+    }
+    else {
+        return;
+    }
 
-    // Draw the Query adn put into histogram
-    // tree->Draw("elec_e >> htemp", generic_query && bin_query);
-    tree->Draw("elec_e >> htemp", query);
-    
+    // Draw the Query and put into histogram
+    if (var == "elec_e"){
+        tree->Draw("elec_e >> htemp", query);
+    }
+    else if (var == "elec_ang"){
+        tree->Draw("true_effective_angle >> htemp", query);
+    }
+
     // Fit it with a Gaussian
     htemp->Fit("gaus");
     
@@ -270,32 +290,69 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
     mean  = fit_gaus->GetParameter(1);
 	sigma = fit_gaus->GetParameter(2);
 
-    if ( (sigma*2 >= bin_upper_edge - bin_lower_edge - 0.01 && sigma*2 <= bin_upper_edge - bin_lower_edge + 0.01) && htemp->Integral() > 330){
-        std::cout << "Fit has converged!: " << 2*sigma/(bin_upper_edge - bin_lower_edge) << std::endl;
-        converged = true;
+
+    if (var == "elec_e"){
+        if ( (sigma*2 >= bin_upper_edge - bin_lower_edge - 0.01 && sigma*2 <= bin_upper_edge - bin_lower_edge + 0.01) && htemp->Integral() > 330){
+            std::cout << "Fit has converged!: " << 2*sigma/(bin_upper_edge - bin_lower_edge) << std::endl;
+            converged = true;
+        }
+    }
+    else if (var == "elec_ang"){
+        if ( (sigma*2 >= bin_upper_edge - bin_lower_edge - 5.0 && sigma*2 <= bin_upper_edge - bin_lower_edge + 5.0) && htemp->Integral() > 330){
+            std::cout << "Fit has converged!: " << 2*sigma/(bin_upper_edge - bin_lower_edge) << std::endl;
+            converged = true;
+        }
     }
 
     TLatex* range;
     TLatex* fit_params;
     if (save_hist){
-        range = new TLatex(0.88,0.86, Form("Reco Energy %0.2f - %0.2f GeV",bin_lower_edge, bin_upper_edge ));
+        
+        if (var == "elec_e"){
+            range = new TLatex(0.88,0.86, Form("Reco Energy %0.2f - %0.2f GeV",bin_lower_edge, bin_upper_edge ));
+        }
+        else if (var == "elec_ang"){
+            range = new TLatex(0.88,0.86, Form("Reco Angle %0.2f - %0.2f deg",bin_lower_edge, bin_upper_edge ));
+        }
+        
         range->SetTextColor(kGray+2);
         range->SetNDC();
         range->SetTextSize(0.038);
         range->SetTextAlign(32);
         range->Draw();
 
-        fit_params = new TLatex(0.88,0.92, Form("Fit Mean: %0.2f GeV, Fit Sigma: %0.2f GeV",mean, sigma ));
+        if (var == "elec_e"){
+            fit_params = new TLatex(0.88,0.92, Form("Fit Mean: %0.2f GeV, Fit Sigma: %0.2f GeV",mean, sigma ));
+        }
+        else if (var == "elec_ang"){
+            fit_params = new TLatex(0.88,0.92, Form("Fit Mean: %0.2f GeV, Fit Sigma: %0.2f deg",mean, sigma ));
+        }
+
         fit_params->SetTextColor(kGray+2);
         fit_params->SetNDC();
         fit_params->SetTextSize(0.038);
         fit_params->SetTextAlign(32);
         if (draw_fit_results) fit_params->Draw();
-        htemp->SetTitle("; Truth Electron Energy [GeV]; Entries");
+        
+
+        if (var == "elec_e"){
+            htemp->SetTitle("; E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV]; Entries");
+        }
+        else if (var == "elec_ang"){
+            htemp->SetTitle("; #beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]; Entries");
+        }
+        
+        
         htemp->SetStats(kFALSE);
         _util.IncreaseLabelSize(htemp, c);
         c->SetTopMargin(0.11);
-        c->Print(Form("plots/run%s/Binning/bins_%0.2fGeV_to_%0.2f_GeV.pdf",_util.run_period, bin_lower_edge, bin_upper_edge ));
+        
+        if (var == "elec_e"){
+            c->Print(Form("plots/run%s/Binning/bins_%0.2fGeV_to_%0.2f_GeV.pdf",_util.run_period, bin_lower_edge, bin_upper_edge ));
+        }
+        else if (var == "elec_ang"){
+            c->Print(Form("plots/run%s/Binning/bins_%0.2fdeg_to_%0.2f_deg.pdf",_util.run_period, bin_lower_edge, bin_upper_edge ));
+        }
     } 
 
     std::cout << _util.red << "Integral: " <<htemp->Integral()  << _util.reset<< std::endl;
@@ -311,6 +368,10 @@ void UtilityPlotter::OptimiseBins(){
     // Create the Bins directory for saving the plots to
     _util.CreateDirectory("Binning");
 
+    // The variable to optimise
+    std::string var = "elec_ang";
+    int nbins;
+
     // Load in the tfile and tree
     double mean{0.0}, sigma{0.0};
     bool converged = false;
@@ -319,53 +380,65 @@ void UtilityPlotter::OptimiseBins(){
     // Generally choose the first bin width to be 0.25 GeV
     float lower_bin = 0.001;
     // float lower_bin = 0.3;
+
+    // The last bin to go up to
+    float upper_bin = 6.0;
+
+    // What increment size to increase the bins by
+    float increment_size = 0.001;
+
+    if (var == "elec_e"){
+        nbins = 6;
+        lower_bin = 0.001;
+        upper_bin = 6.0;
+        increment_size = 0.001;
+    }
+    else if (var == "elec_ang"){
+        nbins = 6;
+        lower_bin = 0.0;
+        upper_bin = 180.;
+        increment_size = 0.5;
+    }
     
     // Loop over the bins
-    for (float bin = 0; bin < 6; bin++ ){
+    for (float bin = 0; bin < nbins; bin++ ){
         std::cout << "\n\033[0;34mTrying to optimise the next bin\033[0m\n"<< std::endl;
         converged = false;
 
         // Slide upper bin value till we get 2xthe STD of the fit
-        for (float i = lower_bin+0.1; i <= 5.0; i+=0.001) {
-            std::cout << "\n\033[0;34mTrying Bin: " << i << "GeV\033[0m\n"<< std::endl;
+        for (float i = lower_bin+increment_size; i <= upper_bin; i+=increment_size) {
+            
+            if (var == "elec_e")
+                std::cout << "\n\033[0;34mTrying Bin: " << i << "GeV\033[0m\n"<< std::endl;
+            else if (var == "elec_ang")
+                std::cout << "\n\033[0;34mTrying Bin: " << i << "deg\033[0m\n"<< std::endl;
+            else
+                std::cout << "Warning, unknown variable specified" << std::endl;
 
-            if (bin == 0){
-                bool fake =true;
-                GetFitResult(mean, sigma, 0.0, 0.30, tree, true, fake, true);
+            // Since in the case of electron energy, the first bin does not want to converge
+            // We set this manually
+            if (bin == 0 && var == "elec_e"){
+                bool fake = true;
+                GetFitResult(mean, sigma, 0.0, 0.30, tree, true, fake, true, var);
                 lower_bin = 0.30;
                 break;
             }
-            // if (bin == 1){
-            //     bool fake =true;
-            //     GetFitResult(mean, sigma, 0.4, 0.65, tree, true, fake, true);
-            //     lower_bin = 0.65;
-            //     break;
-            // }
-            // if (bin == 2){
-            //     bool fake =true;
-            //     GetFitResult(mean, sigma, 0.65, 0.95, tree, true, fake, true);
-            //     lower_bin = 0.95;
-            //     break;
-            // }
-            // if (bin == 3){
-            //     bool fake =true;
-            //     GetFitResult(mean, sigma, 0.95, 1.4, tree, true, fake, true);
-            //     lower_bin = 1.4;
-            //     break;
-            // }
-            // if (bin == 4){
-            //     bool fake =true;
-            //     GetFitResult(mean, sigma, 1.4, 6.0, tree, true, fake, true);
-            //     lower_bin = 6.0;
-            //     break;
-            // }
+
+            if (bin == 0 && var == "elec_ang"){
+                bool fake = true;
+                GetFitResult(mean, sigma, 0.0, 6.0, tree, true, fake, true, var);
+                lower_bin = 6.0;
+                break;
+            }
+            
             // call function which draws the tree to a canvas, fits the tree and returns the fit parameter
             // If the fit has 2xSTD = the reco bin size then we have successfully optimised the bin
-            GetFitResult(mean, sigma, lower_bin, i, tree, false, converged, false);
+            GetFitResult(mean, sigma, lower_bin, i, tree, false, converged, false, var);
 
             // If it converged, do it again and print the canvas then break
             if (converged) {
-                GetFitResult(mean, sigma, lower_bin, i, tree, true, converged, true);
+                
+                GetFitResult(mean, sigma, lower_bin, i, tree, true, converged, true, var);
                 std::cout << "\n\033[0;34mMean: " << mean << "  Sigma: " << sigma<< "\033[0m\n"<< std::endl;
                 
                 // Reset the lower bin value
@@ -373,9 +446,9 @@ void UtilityPlotter::OptimiseBins(){
                 break;
             }
 
-            // Since the fit doesnt want to converge for the last bin, lets jsut draw it anyway
-            if (bin == 5){
-                GetFitResult(mean, sigma, 1.47, 6.0, tree, true, converged, false);
+            // Since the fit doesnt want to converge for elec_E for the last bin, lets just draw it anyway
+            if (bin == nbins-1){
+                GetFitResult(mean, sigma, lower_bin, upper_bin, tree, true, converged, false, var);
                 break;
             }
 

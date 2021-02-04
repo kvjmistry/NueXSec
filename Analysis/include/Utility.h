@@ -174,7 +174,7 @@ public:
     std::vector<double> reco_shr_bins    = { 0.0, 0.30, 0.49, 0.69, 0.98, 1.47, 6.0};
 
     // Bins for reco shr effective angle
-    std::vector<double> reco_shr_bins_ang = { 0.0, 10, 20, 30, 45, 60, 75, 90, 105, 180};
+    std::vector<double> reco_shr_bins_ang = { 0.0, 6.0, 14.0, 20.5, 29.0, 42.5, 180};
 
     // Fine truth Binning
     // std::vector<double> true_shr_bins = { 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
