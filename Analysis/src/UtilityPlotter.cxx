@@ -56,7 +56,7 @@ void UtilityPlotter::Initialise(Utility _utility){
         // Set the names of the histograms
         _util.SetAxesNames(var_labels_xsec, var_labels_events, var_labels_eff, smear_hist_name, vars, xsec_scale);
 
-        _util.CreateDirectory("Models");
+        _util.CreateDirectory("Models/" + std::string(_util.xsec_var));
         TestModelDependence();
         CompareDataCrossSections();
         CompareSmearing();
@@ -1686,7 +1686,7 @@ void UtilityPlotter::TestModelDependence(){
     // leg->AddEntry(h_mcxsec_reco_FLUGG,  Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     leg->Draw();
 
-    c->Print(Form("plots/run%s/Models/DataModelComparison.pdf", _util.run_period));
+    c->Print(Form("plots/run%s/Models/%s/DataModelComparison.pdf", _util.run_period, _util.xsec_var));
 
     fxsec->Close();
 
@@ -1746,7 +1746,7 @@ void UtilityPlotter::CompareDataCrossSections(){
     leg->AddEntry(h_datasec_reco_nogtune, "Data with no gTune Model", "l");
     leg->Draw();
 
-    c->Print(Form("plots/run%s/Models/ModelDataComparison.pdf", _util.run_period));
+    c->Print(Form("plots/run%s/Models/%s/ModelDataComparison.pdf", _util.run_period, _util.xsec_var));
 
     fxsec->Close();
 
@@ -1867,7 +1867,7 @@ void UtilityPlotter::CompareSmearing(){
     
     leg->Draw();
 
-    c->Print(Form("plots/run%s/Models/SmearingModelComparison.pdf", _util.run_period));
+    c->Print(Form("plots/run%s/Models/%s/SmearingModelComparison.pdf", _util.run_period, _util.xsec_var));
 
     fxsec->Close();
 
@@ -2020,7 +2020,7 @@ void UtilityPlotter::CompareUnfoldedModels(){
     
     leg->Draw();
     
-    c->Print(Form("plots/run%s/Models/DataModelUnfoldedComparison.pdf", _util.run_period));
+    c->Print(Form("plots/run%s/Models/%s/DataModelUnfoldedComparison.pdf", _util.run_period, _util.xsec_var));
 
 }
 // -----------------------------------------------------------------------------
