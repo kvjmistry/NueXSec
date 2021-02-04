@@ -1269,9 +1269,13 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         if (std::string(_util.xsec_var) =="elec_E"){
             bins = _util.reco_shr_bins;
         }
-        // Electron/Shower effective angle
+        // Electron/Shower beta
         else if (std::string(_util.xsec_var) =="elec_ang"){
             bins = _util.reco_shr_bins_ang;
+        }
+        // Electron/Shower cos beta
+        else if (std::string(_util.xsec_var) =="elec_cang"){
+            bins = _util.reco_shr_bins_cang;
         }
         else {
             std::cout << "Unsupported parameter...exiting!" << std::endl;
@@ -3456,6 +3460,9 @@ void SystematicsHelper::ExportResult(TFile* f){
     // Choose whichj folder to put the stuff in
     if (std::string(_util.xsec_var) == "elec_ang"){
         folder_name = "elec_ang";
+    }
+    else if (std::string(_util.xsec_var) == "elec_cang"){
+        folder_name = "elec_cang";
     }
     else{
         folder_name = "elec_E";

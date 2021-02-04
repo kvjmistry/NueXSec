@@ -213,8 +213,8 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             std::cout << "Calculating a Cross-Section as function of: " << argv[i+1] << std::endl;
             xsec_var = argv[i+1];
 
-            if (std::string(xsec_var) != "elec_E" && std::string(xsec_var) != "elec_ang" ){
-                std::cout << red << "Error specified variable which is not supported! You can use: elec_E or elec_ang" << reset << std::endl;
+            if (std::string(xsec_var) != "elec_E" && std::string(xsec_var) != "elec_ang" && std::string(xsec_var) != "elec_cang" ){
+                std::cout << red << "Error specified variable which is not supported! You can use: elec_E or elec_ang or elec_cang" << reset << std::endl;
                 exit(5);
             }
         }
@@ -1239,7 +1239,7 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
                            ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg];#frac{d#sigma}{d#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-39} cm^{2}/deg/nucleon]",
-                           ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg];#frac{d#sigma}{d#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-39} cm^{2}/deg/nucleon"
+                           ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg];#frac{d#sigma}{d#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-39} cm^{2}/deg/nucleon]"
                           };
 
 
@@ -1256,6 +1256,40 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
         smear_hist_name = ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg];#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]";
 
         vars = {"integrated", "reco_el_ang", "true_el_ang" };
+
+        if (std::string(xsec_smear_mode) == "mcc8"){
+            xsec_scale = 0.15; // X-Section
+        }
+        else {
+            xsec_scale = 0.05; // Event Rate
+
+            if (std::string(scale_bins) == "standard")
+                xsec_scale*=0.3;
+        }
+
+    }
+    // Electron/Shower cos beta
+    else if (std::string(xsec_var) =="elec_cang"){
+        
+        var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
+                           ";cos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}};#frac{d#sigma}{dcos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/nucleon]",
+                           ";cos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}};#frac{d#sigma}{dcos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/nucleon]"
+                          };
+
+
+        var_labels_events = {";;Entries",
+                             ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}}; Entries",
+                             ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}}; Entries"
+                            };
+
+        var_labels_eff = {";;Efficiency",
+                          ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}}; Efficiency",
+                          ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}}; Efficiency"
+                         };
+
+        smear_hist_name = ";cos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}};cos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}}";
+
+        vars = {"integrated", "reco_el_cang", "true_el_cang" };
 
         if (std::string(xsec_smear_mode) == "mcc8"){
             xsec_scale = 0.15; // X-Section

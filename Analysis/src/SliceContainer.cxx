@@ -948,7 +948,8 @@ void SliceContainer::SetNuMIAngularVariables(){
 
     TVector3 elec_dir(elec_px, elec_py, elec_pz); 
     elec_dir.Unit();
-    true_effective_angle = elec_dir.Angle(v_targ_to_vtx_true) * 180 / 3.14159;
+    // true_effective_angle = elec_dir.Angle(v_targ_to_vtx_true) * 180 / 3.14159;
+    true_effective_angle = elec_dir.Angle(nu_dir) * 180 / 3.14159; // Use dot product of elec dir to nu dir for this as the true value
     
     // --
 

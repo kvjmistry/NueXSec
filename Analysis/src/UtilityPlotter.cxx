@@ -239,11 +239,14 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
         
     TCut query;
     
-    if (var == "elec_e"){
+    if (var == "elec_E"){
         query = Form(" weight*(  ((classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && passed_selection) && shr_energy_cali > %f && shr_energy_cali < %f )", bin_lower_edge, bin_upper_edge); 
     }
     else if (var == "elec_ang"){
         query = Form(" weight*(  ((classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && passed_selection) && effective_angle > %f && effective_angle < %f )", bin_lower_edge, bin_upper_edge); 
+    }
+    else if (var == "elec_cang"){
+        query = Form(" weight*(  ((classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && passed_selection) && cos_effective_angle > %f && cos_effective_angle < %f )", bin_lower_edge, bin_upper_edge); 
     }
     else {
         return;
@@ -255,22 +258,28 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
     // Get the histogram from the pad
     TH1D *htemp;
     
-    if (var == "elec_e"){
+    if (var == "elec_E"){
         htemp = new TH1D("htemp","", 90, 0, 6.0); // Set the binnning
     }
     else if (var == "elec_ang"){
         htemp = new TH1D("htemp","", 90, 0, 180); // Set the binnning
+    }
+    else if (var == "elec_cang"){
+        htemp = new TH1D("htemp","", 90, -1.0, 1.0); // Set the binnning
     }
     else {
         return;
     }
 
     // Draw the Query and put into histogram
-    if (var == "elec_e"){
+    if (var == "elec_E"){
         tree->Draw("elec_e >> htemp", query);
     }
     else if (var == "elec_ang"){
         tree->Draw("true_effective_angle >> htemp", query);
+    }
+    else if (var == "elec_cang"){
+        tree->Draw("cos_true_effective_angle >> htemp", query);
     }
 
     // Fit it with a Gaussian
@@ -291,7 +300,7 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
 	sigma = fit_gaus->GetParameter(2);
 
 
-    if (var == "elec_e"){
+    if (var == "elec_E"){
         if ( (sigma*2 >= bin_upper_edge - bin_lower_edge - 0.01 && sigma*2 <= bin_upper_edge - bin_lower_edge + 0.01) && htemp->Integral() > 330){
             std::cout << "Fit has converged!: " << 2*sigma/(bin_upper_edge - bin_lower_edge) << std::endl;
             converged = true;
@@ -303,16 +312,25 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
             converged = true;
         }
     }
+    else if (var == "elec_cang"){
+        if ( (sigma*2 >= bin_upper_edge - bin_lower_edge - 0.6 && sigma*2 <= bin_upper_edge - bin_lower_edge + 0.6) && htemp->Integral() > 330){
+            std::cout << "Fit has converged!: " << 2*sigma/(bin_upper_edge - bin_lower_edge) << std::endl;
+            converged = true;
+        }
+    }
 
     TLatex* range;
     TLatex* fit_params;
     if (save_hist){
         
-        if (var == "elec_e"){
+        if (var == "elec_E"){
             range = new TLatex(0.88,0.86, Form("Reco Energy %0.2f - %0.2f GeV",bin_lower_edge, bin_upper_edge ));
         }
         else if (var == "elec_ang"){
-            range = new TLatex(0.88,0.86, Form("Reco Angle %0.2f - %0.2f deg",bin_lower_edge, bin_upper_edge ));
+            range = new TLatex(0.88,0.86, Form("Reco #beta %0.2f - %0.2f deg",bin_lower_edge, bin_upper_edge ));
+        }
+         else if (var == "elec_cang"){
+            range = new TLatex(0.88,0.86, Form("Reco cos(#beta) %0.2f - %0.2f",bin_lower_edge, bin_upper_edge ));
         }
         
         range->SetTextColor(kGray+2);
@@ -321,11 +339,14 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
         range->SetTextAlign(32);
         range->Draw();
 
-        if (var == "elec_e"){
+        if (var == "elec_E"){
             fit_params = new TLatex(0.88,0.92, Form("Fit Mean: %0.2f GeV, Fit Sigma: %0.2f GeV",mean, sigma ));
         }
         else if (var == "elec_ang"){
-            fit_params = new TLatex(0.88,0.92, Form("Fit Mean: %0.2f GeV, Fit Sigma: %0.2f deg",mean, sigma ));
+            fit_params = new TLatex(0.88,0.92, Form("Fit Mean: %0.2f deg, Fit Sigma: %0.2f deg",mean, sigma ));
+        }
+        else if (var == "elec_cang"){
+            fit_params = new TLatex(0.88,0.92, Form("Fit Mean: %0.2f, Fit Sigma: %0.2f",mean, sigma ));
         }
 
         fit_params->SetTextColor(kGray+2);
@@ -335,11 +356,14 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
         if (draw_fit_results) fit_params->Draw();
         
 
-        if (var == "elec_e"){
+        if (var == "elec_E"){
             htemp->SetTitle("; E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV]; Entries");
         }
         else if (var == "elec_ang"){
             htemp->SetTitle("; #beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]; Entries");
+        }
+        else if (var == "elec_cang"){
+            htemp->SetTitle("; cos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}}; Entries");
         }
         
         
@@ -347,11 +371,14 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
         _util.IncreaseLabelSize(htemp, c);
         c->SetTopMargin(0.11);
         
-        if (var == "elec_e"){
-            c->Print(Form("plots/run%s/Binning/bins_%0.2fGeV_to_%0.2f_GeV.pdf",_util.run_period, bin_lower_edge, bin_upper_edge ));
+        if (var == "elec_E"){
+            c->Print(Form("plots/run%s/Binning/%s/bins_%0.2fGeV_to_%0.2fGeV.pdf",_util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
         }
         else if (var == "elec_ang"){
-            c->Print(Form("plots/run%s/Binning/bins_%0.2fdeg_to_%0.2f_deg.pdf",_util.run_period, bin_lower_edge, bin_upper_edge ));
+            c->Print(Form("plots/run%s/Binning/%s/bins_%0.1fdeg_to_%0.1fdeg.pdf",_util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        else if (var == "elec_cang"){
+            c->Print(Form("plots/run%s/Binning/%s/bins_%0.2f_to_%0.2f.pdf",_util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
         }
     } 
 
@@ -366,10 +393,10 @@ void UtilityPlotter::GetFitResult(double &mean, double &sigma, float bin_lower_e
 void UtilityPlotter::OptimiseBins(){
 
     // Create the Bins directory for saving the plots to
-    _util.CreateDirectory("Binning");
+    _util.CreateDirectory("Binning/" + std::string(_util.xsec_var));
 
     // The variable to optimise
-    std::string var = "elec_ang";
+    std::string var = std::string(_util.xsec_var);
     int nbins;
 
     // Load in the tfile and tree
@@ -387,7 +414,7 @@ void UtilityPlotter::OptimiseBins(){
     // What increment size to increase the bins by
     float increment_size = 0.001;
 
-    if (var == "elec_e"){
+    if (var == "elec_E"){
         nbins = 6;
         lower_bin = 0.001;
         upper_bin = 6.0;
@@ -399,6 +426,12 @@ void UtilityPlotter::OptimiseBins(){
         upper_bin = 180.;
         increment_size = 0.5;
     }
+     else if (var == "elec_cang"){
+        nbins = 6;
+        lower_bin = -1.0;
+        upper_bin = 1.0;
+        increment_size = 0.005;
+    }
     
     // Loop over the bins
     for (float bin = 0; bin < nbins; bin++ ){
@@ -408,16 +441,18 @@ void UtilityPlotter::OptimiseBins(){
         // Slide upper bin value till we get 2xthe STD of the fit
         for (float i = lower_bin+increment_size; i <= upper_bin; i+=increment_size) {
             
-            if (var == "elec_e")
+            if (var == "elec_E")
                 std::cout << "\n\033[0;34mTrying Bin: " << i << "GeV\033[0m\n"<< std::endl;
             else if (var == "elec_ang")
                 std::cout << "\n\033[0;34mTrying Bin: " << i << "deg\033[0m\n"<< std::endl;
+            else if (var == "elec_cang")
+                std::cout << "\n\033[0;34mTrying Bin: " << i << "\033[0m\n"<< std::endl;
             else
                 std::cout << "Warning, unknown variable specified" << std::endl;
 
             // Since in the case of electron energy, the first bin does not want to converge
             // We set this manually
-            if (bin == 0 && var == "elec_e"){
+            if (bin == 0 && var == "elec_E"){
                 bool fake = true;
                 GetFitResult(mean, sigma, 0.0, 0.30, tree, true, fake, true, var);
                 lower_bin = 0.30;
@@ -428,6 +463,13 @@ void UtilityPlotter::OptimiseBins(){
                 bool fake = true;
                 GetFitResult(mean, sigma, 0.0, 6.0, tree, true, fake, true, var);
                 lower_bin = 6.0;
+                break;
+            }
+
+            if (bin == 0 && var == "elec_cang"){
+                bool fake = true;
+                GetFitResult(mean, sigma, -1.0, 0.6, tree, true, fake, true, var);
+                lower_bin = 0.6;
                 break;
             }
             

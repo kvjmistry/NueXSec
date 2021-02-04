@@ -168,10 +168,15 @@ void CrossSectionHelper::LoopEvents(){
             recoX = shr_energy_cali;
             trueX = elec_e;
         }
-        // Electron/Shower effective angle
+        // Electron/Shower beta
         else if (std::string(_util.xsec_var) =="elec_ang"){
             recoX = effective_angle;
             trueX = true_effective_angle;
+        }
+        // Electron/Shower cos(beta)
+        else if (std::string(_util.xsec_var) =="elec_cang"){
+            recoX = cos_effective_angle;
+            trueX = cos_true_effective_angle;
         }
         else {
             std::cout << "Unsupported parameter...exiting!" << std::endl;
@@ -1557,6 +1562,11 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
     else if (std::string(_util.xsec_var) =="elec_ang"){
         hist_bins = _util.reco_shr_bins_ang;
         fine_bins = _util.true_shr_bins_ang;
+    }
+    // Electron/Shower effective cangle
+    else if (std::string(_util.xsec_var) =="elec_cang"){
+        hist_bins = _util.reco_shr_bins_cang;
+        fine_bins = _util.true_shr_bins_cang;
     }
     else {
         std::cout << "Unsupported parameter...exiting!" << std::endl;
