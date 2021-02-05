@@ -1754,6 +1754,10 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
 
             }
 
+            if (_util.zoom && std::string(_util.xsec_var) == "elec_cang"){
+                h_dataxsec->GetXaxis()->SetRangeUser(0.6, 1.0);
+            }
+
             c->SetLeftMargin(0.2);
             c->SetBottomMargin(0.15);
             h_dataxsec->GetYaxis()->SetTitleOffset(1.8);

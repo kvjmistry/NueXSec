@@ -254,6 +254,12 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             }
         }
 
+        // Zoom in on the plots
+        if (strcmp(arg, "--zoom") == 0){
+            std::cout << "Making final plots with a zoomed in scale" << std::endl;
+            zoom = true;
+        }
+
         // Utility Plotter
         if (strcmp(arg, "--uplot") == 0){
             std::cout << "Using Utility plotting code with mode: " << argv[i+1] << std::endl;

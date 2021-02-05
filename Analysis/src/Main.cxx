@@ -73,7 +73,8 @@ int main(int argc, char *argv[]){
     "\n\nTo run the utility plotter code, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --uplot <utility plotter mode>\033[0m \n\n"
     "\033[0;34m[--uplot <utility plotter mode>]\033[0m                        \033[0;32mThe input mode of the utility plotter to run. Options are default/bins/true/models. See UtilityPlotter Initalise function to see what functions are called. \033[0m\n\n"
-    "This will run the utility plotting code\n\n";
+    "\033[0;34m[--zoom]\033[0m                                                \033[0;32mZoom in on the plots. \033[0m\n\n"
+    "\n\n";
 
 
     // -------------------------------------------------------------------------

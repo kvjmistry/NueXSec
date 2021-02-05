@@ -1664,6 +1664,9 @@ void UtilityPlotter::TestModelDependence(){
     h_dataxsec->GetYaxis()->SetTitleOffset(1.7);
     // h_mcxsec_reco->SetMaximum(1.5);
     h_dataxsec->Draw("E1,X0,same");
+
+    if (_util.zoom && std::string(_util.xsec_var) == "elec_cang")
+        h_dataxsec->GetXaxis()->SetRangeUser(0.6, 1.0);
     
     h_mcxsec_reco_model.at(k_model_CV)->Draw("hist,same");
     h_mcxsec_reco_model.at(k_model_mec)->Draw("hist,same");
@@ -1674,7 +1677,7 @@ void UtilityPlotter::TestModelDependence(){
     h_dataxsec->Draw("E1,X0,same");
     h_dataxsec_stat->Draw("E1,X0,same");
 
-    TLegend *leg = new TLegend(0.5, 0.6, 0.85, 0.85);
+    TLegend *leg = new TLegend(0.4, 0.6, 0.75, 0.85);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(h_dataxsec, "Data (Stat. + Sys.)", "ep");
@@ -1701,6 +1704,11 @@ void UtilityPlotter::TestModelDependence(){
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_tune1),  Form("MC (Tune 1) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     
     leg->Draw();
+
+    // Draw the run period on the plot
+    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+
+    _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.52, 0.92, 0.52, 0.92);
 
     c->Print(Form("plots/run%s/Models/%s/DataModelComparison.pdf", _util.run_period, _util.xsec_var));
 
@@ -1972,7 +1980,7 @@ void UtilityPlotter::CompareUnfoldedModels(){
     }
     
    
-    TLegend *leg = new TLegend(0.5, 0.6, 0.85, 0.85);
+    TLegend *leg = new TLegend(0.4, 0.6, 0.75, 0.85);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(unf, "Data (Stat. + Sys.)", "ep");
@@ -2021,6 +2029,8 @@ void UtilityPlotter::CompareUnfoldedModels(){
     }
     else if (std::string(_util.xsec_var) == "elec_cang"){
         h_mcxsec_true_model_smear.at(k_model_CV)->SetMaximum(30.0);
+        if (_util.zoom) h_mcxsec_true_model_smear.at(k_model_CV)->GetXaxis()->SetRangeUser(0.6, 1.0);
+
     }
 
     h_mcxsec_true_model_smear.at(k_model_CV)->SetMinimum(0.0);
@@ -2042,6 +2052,11 @@ void UtilityPlotter::CompareUnfoldedModels(){
     h_mcxsec_true_model_smear.at(k_model_tune1)->Draw("hist,same" );
     
     unf->Draw("E1,X0,same");
+
+    // Draw the run period on the plot
+    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+
+    _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.52, 0.92, 0.52, 0.92);
     
 
     leg->Draw();
