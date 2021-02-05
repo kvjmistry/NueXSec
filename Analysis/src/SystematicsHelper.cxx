@@ -3539,9 +3539,9 @@ void SystematicsHelper::ExportResult(TFile* f){
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->SetOption("col");
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Write("h_cov_tot_mcxsec_reco", TObject::kOverwrite);
 
-        // MC XSec Smear Covariance Matrix  ---------------------------------
-        h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_tot)->SetOption("col");
-        h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_tot)->Write("h_cov_tot_mcxsec_smear_true", TObject::kOverwrite);
+        // MC XSec Smear MC Stats Covariance Matrix  ---------------------------------
+        h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_mcstats)->SetOption("col");
+        h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_mcstats)->Write("h_cov_tot_mcxsec_smear_true", TObject::kOverwrite);
     
         // MC XSec Reco  ---------------------------------
         cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->SetOption("hist");
@@ -3602,17 +3602,7 @@ void SystematicsHelper::ExportResult(TFile* f){
     
         // MC XSec True  ---------------------------------
         cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->SetOption("hist");
-
-        TH1D* h_mc_xsec_true = (TH1D*)cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->Clone();
-        // TH1D* h_mc_xsec_true = (TH1D*)h_mcxsec_fine->Clone();
-
-
-        // undo the truth efficiency correction
-        // h_mc_xsec_true->Divide(cv_hist_vec.at(k_var_true_el_E).at(k_xsec_eff));
-
-        // cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->Write("h_mc_xsec_true", TObject::kOverwrite);
-        h_mc_xsec_true->Write("h_mc_xsec_true", TObject::kOverwrite);
-        
+        cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->Write("h_mc_xsec_true", TObject::kOverwrite);
 
         // MC Efficiency True  ---------------------------------
         cv_hist_vec.at(k_var_true_el_E).at(k_xsec_eff)->SetOption("hist");
@@ -3629,8 +3619,8 @@ void SystematicsHelper::ExportResult(TFile* f){
         cor->Write("h_corr_tot_dataxsec_reco", TObject::kOverwrite);
 
         // Wiener SVD Unfolding  ---------------------------------
-        _wSVD.DoUnfolding(2, 0, h_mc_xsec_true, cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_smear, h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot));
-        _wSVD.CompareModel(h_mc_xsec_true);
+        _wSVD.DoUnfolding(2, 0, cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_smear, h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot));
+        _wSVD.CompareModel(cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec));
         _wSVD.unf->Write("h_data_xsec_unfolded", TObject::kOverwrite);
         _wSVD.unfcov->Write("h_data_cov_tot_unfolded", TObject::kOverwrite);
         _wSVD.smear->Write("h_ac", TObject::kOverwrite);

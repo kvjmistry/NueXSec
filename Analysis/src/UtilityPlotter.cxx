@@ -1604,65 +1604,73 @@ void UtilityPlotter::TestModelDependence(){
 
     // Load in the cross section output
     fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+
+    // Create a vector for the models
+    std::vector<std::string> models = {
+        "CV",
+        "mec",
+        "nogtune",
+        "nopi0tune",
+        "FLUGG",
+        "tune1"
+    };
+
+    // enums for the models
+    enum enum_models {
+        k_model_CV,
+        k_model_mec,
+        k_model_nogtune,
+        k_model_nopi0tune,
+        k_model_FLUGG,
+        k_model_tune1,
+        k_MODEL_MAX
+    };
+
+    // Create the vector of histograms
+    std::vector<TH2D*> h_response_model(models.size());
+    std::vector<TH1D*> h_mcxsec_true_model(models.size());
+    std::vector<TH1D*> h_mcxsec_reco_model(models.size());
+
+
+    // Loop over each model
+    for (unsigned int m = 0; m < models.size(); m++){
+        
+        // Response Matrix
+        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
+        if (h_temp_2D == NULL) std::cout <<"Help!" << m << std::endl;
+        h_response_model.at(m) = (TH2D*)h_temp_2D->Clone();
+
+        // MC xsec in True
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
+        h_mcxsec_true_model.at(m) = (TH1D*)h_temp->Clone();
+        h_mcxsec_reco_model.at(m) = (TH1D*)h_dataxsec->Clone();
+       
+        _util.MatrixMultiply(h_mcxsec_true_model.at(m), h_mcxsec_reco_model.at(m), h_response_model.at(k_model_CV), "true_reco", true);
+    }
+
+    // Set the line colours
+    h_mcxsec_reco_model.at(k_model_CV)       ->SetLineColor(kRed+2);
+    h_mcxsec_reco_model.at(k_model_mec)      ->SetLineColor(kGreen+2);
+    h_mcxsec_reco_model.at(k_model_nogtune)  ->SetLineColor(kBlue+2);
+    h_mcxsec_reco_model.at(k_model_nopi0tune)->SetLineColor(kPink+1);
+    h_mcxsec_reco_model.at(k_model_FLUGG)    ->SetLineColor(kYellow+2);
+    h_mcxsec_reco_model.at(k_model_tune1)    ->SetLineColor(kOrange-1);
     
-    // Response Matrix
-    h_temp_2D  = (TH2D*)fxsec->Get(Form("CV/%s/h_run1_CV_0_smearing", vars.at(k_var_trueX).c_str()));
-    // h_temp_2D  = (TH2D*)fxsec->Get("mec/true_el_E/h_run1_mec_0_smearing");
-    // h_temp_2D  = (TH2D*)fxsec->Get("nogtune/true_el_E/h_run1_nogtune_0_smearing");
-    TH2D* h_response = (TH2D*)h_temp_2D->Clone();
 
-    // MC xsec in True
-    h_temp  = (TH1D*)fxsec->Get(Form("CV/%s/h_run1_CV_0_%s_mc_xsec", vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
-    TH1D* h_mcxsec_true = (TH1D*)h_temp->Clone();
-    TH1D* h_mcxsec_reco = (TH1D*)h_dataxsec->Clone();
-    h_mcxsec_reco->SetLineColor(kRed+2);
-
-    _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco, h_response, "true_reco", true);
-
-    // MC xsec MEC in True
-    h_temp  = (TH1D*)fxsec->Get(Form("mec/%s/h_run1_CV_0_%s_mc_xsec",vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
-    TH1D* h_mcxsec_true_mec = (TH1D*)h_temp->Clone();
-    TH1D* h_mcxsec_reco_mec = (TH1D*)h_dataxsec->Clone();
-    h_mcxsec_reco_mec->SetLineColor(kGreen+2);
-
-    _util.MatrixMultiply(h_mcxsec_true_mec, h_mcxsec_reco_mec, h_response, "true_reco", true);
-
-    // MC xsec no g tune in True
-    h_temp  = (TH1D*)fxsec->Get(Form("nogtune/%s/h_run1_CV_0_%s_mc_xsec",vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
-    TH1D* h_mcxsec_true_nogtune = (TH1D*)h_temp->Clone();
-    TH1D* h_mcxsec_reco_nogtune = (TH1D*)h_dataxsec->Clone();
-    h_mcxsec_reco_nogtune->SetLineColor(kBlue+2);
-
-    _util.MatrixMultiply(h_mcxsec_true_nogtune, h_mcxsec_reco_nogtune, h_response, "true_reco", true);
-
-    // MC xsec no g pi0 tune in True
-    h_temp  = (TH1D*)fxsec->Get(Form("nopi0tune/%s/h_run1_CV_0_%s_mc_xsec",vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
-    TH1D* h_mcxsec_true_nopi0tune = (TH1D*)h_temp->Clone();
-    TH1D* h_mcxsec_reco_nopi0tune = (TH1D*)h_dataxsec->Clone();
-    h_mcxsec_reco_nopi0tune->SetLineColor(kPink+1);
-
-    _util.MatrixMultiply(h_mcxsec_true_nopi0tune, h_mcxsec_reco_nopi0tune, h_response, "true_reco", true);
-
-    // MC xsec FLUGG flux True
-    h_temp  = (TH1D*)fxsec->Get(Form("FLUGG/%s/h_run1_CV_0_%s_mc_xsec",vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
-    TH1D* h_mcxsec_true_FLUGG = (TH1D*)h_temp->Clone();
-    TH1D* h_mcxsec_reco_FLUGG = (TH1D*)h_dataxsec->Clone();
-    h_mcxsec_reco_FLUGG->SetLineColor(kYellow+2);
-
-    _util.MatrixMultiply(h_mcxsec_true_FLUGG, h_mcxsec_reco_FLUGG, h_response, "true_reco", true);
-
-
+    // Now lets plot
     TCanvas *c = new TCanvas("c", "c", 500, 500);
     c->SetLeftMargin(0.2);
     c->SetBottomMargin(0.15);
     h_dataxsec->GetYaxis()->SetTitleOffset(1.7);
     // h_mcxsec_reco->SetMaximum(1.5);
     h_dataxsec->Draw("E1,X0,same");
-    h_mcxsec_reco->Draw("hist,same");
-    h_mcxsec_reco_mec->Draw("hist,same");
-    h_mcxsec_reco_nogtune->Draw("hist,same");
-    h_mcxsec_reco_nopi0tune->Draw("hist,same");
-    // h_mcxsec_reco_FLUGG->Draw("hist,same");
+    
+    h_mcxsec_reco_model.at(k_model_CV)->Draw("hist,same");
+    h_mcxsec_reco_model.at(k_model_mec)->Draw("hist,same");
+    h_mcxsec_reco_model.at(k_model_nogtune)->Draw("hist,same");
+    h_mcxsec_reco_model.at(k_model_nopi0tune)->Draw("hist,same");
+    // h_mcxsec_reco_model.at(k_model_FLUGG)->Draw("hist,same");
+    h_mcxsec_reco_model.at(k_model_tune1)->Draw("hist,same");
     h_dataxsec->Draw("E1,X0,same");
     h_dataxsec_stat->Draw("E1,X0,same");
 
@@ -1673,17 +1681,25 @@ void UtilityPlotter::TestModelDependence(){
     
     double chi, pval;
     int ndof;
-    _util.CalcChiSquared(h_mcxsec_reco, h_dataxsec, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_reco,  Form("MC (CV) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
-    _util.CalcChiSquared(h_mcxsec_reco_mec, h_dataxsec, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_reco_mec,  Form("MC (1.5 #times MEC) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
-    _util.CalcChiSquared(h_mcxsec_reco_nogtune, h_dataxsec, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_reco_nogtune,  Form("MC (no gTune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
-    leg->Draw();
-    _util.CalcChiSquared(h_mcxsec_reco_nopi0tune, h_dataxsec, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_reco_nopi0tune,  Form("MC (no #pi^{0} Tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
-    // _util.CalcChiSquared(h_mcxsec_reco_FLUGG, h_dataxsec, h_cov, chi, ndof, pval);
-    // leg->AddEntry(h_mcxsec_reco_FLUGG,  Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_CV), h_dataxsec, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_CV),  Form("MC (CV) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    
+    _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_mec), h_dataxsec, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_mec),  Form("MC (1.5 #times MEC) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    
+    _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_nogtune), h_dataxsec, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_nogtune),  Form("MC (no gTune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    
+    _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_nopi0tune), h_dataxsec, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_nopi0tune),  Form("MC (no #pi^{0} Tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    
+    
+    // _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_FLUGG), h_dataxsec, h_cov, chi, ndof, pval);
+    // leg->AddEntry(h_mcxsec_reco_model.at(k_model_FLUGG),  Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+
+    _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_tune1), h_dataxsec, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_tune1),  Form("MC (Tune 1) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    
     leg->Draw();
 
     c->Print(Form("plots/run%s/Models/%s/DataModelComparison.pdf", _util.run_period, _util.xsec_var));
@@ -1780,93 +1796,96 @@ void UtilityPlotter::CompareSmearing(){
 
     // Load in the cross section output
     fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+
+    // Create a vector for the models
+    std::vector<std::string> models = {
+        "mec",
+        "nogtune",
+        "nopi0tune",
+        "FLUGG",
+        "tune1"
+    };
+
+    // enums for the models
+    enum enum_models {
+        k_model_mec,
+        k_model_nogtune,
+        k_model_nopi0tune,
+        k_model_FLUGG,
+        k_model_tune1,
+        k_MODEL_MAX
+    };
+
+    // Create the vector of histograms
+    std::vector<TH2D*> h_response_model(models.size());
+    std::vector<TH1D*> h_mcxsec_reco_model(models.size());
     
     // MC Xsec True
     h_temp  = (TH1D*)fxsec->Get(Form("CV/%s/h_run1_CV_0_%s_mc_xsec",vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
     TH1D* h_mcxsec_true         = (TH1D*)h_temp->Clone();
     
-    TH1D* h_mcxsec_reco_mec       = (TH1D*)h_mcxsec_reco->Clone(); // clone to get the binning, these hists get reset
-    TH1D* h_mcxsec_reco_nogtune   = (TH1D*)h_mcxsec_reco->Clone(); // clone to get the binning, these hists get reset
-    TH1D* h_mcxsec_reco_nopi0tune = (TH1D*)h_mcxsec_reco->Clone(); // clone to get the binning, these hists get reset
-    TH1D* h_mcxsec_reco_FLUGG     = (TH1D*)h_mcxsec_reco->Clone(); // clone to get the binning, these hists get reset
-    TH1D* h_mcxsec_reco_tune1     = (TH1D*)h_mcxsec_reco->Clone(); // clone to get the binning, these hists get reset
+    // Loop over each model
+    for (unsigned int m = 0; m < models.size(); m++){
+        
+        // clone to get the binning, these hists get reset
+        h_mcxsec_reco_model.at(m) = (TH1D*)h_mcxsec_reco->Clone();
 
-    // Response Matrix MEC
-    h_temp_2D  = (TH2D*)fxsec->Get(Form("mec/%s/h_run1_mec_0_smearing", vars.at(k_var_trueX).c_str()));
-    TH2D* h_response_mec = (TH2D*)h_temp_2D->Clone();
-    
-    _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco_mec, h_response_mec, "true_reco", true);
-    h_mcxsec_reco_mec->SetLineColor(kGreen+2);
+        // Get the response matrix
+        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
+        h_response_model.at(m) = (TH2D*)h_temp_2D->Clone();
 
-    // Response Matrix no gTune
-    h_temp_2D  = (TH2D*)fxsec->Get(Form("nogtune/%s/h_run1_nogtune_0_smearing", vars.at(k_var_trueX).c_str()));
-    TH2D* h_response_nogtune = (TH2D*)h_temp_2D->Clone();
-    
-    _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco_nogtune, h_response_nogtune, "true_reco", true);
-    h_mcxsec_reco_nogtune->SetLineColor(kBlue+2);
+        // Apply the response matrix to the CV MC True dist
+        _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco_model.at(m), h_response_model.at(m), "true_reco", true);
+    }
 
-    // Response Matrix no pi0 Tune
-    h_temp_2D  = (TH2D*)fxsec->Get(Form("nopi0tune/%s/h_run1_nopi0tune_0_smearing", vars.at(k_var_trueX).c_str()));
-    TH2D* h_response_nopi0tune = (TH2D*)h_temp_2D->Clone();
-    
-    _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco_nopi0tune, h_response_nopi0tune, "true_reco", true);
-    h_mcxsec_reco_nopi0tune->SetLineColor(kPink+1);
-
-    // Response Matrix FLUGG
-    h_temp_2D  = (TH2D*)fxsec->Get(Form("FLUGG/%s/h_run1_FLUGG_0_smearing", vars.at(k_var_trueX).c_str()));
-    TH2D* h_response_FLUGG = (TH2D*)h_temp_2D->Clone();
-    
-    _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco_FLUGG, h_response_FLUGG, "true_reco", true);
-    h_mcxsec_reco_FLUGG->SetLineColor(kYellow+2);
-
-    // Response Matrix Tune 1
-    h_temp_2D  = (TH2D*)fxsec->Get(Form("tune1/%s/h_run1_tune1_0_smearing", vars.at(k_var_trueX).c_str()));
-    TH2D* h_response_tune1 = (TH2D*)h_temp_2D->Clone();
-    
-    _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_reco_tune1, h_response_tune1, "true_reco", true);
-    h_mcxsec_reco_tune1->SetLineColor(kOrange-1);
-
+    // Set the line colours
+    h_mcxsec_reco_model.at(k_model_mec)      ->SetLineColor(kGreen+2);
+    h_mcxsec_reco_model.at(k_model_nogtune)  ->SetLineColor(kBlue+2);
+    h_mcxsec_reco_model.at(k_model_nopi0tune)->SetLineColor(kPink+1);
+    h_mcxsec_reco_model.at(k_model_FLUGG)    ->SetLineColor(kYellow+2);
+    h_mcxsec_reco_model.at(k_model_tune1)    ->SetLineColor(kOrange-1);
 
     // Set the Bin errors for the MC truth
     for (int bin = 1; bin < h_mcxsec_reco->GetNbinsX()+1; bin++){
-        // h_mcxsec_reco->SetBinError(bin, std::sqrt(h_cov_smear_tot->GetBinContent(bin, bin)));
-        h_mcxsec_reco->SetBinError(bin,  0.02*h_mcxsec_reco->GetBinContent(bin));
-        h_mcxsec_reco_tune1->SetBinError(bin, 0.02*h_mcxsec_reco_tune1->GetBinContent(bin));
-        // h_mcxsec_reco_FLUGG->SetBinError(bin, 0.02*h_mcxsec_reco_FLUGG->GetBinContent(bin));
+        
+        // Set the bin error of the CV to be the stat plus smearing uncertainty 
+        double err_mc_true = (h_mcxsec_true->GetBinError(bin) / h_mcxsec_true->GetBinContent(bin)) * h_mcxsec_reco->GetBinContent(bin);
+        h_mcxsec_reco->SetBinError(bin, err_mc_true + std::sqrt(h_cov_smear_tot->GetBinContent(bin, bin)));        
+        
+        // Set the bin error for each model to be ~2%
+        for (unsigned int m = 0; m < models.size(); m++){
+            h_mcxsec_reco_model.at(m)->SetBinError(bin, 0.02*h_mcxsec_reco_model.at(m)->GetBinContent(bin));
+        }
     }
 
+    // Now lets plot
     TCanvas *c = new TCanvas("c", "c", 500, 500);
     c->SetLeftMargin(0.2);
     c->SetBottomMargin(0.15);
     h_mcxsec_reco->GetYaxis()->SetTitleOffset(1.7);
     h_mcxsec_reco->Draw("hist,E");
-    h_mcxsec_reco_mec->Draw("hist,same");
-    h_mcxsec_reco_nogtune->Draw("hist,same");
-    h_mcxsec_reco_nopi0tune->Draw("hist,same");
-    // h_mcxsec_reco_FLUGG->Draw("hist,E,same");
-    h_mcxsec_reco_tune1->Draw("hist,E,same");
+    
+    // Choose what models to draw
+    h_mcxsec_reco_model.at(k_model_mec)      ->Draw("hist,same");
+    h_mcxsec_reco_model.at(k_model_nogtune)  ->Draw("hist,same");
+    h_mcxsec_reco_model.at(k_model_nopi0tune)->Draw("hist,same");
+    // h_mcxsec_reco_model.at(k_model_FLUGG)    ->Draw("hist,E,same");
+    h_mcxsec_reco_model.at(k_model_tune1)    ->Draw("hist,E,same");
     h_mcxsec_reco->Draw("hist,E,same");
 
+    // Create the legend
     TLegend *leg = new TLegend(0.4, 0.5, 0.85, 0.85);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
-    leg->AddEntry(h_mcxsec_reco, "MC (Stat. + Sys.)", "el");
-
-    double chi, pval;
-    int ndof;
-    _util.CalcChiSquared(h_mcxsec_reco_mec, h_mcxsec_reco, h_cov_smear_tot, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_reco_mec, Form("Smear MC CV with 1.5 #times MEC Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
-    _util.CalcChiSquared(h_mcxsec_reco_nogtune, h_mcxsec_reco, h_cov_smear_tot, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_reco_nogtune, Form("Smear MC CV with no gTune Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
-    _util.CalcChiSquared(h_mcxsec_reco_nopi0tune, h_mcxsec_reco, h_cov_smear_tot, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_reco_nopi0tune, Form("Smear MC CV with #pi^{0} Tune) Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
-    // _util.CalcChiSquared(h_mcxsec_reco_FLUGG, h_mcxsec_reco, h_cov_smear_tot, chi, ndof, pval);
-    // leg->AddEntry(h_mcxsec_reco_FLUGG, Form("Smear MC CV with FLUGG  Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
-    _util.CalcChiSquared(h_mcxsec_reco_tune1, h_mcxsec_reco, h_cov_smear_tot, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_reco_tune1, Form("Smear MC CV with Tune 1 Model #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "le");
-    
+    leg->AddEntry(h_mcxsec_reco, "MC (Stat.)", "el");
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_mec),      "Smear MC CV with 1.5 #times MEC Model", "l");
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_nogtune),  "Smear MC CV with no gTune Model",       "l");
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_nopi0tune),"Smear MC CV with #pi^{0} Tune) Model",  "l");
+    // leg->AddEntry(h_mcxsec_reco_model.at(k_model_FLUGG), "Smear MC CV with FLUGG  Model",         "l");
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_tune1),    "Smear MC CV with Tune 1 Model (Stat.)",         "le");
     leg->Draw();
 
+    // Save and close
     c->Print(Form("plots/run%s/Models/%s/SmearingModelComparison.pdf", _util.run_period, _util.xsec_var));
 
     fxsec->Close();
@@ -1916,44 +1935,43 @@ void UtilityPlotter::CompareUnfoldedModels(){
     // Now Get the Models
     // Load in the cross section output
     fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+
+    // Create a vector for the models
+    std::vector<std::string> models = {
+        "CV",
+        "mec",
+        "nogtune",
+        "nopi0tune",
+        "FLUGG",
+        "tune1"
+    };
+
+    // enums for the models
+    enum enum_models {
+        k_model_CV,
+        k_model_mec,
+        k_model_nogtune,
+        k_model_nopi0tune,
+        k_model_FLUGG,
+        k_model_tune1,
+        k_MODEL_MAX
+    };
+
+    std::vector<TH1D*> h_mcxsec_true_model(models.size());
+    std::vector<TH1D*> h_mcxsec_true_model_smear(models.size());
+
+    // Loop over each model
+    for (unsigned int m = 0; m < models.size(); m++){
+        // MC Xsec True
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
+        h_mcxsec_true_model.at(m)         = (TH1D*)h_temp->Clone();
+        h_mcxsec_true_model_smear.at(m)   = (TH1D*)h_temp->Clone();
+
+        _util.MatrixMultiply(h_mcxsec_true_model.at(m), h_mcxsec_true_model_smear.at(m), h_ac, "reco_true",false);
+
+    }
     
-    // MC Xsec True
-    h_temp  = (TH1D*)fxsec->Get(Form("CV/%s/h_run1_CV_0_%s_mc_xsec", vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
-    TH1D* h_mcxsec_true         = (TH1D*)h_temp->Clone();
-    TH1D* h_mcxsec_true_smear   = (TH1D*)h_temp->Clone();
-
-    _util.MatrixMultiply(h_mcxsec_true, h_mcxsec_true_smear, h_ac, "reco_true",false);
-
-    // MC Xsec True MEC
-    h_temp  = (TH1D*)fxsec->Get(Form("mec/%s/h_run1_CV_0_%s_mc_xsec", vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
-    TH1D* h_mcxsec_true_mec         = (TH1D*)h_temp->Clone();
-    TH1D* h_mcxsec_true_smear_mec   = (TH1D*)h_temp->Clone();
-
-    _util.MatrixMultiply(h_mcxsec_true_mec, h_mcxsec_true_smear_mec, h_ac, "reco_true",false);
-
-    // MC Xsec True no Genie Tune
-    h_temp  = (TH1D*)fxsec->Get(Form("nogtune/%s/h_run1_CV_0_%s_mc_xsec", vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
-    TH1D* h_mcxsec_true_nogtune         = (TH1D*)h_temp->Clone();
-    TH1D* h_mcxsec_true_smear_nogtune   = (TH1D*)h_temp->Clone();
-
-    _util.MatrixMultiply(h_mcxsec_true_nogtune, h_mcxsec_true_smear_nogtune, h_ac, "reco_true",false);
-
-    // MC Xsec True no pi0 Tune
-    h_temp  = (TH1D*)fxsec->Get(Form("nopi0tune/%s/h_run1_CV_0_%s_mc_xsec", vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
-    TH1D* h_mcxsec_true_nopi0tune         = (TH1D*)h_temp->Clone();
-    TH1D* h_mcxsec_true_smear_nopi0tune   = (TH1D*)h_temp->Clone();
-
-    _util.MatrixMultiply(h_mcxsec_true_nopi0tune, h_mcxsec_true_smear_nopi0tune, h_ac, "reco_true",false);
-
-
-    // MC Xsec True FLUGG
-    h_temp  = (TH1D*)fxsec->Get(Form("FLUGG/%s/h_run1_CV_0_%s_mc_xsec", vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
-    TH1D* h_mcxsec_true_FLUGG         = (TH1D*)h_temp->Clone();
-    TH1D* h_mcxsec_true_smear_FLUGG   = (TH1D*)h_temp->Clone();
-
-    _util.MatrixMultiply(h_mcxsec_true_FLUGG, h_mcxsec_true_smear_FLUGG, h_ac, "reco_true",false);
-
-
+   
     TLegend *leg = new TLegend(0.5, 0.6, 0.85, 0.85);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
@@ -1962,62 +1980,70 @@ void UtilityPlotter::CompareUnfoldedModels(){
     // Now calculate the chi-squared
     double chi, pval;
     int ndof;
-    _util.CalcChiSquared(h_mcxsec_true_smear, unf, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_true_smear,   Form("MC (CV) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
-    _util.CalcChiSquared(h_mcxsec_true_smear_mec, unf, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_true_smear_mec,   Form("MC (1.5 #times MEC) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
-    _util.CalcChiSquared(h_mcxsec_true_smear_nogtune, unf, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_true_smear_nogtune,   Form("MC (no gTune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
-    _util.CalcChiSquared(h_mcxsec_true_smear_nopi0tune, unf, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_true_smear_nopi0tune,   Form("MC (no #pi^{0} Tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
-    // _util.CalcChiSquared(h_mcxsec_true_smear_FLUGG, unf, h_cov, chi, ndof, pval);
-    // leg->AddEntry(h_mcxsec_true_smear_FLUGG,   Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_CV), unf, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_CV),   Form("MC (CV) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    
+    _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_mec), unf, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_mec),   Form("MC (1.5 #times MEC) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    
+    _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_nogtune), unf, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_nogtune),   Form("MC (no gTune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    
+    _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_nopi0tune), unf, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_nopi0tune),   Form("MC (no #pi^{0} Tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    
+    // _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_FLUGG), unf, h_cov, chi, ndof, pval);
+    // leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_FLUGG),   Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
+    _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_tune1), unf, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_tune1),   Form("MC (Tune 1) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
-    h_mcxsec_true_smear->Scale(1.0, "width");
-    h_mcxsec_true_smear_mec->Scale(1.0, "width");
-    h_mcxsec_true_smear_nogtune->Scale(1.0, "width");
-    h_mcxsec_true_smear_nopi0tune->Scale(1.0, "width");
-    // h_mcxsec_true_smear_FLUGG->Scale(1.0, "width");
+    // Scale the histograms by bin width 
+    for (unsigned int m = 0; m < models.size(); m++){
+        h_mcxsec_true_model_smear.at(m)->Scale(1.0, "width");
+        h_mcxsec_true_model_smear.at(m)->SetLineWidth(2);
+    }
     unf->Scale(1.0, "width");
 
+    // Make the plot
     TCanvas *c = new TCanvas("c", "c", 500, 500);
-
-    _util.IncreaseLabelSize(h_mcxsec_true_smear, c);
+    _util.IncreaseLabelSize( h_mcxsec_true_model_smear.at(k_model_CV), c);
     gPad->SetLeftMargin(0.20);
     c->SetBottomMargin(0.15);
-    h_mcxsec_true_smear->GetYaxis()->SetTitleOffset(1.7);
-    h_mcxsec_true_smear->SetLineColor(kRed+2);
+    h_mcxsec_true_model_smear.at(k_model_CV)->GetYaxis()->SetTitleOffset(1.7);
+    h_mcxsec_true_model_smear.at(k_model_CV)->SetLineColor(kRed+2);
     
     if (std::string(_util.xsec_var) == "elec_E"){
-        h_mcxsec_true_smear->SetMaximum(7);
+        h_mcxsec_true_model_smear.at(k_model_CV)->SetMaximum(7);
     }
     else if (std::string(_util.xsec_var) == "elec_ang"){
-        h_mcxsec_true_smear->SetMaximum(0.15);
+        h_mcxsec_true_model_smear.at(k_model_CV)->SetMaximum(0.15);
     }
     else if (std::string(_util.xsec_var) == "elec_cang"){
-        h_mcxsec_true_smear->SetMaximum(30.0);
+        h_mcxsec_true_model_smear.at(k_model_CV)->SetMaximum(30.0);
     }
-    h_mcxsec_true_smear->SetMinimum(0.0);
-    h_mcxsec_true_smear->Draw("hist");
 
-    h_mcxsec_true_smear_mec->SetLineColor(kGreen+2);
-    h_mcxsec_true_smear_mec->Draw("hist,same");
+    h_mcxsec_true_model_smear.at(k_model_CV)->SetMinimum(0.0);
+    h_mcxsec_true_model_smear.at(k_model_CV)->Draw("hist");
 
-    h_mcxsec_true_smear_nogtune->SetLineColor(kBlue+2);
-    h_mcxsec_true_smear_nogtune->Draw("hist,same");
+    h_mcxsec_true_model_smear.at(k_model_mec)->SetLineColor(kGreen+2);
+    h_mcxsec_true_model_smear.at(k_model_mec)->Draw("hist,same" );
 
-    h_mcxsec_true_smear_nopi0tune->SetLineColor(kPink+1);
-    h_mcxsec_true_smear_nopi0tune->Draw("hist,same");
+    h_mcxsec_true_model_smear.at(k_model_nogtune)->SetLineColor(kBlue+2);
+    h_mcxsec_true_model_smear.at(k_model_nogtune)->Draw("hist,same" );
 
-    // h_mcxsec_true_smear_FLUGG->SetLineColor(kYellow+2);
-    // h_mcxsec_true_smear_FLUGG->Draw("hist,same");
+    h_mcxsec_true_model_smear.at(k_model_nopi0tune)->SetLineColor(kPink+1);
+    h_mcxsec_true_model_smear.at(k_model_nopi0tune)->Draw("hist,same" );
+
+    // h_mcxsec_true_model_smear.at(k_model_FLUGG)->SetLineColor(kYellow+2);
+    // h_mcxsec_true_model_smear.at(k_model_FLUGG)->Draw("hist,same" );
+
+    h_mcxsec_true_model_smear.at(k_model_tune1)->SetLineColor(kOrange-1);
+    h_mcxsec_true_model_smear.at(k_model_tune1)->Draw("hist,same" );
     
     unf->Draw("E1,X0,same");
     
 
-    
-    
     leg->Draw();
     
     c->Print(Form("plots/run%s/Models/%s/DataModelUnfoldedComparison.pdf", _util.run_period, _util.xsec_var));

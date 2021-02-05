@@ -296,7 +296,7 @@ class SystematicsHelper{
     };
 
     // Vector to store the quadrature sum of the uncertainties
-    std::vector<std::vector<std::vector<std::vector<double>>>> v_err;
+    std::vector<std::vector<std::vector<std::vector<double>>>> v_err; // error type -- var -- type -- bin error . Units are percent squared. To ger the raw err, sqrt and * 0.01 then multiply by the bin content
     
     // Vector to store all the final covariance matrices
     std::vector<std::vector<std::vector<TH2D*>>> h_cov_v; // var -- type -- label
