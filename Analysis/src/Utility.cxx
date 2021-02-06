@@ -260,6 +260,14 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             zoom = true;
         }
 
+        // Zoom in on the plots
+        if (strcmp(arg, "--fake") == 0){
+            std::cout << "The dataset being used is fake data with name: " << argv[i+1]<< std::endl;
+            isfakedata = true;
+            fakedataname = argv[i+1];
+            overwritePOT = true;
+        }
+
         // Utility Plotter
         if (strcmp(arg, "--uplot") == 0){
             std::cout << "Using Utility plotting code with mode: " << argv[i+1] << std::endl;
@@ -325,19 +333,38 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
 
     std::string variation_str = variation;
 
+    // We also want to overwrite the data POT in the case of fake data
+    if (isfakedata)
+        variation_str = std::string(fakedataname);
+
     // Check the variaition mode setting and see if we want to overwrite the POT
     if (overwritePOT){
 
         // Loop over the POT config names and overwrite the name of the CV MC POT
         for (unsigned int p = 0; p < confignames.size(); p++){
             
-            std::string match_name = Form("Run%s_MC_POT", run_period);
-            // std::string match_name = "Run1_MC_POT";
+            std::string match_name;
             
-            // If matched then overwrite the POT config for the MC to the variation
+            if (isfakedata)
+                match_name = Form("Run%s_Data_POT", run_period);
+            else
+                match_name = Form("Run%s_MC_POT", run_period);
+            
+            // If matched then overwrite the POT config for the variation
             if (confignames.at(p) == match_name){
-                confignames[p] = match_name + "_" + variation_str;
-                std::cout << red  <<"New MC POT config to search for is: " << confignames.at(p) << reset << std::endl;
+                
+                // If fake data mode we overwrite the data POT number instead
+                if (isfakedata){
+                    confignames[p] = Form("Run%s_MC_POT_%s", run_period, variation_str.c_str());
+                    std::cout << red  <<"New Data POT config to search for is: " << confignames.at(p) << reset << std::endl;
+                }
+                // Else overwrite the MC POT
+                else { 
+                    confignames[p] = match_name + "_" + variation_str;
+                    std::cout << red  <<"New MC POT config to search for is: " << confignames.at(p) << reset << std::endl;
+                }
+                
+                
             }
         }
 
@@ -351,7 +378,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             // If matched then overwrite the POT config for the MC to the variation
             if (confignames.at(p) == match_name){
                 confignames[p] = match_name + "_" + variation_str;
-                std::cout << red << "New MC POT config to search for is: " << confignames.at(p) << reset <<std::endl;
+                std::cout << red << "New Intrinsic POT config to search for is: " << confignames.at(p) << reset <<std::endl;
             }
         }
     
@@ -442,6 +469,38 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         std::cout << "Using Correction factor for ext"<< std::endl;
     }
 
+    // Set output file names for fake data  ----------
+    
+    if (std::string(mc_file_name) != "empty" && isfakedata){
+        // Use the MC stream, but output the file with the name data
+        mc_file_name_out      = Form("nuexsec_data_run%s_%s.root", run_period, fakedataname);
+        mc_tree_file_name_out = Form("nuexsec_selected_tree_data_run%s_%s.root", run_period, fakedataname);
+
+        std::cout  <<yellow << "Output filename will be overwritten with name: "      << mc_file_name_out << reset <<  std::endl;
+        std::cout <<yellow << "Output tree filename will be overwritten with name: " << mc_tree_file_name_out << reset <<  std::endl;
+    }
+
+    if (std::string(ext_file_name) != "empty" && isfakedata){
+        // Use the MC stream, but output the file with the name data
+        ext_file_name_out      = Form("nuexsec_ext_run%s_fake.root", run_period);
+        ext_tree_file_name_out = Form("nuexsec_selected_tree_ext_run%s_fake.root", run_period);
+
+        std::cout  <<yellow << "Output filename will be overwritten with name: "      << ext_file_name_out << reset <<  std::endl;
+        std::cout <<yellow << "Output tree filename will be overwritten with name: " << ext_tree_file_name_out << reset <<  std::endl;
+    }
+
+    if (std::string(dirt_file_name) != "empty" && isfakedata){
+        // Use the MC stream, but output the file with the name data
+        dirt_file_name_out      = Form("nuexsec_dirt_run%s_fake.root", run_period);
+        dirt_tree_file_name_out = Form("nuexsec_selected_tree_dirt_run%s_fake.root", run_period);
+
+        std::cout  <<yellow << "Output filename will be overwritten with name: "      << dirt_file_name_out << reset <<  std::endl;
+        std::cout <<yellow << "Output tree filename will be overwritten with name: " << dirt_tree_file_name_out << reset <<  std::endl;
+    }
+
+    // ---------
+
+
     // Pi0 correction
     pi0_correction = _pi0_correction;
     if (pi0_correction == 0){
@@ -456,12 +515,29 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
 
     // Set the scale factors
     if (strcmp(run_period, "1") == 0){
+
+        // For fake data adjust these scale factors
+        if (isfakedata){
+            config_v.at(k_Run1_Data_trig)  = 1.0;
+            config_v.at(k_Run1_EXT_trig)   = 0.98;
+            config_v.at(k_Run1_Dirt_POT)   = 0.75*config_v.at(k_Run1_Data_POT);
+        }
+
         mc_scale_factor     = config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_MC_POT);
         dirt_scale_factor   = 0.75*config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_Dirt_POT);
         ext_scale_factor    = 0.98*config_v.at(k_Run1_Data_trig) / config_v.at(k_Run1_EXT_trig);
         intrinsic_weight    = config_v.at(k_Run1_MC_POT)    / config_v.at(k_Run1_Intrinsic_POT);
     }
     else if (strcmp(run_period, "3") == 0){
+
+        // For fake data adjust these scale factors
+        if (isfakedata){
+            config_v.at(k_Run3_Data_trig)  = 1.0;
+            config_v.at(k_Run3_EXT_trig)   = 0.98;
+            config_v.at(k_Run3_Dirt_POT)   = 0.35*config_v.at(k_Run3_Data_POT);
+        }
+
+
         mc_scale_factor     = config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_MC_POT);
         dirt_scale_factor   = 0.35*config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_Dirt_POT);
         ext_scale_factor    = 0.98*config_v.at(k_Run3_Data_trig) / config_v.at(k_Run3_EXT_trig);
@@ -471,6 +547,27 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         std::cout << "Error Krish... You havent specified the run period!" << std::endl;
         std::cout << usage <<  usage2 << usage3 << std::endl;
         exit(1);
+    }
+
+    if (std::string(run_period) == "1"){
+        std::cout << "\033[0;32m-------------------------------" << std::endl;
+        std::cout << red << "POT Read In:\n" << green <<
+        "Data POT:         "   << config_v.at(k_Run1_Data_POT)     << "\n" <<
+        "Data Triggers:    "   << config_v.at(k_Run1_Data_trig)    << "\n" <<
+        "MC POT:           "   << config_v.at(k_Run1_MC_POT)       << "\n" <<
+        "Dirt POT:         "   << config_v.at(k_Run1_Dirt_POT)     << "\n" <<
+        "EXT HW Triggers:  "   << config_v.at(k_Run1_EXT_trig)     << std::endl;
+        std::cout << "-------------------------------\033[0m" << std::endl;
+    }
+    else if (std::string(run_period) == "3"){
+        std::cout << "\033[0;32m-------------------------------" << std::endl;
+        std::cout << red << "POT Read In:\n" << green <<
+        "Data POT:         "   << config_v.at(k_Run3_Data_POT)     << "\n" <<
+        "Data Triggers:    "   << config_v.at(k_Run3_Data_trig)    << "\n" <<
+        "MC POT:           "   << config_v.at(k_Run3_MC_POT)       << "\n" <<
+        "Dirt POT:         "   << config_v.at(k_Run3_Dirt_POT)     << "\n" <<
+        "EXT HW Triggers:  "   << config_v.at(k_Run3_EXT_trig)     << std::endl;
+        std::cout << "-------------------------------\033[0m" << std::endl;
     }
 
     std::cout << "\033[0;32m-------------------------------" << std::endl;
@@ -578,7 +675,24 @@ template void Utility::CheckWeight<float>(float   &weight);
 double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv, int interaction){
 
     // Always give weights of 1 to the data
-    if (type == k_data || type == k_ext) return 1.0;
+    if (type == k_data) return 1.0;
+
+    if (type == k_ext){
+        
+        // If not fake data then keep ext weights to 1.0;
+        if (!isfakedata){
+            return 1.0;
+        }
+        // Weight ext events to zero for fake data
+        else {
+            return 0.0;
+        }
+    }
+
+    // Weight dirt events to zero for fake data
+    if (type == k_dirt && isfakedata){
+        return 0.0;
+    }
 
     double weight = 1.0;
 

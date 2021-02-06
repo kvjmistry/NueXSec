@@ -38,7 +38,7 @@ class TreeHelper{
     // ~TreeHelper(); 
 
     // The output file
-    TFile* f_nuexsec;
+    TFile* f_nuexsec_tree;
 
     // Class instances
     Utility _util;

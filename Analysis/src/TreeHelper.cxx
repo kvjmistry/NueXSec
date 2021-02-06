@@ -19,7 +19,8 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
         
         // File not already open, open the file
         if (!gROOT->GetListOfFiles()->FindObject( file_name.c_str() ) ) {
-            f_nuexsec = new TFile( file_name.c_str(), "UPDATE");
+            f_nuexsec_tree = new TFile( file_name.c_str(), "UPDATE");
+            f_nuexsec_tree->cd();
         }
 
         // Create the TTree
@@ -37,7 +38,8 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
 
         // File not already open, open the file
         if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
-            f_nuexsec = new TFile(file_name.c_str(), "UPDATE");
+            f_nuexsec_tree = new TFile(file_name.c_str(), "UPDATE");
+            f_nuexsec_tree->cd();
         }
 
         // Create the TTree
@@ -54,7 +56,8 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
         
         // File not already open, open the file
         if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
-            f_nuexsec = new TFile(file_name.c_str(), "UPDATE");
+            f_nuexsec_tree = new TFile(file_name.c_str(), "UPDATE");
+            f_nuexsec_tree->cd();
         }
 
         // Create the TTree
@@ -71,7 +74,8 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
 
         // File not already open, open the file
         if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
-            f_nuexsec = new TFile(file_name.c_str(), "UPDATE");
+            f_nuexsec_tree = new TFile(file_name.c_str(), "UPDATE");
+            f_nuexsec_tree->cd();
         }
 
         // Create the TTree
@@ -187,14 +191,19 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
 // -----------------------------------------------------------------------------
 void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
 
-    f_nuexsec->cd();
+    f_nuexsec_tree->cd();
 
     run                      = SC.run;
     subrun                   = SC.sub;
     event                    = SC.evt;
     gen                      = SC.is_signal;
     passed_selection         = _passed_selection;
-    classification           = SC.classification.first;
+    
+    if (_util.isfakedata)
+        classification           = "data";
+    else
+        classification           = SC.classification.first;
+    
     weight                   = SC.cv_weight;
     true_energy              = SC.nu_e;
     reco_energy              = SC.reco_e;
@@ -261,7 +270,7 @@ void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
 // -----------------------------------------------------------------------------
 void TreeHelper::Fill_dedxVars(SliceContainer &SC, std::pair<std::string, int> _classification, std::string _cut, double _weight){
 
-    f_nuexsec->cd();
+    f_nuexsec_tree->cd();
 
     classification = _classification.first;
     weight = _weight;
@@ -308,7 +317,7 @@ void TreeHelper::Fill_dedxVars(SliceContainer &SC, std::pair<std::string, int> _
 // -----------------------------------------------------------------------------
 void TreeHelper::WriteTree(int type){
 
-    f_nuexsec->cd();
+    f_nuexsec_tree->cd();
 
     if (std::string(_util.intrinsic_mode) == "intrinsic")
         nue_tree->Write("",TObject::kOverwrite);
@@ -328,7 +337,7 @@ void TreeHelper::WriteTree(int type){
 // -----------------------------------------------------------------------------
 void TreeHelper::Fill_counters(std::vector<double> counter_v, bool bool_use_mc, bool bool_use_ext, bool bool_use_data, bool bool_use_dirt){
 
-    f_nuexsec->cd();
+    f_nuexsec_tree->cd();
 
     if (bool_use_mc){
         count_nue_cc_qe  = counter_v.at(_util.k_count_nue_cc_qe);

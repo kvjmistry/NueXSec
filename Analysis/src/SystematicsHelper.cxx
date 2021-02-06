@@ -1813,8 +1813,10 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
 
             _util.Draw_Data_POT(c, Data_POT, 0.52, 0.92, 0.52, 0.92);
 
-            
-            c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_data_mc_comparison_%s_no_ratio.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), error_type.at(err_lab).c_str() ));
+            if (_util.zoom)
+                c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_data_mc_comparison_%s_no_ratio_zoom.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), error_type.at(err_lab).c_str() ));
+            else
+                c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_data_mc_comparison_%s_no_ratio.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), error_type.at(err_lab).c_str() ));
             delete c;
             delete h_dataxsec;
             delete h_mcxsec;

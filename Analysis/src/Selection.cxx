@@ -81,13 +81,13 @@ void Selection::Initialise(Utility _utility){
         // Initialise all the data slice container
         data_SC.Initialise(data_tree, _util.k_data, _util);
 
+        // Initialise the Tree Helper
+        _thelper.at(_util.k_data).Initialise(_util.k_data, _util.data_tree_file_name_out, _util);
+
         // Initialise the histogram helper
         if (!_util.slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, _util.data_file_name_out, _util);
         if (!_util.slim) _hhelper.at(_util.k_data).InitHistograms();
         
-        // Initialise the Tree Helper
-        _thelper.at(_util.k_data).Initialise(_util.k_data, "empty", _util);
-
         data_tree_total_entries = data_tree->GetEntries();
         std::cout << "Total Data Events:         " << data_tree_total_entries << std::endl;
 
@@ -104,13 +104,13 @@ void Selection::Initialise(Utility _utility){
         // Initialise all the data slice container
         ext_SC.Initialise(ext_tree, _util.k_ext, _util);
 
+        // Initialise the Tree Helper
+        _thelper.at(_util.k_ext).Initialise(_util.k_ext, _util.ext_tree_file_name_out, _util);
+
         // Initialise the histogram helper
         if (!_util.slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, _util.ext_file_name_out, _util);
         if (!_util.slim) _hhelper.at(_util.k_ext).InitHistograms();
         
-        // Initialise the Tree Helper
-        _thelper.at(_util.k_ext).Initialise(_util.k_ext, "empty", _util);
-
         ext_tree_total_entries = ext_tree->GetEntries();
         std::cout << "Total EXT Events:        " << ext_tree_total_entries << std::endl;
 
@@ -127,12 +127,14 @@ void Selection::Initialise(Utility _utility){
         // Initialise all the data slice container
         dirt_SC.Initialise(dirt_tree, _util.k_dirt, _util);
 
+        // Initialise the Tree Helper
+        _thelper.at(_util.k_dirt).Initialise(_util.k_dirt, _util.dirt_tree_file_name_out, _util);
+
         // Initialise the histogram helper
         if (!_util.slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, _util.dirt_file_name_out ,_util);
         if (!_util.slim) _hhelper.at(_util.k_dirt).InitHistograms();
         
-        // Initialise the Tree Helper
-        _thelper.at(_util.k_dirt).Initialise(_util.k_dirt, "empty", _util);
+        
 
         dirt_tree_total_entries = dirt_tree->GetEntries();
         std::cout << "Total Dirt Events:         " << dirt_tree_total_entries << std::endl;

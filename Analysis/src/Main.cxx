@@ -33,6 +33,7 @@ int main(int argc, char *argv[]){
     "\033[0;33m[--slim]\033[0m                                               \033[0;32mWhen this extension is added, the histogram helper class is not initalised and no histograms will be filled or saved. This is to speed up the selection code if you just want to run the selection.\033[0m\n\n"
     "\033[0;33m[--intrinsic <intrinsic mode>]\033[0m                         \033[0;32mWhen this is on, we overwrite the signal events that get written to file with events from an intrinsic file. Events are also weighted by an additional intrinsic factor. Must be used with --mc option. Options are intrinsic.\033[0m\n\n"
     "\033[0;33m[--tunemec]\033[0m                                            \033[0;32mApply a 1.5 scale factor to MEC events. Default is off \033[0m\n\n"
+    "\033[0;33m[--fake <fake data name>]\033[0m                              \033[0;32mConfigure input file as fake data also give it a name of the fake data. This weights all ext and dirt events to zero. \033[0m\n\n"
     // "\033[0;33m[--verbose <verbose level>]\033[0m                            \033[0;32mDoes not print the selection cut results, 1 (default) currently prints everything\033[0m\n\n"
     "-------------------------------------------------------"
     "\n\nTo print the results of the selection, run: \n\n"

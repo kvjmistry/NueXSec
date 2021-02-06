@@ -430,7 +430,7 @@ void UtilityPlotter::OptimiseBins(){
         increment_size = 0.5;
     }
      else if (var == "elec_cang"){
-        nbins = 6;
+        nbins = 5;
         lower_bin = -1.0;
         upper_bin = 1.0;
         increment_size = 0.005;
@@ -470,8 +470,8 @@ void UtilityPlotter::OptimiseBins(){
             }
 
             if (bin == 0 && var == "elec_cang"){
-                bool fake = true;
-                GetFitResult(mean, sigma, -1.0, 0.6, tree, true, fake, true, var);
+                // bool fake = true;
+                GetFitResult(mean, sigma, -1.0, 0.6, tree, true, converged, true, var);
                 lower_bin = 0.6;
                 break;
             }
@@ -493,7 +493,8 @@ void UtilityPlotter::OptimiseBins(){
 
             // Since the fit doesnt want to converge for elec_E for the last bin, lets just draw it anyway
             if (bin == nbins-1){
-                GetFitResult(mean, sigma, lower_bin, upper_bin, tree, true, converged, false, var);
+                bool fake = true;
+                GetFitResult(mean, sigma, lower_bin, upper_bin, tree, true, fake, true, var);
                 break;
             }
 
@@ -1710,7 +1711,10 @@ void UtilityPlotter::TestModelDependence(){
 
     _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.52, 0.92, 0.52, 0.92);
 
-    c->Print(Form("plots/run%s/Models/%s/DataModelComparison.pdf", _util.run_period, _util.xsec_var));
+    if (_util.zoom)
+        c->Print(Form("plots/run%s/Models/%s/DataModelComparison_zoom.pdf", _util.run_period, _util.xsec_var));
+    else
+        c->Print(Form("plots/run%s/Models/%s/DataModelComparison.pdf", _util.run_period, _util.xsec_var));
 
     fxsec->Close();
 
@@ -2061,7 +2065,10 @@ void UtilityPlotter::CompareUnfoldedModels(){
 
     leg->Draw();
     
-    c->Print(Form("plots/run%s/Models/%s/DataModelUnfoldedComparison.pdf", _util.run_period, _util.xsec_var));
+    if (_util.zoom)
+        c->Print(Form("plots/run%s/Models/%s/DataModelUnfoldedComparison_zoom.pdf", _util.run_period, _util.xsec_var));
+    else
+        c->Print(Form("plots/run%s/Models/%s/DataModelUnfoldedComparison.pdf", _util.run_period, _util.xsec_var));
 
 }
 // -----------------------------------------------------------------------------

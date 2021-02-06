@@ -175,6 +175,7 @@ public:
 
     // Bins for reco shr cos beta
     std::vector<double> reco_shr_bins_cang = {-1.0, 0.6, 0.81, 0.91, 0.95, 0.98, 1.0};
+    // std::vector<double> reco_shr_bins_cang = {-1.0, 0.6, 0.81, 0.91, 0.95, 1.0};
 
     // Fine truth Binning
     std::vector<double> true_shr_bins = { 0.0, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.15, 2.3, 2.6, 3.2, 6.0};
@@ -205,31 +206,35 @@ public:
     bool use_gpvm                  = false; // choose whether you are on the gpvm or Krish's personal laptop
 
     // inputs 
-    char * mc_file_name          = (char *)"empty";
-    char * ext_file_name         = (char *)"empty";
-    char * data_file_name        = (char *)"empty";
-    char * dirt_file_name        = (char *)"empty";
-    char * mc_file_name_out      = (char *)"empty";
-    char * ext_file_name_out     = (char *)"empty";
-    char * data_file_name_out    = (char *)"empty";
-    char * dirt_file_name_out    = (char *)"empty";
-    char * variation             = (char *)"empty";
-    char * variation_file_name   = (char *)"empty";
-    char * mc_tree_file_name_out = (char *)"empty";
-    char * hist_file_name        = (char *)"empty";
-    char * tree_file_name        = (char *)"empty";
-    char * run_period            = (char *)"empty";
-    char * sysmode               = (char *)"default";
-    char * xsecmode              = (char *)"default";
-    char * xsec_rw_mode          = (char *)"default"; // choose whether to reweight by cut or the final selection
-    char * xsec_var              = (char *)"elec_E";  // What variable to do the cross section as a function of
-    char * xsec_labels           = (char *)"all";
-    char * uplotmode             = (char *)"default";
-    char * intrinsic_mode        = (char *)"default"; // choose whether to override the nue component to accomodate the intrinsic nue sample
-    char * sysplot               = (char *)"tot";     // what systematic uncertainty to plot on the CV histograms
-    char * xsec_smear_mode       = (char *)"er";    // what smearing do we want to apply to the measurement? mcc8 = Marco's smearing, response = smearing using a response matrix and compare event rates
-    char * xsec_bin_mode         = (char *)"standard"; // Choose whether to use standard binning (reco = truth) or fine truth binning 
-    char * scale_bins            = (char *)"width"; // Choose whether to use scale the histograms by bin width. Options are standard or width
+    char * mc_file_name            = (char *)"empty";
+    char * ext_file_name           = (char *)"empty";
+    char * data_file_name          = (char *)"empty";
+    char * dirt_file_name          = (char *)"empty";
+    char * mc_file_name_out        = (char *)"empty";
+    char * ext_file_name_out       = (char *)"empty";
+    char * data_file_name_out      = (char *)"empty";
+    char * dirt_file_name_out      = (char *)"empty";
+    char * variation               = (char *)"empty";
+    char * variation_file_name     = (char *)"empty";
+    char * mc_tree_file_name_out   = (char *)"empty";
+    char * ext_tree_file_name_out  = (char *)"empty";
+    char * data_tree_file_name_out = (char *)"empty";
+    char * dirt_tree_file_name_out = (char *)"empty";
+    char * hist_file_name          = (char *)"empty";
+    char * tree_file_name          = (char *)"empty";
+    char * run_period              = (char *)"empty";
+    char * sysmode                 = (char *)"default";
+    char * xsecmode                = (char *)"default";
+    char * xsec_rw_mode            = (char *)"default";  // choose whether to reweight by cut or the final selection
+    char * xsec_var                = (char *)"elec_E";   // What variable to do the cross section as a function of
+    char * xsec_labels             = (char *)"all";
+    char * uplotmode               = (char *)"default";
+    char * intrinsic_mode          = (char *)"default";  // choose whether to override the nue component to accomodate the intrinsic nue sample
+    char * sysplot                 = (char *)"tot";      // what systematic uncertainty to plot on the CV histograms
+    char * xsec_smear_mode         = (char *)"er";       // what smearing do we want to apply to the measurement? mcc8 = Marco's smearing, response = smearing using a response matrix and compare event rates
+    char * xsec_bin_mode           = (char *)"standard"; // Choose whether to use standard binning (reco = truth) or fine truth binning 
+    char * scale_bins              = (char *)"width";    // Choose whether to use scale the histograms by bin width. Options are standard or width
+    char * fakedataname            = (char *)"empty";
     int num_events{-1};
     int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
     int _weight_tune{1}; // Use the GENIE Tune
@@ -238,7 +243,8 @@ public:
     int _weight_ext{1};  // Weight the EXT events
     int _pi0_correction{1};  // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
 
-    bool zoom{false};  // bool to decide whether to zoom in on the plots
+    bool zoom{false};       // bool to decide whether to zoom in on the plots
+    bool isfakedata{false}; // bool for using MC as fake data
 
 
     // Weight configurations

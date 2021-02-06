@@ -278,7 +278,7 @@ void CrossSectionHelper::LoopEvents(){
                 // Data event
                 if (*classification == "data"){
 
-                    if (cv_weight != 1.0) std::cout << "Error weight for data is not 1, this means your weighting the data... bad!"<< std::endl;
+                    if (cv_weight != 1.0 && !_util.isfakedata) std::cout << "Error weight for data is not 1, this means your weighting the data... bad!"<< std::endl;
                     
                     // Fill histograms
                     if (std::string(_util.xsecmode) != "txtlist"){
@@ -919,7 +919,7 @@ void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg,
         h_xsec->Add(h_sel,         1);
     }
     
-    
+    // Subtract the backgrounds
     if (_var != k_var_trueX){
         h_xsec->Add(h_bkg_clone,  -1);
         h_xsec->Add(h_ext_clone,  -1);
