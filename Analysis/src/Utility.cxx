@@ -161,6 +161,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             
             variation = argv[i+2];
             mc_file_name = argv[i+1];
+            isvariation = true;
             
             mc_file_name_out      = Form("nuexsec_mc_run%s_%s.root", run_period, variation);
             mc_tree_file_name_out = Form("nuexsec_selected_tree_mc_run%s_%s.root", run_period, variation);
@@ -333,56 +334,70 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
 
     std::string variation_str = variation;
 
-    // We also want to overwrite the data POT in the case of fake data
-    if (isfakedata)
-        variation_str = std::string(fakedataname);
-
     // Check the variaition mode setting and see if we want to overwrite the POT
     if (overwritePOT){
 
-        // Loop over the POT config names and overwrite the name of the CV MC POT
-        for (unsigned int p = 0; p < confignames.size(); p++){
-            
-            std::string match_name;
-            
-            if (isfakedata)
-                match_name = Form("Run%s_Data_POT", run_period);
-            else
-                match_name = Form("Run%s_MC_POT", run_period);
-            
-            // If matched then overwrite the POT config for the variation
-            if (confignames.at(p) == match_name){
+        if (isvariation){
+            // Loop over the POT config names and overwrite the name of the CV MC POT
+            for (unsigned int p = 0; p < confignames.size(); p++){
                 
-                // If fake data mode we overwrite the data POT number instead
-                if (isfakedata){
-                    confignames[p] = Form("Run%s_MC_POT_%s", run_period, variation_str.c_str());
-                    std::cout << red  <<"New Data POT config to search for is: " << confignames.at(p) << reset << std::endl;
-                }
-                // Else overwrite the MC POT
-                else { 
+                std::string match_name = Form("Run%s_MC_POT", run_period);
+                
+                // If matched then overwrite the POT config for the variation
+                if (confignames.at(p) == match_name){
                     confignames[p] = match_name + "_" + variation_str;
                     std::cout << red  <<"New MC POT config to search for is: " << confignames.at(p) << reset << std::endl;
                 }
+            }
+
+            // We also want to set the intrinsic nue POT so the weighting is done correctly
+            // Loop over the POT config names and overwrite the name of the CV MC POT
+            for (unsigned int p = 0; p < confignames.size(); p++){
                 
+                std::string match_name = Form("Run%s_Intrinsic_POT", run_period);
+                // std::string match_name = "Run1_Intrinsic_POT";
                 
+                // If matched then overwrite the POT config for the MC to the variation
+                if (confignames.at(p) == match_name){
+                    confignames[p] = match_name + "_" + variation_str;
+                    std::cout << red << "New Intrinsic POT config to search for is: " << confignames.at(p) << reset <<std::endl;
+                }
             }
         }
 
-        // We also want to set the intrinsic nue POT so the weighting is done correctly
-        // Loop over the POT config names and overwrite the name of the CV MC POT
-        for (unsigned int p = 0; p < confignames.size(); p++){
-            
-            std::string match_name = Form("Run%s_Intrinsic_POT", run_period);
-            // std::string match_name = "Run1_Intrinsic_POT";
-            
-            // If matched then overwrite the POT config for the MC to the variation
-            if (confignames.at(p) == match_name){
-                confignames[p] = match_name + "_" + variation_str;
-                std::cout << red << "New Intrinsic POT config to search for is: " << confignames.at(p) << reset <<std::endl;
+        // We also want to overwrite the data POT in the case of fake data
+        if (isfakedata){
+            variation_str = std::string(fakedataname);
+
+            // Loop over the POT config names and overwrite the name of the CV MC POT
+            for (unsigned int p = 0; p < confignames.size(); p++){
+                
+                std::string match_name = Form("Run%s_Data_POT", run_period);
+                
+                // If matched then overwrite the POT config for the variation
+                if (confignames.at(p) == match_name){
+                    
+                    // If fake data mode we overwrite the data POT number instead
+                    confignames[p] = Form("Run%s_MC_POT_%s", run_period, variation_str.c_str());
+                    std::cout << red  <<"New Data POT config to search for is: " << confignames.at(p) << reset << std::endl;
+                }
+            }
+
+            // We also want to set the intrinsic nue POT so the weighting is done correctly
+            // Loop over the POT config names and overwrite the name of the CV MC POT
+            for (unsigned int p = 0; p < confignames.size(); p++){
+                
+                std::string match_name = Form("Run%s_Intrinsic_POT", run_period);
+                // std::string match_name = "Run1_Intrinsic_POT";
+                
+                // If matched then overwrite the POT config for the MC to the variation
+                if (confignames.at(p) == match_name){
+                    confignames[p] = match_name + "_" + variation_str;
+                    std::cout << red << "New Intrinsic POT config to search for is: " << confignames.at(p) << reset <<std::endl;
+                }
             }
         }
-    
-    
+
     }
 
     // Get the congigureation parameters
@@ -526,7 +541,16 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         mc_scale_factor     = config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_MC_POT);
         dirt_scale_factor   = 0.75*config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_Dirt_POT);
         ext_scale_factor    = 0.98*config_v.at(k_Run1_Data_trig) / config_v.at(k_Run1_EXT_trig);
-        intrinsic_weight    = config_v.at(k_Run1_MC_POT)    / config_v.at(k_Run1_Intrinsic_POT);
+        
+        // If fake data then scale to the fake data POT
+        if (isfakedata){
+            intrinsic_weight    = config_v.at(k_Run1_Data_POT)    / config_v.at(k_Run1_Intrinsic_POT);
+        }
+        // Otherwise scale to the MC POT
+        else {
+            intrinsic_weight    = config_v.at(k_Run1_MC_POT)    / config_v.at(k_Run1_Intrinsic_POT);
+        }
+        
     }
     else if (strcmp(run_period, "3") == 0){
 
@@ -541,7 +565,15 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         mc_scale_factor     = config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_MC_POT);
         dirt_scale_factor   = 0.35*config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_Dirt_POT);
         ext_scale_factor    = 0.98*config_v.at(k_Run3_Data_trig) / config_v.at(k_Run3_EXT_trig);
-        intrinsic_weight    = config_v.at(k_Run3_MC_POT)    / config_v.at(k_Run3_Intrinsic_POT);
+        
+        // If fake data then scale to the fake data POT
+        if (isfakedata){
+            intrinsic_weight    = config_v.at(k_Run3_Data_POT)    / config_v.at(k_Run3_Intrinsic_POT);
+        }
+        // Otherwise scale to the MC POT
+        else {
+            intrinsic_weight    = config_v.at(k_Run3_MC_POT)    / config_v.at(k_Run3_Intrinsic_POT);
+        }
     }
     else {
         std::cout << "Error Krish... You havent specified the run period!" << std::endl;

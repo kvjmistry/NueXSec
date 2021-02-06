@@ -198,12 +198,7 @@ void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
     event                    = SC.evt;
     gen                      = SC.is_signal;
     passed_selection         = _passed_selection;
-    
-    if (_util.isfakedata)
-        classification           = "data";
-    else
-        classification           = SC.classification.first;
-    
+    classification           = SC.classification.first;
     weight                   = SC.cv_weight;
     true_energy              = SC.nu_e;
     reco_energy              = SC.reco_e;

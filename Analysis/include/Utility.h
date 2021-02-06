@@ -243,8 +243,9 @@ public:
     int _weight_ext{1};  // Weight the EXT events
     int _pi0_correction{1};  // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
 
-    bool zoom{false};       // bool to decide whether to zoom in on the plots
-    bool isfakedata{false}; // bool for using MC as fake data
+    bool zoom{false};        // bool to decide whether to zoom in on the plots
+    bool isfakedata{false};  // bool for using MC as fake data
+    bool isvariation{false}; // Is some different input to the selection
 
 
     // Weight configurations

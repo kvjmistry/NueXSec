@@ -534,8 +534,12 @@ void Selection::SavetoFile(){
             _hhelper.at(_util.k_mc).WriteTEfficiency();
             _hhelper.at(_util.k_mc).WriteTrue();
             _hhelper.at(_util.k_mc).WriteInteractions();
-            _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
             _hhelper.at(_util.k_mc).Write_2DSigBkgHists();
+            
+            if (_util.isfakedata)
+                _hhelper.at(_util.k_mc).WriteReco(_util.k_data);
+            else
+                _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
         }
         
         if (std::string(_util.intrinsic_mode) == "default") {
