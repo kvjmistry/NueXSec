@@ -35,7 +35,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
     Initalise();
 
     // Only do this stuff for the CV -- unless we really want these plots for each detvar, then we need to change the file paths!!
-    if (std::string(_util.variation) == "empty") {
+    if (std::string(_util.variation) == "empty" && !_util.isfakedata) {
 
         // Create a set of strings for creating a dynamic directory
         // Directory structure that is created will take the form plots/<cut>/
@@ -281,10 +281,12 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
     for (unsigned int i = 0; i < _util.k_cuts_MAX; i++) {
 
         // Create the directories
-        if (std::string(_util.variation) == "empty")
-            _util.CreateDirectory("/cuts/" + _util.cut_dirs.at(i));
-        else
+        if (_util.isvariation)
             _util.CreateDirectory("/detvar/" + std::string(_util.variation) + "/cuts/" + _util.cut_dirs.at(i));
+        else if (_util.isfakedata)
+            _util.CreateDirectory("/detvar/fake_" + std::string(_util.fakedataname) + "/cuts/" + _util.cut_dirs.at(i));
+        else
+            _util.CreateDirectory("/cuts/" + _util.cut_dirs.at(i));
 
         // Call the Make stack function for all the plots we want
         CallMakeStack( i, Data_POT);
@@ -409,7 +411,10 @@ void HistogramPlotter::Draw_VarMode(TCanvas *c ) {
     TPaveText *pt;
 
     pt = new TPaveText(0.3215, 0.936, 0.3215, 0.936, "NDC");
-    pt->AddText(_util.variation);
+    if (_util.isfakedata)
+        pt->AddText(Form("fake_%s", _util.fakedataname));
+    else 
+        pt->AddText(_util.variation);
     pt->SetBorderSize(0);
     pt->SetFillColor(0);
     pt->SetFillStyle(0);
@@ -417,6 +422,9 @@ void HistogramPlotter::Draw_VarMode(TCanvas *c ) {
     pt->SetTextColor(kViolet + 2);
     
     if (std::string(_util.variation) != "empty")
+        pt->Draw();
+
+    if (_util.isfakedata)
         pt->Draw();
 }
 // -----------------------------------------------------------------------------
@@ -749,9 +757,6 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     double integral_mc_ext{0.0}; // Integral of MC + EXT -- needs to be removed
     double y_maximum{0};         // y max for scaling histogram scale
 
-    std::vector<double> chi2;
-    TPaveText *pt_bottom;
-
     TH1D *h_ratio;
     TH1D *h_ratio_error;
     TH1D *h_mc_ext_sum;
@@ -1076,11 +1081,6 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     else if (logy && found_data)
         topPad->SetLogy();
 
-    // Calculate the chi2
-    if (found_data) {
-        TH1D *h_last = (TH1D *)h_stack->GetStack()->Last();
-        chi2 = Chi2Calc(h_last, hist.at(k_plot_data), _area_norm, hist_integrals.at(k_plot_data));
-    }
 
     // Now create the ratio of data to MC ----------------------------------
     if (found_data) {
@@ -1153,25 +1153,6 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
             h_ratio->GetXaxis()->CenterLabels(kTRUE);
         }
 
-        // Now doing this stuff on the bottom pad
-        //x_min, y_min, x_max, y_max
-        // Reduced chi2
-        pt_bottom = new TPaveText(.12, .80, .30, .96, "NBNDC");
-        std::ostringstream o_string_bottom;
-        o_string_bottom.precision(3);
-        o_string_bottom << std::fixed;
-        o_string_bottom << float(chi2.at(0) * chi2.at(3));
-        std::string convert_string_bottom = o_string_bottom.str();
-
-        std::ostringstream o_string3_bottom;
-        o_string3_bottom << int(chi2.at(3));
-        std::string convert_string3_bottom = o_string3_bottom.str();
-
-        std::string chi2_string_bottom = "#chi_{Stat}^{2}/DOF=(" + convert_string_bottom + "/" + convert_string3_bottom + ")";
-        pt_bottom->AddText(chi2_string_bottom.c_str());
-        pt_bottom->SetFillStyle(0);
-        pt_bottom->SetBorderSize(0);
-        // pt_bottom->Draw();
     }
 
     // Draw the run period on the plot
@@ -1203,10 +1184,13 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         return;
     }
 
-    if (std::string(_util.variation) == "empty")
-        c->Print(Form("plots/run%s/%s", _util.run_period, print_name_str.c_str()));
-    else
+    if (_util.isvariation)
         c->Print(Form("plots/run%s/detvar/%s/%s", _util.run_period, _util.variation, print_name_str.c_str()));
+    else if (_util.isfakedata)
+        c->Print(Form("plots/run%s/detvar/fake_%s/%s", _util.run_period, _util.fakedataname, print_name_str.c_str()));
+    else
+        c->Print(Form("plots/run%s/%s", _util.run_period, print_name_str.c_str()));
+        
 
     delete c;
 

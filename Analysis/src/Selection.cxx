@@ -543,10 +543,18 @@ void Selection::SavetoFile(){
         }
         
         if (std::string(_util.intrinsic_mode) == "default") {
-            _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_mc);
             _hhelper.at(_util.k_mc).WriteFlash();
-            _hhelper.at(_util.k_mc).WritePiZero(_util.k_mc);
-            _hhelper.at(_util.k_mc).WriteNuMu(_util.k_mc);
+            
+            if (_util.isfakedata){
+                _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_data);
+                _hhelper.at(_util.k_mc).WritePiZero(_util.k_data);
+                _hhelper.at(_util.k_mc).WriteNuMu(_util.k_data);
+            }
+            else {
+                _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_mc);
+                _hhelper.at(_util.k_mc).WritePiZero(_util.k_mc);
+                _hhelper.at(_util.k_mc).WriteNuMu(_util.k_mc);
+            }
         }
 
         _thelper.at(_util.k_mc).WriteTree(_util.k_mc);

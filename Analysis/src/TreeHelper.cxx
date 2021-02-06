@@ -24,11 +24,21 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
         }
 
         // Create the TTree
-        tree             = new TTree("mc_tree",                "mc_tree");
-        nue_tree         = new TTree("mc_nue_tree",            "mc_nue_tree");
-        dedx_tree        = new TTree("mc_dedx_tree",           "mc_dedx_tree");
-        counter_tree     = new TTree("mc_counter_tree",        "mc_counter_tree");
-        nue_counter_tree = new TTree("mc_nue_counter_tree",    "mc_nue_counter_tree");
+        if (_util.isfakedata){
+            tree             = new TTree("data_tree",                "data_tree");
+            nue_tree         = new TTree("data_nue_tree",            "data_nue_tree");
+            dedx_tree        = new TTree("data_dedx_tree",           "data_dedx_tree");
+            counter_tree     = new TTree("data_counter_tree",        "data_counter_tree");
+            nue_counter_tree = new TTree("data_nue_counter_tree",    "data_nue_counter_tree");
+        }
+        else {
+            tree             = new TTree("mc_tree",                "mc_tree");
+            nue_tree         = new TTree("mc_nue_tree",            "mc_nue_tree");
+            dedx_tree        = new TTree("mc_dedx_tree",           "mc_dedx_tree");
+            counter_tree     = new TTree("mc_counter_tree",        "mc_counter_tree");
+            nue_counter_tree = new TTree("mc_nue_counter_tree",    "mc_nue_counter_tree");
+        }
+        
     }
     else if (type == _util.k_data){
         

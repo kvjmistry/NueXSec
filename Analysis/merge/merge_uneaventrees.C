@@ -254,7 +254,7 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
 
                 // If intrinsic mode is turned on and we are using the default mc, then skip the fill for generated events which are already covered
                 if (intrinsic_mode && k == 1 && _gen){
-                            continue;
+                     continue;
                 }
 
                 run              = _run;

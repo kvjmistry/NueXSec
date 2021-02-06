@@ -1017,4 +1017,7 @@ void SliceContainer::SetThresholdEvent(){
             classification = std::make_pair("thr_nuebar",_util.k_thr_nuebar);
         }
     }
+
+    if (_util.isfakedata)
+        classification = std::make_pair("data",_util.k_leg_data);
 }
