@@ -737,7 +737,6 @@ void SystematicsHelper::InitialiseReweightingMode(){
     _util.CreateDirectory("/Systematics/Covariance");
     for (unsigned int cov = 0; cov < h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).size(); cov++){
         SaveCovMatrix(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(cov),         Form("plots/run%s/Systematics/Covariance/run%s_%s_cov.pdf",         _util.run_period, _util.run_period,systematic_names.at(cov).c_str()));
-
     }
 
     // Create the directories
@@ -761,23 +760,6 @@ void SystematicsHelper::InitialiseReweightingMode(){
     int ndof;
     _util.CalcChiSquared(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot), chi, ndof, pval);
     _util.CalcChiSquared(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot), chi, ndof, pval);
-
-    // // Print the sqrt of the diagonals of the covariance matrix
-    // // loop over rows
-    // for (int row = 1; row < h_cov_v.at(k_err_sys)->GetNbinsX()+1; row++) {
-        
-    //     // Loop over columns
-    //     for (int col = 1; col < h_cov_v.at(k_err_sys)->GetNbinsY()+1; col++) {
-            
-    //         // Only set the bin content of the diagonals
-    //         double bin_diag = cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->GetBinContent(row);
-
-    //         // 0.01 converts each percentage back to a number. We multiply this by the cv to get the deviate
-    //         if (row == col) {
-    //                 std::cout << 100 * std::sqrt(h_cov_v.at(k_err_sys)->GetBinContent(row, col)) / bin_diag << std::endl;
-    //         }
-    //     }
-    // }
 
     // Export the results to file
     ExportResult(f_nuexsec);
@@ -2089,14 +2071,6 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
             
     }
 
-    // Correlation Matrix
-    _util.CalcCorrelation(h_CV, cov, cor);
-    
-    // Fractional Covariance Matrix
-    TH2D *frac_cov = (TH2D*) cov->Clone("h_frac_cov");
-    _util.CalcCFracCovariance(h_CV, frac_cov);
-
-
     gStyle->SetPalette(kBlueGreenYellow);
     
     // Store the covariance matrices so we can add them and get the total
@@ -2145,6 +2119,10 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
             label == "WireModThetaYZ_withSigmaSplines" ||
             label == "WireModThetaYZ_withoutSigmaSplines" ||
             label == "WireModdEdX" ){
+            
+            // Convert the Covariance Matrix-- switching from detvar cv deviations to CV deviation
+            ConvertCovarianceUnits(cov, h_CV, cv_hist_vec.at(var).at(_type));
+           
             h_cov_v.at(var).at(_type).at(k_err_detvar)->Add(cov);
             h_cov_v.at(var).at(_type).at(k_err_tot)->Add(cov);
             h_cov_v.at(var).at(_type).at(k_err_sys)->Add(cov);
@@ -2195,10 +2173,16 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
         std::cout << "Unknown variation specified: " << label << std::endl;
         delete cov;
         delete cor;
-        delete frac_cov;
+        // delete frac_cov;
         return;
     }
 
+     // Correlation Matrix
+    _util.CalcCorrelation(h_CV, cov, cor);
+    
+    // Fractional Covariance Matrix
+    TH2D *frac_cov = (TH2D*) cov->Clone("h_frac_cov");
+    _util.CalcCFracCovariance(h_CV, frac_cov);
 
     if ( (var == k_var_reco_el_E && _type == k_xsec_mcxsec) || (var == k_var_true_el_E && _type == k_xsec_mcxsec_smear)){
 
@@ -2508,15 +2492,38 @@ void SystematicsHelper::FillStatVector(){
         }
     }
 
+    // ---
+
     // Add the data stat to the total mc cov matrix
+    // Convert the Covariance Matrix-- switching from detvar Data CV deviations to MC CV deviation
+    ConvertCovarianceUnits(h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_stat), 
+                           cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), 
+                           cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec));
+    
     h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_stat));
 
+    // ---
+
     // Add the mc stat to the total data cov matrix
+    // Convert the Covariance Matrix-- switching from MC CV deviations to Data CV deviation
+    ConvertCovarianceUnits(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_stat),
+                           cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec),
+                           cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec));
+    
     h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_stat));
+
+    // ---
 
     // If we are using event rate mode, then we add the true mc xsec smeared covariance matrix (sys) to the total too
     if (std::string(_util.xsec_smear_mode) == "er" || std::string(_util.xsec_smear_mode) == "wiener"){
+        
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_sys));
+        
+        // Convert the Covariance Matrix-- switching from MC CV deviations to Data CV deviation
+        ConvertCovarianceUnits(h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_sys),
+                               cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec),
+                               cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec));
+        
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_sys));
     }
 
@@ -2548,13 +2555,13 @@ void SystematicsHelper::PrintUncertaintySummary(){
 
     // Loop over the variables
     for (unsigned int var = 0; var < vars.size(); var++ ){
-        if (vars.at(var) == "true_el_E") continue; // Skip the true var which doesnt make much sense
+        if (var == k_var_true_el_E) continue; // Skip the true var which doesnt make much sense
 
         std::cout <<"----------------------------------------------" << std::endl;
         std::cout <<"Differential Variable: " << vars.at(var) <<"\n"<< std::endl;
         
         // Loop over the bins
-        for (unsigned int bin = 0; bin < v_err.at(k_err_genie_uni).at(var).at(k_xsec_mcxsec).size(); bin++ ){
+        for (unsigned int bin = 0; bin < v_err.front().at(var).at(k_xsec_mcxsec).size(); bin++ ){
             
             std::cout << "Bin: " << bin+1 << " GENIE Unisim:       " <<std::sqrt(v_err.at(k_err_genie_uni).at(var).at(k_xsec_mcxsec)  .at(bin)) << " \%"<< std::endl;
             std::cout << "Bin: " << bin+1 << " GENIE Multisim:     " <<std::sqrt(v_err.at(k_err_genie_multi).at(var).at(k_xsec_mcxsec).at(bin)) << " \%"<< std::endl;
@@ -2566,15 +2573,51 @@ void SystematicsHelper::PrintUncertaintySummary(){
             std::cout << "Bin: " << bin+1 << " POT Counting:       " <<std::sqrt(v_err.at(k_err_pot).at(var).at(k_xsec_mcxsec)        .at(bin)) << " \%"<< std::endl;
             std::cout << "Bin: " << bin+1 << " MC Stats:           " <<std::sqrt(v_err.at(k_err_mcstats).at(var).at(k_xsec_mcxsec)    .at(bin)) << " \%"<< std::endl;
             std::cout << "Bin: " << bin+1 << " Pi0 Tune:           " <<std::sqrt(v_err.at(k_err_pi0).at(var).at(k_xsec_mcxsec)        .at(bin)) << " \%"<< std::endl;
+            
+            if ( (std::string(_util.xsec_smear_mode) == "er" || std::string(_util.xsec_smear_mode) == "wiener") && var == k_var_reco_el_E)
+                std::cout << "Bin: " << bin+1 << " Smearing:           " << std::sqrt(v_err.at(k_err_sys).at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(bin)) << " \%"<< std::endl;
+
             std::cout << std::endl;
             std::cout << "Bin: " << bin+1 << " Tot Data X-Sec Stat:                 " <<std::sqrt(v_err.at(k_err_stat).at(var).at(k_xsec_dataxsec).at(bin)) << " \%"<< std::endl;
             std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Stat:                   " <<std::sqrt(v_err.at(k_err_stat).at(var).at(k_xsec_mcxsec).at(bin))   << " \%"<< std::endl;
             std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Sys:                    " <<std::sqrt(v_err.at(k_err_sys) .at(var).at(k_xsec_mcxsec)   .at(bin)) << " \%"<< std::endl;
-            std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Uncertainty:            " <<std::sqrt(v_err.at(k_err_stat).at(var).at(k_xsec_dataxsec).at(bin) + v_err.at(k_err_sys).at(var).at(k_xsec_mcxsec)   .at(bin)) << " \%"<< std::endl;
+            
+            if ( (std::string(_util.xsec_smear_mode) == "er" || std::string(_util.xsec_smear_mode) == "wiener") && var == k_var_reco_el_E){
+                std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Uncertainty:            " <<std::sqrt(v_err.at(k_err_stat).at(var).at(k_xsec_dataxsec).at(bin) + v_err.at(k_err_stat).at(var).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_sys).at(var).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_sys).at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(bin)) << " \%"<< std::endl;
+            }
+            else {
+                std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Uncertainty:            " <<std::sqrt(v_err.at(k_err_stat).at(var).at(k_xsec_dataxsec).at(bin) + v_err.at(k_err_stat).at(var).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_sys).at(var).at(k_xsec_mcxsec).at(bin)) << " \%"<< std::endl;
+            }
             std::cout <<"\n--" << std::endl;       
         }
     }
     std::cout <<"----------------------------------------------" << std::endl;
+
+    // Print the sqrt of the diagonals of the covariance matrix -- should be equivalent
+    bool print_debug = false;
+    if (print_debug){
+        // loop over rows
+        for (int i = 1; i < h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->GetNbinsX()+1; i++) {
+            
+                // Only set the bin content of the diagonals
+                double bin_diag = cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->GetBinContent(i);
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_genie_uni)->GetBinContent(i, i)) / bin_diag   << " genie_uni" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_genie_multi)->GetBinContent(i, i)) / bin_diag << " genie_multi" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_hp)->GetBinContent(i, i)) / bin_diag          << " hp" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_beamline)->GetBinContent(i, i)) / bin_diag    << " beamline" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_dirt)->GetBinContent(i, i)) / bin_diag        << " dirt" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_pot)->GetBinContent(i, i)) / bin_diag         << " pot" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_reint)->GetBinContent(i, i)) / bin_diag       << " reint" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_detvar)->GetBinContent(i, i)) / bin_diag      << " detvar" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_pi0)->GetBinContent(i, i)) / bin_diag         << " pi0" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_mcstats)->GetBinContent(i, i)) / bin_diag     << " mcstats" << std::endl;
+                
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_stat)->GetBinContent(i, i)) / bin_diag << " data stat" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_sys)->GetBinContent(i, i)) / bin_diag << " sys" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->GetBinContent(i, i)) / bin_diag << " tot" << std::endl;
+                std::cout << std::endl;
+        }
+    }
 }
 // -----------------------------------------------------------------------------
 void SystematicsHelper::InitialiseUncertaintyVectors(){
@@ -3662,3 +3705,22 @@ void SystematicsHelper::ExportResult(TFile* f){
     f_sys_out->Close();
 
 }
+// -----------------------------------------------------------------------------
+void SystematicsHelper::ConvertCovarianceUnits(TH2D* &h_cov, TH1D *h_input, TH1D* h_output){
+
+    // Loop over the bins of the covariance matrix and convert deviations to percentages
+    for (int i = 1; i < h_cov->GetNbinsY()+1; i++) {
+
+        for (int j = 1; j < h_cov->GetNbinsX()+1; j++) {
+            double conversion;
+            
+            if (h_input->GetBinContent(i) * h_input->GetBinContent(j) == 0)
+                conversion  = 0.0;
+            else
+                conversion = (h_output->GetBinContent(i) * h_output->GetBinContent(j) * h_cov->GetBinContent(i,j) / (h_input->GetBinContent(i) * h_input->GetBinContent(j)));
+            
+            h_cov->SetBinContent(i, j, conversion);
+        }
+    }
+}
+// -----------------------------------------------------------------------------

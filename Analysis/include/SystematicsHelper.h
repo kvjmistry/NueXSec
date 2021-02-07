@@ -133,6 +133,9 @@ class SystematicsHelper{
     // Write the results to a file for ease of storage
     void ExportResult(TFile* f);
     // -------------------------------------------------------------------------
+    // Change units of covariane matrix so we can add them
+    void ConvertCovarianceUnits(TH2D* &h_cov, TH1D *h_input, TH1D* h_output);
+    // -------------------------------------------------------------------------
 
 
 

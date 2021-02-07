@@ -138,6 +138,9 @@ public:
     // Calulate a chi squared using a covarinace matrix, for a model to data
     void CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov, double &chi, int &ndof, double &pval);
     // -------------------------------------------------------------------------
+    // Calculate a chi squared using a covarinace matrix, for a model to data with no correlations between bins
+    void CalcChiSquaredNoCorr(TH1D* h_model, TH1D* h_data, TH2D* cov, double &chi, int &ndof, double &pval);
+    // -------------------------------------------------------------------------
     // Set the axes names of the cross section plots
     void SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vector<std::string> &var_labels_events,
                       std::vector<std::string> &var_labels_eff,  std::string &smear_hist_name, std::vector<std::string> &vars, double  &xsec_scale);

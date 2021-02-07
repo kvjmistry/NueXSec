@@ -59,23 +59,23 @@ fi
 if [ "$1" == "weight" ]; then
 
   # Electron Energy
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel unisim  --xsec_smear $sm --xsecbins standard --xsecvar elec_cang
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel ppfx    --xsec_smear $sm --xsecbins standard --xsecvar elec_cang
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel genie   --xsec_smear $sm --xsecbins standard --xsecvar elec_cang
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel reint   --xsec_smear $sm --xsecbins standard --xsecvar elec_cang
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel mcstats --xsec_smear $sm --xsecbins standard --xsecvar elec_cang
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel unisim  --xsec_smear $sm --xsecbins standard --xsecvar elec_ang
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel ppfx    --xsec_smear $sm --xsecbins standard --xsecvar elec_ang
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel genie   --xsec_smear $sm --xsecbins standard --xsecvar elec_ang
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel reint   --xsec_smear $sm --xsecbins standard --xsecvar elec_ang
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel mcstats --xsec_smear $sm --xsecbins standard --xsecvar elec_ang
 
   # Re-run the detvar xsec
   source run_selection_mcc9_run1.sh allvarxsec
 
-  ./nuexsec --run 1 --sys reweight --xsec_smear $sm --binscaling width --xsecvar elec_cang
+  ./nuexsec --run 1 --sys reweight --xsec_smear $sm --binscaling width --xsecvar elec_ang
   # ./nuexsec --run 1 --sys reweight --xsec_smear wiener --binscaling standard
 
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_mec.root       --var dummy mec       --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_nogtune.root   --var dummy nogtune   --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang 
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_nopi0tune.root --var dummy nopi0tune --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_FLUGG.root     --var dummy FLUGG     --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang 
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_tune1.root     --var dummy tune1     --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_mec.root       --var dummy mec       --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_nogtune.root   --var dummy nogtune   --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang 
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_nopi0tune.root --var dummy nopi0tune --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_FLUGG.root     --var dummy FLUGG     --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang 
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_tune1.root     --var dummy tune1     --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang
 
   # Electron Angle
   # ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel unisim  --xsecvar elec_ang --xsec_smear $sm
@@ -160,7 +160,7 @@ if [ "$1" == "allvarxsec" ]; then
   # run the above script for every det variation 
   for i in "${var[@]}"
   do
-    ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$i.root --var dummy $i --xsecmode default --xsecvar elec_cang --xsec_smear $sm --xsecbins standard
+    ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$i.root --var dummy $i --xsecmode default --xsecvar elec_ang --xsec_smear $sm --xsecbins standard
   done
 
 fi
@@ -252,5 +252,7 @@ if [ "$1" == "faketune1" ]; then
   root -l -b -q 'merge/merge_uneaventrees.C("1", false, "files/trees/nuexsec_selected_tree_mc_run1.root", "files/trees/nuexsec_selected_tree_data_run1_tune1.root", "files/trees/nuexsec_selected_tree_ext_run1_fake.root","files/trees/nuexsec_selected_tree_dirt_run1_fake.root", "faketune1")'
 
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_faketune1.root --fake tune1 --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_faketune1.root --fake tune1 --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_faketune1.root --fake tune1 --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang
 
 fi

@@ -454,11 +454,23 @@ void CrossSectionHelper::LoopEvents(){
                     h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_fine)->Add(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_fine), 1);
                     h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_fine)->Scale(1.0 / (integrated_flux * mc_flux_scale_factor * N_target_MC));
                     h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_fine)->Scale(1.0e39);
+
+                    // If the crosssec is a function of angle then scale again by a factor of 100
+                    if (std::string(_util.xsec_var) == "elec_ang"){
+                        h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_smear)->Scale(100);
+                        h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_fine)->Scale(100);
+                    }
                 }
 
                 // Scale the histograms to avoid working with really small numbers
                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec)->Scale(1.0e39);
                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dataxsec)->Scale(1.0e39);
+
+                // If the crosssec is a function of angle then scale again by a factor of 100
+                if (std::string(_util.xsec_var) == "elec_ang" && var != k_var_integrated){
+                    h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec)->Scale(100);
+                    h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dataxsec)->Scale(100);
+                }
 
                 // if (var == 0) std::cout << reweighter_labels.at(label) << ": " << _util.red << h_cross_sec.at(label).at(uni).at(k_var_integrated).at(k_xsec_mcxsec)  ->Integral() << _util.reset<< " x10^-39 cm2/nucleon" << std::endl;
 

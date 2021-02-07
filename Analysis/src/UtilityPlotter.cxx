@@ -1685,15 +1685,20 @@ void UtilityPlotter::TestModelDependence(){
     
     double chi, pval;
     int ndof;
+    std::cout << "CV" << std::endl;
     _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_CV), h_dataxsec, h_cov, chi, ndof, pval);
+    // _util.CalcChiSquaredNoCorr(h_mcxsec_reco_model.at(k_model_CV), h_dataxsec, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_CV),  Form("MC (CV) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     
+    std::cout << "1.5 MEC" << std::endl;
     _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_mec), h_dataxsec, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_mec),  Form("MC (1.5 #times MEC) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     
+    std::cout << "No gTune" << std::endl;
     _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_nogtune), h_dataxsec, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_nogtune),  Form("MC (no gTune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     
+    std::cout << "no pi0 tune" << std::endl;
     _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_nopi0tune), h_dataxsec, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_nopi0tune),  Form("MC (no #pi^{0} Tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     
@@ -1701,6 +1706,7 @@ void UtilityPlotter::TestModelDependence(){
     // _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_FLUGG), h_dataxsec, h_cov, chi, ndof, pval);
     // leg->AddEntry(h_mcxsec_reco_model.at(k_model_FLUGG),  Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
 
+    std::cout << "Tune 1" << std::endl;
     _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_tune1), h_dataxsec, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_tune1),  Form("MC (Tune 1) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     
@@ -1992,21 +1998,27 @@ void UtilityPlotter::CompareUnfoldedModels(){
     // Now calculate the chi-squared
     double chi, pval;
     int ndof;
+
+    std::cout << "CV" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_CV), unf, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_CV),   Form("MC (CV) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
     
+    std::cout << "1.5 MEC" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_mec), unf, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_mec),   Form("MC (1.5 #times MEC) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
     
+    std::cout << "No gTune" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_nogtune), unf, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_nogtune),   Form("MC (no gTune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
     
+    std::cout << "no pi0 tune" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_nopi0tune), unf, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_nopi0tune),   Form("MC (no #pi^{0} Tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
     
     // _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_FLUGG), unf, h_cov, chi, ndof, pval);
     // leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_FLUGG),   Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
+    std::cout << "Tune 1" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_tune1), unf, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_tune1),   Form("MC (Tune 1) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
@@ -2029,7 +2041,7 @@ void UtilityPlotter::CompareUnfoldedModels(){
         h_mcxsec_true_model_smear.at(k_model_CV)->SetMaximum(7);
     }
     else if (std::string(_util.xsec_var) == "elec_ang"){
-        h_mcxsec_true_model_smear.at(k_model_CV)->SetMaximum(0.15);
+        h_mcxsec_true_model_smear.at(k_model_CV)->SetMaximum(15);
     }
     else if (std::string(_util.xsec_var) == "elec_cang"){
         h_mcxsec_true_model_smear.at(k_model_CV)->SetMaximum(30.0);

@@ -1319,7 +1319,7 @@ void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov, double &chi
     for (int i = 0; i < h_cov_clone->GetNbinsX(); i++) {
 
         // loop over columns
-        for (int j = 0; j < h_cov_clone->GetNbinsX(); j++) {
+        for (int j = 0; j < h_cov_clone->GetNbinsY(); j++) {
             cov_m[i][j] = h_cov_clone->GetBinContent(i+1, j+1);
         }
     
@@ -1332,7 +1332,7 @@ void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov, double &chi
     // x = data, mu = model, E^(-1) = inverted covariance matrix 
     chi = 0;
     for (int i = 0; i < h_cov_clone->GetNbinsX(); i++) {
-        for (int j = 0; j < h_cov_clone->GetNbinsX(); j++) {
+        for (int j = 0; j < h_cov_clone->GetNbinsY(); j++) {
             chi += (h_data_clone->GetBinContent(i+1) - h_model_clone->GetBinContent(i+1)) * inverse_cov_m[i][j] * (h_data_clone->GetBinContent(j+1) - h_model_clone->GetBinContent(j+1));
         }
     }
@@ -1341,7 +1341,54 @@ void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov, double &chi
     pval = TMath::Prob(chi, ndof);
 
     std::cout << blue << "Chi2/dof: " << chi << "/" << h_data_clone->GetNbinsX() << " = " << chi/double(ndof)  << reset <<  std::endl;
-    std::cout << red << "p-value: " <<  pval << reset <<  std::endl;
+    std::cout << red << "p-value: " <<  pval << reset << "\n" <<  std::endl;
+
+    delete h_model_clone;
+    delete h_data_clone;
+    delete h_cov_clone;
+
+}
+// -----------------------------------------------------------------------------
+void Utility::CalcChiSquaredNoCorr(TH1D* h_model, TH1D* h_data, TH2D* cov, double &chi, int &ndof, double &pval){
+
+    // Clone them so we can scale them 
+    TH1D* h_model_clone = (TH1D*)h_model->Clone();
+    TH1D* h_data_clone  = (TH1D*)h_data->Clone();
+    TH2D* h_cov_clone   = (TH2D*)cov->Clone();
+
+
+
+    // Getting covariance matrix in TMatrix form
+    TMatrix cov_m;
+    cov_m.Clear();
+    cov_m.ResizeTo(h_cov_clone->GetNbinsX(), h_cov_clone->GetNbinsX());
+
+    // loop over rows
+    for (int i = 0; i < h_cov_clone->GetNbinsX(); i++) {
+
+        // loop over columns
+        for (int j = 0; j < h_cov_clone->GetNbinsY(); j++) {
+            cov_m[i][j] = h_cov_clone->GetBinContent(i+1, j+1);
+        }
+    
+    }
+
+    // Inverting the covariance matrix
+    // TMatrix inverse_cov_m = cov_m.Invert();
+
+    // Calculating the chi2 = Summation_ij{ (x_i - mu_j)*E_ij^(-1)*(x_j - mu_j)  }
+    // x = data, mu = model, E^(-1) = inverted covariance matrix 
+    chi = 0;
+    for (int i = 0; i < h_cov_clone->GetNbinsX(); i++) {
+        // std::cout <<h_model_clone->GetBinContent(i+1) << "  " << 100 *  std::sqrt(cov_m[i][i]) / h_model_clone->GetBinContent(i+1) << std::endl;
+        chi += (h_data_clone->GetBinContent(i+1) - h_model_clone->GetBinContent(i+1)) * (h_data_clone->GetBinContent(i+1) - h_model_clone->GetBinContent(i+1)) / cov_m[i][i];
+    }
+
+    ndof = h_data_clone->GetNbinsX();
+    pval = TMath::Prob(chi, ndof);
+
+    std::cout << blue << "Chi2/dof (no corr): " << chi << "/" << h_data_clone->GetNbinsX() << " = " << chi/double(ndof)  << reset <<  std::endl;
+    std::cout << red << "p-value (no corr): " <<  pval << reset <<  std::endl;
 
     delete h_model_clone;
     delete h_data_clone;
@@ -1390,8 +1437,8 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
     else if (std::string(xsec_var) =="elec_ang"){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                           ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg];#frac{d#sigma}{d#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-39} cm^{2}/deg/nucleon]",
-                           ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg];#frac{d#sigma}{d#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-39} cm^{2}/deg/nucleon]"
+                           ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg];#frac{d#sigma}{d#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-37} cm^{2}/deg/nucleon]",
+                           ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg];#frac{d#sigma}{d#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-37} cm^{2}/deg/nucleon]"
                           };
 
 
@@ -1410,10 +1457,10 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
         vars = {"integrated", "reco_el_ang", "true_el_ang" };
 
         if (std::string(xsec_smear_mode) == "mcc8"){
-            xsec_scale = 0.15; // X-Section
+            xsec_scale = 15.0; // X-Section
         }
         else {
-            xsec_scale = 0.05; // Event Rate
+            xsec_scale = 5.0; // Event Rate
 
             if (std::string(scale_bins) == "standard")
                 xsec_scale*=0.3;

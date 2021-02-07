@@ -41,7 +41,7 @@ void WienerSVD::DoUnfolding(Int_t C_type, Float_t Norm_type, TH1D *sig, TH1D *me
     TMatrixD UnfoldCov(n,n);
     
     // Create the histograms
-    smear     = new TH2D("smear",     "Additional Smearing Matirx;True e#lower[-0.5]{-} + e^{+} Energy [GeV];True e#lower[-0.5]{-} + e^{+} Energy [GeV]",n,Nuedges,n,Nuedges);
+    smear     = new TH2D("smear",     "Additional Smearing Matrix;True e#lower[-0.5]{-} + e^{+} Energy [GeV];True e#lower[-0.5]{-} + e^{+} Energy [GeV]",n,Nuedges,n,Nuedges);
     wiener    = new TH1D("wiener",    "Wiener Filter Vector",n,0,n);
     unfcov    = new TH2D("unfcov",    "Unfolded spectrum covariance;True e#lower[-0.5]{-} + e^{+} Energy [GeV];True e#lower[-0.5]{-} + e^{+} Energy [GeV]", n, Nuedges, n, Nuedges);
     unf       = new TH1D("unf",       "unfolded spectrum",n,Nuedges);
