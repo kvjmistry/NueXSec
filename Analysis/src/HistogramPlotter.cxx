@@ -87,7 +87,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_eff_nu_phi",                  false, false, "True #nu_{e} + #bar{#nu}_{e} #phi [deg]; Efficiency",             "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "nu_phi" );
         MakeEfficiencyPlotByCut("h_eff_elec_theta",              false, false, "True e#lower[-0.5]{-} + e^{+} #theta [deg]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_theta" );
         MakeEfficiencyPlotByCut("h_eff_elec_phi",                false, false, "True e#lower[-0.5]{-} + e^{+} #phi [deg]; Efficiency",            "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_phi" );
-        MakeEfficiencyPlotByCut("h_eff_effective_ang",           false, false, "True e#lower[-0.5]{-} + e^{+} beta [deg]; Efficiency",            "True e#lower[-0.5]{-} + e^{+} Events in FV",       "eff_ang" );
+        MakeEfficiencyPlotByCut("h_eff_effective_ang",           false, false, "True e#lower[-0.5]{-} + e^{+} #beta [deg]; Efficiency",            "True e#lower[-0.5]{-} + e^{+} Events in FV",       "eff_ang" );
         
         MakeEfficiencyPlotByCut("h_eff_proton_multi",            false, false, "True #nu_{e} + #bar{#nu}_{e} Proton Multi.; Efficiency",          "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "prot_multi" );
         MakeEfficiencyPlotByCut("h_eff_proton_multi_nue",        false, false, "True #nu_{e} Proton Multi.; Efficiency",                          "True #nu_{e} Events in FV",                        "prot_multi_nue" );
@@ -209,6 +209,9 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
             Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_completeness_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_shr_energy_completeness", cut_type, false);
             Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_resolution_reco_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_shr_energy_resolution_reco", cut_type, false);
             Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_resolution_true_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_shr_energy_resolution_true", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_elec_true_beta_reco_beta_%s.pdf",   _util.run_period, cut_type.c_str()), "h_elec_true_beta_reco_beta",   cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_elec_true_theta_reco_theta_%s.pdf", _util.run_period, cut_type.c_str()), "h_elec_true_theta_reco_theta", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_elec_true_phi_reco_phi_%s.pdf",     _util.run_period, cut_type.c_str()), "h_elec_true_phi_reco_phi",     cut_type, false);
 
             // Normalised by reco (row)
             Save2DHistsNorm(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s_row_norm_reco.pdf",     _util.run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type, true, "reco");
@@ -1335,7 +1338,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Calibrated energy of the leading shower
     MakeStack("h_reco_shower_energy_cali", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Reco Energy Leading Shower [GeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.5, "Reco Energy Leading Shower [GeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shower_energy_cali.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
     
     // Calibrated energy of all the showers with uneaven bins
@@ -1514,12 +1517,12 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Angle between vector from NuMI targ to shower direction
     MakeStack("h_reco_effective_angle", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "#beta [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.5, "#beta [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_effective_angle.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Cosine of the Angle between vector from NuMI targ to shower direction
     MakeStack("h_reco_effective_cosangle", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "cos(#beta)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.5, "cos(#beta)",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_effective_cosangle.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Track LLR PID score

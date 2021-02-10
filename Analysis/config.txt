@@ -92,7 +92,7 @@ Run1_MC_POT_WireModdEdX 3.66871e+20 // new tune
 Run1_MC_POT_FLUGG 2.32136e+21 
 -
 // Run 1 Det Var for tune1 -- this is actually cv genie with dk2nu for now
-Run1_MC_POT_tune1 2.32136e+21 
+Run1_MC_POT_tune1 6.0093e+20 
 -
 // Run 1 Det var CV intrinsic nue sample
 // Run1_Intrinsic_POT_CV 2.68294e+22

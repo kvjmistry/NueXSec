@@ -1477,13 +1477,13 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
 
 
         var_labels_events = {";;Entries",
-                             ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}}; Entries",
-                             ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}}; Entries"
+                             ";cos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}}; Entries",
+                             ";cos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}}; Entries"
                             };
 
         var_labels_eff = {";;Efficiency",
-                          ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}}; Efficiency",
-                          ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}}; Efficiency"
+                          ";cos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}}; Efficiency",
+                          ";cos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}}; Efficiency"
                          };
 
         smear_hist_name = ";cos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}};cos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}}";

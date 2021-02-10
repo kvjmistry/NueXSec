@@ -1745,6 +1745,13 @@ void UtilityPlotter::CompareDataCrossSections(){
     h_dataxsec->SetMarkerStyle(20);
     h_dataxsec->SetMarkerSize(0.5);
 
+    h_temp  = (TH1D*)fxsec->Get(Form("%s/er/h_data_xsec_stat_reco", _util.xsec_var));
+    TH1D* h_dataxsec_stat = (TH1D*)h_temp->Clone();
+    h_dataxsec_stat->SetDirectory(0);
+    h_dataxsec_stat->SetLineColor(kBlack);
+    h_dataxsec_stat->SetMarkerStyle(20);
+    h_dataxsec_stat->SetMarkerSize(0.5);
+
     fxsec->Close();
 
     // Load in the cross section output
@@ -1755,21 +1762,32 @@ void UtilityPlotter::CompareDataCrossSections(){
     TH1D* h_datasec_reco_mec = (TH1D*)h_temp->Clone();
     h_datasec_reco_mec->SetLineColor(kGreen+2);
     h_datasec_reco_mec->Scale(1.0, "width");
+    h_datasec_reco_mec->SetLineWidth(2);
 
     // Data X Sec No Genie Tune
     h_temp  = (TH1D*)fxsec->Get(Form("nogtune/%s/h_run1_CV_0_%s_data_xsec", vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
     TH1D* h_datasec_reco_nogtune = (TH1D*)h_temp->Clone();
     h_datasec_reco_nogtune->SetLineColor(kBlue+2);
     h_datasec_reco_nogtune->Scale(1.0, "width");
+    h_datasec_reco_nogtune->SetLineWidth(2);
+    
+    // Data X Sec Tune 1
+    h_temp  = (TH1D*)fxsec->Get(Form("tune1/%s/h_run1_CV_0_%s_data_xsec", vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+    TH1D* h_datasec_reco_tune1 = (TH1D*)h_temp->Clone();
+    h_datasec_reco_tune1->SetLineColor(kOrange-1);
+    h_datasec_reco_tune1->Scale(1.0, "width");
+    h_datasec_reco_tune1->SetLineWidth(2);
 
     TCanvas *c = new TCanvas("c", "c", 500, 500);
     c->SetLeftMargin(0.2);
     c->SetBottomMargin(0.15);
     h_dataxsec->GetYaxis()->SetTitleOffset(1.7);
-    h_dataxsec->Draw();
+    h_dataxsec->Draw("E1,X0");
     h_datasec_reco_mec->Draw("hist,same");
     h_datasec_reco_nogtune->Draw("hist,same");
+    h_datasec_reco_tune1->Draw("hist,same");
     h_dataxsec->Draw("E1,same,X0");
+    h_dataxsec_stat->Draw("E1,same,X0");
     
 
     TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
@@ -1778,6 +1796,7 @@ void UtilityPlotter::CompareDataCrossSections(){
     leg->AddEntry(h_dataxsec, "Data (Stat. + Sys.)", "ep");
     leg->AddEntry(h_datasec_reco_mec, "Data with 1.5 #times MEC Model", "l");
     leg->AddEntry(h_datasec_reco_nogtune, "Data with no gTune Model", "l");
+    leg->AddEntry(h_datasec_reco_tune1, "Data with Tune 1 Model", "l");
     leg->Draw();
 
     c->Print(Form("plots/run%s/Models/%s/ModelDataComparison.pdf", _util.run_period, _util.xsec_var));
@@ -1875,6 +1894,9 @@ void UtilityPlotter::CompareSmearing(){
             h_mcxsec_reco_model.at(m)->SetBinError(bin, 0.02*h_mcxsec_reco_model.at(m)->GetBinContent(bin));
         }
     }
+
+    if (_util.zoom && std::string(_util.xsec_var) == "elec_cang")
+        h_mcxsec_reco->GetXaxis()->SetRangeUser(0.6, 1.0);
 
     // Now lets plot
     TCanvas *c = new TCanvas("c", "c", 500, 500);
