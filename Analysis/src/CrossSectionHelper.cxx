@@ -780,7 +780,7 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
                                            std::string _classification, double cv_weight, int uni, int _nu_pdg, double _true_energy, double _numi_ang, int _npi0, double _pi0_e ){
 
     // Weight equal to universe weight times cv weight
-    if (label == "weightsReint" || label == "weightsPPFX" || label == "CV" ){
+    if (label == "weightsReint" || label == "weightsPPFX" || label == "CV" || label == "xsr_scc_Fv3up" || label == "xsr_scc_Fa3up" || label == "xsr_scc_Fv3dn" || label == "xsr_scc_Fa3dn"){
         
         _util.CheckWeight(vec_universes[uni]);
 
@@ -1256,6 +1256,10 @@ void CrossSectionHelper::InitTree(){
     tree->SetBranchAddress("knobNormCCCOHdn",       &knobNormCCCOHdn);
     tree->SetBranchAddress("knobNormNCCOHup",       &knobNormNCCOHup);
     tree->SetBranchAddress("knobNormNCCOHdn",       &knobNormNCCOHdn);
+    tree->SetBranchAddress("knobxsr_scc_Fv3up",     &knobxsr_scc_Fv3up);
+    tree->SetBranchAddress("knobxsr_scc_Fv3dn",     &knobxsr_scc_Fv3dn);
+    tree->SetBranchAddress("knobxsr_scc_Fa3up",     &knobxsr_scc_Fa3up);
+    tree->SetBranchAddress("knobxsr_scc_Fa3dn",     &knobxsr_scc_Fa3dn);
 
 }
 // -----------------------------------------------------------------------------
@@ -1354,6 +1358,18 @@ void CrossSectionHelper::SwitchReweighterLabel(std::string label){
     }
     else if (label == "NormNCCOHdn"){
         vec_universes.push_back(knobNormNCCOHdn);
+    }
+    else if (label == "xsr_scc_Fv3up"){
+        vec_universes.push_back(knobxsr_scc_Fv3up);
+    }
+    else if (label == "xsr_scc_Fv3dn"){
+        vec_universes.push_back(knobxsr_scc_Fv3dn);
+    }
+    else if (label == "xsr_scc_Fa3up"){
+        vec_universes.push_back(knobxsr_scc_Fa3up);
+    }
+    else if (label == "xsr_scc_Fa3dn"){
+        vec_universes.push_back(knobxsr_scc_Fa3dn);
     }
     // This can be the CV or any beamline variation
     else {
@@ -1459,6 +1475,18 @@ void CrossSectionHelper::SwitchReweighterLabel(std::string label, SliceContainer
     else if (label == "NormNCCOHdn"){
         vec_universes.push_back(SC.knobNormNCCOHdn);
     }
+    else if (label == "xsr_scc_Fv3up"){
+        vec_universes.push_back(SC.knobxsr_scc_Fv3up);
+    }
+    else if (label == "xsr_scc_Fv3dn"){
+        vec_universes.push_back(SC.knobxsr_scc_Fv3dn);
+    }
+    else if (label == "xsr_scc_Fa3up"){
+        vec_universes.push_back(SC.knobxsr_scc_Fa3up);
+    }
+    else if (label == "xsr_scc_Fa3dn"){
+        vec_universes.push_back(SC.knobxsr_scc_Fa3dn);
+    }
     // This can be the CV or any beamline variation
     else {
         vec_universes.push_back(1.0);
@@ -1528,6 +1556,10 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 "RPA_CCQE_Reduceddn",
                 "NormCCCOHdn",
                 "NormNCCOHdn",
+                "xsr_scc_Fv3up",
+                "xsr_scc_Fa3up",
+                "xsr_scc_Fv3dn",
+                "xsr_scc_Fa3dn",
                 "Dirtup",
                 "Dirtdn",
                 "POTup",

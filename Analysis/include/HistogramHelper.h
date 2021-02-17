@@ -137,8 +137,10 @@ class HistogramHelper{
         k_reco_hits_ratio_ldg_th,                                               // Ratio hits from leading shower to slice with a minimum hit requirement
         k_reco_shower_score,                                                    // Shower score
         k_reco_track_score,                                                     // Track score
-        k_reco_shower_energy_tot_cali,                                          // Calibrated energy of all the showers
-        k_reco_shower_energy_tot_cali_rebin,                                    // Calibrated energy of all the showers with optimised bins
+        k_reco_effective_angle,                                                 // Angle between vector from target to vertex and shower direction.
+        k_reco_effective_angle_rebin,                                           // Angle between vector from target to vertex and shower direction.
+        k_reco_effective_cosangle,                                              // Cosine of the Angle between vector from target to vertex and shower direction.
+        k_reco_effective_cosangle_rebin,                                        // Cosine of the Angle between vector from target to vertex and shower direction.
         k_reco_shower_energy_cali,                                              // Calibrated energy of just the leading shower 
         k_reco_shower_energy_cali_rebin,                                        // Calibrated energy of just the leading shower with optimised bins
         k_reco_shr_hits_tot,                                                    // Total number of hits for all showers
@@ -188,8 +190,6 @@ class HistogramHelper{
         k_reco_crthitpe,                                                        // CRT hit pe
         k_reco_shr_ang_numi,                                                    // Angle of the reconstructed leading shower relative to the numi beamline
         k_reco_single_bin,                                                      // Just fill with weight. We need this to get the uncertainty on the purity
-        k_reco_effective_angle,                                                 // Angle between vector from target to vertex and shower direction.
-        k_reco_effective_cosangle,                                              // Cosine of the Angle between vector from target to vertex and shower direction.
         k_reco_trk_pid_score,                                                   // The PID score for tracks in the event
         k_TH1D_MAX
     };

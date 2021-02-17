@@ -682,6 +682,9 @@ void SystematicsHelper::InitialiseReweightingMode(){
         // PlotReweightingModeUnisim("RPA_CCQE_Reduced", var, "RPA CCQE Reduced" );
         PlotReweightingModeUnisim("NormCCCOH",        var, "Norm CC COH" );
         PlotReweightingModeUnisim("NormNCCOH",        var, "Norm NC COH" );
+        PlotReweightingModeUnisim("xsr_scc_Fv3",      var, "SCC Fv3" );
+        PlotReweightingModeUnisim("xsr_scc_Fa3",      var, "SCC Fa3" );
+
 
         // Dirt
         PlotReweightingModeUnisim("Dirt",        var, "Dirt" );
@@ -849,6 +852,14 @@ void SystematicsHelper::SetLabelName(std::string label, std::string &label_up, s
         label_dn = label + "up";
     }
     else if  (label == "NormNCCOH"      ){
+        label_up = label + "up";
+        label_dn = label + "up";
+    }
+    else if  (label == "xsr_scc_Fv3"      ){
+        label_up = label + "up";
+        label_dn = label + "up";
+    }
+    else if  (label == "xsr_scc_Fa3"      ){
         label_up = label + "up";
         label_dn = label + "up";
     }
@@ -2084,7 +2095,9 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
         label == "ThetaDelta2NRad"  ||
         label == "RPA_CCQE_Reduced" ||
         label == "NormCCCOH"        ||
-        label == "NormNCCOH"){
+        label == "NormNCCOH"        ||
+        label == "xsr_scc_Fv3"      ||
+        label == "xsr_scc_Fa3"){
             h_cov_v.at(var).at(_type).at(k_err_genie_uni)->Add(cov);
             h_cov_v.at(var).at(_type).at(k_err_tot)->Add(cov);
             h_cov_v.at(var).at(_type).at(k_err_sys)->Add(cov);
@@ -2255,7 +2268,9 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         variation == "ThetaDelta2NRad"  ||
         variation == "RPA_CCQE_Reduced" ||
         variation == "NormCCCOH"        ||
-        variation == "NormNCCOH"){
+        variation == "NormNCCOH"        ||
+        variation == "xsr_scc_Fv3"      ||
+        variation == "xsr_scc_Fa3"){
 
         // Loop over histogram bins
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
@@ -2709,7 +2724,9 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                     "ThetaDelta2NRad",
                     // "RPA_CCQE_Reduced",
                     "NormCCCOH",
-                    "NormNCCOH"
+                    "NormNCCOH",
+                    "xsr_scc_Fv3",
+                    "xsr_scc_Fa3"
                 };
     }
     else if (unisim_type == "DetVar") {
@@ -3044,7 +3061,7 @@ void SystematicsHelper::SetUnisimColours(std::string label, TH1D* h_up, TH1D* h_
         h_up->SetLineColor(46);
         h_dn->SetLineColor(46);
     }
-    else if (label == "Beam_shift_x" || label == "RPA_CCQE_Reduced"  || label == "WireModThetaYZ_withSigmaSplines"){
+    else if (label == "Beam_shift_x" || label == "xsr_scc_Fa3"  || label == "WireModThetaYZ_withSigmaSplines"){
         h_up->SetLineColor(12);
         h_dn->SetLineColor(12);
     }
@@ -3056,14 +3073,13 @@ void SystematicsHelper::SetUnisimColours(std::string label, TH1D* h_up, TH1D* h_
         h_up->SetLineColor(42);
         h_dn->SetLineColor(42);
     }
-    else if (label == "Decay_pipe_Bfield" || label == "LYDown"){
+    else if (label == "Decay_pipe_Bfield" || label == "LYDown" || label == "xsr_scc_Fv3"){
         h_up->SetLineColor(kGreen+2);
         h_dn->SetLineColor(kGreen+2);
     }
     else { 
         std::cout << "Unknown label specified: " << label << std::endl;
     }
-
     h_up->SetLineStyle(1);
     h_dn->SetLineStyle(2);
 
@@ -3091,6 +3107,8 @@ void SystematicsHelper::InitialiseReweightingModeCut(){
         std::make_tuple("RPA_CCQE_Reduced", 2,   "unisim"),
         std::make_tuple("NormCCCOH",        2,   "unisim"),
         std::make_tuple("NormNCCOH",        2,   "unisim"),
+        std::make_tuple("xsr_scc_Fa3",      2,   "unisim"),
+        std::make_tuple("xsr_scc_Fv3",      2,   "unisim"),
         std::make_tuple("Horn1_x",          2,   "unisim"),
         std::make_tuple("Horn_curr",        2,   "unisim"),
         std::make_tuple("Horn1_y",          2,   "unisim"),

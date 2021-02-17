@@ -254,6 +254,8 @@ void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
     knobRPA_CCQE_Reducedup = SC.knobRPA_CCQE_Reducedup;
     knobNormCCCOHup        = SC.knobNormCCCOHup;
     knobNormNCCOHup        = SC.knobNormNCCOHup;
+    knobxsr_scc_Fv3up      = SC.knobxsr_scc_Fv3up;
+    knobxsr_scc_Fa3up      = SC.knobxsr_scc_Fa3up;
     knobRPAdn              = SC.knobRPAdn;
     knobCCMECdn            = SC.knobCCMECdn;
     knobAxFFCCQEdn         = SC.knobAxFFCCQEdn;
@@ -264,6 +266,8 @@ void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
     knobRPA_CCQE_Reduceddn = SC.knobRPA_CCQE_Reduceddn;
     knobNormCCCOHdn        = SC.knobNormCCCOHdn;
     knobNormNCCOHdn        = SC.knobNormNCCOHdn;
+    knobxsr_scc_Fv3dn      = SC.knobxsr_scc_Fv3dn;
+    knobxsr_scc_Fa3dn      = SC.knobxsr_scc_Fa3dn;
 
     // Fill the nue tree
     if (std::string(_util.intrinsic_mode) == "intrinsic")
@@ -481,6 +485,10 @@ void TreeHelper::SetBranches(TTree * tree){
     tree->Branch("knobNormCCCOHdn",       &knobNormCCCOHdn,       "knobNormCCCOHdn/D");
     tree->Branch("knobNormNCCOHup",       &knobNormNCCOHup,       "knobNormNCCOHup/D");
     tree->Branch("knobNormNCCOHdn",       &knobNormNCCOHdn,       "knobNormNCCOHdn/D");
+    tree->Branch("knobxsr_scc_Fv3up",     &knobxsr_scc_Fv3up,     "knobxsr_scc_Fv3up/D");
+    tree->Branch("knobxsr_scc_Fv3dn",     &knobxsr_scc_Fv3dn,     "knobxsr_scc_Fv3dn/D");
+    tree->Branch("knobxsr_scc_Fa3up",     &knobxsr_scc_Fa3up,     "knobxsr_scc_Fa3up/D");
+    tree->Branch("knobxsr_scc_Fa3dn",     &knobxsr_scc_Fa3dn,     "knobxsr_scc_Fa3dn/D");
 
 }
 // -----------------------------------------------------------------------------

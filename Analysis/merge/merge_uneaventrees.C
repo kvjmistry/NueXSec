@@ -84,6 +84,8 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
     double knobRPA_CCQE_Reducedup{0.0}, _knobRPA_CCQE_Reducedup{0.0};
     double knobNormCCCOHup{0.0},        _knobNormCCCOHup{0.0};
     double knobNormNCCOHup{0.0},        _knobNormNCCOHup{0.0};
+    double knobxsr_scc_Fv3up{0.0},      _knobxsr_scc_Fv3up{0.0};
+    double knobxsr_scc_Fa3up{0.0},      _knobxsr_scc_Fa3up{0.0};
     double knobRPAdn{0.0},              _knobRPAdn{0.0};
     double knobCCMECdn{0.0},            _knobCCMECdn{0.0};
     double knobAxFFCCQEdn{0.0},         _knobAxFFCCQEdn{0.0};
@@ -94,6 +96,8 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
     double knobRPA_CCQE_Reduceddn{0.0}, _knobRPA_CCQE_Reduceddn{0.0};
     double knobNormCCCOHdn{0.0},        _knobNormCCCOHdn{0.0};
     double knobNormNCCOHdn{0.0},        _knobNormNCCOHdn{0.0};
+    double knobxsr_scc_Fv3dn{0.0},      _knobxsr_scc_Fv3dn{0.0};
+    double knobxsr_scc_Fa3dn{0.0},      _knobxsr_scc_Fa3dn{0.0};
 
 
 
@@ -173,6 +177,10 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
     outtree->Branch("knobNormCCCOHdn",       &knobNormCCCOHdn);
     outtree->Branch("knobNormNCCOHup",       &knobNormNCCOHup);
     outtree->Branch("knobNormNCCOHdn",       &knobNormNCCOHdn);
+    outtree->Branch("knobxsr_scc_Fv3up",     &knobxsr_scc_Fv3up);
+    outtree->Branch("knobxsr_scc_Fv3dn",     &knobxsr_scc_Fv3dn);
+    outtree->Branch("knobxsr_scc_Fa3up",     &knobxsr_scc_Fa3up);
+    outtree->Branch("knobxsr_scc_Fa3dn",     &knobxsr_scc_Fa3dn);
 
     // Loop over the flles
     for (unsigned int k = 0; k < files.size(); k++){
@@ -245,6 +253,10 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
         trees.at(k)->SetBranchAddress("knobNormCCCOHdn",       &_knobNormCCCOHdn);
         trees.at(k)->SetBranchAddress("knobNormNCCOHup",       &_knobNormNCCOHup);
         trees.at(k)->SetBranchAddress("knobNormNCCOHdn",       &_knobNormNCCOHdn);
+        trees.at(k)->SetBranchAddress("knobxsr_scc_Fv3up",     &_knobxsr_scc_Fv3up);
+        trees.at(k)->SetBranchAddress("knobxsr_scc_Fv3dn",     &_knobxsr_scc_Fv3dn);
+        trees.at(k)->SetBranchAddress("knobxsr_scc_Fa3up",     &_knobxsr_scc_Fa3up);
+        trees.at(k)->SetBranchAddress("knobxsr_scc_Fa3dn",     &_knobxsr_scc_Fa3dn);
 
         int tree_entries = trees.at(k)->GetEntries();
 
@@ -317,6 +329,10 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
                 knobRPA_CCQE_Reduceddn = _knobRPA_CCQE_Reduceddn;
                 knobNormCCCOHdn =        _knobNormCCCOHdn;
                 knobNormNCCOHdn =        _knobNormNCCOHdn;
+                knobxsr_scc_Fv3up =      _knobxsr_scc_Fv3up;
+                knobxsr_scc_Fv3dn =      _knobxsr_scc_Fv3dn;
+                knobxsr_scc_Fa3up =      _knobxsr_scc_Fa3up;
+                knobxsr_scc_Fa3dn =      _knobxsr_scc_Fa3dn;
 
                 outtree->Fill();
         }

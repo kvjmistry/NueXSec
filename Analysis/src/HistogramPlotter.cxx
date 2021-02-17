@@ -851,7 +851,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         }
 
         // Normalse the histograms with uneaven bin widths
-        if (hist_name == "h_reco_shower_energy_cali_rebin"){
+        if (hist_name == "h_reco_shower_energy_cali_rebin" || hist_name == "h_reco_effective_angle_rebin" || hist_name == "h_reco_effective_cosangle_rebin"){
             hist.at(i)->Scale(1, "width");
             // h_stack->GetYaxis()->SetTitle("Entries / GeV");
         }
@@ -1326,11 +1326,6 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               area_norm, false, 1.0, "Track Score",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_track_score.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
-    // Calibrated energy of all the showers
-    MakeStack("h_reco_shower_energy_tot_cali", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Total Calibrated Energy of all Showers [GeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_shower_energy_tot_cali.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
-    
     // Calibrated energy of all the showers with uneaven bins
     MakeStack("h_reco_shower_energy_tot_cali_rebin", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Total Calibrated Energy of all Showers [GeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
@@ -1520,10 +1515,21 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               area_norm, false, 1.5, "#beta [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_effective_angle.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
+    // Angle between vector from NuMI targ to shower direction
+    MakeStack("h_reco_effective_angle_rebin", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.5, "#beta [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_effective_angle_rebin.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
+
     // Cosine of the Angle between vector from NuMI targ to shower direction
     MakeStack("h_reco_effective_cosangle", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.5, "cos(#beta)",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_effective_cosangle.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
+
+
+    // Cosine of the Angle between vector from NuMI targ to shower direction
+    MakeStack("h_reco_effective_cosangle_rebin", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.5, "cos(#beta)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_effective_cosangle_rebin.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Track LLR PID score
     MakeStack("h_reco_trk_pid_score", _util.cut_dirs.at(cut_index).c_str(),

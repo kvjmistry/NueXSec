@@ -61,6 +61,8 @@ class CrossSectionHelper{
     double knobRPA_CCQE_Reducedup{0.0};
     double knobNormCCCOHup{0.0};
     double knobNormNCCOHup{0.0};
+    double knobxsr_scc_Fv3up{0.0};
+    double knobxsr_scc_Fa3up{0.0};
     double knobRPAdn{0.0};
     double knobCCMECdn{0.0};
     double knobAxFFCCQEdn{0.0};
@@ -71,6 +73,8 @@ class CrossSectionHelper{
     double knobRPA_CCQE_Reduceddn{0.0};
     double knobNormCCCOHdn{0.0};
     double knobNormNCCOHdn{0.0};
+    double knobxsr_scc_Fv3dn{0.0};
+    double knobxsr_scc_Fa3dn{0.0};
 
     std::vector<double> vec_universes;
 
@@ -213,6 +217,10 @@ class CrossSectionHelper{
         "RPA_CCQE_Reduceddn",
         "NormCCCOHdn",
         "NormNCCOHdn",
+        "xsr_scc_Fv3up",
+        "xsr_scc_Fa3up",
+        "xsr_scc_Fv3dn",
+        "xsr_scc_Fa3dn",
         "Dirtup",
         "Dirtdn",
         "POTup",

@@ -366,6 +366,10 @@ template<typename T> void SliceContainer::Initialise(T *tree, int type, Utility 
             tree->SetBranchAddress("knobNormCCCOHdn",       &knobNormCCCOHdn);
             tree->SetBranchAddress("knobNormNCCOHup",       &knobNormNCCOHup);
             tree->SetBranchAddress("knobNormNCCOHdn",       &knobNormNCCOHdn);
+            tree->SetBranchAddress("knobxsr_scc_Fv3up",     &knobxsr_scc_Fv3up);
+            tree->SetBranchAddress("knobxsr_scc_Fv3dn",     &knobxsr_scc_Fv3dn);
+            tree->SetBranchAddress("knobxsr_scc_Fa3up",     &knobxsr_scc_Fa3up);
+            tree->SetBranchAddress("knobxsr_scc_Fa3dn",     &knobxsr_scc_Fa3dn);
         }
     }
     

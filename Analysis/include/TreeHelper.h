@@ -96,6 +96,8 @@ class TreeHelper{
     double knobRPA_CCQE_Reducedup;
     double knobNormCCCOHup;
     double knobNormNCCOHup;
+    double knobxsr_scc_Fv3up;
+    double knobxsr_scc_Fa3up;
     double knobRPAdn;
     double knobCCMECdn;
     double knobAxFFCCQEdn;
@@ -106,6 +108,8 @@ class TreeHelper{
     double knobRPA_CCQE_Reduceddn;
     double knobNormCCCOHdn;
     double knobNormNCCOHdn;
+    double knobxsr_scc_Fv3dn;
+    double knobxsr_scc_Fa3dn;
 
 
 

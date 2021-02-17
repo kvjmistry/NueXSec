@@ -525,6 +525,8 @@ public:
     double knobRPA_CCQE_Reducedup{1.0};
     double knobNormCCCOHup{1.0};
     double knobNormNCCOHup{1.0};
+    double knobxsr_scc_Fv3up{1.0};
+    double knobxsr_scc_Fa3up{1.0};
     double knobRPAdn{1.0};
     double knobCCMECdn{1.0};
     double knobAxFFCCQEdn{1.0};
@@ -535,6 +537,8 @@ public:
     double knobRPA_CCQE_Reduceddn{1.0};
     double knobNormCCCOHdn{1.0};
     double knobNormNCCOHdn{1.0};
+    double knobxsr_scc_Fv3dn{1.0};
+    double knobxsr_scc_Fa3dn{1.0};
 
 
     
