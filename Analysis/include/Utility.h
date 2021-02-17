@@ -191,6 +191,11 @@ public:
     // Flux bins are 0.00 ,0.06, 0.125, 0.25, 0.5, 0.75, 1.00, 1.25, 1.50, 1.75, 2.00, 2.25, 2.50, 2.75, 3.00, 3.25, 3.50, 4.00, 5.00
     double energy_threshold = 0.06; // GeV
     double elec_threshold   = 0.12; // GeV
+
+    // For MCC8 values
+    // double energy_threshold = 0.25; // GeV
+    // double elec_threshold   = 0.0; // GeV
+    
     
     bool slim                      = false;
     bool make_histos               = false;

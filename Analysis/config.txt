@@ -88,10 +88,10 @@ Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 3.69422e+20 // new tune
 // Run1_MC_POT_WireModdEdX 3.6318e+20
 Run1_MC_POT_WireModdEdX 3.66871e+20 // new tune
 -
-// Run 1 Det Var for flugg -- this is actually dk2nu for now
-Run1_MC_POT_FLUGG 2.32136e+21 
+// Run 1 Det Var for flugg
+Run1_MC_POT_FLUGG 8.87591e+20
 -
-// Run 1 Det Var for tune1 -- this is actually cv genie with dk2nu for now
+// Run 1 Det Var for tune1
 Run1_MC_POT_tune1 6.0093e+20 
 -
 // Run 1 Det var CV intrinsic nue sample

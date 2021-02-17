@@ -1770,6 +1770,13 @@ void UtilityPlotter::CompareDataCrossSections(){
     h_datasec_reco_nogtune->SetLineColor(kBlue+2);
     h_datasec_reco_nogtune->Scale(1.0, "width");
     h_datasec_reco_nogtune->SetLineWidth(2);
+
+    // Data X Sec FLUGG
+    h_temp  = (TH1D*)fxsec->Get(Form("FLUGG/%s/h_run1_CV_0_%s_data_xsec", vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+    TH1D* h_datasec_reco_FLUGG = (TH1D*)h_temp->Clone();
+    h_datasec_reco_FLUGG->SetLineColor(kYellow+2);
+    h_datasec_reco_FLUGG->Scale(1.0, "width");
+    h_datasec_reco_FLUGG->SetLineWidth(2);
     
     // Data X Sec Tune 1
     h_temp  = (TH1D*)fxsec->Get(Form("tune1/%s/h_run1_CV_0_%s_data_xsec", vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
@@ -1785,6 +1792,7 @@ void UtilityPlotter::CompareDataCrossSections(){
     h_dataxsec->Draw("E1,X0");
     h_datasec_reco_mec->Draw("hist,same");
     h_datasec_reco_nogtune->Draw("hist,same");
+    h_datasec_reco_FLUGG->Draw("hist,same");
     h_datasec_reco_tune1->Draw("hist,same");
     h_dataxsec->Draw("E1,same,X0");
     h_dataxsec_stat->Draw("E1,same,X0");
@@ -1796,6 +1804,7 @@ void UtilityPlotter::CompareDataCrossSections(){
     leg->AddEntry(h_dataxsec, "Data (Stat. + Sys.)", "ep");
     leg->AddEntry(h_datasec_reco_mec, "Data with 1.5 #times MEC Model", "l");
     leg->AddEntry(h_datasec_reco_nogtune, "Data with no gTune Model", "l");
+    leg->AddEntry(h_datasec_reco_FLUGG, "Data with FLUGG Model", "l");
     leg->AddEntry(h_datasec_reco_tune1, "Data with Tune 1 Model", "l");
     leg->Draw();
 
@@ -1909,7 +1918,7 @@ void UtilityPlotter::CompareSmearing(){
     h_mcxsec_reco_model.at(k_model_mec)      ->Draw("hist,same");
     h_mcxsec_reco_model.at(k_model_nogtune)  ->Draw("hist,same");
     h_mcxsec_reco_model.at(k_model_nopi0tune)->Draw("hist,same");
-    // h_mcxsec_reco_model.at(k_model_FLUGG)    ->Draw("hist,E,same");
+    h_mcxsec_reco_model.at(k_model_FLUGG)    ->Draw("hist,E,same");
     h_mcxsec_reco_model.at(k_model_tune1)    ->Draw("hist,E,same");
     h_mcxsec_reco->Draw("hist,E,same");
 
@@ -1921,7 +1930,7 @@ void UtilityPlotter::CompareSmearing(){
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_mec),      "Smear MC CV with 1.5 #times MEC Model", "l");
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_nogtune),  "Smear MC CV with no gTune Model",       "l");
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_nopi0tune),"Smear MC CV with #pi^{0} Tune) Model",  "l");
-    // leg->AddEntry(h_mcxsec_reco_model.at(k_model_FLUGG), "Smear MC CV with FLUGG  Model",         "l");
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_FLUGG), "Smear MC CV with FLUGG  Model",         "le");
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_tune1),    "Smear MC CV with Tune 1 Model (Stat.)",         "le");
     leg->Draw();
 
