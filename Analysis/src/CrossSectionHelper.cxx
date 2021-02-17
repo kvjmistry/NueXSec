@@ -1142,7 +1142,7 @@ void CrossSectionHelper::WriteHists(){
 
                         // Certain histograms we want to divide out by the bin width
                         if ((var == k_var_recoX || var == k_var_trueX) && p != k_xsec_eff )
-                            h_cross_sec.at(label).at(uni).at(var).at(p)->Scale(1.0, "width");
+                            // h_cross_sec.at(label).at(uni).at(var).at(p)->Scale(1.0, "width");
 
                         h_cross_sec.at(label).at(uni).at(var).at(p)->SetOption("hist");
                         h_cross_sec.at(label).at(uni).at(var).at(p)->Write("",TObject::kOverwrite);
@@ -2268,8 +2268,10 @@ void CrossSectionHelper::ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH1
             
             if (h_gen->GetBinContent(row) == 0)
                 h_smear->SetBinContent(row,col, 0.0 );
-            else
-                h_smear->SetBinContent(row,col, h_gen->GetBinWidth(row) * h_smear->GetBinContent(row, col)/ h_gen->GetBinContent(row) );
+            else {
+                // h_smear->SetBinContent(row,col, h_gen->GetBinWidth(row) * h_smear->GetBinContent(row, col)/ h_gen->GetBinContent(row) );
+                h_smear->SetBinContent(row,col, h_smear->GetBinContent(row, col)/ h_gen->GetBinContent(row) );
+            }
         }
     } 
 
@@ -2290,7 +2292,8 @@ void CrossSectionHelper::ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH1
             if (debug)
                 std::cout <<  "R_" << j << i << " * " << j << "  " << h_smear->GetBinContent(j, i) << " * " << h_gen_CV->GetBinContent(j) << std::endl;
             
-            h_gen_smear->SetBinContent(i, h_gen_smear->GetBinContent(i) + h_smear->GetBinContent(j, i) * (h_gen_CV->GetBinContent(j)/ h_gen_CV->GetBinWidth(j)));
+            // h_gen_smear->SetBinContent(i, h_gen_smear->GetBinContent(i) + h_smear->GetBinContent(j, i) * (h_gen_CV->GetBinContent(j)/ h_gen_CV->GetBinWidth(j)));
+            h_gen_smear->SetBinContent(i, h_gen_smear->GetBinContent(i) + h_smear->GetBinContent(j, i) * (h_gen_CV->GetBinContent(j)));
         }
 
         if (debug)

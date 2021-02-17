@@ -11,7 +11,7 @@ varname value
 // Run1_MC_POT 1.18488e+21
 // Run1_MC_POT 2.07136e+21 // NuMI POT for high stats file
 // Run1_MC_POT 2.31956e+21 // For Overlay file with evetnweights
-Run1_MC_POT 2.32136e+21 // new Genie tune
+Run1_MC_POT 2.33652e+21 // new Genie tune
 -
 // Run 1 dirt POT
 // Run1_Dirt_POT 3.22483e+20 // **BNB** dirt POT
@@ -37,7 +37,7 @@ Run1_EXT_trig 9199232.740000 // v5
 // Run1_EXT_trig 3089988.35 // v5 Set 3 run >= 7103
 -
 // Run1_Intrinsic_POT 1.85664e+22 // For Using Intrinsic nue sample
-Run1_Intrinsic_POT 2.59311e+22 //  new Genie tune
+Run1_Intrinsic_POT 2.37838e+22 //  new Genie tune
 -
 // ------- Additional Run 1 POT Definitions -----
 -
@@ -159,7 +159,7 @@ Run1_EXT_trig_BNB 33580525.000000
 // ---------------- Run 3 ----------------------
 // Run 3 MC POT
 // Run3_MC_POT 1.57761e+21
-Run3_MC_POT 1.99076e+21 // new tune
+Run3_MC_POT 1.98937e+21 // new tune
 -
 // Run 3 dirt POT
 // Run3_Dirt_POT 4.32295e+20
@@ -187,7 +187,7 @@ Run3_EXT_trig 32878305.25 // v5
 // Run3_EXT_trig 803615.575 // Set 0 and Set 1 < 16880 (pre)
 -
 // Run3 intrinsic sample
-Run3_Intrinsic_POT 2.5392e+22 //  new Genie tune
+Run3_Intrinsic_POT 2.5345e+22 //  new Genie tune
 // ------- Additional Run 3 POT Definitions -----
 -
 // Run 3 Det var CV
