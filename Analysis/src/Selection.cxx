@@ -506,8 +506,8 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     SelectionFill(type, SC, _util.k_dEdx_max_no_tracks, counter_v );
 
     // Skip unnaturally high shower energies?
-    // if (SC.shr_energy_cali > 6.0)
-    //     std::cout << "reco shr energy: "  << SC.shr_energy_cali << "  elec E: "<< SC.elec_e << "  nu E: " << SC.nu_e<< std::endl;
+    if (SC.shr_energy_cali > 6.0 && type == _util.k_data)
+        std::cout << "reco shr energy: "  << SC.shr_energy_cali << "  elec E: "<< SC.elec_e << "  nu E: " << SC.nu_e<< std::endl;
 
     // if (SC.is_signal && SC.nu_e < 0.3) std::cout<<"Low elec E!: " <<SC.elec_e*1000 << " MeV" << "  | E Nu: "<< SC.nu_e*1000 << " MeV" <<  std::endl; 
     // if (SC.is_signal && SC.elec_e < 0.1) std::cout<<"Low elec E!: " <<SC.elec_e*1000 << " MeV" << "  | E Nu: "<< SC.nu_e*1000 << " MeV" << "  |Reco Shr Energy: " <<  SC.shr_energy_cali *1000<<  std::endl; 

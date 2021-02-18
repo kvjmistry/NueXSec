@@ -2248,7 +2248,13 @@ void CrossSectionHelper::Smear(TH1D* h_sig, TH1D* h_gen, TH2D* h_smear, TH1D* h_
 
         // Now normalise the column entries by the integral
         for (int col=1; col<h_smear->GetYaxis()->GetNbins()+2; col++){
-            h_smear->SetBinContent(row,col, h_smear->GetBinContent(row, col)/ integral );
+            
+            if (integral == 0){
+                h_smear->SetBinContent(row,col, 0.0 );
+            }
+            else{
+                h_smear->SetBinContent(row,col, h_smear->GetBinContent(row, col)/ integral );
+            }
             
         }
     } 

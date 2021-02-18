@@ -171,13 +171,13 @@ public:
     std::string reset   = "\033[0m";
 
     // Bins for the reconstructed shower energy
-    std::vector<double> reco_shr_bins    = { 0.0, 0.30, 0.49, 0.69, 0.98, 1.47, 6.0};
+    std::vector<double> reco_shr_bins    = { 0.0, 0.30, 0.47, 0.70, 0.99, 1.43, 3.0, 6.0};
 
     // Bins for reco shr beta
-    std::vector<double> reco_shr_bins_ang = { 0.0, 6.0, 14.0, 20.5, 29.0, 42.5, 180};
+    std::vector<double> reco_shr_bins_ang = { 0.0, 6.0, 13.5, 20.0, 27.5, 39.5, 180};
 
     // Bins for reco shr cos beta
-    std::vector<double> reco_shr_bins_cang = {-1.0, 0.6, 0.81, 0.91, 0.95, 0.98, 1.0};
+    std::vector<double> reco_shr_bins_cang = {-1.0, 0.6, 0.79, 0.90, 0.95, 1.0};
     // std::vector<double> reco_shr_bins_cang = {-1.0, 0.6, 0.81, 0.91, 0.95, 1.0};
 
     // Fine truth Binning

@@ -418,7 +418,7 @@ void UtilityPlotter::OptimiseBins(){
     float increment_size = 0.001;
 
     if (var == "elec_E"){
-        nbins = 6;
+        nbins = 7;
         lower_bin = 0.001;
         upper_bin = 6.0;
         increment_size = 0.001;
@@ -488,6 +488,13 @@ void UtilityPlotter::OptimiseBins(){
                 
                 // Reset the lower bin value
                 lower_bin = i;
+                break;
+            }
+
+            if (bin == 5 && var == "elec_E"){
+                bool fake = true;
+                GetFitResult(mean, sigma, 1.43, 3.00, tree, true, fake, true, var);
+                lower_bin = 3.00;
                 break;
             }
 
