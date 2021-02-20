@@ -61,6 +61,7 @@ void UtilityPlotter::Initialise(Utility _utility){
         CompareDataCrossSections();
         CompareSmearing();
         CompareUnfoldedModels();
+        CompareFakeDataReco();
         return;
     }
     else {
@@ -1936,9 +1937,9 @@ void UtilityPlotter::CompareSmearing(){
     leg->AddEntry(h_mcxsec_reco, "MC (Stat.)", "el");
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_mec),      "Smear MC CV with 1.5 #times MEC Model", "l");
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_nogtune),  "Smear MC CV with no gTune Model",       "l");
-    leg->AddEntry(h_mcxsec_reco_model.at(k_model_nopi0tune),"Smear MC CV with #pi^{0} Tune) Model",  "l");
-    leg->AddEntry(h_mcxsec_reco_model.at(k_model_FLUGG), "Smear MC CV with FLUGG  Model",         "le");
-    leg->AddEntry(h_mcxsec_reco_model.at(k_model_tune1),    "Smear MC CV with Tune 1 Model (Stat.)",         "le");
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_nopi0tune),"Smear MC CV with #pi^{0} Tune Model",   "l");
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_FLUGG),    "Smear MC CV with FLUGG  Model (Stat.)",         "le");
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_tune1),    "Smear MC CV with Tune 1 Model (Stat.)", "le");
     leg->Draw();
 
     // Save and close
@@ -2120,8 +2121,113 @@ void UtilityPlotter::CompareUnfoldedModels(){
     else
         c->Print(Form("plots/run%s/Models/%s/DataModelUnfoldedComparison.pdf", _util.run_period, _util.xsec_var));
 
+    delete c;
+
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::CompareFakeDataReco(){
+
+    gStyle->SetOptStat(0);
+
+    /// Load in the cross section output
+    TFile *fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+
+    // Create a vector for the models
+    std::vector<std::string> models = {
+        "mec",
+        "nogtune",
+        "nopi0tune",
+        "FLUGG",
+        "tune1"
+    };
+
+    // enums for the models
+    enum enum_models {
+        k_model_mec,
+        k_model_nogtune,
+        k_model_nopi0tune,
+        k_model_FLUGG,
+        k_model_tune1,
+        k_MODEL_MAX
+    };
+    
+    // MC Xsec True
+    TH1D* htemp;
+
+
+    std::vector<TH1D*> h_true(k_MODEL_MAX);
+    std::vector<TH1D*> h_fake(k_MODEL_MAX);
+    
+    double ymax = 1.0;
+
+    
+    // Loop over each model
+    for (unsigned int m = 0; m < models.size(); m++){
+
+        htemp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec",models.at(m).c_str(), vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+        h_true.at(m)        = (TH1D*)htemp->Clone();
+
+        htemp  = (TH1D*)fxsec->Get(Form("fake%s/%s/h_run1_CV_0_%s_data_xsec",models.at(m).c_str(), vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+        h_fake.at(m)        = (TH1D*)htemp->Clone();
+
+        // Set the line colours
+        h_true.at(m)->SetLineColor(kRed+2);
+        h_fake.at(m)->SetLineColor(kBlack);
+        h_true.at(m)->SetLineWidth(2);
+        h_fake.at(m)->SetLineWidth(2);
+
+
+        h_true.at(m)->Scale(1.0, "width");
+        h_fake.at(m)->Scale(1.0, "width");
+
+        ymax = h_true.at(m)->GetMaximum();
+
+        if (h_fake.at(m)->GetMaximum() > h_true.at(m)->GetMaximum())
+            ymax = h_fake.at(m)->GetMaximum();
+    }
+
+    
+
+    // Now lets plot
+    TCanvas *c;
+    
+    // Loop over each model
+    for (unsigned int m = 0; m < models.size(); m++){
+    
+        c = new TCanvas("c", "c", 500, 500);
+        c->SetLeftMargin(0.2);
+        c->SetBottomMargin(0.15);
+        h_true.at(m)->GetYaxis()->SetTitleOffset(1.7);
+        h_true.at(m)->SetMinimum(0);
+        h_true.at(m)->SetMaximum(ymax + 0.2*ymax);
+
+        
+
+        TH1D* h_error_hist = (TH1D*)h_true.at(m)->Clone();
+        h_error_hist->SetFillColorAlpha(12, 0.15);
+        
+        h_true.at(m)->Draw("hist");
+        h_error_hist->Draw("e2, same");
+        h_fake.at(m)->Draw("E,same");
+
+        // Create the legend
+        TLegend *leg = new TLegend(0.4, 0.5, 0.85, 0.85);
+        leg->SetBorderSize(0);
+        leg->SetFillStyle(0);
+        leg->AddEntry(h_error_hist, Form("True %s (stat.)", models.at(m).c_str()), "lf");
+        leg->AddEntry(h_true.at(m), Form("Fake %s (stat.)", models.at(m).c_str()), "el");
+        leg->Draw();
+
+        // Save and close
+        c->Print(Form("plots/run%s/Models/%s/FakeDataComparison_%s.pdf", _util.run_period, _util.xsec_var, models.at(m).c_str()));
+        delete c;
+    }
+
+    fxsec->Close();
+
+    
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

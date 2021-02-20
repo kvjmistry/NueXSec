@@ -591,7 +591,6 @@ public:
 
     // Variables to get the systematic uncertainty by cut for
     enum TH1D_cut_vars {
-        k_cut_softwaretrig,
         k_cut_nslice,
         k_cut_shower_multiplicity,
         k_cut_track_multiplicity,
@@ -616,13 +615,14 @@ public:
         k_cut_flash_pe,
         k_cut_effective_angle,
         k_cut_effective_cosangle,
+        k_cut_effective_angle_rebin,
+        k_cut_effective_cosangle_rebin,
         k_cut_vars_max
     };
 
     // ------------------------------------------
     // variables to plot PlotVariations and SysVariations
         std::vector<std::string> vec_hist_name = {
-        "h_reco_softwaretrig",
         "h_reco_nslice",
         "h_reco_shower_multiplicity",
         "h_reco_track_multiplicity",
@@ -646,12 +646,13 @@ public:
         "h_reco_flash_time",
         "h_reco_flash_pe",
         "h_reco_effective_angle",
-        "h_reco_effective_cosangle"
+        "h_reco_effective_cosangle",
+        "h_reco_effective_angle_rebin",
+        "h_reco_effective_cosangle_rebin",
     };
  
     // x axis label for those plots
     std::vector<std::string> vec_axis_label = {
-        "Software Trigger",
         "Pandora Slice ID",
         "Shower Multiplicity",
         "Track Multiplicity",
@@ -674,8 +675,10 @@ public:
         "Reconstructed Leading Shower Energy [GeV]",
         "Largest Flash Time [#mus]",
         "Largest Flash Intensity [PE]",
-        "Leading Shower Effective Angle [deg]",
-        "Leading Shower Cosine Effective Angle [deg]"
+        "#beta [deg]",
+        "cos(#beta) [deg]",
+        "#beta [deg]",
+        "cos(#beta) [deg]"
     };
 
     // list of detector variations

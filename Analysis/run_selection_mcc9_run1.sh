@@ -246,12 +246,73 @@ fi
 # To generate the file lists with all event weights then use this command
 # ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode txtlist --xseclabel all --xsecvar elec_E
 
+# Use the reweighted mec model as fake data
+if [ "$1" == "fakemec" ]; then
+
+  # Run the cross sec calculation in fake data mode
+  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake mec --tunemec 
+
+  # Merge the files
+  hadd -f -T files/nuexsec_run1_merged_fakemec.root files/nuexsec_data_run1_mec.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root
+
+  # Plot the files
+  ./nuexsec --run 1 --hist files/nuexsec_run1_merged_fakemec.root --fake mec
+
+  root -l -b -q 'merge/merge_uneaventrees.C("1", false, "files/trees/nuexsec_selected_tree_mc_run1.root", "files/trees/nuexsec_selected_tree_data_run1_mec.root", "files/trees/nuexsec_selected_tree_ext_run1_fake.root","files/trees/nuexsec_selected_tree_dirt_run1_fake.root", "fakemec")'
+
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakemec.root --fake mec --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakemec.root --fake mec --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakemec.root --fake mec --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang
+
+fi
+
+# Use the reweighted no genie tune model as fake data
+if [ "$1" == "fakenogtune" ]; then
+
+  # Run the cross sec calculation in fake data mode
+  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake nogtune --weight_tune 0
+
+  # Merge the files
+  hadd -f -T files/nuexsec_run1_merged_fakenogtune.root files/nuexsec_data_run1_nogtune.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root
+
+  # Plot the files
+  ./nuexsec --run 1 --hist files/nuexsec_run1_merged_fakenogtune.root --fake nogtune
+
+  root -l -b -q 'merge/merge_uneaventrees.C("1", false, "files/trees/nuexsec_selected_tree_mc_run1.root", "files/trees/nuexsec_selected_tree_data_run1_nogtune.root", "files/trees/nuexsec_selected_tree_ext_run1_fake.root","files/trees/nuexsec_selected_tree_dirt_run1_fake.root", "fakenogtune")'
+
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakenogtune.root --fake nogtune --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakenogtune.root --fake nogtune --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakenogtune.root --fake nogtune --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang
+
+fi
+
+# Use the reweighted no pi0 tune model as fake data
+if [ "$1" == "fakenopi0tune" ]; then
+
+  # Run the cross sec calculation in fake data mode
+  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake nopi0tune --weight_pi0 0
+
+  # Merge the files
+  hadd -f -T files/nuexsec_run1_merged_fakenopi0tune.root files/nuexsec_data_run1_nopi0tune.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root
+
+  # Plot the files
+  ./nuexsec --run 1 --hist files/nuexsec_run1_merged_fakenopi0tune.root --fake nopi0tune
+
+  root -l -b -q 'merge/merge_uneaventrees.C("1", false, "files/trees/nuexsec_selected_tree_mc_run1.root", "files/trees/nuexsec_selected_tree_data_run1_nopi0tune.root", "files/trees/nuexsec_selected_tree_ext_run1_fake.root","files/trees/nuexsec_selected_tree_dirt_run1_fake.root", "fakenopi0tune")'
+
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakenopi0tune.root --fake nopi0tune --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakenopi0tune.root --fake nopi0tune --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakenopi0tune.root --fake nopi0tune --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang
+
+fi
+
+
 
 # Use the tune 1 model as fake data
 if [ "$1" == "faketune1" ]; then
 
   # Run the cross sec calculation in fake data mode
-  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_tune1.root --fake tune1
+  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_tune1.root --fake tune1 --weight_tune 0
 
   # Merge the files
   hadd -f -T files/nuexsec_run1_merged_faketune1.root files/nuexsec_data_run1_tune1.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root
@@ -264,5 +325,25 @@ if [ "$1" == "faketune1" ]; then
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_faketune1.root --fake tune1 --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_faketune1.root --fake tune1 --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_faketune1.root --fake tune1 --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang
+
+fi
+
+# Use the tune 1 model as fake data
+if [ "$1" == "fakeFLUGG" ]; then
+
+  # Run the cross sec calculation in fake data mode
+  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_FLUGG.root --fake FLUGG  --weight_ppfx 0
+
+  # Merge the files
+  hadd -f -T files/nuexsec_run1_merged_fakeFLUGG.root files/nuexsec_data_run1_FLUGG.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root
+
+  # Plot the files
+  ./nuexsec --run 1 --hist files/nuexsec_run1_merged_fakeFLUGG.root --fake FLUGG
+
+  root -l -b -q 'merge/merge_uneaventrees.C("1", false, "files/trees/nuexsec_selected_tree_mc_run1.root", "files/trees/nuexsec_selected_tree_data_run1_FLUGG.root", "files/trees/nuexsec_selected_tree_ext_run1_fake.root","files/trees/nuexsec_selected_tree_dirt_run1_fake.root", "fakeFLUGG")'
+
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakeFLUGG.root --fake FLUGG --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakeFLUGG.root --fake FLUGG --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakeFLUGG.root --fake FLUGG --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang
 
 fi

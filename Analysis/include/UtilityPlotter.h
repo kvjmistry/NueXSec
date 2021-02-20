@@ -136,6 +136,9 @@ class UtilityPlotter{
     // Compare the cross sections for different models in true space
     void CompareUnfoldedModels();
     // -------------------------------------------------------------------------
+    // Compare the true cross section of fake data to the extracted cross section
+    // in reco space
+    void CompareFakeDataReco();
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

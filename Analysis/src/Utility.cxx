@@ -367,6 +367,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
 
         // We also want to overwrite the data POT in the case of fake data
         if (isfakedata){
+
             variation_str = std::string(fakedataname);
 
             // Loop over the POT config names and overwrite the name of the CV MC POT
@@ -378,7 +379,11 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
                 if (confignames.at(p) == match_name){
                     
                     // If fake data mode we overwrite the data POT number instead
-                    confignames[p] = Form("Run%s_MC_POT_%s", run_period, variation_str.c_str());
+                    if (std::string(fakedataname) == "weight" || std::string(fakedataname) == "mec" || std::string(fakedataname) == "nogtune" || std::string(fakedataname) == "nopi0tune")
+                        confignames[p] = Form("Run%s_MC_POT", run_period);
+                    else
+                        confignames[p] = Form("Run%s_MC_POT_%s", run_period, variation_str.c_str());
+                    
                     std::cout << red  <<"New Data POT config to search for is: " << confignames.at(p) << reset << std::endl;
                 }
             }
@@ -392,7 +397,12 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
                 
                 // If matched then overwrite the POT config for the MC to the variation
                 if (confignames.at(p) == match_name){
-                    confignames[p] = match_name + "_" + variation_str;
+                    
+                    if (std::string(fakedataname) == "weight" || std::string(fakedataname) == "mec" || std::string(fakedataname) == "nogtune" || std::string(fakedataname) == "nopi0tune")
+                        confignames[p] = match_name;
+                    else
+                        confignames[p] = match_name + "_" + variation_str;
+                    
                     std::cout << red << "New Intrinsic POT config to search for is: " << confignames.at(p) << reset <<std::endl;
                 }
             }

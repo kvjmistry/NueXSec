@@ -344,6 +344,8 @@ class HistogramHelper{
         k_int_elec_theta,
         k_int_elec_phi,
         k_int_effective_ang,
+        k_int_beta_nue,
+        k_int_beta_nuebar,
         k_INTERACTION_MAX
     };
 

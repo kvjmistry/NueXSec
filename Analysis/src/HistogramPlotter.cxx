@@ -133,6 +133,8 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
             MakeInteractionPlot("h_int_elec_theta",             true, ";True e#lower[-0.5]{-} + e^{+} #theta [deg]; Entries",   "elec_theta",             cut_stage, 600);
             MakeInteractionPlot("h_int_elec_phi",               true, ";True e#lower[-0.5]{-} + e^{+} #phi [deg]; Entries",     "elec_phi",               cut_stage, 500);
             MakeInteractionPlot("h_int_effective_ang",          true, ";True e#lower[-0.5]{-} + e^{+} Eff Ang. [deg]; Entries", "eff_ang",                cut_stage, 600);
+            MakeInteractionPlot("h_int_beta_nue",               true, ";True e#lower[-0.5]{-} #beta [deg]; Entries",                  "eff_ang_nue",            cut_stage, 600);
+            MakeInteractionPlot("h_int_beta_nuebar",            true, ";True e^{+} #beta [deg]; Entries",                       "eff_ang_nuebar",         cut_stage, 600);
         }
         
         MakeInteractionEfficiency("h_true_nue_E",                 false, ";True #nu_{e} Energy [GeV]; Efficiency",                    "nue_E");
@@ -148,6 +150,8 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeInteractionEfficiency("h_int_elec_theta",             false, ";True e#lower[-0.5]{-} + e^{+} #theta [deg]; Efficiency",   "elec_theta");
         MakeInteractionEfficiency("h_int_elec_phi",               false, ";True e#lower[-0.5]{-} + e^{+} #phi [deg]; Efficiency",     "elec_phi");
         MakeInteractionEfficiency("h_int_effective_ang",          false, ";True e#lower[-0.5]{-} + e^{+} Eff Ang. [deg]; Efficiency", "eff_ang");
+        MakeInteractionEfficiency("h_int_beta_nue",               false, ";True e#lower[-0.5]{-} #beta [deg]; Efficiency",            "eff_ang_nue");
+        MakeInteractionEfficiency("h_int_beta_nuebar",            false, ";True e^{+} #beta [deg]; Efficiency",                       "eff_ang_nuebar");
 
         // Create the 2D folder
         _util.CreateDirectory("2D");

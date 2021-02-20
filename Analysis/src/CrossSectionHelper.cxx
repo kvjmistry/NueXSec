@@ -737,7 +737,6 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
 
             // Now we got the weight for universe i, lets fill the histograms :D
             // Use [] rather than .at() to speed this process up. This can cause errors if indexes go out of bound
-            h_cut_v[label][cut_index][_util.k_cut_softwaretrig][uni]             ->Fill(SC.swtrig,                 weight_uni);
             h_cut_v[label][cut_index][_util.k_cut_nslice][uni]                   ->Fill(SC.nslice,                 weight_uni);
             h_cut_v[label][cut_index][_util.k_cut_shower_multiplicity][uni]      ->Fill(SC.n_showers,              weight_uni);
             h_cut_v[label][cut_index][_util.k_cut_track_multiplicity][uni]       ->Fill(SC.n_tracks,               weight_uni);
@@ -767,6 +766,8 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
             h_cut_v[label][cut_index][_util.k_cut_flash_pe][uni]                 ->Fill(SC.flash_pe,               weight_uni);
             h_cut_v[label][cut_index][_util.k_cut_effective_angle][uni]          ->Fill(SC.effective_angle,        weight_uni);
             h_cut_v[label][cut_index][_util.k_cut_effective_cosangle][uni]       ->Fill(SC.cos_effective_angle,    weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_effective_angle_rebin][uni]          ->Fill(SC.effective_angle,        weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_effective_cosangle_rebin][uni]       ->Fill(SC.cos_effective_angle,    weight_uni);
         
         }
 
@@ -1919,7 +1920,6 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 
                 // Only initialise if this mode to stop loading too much into memory
                 if (std::string(_util.xsec_rw_mode) == "rw_cuts"){
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_softwaretrig).at(uni)                   = new TH1D(Form("h_reco_softwaretrig_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 2, 0, 2);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_nslice).at(uni)                         = new TH1D(Form("h_reco_nslice_%s_%s_%i",                         reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 2, 0, 2);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_shower_multiplicity).at(uni)            = new TH1D(Form("h_reco_shower_multiplicity_%s_%s_%i",            reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 6, 0, 6);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_track_multiplicity).at(uni)             = new TH1D(Form("h_reco_track_multiplicity_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 6, 0, 6);
@@ -1947,6 +1947,12 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
 
                     double* edges = &_util.reco_shr_bins[0]; // Cast to an array 
                     h_cut_v.at(label).at(cut).at(_util.k_cut_shower_energy_cali_rebin).at(uni)  = new TH1D(Form("h_reco_shower_energy_cali_rebin_%s_%s_%i",  reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", _util.reco_shr_bins.size()-1, edges);
+
+                    edges = &_util.reco_shr_bins_ang[0]; // Cast to an array 
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_effective_angle_rebin).at(uni)                = new TH1D(Form("h_reco_effective_angle_rebin_%s_%s_%i",                reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", _util.reco_shr_bins_ang.size()-1, edges);
+                    
+                    edges = &_util.reco_shr_bins_cang[0]; // Cast to an array 
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_effective_cosangle_rebin).at(uni)             = new TH1D(Form("h_reco_effective_cosangle_rebin_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", _util.reco_shr_bins_cang.size()-1, edges);
                 }
             }
         }
