@@ -396,6 +396,7 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
 
     // Set derived variables in the slice container
     SC.SetSignal();                // Set the event as either signal or other
+    SC.SetFakeData();              // Set the classifcation as data if fake data mode
     SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
     SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
     SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
@@ -536,7 +537,7 @@ void Selection::SavetoFile(){
             _hhelper.at(_util.k_mc).WriteInteractions();
             _hhelper.at(_util.k_mc).Write_2DSigBkgHists();
             
-            if (_util.isfakedata)
+            if (_util.isfakedata && !_util.intrinsic_mode)
                 _hhelper.at(_util.k_mc).WriteReco(_util.k_data);
             else
                 _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
@@ -545,7 +546,7 @@ void Selection::SavetoFile(){
         if (std::string(_util.intrinsic_mode) == "default") {
             _hhelper.at(_util.k_mc).WriteFlash();
             
-            if (_util.isfakedata){
+            if (_util.isfakedata && !_util.intrinsic_mode){
                 _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_data);
                 _hhelper.at(_util.k_mc).WritePiZero(_util.k_data);
                 _hhelper.at(_util.k_mc).WriteNuMu(_util.k_data);

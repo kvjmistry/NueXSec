@@ -2215,7 +2215,7 @@ void UtilityPlotter::CompareFakeDataReco(){
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
         leg->AddEntry(h_error_hist, Form("True %s (stat.)", models.at(m).c_str()), "lf");
-        leg->AddEntry(h_true.at(m), Form("Fake %s (stat.)", models.at(m).c_str()), "el");
+        leg->AddEntry(h_fake.at(m), Form("Fake %s (stat.)", models.at(m).c_str()), "el");
         leg->Draw();
 
         // Save and close

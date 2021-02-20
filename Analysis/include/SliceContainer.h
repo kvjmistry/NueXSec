@@ -60,6 +60,10 @@ public:
     // Set events that are below threshold to a new category
     void SetThresholdEvent();
     // -------------------------------------------------------------------------
+    // Set the event as fake data
+    void SetFakeData();
+    // -------------------------------------------------------------------------
+
 
 
 

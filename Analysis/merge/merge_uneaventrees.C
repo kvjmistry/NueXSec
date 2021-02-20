@@ -1,6 +1,6 @@
 // Script to merge the mc, data, ext and dirt ttrees to one file
 
-void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string mc, std::string data, std::string ext, std::string dirt, std::string detvar) {
+void merge_uneaventrees(std::string run_type, bool intrinsic_mode, bool fake_intrinsic_mode, std::string mc, std::string data, std::string ext, std::string dirt, std::string detvar) {
 
     enum types {
         k_mc,
@@ -23,8 +23,20 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
     std::vector<TTree*> trees(resize);
     std::vector<std::string> filenames;
     
-    if (intrinsic_mode){
+    // Using intrinsic nue in MC only
+    if (intrinsic_mode && !fake_intrinsic_mode){
+        std::cout << "MC Intrinsic Only"<< std::endl;
         filenames = {mc, mc, data, ext, dirt};
+    }
+    // Using intrinsic nue in fake data only
+    else if (!intrinsic_mode && fake_intrinsic_mode){
+        std::cout << "Fake Data Intrinsic Only"<< std::endl;
+        filenames = {mc, data, data, ext, dirt};
+    }
+    // Using intrinsic nue in MC and fake data
+    else if (intrinsic_mode && fake_intrinsic_mode){
+        std::cout << "MC and Data Intrinsic"<< std::endl;
+        filenames = {mc, mc, data, data, ext, dirt};
     }
     else
         filenames = {mc, data, ext, dirt};
@@ -103,8 +115,14 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
 
     std::vector<std::string> treenames;
     
-    if (intrinsic_mode){
+    if (intrinsic_mode && !fake_intrinsic_mode){
         treenames = {"mc_nue_tree", "mc_tree", "data_tree", "ext_tree", "dirt_tree"};
+    }
+    else if (!intrinsic_mode && fake_intrinsic_mode){
+        treenames = {"mc_tree", "data_nue_tree", "data_tree", "ext_tree", "dirt_tree"};
+    }
+    else if (intrinsic_mode && fake_intrinsic_mode){
+        treenames = {"mc_nue_tree", "mc_tree", "data_nue_tree", "data_tree", "ext_tree", "dirt_tree"};
     }
     else
         treenames = {"mc_tree", "data_tree", "ext_tree", "dirt_tree"};
@@ -265,8 +283,17 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
                 trees.at(k)->GetEntry(ievent); 
 
                 // If intrinsic mode is turned on and we are using the default mc, then skip the fill for generated events which are already covered
-                if (intrinsic_mode && k == 1 && _gen){
-                     continue;
+                if (intrinsic_mode && !fake_intrinsic_mode){
+                     if (k == 1 && _gen)
+                        continue;
+                }
+                else if (!intrinsic_mode && fake_intrinsic_mode){
+                     if (k == 2 && _gen)
+                        continue;
+                }
+                else if (intrinsic_mode && fake_intrinsic_mode){
+                     if (( k == 1 || k == 3) && _gen)
+                        continue;
                 }
 
                 run              = _run;

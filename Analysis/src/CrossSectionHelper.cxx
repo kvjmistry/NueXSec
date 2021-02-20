@@ -183,7 +183,7 @@ void CrossSectionHelper::LoopEvents(){
             return;
         }
 
-        if (shr_energy_cali > 6.0 && *classification == "data" ) std::cout << _util.red << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins " << run << " " << subrun << " " << event  << _util.reset<<std::endl;
+        if (shr_energy_cali > 8.0 && *classification == "data" ) std::cout << _util.red << "reco shower energy was:  " << shr_energy_cali << "  Consider updating the bins " << run << " " << subrun << " " << event  << _util.reset<<std::endl;
 
         double cv_weight = weight; // SplinetimesTune * PPFX CV * Pi0 Tune
         double weight_dirt = weight; // Use this for estimating dirt and POT sys
@@ -279,6 +279,10 @@ void CrossSectionHelper::LoopEvents(){
                 if (*classification == "data"){
 
                     if (cv_weight != 1.0 && !_util.isfakedata) std::cout << "Error weight for data is not 1, this means your weighting the data... bad!"<< std::endl;
+
+                    // If fake data, dont fill if we have a generated event!
+                    if (_util.isfakedata && !passed_selection)
+                        continue;
                     
                     // Fill histograms
                     if (std::string(_util.xsecmode) != "txtlist"){

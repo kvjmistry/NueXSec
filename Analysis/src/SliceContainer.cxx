@@ -410,14 +410,6 @@ void SliceContainer::SliceClassifier(int type){
     
     // MC Specific classsifications
     if (type == _util.k_mc){
-
-        // If its ske data, then all events should have the data classification
-        if (_util.isfakedata){
-            classification = std::make_pair("data",_util.k_leg_data);
-            return;
-        }
-
-
         
         bool is_in_fv = _util.in_fv(true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z);
 
@@ -1022,6 +1014,10 @@ void SliceContainer::SetThresholdEvent(){
         }
     }
 
+}
+// -----------------------------------------------------------------------------
+void SliceContainer::SetFakeData(){
+    
     if (_util.isfakedata)
         classification = std::make_pair("data",_util.k_leg_data);
 }
