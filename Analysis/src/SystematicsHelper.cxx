@@ -766,6 +766,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
 
     // Export the results to file
     ExportResult(f_nuexsec);
+    ExportTotalCrossSectionResult();
 
 
 }
@@ -3721,6 +3722,67 @@ void SystematicsHelper::ExportResult(TFile* f){
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetOption("E1,X0");
     cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_sys_reco", TObject::kOverwrite);
 
+
+    // Close the file ---------------------------------
+    f_sys_out->cd();
+    f_sys_out->Close();
+
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::ExportTotalCrossSectionResult(){
+
+    std::cout << _util.blue << "Saving Total Cross Section Results to File!!!" << _util.reset << std::endl;
+
+    std::string folder_name = "total";
+    
+    // Now we have the histograms we need, lets open a new file to store the systematics
+    TFile *f_sys_out = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "UPDATE");
+    f_sys_out->cd();
+
+    // Create subdirectory for each reweighter
+    TDirectory *dir_mode;
+
+    // Create subdirectory for each variable
+    TDirectory *dir_var;
+
+    // See if the directory already exists
+    bool bool_dir = _util.GetDirectory(f_sys_out, dir_var, folder_name.c_str());
+
+    // If it doesnt exist then create it
+    if (!bool_dir) f_sys_out->mkdir(folder_name.c_str());
+
+    _util.GetDirectory(f_sys_out, dir_var, folder_name.c_str());
+
+    dir_var->cd();
+
+    // Now save the histograms
+    // Data XSec Reco (Stat Only)  ---------------------------------
+    cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->SetOption("E1,X0");
+    cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->SetLineColor(kBlack);
+    cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->SetTitle(var_labels_xsec.at(k_var_integrated).c_str());
+    // Data XSec Reco (Sys Only)  ---------------------------------
+    for (int bin = 0; bin < cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->GetNbinsX(); bin++){
+        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_stat).at(k_var_integrated).at(k_xsec_mcxsec).at(bin)) * cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->GetBinContent(bin+1));
+    }
+
+    cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_reco", TObject::kOverwrite);
+
+    // Data XSec Reco (Sys Only)  ---------------------------------
+    for (int bin = 0; bin < cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->GetNbinsX(); bin++){
+        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_sys).at(k_var_integrated).at(k_xsec_mcxsec).at(bin)) * cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->GetBinContent(bin+1));
+    }
+
+    cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->SetOption("E1,X0");
+    cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->Write("h_data_xsec_sys_reco", TObject::kOverwrite);
+
+
+    // Data XSec Reco (Stat + Sys)  ---------------------------------
+    for (int bin = 0; bin < cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->GetNbinsX(); bin++){
+        cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_sys).at(k_var_integrated).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_stat).at(k_var_integrated).at(k_xsec_dataxsec).at(bin)) * cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->GetBinContent(bin+1));
+    }
+
+    cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->SetOption("E1,X0");
+    cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_sys_reco", TObject::kOverwrite);
 
     // Close the file ---------------------------------
     f_sys_out->cd();

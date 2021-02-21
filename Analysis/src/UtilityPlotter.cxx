@@ -57,12 +57,14 @@ void UtilityPlotter::Initialise(Utility _utility){
         _util.SetAxesNames(var_labels_xsec, var_labels_events, var_labels_eff, smear_hist_name, vars, xsec_scale);
 
         _util.CreateDirectory("Models/" + std::string(_util.xsec_var));
+        _util.CreateDirectory("Models/Total");
         TestModelDependence();
         CompareDataCrossSections();
         CompareSmearing();
         CompareUnfoldedModels();
         CompareFakeDataReco();
         CompareFakeDataTrue();
+        CompareTotalCrossSec();
         return;
     }
     else {
@@ -2396,5 +2398,133 @@ void UtilityPlotter::CompareFakeDataTrue(){
 
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::CompareTotalCrossSec(){
+
+    gStyle->SetOptStat(0);
+
+    TCanvas *c = new TCanvas("c", "c", 150, 350);
+    gPad->SetLeftMargin(0.3);
+
+    // Load in the cross section output
+    TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
+
+    TH1D* h_temp;
+
+    // Data Xsec stat
+    h_temp  = (TH1D*)fxsec->Get("total/h_data_xsec_stat_reco");
+    TH1D* h_data_stat = (TH1D*)h_temp->Clone();
+    h_data_stat->SetDirectory(0);
+
+    // Data Xsec stat + sys
+    h_temp  = (TH1D*)fxsec->Get("total/h_data_xsec_stat_sys_reco");
+    TH1D* h_data = (TH1D*)h_temp->Clone();
+    h_data->SetDirectory(0);
+
+    fxsec->Close();
+
+    // Now Get the Models
+    // Load in the cross section output
+    fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+
+    // Now get some other models
+    // Create a vector for the models
+    std::vector<std::string> models = {
+        "CV",
+        "mec",
+        "nogtune",
+        "nopi0tune",
+        "FLUGG",
+        "tune1"
+    };
+
+    // enums for the models
+    enum enum_models {
+        k_model_CV,
+        k_model_mec,
+        k_model_nogtune,
+        k_model_nopi0tune,
+        k_model_FLUGG,
+        k_model_tune1,
+        k_MODEL_MAX
+    };
+
+    std::vector<TH1D*> h_model_xsec(k_MODEL_MAX);
+    // Loop over each model
+    for (unsigned int m = 0; m < models.size(); m++){
+
+        // Get true tune1 xsec
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/integrated/h_run%s_CV_0_integrated_mc_xsec", models.at(m).c_str(), _util.run_period));
+        h_model_xsec.at(m) = (TH1D*)h_temp->Clone();
+        h_model_xsec.at(m)->SetLineWidth(2);
+       
+    }
+
+
+    h_model_xsec.at(k_model_CV)->SetLineColor(kRed+2);
+    h_model_xsec.at(k_model_mec)->SetLineColor(kGreen+2);
+    h_model_xsec.at(k_model_nogtune)->SetLineColor(kBlue+2);
+    h_model_xsec.at(k_model_nopi0tune)->SetLineColor(kPink+1);
+    h_model_xsec.at(k_model_FLUGG)->SetLineColor(kYellow+2);
+    h_model_xsec.at(k_model_tune1)->SetLineColor(kOrange-1);
+
+
+    // X-Axis
+    h_data->GetXaxis()->SetRangeUser(0.0,1.0); 
+    h_data->GetXaxis()->SetLabelOffset(999);
+    h_data->GetXaxis()->SetLabelSize(0);
+    h_data->GetXaxis()->SetTickLength(0);
+    
+    // Y-Axis
+    h_data->GetYaxis()->SetRangeUser(3.0, 8.0);
+    h_data->GetYaxis()->CenterTitle();
+    h_data->GetYaxis()->SetLabelSize(0.1);
+    h_data->GetYaxis()->SetTitleSize(0.1);
+   
+    // h_data->SetLineWidth(2);
+    h_data->SetMarkerStyle(20);
+    h_data->SetMarkerSize(0.7);
+    h_data->SetLineColor(kBlack);
+    h_data->Draw("E1,X0");
+
+    // Statistical band
+    h_data_stat->SetLineColor(kBlack);
+    h_data_stat->Draw("E1,X0,same");
+
+    // Draw the models
+    for (unsigned int m = 0; m < models.size(); m++){
+        h_model_xsec.at(m)->Draw("hist,same");
+    }
+
+
+    h_data->Draw("E1,X0,same");
+    h_data_stat->Draw("E1,X0,same");
+
+
+    // Draw the Legend
+    TLegend *leg = new TLegend(0.35, 0.70, 0.70, 0.89);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(h_data, "Data (stat. + sys.)",        "ep");
+    leg->AddEntry( h_model_xsec.at(k_model_CV),         "MC (CV)", "lf");
+    leg->AddEntry( h_model_xsec.at(k_model_mec),        "MC (1.5 #times MEC)", "lf");
+    leg->AddEntry( h_model_xsec.at(k_model_nogtune),    "MC (no gTune)", "lf");
+    leg->AddEntry( h_model_xsec.at(k_model_nopi0tune),  "MC (no #pi^{0} Tune)", "lf");
+    leg->AddEntry( h_model_xsec.at(k_model_FLUGG),      "MC (FLUGG Flux)", "lf");
+    leg->AddEntry( h_model_xsec.at(k_model_tune1),      "MC (Tune 1)", "lf");
+    
+    leg->Draw();
+
+    gStyle->SetLegendTextSize(0.06);
+    TLatex *t = new TLatex(.34, .145, "#splitline{MicroBooNE NuMI}{Data 2.0#times10^{20} POT}");
+    t->SetTextColor(kBlack);
+    t->SetNDC();
+    t->SetTextSize(2.0/30.);
+    t->SetTextAlign(11);
+    t->Draw();
+
+
+    c->Print(Form("plots/run%s/Models/Total/TotalCrossSectionComparison.pdf", _util.run_period));
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

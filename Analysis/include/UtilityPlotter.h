@@ -145,6 +145,8 @@ class UtilityPlotter{
     // in true space
     void CompareFakeDataTrue();
     // -------------------------------------------------------------------------
+    // Compare the data to a number of alternative models
+    void CompareTotalCrossSec();
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 
