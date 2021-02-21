@@ -2,6 +2,7 @@
 #define UTILITYPLOTTER_H
 
 #include "Utility.h"
+#include "WienerSVD.h"
 
 // Class for making plots of generic things, such as run vs run comparisons and 
 // separate stuies that people want me to do for the analsis
@@ -140,6 +141,9 @@ class UtilityPlotter{
     // in reco space
     void CompareFakeDataReco();
     // -------------------------------------------------------------------------
+     // Compare the true cross section of fake data to the extracted cross section
+    // in true space
+    void CompareFakeDataTrue();
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

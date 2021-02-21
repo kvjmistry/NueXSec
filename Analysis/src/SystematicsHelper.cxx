@@ -3666,6 +3666,10 @@ void SystematicsHelper::ExportResult(TFile* f){
         // Data XSec Covariance Matrix ---------------------------------
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->SetOption("colz");
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->Write("h_cov_tot_dataxsec_reco", TObject::kOverwrite);
+
+        // Data XSec Stat Covariance Matrix ---------------------------------
+        h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_stat)->SetOption("colz");
+        h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_stat)->Write("h_cov_stat_dataxsec_reco", TObject::kOverwrite);
     
         // MC XSec True  ---------------------------------
         cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->SetOption("hist");

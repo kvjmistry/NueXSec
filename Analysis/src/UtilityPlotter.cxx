@@ -62,6 +62,7 @@ void UtilityPlotter::Initialise(Utility _utility){
         CompareSmearing();
         CompareUnfoldedModels();
         CompareFakeDataReco();
+        CompareFakeDataTrue();
         return;
     }
     else {
@@ -2174,7 +2175,9 @@ void UtilityPlotter::CompareFakeDataReco(){
         h_true.at(m)->SetLineColor(kRed+2);
         h_fake.at(m)->SetLineColor(kBlack);
         h_true.at(m)->SetLineWidth(2);
-        h_fake.at(m)->SetLineWidth(2);
+        // h_fake.at(m)->SetLineWidth(2);
+        h_fake.at(m)->SetMarkerStyle(20);
+        h_fake.at(m)->SetMarkerSize(0.5);
 
 
         h_true.at(m)->Scale(1.0, "width");
@@ -2215,7 +2218,7 @@ void UtilityPlotter::CompareFakeDataReco(){
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
         leg->AddEntry(h_error_hist, Form("True %s (stat.)", models.at(m).c_str()), "lf");
-        leg->AddEntry(h_fake.at(m), Form("Fake %s (stat.)", models.at(m).c_str()), "el");
+        leg->AddEntry(h_fake.at(m), Form("Fake %s (stat.)", models.at(m).c_str()), "elp");
         leg->Draw();
 
         // Save and close
@@ -2225,10 +2228,162 @@ void UtilityPlotter::CompareFakeDataReco(){
 
     fxsec->Close();
 
-    
-
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::CompareFakeDataTrue(){
+
+    gStyle->SetOptStat(0);
+
+    // Create a vector for the models
+    std::vector<std::string> models = {
+        "mec",
+        "nogtune",
+        "nopi0tune",
+        "FLUGG",
+        "tune1"
+    };
+
+    // enums for the models
+    enum enum_models {
+        k_model_mec,
+        k_model_nogtune,
+        k_model_nopi0tune,
+        k_model_FLUGG,
+        k_model_tune1,
+        k_MODEL_MAX
+    };
+
+
+    // Load in the cross section output
+    TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
+
+    TH2D* h_temp_2D;
+    TH1D* h_temp;
+
+    // True MC Xsec
+    h_temp  = (TH1D*)fxsec->Get(Form("%s/wiener/h_mc_xsec_true", _util.xsec_var));
+    TH1D* h_true_mc_xsec = (TH1D*)h_temp->Clone();
+    h_true_mc_xsec->SetDirectory(0);
+
+    // Response Matrix
+    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/wiener/h_response",_util.xsec_var));
+    TH2D* h_response = (TH2D*)h_temp_2D->Clone();
+    h_response->SetDirectory(0);
+
+    // Total Covariance Matrix
+    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/wiener/h_cov_stat_dataxsec_reco",_util.xsec_var));
+    TH2D* h_cov_reco = (TH2D*)h_temp_2D->Clone();
+    h_cov_reco->SetDirectory(0);
+
+    fxsec->Close();
+ 
+    // Now Get the Models
+    // Load in the cross section output
+    fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+
+    std::vector<TH1D*> h_true(k_MODEL_MAX);
+    std::vector<TH1D*> h_fake(k_MODEL_MAX);
+    std::vector<TH2D*> h_cov_diag(k_MODEL_MAX);
+
+    // Loop over each model
+    for (unsigned int m = 0; m < models.size(); m++){
+
+        // Get true tune1 xsec
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run%s_CV_0_%s_mc_xsec", models.at(m).c_str(),vars.at(k_var_trueX).c_str(), _util.run_period, vars.at(k_var_trueX).c_str()));
+        h_true.at(m) = (TH1D*)h_temp->Clone();
+
+        // Get fake Tune1 data
+        h_temp  = (TH1D*)fxsec->Get(Form("fake%s/%s/h_run%s_CV_0_%s_data_xsec", models.at(m).c_str(), vars.at(k_var_recoX).c_str(), _util.run_period, vars.at(k_var_recoX).c_str()));
+        h_fake.at(m) = (TH1D*)h_temp->Clone();
+
+
+        // Set diagonals of covariance matrix
+        h_cov_diag.at(m) = (TH2D*)h_cov_reco->Clone();
+        for (int i = 0; i < h_cov_reco->GetXaxis()->GetNbins()+2; i++ ){
+            for (int j = 0; j < h_cov_reco->GetYaxis()->GetNbins()+2; j++ ){
+                
+                h_cov_diag.at(m)->SetBinContent(i, j, 0);
+                
+                if (i == j) {
+                    h_cov_diag.at(m)->SetBinContent(i, j, h_fake.at(m)->GetBinError(i) * h_fake.at(m)->GetBinError(i));
+                }
+
+            }
+        }
+
+
+        // Initialise the WienerSVD class
+        WienerSVD _wSVD;
+        _wSVD.Initialise(_util);
+        _wSVD.DoUnfolding(2, 0, h_true_mc_xsec, h_fake.at(m), h_response, h_cov_diag.at(m));
+
+        for (int bin = 1; bin < _wSVD.unf->GetNbinsX()+1; bin++){
+            double err = _wSVD.unfcov->GetBinContent(bin, bin);
+            _wSVD.unf->SetBinError(bin, std::sqrt(err));
+        }
+        
+        _wSVD.unf->SetLineColor(kBlack);
+        _wSVD.unf->SetMarkerStyle(20);
+        _wSVD.unf->SetMarkerSize(0.5);
+
+
+        // Matrix multiply the true xsec by AC
+        TH1D* h_fake_xsec_smear = (TH1D*)h_true.at(m)->Clone();
+        _util.MatrixMultiply(h_true.at(m), h_fake_xsec_smear, _wSVD.smear, "reco_true", false);
+        
+        // Make the plot
+        TCanvas *c = new TCanvas("c", "c", 500, 500);
+        // _util.IncreaseLabelSize( h_mcxsec_true_model_smear.at(k_model_CV), c);
+        gPad->SetLeftMargin(0.20);
+        c->SetBottomMargin(0.15);
+
+
+        h_fake_xsec_smear->Scale(1.0, "width");
+        _wSVD.unf->Scale(1.0, "width");
+
+        double ymax = h_fake_xsec_smear->GetMaximum();
+
+        if (_wSVD.unf->GetMaximum() > ymax)
+            ymax = _wSVD.unf->GetMaximum();
+
+        h_fake_xsec_smear->SetMinimum(0);
+        h_fake_xsec_smear->SetMaximum(ymax + ymax*0.2);
+        h_fake_xsec_smear->SetLineWidth(2);
+        h_fake_xsec_smear->SetLineColor(kRed+2);
+
+        TH1D* h_error_hist = (TH1D*)h_fake_xsec_smear->Clone();
+        h_error_hist->SetFillColorAlpha(12, 0.15);
+
+        h_fake_xsec_smear->Draw("hist");
+        h_error_hist->Draw("E2, same");
+        _wSVD.unf->Draw("E,same");
+
+        // Create the legend
+        TLegend *leg = new TLegend(0.4, 0.5, 0.85, 0.85);
+        leg->SetBorderSize(0);
+        leg->SetFillStyle(0);
+        leg->AddEntry(h_error_hist, Form("True %s (stat.)", models.at(m).c_str()), "lf");
+        leg->AddEntry(_wSVD.unf, Form("Fake %s (stat.)", models.at(m).c_str()), "elp");
+        leg->Draw();
+
+        
+        c->Print(Form("plots/run%s/Models/%s/UnfoldedFakeDataComparison_%s.pdf", _util.run_period, _util.xsec_var, models.at(m).c_str()));
+        delete c;
+
+        delete _wSVD.smear;
+        delete _wSVD.wiener;
+        delete _wSVD.unfcov;
+        delete _wSVD.unf;
+        delete _wSVD.diff;
+        delete _wSVD.bias;
+        delete _wSVD.bias2;
+        delete _wSVD.fracError;
+        delete _wSVD.absError;
+        delete _wSVD.MSE;
+        delete _wSVD.MSE2;
+    }
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

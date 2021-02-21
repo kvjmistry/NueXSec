@@ -226,7 +226,7 @@ fi
 # Make a new file with genie tune1 model
 if [ "$1" == "tune1" ]; then
 
-  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_tune1.root tune1
+  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_tune1.root tune1 --weight_tune 0
 
   ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_tune1_intrinsic.root tune1 --intrinsic intrinsic --weight_tune 0
 
