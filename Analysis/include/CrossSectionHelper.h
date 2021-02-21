@@ -358,7 +358,7 @@ class CrossSectionHelper{
     double GetIntegratedFluxHP(int uni, std::string label);
     // -------------------------------------------------------------------------
     // Function to get the weight for a beamline variation
-    double GetIntegratedFluxBeamline(std::string variation, int _nu_pdg, double _true_energy, double _numi_ang);
+    double GetBeamlineWeight(std::string variation, int _nu_pdg, double _true_energy, double _numi_ang);
     // -------------------------------------------------------------------------
     // Function to get the POT from the flux file
     double GetPOT(TFile* f);

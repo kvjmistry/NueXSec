@@ -809,8 +809,8 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
     }
     // This is a beamline variation
     else if (CheckBeamline(label)){
-        weight_uni = cv_weight * GetIntegratedFluxBeamline(label, _nu_pdg, _true_energy, _numi_ang);
-        // std::cout << GetIntegratedFlux(label, _nu_pdg, _true_energy, _numi_ang) << std::endl;
+        weight_uni = cv_weight * GetBeamlineWeight(label, _nu_pdg, _true_energy, _numi_ang);
+        // std::cout << GetBeamlineWeight(label, _nu_pdg, _true_energy, _numi_ang) << std::endl;
     }
     // Dirt reweighting
     else if ( label == "Dirtup" || label == "Dirtdn"){
@@ -1033,7 +1033,7 @@ double CrossSectionHelper::GetIntegratedFluxHP(int uni, std::string label){
 
 }
 // -----------------------------------------------------------------------------
-double CrossSectionHelper::GetIntegratedFluxBeamline(std::string variation, int _nu_pdg, double _true_energy, double _numi_ang){
+double CrossSectionHelper::GetBeamlineWeight(std::string variation, int _nu_pdg, double _true_energy, double _numi_ang){
 
     f_flux->cd();
 
