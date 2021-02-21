@@ -2152,12 +2152,15 @@ void UtilityPlotter::CompareFakeDataReco(){
         k_MODEL_MAX
     };
     
-    // MC Xsec True
+    // Temp histograms
     TH1D* htemp;
+    TH2D* htemp2D;
 
 
     std::vector<TH1D*> h_true(k_MODEL_MAX);
+    std::vector<TH1D*> h_true_smear(k_MODEL_MAX);
     std::vector<TH1D*> h_fake(k_MODEL_MAX);
+    std::vector<TH2D*> h_response(k_MODEL_MAX);
     
     double ymax = 1.0;
 
@@ -2165,27 +2168,35 @@ void UtilityPlotter::CompareFakeDataReco(){
     // Loop over each model
     for (unsigned int m = 0; m < models.size(); m++){
 
-        htemp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec",models.at(m).c_str(), vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+        htemp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec",models.at(m).c_str(), vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
         h_true.at(m)        = (TH1D*)htemp->Clone();
+        h_true_smear.at(m)  = (TH1D*)htemp->Clone();
 
         htemp  = (TH1D*)fxsec->Get(Form("fake%s/%s/h_run1_CV_0_%s_data_xsec",models.at(m).c_str(), vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
         h_fake.at(m)        = (TH1D*)htemp->Clone();
 
+        // Get the response matrix
+        htemp2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
+        h_response.at(m) = (TH2D*)htemp2D->Clone();
+
+        // Apply the response matrix to the model MC True dist to get the reco dist back
+        _util.MatrixMultiply(h_true.at(m), h_true_smear.at(m), h_response.at(m), "true_reco", true);
+
         // Set the line colours
-        h_true.at(m)->SetLineColor(kRed+2);
+        h_true_smear.at(m)->SetLineColor(kRed+2);
         h_fake.at(m)->SetLineColor(kBlack);
-        h_true.at(m)->SetLineWidth(2);
+        h_true_smear.at(m)->SetLineWidth(2);
         // h_fake.at(m)->SetLineWidth(2);
         h_fake.at(m)->SetMarkerStyle(20);
         h_fake.at(m)->SetMarkerSize(0.5);
 
 
-        h_true.at(m)->Scale(1.0, "width");
+        // h_true_smear.at(m)->Scale(1.0, "width");
         h_fake.at(m)->Scale(1.0, "width");
 
-        ymax = h_true.at(m)->GetMaximum();
+        ymax = h_true_smear.at(m)->GetMaximum();
 
-        if (h_fake.at(m)->GetMaximum() > h_true.at(m)->GetMaximum())
+        if (h_fake.at(m)->GetMaximum() > h_true_smear.at(m)->GetMaximum())
             ymax = h_fake.at(m)->GetMaximum();
     }
 
@@ -2200,16 +2211,16 @@ void UtilityPlotter::CompareFakeDataReco(){
         c = new TCanvas("c", "c", 500, 500);
         c->SetLeftMargin(0.2);
         c->SetBottomMargin(0.15);
-        h_true.at(m)->GetYaxis()->SetTitleOffset(1.7);
-        h_true.at(m)->SetMinimum(0);
-        h_true.at(m)->SetMaximum(ymax + 0.2*ymax);
+        h_true_smear.at(m)->GetYaxis()->SetTitleOffset(1.7);
+        h_true_smear.at(m)->SetMinimum(0);
+        h_true_smear.at(m)->SetMaximum(ymax + 0.2*ymax);
 
         
 
-        TH1D* h_error_hist = (TH1D*)h_true.at(m)->Clone();
+        TH1D* h_error_hist = (TH1D*)h_true_smear.at(m)->Clone();
         h_error_hist->SetFillColorAlpha(12, 0.15);
         
-        h_true.at(m)->Draw("hist");
+        h_true_smear.at(m)->Draw("hist");
         h_error_hist->Draw("e2, same");
         h_fake.at(m)->Draw("E,same");
 
@@ -2276,7 +2287,7 @@ void UtilityPlotter::CompareFakeDataTrue(){
     h_cov_reco->SetDirectory(0);
 
     fxsec->Close();
-     
+
     // Now Get the Models
     // Load in the cross section output
     fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");

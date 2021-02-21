@@ -1573,6 +1573,7 @@ void Utility::MatrixMultiply(TH1D* h_true, TH1D* &h_reco, TH2D* matrix, std::str
     // Clear the Bins
     for (int bin = 0; bin < h_reco->GetNbinsX()+2; bin++){
         h_reco->SetBinContent(bin, 0);
+        h_reco->SetBinError(bin, 0);
     }
 
     // --- Do the matrix multiplication --- 
@@ -1591,6 +1592,8 @@ void Utility::MatrixMultiply(TH1D* h_true, TH1D* &h_reco, TH2D* matrix, std::str
             else
                 std::cout << "Unknown Option Specified!!!" << std::endl;
         }
+
+        h_reco->SetBinError(i, (h_reco->GetBinContent(i) * h_true->GetBinError(i)) / h_true->GetBinContent(i));
 
     } 
 
