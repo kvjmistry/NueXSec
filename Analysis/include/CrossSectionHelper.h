@@ -351,8 +351,14 @@ class CrossSectionHelper{
     // Function to calculate the cross section using binned histograms
     void CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double ext_scale_factor, TH1D* h_ext, double dirt_scale_factor, TH1D* h_dirt, TH1D* h_xsec, TH1D* h_sig, double targ, std::string mcdata, int _var);
     // -------------------------------------------------------------------------
-    // Function to get the integrated flux OR a weight
-    double GetIntegratedFlux(int uni, std::string value, std::string label, std::string variation, int _nu_pdg, double _true_energy, double _numi_ang);
+    // Function to get the integrated flux for CV
+    double GetIntegratedFluxCV();
+    // -------------------------------------------------------------------------
+    // Function to get the integrated flux for HP Universe
+    double GetIntegratedFluxHP(int uni, std::string label);
+    // -------------------------------------------------------------------------
+    // Function to get the weight for a beamline variation
+    double GetIntegratedFluxBeamline(std::string variation, int _nu_pdg, double _true_energy, double _numi_ang);
     // -------------------------------------------------------------------------
     // Function to get the POT from the flux file
     double GetPOT(TFile* f);
