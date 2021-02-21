@@ -65,6 +65,7 @@ void UtilityPlotter::Initialise(Utility _utility){
         CompareFakeDataReco();
         CompareFakeDataTrue();
         CompareTotalCrossSec();
+        CompareFakeTotalCrossSec();
         return;
     }
     else {
@@ -2543,6 +2544,106 @@ void UtilityPlotter::CompareTotalCrossSec(){
 
     c->Print(Form("plots/run%s/Models/Total/TotalCrossSectionComparison.pdf", _util.run_period));
 
+    delete c;
+
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::CompareFakeTotalCrossSec(){
+
+    gStyle->SetOptStat(0);
+
+    
+    
+
+    // Now Get the Models
+    // Load in the cross section output
+    TFile *fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+
+    // Now get some other models
+    // Create a vector for the models
+    std::vector<std::string> models = {
+        "mec",
+        "nogtune",
+        "nopi0tune",
+        "FLUGG",
+        "tune1"
+    };
+
+    // enums for the models
+    enum enum_models {
+        k_model_mec,
+        k_model_nogtune,
+        k_model_nopi0tune,
+        k_model_FLUGG,
+        k_model_tune1,
+        k_MODEL_MAX
+    };
+
+    TH1D* h_temp;
+
+    std::vector<TH1D*> h_model_xsec(k_MODEL_MAX);
+    std::vector<TH1D*> h_gen(k_MODEL_MAX);
+    std::vector<TH1D*> h_fake_xsec(k_MODEL_MAX);
+    
+    // Loop over each model
+    for (unsigned int m = 0; m < models.size(); m++){
+
+        TCanvas *c = new TCanvas("c", "c", 150, 350);
+        gPad->SetLeftMargin(0.3);
+
+        // Get true tune1 xsec
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/integrated/h_run%s_CV_0_integrated_mc_xsec", models.at(m).c_str(), _util.run_period));
+        h_model_xsec.at(m) = (TH1D*)h_temp->Clone();
+        h_model_xsec.at(m)->SetLineWidth(2);
+        h_model_xsec.at(m)->SetLineColor(kRed+2);
+
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/integrated/h_run%s_CV_0_integrated_gen", models.at(m).c_str(), _util.run_period));
+        h_gen.at(m) = (TH1D*)h_temp->Clone();
+
+        // Set the bin error to use the generated events err
+        h_model_xsec.at(m)->SetBinError(1,  h_model_xsec.at(m)->GetBinContent(1) * h_gen.at(m)->GetBinError(1) / h_gen.at(m)->GetBinContent(1));
+
+
+        // Get total mc xsec fake data prediction
+        h_temp  = (TH1D*)fxsec->Get(Form("fake%s/integrated/h_run%s_CV_0_integrated_data_xsec", models.at(m).c_str(), _util.run_period));
+        h_fake_xsec.at(m) = (TH1D*)h_temp->Clone();
+        
+
+        // X-Axis
+        h_fake_xsec.at(m)->GetXaxis()->SetRangeUser(0.0,1.0); 
+        h_fake_xsec.at(m)->GetXaxis()->SetLabelOffset(999);
+        h_fake_xsec.at(m)->GetXaxis()->SetLabelSize(0);
+        h_fake_xsec.at(m)->GetXaxis()->SetTickLength(0);
+        
+        // Y-Axis
+        h_fake_xsec.at(m)->GetYaxis()->SetRangeUser(4.0, 7.5);
+        h_fake_xsec.at(m)->GetYaxis()->CenterTitle();
+        h_fake_xsec.at(m)->GetYaxis()->SetLabelSize(0.1);
+        h_fake_xsec.at(m)->GetYaxis()->SetTitleSize(0.1);
+
+        h_fake_xsec.at(m)->SetMarkerStyle(20);
+        h_fake_xsec.at(m)->SetMarkerSize(0.7);
+        h_fake_xsec.at(m)->SetLineColor(kBlack);
+        h_fake_xsec.at(m)->Draw("E1,X0");
+        h_model_xsec.at(m)->Draw("hist,E,same");
+        h_fake_xsec.at(m)->Draw("E1,X0,same");
+
+        // Draw the Legend
+        TLegend *leg = new TLegend(0.35, 0.70, 0.70, 0.89);
+        leg->SetBorderSize(0);
+        leg->SetFillStyle(0);
+        h_fake_xsec.at(m)->SetMarkerSize(0.4);
+        
+        leg->AddEntry(h_model_xsec.at(m), Form("True %s", models.at(m).c_str()), "l");
+        leg->AddEntry(h_fake_xsec.at(m),  Form("Fake %s", models.at(m).c_str()),  "ep");
+        
+        leg->Draw();
+
+        gStyle->SetLegendTextSize(0.06);
+
+        c->Print(Form("plots/run%s/Models/Total/FakeTotalCrossSectionComparison_%s.pdf", _util.run_period, models.at(m).c_str()));
+        delete c;
+    
+    }
+}
 // -----------------------------------------------------------------------------

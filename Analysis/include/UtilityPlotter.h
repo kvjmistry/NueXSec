@@ -148,6 +148,8 @@ class UtilityPlotter{
     // Compare the data to a number of alternative models
     void CompareTotalCrossSec();
     // -------------------------------------------------------------------------
+    // Compare the total cross section for each fake data model
+    void CompareFakeTotalCrossSec();
     // -------------------------------------------------------------------------
 
 
