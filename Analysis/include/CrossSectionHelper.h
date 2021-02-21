@@ -354,11 +354,17 @@ class CrossSectionHelper{
     // Function to get the integrated flux for CV
     double GetIntegratedFluxCV();
     // -------------------------------------------------------------------------
+    // Get the integrated flux from the FLUGG flux file
+    double GetIntegratedFluxFLUGG();
+    // -------------------------------------------------------------------------
     // Function to get the integrated flux for HP Universe
     double GetIntegratedFluxHP(int uni, std::string label);
     // -------------------------------------------------------------------------
     // Function to get the weight for a beamline variation
     double GetBeamlineWeight(std::string variation, int _nu_pdg, double _true_energy, double _numi_ang);
+    // -------------------------------------------------------------------------
+    // Function to get the weight for a HP variation using the flux file
+    double GetHPWeight(int uni, std::string label, int _nu_pdg, double _true_energy, double _numi_ang);
     // -------------------------------------------------------------------------
     // Function to get the POT from the flux file
     double GetPOT(TFile* f);

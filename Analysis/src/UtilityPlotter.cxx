@@ -2271,12 +2271,12 @@ void UtilityPlotter::CompareFakeDataTrue(){
     h_response->SetDirectory(0);
 
     // Total Covariance Matrix
-    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/wiener/h_cov_stat_dataxsec_reco",_util.xsec_var));
+    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/wiener/h_cov_tot_dataxsec_reco",_util.xsec_var));
     TH2D* h_cov_reco = (TH2D*)h_temp_2D->Clone();
     h_cov_reco->SetDirectory(0);
 
     fxsec->Close();
- 
+     
     // Now Get the Models
     // Load in the cross section output
     fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");

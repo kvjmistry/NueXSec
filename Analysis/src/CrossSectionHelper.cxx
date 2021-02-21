@@ -76,6 +76,9 @@ void CrossSectionHelper::Initialise(Utility _utility){
     // Get the integrated flux for the CV
     integrated_flux = GetIntegratedFluxCV();
 
+    // Turn this on for using the FLUGG flux as the integrated flux
+    // integrated_flux = GetIntegratedFluxFLUGG();
+
 
     // Now lets open the beamline variation files
     GetBeamlineHists();
@@ -996,6 +999,55 @@ double CrossSectionHelper::GetIntegratedFluxCV(){
 
 }
 // -----------------------------------------------------------------------------
+double CrossSectionHelper::GetIntegratedFluxFLUGG(){
+
+    std::cout << "\n\n"<< "Printing Flux values from FLUGG flux file" << std::endl; 
+
+    TFile *f_flugg = TFile::Open("Systematics/MCC8_FHC_flux.root");
+
+    TH1D* h_nue, *h_nuebar;
+
+    double xbin;
+    double POT_flux{0.0}; // The POT of the flux file (i.e the POT used in the flux histogram)
+    double xbin_th{0.0};
+    double integral_nue{0.0}, integral_nuebar{0.0};
+    bool boolhist;
+
+    // Get the nue flux histogram from the file
+    boolhist = _util.GetHist(f_flugg, h_nue,         "nueFluxHisto");       
+    if (boolhist == false) gSystem->Exit(0); 
+    
+    // Get the nuebar flux histogram from the file
+    boolhist      = _util.GetHist(f_flugg, h_nuebar, "anueFluxHisto");
+    if (boolhist == false) gSystem->Exit(0); 
+
+    // Get the POT from the flux histogram
+    POT_flux = 2.4e20;
+
+    // Nue Integrated Flux
+    xbin_th = h_nue->GetXaxis()->FindBin(_util.energy_threshold);                     // Find the x bin to integrate from
+    integral_nue = h_nue->Integral( xbin_th, h_nue->GetNbinsX()+1); // Integrate over the flux for nue
+    std::cout << "\nIntegral Nue Flux: " <<  integral_nue / POT_flux << " nue / POT / cm2" << std::endl;
+
+    // Nuebar Integrated Flux
+    xbin_th   = h_nuebar->GetXaxis()->FindBin(_util.energy_threshold);                                   // Find the x bin to integrate from
+    integral_nuebar = h_nuebar->Integral( xbin_th, h_nuebar->GetNbinsX()+1); // Integrate over the flux for nue
+    std::cout << "\nIntegral Nuebar Flux: " << integral_nuebar / POT_flux<< " nuebar / POT / cm2" << "\n" << std::endl;
+
+    // Print the flux scaled to the MC and Data POT
+    std::cout << "Integral Flux MC POT: "   << mc_flux_scale_factor * integral_nuebar / (POT_flux * flux_scale_factor)   << " nu / MC POT / cm2"   << "\n" << std::endl;
+    std::cout << "Integral Flux Data POT: " << data_flux_scale_factor * integral_nuebar / (POT_flux * flux_scale_factor) << " nu / Data POT / cm2" << "\n" << std::endl;
+
+    // Return the flux per POT
+    return (integral_nue + integral_nuebar) / (POT_flux * flux_scale_factor);
+
+    f_flugg->Close();
+
+    f_flux->cd();
+
+
+}
+// -----------------------------------------------------------------------------
 double CrossSectionHelper::GetIntegratedFluxHP(int uni, std::string label){
 
     f_flux->cd();
@@ -1069,6 +1121,114 @@ double CrossSectionHelper::GetBeamlineWeight(std::string variation, int _nu_pdg,
         return ( beamline_hists.at(var_index).at(k_numubar)->GetBinContent(xbin, ybin));
     }
     else return 1.0;
+
+
+}
+// -----------------------------------------------------------------------------
+double CrossSectionHelper::GetHPWeight(int uni, std::string label, int _nu_pdg, double _true_energy, double _numi_ang){
+
+    f_flux->cd();
+
+    TH2D *h_nue, *h_nuebar ,*h_uni_nue, *h_uni_nuebar;
+    TH2D *h_numu, *h_numubar, *h_uni_numu, *h_uni_numubar;
+    double xbin, ybin;
+    double xbinCV, ybinCV;
+    double POT_flux{0.0}; // The POT of the flux file (i.e the POT used in the flux histogram)
+    double xbin_th{0.0};
+    double integral_nue{0.0}, integral_nuebar{0.0};
+    double ratio{1.0};
+    bool boolhist;
+    
+    // Get the POT from the file
+    POT_flux = GetPOT(f_flux);
+
+  
+    // Nue
+    if (_nu_pdg == 12){
+
+        // Get Nue histogram
+        boolhist = _util.GetHist(f_flux, h_uni_nue, Form("nue/Multisims/nue_%s_Uni_%i_AV_TPC_2D", label.c_str(), uni));
+        if (boolhist == false) gSystem->Exit(0);
+    
+        xbin = h_uni_nue->GetXaxis()->FindBin(_true_energy);
+        ybin = h_uni_nue->GetYaxis()->FindBin(_numi_ang);
+        ratio = h_uni_nue->GetBinContent(xbin, ybin);
+        
+        // Get the nue flux histogram from the file CV
+        boolhist = _util.GetHist(f_flux, h_nue,         "nue/Detsmear/nue_CV_AV_TPC_2D");       
+        if (boolhist == false) gSystem->Exit(0); 
+
+        xbinCV = h_nue->GetXaxis()->FindBin(_true_energy);
+        ybinCV = h_nue->GetYaxis()->FindBin(_numi_ang);
+        ratio /= h_nue->GetBinContent(xbin, ybin);
+
+        return (ratio);
+    }
+    // Nuebar
+    else if (_nu_pdg == -12){
+        
+        // Get Nuebar histogram
+        boolhist = _util.GetHist(f_flux, h_uni_nuebar, Form("nuebar/Multisims/nuebar_%s_Uni_%i_AV_TPC_2D", label.c_str(), uni));
+        if (boolhist == false) gSystem->Exit(0);
+    
+        xbin = h_uni_nuebar->GetXaxis()->FindBin(_true_energy);
+        ybin = h_uni_nuebar->GetYaxis()->FindBin(_numi_ang);
+        ratio = h_uni_nuebar->GetBinContent(xbin, ybin);
+        
+        // Get the nuebar flux histogram from the file CV
+        boolhist = _util.GetHist(f_flux, h_nuebar,         "nuebar/Detsmear/nuebar_CV_AV_TPC_2D");       
+        if (boolhist == false) gSystem->Exit(0); 
+
+        xbinCV = h_nuebar->GetXaxis()->FindBin(_true_energy);
+        ybinCV = h_nuebar->GetYaxis()->FindBin(_numi_ang);
+        ratio /= h_nuebar->GetBinContent(xbin, ybin);
+
+        return (ratio);
+    }
+    // Numu
+    else if (_nu_pdg == 14){
+        
+        // Get Numu histogram
+        boolhist = _util.GetHist(f_flux, h_uni_numu, Form("numu/Multisims/numu_%s_Uni_%i_AV_TPC_2D", label.c_str(), uni));
+        if (boolhist == false) gSystem->Exit(0);
+    
+        xbin = h_uni_numu->GetXaxis()->FindBin(_true_energy);
+        ybin = h_uni_numu->GetYaxis()->FindBin(_numi_ang);
+        ratio = h_uni_numu->GetBinContent(xbin, ybin);
+        
+        // Get the numu flux histogram from the file CV
+        boolhist = _util.GetHist(f_flux, h_numu,         "numu/Detsmear/numu_CV_AV_TPC_2D");       
+        if (boolhist == false) gSystem->Exit(0); 
+
+        xbinCV = h_numu->GetXaxis()->FindBin(_true_energy);
+        ybinCV = h_numu->GetYaxis()->FindBin(_numi_ang);
+        ratio /= h_numu->GetBinContent(xbin, ybin);
+
+        return (ratio);
+    }
+    // NumuBar
+    else if (_nu_pdg == -14){
+        
+        // Get Numubar histogram
+        boolhist = _util.GetHist(f_flux, h_uni_numubar, Form("numubar/Multisims/numubar_%s_Uni_%i_AV_TPC_2D", label.c_str(), uni));
+        if (boolhist == false) gSystem->Exit(0);
+    
+        xbin = h_uni_numubar->GetXaxis()->FindBin(_true_energy);
+        ybin = h_uni_numubar->GetYaxis()->FindBin(_numi_ang);
+        ratio = h_uni_numubar->GetBinContent(xbin, ybin);
+        
+        // Get the numubar flux histogram from the file CV
+        boolhist = _util.GetHist(f_flux, h_numubar,         "numubar/Detsmear/numubar_CV_AV_TPC_2D");       
+        if (boolhist == false) gSystem->Exit(0); 
+
+        xbinCV = h_numubar->GetXaxis()->FindBin(_true_energy);
+        ybinCV = h_numubar->GetYaxis()->FindBin(_numi_ang);
+        ratio /= h_numubar->GetBinContent(xbin, ybin);
+
+        return (ratio);
+    }
+    else
+        return 1.0;
 
 
 }
