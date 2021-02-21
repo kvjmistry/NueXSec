@@ -220,7 +220,14 @@ class HistogramHelper{
         k_eff_nu_phi,                // Efficiency as a function of nu phi
         k_eff_elec_theta,            // Efficiency as a function of electron theta
         k_eff_elec_phi,              // Efficiency as a function of electron phi
-        k_eff_effective_ang,         // Efficiency as a function of the effective angle (angle between nu dir and elec dir)
+        k_eff_beta,                  // beta
+        k_eff_beta_rebin,            // beta with uneven bins
+        k_eff_beta_rebin_nue,        // beta with uneven bins nue
+        k_eff_beta_rebin_nuebar,     // beta with uneven bins nueber
+        k_eff_cosine_beta,           // cosine beta
+        k_eff_cosine_beta_rebin,     // cosine beta with uneven bins
+        k_eff_cosine_beta_rebin_nue, // cosine beta with uneven bins
+        k_eff_cosine_beta_rebin_nuebar, // cosine beta with uneven bins
         k_eff_proton_multi,          // Efficiency as a function of the number of true protons in the interaction.
         k_eff_proton_multi_nue,      // Efficiency as a function of the number of true protons in the interaction. Nue events only
         k_eff_proton_multi_nuebar,   // Efficiency as a function of the number of true protons in the interaction. Nuebar events only

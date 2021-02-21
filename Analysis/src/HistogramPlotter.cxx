@@ -87,7 +87,16 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_eff_nu_phi",                  false, false, "True #nu_{e} + #bar{#nu}_{e} #phi [deg]; Efficiency",             "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "nu_phi" );
         MakeEfficiencyPlotByCut("h_eff_elec_theta",              false, false, "True e#lower[-0.5]{-} + e^{+} #theta [deg]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_theta" );
         MakeEfficiencyPlotByCut("h_eff_elec_phi",                false, false, "True e#lower[-0.5]{-} + e^{+} #phi [deg]; Efficiency",            "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_phi" );
-        MakeEfficiencyPlotByCut("h_eff_effective_ang",           false, false, "True e#lower[-0.5]{-} + e^{+} #beta [deg]; Efficiency",            "True e#lower[-0.5]{-} + e^{+} Events in FV",       "eff_ang" );
+        
+        MakeEfficiencyPlotByCut("h_eff_beta",                    false, false, "True e#lower[-0.5]{-} + e^{+} #beta [deg]; Efficiency",            "True e#lower[-0.5]{-} + e^{+} Events in FV",       "beta" );
+        MakeEfficiencyPlotByCut("h_eff_beta_rebin",              true, false, "True e#lower[-0.5]{-} + e^{+} #beta [deg]; Efficiency",            "True e#lower[-0.5]{-} + e^{+} Events in FV",        "beta_rebin" );
+        MakeEfficiencyPlotByCut("h_eff_beta_rebin_nue",          true, false, "True e#lower[-0.5]{-} [deg]; Efficiency",                          "True e#lower[-0.5]{-} Events in FV",                "beta_rebin_nue" );
+        MakeEfficiencyPlotByCut("h_eff_beta_rebin_nuebar",       true, false, "True e^{+} #beta [deg]; Efficiency",                               "True e^{+} Events in FV",                           "beta_rebin_nuebar" );
+
+        MakeEfficiencyPlotByCut("h_eff_cosine_beta",             false, false, "True e#lower[-0.5]{-} + e^{+} cos(#beta); Efficiency",            "True e#lower[-0.5]{-} + e^{+} Events in FV",        "cosine_beta" );
+        MakeEfficiencyPlotByCut("h_eff_cosine_beta_rebin",       true, false,  "True e#lower[-0.5]{-} + e^{+} cos(#beta); Efficiency",            "True e#lower[-0.5]{-} + e^{+} Events in FV",        "cosine_beta_rebin" );
+        MakeEfficiencyPlotByCut("h_eff_cosine_beta_rebin_nue",   true, false,  "True e#lower[-0.5]{-} cos(#beta); Efficiency",                    "True e#lower[-0.5]{-} Events in FV",                "cosine_beta_rebin_nue" );
+        MakeEfficiencyPlotByCut("h_eff_cosine_beta_rebin_nuebar",true, false,  "True e^{+} cos(#beta); Efficiency",                               "True e^{+} Events in FV",                           "cosine_beta_rebin_nuebar" );
         
         MakeEfficiencyPlotByCut("h_eff_proton_multi",            false, false, "True #nu_{e} + #bar{#nu}_{e} Proton Multi.; Efficiency",          "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "prot_multi" );
         MakeEfficiencyPlotByCut("h_eff_proton_multi_nue",        false, false, "True #nu_{e} Proton Multi.; Efficiency",                          "True #nu_{e} Events in FV",                        "prot_multi_nue" );
