@@ -2504,6 +2504,7 @@ void UtilityPlotter::CompareTotalCrossSec(){
     TLegend *leg = new TLegend(0.35, 0.70, 0.70, 0.89);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
+    h_data->SetMarkerSize(0.4);
     leg->AddEntry(h_data, "Data (stat. + sys.)",        "ep");
     leg->AddEntry( h_model_xsec.at(k_model_CV),         "MC (CV)", "lf");
     leg->AddEntry( h_model_xsec.at(k_model_mec),        "MC (1.5 #times MEC)", "lf");
@@ -2515,7 +2516,24 @@ void UtilityPlotter::CompareTotalCrossSec(){
     leg->Draw();
 
     gStyle->SetLegendTextSize(0.06);
-    TLatex *t = new TLatex(.34, .145, "#splitline{MicroBooNE NuMI}{Data 2.0#times10^{20} POT}");
+
+    double Data_POT; 
+
+    // Set the scale factors
+    if (strcmp(_util.run_period, "1") == 0){
+        Data_POT = _util.config_v.at(_util.k_Run1_Data_POT); // Define this variable here for easier reading
+    }
+    else if (strcmp(_util.run_period, "3") == 0){
+        Data_POT = _util.config_v.at(_util.k_Run3_Data_POT); // Define this variable here for easier reading
+    }
+    else {
+        std::cout << "Error Krish... You havent defined the run3b POT numbers yet you donut!" << std::endl;
+        exit(1);
+    }
+
+    Data_POT = Data_POT / 1.0e20;
+
+    TLatex *t = new TLatex(.34, .145, Form("#splitline{MicroBooNE NuMI}{Data %2.1f#times10^{20} POT}", Data_POT));
     t->SetTextColor(kBlack);
     t->SetNDC();
     t->SetTextSize(2.0/30.);
