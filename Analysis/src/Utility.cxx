@@ -1601,3 +1601,21 @@ void Utility::MatrixMultiply(TH1D* h_true, TH1D* &h_reco, TH2D* matrix, std::str
         h_reco->Scale(1.0, "width");
 
 }
+// -----------------------------------------------------------------------------
+void Utility::ConvertCovarianceUnits(TH2D* &h_cov, TH1D *h_input, TH1D* h_output){
+
+    // Loop over the bins of the covariance matrix and convert deviations to percentages
+    for (int i = 1; i < h_cov->GetNbinsY()+1; i++) {
+
+        for (int j = 1; j < h_cov->GetNbinsX()+1; j++) {
+            double conversion;
+            
+            if (h_input->GetBinContent(i) * h_input->GetBinContent(j) == 0)
+                conversion  = 0.0;
+            else
+                conversion = (h_output->GetBinContent(i) * h_output->GetBinContent(j) * h_cov->GetBinContent(i,j) / (h_input->GetBinContent(i) * h_input->GetBinContent(j)));
+            
+            h_cov->SetBinContent(i, j, conversion);
+        }
+    }
+}

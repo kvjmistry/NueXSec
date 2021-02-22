@@ -157,6 +157,8 @@ public:
     // Apply matrix to smear from true to reco space
     void MatrixMultiply(TH1D* h_true, TH1D* &h_reco, TH2D* matrix, std::string option, bool norm);
     // -------------------------------------------------------------------------
+    // Change units of covariane matrix so we can add them
+    void ConvertCovarianceUnits(TH2D* &h_cov, TH1D *h_input, TH1D* h_output);
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 

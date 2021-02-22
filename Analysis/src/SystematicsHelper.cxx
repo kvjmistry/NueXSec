@@ -2135,7 +2135,7 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
             label == "WireModdEdX" ){
             
             // Convert the Covariance Matrix-- switching from detvar cv deviations to CV deviation
-            ConvertCovarianceUnits(cov, h_CV, cv_hist_vec.at(var).at(_type));
+            _util.ConvertCovarianceUnits(cov, h_CV, cv_hist_vec.at(var).at(_type));
            
             h_cov_v.at(var).at(_type).at(k_err_detvar)->Add(cov);
             h_cov_v.at(var).at(_type).at(k_err_tot)->Add(cov);
@@ -2512,7 +2512,7 @@ void SystematicsHelper::FillStatVector(){
 
     // Add the data stat to the total mc cov matrix
     // Convert the Covariance Matrix-- switching from detvar Data CV deviations to MC CV deviation
-    ConvertCovarianceUnits(h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_stat), 
+    _util.ConvertCovarianceUnits(h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_stat), 
                            cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), 
                            cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec));
     
@@ -2522,7 +2522,7 @@ void SystematicsHelper::FillStatVector(){
 
     // Add the mc stat to the total data cov matrix
     // Convert the Covariance Matrix-- switching from MC CV deviations to Data CV deviation
-    ConvertCovarianceUnits(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_stat),
+    _util.ConvertCovarianceUnits(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_stat),
                            cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec),
                            cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec));
     
@@ -2536,7 +2536,7 @@ void SystematicsHelper::FillStatVector(){
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_sys));
         
         // Convert the Covariance Matrix-- switching from MC CV deviations to Data CV deviation
-        ConvertCovarianceUnits(h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_sys),
+        _util.ConvertCovarianceUnits(h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_sys),
                                cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec),
                                cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec));
         
@@ -3607,6 +3607,10 @@ void SystematicsHelper::ExportResult(TFile* f){
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->SetOption("col");
         h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Write("h_cov_tot_mcxsec_reco", TObject::kOverwrite);
 
+        // MC XSec Sys Covariance Matrix  ---------------------------------
+        h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_sys)->SetOption("col");
+        h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_sys)->Write("h_cov_sys_mcxsec_reco", TObject::kOverwrite);
+
         // MC XSec Smear MC Stats Covariance Matrix  ---------------------------------
         h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_mcstats)->SetOption("col");
         h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_mcstats)->Write("h_cov_tot_mcxsec_smear_true", TObject::kOverwrite);
@@ -3788,23 +3792,5 @@ void SystematicsHelper::ExportTotalCrossSectionResult(){
     f_sys_out->cd();
     f_sys_out->Close();
 
-}
-// -----------------------------------------------------------------------------
-void SystematicsHelper::ConvertCovarianceUnits(TH2D* &h_cov, TH1D *h_input, TH1D* h_output){
-
-    // Loop over the bins of the covariance matrix and convert deviations to percentages
-    for (int i = 1; i < h_cov->GetNbinsY()+1; i++) {
-
-        for (int j = 1; j < h_cov->GetNbinsX()+1; j++) {
-            double conversion;
-            
-            if (h_input->GetBinContent(i) * h_input->GetBinContent(j) == 0)
-                conversion  = 0.0;
-            else
-                conversion = (h_output->GetBinContent(i) * h_output->GetBinContent(j) * h_cov->GetBinContent(i,j) / (h_input->GetBinContent(i) * h_input->GetBinContent(j)));
-            
-            h_cov->SetBinContent(i, j, conversion);
-        }
-    }
 }
 // -----------------------------------------------------------------------------

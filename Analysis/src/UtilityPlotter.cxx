@@ -1666,7 +1666,7 @@ void UtilityPlotter::TestModelDependence(){
     h_mcxsec_reco_model.at(k_model_mec)      ->SetLineColor(kGreen+2);
     h_mcxsec_reco_model.at(k_model_nogtune)  ->SetLineColor(kBlue+2);
     h_mcxsec_reco_model.at(k_model_nopi0tune)->SetLineColor(kPink+1);
-    h_mcxsec_reco_model.at(k_model_FLUGG)    ->SetLineColor(kYellow+2);
+    h_mcxsec_reco_model.at(k_model_FLUGG)    ->SetLineColor(kViolet-1);
     h_mcxsec_reco_model.at(k_model_tune1)    ->SetLineColor(kOrange-1);
     
 
@@ -1786,7 +1786,7 @@ void UtilityPlotter::CompareDataCrossSections(){
     // Data X Sec FLUGG
     h_temp  = (TH1D*)fxsec->Get(Form("FLUGG/%s/h_run1_CV_0_%s_data_xsec", vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
     TH1D* h_datasec_reco_FLUGG = (TH1D*)h_temp->Clone();
-    h_datasec_reco_FLUGG->SetLineColor(kYellow+2);
+    h_datasec_reco_FLUGG->SetLineColor(kViolet-1);
     h_datasec_reco_FLUGG->Scale(1.0, "width");
     h_datasec_reco_FLUGG->SetLineWidth(2);
     
@@ -1900,7 +1900,7 @@ void UtilityPlotter::CompareSmearing(){
     h_mcxsec_reco_model.at(k_model_mec)      ->SetLineColor(kGreen+2);
     h_mcxsec_reco_model.at(k_model_nogtune)  ->SetLineColor(kBlue+2);
     h_mcxsec_reco_model.at(k_model_nopi0tune)->SetLineColor(kPink+1);
-    h_mcxsec_reco_model.at(k_model_FLUGG)    ->SetLineColor(kYellow+2);
+    h_mcxsec_reco_model.at(k_model_FLUGG)    ->SetLineColor(kViolet-1);
     h_mcxsec_reco_model.at(k_model_tune1)    ->SetLineColor(kOrange-1);
 
     // Set the Bin errors for the MC truth
@@ -2104,7 +2104,7 @@ void UtilityPlotter::CompareUnfoldedModels(){
     h_mcxsec_true_model_smear.at(k_model_nopi0tune)->SetLineColor(kPink+1);
     h_mcxsec_true_model_smear.at(k_model_nopi0tune)->Draw("hist,same" );
 
-    // h_mcxsec_true_model_smear.at(k_model_FLUGG)->SetLineColor(kYellow+2);
+    // h_mcxsec_true_model_smear.at(k_model_FLUGG)->SetLineColor(kViolet-1);
     // h_mcxsec_true_model_smear.at(k_model_FLUGG)->Draw("hist,same" );
 
     h_mcxsec_true_model_smear.at(k_model_tune1)->SetLineColor(kOrange-1);
@@ -2134,7 +2134,19 @@ void UtilityPlotter::CompareFakeDataReco(){
     gStyle->SetOptStat(0);
 
     /// Load in the cross section output
-    TFile *fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+    TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
+
+    TH2D* h_temp_2D;
+
+    // Get the MC covariance Matrix
+    h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/er/h_cov_sys_mcxsec_reco", _util.xsec_var ));
+    TH2D* h_cov_tot = (TH2D*)h_temp_2D->Clone();
+    h_cov_tot->SetDirectory(0);
+
+    fxsec->Close();
+
+    /// Load in the cross section output
+    fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
 
     // Create a vector for the models
     std::vector<std::string> models = {
@@ -2164,9 +2176,14 @@ void UtilityPlotter::CompareFakeDataReco(){
     std::vector<TH1D*> h_true_smear(k_MODEL_MAX);
     std::vector<TH1D*> h_fake(k_MODEL_MAX);
     std::vector<TH2D*> h_response(k_MODEL_MAX);
+    std::vector<TH2D*> h_cov_m(k_MODEL_MAX);
     
     double ymax = 1.0;
 
+    // Get the cv hist 
+    htemp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", "CV", vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+    TH1D *h_temp_CV = (TH1D*)htemp->Clone();
+    h_temp_CV->Scale(1.0, "width");
     
     // Loop over each model
     for (unsigned int m = 0; m < models.size(); m++){
@@ -2182,6 +2199,9 @@ void UtilityPlotter::CompareFakeDataReco(){
         htemp2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
         h_response.at(m) = (TH2D*)htemp2D->Clone();
 
+        // Get the Covariance matrix
+        h_cov_m.at(m) = (TH2D*)h_cov_tot->Clone();
+
         // Apply the response matrix to the model MC True dist to get the reco dist back
         _util.MatrixMultiply(h_true.at(m), h_true_smear.at(m), h_response.at(m), "true_reco", true);
 
@@ -2193,9 +2213,24 @@ void UtilityPlotter::CompareFakeDataReco(){
         h_fake.at(m)->SetMarkerStyle(20);
         h_fake.at(m)->SetMarkerSize(0.5);
 
-
         // h_true_smear.at(m)->Scale(1.0, "width");
         h_fake.at(m)->Scale(1.0, "width");
+
+        // Convert the Covariance Matrix-- switching from MC CV deviations to Fake Data CV deviation
+        _util.ConvertCovarianceUnits(h_cov_m.at(m),
+                               h_temp_CV,
+                               h_fake.at(m));
+
+        // Now set the bin errors
+        for (int bin = 1; bin <  h_fake.at(m)->GetNbinsX()+1; bin++ ){
+            
+            std::cout << 100 * std::sqrt(h_cov_m.at(m)->GetBinContent(bin, bin)) / h_fake.at(m)->GetBinContent(bin) << std::endl;
+            
+            h_fake.at(m)->SetBinError(bin, std::sqrt(h_cov_m.at(m)->GetBinContent(bin, bin)));
+            
+            
+        }
+        std::cout << std::endl;
 
         ymax = h_true_smear.at(m)->GetMaximum();
 
@@ -2216,9 +2251,16 @@ void UtilityPlotter::CompareFakeDataReco(){
         c->SetBottomMargin(0.15);
         h_true_smear.at(m)->GetYaxis()->SetTitleOffset(1.7);
         h_true_smear.at(m)->SetMinimum(0);
-        h_true_smear.at(m)->SetMaximum(ymax + 0.2*ymax);
+        h_true_smear.at(m)->SetMaximum(ymax + 0.4*ymax);
 
-        
+        // Set the line colours
+        if (m == k_model_mec)      h_true_smear.at(k_model_mec)      ->SetLineColor(kGreen+2);
+        if (m == k_model_nogtune)  h_true_smear.at(k_model_nogtune)  ->SetLineColor(kBlue+2);
+        if (m == k_model_nopi0tune)h_true_smear.at(k_model_nopi0tune)->SetLineColor(kPink+1);
+        if (m == k_model_FLUGG)    h_true_smear.at(k_model_FLUGG)    ->SetLineColor(kViolet-1);
+        if (m == k_model_tune1)    h_true_smear.at(k_model_tune1)    ->SetLineColor(kOrange-1);
+
+        h_true_smear.at(m)->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
 
         TH1D* h_error_hist = (TH1D*)h_true_smear.at(m)->Clone();
         h_error_hist->SetFillColorAlpha(12, 0.15);
@@ -2232,7 +2274,7 @@ void UtilityPlotter::CompareFakeDataReco(){
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
         leg->AddEntry(h_error_hist, Form("True %s (stat.)", models.at(m).c_str()), "lf");
-        leg->AddEntry(h_fake.at(m), Form("Fake %s (stat.)", models.at(m).c_str()), "elp");
+        leg->AddEntry(h_fake.at(m), Form("Fake %s (sys.)", models.at(m).c_str()), "elp");
         leg->Draw();
 
         // Save and close
@@ -2465,7 +2507,7 @@ void UtilityPlotter::CompareTotalCrossSec(){
     h_model_xsec.at(k_model_mec)->SetLineColor(kGreen+2);
     h_model_xsec.at(k_model_nogtune)->SetLineColor(kBlue+2);
     h_model_xsec.at(k_model_nopi0tune)->SetLineColor(kPink+1);
-    h_model_xsec.at(k_model_FLUGG)->SetLineColor(kYellow+2);
+    h_model_xsec.at(k_model_FLUGG)->SetLineColor(kViolet-1);
     h_model_xsec.at(k_model_tune1)->SetLineColor(kOrange-1);
 
 
@@ -2552,9 +2594,6 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
 
     gStyle->SetOptStat(0);
 
-    
-    
-
     // Now Get the Models
     // Load in the cross section output
     TFile *fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
@@ -2607,6 +2646,16 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
         // Get total mc xsec fake data prediction
         h_temp  = (TH1D*)fxsec->Get(Form("fake%s/integrated/h_run%s_CV_0_integrated_data_xsec", models.at(m).c_str(), _util.run_period));
         h_fake_xsec.at(m) = (TH1D*)h_temp->Clone();
+
+        // Set the error to be equal to the total systematic uncertainty of ~21%
+        h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * 0.21 );
+
+        // Set the line colours
+        if (m == k_model_mec)      h_model_xsec.at(k_model_mec)      ->SetLineColor(kGreen+2);
+        if (m == k_model_nogtune)  h_model_xsec.at(k_model_nogtune)  ->SetLineColor(kBlue+2);
+        if (m == k_model_nopi0tune)h_model_xsec.at(k_model_nopi0tune)->SetLineColor(kPink+1);
+        if (m == k_model_FLUGG)    h_model_xsec.at(k_model_FLUGG)    ->SetLineColor(kViolet-1);
+        if (m == k_model_tune1)    h_model_xsec.at(k_model_tune1)    ->SetLineColor(kOrange-1);
         
 
         // X-Axis
@@ -2616,7 +2665,7 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
         h_fake_xsec.at(m)->GetXaxis()->SetTickLength(0);
         
         // Y-Axis
-        h_fake_xsec.at(m)->GetYaxis()->SetRangeUser(4.0, 7.5);
+        h_fake_xsec.at(m)->GetYaxis()->SetRangeUser(3.0, 9.0);
         h_fake_xsec.at(m)->GetYaxis()->CenterTitle();
         h_fake_xsec.at(m)->GetYaxis()->SetLabelSize(0.1);
         h_fake_xsec.at(m)->GetYaxis()->SetTitleSize(0.1);
