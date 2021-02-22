@@ -186,8 +186,17 @@ void Selection::MakeSelection(){
             // Apply the Selection cuts 
             bool pass = ApplyCuts(_util.k_mc, counter_v, mc_SC);
 
+            // Only fill passed events for fake data
+            if (_util.isfakedata){
+                
+                if (pass)
+                    _thelper.at(_util.k_mc).FillVars(mc_SC, pass);
+            }
             // Fill the output tree if the event passed or it was signal
-            if (pass || mc_SC.is_signal) _thelper.at(_util.k_mc).FillVars(mc_SC, pass);
+            else {
+                if (pass || mc_SC.is_signal)
+                    _thelper.at(_util.k_mc).FillVars(mc_SC, pass);
+            }
             
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_mc << mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt << '\n';

@@ -2600,6 +2600,7 @@ void HistogramPlotter::Save1DHists(const char *print_name, const char *histname,
 
     TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
     c->SetTopMargin(0.11);
+    // gPad->SetLogy();
 
     hist->SetStats(kFALSE);
 
