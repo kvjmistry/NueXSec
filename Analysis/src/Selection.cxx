@@ -546,8 +546,11 @@ void Selection::SavetoFile(){
             _hhelper.at(_util.k_mc).WriteInteractions();
             _hhelper.at(_util.k_mc).Write_2DSigBkgHists();
             
-            if (_util.isfakedata && !_util.intrinsic_mode)
-                _hhelper.at(_util.k_mc).WriteReco(_util.k_data);
+            if (_util.isfakedata){
+                if (std::string(_util.intrinsic_mode) == "default"){
+                    _hhelper.at(_util.k_mc).WriteReco(_util.k_data);
+                }
+            }
             else
                 _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
         }
@@ -555,10 +558,12 @@ void Selection::SavetoFile(){
         if (std::string(_util.intrinsic_mode) == "default") {
             _hhelper.at(_util.k_mc).WriteFlash();
             
-            if (_util.isfakedata && !_util.intrinsic_mode){
-                _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_data);
-                _hhelper.at(_util.k_mc).WritePiZero(_util.k_data);
-                _hhelper.at(_util.k_mc).WriteNuMu(_util.k_data);
+            if (_util.isfakedata){
+                if (std::string(_util.intrinsic_mode) == "default"){
+                    _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_data);
+                    _hhelper.at(_util.k_mc).WritePiZero(_util.k_data);
+                    _hhelper.at(_util.k_mc).WriteNuMu(_util.k_data);
+                }
             }
             else {
                 _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_mc);

@@ -188,6 +188,7 @@ if [ "$1" == "nogtune" ]; then
   ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root nogtune --weight_tune 0
 
   ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root nogtune --intrinsic intrinsic --weight_tune 0
+  
   root -l -b -q 'merge/merge_uneaventrees.C("1", true, false, "files/trees/nuexsec_selected_tree_mc_run1_nogtune.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "nogtune")'
 
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_nogtune.root --var dummy nogtune --xsecmode default --xsec_smear er --xsecbins standard --xsecvar elec_E
@@ -246,6 +247,23 @@ if [ "$1" == "tune1" ]; then
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_tune1.root --var dummy tune1 --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_tune1.root --var dummy tune1 --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_tune1.root --var dummy tune1 --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang
+
+fi
+
+# Make a new file so we can do tests with fake data as the CV model
+if [ "$1" == "Input" ]; then
+
+  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root Input
+
+  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root Input --intrinsic intrinsic
+
+  # source merge/merge_run1_files.sh files/nuexsec_mc_run1_Input.root files/nuexsec_run1_Input_merged.root
+
+  root -l -b -q 'merge/merge_uneaventrees.C("1", true, false, "files/trees/nuexsec_selected_tree_mc_run1_Input.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "Input")'
+
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_Input.root --var dummy Input --xsecmode default --xsec_smear er --xsecbins standard --xsecvar elec_E
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_Input.root --var dummy Input --xsecmode default --xsec_smear er --xsecbins standard --xsecvar elec_ang
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_Input.root --var dummy Input --xsecmode default --xsec_smear er --xsecbins standard --xsecvar elec_cang
 
 fi
 
@@ -362,5 +380,27 @@ if [ "$1" == "fakeFLUGG" ]; then
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakeFLUGG.root --fake FLUGG --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakeFLUGG.root --fake FLUGG --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakeFLUGG.root --fake FLUGG --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang
+
+fi
+
+# Use the cv model as fake data
+if [ "$1" == "fakeInput" ]; then
+
+  # Run the cross sec calculation in fake data mode
+  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake Input
+
+  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root --fake Input --intrinsic intrinsic
+
+  # Merge the files
+  hadd -f -T files/nuexsec_run1_merged_fakeInput.root files/nuexsec_data_run1_Input.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root
+
+  # Plot the files
+  ./nuexsec --run 1 --hist files/nuexsec_run1_merged_fakeInput.root --fake Input
+
+  root -l -b -q 'merge/merge_uneaventrees.C("1", true, true, "files/trees/nuexsec_selected_tree_mc_run1.root", "files/trees/nuexsec_selected_tree_data_run1_Input.root", "files/trees/nuexsec_selected_tree_ext_run1_fake.root","files/trees/nuexsec_selected_tree_dirt_run1_fake.root", "fakeInput")'
+
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakeInput.root --fake Input --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakeInput.root --fake Input --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakeInput.root --fake Input --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang
 
 fi
