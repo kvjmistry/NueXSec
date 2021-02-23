@@ -22,16 +22,16 @@ void UtilityPlotter::Initialise(Utility _utility){
         // CompareDetVarEfficiency();
 
         // Compare the efficiency in run 1 and run 3
-        // CompareEfficiency();
+        CompareEfficiency();
 
-        // // Function that plots all the ppfx universe weights on one plot for the backgrounds
+        // Function that plots all the ppfx universe weights on one plot for the backgrounds
         // StudyPPFXWeights();
 
-        // // Look to see if the shower with the most hits is the same as the shower with the most energy
-        // CompareHitstoEnergy();
+        // Look to see if the shower with the most hits is the same as the shower with the most energy
+        CompareHitstoEnergy();
 
-        // // Lets see how many of the leading showers that we select are not an electorn
-        // CompareSignalPurity();
+        // Lets see how many of the leading showers that we select are not an electorn
+        CompareSignalPurity();
 
         // Make the bin resolution plots
         PlotVarbyRecoBin();

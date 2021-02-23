@@ -205,26 +205,31 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
             Save1DHists(Form("plots/run%s/Truth/reco_true_nu_ang_%s.pdf", _util.run_period, cut_type.c_str()),     "h_reco_true_ang", cut_type, true);
 
             // Make the 2D histograms
-            Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta_%s.pdf",          _util.run_period, cut_type.c_str()), "h_true_nue_phi_theta", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_theta_%s.pdf",       _util.run_period, cut_type.c_str()), "h_true_nue_energy_theta", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_phi_%s.pdf",         _util.run_period, cut_type.c_str()), "h_true_nue_energy_phi", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_angle_%s.pdf",       _util.run_period, cut_type.c_str()), "h_true_nue_energy_angle", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_%s.pdf",            _util.run_period, cut_type.c_str()), "h_true_nue_vtx_z_y", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_sce_%s.pdf",        _util.run_period, cut_type.c_str()), "h_true_nue_vtx_z_y_sce", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s.pdf",     _util.run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type, true);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nu_E_reco_nu_E_%s.pdf",         _util.run_period, cut_type.c_str()), "h_true_nu_E_reco_nu_E", cut_type, true);
-            Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_extra_bins_%s.pdf",     _util.run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E_extra_bins", cut_type, true);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nu_E_reco_nu_E_extra_bins_%s.pdf",         _util.run_period, cut_type.c_str()), "h_true_nu_E_reco_nu_E_extra_bins", cut_type, true);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_x_reco_nu_vtx_x_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_nu_vtx_x_reco_nu_vtx_x", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_y_reco_nu_vtx_y_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_nu_vtx_y_reco_nu_vtx_y", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_z_reco_nu_vtx_z_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_nu_vtx_z_reco_nu_vtx_z", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_purity_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_shr_energy_purity", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_completeness_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_shr_energy_completeness", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_resolution_reco_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_shr_energy_resolution_reco", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_resolution_true_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_shr_energy_resolution_true", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_elec_true_beta_reco_beta_%s.pdf",   _util.run_period, cut_type.c_str()), "h_elec_true_beta_reco_beta",   cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_elec_true_theta_reco_theta_%s.pdf", _util.run_period, cut_type.c_str()), "h_elec_true_theta_reco_theta", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_elec_true_phi_reco_phi_%s.pdf",     _util.run_period, cut_type.c_str()), "h_elec_true_phi_reco_phi",     cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta_%s.pdf",                _util.run_period, cut_type.c_str()), "h_true_nue_phi_theta", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_theta_%s.pdf",             _util.run_period, cut_type.c_str()), "h_true_nue_energy_theta", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_phi_%s.pdf",               _util.run_period, cut_type.c_str()), "h_true_nue_energy_phi", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_angle_%s.pdf",             _util.run_period, cut_type.c_str()), "h_true_nue_energy_angle", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_%s.pdf",                  _util.run_period, cut_type.c_str()), "h_true_nue_vtx_z_y", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_sce_%s.pdf",              _util.run_period, cut_type.c_str()), "h_true_nue_vtx_z_y_sce", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s.pdf",           _util.run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type, true);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nu_E_reco_nu_E_%s.pdf",               _util.run_period, cut_type.c_str()), "h_true_nu_E_reco_nu_E", cut_type, true);
+            Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_extra_bins_%s.pdf",_util.run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E_extra_bins", cut_type, true);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nu_E_reco_nu_E_extra_bins_%s.pdf",    _util.run_period, cut_type.c_str()), "h_true_nu_E_reco_nu_E_extra_bins", cut_type, true);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_x_reco_nu_vtx_x_%s.pdf",       _util.run_period, cut_type.c_str()), "h_true_nu_vtx_x_reco_nu_vtx_x", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_y_reco_nu_vtx_y_%s.pdf",       _util.run_period, cut_type.c_str()), "h_true_nu_vtx_y_reco_nu_vtx_y", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_z_reco_nu_vtx_z_%s.pdf",       _util.run_period, cut_type.c_str()), "h_true_nu_vtx_z_reco_nu_vtx_z", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_purity_%s.pdf",            _util.run_period, cut_type.c_str()), "h_true_shr_energy_purity", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_completeness_%s.pdf",      _util.run_period, cut_type.c_str()), "h_true_shr_energy_completeness", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_resolution_reco_%s.pdf",   _util.run_period, cut_type.c_str()), "h_true_shr_energy_resolution_reco", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_resolution_true_%s.pdf",   _util.run_period, cut_type.c_str()), "h_true_shr_energy_resolution_true", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_elec_true_beta_reco_beta_%s.pdf",          _util.run_period, cut_type.c_str()), "h_elec_true_beta_reco_beta",   cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_elec_true_theta_reco_theta_%s.pdf",        _util.run_period, cut_type.c_str()), "h_elec_true_theta_reco_theta", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_elec_true_phi_reco_phi_%s.pdf",            _util.run_period, cut_type.c_str()), "h_elec_true_phi_reco_phi",     cut_type, false);
+
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_cosbeta_purity_%s.pdf",            _util.run_period, cut_type.c_str()), "h_true_shr_cosbeta_purity", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_cosbeta_completeness_%s.pdf",      _util.run_period, cut_type.c_str()), "h_true_shr_cosbeta_completeness", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_cosbeta_resolution_reco_%s.pdf",   _util.run_period, cut_type.c_str()), "h_true_shr_cosbeta_resolution_reco", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_cosbeta_resolution_true_%s.pdf",   _util.run_period, cut_type.c_str()), "h_true_shr_cosbeta_resolution_true", cut_type, false);
 
             // Normalised by reco (row)
             Save2DHistsNorm(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s_row_norm_reco.pdf",     _util.run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type, true, "reco");
@@ -2629,6 +2634,7 @@ void HistogramPlotter::Save2DHists(const char *print_name, const char *histname,
 
     TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
     c->SetTopMargin(0.11);
+    gStyle->SetPalette(kBlueGreenYellow);
 
     hist->SetStats(kFALSE);
 
@@ -2666,6 +2672,7 @@ void HistogramPlotter::Save2DHistsNorm(const char *print_name, const char *histn
 
     TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
     c->SetTopMargin(0.11);
+    gStyle->SetPalette(kBlueGreenYellow);
 
     hist->SetStats(kFALSE);
 
