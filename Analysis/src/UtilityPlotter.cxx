@@ -67,6 +67,7 @@ void UtilityPlotter::Initialise(Utility _utility){
         CompareTotalCrossSec();
         CompareFakeTotalCrossSec();
         CompareTotalDataCrossSections();
+        CompareUnfoldedDataCrossSections();
         return;
     }
     else {
@@ -2063,6 +2064,7 @@ void UtilityPlotter::CompareFakeDataReco(){
 
     // Create a vector for the models
     std::vector<std::string> models = {
+        "Input",
         "mec",
         "nogtune",
         "nopi0tune",
@@ -2072,6 +2074,7 @@ void UtilityPlotter::CompareFakeDataReco(){
 
     // enums for the models
     enum enum_models {
+        k_model_input,
         k_model_mec,
         k_model_nogtune,
         k_model_nopi0tune,
@@ -2161,6 +2164,7 @@ void UtilityPlotter::CompareFakeDataReco(){
         h_true_smear.at(m)->SetMaximum(ymax + 0.4*ymax);
 
         // Set the line colours
+        if (m == k_model_input)    h_true_smear.at(k_model_input)    ->SetLineColor(kRed+2);
         if (m == k_model_mec)      h_true_smear.at(k_model_mec)      ->SetLineColor(kGreen+2);
         if (m == k_model_nogtune)  h_true_smear.at(k_model_nogtune)  ->SetLineColor(kBlue+2);
         if (m == k_model_nopi0tune)h_true_smear.at(k_model_nopi0tune)->SetLineColor(kPink+1);
@@ -2180,6 +2184,7 @@ void UtilityPlotter::CompareFakeDataReco(){
         TLegend *leg = new TLegend(0.4, 0.5, 0.85, 0.85);
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
+        if (m == k_model_input) models.at(m) = "CV";
         leg->AddEntry(h_error_hist, Form("True %s (stat.)", models.at(m).c_str()), "lf");
         leg->AddEntry(h_fake.at(m), Form("Fake %s (sys.)", models.at(m).c_str()), "elp");
         leg->Draw();
@@ -2199,6 +2204,7 @@ void UtilityPlotter::CompareFakeDataTrue(){
 
     // Create a vector for the models
     std::vector<std::string> models = {
+        "Input",
         "mec",
         "nogtune",
         "nopi0tune",
@@ -2208,6 +2214,7 @@ void UtilityPlotter::CompareFakeDataTrue(){
 
     // enums for the models
     enum enum_models {
+        k_model_input,
         k_model_mec,
         k_model_nogtune,
         k_model_nopi0tune,
@@ -2313,6 +2320,7 @@ void UtilityPlotter::CompareFakeDataTrue(){
         h_fake_xsec_smear->SetLineColor(kRed+2);
 
         // Set the line colours
+        if (m == k_model_input)    h_fake_xsec_smear->SetLineColor(kRed+2);
         if (m == k_model_mec)      h_fake_xsec_smear->SetLineColor(kGreen+2);
         if (m == k_model_nogtune)  h_fake_xsec_smear->SetLineColor(kBlue+2);
         if (m == k_model_nopi0tune)h_fake_xsec_smear->SetLineColor(kPink+1);
@@ -2330,6 +2338,7 @@ void UtilityPlotter::CompareFakeDataTrue(){
         TLegend *leg = new TLegend(0.4, 0.5, 0.85, 0.85);
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
+        if (m == k_model_input) models.at(m) = "CV";
         leg->AddEntry(h_error_hist, Form("True %s (stat.)", models.at(m).c_str()), "lf");
         leg->AddEntry(_wSVD.unf, Form("Fake %s (sys.)", models.at(m).c_str()), "elp");
         leg->Draw();
@@ -2513,6 +2522,7 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
     // Now get some other models
     // Create a vector for the models
     std::vector<std::string> models = {
+        "Input",
         "mec",
         "nogtune",
         "nopi0tune",
@@ -2522,6 +2532,7 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
 
     // enums for the models
     enum enum_models {
+        k_model_input,
         k_model_mec,
         k_model_nogtune,
         k_model_nopi0tune,
@@ -2563,6 +2574,7 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
         h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * 0.21 );
 
         // Set the line colours
+        if (m == k_model_input)    h_model_xsec.at(k_model_input)    ->SetLineColor(kRed+2);
         if (m == k_model_mec)      h_model_xsec.at(k_model_mec)      ->SetLineColor(kGreen+2);
         if (m == k_model_nogtune)  h_model_xsec.at(k_model_nogtune)  ->SetLineColor(kBlue+2);
         if (m == k_model_nopi0tune)h_model_xsec.at(k_model_nopi0tune)->SetLineColor(kPink+1);
@@ -2594,7 +2606,7 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
         h_fake_xsec.at(m)->SetMarkerSize(0.4);
-        
+        if (m == k_model_input) models.at(m) = "CV";
         leg->AddEntry(h_model_xsec.at(m), Form("True %s", models.at(m).c_str()), "l");
         leg->AddEntry(h_fake_xsec.at(m),  Form("Fake %s", models.at(m).c_str()),  "ep");
         
@@ -2804,6 +2816,160 @@ void UtilityPlotter::CompareTotalDataCrossSections(){
 
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::CompareUnfoldedDataCrossSections(){
+
+    gStyle->SetOptStat(0);
+
+    // Create a vector for the models
+    std::vector<std::string> models = {
+        "Input",
+        "mec",
+        "nogtune",
+        "nopi0tune",
+        "FLUGG",
+        "tune1"
+    };
+
+    // enums for the models
+    enum enum_models {
+        k_model_input,
+        k_model_mec,
+        k_model_nogtune,
+        k_model_nopi0tune,
+        k_model_FLUGG,
+        k_model_tune1,
+        k_MODEL_MAX
+    };
+
+    // Load in the cross section output
+    TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
+
+    TH2D* h_temp_2D;
+    TH1D* h_temp;
+
+    // Total Covariance Matrix
+    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/wiener/h_cov_tot_dataxsec_reco",_util.xsec_var));
+    TH2D* h_cov_reco = (TH2D*)h_temp_2D->Clone();
+    h_cov_reco->SetDirectory(0);
+
+    fxsec->Close();
+
+    // Now Get the Models
+    // Load in the cross section output
+    fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+
+    std::vector<TH1D*> h_true_model(k_MODEL_MAX);
+    std::vector<TH1D*> h_data_model(k_MODEL_MAX);
+    std::vector<TH2D*> h_cov_diag(k_MODEL_MAX);
+    std::vector<TH2D*> h_response_model(k_MODEL_MAX);
+    std::vector<TH1D*> h_unf_model(k_MODEL_MAX);
+
+    // Make the plot
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+    
+    // Create the legend
+    TLegend *leg = new TLegend(0.35, 0.50, 0.70, 0.89);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+
+    // Loop over each model
+    for (unsigned int m = 0; m < models.size(); m++){
+
+        // Get true model xsec
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run%s_CV_0_%s_mc_xsec", models.at(m).c_str(),vars.at(k_var_trueX).c_str(), _util.run_period, vars.at(k_var_trueX).c_str()));
+        h_true_model.at(m) = (TH1D*)h_temp->Clone();
+
+        // Get data cross section extracted for model 
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run%s_CV_0_%s_data_xsec", models.at(m).c_str(), vars.at(k_var_recoX).c_str(), _util.run_period, vars.at(k_var_recoX).c_str()));
+        h_data_model.at(m) = (TH1D*)h_temp->Clone();
+
+        // Get the response matrix for model
+        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run%s_%s_0_smearing", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), _util.run_period, models.at(m).c_str()));
+        h_response_model.at(m) = (TH2D*)h_temp_2D->Clone();
+
+        // Clone covariance matrix
+        h_cov_diag.at(m) = (TH2D*)h_cov_reco->Clone();
+        
+        // Convert the Covariance Matrix-- switching from MC CV deviations to Fake Data CV deviation
+        _util.ConvertCovarianceUnits(h_cov_diag.at(m),
+                               h_data_model.at(k_model_input),
+                               h_data_model.at(m));
+
+
+        // Initialise the WienerSVD class
+        WienerSVD _wSVD;
+        _wSVD.Initialise(_util);
+        _wSVD.DoUnfolding(2, 0, h_true_model.at(m), h_data_model.at(m), h_response_model.at(m), h_cov_diag.at(m));
+
+        h_unf_model.at(m) = (TH1D*)_wSVD.unf->Clone(Form("test_%s", models.at(m).c_str()));
+
+        for (int bin = 1; bin < h_unf_model.at(m)->GetNbinsX()+1; bin++){
+            double err = _wSVD.unfcov->GetBinContent(bin, bin);
+            h_unf_model.at(m)->SetBinError(bin, std::sqrt(err));
+        }
+        
+        // Set the line colours
+        if (m == k_model_input){
+            h_unf_model.at(m)->SetLineColor(kBlack);
+            h_unf_model.at(m)->SetMarkerStyle(20);
+            h_unf_model.at(m)->SetMarkerSize(0.5);
+        }    
+        
+        if (m == k_model_mec)      h_unf_model.at(m)->SetLineColor(kGreen+2);
+        if (m == k_model_nogtune)  h_unf_model.at(m)->SetLineColor(kBlue+2);
+        if (m == k_model_nopi0tune)h_unf_model.at(m)->SetLineColor(kPink+1);
+        if (m == k_model_FLUGG)    h_unf_model.at(m)->SetLineColor(kViolet-1);
+        if (m == k_model_tune1)    h_unf_model.at(m)->SetLineColor(kOrange-1);
+        
+        
+        h_unf_model.at(m)->Scale(1.0, "width");
+        
+        if (m == k_model_input){
+            _util.IncreaseLabelSize( h_unf_model.at(m), c);
+            gPad->SetLeftMargin(0.20);
+            c->SetBottomMargin(0.15);
+            h_unf_model.at(m)->SetTitle(var_labels_xsec.at(k_var_trueX).c_str());
+            h_unf_model.at(m)->Draw("E,same");
+            h_unf_model.at(m)->GetYaxis()->SetTitleOffset(1.4);
+        }
+        else
+            h_unf_model.at(m)->Draw("hist,same");
+
+        h_unf_model.at(m)->SetLineWidth(2);
+
+        
+        if (m == k_model_input) {
+            models.at(m) = "CV";
+            leg->AddEntry(h_unf_model.at(m), "Data (Stat + Sys.)", "ep");
+        }
+        if (m == k_model_mec)      leg->AddEntry(h_unf_model.at(m), "Data 1.5 #times MEC", "l");
+        if (m == k_model_nogtune)  leg->AddEntry(h_unf_model.at(m), "Data no gTune", "l");
+        if (m == k_model_nopi0tune)leg->AddEntry(h_unf_model.at(m), "Data no #pi^{0} Tune", "l");
+        if (m == k_model_FLUGG)    leg->AddEntry(h_unf_model.at(m), "Data FLUGG", "l");
+        if (m == k_model_tune1)    leg->AddEntry(h_unf_model.at(m), "Data Tune 1", "l");
+        
+
+        delete _wSVD.smear;
+        delete _wSVD.wiener;
+        delete _wSVD.unfcov;
+        delete _wSVD.unf;
+        delete _wSVD.diff;
+        delete _wSVD.bias;
+        delete _wSVD.bias2;
+        delete _wSVD.fracError;
+        delete _wSVD.absError;
+        delete _wSVD.MSE;
+        delete _wSVD.MSE2;
+    }
+
+    h_unf_model.at(k_model_input)->Draw("E,same");
+    gStyle->SetLegendTextSize(0.06);
+    leg->Draw();
+
+    c->Print(Form("plots/run%s/Models/%s/UnfoldedDataComparison.pdf", _util.run_period, _util.xsec_var));
+    delete c;
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

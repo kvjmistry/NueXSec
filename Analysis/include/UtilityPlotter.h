@@ -154,6 +154,10 @@ class UtilityPlotter{
     // Compare the total data cross sections extracted for each model
     void CompareTotalDataCrossSections();
     // -------------------------------------------------------------------------
+    // Compare the unfolded data cross section extracted with different models
+    void CompareUnfoldedDataCrossSections();
+    // -------------------------------------------------------------------------
+
 
 
 }; // End Class UtilityPlotter
