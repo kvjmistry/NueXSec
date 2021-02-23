@@ -593,7 +593,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
 
     if (std::string(run_period) == "1"){
         std::cout << "\033[0;32m-------------------------------" << std::endl;
-        std::cout << red << "POT Read In:\n" << green <<
+        std::cout << red << "POT Read In:" << reset << "\n" << green <<
         "Data POT:         "   << config_v.at(k_Run1_Data_POT)     << "\n" <<
         "Data Triggers:    "   << config_v.at(k_Run1_Data_trig)    << "\n" <<
         "MC POT:           "   << config_v.at(k_Run1_MC_POT)       << "\n" <<
@@ -603,7 +603,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     }
     else if (std::string(run_period) == "3"){
         std::cout << "\033[0;32m-------------------------------" << std::endl;
-        std::cout << red << "POT Read In:\n" << green <<
+        std::cout << red << "POT Read In:" << reset << "\n" << green <<
         "Data POT:         "   << config_v.at(k_Run3_Data_POT)     << "\n" <<
         "Data Triggers:    "   << config_v.at(k_Run3_Data_trig)    << "\n" <<
         "MC POT:           "   << config_v.at(k_Run3_MC_POT)       << "\n" <<

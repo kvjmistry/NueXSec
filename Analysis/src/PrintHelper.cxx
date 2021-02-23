@@ -12,7 +12,7 @@ void PrintHelper::Initialise(Utility _utility ){
     std::string file_name;
 
     // define this to scale the MC to a desired POT
-    // double additional_scaling = 6.0e20/_util.config_v.at(_util.k_Run1_Data_POT); // Use this to scale the POT to set amount -- also chnage the run POT
+    // double additional_scaling = 2.0e20/_util.config_v.at(_util.k_Run1_Data_POT); // Use this to scale the POT to set amount -- also chnage the run POT
     double additional_scaling = 1.0; // Use this to use default
     if ( additional_scaling != 1.0) std::cout << "\033[0;34mWarning using an additional POT scale factor to print the selection results\033[0m" << std::endl;
 

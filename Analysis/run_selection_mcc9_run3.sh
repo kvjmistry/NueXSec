@@ -36,7 +36,7 @@ if [ -z "$1" ]; then
   ./nuexsec --run 3 --hist files/nuexsec_run3_merged.root
 
   # Merge the ttrees to one file
-  root -l -b -q 'merge/merge_uneaventrees.C("3", true, "files/trees/nuexsec_selected_tree_mc_run3.root", "files/trees/nuexsec_selected_tree_data_run3.root", "files/trees/nuexsec_selected_tree_ext_run3.root","files/trees/nuexsec_selected_tree_dirt_run3.root", "")'
+  root -l -b -q 'merge/merge_uneaventrees.C("3", true, false, "files/trees/nuexsec_selected_tree_mc_run3.root", "files/trees/nuexsec_selected_tree_data_run3.root", "files/trees/nuexsec_selected_tree_ext_run3.root","files/trees/nuexsec_selected_tree_dirt_run3.root", "")'
 
   # Now run the cross section calculator
   # Not running this until happy its working...
@@ -97,7 +97,7 @@ if [ "$1" == "var" ]; then
 
   ./nuexsec --run 3 --hist files/nuexsec_run3_$2_merged.root --var dummy $2
 
-  root -l -b -q 'merge/merge_uneaventrees.C("3", true, "files/trees/nuexsec_selected_tree_mc_run3_'"$2"'.root", "files/trees/nuexsec_selected_tree_data_run3.root", "files/trees/nuexsec_selected_tree_ext_run3.root","files/trees/nuexsec_selected_tree_dirt_run3.root", "'"$2"'")'
+  root -l -b -q 'merge/merge_uneaventrees.C("3", true, false, "files/trees/nuexsec_selected_tree_mc_run3_'"$2"'.root", "files/trees/nuexsec_selected_tree_data_run3.root", "files/trees/nuexsec_selected_tree_ext_run3.root","files/trees/nuexsec_selected_tree_dirt_run3.root", "'"$2"'")'
 
   ./nuexsec --run 3 --xsec files/trees/nuexsec_tree_merged_run3_$2.root --var dummy $2 --xsecmode default --xsecvar elec_E --xsec_smear er
 
