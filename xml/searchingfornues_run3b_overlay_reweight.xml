@@ -47,7 +47,7 @@
     <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple0/&version;</logdir>
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple0/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple0/&version;</bookdir>
-    <maxfilesperjob>5</maxfilesperjob>
+    <maxfilesperjob>4</maxfilesperjob>
     <numjobs>800</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
@@ -56,7 +56,7 @@
     <prestagefraction>1</prestagefraction>
     <endscript>/pnfs/uboone/resilient/users/kmistry/zip_logs.sh</endscript>
     <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/RHC/flux_cached_entries.root</jobsub>
-    <jobsub_start>  --expected-lifetime=5h</jobsub_start>
+    <jobsub_start>  --expected-lifetime=long</jobsub_start>
   </stage>
  
 <!-- Project stages -->
@@ -74,7 +74,7 @@
     <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple1/&version;</logdir>
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple1/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple1/&version;</bookdir>
-    <maxfilesperjob>5</maxfilesperjob>
+    <maxfilesperjob>4</maxfilesperjob>
     <numjobs>800</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
@@ -83,7 +83,7 @@
     <prestagefraction>1</prestagefraction>
     <endscript>/pnfs/uboone/resilient/users/kmistry/zip_logs.sh</endscript>
     <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/RHC/flux_cached_entries.root</jobsub>
-    <jobsub_start>  --expected-lifetime=5h</jobsub_start>
+    <jobsub_start>  --expected-lifetime=long</jobsub_start>
   </stage>
 
 <!-- Project stages -->
@@ -101,7 +101,7 @@
     <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple2/&version;</logdir>
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple2/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple2/&version;</bookdir>
-    <maxfilesperjob>5</maxfilesperjob>
+    <maxfilesperjob>4</maxfilesperjob>
     <numjobs>800</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
@@ -110,7 +110,7 @@
     <prestagefraction>1</prestagefraction>
     <endscript>/pnfs/uboone/resilient/users/kmistry/zip_logs.sh</endscript>
     <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/RHC/flux_cached_entries.root</jobsub>
-    <jobsub_start>  --expected-lifetime=5h</jobsub_start>
+    <jobsub_start>  --expected-lifetime=long</jobsub_start>
   </stage>
 
 <!-- Project stages -->
@@ -128,7 +128,7 @@
     <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple3/&version;</logdir>
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple3/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple3/&version;</bookdir>
-    <maxfilesperjob>5</maxfilesperjob>
+    <maxfilesperjob>4</maxfilesperjob>
     <numjobs>800</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
@@ -137,7 +137,7 @@
     <prestagefraction>1</prestagefraction>
     <endscript>/pnfs/uboone/resilient/users/kmistry/zip_logs.sh</endscript>
     <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/RHC/flux_cached_entries.root</jobsub>
-    <jobsub_start>  --expected-lifetime=5h</jobsub_start>
+    <jobsub_start>  --expected-lifetime=long</jobsub_start>
   </stage>
 
 <!-- Project stages -->
@@ -155,7 +155,7 @@
     <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple4/&version;</logdir>
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple4/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple4/&version;</bookdir>
-    <maxfilesperjob>5</maxfilesperjob>
+    <maxfilesperjob>4</maxfilesperjob>
     <numjobs>90</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>

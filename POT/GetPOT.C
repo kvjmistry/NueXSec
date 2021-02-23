@@ -50,7 +50,7 @@ void GetPOT(const char *_file1, std::string type){
 
     }
     // Data file so do zarko's POT counting script
-    else {
+    else if (type == "ext" || type == "data"){
 
         int run, subrun;
 
@@ -99,7 +99,7 @@ void GetPOT(const char *_file1, std::string type){
             gSystem->Exec("/uboone/app/users/zarko/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt"); 
         }
         // Use Pawels updated version for on beam, use  --slip for slipstacking info
-        else {
+        else{
             std::cout << "/uboone/app/users/guzowski/slip_stacking/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt --slip" << std::endl;
             gSystem->Exec("/uboone/app/users/guzowski/slip_stacking/getDataInfo.py -v3 --format-numi --prescale --run-subrun-list run_subrun_list_data.txt --slip"); 
 
@@ -108,6 +108,9 @@ void GetPOT(const char *_file1, std::string type){
     
         gSystem->Exec("rm run_subrun_list_data.txt");
 
+    }
+    else {
+      std::cout << "Unknown type specified" << std::endl;
     }
     
 }
