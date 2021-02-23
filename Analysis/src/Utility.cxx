@@ -1413,7 +1413,7 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
     if (std::string(xsec_var) =="elec_E"){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                           ";E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV];#frac{d#sigma}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon]",
+                           ";E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV];#frac{dR}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon]",
                            ";E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV];#frac{d#sigma}{dE^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon"
                           };
 
@@ -1447,7 +1447,7 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
     else if (std::string(xsec_var) =="elec_ang"){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                           ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg];#frac{d#sigma}{d#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-37} cm^{2}/deg/nucleon]",
+                           ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg];#frac{dR}{d#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-37} cm^{2}/deg/nucleon]",
                            ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg];#frac{d#sigma}{d#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-37} cm^{2}/deg/nucleon]"
                           };
 
@@ -1481,7 +1481,7 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
     else if (std::string(xsec_var) =="elec_cang"){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                           ";cos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}};#frac{d#sigma}{dcos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/nucleon]",
+                           ";cos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}};#frac{dR}{dcos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/nucleon]",
                            ";cos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}};#frac{d#sigma}{dcos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/nucleon]"
                           };
 
