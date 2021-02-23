@@ -3061,6 +3061,7 @@ void UtilityPlotter::SaveResponseMatrix(){
 
     // Vector for storing the response matrix
     std::vector<TH2D*> h_response(variables.size());
+    std::vector<TH2D*> h_response_index(variables.size());
 
     for (unsigned int m = 0; m < variables.size(); m++){
         
@@ -3081,7 +3082,7 @@ void UtilityPlotter::SaveResponseMatrix(){
         h_response.at(m)->SetMarkerSize(0.4);
         h_response.at(m)->SetMarkerColor(kRed+2);
 
-        h_response.at(m)->Draw("colz,text00");
+        h_response.at(m)->Draw("colz");
 
         // Draw the run period on the plot
         _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);
@@ -3090,6 +3091,60 @@ void UtilityPlotter::SaveResponseMatrix(){
         delete c;
     
     }
+
+    // Now convert the histogram to bin indexes to read the response matrix more clearly
+    for (unsigned int m = 0; m < variables.size(); m++){
+        
+        // Get the response matrix
+        h_response_index.at(m) = new TH2D("h_response", ";True Bin; Reco Bin", h_response.at(m)->GetNbinsX(), 0, h_response.at(m)->GetNbinsX(), h_response.at(m)->GetNbinsY(), 0, h_response.at(m)->GetNbinsY());
+    
+        // Set the bin values
+        for (int x = 1; x < h_response.at(m)->GetNbinsY()+1; x++){
+            for (int y = 1; y < h_response.at(m)->GetNbinsX()+1; y++){
+                 h_response_index.at(m)->SetBinContent(x,y,h_response.at(m)->GetBinContent(x,y));
+            }
+        }
+
+        if (variables.at(m) == "elec_E"){
+            h_response_index.at(m)->SetTitle("E_{e#lower[-0.5]{-} + e^{+}}");
+        }
+        if (variables.at(m) == "elec_ang"){
+            h_response_index.at(m)->SetTitle("#beta_{e#lower[-0.5]{-} + e^{+}}");
+        }
+        if (variables.at(m) == "elec_cang"){
+            h_response_index.at(m)->SetTitle("cos#beta_{e#lower[-0.5]{-} + e^{+}}");
+        }
+
+
+
+        // Now we got the histogram lets save it!
+        TCanvas * c = new TCanvas("c", "c", 500, 500);
+        c->SetTopMargin(0.11);
+
+        h_response_index.at(m)->SetStats(kFALSE);
+
+        _util.IncreaseLabelSize(h_response_index.at(m), c);
+
+        gStyle->SetPalette(kBlueGreenYellow);
+        gStyle->SetPaintTextFormat("4.2f");
+        h_response_index.at(m)->SetMarkerSize(1.0);
+        h_response_index.at(m)->SetMarkerColor(kRed+2);
+
+        h_response_index.at(m)->Draw("colz,text00");
+        h_response_index.at(m)->GetXaxis()->CenterLabels(kTRUE);
+        h_response_index.at(m)->GetYaxis()->CenterLabels(kTRUE);
+        h_response_index.at(m)->GetXaxis()->SetNdivisions(h_response.at(m)->GetNbinsX(), 0, 0, kFALSE);
+        h_response_index.at(m)->GetYaxis()->SetNdivisions(h_response.at(m)->GetNbinsY(), 0, 0, kFALSE);
+
+
+        // Draw the run period on the plot
+        _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);
+
+        c->Print(Form("plots/run%s/Response/Response_run%s_%s_index.pdf", _util.run_period, _util.run_period, variables.at(m).c_str()));
+        delete c;
+    
+    }
+
 
     fxsec->Close();
 
