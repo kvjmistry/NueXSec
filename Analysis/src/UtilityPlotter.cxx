@@ -22,16 +22,16 @@ void UtilityPlotter::Initialise(Utility _utility){
         // CompareDetVarEfficiency();
 
         // Compare the efficiency in run 1 and run 3
-        CompareEfficiency();
+        // CompareEfficiency();
 
-        // Function that plots all the ppfx universe weights on one plot for the backgrounds
-        StudyPPFXWeights();
+        // // Function that plots all the ppfx universe weights on one plot for the backgrounds
+        // StudyPPFXWeights();
 
-        // Look to see if the shower with the most hits is the same as the shower with the most energy
-        CompareHitstoEnergy();
+        // // Look to see if the shower with the most hits is the same as the shower with the most energy
+        // CompareHitstoEnergy();
 
-        // Lets see how many of the leading showers that we select are not an electorn
-        CompareSignalPurity();
+        // // Lets see how many of the leading showers that we select are not an electorn
+        // CompareSignalPurity();
 
         // Make the bin resolution plots
         PlotVarbyRecoBin();
@@ -520,58 +520,77 @@ void UtilityPlotter::OptimiseBins(){
 void UtilityPlotter::PlotVarbyRecoBin(){
 
     // Create the resolutions directory for saving the plots to
-    _util.CreateDirectory("Resolution");
+    _util.CreateDirectory("Resolution/" + std::string(_util.xsec_var));
 
-    _util.CreateDirectory("Purity_Completeness");
+    _util.CreateDirectory("Purity/" + std::string(_util.xsec_var));
+
+    _util.CreateDirectory("Completeness/" + std::string(_util.xsec_var));
 
 
     // Get the vector of bins
-    std::vector<double> bins = _util.reco_shr_bins;
+    std::vector<double> bins;
+    std::string reco_var, true_var;
+    
+    if (std::string(_util.xsec_var) == "elec_E"){
+        bins = _util.reco_shr_bins;
+        reco_var = "shr_energy_cali";
+        true_var = "elec_e";
+    }
+    else if (std::string(_util.xsec_var) == "elec_ang"){
+        bins = _util.reco_shr_bins_ang;
+        reco_var = "effective_angle";
+        true_var = "true_effective_angle";
+    }
+     else if (std::string(_util.xsec_var) == "elec_cang"){
+        bins = _util.reco_shr_bins_cang;
+        reco_var = "cos_effective_angle";
+        true_var = "cos_true_effective_angle";
+    }
+    
+     
     
     // Loop over the bins
     for (float bin = 0; bin < bins.size()-1; bin++ ){
 
         std::cout <<"\nBin Range: " << bins.at(bin) << " - " << bins.at(bin+1) << " GeV" << std::endl;
         
-        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "reco_e");
-        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "true_e");
-        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "purity");
-        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "completeness");
+        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "res_reco", reco_var, true_var);
+        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "res_true", reco_var, true_var);
+        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "purity", reco_var, true_var);
+        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "completeness", reco_var, true_var);
 
 
     }
     
 }
 // -----------------------------------------------------------------------------
-void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string variable_str){
+void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string x_var, std::string reco_var, std::string true_var){
     
-    TCut generic_query = "(classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && !gen && elec_e > 0"; // This gets selected signal events in the MC
-    TCut bin_query = Form("shr_energy_cali > %f && shr_energy_cali < %f", bin_lower_edge, bin_upper_edge); // Get the reconstructed shower energy range
-
-    TCut query = Form(" weight*(  ((classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && passed_selection) && shr_energy_cali > %f && shr_energy_cali < %f )", bin_lower_edge, bin_upper_edge); 
+    TCut query = Form(" weight*(  ((classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && passed_selection) && %s > %f && %s < %f )", reco_var.c_str(), bin_lower_edge, reco_var.c_str(), bin_upper_edge); 
     
-    TCanvas * c = new TCanvas(Form("c_%f_%f_%s", bin_upper_edge, bin_lower_edge, variable_str.c_str()), "c", 500, 500);
+    TCanvas * c = new TCanvas("c", "c", 500, 500);
 
     TH1D *htemp;
-    if      (variable_str == "reco_e") htemp = new TH1D("htemp","", 30, -1.2, 1.2);
-    else if (variable_str == "true_e") htemp = new TH1D("htemp","", 30, -1.2, 1.2);
-    else if (variable_str == "purity") htemp = new TH1D("htemp","", 21, 0, 1.1);
-    else if (variable_str == "completeness") htemp = new TH1D("htemp","", 21, 0, 1.1);
+    if      (x_var == "res_reco" || x_var == "res_true") htemp = new TH1D("htemp","", 30, -1.2, 1.2);
+    else if (x_var == "purity") htemp = new TH1D("htemp","", 21, 0, 1.1);
+    else if (x_var == "completeness") htemp = new TH1D("htemp","", 21, 0, 1.1);
     else {
         std::cout << "incorrect variable input" << std::endl;
         return;
     }
+
+    
      
 
     // Draw the Query -- adjust by query type
-    if      (variable_str == "reco_e") tree->Draw("(shr_energy_cali - elec_e) / shr_energy_cali >> htemp", query);
-    else if (variable_str == "true_e") tree->Draw("(shr_energy_cali - elec_e) / elec_e >> htemp", query);
-    else if (variable_str == "purity") tree->Draw("shr_bkt_purity >> htemp", query);
-    else if (variable_str == "completeness") tree->Draw("shr_bkt_completeness >> htemp", query);
+    if      (x_var == "res_reco") tree->Draw(Form("(%s - %s) / %s >> htemp", reco_var.c_str(), true_var.c_str(), reco_var.c_str()), query);
+    else if (x_var == "res_true") tree->Draw(Form("(%s - %s) / %s >> htemp", reco_var.c_str(), true_var.c_str(), true_var.c_str()), query);
+    else if (x_var == "purity") tree->Draw("shr_bkt_purity >> htemp", query);
+    else if (x_var == "completeness") tree->Draw("shr_bkt_completeness >> htemp", query);
     else {
         std::cout << "incorrect variable input" << std::endl;
         return;
-    }
+    }    
             
     // Draw the histogram
     htemp->SetLineWidth(2);
@@ -579,7 +598,17 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     htemp->Draw("hist");
 
     // Draw the text specifying the bin range
-    TLatex* range = new TLatex(0.65,0.91, Form("Reco Energy %0.2f - %0.2f GeV",bin_lower_edge, bin_upper_edge ));
+    TLatex* range;
+    if (true_var == "elec_e"){
+        range  = new TLatex(0.65,0.91, Form("Reco Energy %0.2f - %0.2f GeV",bin_lower_edge, bin_upper_edge ));
+    }
+    if (true_var == "true_effective_angle"){
+        range  = new TLatex(0.65,0.91, Form("Reco #beta %0.2f - %0.2f deg",bin_lower_edge, bin_upper_edge ));
+    }
+     if (true_var == "cos_true_effective_angle"){
+        range  = new TLatex(0.65,0.91, Form("Reco cos#beta %0.2f - %0.2f",bin_lower_edge, bin_upper_edge ));
+    }
+
     _util.SetTextProperties(range);
     range->Draw();
 
@@ -598,10 +627,10 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     _util.SetTextProperties(text_rms);
     text_rms->Draw();
 
-    if (variable_str == "reco_e")      htemp->SetTitle("; Reco - True / Reco; Entries");
-    else if (variable_str == "true_e") htemp->SetTitle("; Reco - True / True; Entries");
-    else if (variable_str == "purity") htemp->SetTitle("; Reco Shower Purity; Entries");
-    else if (variable_str == "completeness") htemp->SetTitle("; Reco Shower Completeness; Entries");
+    if (x_var == "res_reco")          htemp->SetTitle("; Reco - True / Reco; Entries");
+    else if (x_var == "res_true")     htemp->SetTitle("; Reco - True / True; Entries");
+    else if (x_var == "purity")       htemp->SetTitle("; Reco Shower Purity; Entries");
+    else if (x_var == "completeness") htemp->SetTitle("; Reco Shower Completeness; Entries");
     else {
         std::cout << "incorrect variable input" << std::endl;
         return;
@@ -617,16 +646,61 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     
 
     // Save it 
-    if (variable_str== "reco_e")       c->Print(Form("plots/run%s/Resolution/resolution_%0.0fMeV_to_%0.0f_MeV_reco.pdf", _util.run_period, bin_lower_edge*1000, bin_upper_edge*1000 ));
-    else if (variable_str == "true_e") c->Print(Form("plots/run%s/Resolution/resolution_%0.0fMeV_to_%0.0f_MeV_true.pdf", _util.run_period, bin_lower_edge*1000, bin_upper_edge*1000 ));
-    else if (variable_str == "purity") c->Print(Form("plots/run%s/Purity_Completeness/purity_%0.0fMeV_to_%0.0f_MeV.pdf", _util.run_period, bin_lower_edge*1000, bin_upper_edge*1000 ));
-    else if (variable_str == "completeness") c->Print(Form("plots/run%s/Purity_Completeness/completeness_%0.0fMeV_to_%0.0f_MeV.pdf", _util.run_period, bin_lower_edge*1000, bin_upper_edge*1000 ));
+    if (x_var== "res_reco"){
+        if (true_var == "elec_e"){
+            c->Print(Form("plots/run%s/Resolution/%s/resolution_%0.2fMeV_to_%0.2fMeV_reco.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        if (true_var == "true_effective_angle"){
+            c->Print(Form("plots/run%s/Resolution/%s/resolution_%0.1fdeg_to_%0.1fdeg_reco.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        if (true_var == "cos_true_effective_angle"){
+            c->Print(Form("plots/run%s/Resolution/%s/resolution_%0.2f_to_%0.2f_reco.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+    }
+    else if (x_var == "res_true"){
+        if (true_var == "elec_e"){
+            c->Print(Form("plots/run%s/Resolution/%s/resolution_%0.2fMeV_to_%0.2fMeV_true.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        if (true_var == "true_effective_angle"){
+            c->Print(Form("plots/run%s/Resolution/%s/resolution_%0.1fdeg_to_%0.1fdeg_true.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        if (true_var == "cos_true_effective_angle"){
+            c->Print(Form("plots/run%s/Resolution/%s/resolution_%0.2f_to_%0.2f_true.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        
+    }       
+    else if (x_var == "purity"){
+        if (true_var == "elec_e"){
+            c->Print(Form("plots/run%s/Purity/%s/purity_%0.2fMeV_to_%0.2fMeV.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        if (true_var == "true_effective_angle"){
+            c->Print(Form("plots/run%s/Purity/%s/purity_%0.1fdeg_to_%0.1fdeg.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        if (true_var == "cos_true_effective_angle"){
+            c->Print(Form("plots/run%s/Purity/%s/purity_%0.2f_to_%0.2f.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+
+        
+    }
+    else if (x_var == "completeness"){
+        if (true_var == "elec_e"){
+            c->Print(Form("plots/run%s/Completeness/%s/completeness_%0.2fMeV_to_%0.2fMeV.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        if (true_var == "true_effective_angle"){
+            c->Print(Form("plots/run%s/Completeness/%s/completeness_%0.1fdeg_to_%0.1fdeg.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        if (true_var == "cos_true_effective_angle"){
+            c->Print(Form("plots/run%s/Completeness/%s/completeness_%0.2f_to_%0.2f.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        
+    }
     else {
         std::cout << "incorrect variable input" << std::endl;
         return;
     }
 
     delete htemp;
+    delete c;
 
 
 }

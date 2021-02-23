@@ -93,7 +93,7 @@ class UtilityPlotter{
     void PlotVarbyRecoBin();
     // -------------------------------------------------------------------------
     // Function that plots a variable in different bin ranges
-    void PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string variable);
+    void PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string xvar, std::string reco_var, std::string true_var);
     // -------------------------------------------------------------------------
     // Get the integrated flux, draw threshold line for technote
     void PlotIntegratedFluxwithThrehold();
