@@ -20,6 +20,8 @@ void UtilityPlotter::Initialise(Utility _utility){
         // Compare the efficiency for the det var CV and intrinsic nue det var CV
         // leave this commented out, needs speccific files for this to run 
         // CompareDetVarEfficiency();
+        // Save the Response Matrix
+        SaveResponseMatrix();
 
         // Compare the efficiency in run 1 and run 3
         CompareEfficiency();
@@ -1820,7 +1822,7 @@ void UtilityPlotter::CompareSmearing(){
 
     gStyle->SetOptStat(0);
 
-    /// Load in the cross section output
+    // Load in the cross section output
     TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
 
     TH1D* h_temp;
@@ -3045,6 +3047,53 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
 
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::SaveResponseMatrix(){
+
+    TFile *fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+
+    _util.CreateDirectory("Response/");
+
+    TH2D* h_temp_2D;
+
+    std::vector<std::string> variables = {"elec_E", "elec_ang", "elec_cang"};
+
+    std::vector<std::string> var_names = {"reco_el_E", "reco_el_ang", "reco_el_cang"};
+
+    // Vector for storing the response matrix
+    std::vector<TH2D*> h_response(variables.size());
+
+    for (unsigned int m = 0; m < variables.size(); m++){
+        
+        // Get the response matrix
+        h_temp_2D  = (TH2D*)fxsec->Get(Form("CV/%s/h_run1_CV_0_smearing", var_names.at(m).c_str()));
+        h_response.at(m) = (TH2D*)h_temp_2D->Clone();
+    
+        // Now we got the histogram lets save it!
+        TCanvas * c = new TCanvas("c", "c", 500, 500);
+        c->SetTopMargin(0.11);
+
+        h_response.at(m)->SetStats(kFALSE);
+
+        _util.IncreaseLabelSize(h_response.at(m), c);
+
+        gStyle->SetPalette(kBlueGreenYellow);
+        gStyle->SetPaintTextFormat("4.2f");
+        h_response.at(m)->SetMarkerSize(0.4);
+        h_response.at(m)->SetMarkerColor(kRed+2);
+
+        h_response.at(m)->Draw("colz,text00");
+
+        // Draw the run period on the plot
+        _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);
+
+        c->Print(Form("plots/run%s/Response/Response_run%s_%s.pdf", _util.run_period, _util.run_period, variables.at(m).c_str()));
+        delete c;
+    
+    }
+
+    fxsec->Close();
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

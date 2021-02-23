@@ -157,7 +157,9 @@ class UtilityPlotter{
     // Compare the unfolded data cross section extracted with different models
     void CompareUnfoldedDataCrossSections();
     // -------------------------------------------------------------------------
-
+    // Get the response matrix from file and save it for the technote
+    void SaveResponseMatrix();
+    // -------------------------------------------------------------------------
 
 
 }; // End Class UtilityPlotter
