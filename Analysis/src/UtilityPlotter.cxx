@@ -2234,7 +2234,7 @@ void UtilityPlotter::CompareFakeDataTrue(){
     h_response->SetDirectory(0);
 
     // Total Covariance Matrix
-    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/wiener/h_cov_tot_dataxsec_reco",_util.xsec_var));
+    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/wiener/h_cov_sys_dataxsec_reco",_util.xsec_var));
     TH2D* h_cov_reco = (TH2D*)h_temp_2D->Clone();
     h_cov_reco->SetDirectory(0);
 
@@ -2244,6 +2244,10 @@ void UtilityPlotter::CompareFakeDataTrue(){
     // Load in the cross section output
     fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
 
+    // Load in the CV data cross section
+    h_temp  = (TH1D*)fxsec->Get(Form("CV/%s/h_run%s_CV_0_%s_data_xsec",vars.at(k_var_recoX).c_str(), _util.run_period, vars.at(k_var_recoX).c_str()));
+    TH1D* h_reco_data_xsec = (TH1D*)h_temp->Clone();
+
     std::vector<TH1D*> h_true(k_MODEL_MAX);
     std::vector<TH1D*> h_fake(k_MODEL_MAX);
     std::vector<TH2D*> h_cov_diag(k_MODEL_MAX);
@@ -2251,7 +2255,7 @@ void UtilityPlotter::CompareFakeDataTrue(){
     // Loop over each model
     for (unsigned int m = 0; m < models.size(); m++){
 
-        // Get true tune1 xsec
+        // Get true model xsec
         h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run%s_CV_0_%s_mc_xsec", models.at(m).c_str(),vars.at(k_var_trueX).c_str(), _util.run_period, vars.at(k_var_trueX).c_str()));
         h_true.at(m) = (TH1D*)h_temp->Clone();
 
@@ -2262,17 +2266,11 @@ void UtilityPlotter::CompareFakeDataTrue(){
 
         // Set diagonals of covariance matrix
         h_cov_diag.at(m) = (TH2D*)h_cov_reco->Clone();
-        for (int i = 0; i < h_cov_reco->GetXaxis()->GetNbins()+2; i++ ){
-            for (int j = 0; j < h_cov_reco->GetYaxis()->GetNbins()+2; j++ ){
-                
-                h_cov_diag.at(m)->SetBinContent(i, j, 0);
-                
-                if (i == j) {
-                    h_cov_diag.at(m)->SetBinContent(i, j, h_fake.at(m)->GetBinError(i) * h_fake.at(m)->GetBinError(i));
-                }
-
-            }
-        }
+        
+        // Convert the Covariance Matrix-- switching from MC CV deviations to Fake Data CV deviation
+        _util.ConvertCovarianceUnits(h_cov_diag.at(m),
+                               h_reco_data_xsec,
+                               h_fake.at(m));
 
 
         // Initialise the WienerSVD class
@@ -2310,9 +2308,16 @@ void UtilityPlotter::CompareFakeDataTrue(){
             ymax = _wSVD.unf->GetMaximum();
 
         h_fake_xsec_smear->SetMinimum(0);
-        h_fake_xsec_smear->SetMaximum(ymax + ymax*0.2);
+        h_fake_xsec_smear->SetMaximum(ymax + ymax*0.4);
         h_fake_xsec_smear->SetLineWidth(2);
         h_fake_xsec_smear->SetLineColor(kRed+2);
+
+        // Set the line colours
+        if (m == k_model_mec)      h_fake_xsec_smear->SetLineColor(kGreen+2);
+        if (m == k_model_nogtune)  h_fake_xsec_smear->SetLineColor(kBlue+2);
+        if (m == k_model_nopi0tune)h_fake_xsec_smear->SetLineColor(kPink+1);
+        if (m == k_model_FLUGG)    h_fake_xsec_smear->SetLineColor(kViolet-1);
+        if (m == k_model_tune1)    h_fake_xsec_smear->SetLineColor(kOrange-1);
 
         TH1D* h_error_hist = (TH1D*)h_fake_xsec_smear->Clone();
         h_error_hist->SetFillColorAlpha(12, 0.15);
@@ -2326,7 +2331,7 @@ void UtilityPlotter::CompareFakeDataTrue(){
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
         leg->AddEntry(h_error_hist, Form("True %s (stat.)", models.at(m).c_str()), "lf");
-        leg->AddEntry(_wSVD.unf, Form("Fake %s (stat.)", models.at(m).c_str()), "elp");
+        leg->AddEntry(_wSVD.unf, Form("Fake %s (sys.)", models.at(m).c_str()), "elp");
         leg->Draw();
 
         
