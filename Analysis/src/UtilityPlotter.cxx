@@ -66,6 +66,7 @@ void UtilityPlotter::Initialise(Utility _utility){
         CompareFakeDataTrue();
         CompareTotalCrossSec();
         CompareFakeTotalCrossSec();
+        CompareTotalDataCrossSections();
         return;
     }
     else {
@@ -1740,94 +1741,6 @@ void UtilityPlotter::TestModelDependence(){
 
 }
 // -----------------------------------------------------------------------------
-void UtilityPlotter::CompareDataCrossSections(){
-
-    gStyle->SetOptStat(0);
-
-    /// Load in the cross section output
-    TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
-
-    TH1D* h_temp;
-
-    // Data XSec
-    h_temp  = (TH1D*)fxsec->Get(Form("%s/er/h_data_xsec_stat_sys_reco", _util.xsec_var));
-    TH1D* h_dataxsec = (TH1D*)h_temp->Clone();
-    h_dataxsec->SetDirectory(0);
-    h_dataxsec->SetLineColor(kBlack);
-    h_dataxsec->SetMarkerStyle(20);
-    h_dataxsec->SetMarkerSize(0.5);
-
-    h_temp  = (TH1D*)fxsec->Get(Form("%s/er/h_data_xsec_stat_reco", _util.xsec_var));
-    TH1D* h_dataxsec_stat = (TH1D*)h_temp->Clone();
-    h_dataxsec_stat->SetDirectory(0);
-    h_dataxsec_stat->SetLineColor(kBlack);
-    h_dataxsec_stat->SetMarkerStyle(20);
-    h_dataxsec_stat->SetMarkerSize(0.5);
-
-    fxsec->Close();
-
-    // Load in the cross section output
-    fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
-    
-    // Data X Sec MEC
-    h_temp  = (TH1D*)fxsec->Get(Form("mec/%s/h_run1_CV_0_%s_data_xsec", vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
-    TH1D* h_datasec_reco_mec = (TH1D*)h_temp->Clone();
-    h_datasec_reco_mec->SetLineColor(kGreen+2);
-    h_datasec_reco_mec->Scale(1.0, "width");
-    h_datasec_reco_mec->SetLineWidth(2);
-
-    // Data X Sec No Genie Tune
-    h_temp  = (TH1D*)fxsec->Get(Form("nogtune/%s/h_run1_CV_0_%s_data_xsec", vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
-    TH1D* h_datasec_reco_nogtune = (TH1D*)h_temp->Clone();
-    h_datasec_reco_nogtune->SetLineColor(kBlue+2);
-    h_datasec_reco_nogtune->Scale(1.0, "width");
-    h_datasec_reco_nogtune->SetLineWidth(2);
-
-    // Data X Sec FLUGG
-    h_temp  = (TH1D*)fxsec->Get(Form("FLUGG/%s/h_run1_CV_0_%s_data_xsec", vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
-    TH1D* h_datasec_reco_FLUGG = (TH1D*)h_temp->Clone();
-    h_datasec_reco_FLUGG->SetLineColor(kViolet-1);
-    h_datasec_reco_FLUGG->Scale(1.0, "width");
-    h_datasec_reco_FLUGG->SetLineWidth(2);
-    
-    // Data X Sec Tune 1
-    h_temp  = (TH1D*)fxsec->Get(Form("tune1/%s/h_run1_CV_0_%s_data_xsec", vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
-    TH1D* h_datasec_reco_tune1 = (TH1D*)h_temp->Clone();
-    h_datasec_reco_tune1->SetLineColor(kOrange-1);
-    h_datasec_reco_tune1->Scale(1.0, "width");
-    h_datasec_reco_tune1->SetLineWidth(2);
-
-    TCanvas *c = new TCanvas("c", "c", 500, 500);
-    c->SetLeftMargin(0.2);
-    c->SetBottomMargin(0.15);
-    h_dataxsec->GetYaxis()->SetTitleOffset(1.7);
-    h_dataxsec->Draw("E1,X0");
-    h_datasec_reco_mec->Draw("hist,same");
-    h_datasec_reco_nogtune->Draw("hist,same");
-    h_datasec_reco_FLUGG->Draw("hist,same");
-    h_datasec_reco_tune1->Draw("hist,same");
-    h_dataxsec->Draw("E1,same,X0");
-    h_dataxsec_stat->Draw("E1,same,X0");
-    
-
-    TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
-    leg->SetBorderSize(0);
-    leg->SetFillStyle(0);
-    leg->AddEntry(h_dataxsec, "Data (Stat. + Sys.)", "ep");
-    leg->AddEntry(h_datasec_reco_mec, "Data with 1.5 #times MEC Model", "l");
-    leg->AddEntry(h_datasec_reco_nogtune, "Data with no gTune Model", "l");
-    leg->AddEntry(h_datasec_reco_FLUGG, "Data with FLUGG Model", "l");
-    leg->AddEntry(h_datasec_reco_tune1, "Data with Tune 1 Model", "l");
-    leg->Draw();
-
-    c->Print(Form("plots/run%s/Models/%s/ModelDataComparison.pdf", _util.run_period, _util.xsec_var));
-
-    fxsec->Close();
-
-    delete c;
-
-}
-// -----------------------------------------------------------------------------
 void UtilityPlotter::CompareSmearing(){
 
     gStyle->SetOptStat(0);
@@ -2222,15 +2135,9 @@ void UtilityPlotter::CompareFakeDataReco(){
                                h_fake.at(m));
 
         // Now set the bin errors
-        for (int bin = 1; bin <  h_fake.at(m)->GetNbinsX()+1; bin++ ){
-            
-            std::cout << 100 * std::sqrt(h_cov_m.at(m)->GetBinContent(bin, bin)) / h_fake.at(m)->GetBinContent(bin) << std::endl;
-            
+        for (int bin = 1; bin <  h_fake.at(m)->GetNbinsX()+1; bin++ ){    
             h_fake.at(m)->SetBinError(bin, std::sqrt(h_cov_m.at(m)->GetBinContent(bin, bin)));
-            
-            
         }
-        std::cout << std::endl;
 
         ymax = h_true_smear.at(m)->GetMaximum();
 
@@ -2695,4 +2602,204 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
     
     }
 }
+// -----------------------------------------------------------------------------
+void UtilityPlotter::CompareDataCrossSections(){
+
+    gStyle->SetOptStat(0);
+
+    /// Load in the cross section output
+    TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
+
+    TH1D* h_temp;
+
+    // Data XSec
+    h_temp  = (TH1D*)fxsec->Get(Form("%s/er/h_data_xsec_sys_reco", _util.xsec_var));
+    TH1D* h_dataxsec = (TH1D*)h_temp->Clone();
+    h_dataxsec->SetDirectory(0);
+    h_dataxsec->SetLineColor(kBlack);
+    h_dataxsec->SetMarkerStyle(20);
+    h_dataxsec->SetMarkerSize(0.5);
+
+    fxsec->Close();
+
+    // Create a vector for the models
+    std::vector<std::string> models = {
+        "mec",
+        "nogtune",
+        "nopi0tune",
+        "FLUGG",
+        "tune1"
+    };
+
+    // enums for the models
+    enum enum_models {
+        k_model_mec,
+        k_model_nogtune,
+        k_model_nopi0tune,
+        k_model_FLUGG,
+        k_model_tune1,
+        k_MODEL_MAX
+    };
+
+    std::vector<TH1D*> h_dataxsec_model(models.size());
+
+    // Load in the cross section output
+    fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+
+    // Loop over each model
+    for (unsigned int m = 0; m < models.size(); m++){
+    
+        // Data X Sec MEC
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_data_xsec", models.at(m).c_str(), vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+        h_dataxsec_model.at(m) = (TH1D*)h_temp->Clone();
+        h_dataxsec_model.at(m)->Scale(1.0, "width");
+        h_dataxsec_model.at(m)->SetLineWidth(2);
+
+        // Set the line colours
+        if (m == k_model_mec)      h_dataxsec_model.at(k_model_mec)      ->SetLineColor(kGreen+2);
+        if (m == k_model_nogtune)  h_dataxsec_model.at(k_model_nogtune)  ->SetLineColor(kBlue+2);
+        if (m == k_model_nopi0tune)h_dataxsec_model.at(k_model_nopi0tune)->SetLineColor(kPink+1);
+        if (m == k_model_FLUGG)    h_dataxsec_model.at(k_model_FLUGG)    ->SetLineColor(kViolet-1);
+        if (m == k_model_tune1)    h_dataxsec_model.at(k_model_tune1)    ->SetLineColor(kOrange-1);
+    
+    }
+
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+    c->SetLeftMargin(0.2);
+    c->SetBottomMargin(0.15);
+    h_dataxsec->GetYaxis()->SetTitleOffset(1.7);
+    h_dataxsec->Draw("E1,X0");
+    
+    // Draw the model data xsections
+    for (unsigned int m = 0; m < models.size(); m++){
+        h_dataxsec_model.at(m)->Draw("hist,same");
+    }
+    
+    h_dataxsec->Draw("E1,same,X0");
+    
+
+    TLegend *leg = new TLegend(0.5, 0.5, 0.85, 0.85);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(h_dataxsec, "Data (Sys.)", "ep");
+    leg->AddEntry(h_dataxsec_model.at(k_model_mec)      , "Data 1.5 #times MEC", "l");
+    leg->AddEntry(h_dataxsec_model.at(k_model_nogtune)  , "Data no gTune", "l");
+    leg->AddEntry(h_dataxsec_model.at(k_model_nopi0tune), "Data no #pi^{0} Tune", "l");
+    leg->AddEntry(h_dataxsec_model.at(k_model_FLUGG)    , "Data FLUGG", "l");
+    leg->AddEntry(h_dataxsec_model.at(k_model_tune1)    , "Data Tune 1", "l");
+    leg->Draw();
+
+    c->Print(Form("plots/run%s/Models/%s/ModelDataComparison.pdf", _util.run_period, _util.xsec_var));
+    delete c;
+
+    fxsec->Close();
+
+}
+// -----------------------------------------------------------------------------
+void UtilityPlotter::CompareTotalDataCrossSections(){
+
+    gStyle->SetOptStat(0);
+
+    TH1D* h_temp;
+
+    // Create a vector for the models
+    std::vector<std::string> models = {
+        "mec",
+        "nogtune",
+        "nopi0tune",
+        "FLUGG",
+        "tune1"
+    };
+
+    // enums for the models
+    enum enum_models {
+        k_model_mec,
+        k_model_nogtune,
+        k_model_nopi0tune,
+        k_model_FLUGG,
+        k_model_tune1,
+        k_MODEL_MAX
+    };
+
+    std::vector<TH1D*> h_dataxsec_model(models.size());
+
+    // Load in the cross section output
+    TFile *fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+
+    // Data XSec
+    h_temp  = (TH1D*)fxsec->Get(Form("CV/integrated/h_run%s_CV_0_integrated_data_xsec", _util.run_period));
+    TH1D* h_dataxsec = (TH1D*)h_temp->Clone();
+
+    // Set the error to be 21% total systematic uncertainty
+    h_dataxsec->SetBinError(1, h_dataxsec->GetBinContent(1) * 0.21);
+    h_dataxsec->SetLineColor(kBlack);
+    h_dataxsec->SetMarkerStyle(20);
+    h_dataxsec->SetMarkerSize(0.5);
+
+    // X-Axis
+    h_dataxsec->GetXaxis()->SetRangeUser(0.0,1.0); 
+    h_dataxsec->GetXaxis()->SetLabelOffset(999);
+    h_dataxsec->GetXaxis()->SetLabelSize(0);
+    h_dataxsec->GetXaxis()->SetTickLength(0);
+    
+    // Y-Axis
+    h_dataxsec->GetYaxis()->SetRangeUser(3.0, 8.0);
+    h_dataxsec->GetYaxis()->CenterTitle();
+    h_dataxsec->GetYaxis()->SetLabelSize(0.1);
+    h_dataxsec->GetYaxis()->SetTitleSize(0.1);
+
+    // Loop over each model
+    for (unsigned int m = 0; m < models.size(); m++){
+    
+        // Data X Sec MEC
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/integrated/h_run%s_CV_0_integrated_data_xsec", models.at(m).c_str(), _util.run_period));
+        h_dataxsec_model.at(m) = (TH1D*)h_temp->Clone();
+        h_dataxsec_model.at(m)->Scale(1.0, "width");
+        h_dataxsec_model.at(m)->SetLineWidth(2);
+
+        // Set the line colours
+        if (m == k_model_mec)      h_dataxsec_model.at(k_model_mec)      ->SetLineColor(kGreen+2);
+        if (m == k_model_nogtune)  h_dataxsec_model.at(k_model_nogtune)  ->SetLineColor(kBlue+2);
+        if (m == k_model_nopi0tune)h_dataxsec_model.at(k_model_nopi0tune)->SetLineColor(kPink+1);
+        if (m == k_model_FLUGG)    h_dataxsec_model.at(k_model_FLUGG)    ->SetLineColor(kViolet-1);
+        if (m == k_model_tune1)    h_dataxsec_model.at(k_model_tune1)    ->SetLineColor(kOrange-1);
+    
+    }
+
+    TCanvas *c = new TCanvas("c", "c", 150, 350);
+    gPad->SetLeftMargin(0.3);
+    h_dataxsec->Draw("E1,X0");
+    
+    // Draw the model data xsections
+    for (unsigned int m = 0; m < models.size(); m++){
+        h_dataxsec_model.at(m)->Draw("hist,same");
+    }
+    
+    h_dataxsec->Draw("E1,same,X0");
+    h_dataxsec->SetMarkerSize(0.4);
+    
+
+    TLegend *leg = new TLegend(0.35, 0.70, 0.70, 0.89);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(h_dataxsec, "Data (Sys.)", "ep");
+    leg->AddEntry(h_dataxsec_model.at(k_model_mec)      , "Data 1.5 #times MEC", "l");
+    leg->AddEntry(h_dataxsec_model.at(k_model_nogtune)  , "Data no gTune", "l");
+    leg->AddEntry(h_dataxsec_model.at(k_model_nopi0tune), "Data no #pi^{0} Tune", "l");
+    leg->AddEntry(h_dataxsec_model.at(k_model_FLUGG)    , "Data FLUGG", "l");
+    leg->AddEntry(h_dataxsec_model.at(k_model_tune1)    , "Data Tune 1", "l");
+    leg->Draw();
+
+    gStyle->SetLegendTextSize(0.06);
+
+    c->Print(Form("plots/run%s/Models/Total/ModelDataComparison.pdf", _util.run_period));
+    delete c;
+
+    fxsec->Close();
+
+}
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
