@@ -366,6 +366,10 @@ template<typename T> void SliceContainer::Initialise(T *tree, int type, Utility 
             tree->SetBranchAddress("knobNormCCCOHdn",       &knobNormCCCOHdn);
             tree->SetBranchAddress("knobNormNCCOHup",       &knobNormNCCOHup);
             tree->SetBranchAddress("knobNormNCCOHdn",       &knobNormNCCOHdn);
+            tree->SetBranchAddress("knobxsr_scc_Fv3up",     &knobxsr_scc_Fv3up);
+            tree->SetBranchAddress("knobxsr_scc_Fv3dn",     &knobxsr_scc_Fv3dn);
+            tree->SetBranchAddress("knobxsr_scc_Fa3up",     &knobxsr_scc_Fa3up);
+            tree->SetBranchAddress("knobxsr_scc_Fa3dn",     &knobxsr_scc_Fa3dn);
         }
     }
     
@@ -406,7 +410,6 @@ void SliceContainer::SliceClassifier(int type){
     
     // MC Specific classsifications
     if (type == _util.k_mc){
-
         
         bool is_in_fv = _util.in_fv(true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z);
 
@@ -906,7 +909,7 @@ void SliceContainer::SetSignal(){
 
     if (classification.second == _util.k_nue_cc           || classification.second == _util.k_nuebar_cc ||
         classification.second == _util.k_unmatched_nue    || classification.second == _util.k_cosmic_nue ||
-        classification.second == _util.k_unmatched_nuebar || classification.second == _util.k_cosmic_nuebar ){
+        classification.second == _util.k_unmatched_nuebar || classification.second == _util.k_cosmic_nuebar){
             is_signal = true;
     }
     else 
@@ -948,7 +951,8 @@ void SliceContainer::SetNuMIAngularVariables(){
 
     TVector3 elec_dir(elec_px, elec_py, elec_pz); 
     elec_dir.Unit();
-    true_effective_angle = elec_dir.Angle(v_targ_to_vtx_true) * 180 / 3.14159;
+    // true_effective_angle = elec_dir.Angle(v_targ_to_vtx_true) * 180 / 3.14159;
+    true_effective_angle = elec_dir.Angle(nu_dir) * 180 / 3.14159; // Use dot product of elec dir to nu dir for this as the true value
     
     // --
 
@@ -996,4 +1000,24 @@ void SliceContainer::CalibrateShowerEnergy(){
     // Divide the shower energy by 0.83 to calibrate it properly. 
     shr_energy_cali= shr_energy_cali/0.83;
 
+}
+// -----------------------------------------------------------------------------
+void SliceContainer::SetThresholdEvent(){
+
+    // Below threshold of nue or electron energy
+    if (nu_e < _util.energy_threshold || elec_e < _util.elec_threshold){
+        if (nu_pdg == 12){
+            classification = std::make_pair("thr_nue",_util.k_thr_nue);
+        }
+        if (nu_pdg == -12){
+            classification = std::make_pair("thr_nuebar",_util.k_thr_nuebar);
+        }
+    }
+
+}
+// -----------------------------------------------------------------------------
+void SliceContainer::SetFakeData(){
+    
+    if (_util.isfakedata)
+        classification = std::make_pair("data",_util.k_leg_data);
 }

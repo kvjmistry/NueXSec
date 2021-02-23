@@ -108,6 +108,9 @@ To run the systematics code, we run the cross section helper in `reweight` mode.
 ```
 This creates a new folder in `files/crosssec_run1.root` with the systematic plots you have just ran.
 
+If you are running on the gpvm, its more useful to run this in a tmux session and run them all in one go instead:
+`./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel all --xsecvar elec_E`
+
 # Running the Systematics: Detector Variations
 Detector variations are made in different samples so we cant use the CV file. We need to run the selection, create a unique file and then run the xsec code over it like it was a CV. E.g. in the case of `LYDown`, this can be done by:
 
@@ -142,7 +145,7 @@ We now need to plot the cross section and calculate the uncertainties along with
 This reads in all the stuff in `files/crosssec_run1.root`, and creates all the final plots.
 
 # Creating Systematics by Selection Stage
-This is pretty cpu intensive, so try to minise how often you run this. But basically to calculate the systematics for select plots at each cut stage, we can use a different mode of the cross section helper:
+This is pretty cpu intensive, so try to minimise how often you run this. But basically to calculate the systematics for select plots at each cut stage, we can use a different mode of the cross section helper:
 This is running the so called rw_cuts stage and adds a cut folder in `files/crosssec_run1.root`. *This can take hours to run*.
 ```
 ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --mc ../ntuples/neutrinoselection_filt_run1_overlay.root --xsecmode reweight --xseclabel unisim --xsecplot rw_cuts --intrinsic intrinsic
@@ -150,6 +153,9 @@ This is running the so called rw_cuts stage and adds a cut folder in `files/cros
 ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --mc ../ntuples/neutrinoselection_filt_run1_overlay.root --xsecmode reweight --xseclabel genie  --xsecplot rw_cuts --intrinsic intrinsic
 ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --mc ../ntuples/neutrinoselection_filt_run1_overlay.root --xsecmode reweight --xseclabel reint  --xsecplot rw_cuts --intrinsic intrinsic
 ```
+
+If you are running on the gpvm, its more useful to run this in a tmux session and run them all in one go instead (this command will probably take a really really long time!):
+`./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --mc ../ntuples/neutrinoselection_filt_run1_overlay.root --xsecmode reweight --xseclabel all --xsecplot rw_cuts --intrinsic intrinsic`
 
 Once you have done this, we need to store the total uncertainties to a file so we can plot them. We can do this by running a function in the systematics helper class:
 `./nuexsec --run 1 --sys reweightcuts`

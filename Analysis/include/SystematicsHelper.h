@@ -2,6 +2,7 @@
 #define SYSTEMATICSHELPER_H
 
 #include "Utility.h"
+#include "WienerSVD.h"
 
 // Class for making plots for systematic studies
 class SystematicsHelper{
@@ -24,7 +25,11 @@ class SystematicsHelper{
     
     TTree * tree;
 
+    WienerSVD _wSVD;
+
     std::vector<double> POT_v; // vector of POT for each variation 
+
+    bool scale_bins = false;
 
     double Data_POT;
     // -------------------------------------------------------------------------
@@ -122,6 +127,17 @@ class SystematicsHelper{
     // Make a plot of the systematics in one plot
     void MakeTotUncertaintyPlot();
     // -------------------------------------------------------------------------
+    // Initialse the matrix of covariance matrices
+    void InitialseCovarianceVector();
+    // -------------------------------------------------------------------------
+    // Write the results to a file for ease of storage
+    void ExportResult(TFile* f);
+    // -------------------------------------------------------------------------
+    // Save the total data cross section result to file
+    void ExportTotalCrossSectionResult();
+    // -------------------------------------------------------------------------
+
+
 
     std::string mode{"default"}; // what mode to run this class in
 
@@ -197,17 +213,18 @@ class SystematicsHelper{
 
     // enum for histogram types
     enum TH1D_xsec_hist_vars {
-        k_xsec_sel,     // Selected event histogram binned in energy
-        k_xsec_bkg,     // Bkg event histogram binned in energy
-        k_xsec_gen,     // Gen event histogram binned in energy
+        k_xsec_sel,          // Selected event histogram binned in energy
+        k_xsec_bkg,          // Bkg event histogram binned in energy
+        k_xsec_gen,          // Gen event histogram binned in energy
         k_xsec_gen_smear,    // Gen event histogram binned in energy with smeared truth
-        k_xsec_sig,     // Sig event histogram binned in energy
-        k_xsec_eff,     // Efficiency histogram binned in energy
-        k_xsec_ext,     // EXT event histogram binned in energy
-        k_xsec_dirt,    // Dirt event histogram binned in energy
-        k_xsec_data,    // Data event histogram binned in energy
-        k_xsec_mcxsec,  // MC Cross Section
-        k_xsec_dataxsec,// Data Cross Section
+        k_xsec_sig,          // Sig event histogram binned in energy
+        k_xsec_eff,          // Efficiency histogram binned in energy
+        k_xsec_ext,          // EXT event histogram binned in energy
+        k_xsec_dirt,         // Dirt event histogram binned in energy
+        k_xsec_data,         // Data event histogram binned in energy
+        k_xsec_mcxsec,       // MC Cross Section
+        k_xsec_mcxsec_smear, // MC Cross Section smeared truth
+        k_xsec_dataxsec,     // Data Cross Section
         k_TH1D_xsec_MAX
     };
 
@@ -220,15 +237,13 @@ class SystematicsHelper{
     };
 
     // Names for cross section histograms
-    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "data_xsec"};
-    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Smeared Prediction", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC", "Data"};
+    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "data_xsec"};
+    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Smeared Prediction", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC", "MC Smear",  "Data"};
 
     std::vector<std::string> vars = {"integrated","recoX", "trueX" };
 
     // Choose the cross section scale to set the histogram
-    double xsec_scale = 13.0e-39;
-    // double xsec_scale = 0.15e-39;
-    // double xsec_scale = 0.5e-39;
+    double xsec_scale = 13.0;
     
     // Use these for when we do the flux normalised event rate
     // std::vector<std::string> var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",
@@ -284,10 +299,10 @@ class SystematicsHelper{
     };
 
     // Vector to store the quadrature sum of the uncertainties
-    std::vector<std::vector<std::vector<std::vector<double>>>> v_err;
+    std::vector<std::vector<std::vector<std::vector<double>>>> v_err; // error type -- var -- type -- bin error . Units are percent squared. To ger the raw err, sqrt and * 0.01 then multiply by the bin content
     
     // Vector to store all the final covariance matrices
-    std::vector<TH2D*> h_cov_v;
+    std::vector<std::vector<std::vector<TH2D*>>> h_cov_v; // var -- type -- label
 
 
     // Vector to store total uncertainty histograms

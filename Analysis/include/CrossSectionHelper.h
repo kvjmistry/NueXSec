@@ -61,6 +61,8 @@ class CrossSectionHelper{
     double knobRPA_CCQE_Reducedup{0.0};
     double knobNormCCCOHup{0.0};
     double knobNormNCCOHup{0.0};
+    double knobxsr_scc_Fv3up{0.0};
+    double knobxsr_scc_Fa3up{0.0};
     double knobRPAdn{0.0};
     double knobCCMECdn{0.0};
     double knobAxFFCCQEdn{0.0};
@@ -71,6 +73,8 @@ class CrossSectionHelper{
     double knobRPA_CCQE_Reduceddn{0.0};
     double knobNormCCCOHdn{0.0};
     double knobNormNCCOHdn{0.0};
+    double knobxsr_scc_Fv3dn{0.0};
+    double knobxsr_scc_Fa3dn{0.0};
 
     std::vector<double> vec_universes;
 
@@ -102,15 +106,19 @@ class CrossSectionHelper{
 
     // Define the bins for each variable -- See InitialiseHistograms function to see the actual binning used
     std::vector<std::vector<double>> bins;
-    
+    std::vector<std::vector<double>> bins_fine;
+
     // Define histograms for the cross section calculation
     std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_cross_sec; // Label -- Universe -- variable -- xsec_type
 
     // define vector of smearing matrices
     std::vector<std::vector<std::vector<TH2D*>>> h_smear; // Label -- Universe -- variable
+    std::vector<std::vector<std::vector<TH2D*>>> h_smear_fine; // Label -- Universe -- variable
 
     // Define histograms for the reweighting by cut
     std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_cut_v; // Label -- Cut -- variable -- Universe
+
+    TH2D* h_2D_CV_binning; // Histogram to define the bin indexes for a response matrix in energy and angle
 
     // enum for histogram types
     enum TH1D_xsec_hist_vars {
@@ -118,6 +126,7 @@ class CrossSectionHelper{
         k_xsec_bkg,          // Bkg event histogram binned in energy
         k_xsec_gen,          // Gen event histogram binned in energy
         k_xsec_gen_smear,    // Gen event histogram binned in energy with smeared truth
+        k_xsec_gen_fine,     // Generated events with a fine truth binning
         k_xsec_sig,          // Sig event histogram binned in energy
         k_xsec_eff,          // Efficiency histogram binned in energy
         k_xsec_ext,          // EXT event histogram binned in energy
@@ -125,6 +134,7 @@ class CrossSectionHelper{
         k_xsec_data,         // Data event histogram binned in energy
         k_xsec_mcxsec,       // MC Cross Section
         k_xsec_mcxsec_smear, // MC Cross Section smeared truth
+        k_xsec_mcxsec_fine, // MC Cross Section smeared truth
         k_xsec_dataxsec,     // Data Cross Section
         k_TH1D_xsec_MAX
     };
@@ -138,7 +148,7 @@ class CrossSectionHelper{
     };
 
     // Names for cross section histograms
-    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "data_xsec"};
+    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "gen_fine", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "mc_xsec_fine", "data_xsec"};
 
     std::vector<std::string> vars = {"integrated", "recoX", "trueX"};
     
@@ -157,6 +167,10 @@ class CrossSectionHelper{
     std::string smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]";
 
     std::vector<double> hist_bins;
+
+    std::vector<double> fine_bins;
+
+    double xsec_scale = 0.0; // not needed in this code
 
     std::vector<std::string> reweighter_labels = {
         "CV",    // Dont comment this out
@@ -203,6 +217,10 @@ class CrossSectionHelper{
         "RPA_CCQE_Reduceddn",
         "NormCCCOHdn",
         "NormNCCOHdn",
+        "xsr_scc_Fv3up",
+        "xsr_scc_Fa3up",
+        "xsr_scc_Fv3dn",
+        "xsr_scc_Fa3dn",
         "Dirtup",
         "Dirtdn",
         "POTup",
@@ -333,8 +351,20 @@ class CrossSectionHelper{
     // Function to calculate the cross section using binned histograms
     void CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg, double mc_scale_factor, double flux, double ext_scale_factor, TH1D* h_ext, double dirt_scale_factor, TH1D* h_dirt, TH1D* h_xsec, TH1D* h_sig, double targ, std::string mcdata, int _var);
     // -------------------------------------------------------------------------
-    // Function to get the integrated flux OR a weight
-    double GetIntegratedFlux(int uni, std::string value, std::string label, std::string variation, int _nu_pdg, double _true_energy, double _numi_ang);
+    // Function to get the integrated flux for CV
+    double GetIntegratedFluxCV();
+    // -------------------------------------------------------------------------
+    // Get the integrated flux from the FLUGG flux file
+    double GetIntegratedFluxFLUGG();
+    // -------------------------------------------------------------------------
+    // Function to get the integrated flux for HP Universe
+    double GetIntegratedFluxHP(int uni, std::string label);
+    // -------------------------------------------------------------------------
+    // Function to get the weight for a beamline variation
+    double GetBeamlineWeight(std::string variation, int _nu_pdg, double _true_energy, double _numi_ang);
+    // -------------------------------------------------------------------------
+    // Function to get the weight for a HP variation using the flux file
+    double GetHPWeight(int uni, std::string label, int _nu_pdg, double _true_energy, double _numi_ang);
     // -------------------------------------------------------------------------
     // Function to get the POT from the flux file
     double GetPOT(TFile* f);
@@ -384,7 +414,9 @@ class CrossSectionHelper{
     // Save the event to file
     void SaveEvent(std::string _classification, bool _passed_selection, std::vector<float> ev_weight, double reco_E, double true_E);
     // -------------------------------------------------------------------------
-
+    // Return the bin index from a 2D histogram
+    int GetBinIndex();
+    // -------------------------------------------------------------------------
 
 
 

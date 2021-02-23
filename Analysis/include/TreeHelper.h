@@ -38,7 +38,7 @@ class TreeHelper{
     // ~TreeHelper(); 
 
     // The output file
-    TFile* f_nuexsec;
+    TFile* f_nuexsec_tree;
 
     // Class instances
     Utility _util;
@@ -96,6 +96,8 @@ class TreeHelper{
     double knobRPA_CCQE_Reducedup;
     double knobNormCCCOHup;
     double knobNormNCCOHup;
+    double knobxsr_scc_Fv3up;
+    double knobxsr_scc_Fa3up;
     double knobRPAdn;
     double knobCCMECdn;
     double knobAxFFCCQEdn;
@@ -106,6 +108,8 @@ class TreeHelper{
     double knobRPA_CCQE_Reduceddn;
     double knobNormCCCOHdn;
     double knobNormNCCOHdn;
+    double knobxsr_scc_Fv3dn;
+    double knobxsr_scc_Fa3dn;
 
 
 
@@ -181,6 +185,8 @@ class TreeHelper{
     double count_cosmic_nue{0.0};
     double count_unmatched_nuebar{0.0};
     double count_cosmic_nuebar{0.0};
+    double count_thr_nue{0.0};
+    double count_thr_nuebar{0.0};
     double count_total_mc{0.0};
     double count_data{0.0};
     double count_ext{0.0};

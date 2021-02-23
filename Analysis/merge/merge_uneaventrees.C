@@ -1,6 +1,6 @@
 // Script to merge the mc, data, ext and dirt ttrees to one file
 
-void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string mc, std::string data, std::string ext, std::string dirt, std::string detvar) {
+void merge_uneaventrees(std::string run_type, bool intrinsic_mode, bool fake_intrinsic_mode, std::string mc, std::string data, std::string ext, std::string dirt, std::string detvar) {
 
     enum types {
         k_mc,
@@ -23,8 +23,20 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
     std::vector<TTree*> trees(resize);
     std::vector<std::string> filenames;
     
-    if (intrinsic_mode){
+    // Using intrinsic nue in MC only
+    if (intrinsic_mode && !fake_intrinsic_mode){
+        std::cout << "MC Intrinsic Only"<< std::endl;
         filenames = {mc, mc, data, ext, dirt};
+    }
+    // Using intrinsic nue in fake data only
+    else if (!intrinsic_mode && fake_intrinsic_mode){
+        std::cout << "Fake Data Intrinsic Only"<< std::endl;
+        filenames = {mc, data, data, ext, dirt};
+    }
+    // Using intrinsic nue in MC and fake data
+    else if (intrinsic_mode && fake_intrinsic_mode){
+        std::cout << "MC and Data Intrinsic"<< std::endl;
+        filenames = {mc, mc, data, data, ext, dirt};
     }
     else
         filenames = {mc, data, ext, dirt};
@@ -84,6 +96,8 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
     double knobRPA_CCQE_Reducedup{0.0}, _knobRPA_CCQE_Reducedup{0.0};
     double knobNormCCCOHup{0.0},        _knobNormCCCOHup{0.0};
     double knobNormNCCOHup{0.0},        _knobNormNCCOHup{0.0};
+    double knobxsr_scc_Fv3up{0.0},      _knobxsr_scc_Fv3up{0.0};
+    double knobxsr_scc_Fa3up{0.0},      _knobxsr_scc_Fa3up{0.0};
     double knobRPAdn{0.0},              _knobRPAdn{0.0};
     double knobCCMECdn{0.0},            _knobCCMECdn{0.0};
     double knobAxFFCCQEdn{0.0},         _knobAxFFCCQEdn{0.0};
@@ -94,13 +108,21 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
     double knobRPA_CCQE_Reduceddn{0.0}, _knobRPA_CCQE_Reduceddn{0.0};
     double knobNormCCCOHdn{0.0},        _knobNormCCCOHdn{0.0};
     double knobNormNCCOHdn{0.0},        _knobNormNCCOHdn{0.0};
+    double knobxsr_scc_Fv3dn{0.0},      _knobxsr_scc_Fv3dn{0.0};
+    double knobxsr_scc_Fa3dn{0.0},      _knobxsr_scc_Fa3dn{0.0};
 
 
 
     std::vector<std::string> treenames;
     
-    if (intrinsic_mode){
+    if (intrinsic_mode && !fake_intrinsic_mode){
         treenames = {"mc_nue_tree", "mc_tree", "data_tree", "ext_tree", "dirt_tree"};
+    }
+    else if (!intrinsic_mode && fake_intrinsic_mode){
+        treenames = {"mc_tree", "data_nue_tree", "data_tree", "ext_tree", "dirt_tree"};
+    }
+    else if (intrinsic_mode && fake_intrinsic_mode){
+        treenames = {"mc_nue_tree", "mc_tree", "data_nue_tree", "data_tree", "ext_tree", "dirt_tree"};
     }
     else
         treenames = {"mc_tree", "data_tree", "ext_tree", "dirt_tree"};
@@ -173,6 +195,10 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
     outtree->Branch("knobNormCCCOHdn",       &knobNormCCCOHdn);
     outtree->Branch("knobNormNCCOHup",       &knobNormNCCOHup);
     outtree->Branch("knobNormNCCOHdn",       &knobNormNCCOHdn);
+    outtree->Branch("knobxsr_scc_Fv3up",     &knobxsr_scc_Fv3up);
+    outtree->Branch("knobxsr_scc_Fv3dn",     &knobxsr_scc_Fv3dn);
+    outtree->Branch("knobxsr_scc_Fa3up",     &knobxsr_scc_Fa3up);
+    outtree->Branch("knobxsr_scc_Fa3dn",     &knobxsr_scc_Fa3dn);
 
     // Loop over the flles
     for (unsigned int k = 0; k < files.size(); k++){
@@ -245,6 +271,10 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
         trees.at(k)->SetBranchAddress("knobNormCCCOHdn",       &_knobNormCCCOHdn);
         trees.at(k)->SetBranchAddress("knobNormNCCOHup",       &_knobNormNCCOHup);
         trees.at(k)->SetBranchAddress("knobNormNCCOHdn",       &_knobNormNCCOHdn);
+        trees.at(k)->SetBranchAddress("knobxsr_scc_Fv3up",     &_knobxsr_scc_Fv3up);
+        trees.at(k)->SetBranchAddress("knobxsr_scc_Fv3dn",     &_knobxsr_scc_Fv3dn);
+        trees.at(k)->SetBranchAddress("knobxsr_scc_Fa3up",     &_knobxsr_scc_Fa3up);
+        trees.at(k)->SetBranchAddress("knobxsr_scc_Fa3dn",     &_knobxsr_scc_Fa3dn);
 
         int tree_entries = trees.at(k)->GetEntries();
 
@@ -253,8 +283,17 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
                 trees.at(k)->GetEntry(ievent); 
 
                 // If intrinsic mode is turned on and we are using the default mc, then skip the fill for generated events which are already covered
-                if (intrinsic_mode && k == 1 && _gen){
-                            continue;
+                if (intrinsic_mode && !fake_intrinsic_mode){
+                     if (k == 1 && _gen)
+                        continue;
+                }
+                else if (!intrinsic_mode && fake_intrinsic_mode){
+                     if (k == 2 && _gen)
+                        continue;
+                }
+                else if (intrinsic_mode && fake_intrinsic_mode){
+                     if (( k == 1 || k == 3) && _gen)
+                        continue;
                 }
 
                 run              = _run;
@@ -317,6 +356,10 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, std::string m
                 knobRPA_CCQE_Reduceddn = _knobRPA_CCQE_Reduceddn;
                 knobNormCCCOHdn =        _knobNormCCCOHdn;
                 knobNormNCCOHdn =        _knobNormNCCOHdn;
+                knobxsr_scc_Fv3up =      _knobxsr_scc_Fv3up;
+                knobxsr_scc_Fv3dn =      _knobxsr_scc_Fv3dn;
+                knobxsr_scc_Fa3up =      _knobxsr_scc_Fa3up;
+                knobxsr_scc_Fa3dn =      _knobxsr_scc_Fa3dn;
 
                 outtree->Fill();
         }
