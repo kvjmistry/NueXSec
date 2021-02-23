@@ -9,7 +9,7 @@ fi
 
 if [ -z "$1" ]; then
   # Run the selection
-  mc="./nuexsec --run 1 --mc /pnfs/uboone/persistent/users/davidc/searchingfornues/v08_00_00_51/1124/prodgenie_numi_uboone_overlay_fhc_mcc9_run1_v28_all_snapshot.root --gpvm"
+  mc="./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v7/neutrinoselection_filt_run1_overlay.root --gpvm"
   data="./nuexsec --run 1 --data /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v5/neutrinoselection_filt_run1_beamon_beamgood.root --gpvm"
   ext="./nuexsec --run 1 --ext /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v5/neutrinoselection_filt_run1_beamoff.root --gpvm"
   dirt="./nuexsec --run 1 --dirt /pnfs/uboone/persistent/users/davidc/searchingfornues/v08_00_00_51/1124/prodgenie_numi_uboone_overlay_dirt_fhc_mcc9_run1_v28_all_snapshot.root --gpvm"
@@ -32,7 +32,7 @@ if [ -z "$1" ]; then
   done
 
   # Overwrite the Nue cc events with a higher stats version
-  ./nuexsec --run 1 --mc /pnfs/uboone/persistent/users/davidc/searchingfornues/v08_00_00_51/1124/prodgenie_numi_nue_overlay_mcc9_v08_00_00_48_CV_reco2_run1_reco2.root --intrinsic intrinsic --gpvm
+  ./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v7/neutrinoselection_filt_run1_overlay_intrinsic.root --intrinsic intrinsic --gpvm
 
   # Print the selection
   ./nuexsec --run 1 --printonly --printall --gpvm | tee -a log/run1.log 

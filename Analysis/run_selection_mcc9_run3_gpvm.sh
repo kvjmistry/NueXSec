@@ -9,7 +9,7 @@ fi
 
 if [ -z "$1" ]; then
   # Run the selection
-  mc="./nuexsec --run 3 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v6/neutrinoselection_filt_run3b_overlay.root --gpvm"
+  mc="./nuexsec --run 3 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v7/neutrinoselection_filt_run3b_overlay.root --gpvm"
   data="./nuexsec --run 3 --data /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v5/neutrinoselection_filt_run3b_beamon_beamgood.root --gpvm"
   ext="./nuexsec --run 3 --ext /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v5/neutrinoselection_filt_run3b_beamoff.root --gpvm"
   dirt="./nuexsec --run 3 --dirt /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v6/neutrinoselection_filt_run3b_dirt_overlay.root --gpvm"
@@ -32,7 +32,7 @@ if [ -z "$1" ]; then
   done
 
   # Overwrite the Nue cc events with a higher stats version
-  ./nuexsec --run 3 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v6/neutrinoselection_filt_run3b_overlay_intrinsic.root --intrinsic intrinsic --gpvm
+  ./nuexsec --run 3 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v7/neutrinoselection_filt_run3b_overlay_intrinsic.root --intrinsic intrinsic --gpvm
 
   # Print the selection
   ./nuexsec --run 3 --printonly --printall --gpvm | tee -a log/run3.log 
