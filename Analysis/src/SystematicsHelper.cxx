@@ -3033,11 +3033,11 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
 
             TLegend *leg;
             
-            if (type != k_xsec_eff && vars.at(var) != "integrated") leg = new TLegend(0.41, 0.55, 0.91, 0.85);
+            if (type != k_xsec_eff && vars.at(var) != "integrated") leg = new TLegend(0.35, 0.55, 0.85, 0.85);
             else {
                 
                 if (is_detvar)
-                    leg = new TLegend(0.4, 0.2, 0.9, 0.5);
+                    leg = new TLegend(0.35, 0.2, 0.85, 0.5);
                 else
                     leg = new TLegend(0.4, 0.3, 0.9, 0.6);
 
@@ -3059,12 +3059,23 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                 
 
                 if (single_var.at(label)){
-                    leg->AddEntry(h_universe.at(var).at(label).at(k_up).at(type),Form("%s", unisim_names.at(label).c_str()), "l");
+                    
+                    if(is_detvar)
+                        leg->AddEntry(h_universe.at(var).at(label).at(k_up).at(type),Form("%s", var_string_pretty.at(label).c_str()), "l");
+                    else
+                        leg->AddEntry(h_universe.at(var).at(label).at(k_up).at(type),Form("%s", unisim_names.at(label).c_str()), "l");
+                    
                     h_universe.at(var).at(label).at(k_up).at(type)->Draw("hist,same");
                 }
                 else {
-                    leg->AddEntry(h_universe.at(var).at(label).at(k_up).at(type),Form("%s +1#sigma", unisim_names.at(label).c_str()), "l");
-                    leg->AddEntry(h_universe.at(var).at(label).at(k_dn).at(type),Form("%s -1#sigma", unisim_names.at(label).c_str()), "l");
+                    if(is_detvar){
+                        leg->AddEntry(h_universe.at(var).at(label).at(k_up).at(type),Form("%s +1#sigma", var_string_pretty.at(label).c_str()), "l");
+                        leg->AddEntry(h_universe.at(var).at(label).at(k_dn).at(type),Form("%s -1#sigma", var_string_pretty.at(label).c_str()), "l");
+                    }
+                    else {
+                        leg->AddEntry(h_universe.at(var).at(label).at(k_up).at(type),Form("%s +1#sigma", unisim_names.at(label).c_str()), "l");
+                        leg->AddEntry(h_universe.at(var).at(label).at(k_dn).at(type),Form("%s -1#sigma", unisim_names.at(label).c_str()), "l");
+                    }
                     h_universe.at(var).at(label).at(k_up).at(type)->Draw("hist,same");
                     h_universe.at(var).at(label).at(k_dn).at(type)->Draw("hist,same");
                 }

@@ -1119,7 +1119,7 @@ void Utility::SetTPadOptions(TPad *topPad, TPad *bottomPad){
     topPad->SetBottomMargin(0.05);
     topPad->SetTopMargin(0.15);
     bottomPad->SetTopMargin(0.04);
-    bottomPad->SetBottomMargin(0.25);
+    bottomPad->SetBottomMargin(0.3);
     bottomPad->SetGridy();
     topPad->SetLeftMargin(0.15);
     topPad->SetRightMargin(0.1);
@@ -1447,8 +1447,8 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
     else if (std::string(xsec_var) =="elec_ang"){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                           ";#beta^{reco}_{e} [deg];#frac{dR}{d#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-37} cm^{2}/deg/nucleon]",
-                           ";#beta^{true}_{e} [deg];#frac{d#sigma}{d#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-37} cm^{2}/deg/nucleon]"
+                           ";#beta^{reco}_{e} [deg];#frac{dR}{d#beta^{reco}_{e}} [10^{-37} cm^{2}/deg/nucleon]",
+                           ";#beta^{true}_{e} [deg];#frac{d#sigma}{d#beta^{true}_{e}} [10^{-37} cm^{2}/deg/nucleon]"
                           };
 
 
@@ -1481,8 +1481,8 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
     else if (std::string(xsec_var) =="elec_cang"){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                           ";cos#beta^{reco}_{e};#frac{dR}{dcos#beta^{reco}_{e} [10^{-39} cm^{2}/nucleon]",
-                           ";cos#beta^{true}_{e};#frac{d#sigma}{dcos#beta^{true}_{e} [10^{-39} cm^{2}/nucleon]"
+                           ";cos#beta^{reco}_{e};#frac{dR}{dcos#beta^{reco}_{e}} [10^{-39} cm^{2}/nucleon]",
+                           ";cos#beta^{true}_{e};#frac{d#sigma}{dcos#beta^{true}_{e}} [10^{-39} cm^{2}/nucleon]"
                           };
 
 
