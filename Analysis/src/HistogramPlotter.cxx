@@ -82,7 +82,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_true_nu_E_nuebar_single_bin", true,  true,  "True #bar{#nu}_{e}; Efficiency",                                  "True #bar{#nu}_{e} Events in FV",                  "nu_E_nuebar_single_bin");
         
         MakeEfficiencyPlotByCut("h_true_elec_E",                 false, false, "True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_E");
-        MakeEfficiencyPlotByCut("h_eff_elec_E_many_bins",        false, false, "True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_E_many_bins");
+        MakeEfficiencyPlotByCut("h_eff_elec_E_many_bins",        true,  false, "True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_E_many_bins");
         MakeEfficiencyPlotByCut("h_eff_nu_theta",                false, false, "True #nu_{e} + #bar{#nu}_{e} #theta [deg]; Efficiency",           "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "nu_theta" );
         MakeEfficiencyPlotByCut("h_eff_nu_phi",                  false, false, "True #nu_{e} + #bar{#nu}_{e} #phi [deg]; Efficiency",             "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "nu_phi" );
         MakeEfficiencyPlotByCut("h_eff_elec_theta",              false, false, "True e#lower[-0.5]{-} + e^{+} #theta [deg]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_theta" );
@@ -142,8 +142,9 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
             MakeInteractionPlot("h_int_elec_theta",             true, ";True e#lower[-0.5]{-} + e^{+} #theta [deg]; Entries",   "elec_theta",             cut_stage, 600);
             MakeInteractionPlot("h_int_elec_phi",               true, ";True e#lower[-0.5]{-} + e^{+} #phi [deg]; Entries",     "elec_phi",               cut_stage, 500);
             MakeInteractionPlot("h_int_effective_ang",          true, ";True e#lower[-0.5]{-} + e^{+} Eff Ang. [deg]; Entries", "eff_ang",                cut_stage, 600);
-            MakeInteractionPlot("h_int_beta_nue",               true, ";True e#lower[-0.5]{-} #beta [deg]; Entries",                  "eff_ang_nue",            cut_stage, 600);
+            MakeInteractionPlot("h_int_beta_nue",               true, ";True e#lower[-0.5]{-} #beta [deg]; Entries",            "eff_ang_nue",            cut_stage, 600);
             MakeInteractionPlot("h_int_beta_nuebar",            true, ";True e^{+} #beta [deg]; Entries",                       "eff_ang_nuebar",         cut_stage, 600);
+            MakeInteractionPlot("h_int_cosbeta",                true, ";True e#lower[-0.5]{-} + e^{+} cos#beta; Entries",       "cosbeta",                cut_stage, 600);
         }
         
         MakeInteractionEfficiency("h_true_nue_E",                 false, ";True #nu_{e} Energy [GeV]; Efficiency",                    "nue_E");
@@ -158,9 +159,10 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeInteractionEfficiency("h_int_elec_E_rebin_nuebar",    false, ";True e^{+} Energy [GeV]; Efficiency",                      "elec_E_rebin_nuebar");
         MakeInteractionEfficiency("h_int_elec_theta",             false, ";True e#lower[-0.5]{-} + e^{+} #theta [deg]; Efficiency",   "elec_theta");
         MakeInteractionEfficiency("h_int_elec_phi",               false, ";True e#lower[-0.5]{-} + e^{+} #phi [deg]; Efficiency",     "elec_phi");
-        MakeInteractionEfficiency("h_int_effective_ang",          false, ";True e#lower[-0.5]{-} + e^{+} Eff Ang. [deg]; Efficiency", "eff_ang");
+        MakeInteractionEfficiency("h_int_effective_ang",          false, ";True e#lower[-0.5]{-} + e^{+} #beta [deg]; Efficiency",    "eff_ang");
         MakeInteractionEfficiency("h_int_beta_nue",               false, ";True e#lower[-0.5]{-} #beta [deg]; Efficiency",            "eff_ang_nue");
         MakeInteractionEfficiency("h_int_beta_nuebar",            false, ";True e^{+} #beta [deg]; Efficiency",                       "eff_ang_nuebar");
+        MakeInteractionEfficiency("h_int_cosbeta",                false, ";True e#lower[-0.5]{-} + e^{+} cos#beta; Efficiency",       "cosbeta");
 
         // Create the 2D folder
         _util.CreateDirectory("2D");
@@ -222,7 +224,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
             Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_completeness_%s.pdf",      _util.run_period, cut_type.c_str()), "h_true_shr_energy_completeness", cut_type, false);
             Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_resolution_reco_%s.pdf",   _util.run_period, cut_type.c_str()), "h_true_shr_energy_resolution_reco", cut_type, false);
             Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_resolution_true_%s.pdf",   _util.run_period, cut_type.c_str()), "h_true_shr_energy_resolution_true", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_elec_true_beta_reco_beta_%s.pdf",          _util.run_period, cut_type.c_str()), "h_elec_true_beta_reco_beta",   cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_elec_true_beta_reco_beta_%s.pdf",          _util.run_period, cut_type.c_str()), "h_elec_true_beta_reco_beta",   cut_type, true);
             Save2DHists(Form("plots/run%s/Truth/h_elec_true_theta_reco_theta_%s.pdf",        _util.run_period, cut_type.c_str()), "h_elec_true_theta_reco_theta", cut_type, false);
             Save2DHists(Form("plots/run%s/Truth/h_elec_true_phi_reco_phi_%s.pdf",            _util.run_period, cut_type.c_str()), "h_elec_true_phi_reco_phi",     cut_type, false);
 

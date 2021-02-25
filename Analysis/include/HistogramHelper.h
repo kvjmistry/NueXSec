@@ -357,6 +357,7 @@ class HistogramHelper{
         k_int_effective_ang,
         k_int_beta_nue,
         k_int_beta_nuebar,
+        k_int_cosbeta,
         k_INTERACTION_MAX
     };
 

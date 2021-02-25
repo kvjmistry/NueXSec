@@ -106,6 +106,12 @@ class SystematicsHelper{
     // Save the covariance matrix
     void SaveCovMatrix(TH2D* cov, std::string print_name);
     // -------------------------------------------------------------------------
+    // Save the correlation matrix
+    void SaveCorMatrix(TH2D* cov, TH1D* h_CV, std::string print_name);
+    // -------------------------------------------------------------------------
+    // Save the frac covariance matrix
+    void SaveFracCovMatrix(TH2D* cov, TH1D* h_CV, std::string print_name);
+    // -------------------------------------------------------------------------
     // Make the total beamline sys error plots
     void PlotTotUnisim(std::string unisim_type);
     // -------------------------------------------------------------------------
@@ -231,14 +237,14 @@ class SystematicsHelper{
     // enum for histogram vars
     enum TH1D_xsec_var_vars {
         k_var_integrated,     // Integrated X-Section
-        k_var_reco_el_E,      // Reconstructed electron energy
-        k_var_true_el_E,      // True electron energy
+        k_var_recoX,      // Reconstructed electron energy
+        k_var_trueX,      // True electron energy
         k_TH1D_xsec_var_MAX
     };
 
     // Names for cross section histograms
     std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "data_xsec"};
-    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Smeared Prediction", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC", "MC Smear",  "Data"};
+    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Smeared Prediction", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC Event Rate", "MC Event Rate Response",  "Data Event Rate"};
 
     std::vector<std::string> vars = {"integrated","recoX", "trueX" };
 

@@ -1413,22 +1413,22 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
     if (std::string(xsec_var) =="elec_E"){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                           ";E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV];#frac{dR}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon]",
-                           ";E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV];#frac{d#sigma}{dE^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon"
+                           ";E^{reco}_{e} [GeV];#frac{dR}{dE^{reco}_{e}} [10^{-39} cm^{2}/GeV/nucleon]",
+                           ";E^{true}_{e} [GeV];#frac{d#sigma}{dE^{unf}_{e}} [10^{-39} cm^{2}/GeV/nucleon"
                           };
 
 
         var_labels_events = {";;Entries",
-                             ";E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV]; Entries / GeV",
-                             ";E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV]; Entries / GeV"
+                             ";E^{reco}_{e} [GeV]; Entries / GeV",
+                             ";E^{true}_{e} [GeV]; Entries / GeV"
                             };
 
         var_labels_eff = {";;Efficiency",
-                          ";E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV]; Efficiency",
-                          ";E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV]; Efficiency"
+                          ";E^{reco}_{e} [GeV]; Efficiency",
+                          ";E^{true}_{e} [GeV]; Efficiency"
                          };
 
-        smear_hist_name = ";E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV];E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV]";
+        smear_hist_name = ";E^{true}_{e} [GeV];E^{reco}_{e} [GeV]";
 
         vars = {"integrated", "reco_el_E", "true_el_E" };
 
@@ -1447,22 +1447,22 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
     else if (std::string(xsec_var) =="elec_ang"){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                           ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg];#frac{dR}{d#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-37} cm^{2}/deg/nucleon]",
-                           ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg];#frac{d#sigma}{d#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-37} cm^{2}/deg/nucleon]"
+                           ";#beta^{reco}_{e} [deg];#frac{dR}{d#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-37} cm^{2}/deg/nucleon]",
+                           ";#beta^{true}_{e} [deg];#frac{d#sigma}{d#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-37} cm^{2}/deg/nucleon]"
                           };
 
 
         var_labels_events = {";;Entries",
-                             ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]; Entries / deg",
-                             ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]; Entries / deg"
+                             ";#beta^{reco}_{e} [deg]; Entries / deg",
+                             ";#beta^{true}_{e} [deg]; Entries / deg"
                             };
 
         var_labels_eff = {";;Efficiency",
-                          ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]; Efficiency",
-                          ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]; Efficiency"
+                          ";#beta^{reco}_{e} [deg]; Efficiency",
+                          ";#beta^{true}_{e} [deg]; Efficiency"
                          };
 
-        smear_hist_name = ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg];#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]";
+        smear_hist_name = ";#beta^{true}_{e} [deg];#beta^{reco}_{e} [deg]";
 
         vars = {"integrated", "reco_el_ang", "true_el_ang" };
 
@@ -1481,22 +1481,22 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
     else if (std::string(xsec_var) =="elec_cang"){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                           ";cos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}};#frac{dR}{dcos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/nucleon]",
-                           ";cos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}};#frac{d#sigma}{dcos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/nucleon]"
+                           ";cos#beta^{reco}_{e};#frac{dR}{dcos#beta^{reco}_{e} [10^{-39} cm^{2}/nucleon]",
+                           ";cos#beta^{true}_{e};#frac{d#sigma}{dcos#beta^{true}_{e} [10^{-39} cm^{2}/nucleon]"
                           };
 
 
         var_labels_events = {";;Entries",
-                             ";cos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}}; Entries",
-                             ";cos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}}; Entries"
+                             ";cos#beta^{reco}_{e}; Entries",
+                             ";cos#beta^{true}_{e}; Entries"
                             };
 
         var_labels_eff = {";;Efficiency",
-                          ";cos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}}; Efficiency",
-                          ";cos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}}; Efficiency"
+                          ";cos#beta^{reco}_{e}; Efficiency",
+                          ";cos#beta^{true}_{e}; Efficiency"
                          };
 
-        smear_hist_name = ";cos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}};cos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}}";
+        smear_hist_name = ";cos#beta^{true}_{e};cos#beta^{reco}_{e}";
 
         vars = {"integrated", "reco_el_cang", "true_el_cang" };
 

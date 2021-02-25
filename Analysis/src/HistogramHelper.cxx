@@ -530,7 +530,7 @@ void HistogramHelper::InitHistograms(){
             double* edges = &_util.reco_shr_bins[0]; // Cast to an array 
             TH2D_true_hists.at(i).at(k_true_elec_E_reco_elec_E) = new TH2D( Form("h_true_elec_E_reco_elec_E_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True e#lower[-0.5]{-} + e^{+} Energy [GeV] ;E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV]", _util.reco_shr_bins.size()-1, edges, _util.reco_shr_bins.size()-1, edges);
             TH2D_true_hists.at(i).at(k_true_nu_E_reco_nu_E)     = new TH2D( Form("h_true_nu_E_reco_nu_E_%s_%s",             _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} + #bar{#nu}_{e} Energy [GeV] ;Reco #nu_{e} + #bar{#nu}_{e} Energy [GeV]", 25, 0, 4, 25, 0, 4);
-            TH2D_true_hists.at(i).at(k_true_elec_E_reco_elec_E_extra_bins) = new TH2D( Form("h_true_elec_E_reco_elec_E_extra_bins_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True e#lower[-0.5]{-} Energy [GeV] ;E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV]", 50, 0, 4, 50, 0, 4);
+            TH2D_true_hists.at(i).at(k_true_elec_E_reco_elec_E_extra_bins) = new TH2D( Form("h_true_elec_E_reco_elec_E_extra_bins_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True e#lower[-0.5]{-} + e^{+} Energy [GeV] ;E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV]", 50, 0, 4, 50, 0, 4);
             TH2D_true_hists.at(i).at(k_true_nu_E_reco_nu_E_extra_bins)     = new TH2D( Form("h_true_nu_E_reco_nu_E_extra_bins_%s_%s",             _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} + #bar{#nu}_{e} Energy [GeV] ;Reco #nu_{e} + #bar{#nu}_{e} Energy [GeV]", 50, 0, 4, 50, 0, 4);
 
             TH2D_true_hists.at(i).at(k_true_nu_vtx_x_reco_nu_vtx_x)  = new TH2D( Form("h_true_nu_vtx_x_reco_nu_vtx_x_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} + #bar{#nu}_{e} Vtx X [cm] ;Reco #nu_{e} + #bar{#nu}_{e} Vtx X [cm]", 20, -10, 270, 20, -10, 270);
@@ -612,8 +612,10 @@ void HistogramHelper::InitHistograms(){
             TH1D_interaction_hists.at(k_int_elec_theta).at(i).at(p)             = new TH1D( Form("h_int_elec_theta_%s_%s",             _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries", 13, 0, 190 );
             TH1D_interaction_hists.at(k_int_elec_phi).at(i).at(p)               = new TH1D( Form("h_int_elec_phi_%s_%s",               _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries", 14, -190, 190 );
             TH1D_interaction_hists.at(k_int_effective_ang).at(i).at(p)          = new TH1D( Form("h_int_effective_ang_%s_%s",          _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries", 13, 0, 190 );
-            TH1D_interaction_hists.at(k_int_beta_nue).at(i).at(p)               = new TH1D( Form("h_int_beta_nue_%s_%s",               _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries", 13, 0, 190 );
-            TH1D_interaction_hists.at(k_int_beta_nuebar).at(i).at(p)            = new TH1D( Form("h_int_beta_nuebar_%s_%s",            _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries", 13, 0, 190 );
+            TH1D_interaction_hists.at(k_int_beta_nue).at(i).at(p)               = new TH1D( Form("h_int_beta_nue_%s_%s",               _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e#lower[-0.5]{-} + e^{+} #beta [deg]; Entries", 13, 0, 190 );
+            TH1D_interaction_hists.at(k_int_beta_nuebar).at(i).at(p)            = new TH1D( Form("h_int_beta_nuebar_%s_%s",            _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e#lower[-0.5]{-} + e^{+} #beta [deg]; Entries", 13, 0, 190 );
+            edges = &_util.reco_shr_bins_cang[0]; // Cast to an array 
+            TH1D_interaction_hists.at(k_int_cosbeta).at(i).at(p)                = new TH1D( Form("h_int_cosbeta_%s_%s",                _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e#lower[-0.5]{-} + e^{+} cos#beta; Entries", _util.reco_shr_bins_cang.size()-1, edges );
         }
     }
         
@@ -979,6 +981,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
                 TH1D_interaction_hists.at(k_int_elec_theta)     .at(index).at(_util.k_plot_qe)->Fill(SC.elec_theta, weight);
                 TH1D_interaction_hists.at(k_int_elec_phi)       .at(index).at(_util.k_plot_qe)->Fill(SC.elec_phi, weight);
                 TH1D_interaction_hists.at(k_int_effective_ang)  .at(index).at(_util.k_plot_qe)->Fill(SC.true_effective_angle, weight);
+                TH1D_interaction_hists.at(k_int_cosbeta)        .at(index).at(_util.k_plot_qe)->Fill(true_cosbeta, weight);
                 
                 // Nue
                 if (interaction == "nue_cc_qe")     {
@@ -1008,6 +1011,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
                 TH1D_interaction_hists.at(k_int_elec_theta)     .at(index).at(_util.k_plot_res)->Fill(SC.elec_theta, weight);
                 TH1D_interaction_hists.at(k_int_elec_phi)       .at(index).at(_util.k_plot_res)->Fill(SC.elec_phi, weight);
                 TH1D_interaction_hists.at(k_int_effective_ang)  .at(index).at(_util.k_plot_res)->Fill(SC.true_effective_angle, weight);
+                TH1D_interaction_hists.at(k_int_cosbeta)        .at(index).at(_util.k_plot_res)->Fill(true_cosbeta, weight);
                 
                 // Nue
                 if (interaction == "nue_cc_res"){     
@@ -1037,6 +1041,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
                 TH1D_interaction_hists.at(k_int_elec_theta)     .at(index).at(_util.k_plot_dis)->Fill(SC.elec_theta, weight);
                 TH1D_interaction_hists.at(k_int_elec_phi)       .at(index).at(_util.k_plot_dis)->Fill(SC.elec_phi, weight);
                 TH1D_interaction_hists.at(k_int_effective_ang)  .at(index).at(_util.k_plot_dis)->Fill(SC.true_effective_angle, weight);
+                TH1D_interaction_hists.at(k_int_cosbeta)        .at(index).at(_util.k_plot_dis)->Fill(true_cosbeta, weight);
                 
                 // Nue
                 if (interaction == "nue_cc_dis"){     
@@ -1066,6 +1071,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
                 TH1D_interaction_hists.at(k_int_elec_theta)     .at(index).at(_util.k_plot_coh)->Fill(SC.elec_theta, weight);
                 TH1D_interaction_hists.at(k_int_elec_phi)       .at(index).at(_util.k_plot_coh)->Fill(SC.elec_phi, weight);
                 TH1D_interaction_hists.at(k_int_effective_ang)  .at(index).at(_util.k_plot_coh)->Fill(SC.true_effective_angle, weight);
+                TH1D_interaction_hists.at(k_int_cosbeta)        .at(index).at(_util.k_plot_coh)->Fill(true_cosbeta, weight);
                 
                 // Nue
                 if (interaction == "nue_cc_coh"){     
@@ -1095,6 +1101,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
                 TH1D_interaction_hists.at(k_int_elec_theta)     .at(index).at(_util.k_plot_mec)->Fill(SC.elec_theta, weight);
                 TH1D_interaction_hists.at(k_int_elec_phi)       .at(index).at(_util.k_plot_mec)->Fill(SC.elec_phi, weight);
                 TH1D_interaction_hists.at(k_int_effective_ang)  .at(index).at(_util.k_plot_mec)->Fill(SC.true_effective_angle, weight);
+                TH1D_interaction_hists.at(k_int_cosbeta)        .at(index).at(_util.k_plot_mec)->Fill(true_cosbeta, weight);
                 
                 // Nue
                 if (interaction == "nue_cc_mec"){     

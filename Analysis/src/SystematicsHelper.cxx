@@ -724,7 +724,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
         // Plot the multisims
         PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 500);
         PlotReweightingModeMultisim("weightsReint", var,  "Geant Reinteractions", 1000);
-        PlotReweightingModeMultisim("weightsPPFX",  var,  "PPFX", 500);
+        PlotReweightingModeMultisim("weightsPPFX",  var,  "Hadron Production", 500);
         PlotReweightingModeMultisim("MCStats",      var,  "MC Stats", 1000);
         
     }
@@ -737,9 +737,16 @@ void SystematicsHelper::InitialiseReweightingMode(){
     CompareCVXSecNoRatio();
 
     // Save the total covariance matrices
-    _util.CreateDirectory("/Systematics/Covariance");
-    for (unsigned int cov = 0; cov < h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).size(); cov++){
-        SaveCovMatrix(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(cov),         Form("plots/run%s/Systematics/Covariance/run%s_%s_cov.pdf",         _util.run_period, _util.run_period,systematic_names.at(cov).c_str()));
+    _util.CreateDirectory("/Systematics/Covariance/" + vars.at(k_var_recoX));
+    _util.CreateDirectory("/Systematics/Correlation/" + vars.at(k_var_recoX));
+    _util.CreateDirectory("/Systematics/FracCovariance/" + vars.at(k_var_recoX));
+    for (unsigned int cov = 0; cov < h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).size(); cov++){
+        SaveCovMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(cov),                                                            Form("plots/run%s/Systematics/Covariance/%s/run%s_%s_%s_%s_cov.pdf",          _util.run_period, vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_mcxsec).c_str(),   vars.at(k_var_recoX).c_str()));
+        SaveCovMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(cov),                                                          Form("plots/run%s/Systematics/Covariance/%s/run%s_%s_%s_%s_cov.pdf",          _util.run_period, vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_dataxsec).c_str(), vars.at(k_var_recoX).c_str()));
+        SaveCorMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(cov),       cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec),   Form("plots/run%s/Systematics/Correlation/%s/run%s_%s_%s_%s_cor.pdf",         _util.run_period, vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_mcxsec).c_str(),   vars.at(k_var_recoX).c_str()));
+        SaveCorMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(cov),     cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), Form("plots/run%s/Systematics/Correlation/%s/run%s_%s_%s_%s_cor.pdf",         _util.run_period, vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_dataxsec).c_str(), vars.at(k_var_recoX).c_str()));
+        SaveFracCovMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(cov),   cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec),   Form("plots/run%s/Systematics/FracCovariance/%s/run%s_%s_%s_%s_frac_cov.pdf", _util.run_period, vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_mcxsec).c_str(),   vars.at(k_var_recoX).c_str()));
+        SaveFracCovMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(cov), cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), Form("plots/run%s/Systematics/FracCovariance/%s/run%s_%s_%s_%s_frac_cov.pdf", _util.run_period, vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_dataxsec).c_str(), vars.at(k_var_recoX).c_str()));
     }
 
     // Create the directories
@@ -761,8 +768,8 @@ void SystematicsHelper::InitialiseReweightingMode(){
     // Calculate a chi-squared using the total covariance matrix
     double chi, pval;
     int ndof;
-    _util.CalcChiSquared(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot), chi, ndof, pval);
-    _util.CalcChiSquared(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot), chi, ndof, pval);
+    _util.CalcChiSquared(cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot), chi, ndof, pval);
+    _util.CalcChiSquared(cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_tot), chi, ndof, pval);
 
     // Export the results to file
     ExportResult(f_nuexsec);
@@ -904,7 +911,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
 
         h_universe.at(k_up).at(k) = (TH1D*)htemp->Clone();
 
-        if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
+        if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
             h_universe.at(k_up).at(k)->Scale(1.0, "width");
 
         // Customise
@@ -919,7 +926,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
 
         h_universe.at(k_dn).at(k) = (TH1D*)htemp->Clone();
 
-        if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
+        if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
             h_universe.at(k_dn).at(k)->Scale(1.0, "width");
 
         // Customise
@@ -960,8 +967,10 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         // bottomPad->SetRightMargin(0.10 );
 
         // Set the Titles
-        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec || k_xsec_mcxsec_smear)
+        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
             h_universe.at(k_up).at(k)->SetTitle(var_labels_xsec.at(var).c_str());
+        else if (k == k_xsec_mcxsec_smear)
+            h_universe.at(k_up).at(k)->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
         else if (k == k_xsec_eff)
             h_universe.at(k_up).at(k)->SetTitle(var_labels_eff.at(var).c_str());
         else
@@ -1029,8 +1038,10 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         
 
         // Set the Titles
-        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec || k_xsec_mcxsec_smear)
+        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
             h_err_up->SetTitle(var_labels_xsec.at(var).c_str());
+        else if (k == k_xsec_mcxsec_smear)
+            h_err_up->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
         else if (k == k_xsec_eff)
             h_err_up->SetTitle(var_labels_eff.at(var).c_str());
         else
@@ -1113,7 +1124,7 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
         _util.GetHist(f_nuexsec, h_temp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label.c_str(), vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
         h_universe.at(k) = (TH1D*)h_temp->Clone();
 
-        if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
+        if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
             h_universe.at(k)->Scale(1.0, "width");
 
         double scale_fact = POT_v.at(k_CV) / POT_v.at(detvar_index);
@@ -1125,7 +1136,7 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
         _util.GetHist(f_nuexsec, h_temp, Form( "detvar_CV/%s/h_run%s_CV_0_%s_%s", vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
         h_CV.at(k) = (TH1D*)h_temp->Clone();
 
-        if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
+        if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
             h_CV.at(k)->Scale(1.0, "width");
 
         // Customise
@@ -1201,8 +1212,10 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
         h_err->Scale(100);
         
         // Set the Titles
-        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec || k_xsec_mcxsec_smear)
+        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
             h_err->SetTitle(var_labels_xsec.at(var).c_str());
+        else if (k == k_xsec_mcxsec_smear)
+            h_err->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
         else if (k == k_xsec_eff)
             h_err->SetTitle(var_labels_eff.at(var).c_str());
         else
@@ -1378,7 +1391,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
             _util.GetHist(f_nuexsec, h_universe.at(uni).at(k), Form( "%s/%s/h_run%s_%s_%i_%s_%s", label.c_str(), vars.at(var).c_str(), _util.run_period, label.c_str(), uni ,vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
-            if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
+            if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
                 h_universe.at(uni).at(k)->Scale(1.0, "width");
 
             // Customise
@@ -1467,8 +1480,10 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         _util.SetTPadOptions(topPad, bottomPad);
 
         // Set the Titles
-        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec || k_xsec_mcxsec_smear)
+        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
             h_universe_2D.at(k)->SetTitle(var_labels_xsec.at(var).c_str());
+        else if (k == k_xsec_mcxsec_smear)
+            h_universe_2D.at(k)->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
         else if (k == k_xsec_eff)
             h_universe_2D.at(k)->SetTitle(var_labels_eff.at(var).c_str());
         else
@@ -1530,8 +1545,10 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_err->GetYaxis()->SetTitleOffset(1.5);
 
         // Set the Titles
-        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec || k_xsec_mcxsec_smear)
+        if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
             h_err->SetTitle(var_labels_xsec.at(var).c_str());
+        else if (k == k_xsec_mcxsec_smear)
+             h_err->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
         else if (k == k_xsec_eff)
             h_err->SetTitle(var_labels_eff.at(var).c_str());
         else
@@ -1790,7 +1807,7 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
                 index = index = k_err_tot;
             }
 
-            _util.CalcChiSquared(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(index), chi, ndof, pval);
+            _util.CalcChiSquared(cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(index), chi, ndof, pval);
             
 
             TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
@@ -1843,7 +1860,7 @@ void SystematicsHelper::InitialsePlotCV(){
 
             if (cv_hist_vec.at(var).at(k) == NULL) std::cout << "Failed to get the histogram!" << std::endl;
 
-            if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
+            if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
                 cv_hist_vec.at(var).at(k)->Scale(1.0, "width");
 
             // Customise
@@ -1854,7 +1871,7 @@ void SystematicsHelper::InitialsePlotCV(){
             if (k == k_xsec_mcxsec)
                 cv_hist_vec.at(var).at(k)->SetTitle(var_labels_xsec.at(var).c_str());
             else if (k == k_xsec_mcxsec_smear)
-                cv_hist_vec.at(var).at(k)->SetTitle(var_labels_xsec.at(k_var_reco_el_E).c_str());
+                cv_hist_vec.at(var).at(k)->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
             else if (k == k_xsec_dataxsec)
                 cv_hist_vec.at(var).at(k)->SetTitle(var_labels_events.at(var).c_str());
             else if (k == k_xsec_eff)
@@ -1922,7 +1939,7 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
 
         h_universe.at(k_up).at(k) = (TH1D*)htemp->Clone();
 
-        if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
+        if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
             h_universe.at(k_up).at(k)->Scale(1.0, "width");
 
         // Customise
@@ -1938,7 +1955,7 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
 
         h_universe.at(k_dn).at(k) = (TH1D*)htemp->Clone();
 
-        if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
+        if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
             h_universe.at(k_dn).at(k)->Scale(1.0, "width");
 
         // Customise
@@ -2198,14 +2215,24 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
     TH2D *frac_cov = (TH2D*) cov->Clone("h_frac_cov");
     _util.CalcCFracCovariance(h_CV, frac_cov);
 
-    if ( (var == k_var_reco_el_E && _type == k_xsec_mcxsec) || (var == k_var_true_el_E && _type == k_xsec_mcxsec_smear)){
+    if ( (var == k_var_recoX && _type == k_xsec_mcxsec) || (var == k_var_trueX && _type == k_xsec_mcxsec_smear)){
 
         TCanvas *c = new TCanvas("c", "c", 500, 500);
         cov->GetXaxis()->CenterLabels(kTRUE);
         cov->GetYaxis()->CenterLabels(kTRUE);
         cov->GetZaxis()->CenterTitle();
         cov->SetTitle("Covariance Matrix");
-        cov->GetZaxis()->SetTitle("Covariance [cm^{4}GeV^{2}]");
+        if (std::string(_util.xsec_var) == "elec_E"){
+            cov->GetZaxis()->SetTitle("Covariance [cm^{4}/GeV^{2}]");
+        }
+        if (std::string(_util.xsec_var) == "elec_ang"){
+            cov->GetZaxis()->SetTitle("Covariance [cm^{4}/deg^{2}]");
+        }
+        if (std::string(_util.xsec_var) == "elec_cang"){
+            cov->GetZaxis()->SetTitle("Covariance [cm^{4}]");
+            cov->GetXaxis()->SetNdivisions(cov->GetNbinsX(), 0, 0, kFALSE);
+            cov->GetYaxis()->SetNdivisions(cov->GetNbinsY(), 0, 0, kFALSE);
+        }
         cov->GetZaxis()->SetTitleOffset(1.45);
         cov->Draw("colz");
         _util.IncreaseLabelSize(cov, c);
@@ -2219,6 +2246,10 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
         cor->GetZaxis()->SetTitle("Correlation");
         cor->GetZaxis()->SetTitleOffset(1.3);
         cor->SetTitle("Correlation Matrix");
+        if (std::string(_util.xsec_var) == "elec_cang"){
+            cor->GetXaxis()->SetNdivisions(cor->GetNbinsX(), 0, 0, kFALSE);
+            cor->GetYaxis()->SetNdivisions(cor->GetNbinsY(), 0, 0, kFALSE);
+        }
         // cor->SetMaximum(1);
         // cor->SetMinimum(0);
         cor->Draw("colz, text00");
@@ -2235,6 +2266,10 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
         frac_cov->GetZaxis()->CenterTitle();
         frac_cov->Draw("colz, text00");
         frac_cov->GetZaxis()->SetTitle("Frac. Covariance");
+        if (std::string(_util.xsec_var) == "elec_cang"){
+            frac_cov->GetXaxis()->SetNdivisions(frac_cov->GetNbinsX(), 0, 0, kFALSE);
+            frac_cov->GetYaxis()->SetNdivisions(frac_cov->GetNbinsY(), 0, 0, kFALSE);
+        }
         frac_cov->SetTitle("Fractional Covariance Matrix");
         frac_cov->GetZaxis()->SetTitleOffset(1.52);
         _util.IncreaseLabelSize(frac_cov, c3);
@@ -2512,35 +2547,35 @@ void SystematicsHelper::FillStatVector(){
 
     // Add the data stat to the total mc cov matrix
     // Convert the Covariance Matrix-- switching from detvar Data CV deviations to MC CV deviation
-    _util.ConvertCovarianceUnits(h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_stat), 
-                           cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), 
-                           cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec));
+    _util.ConvertCovarianceUnits(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_stat), 
+                           cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), 
+                           cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec));
     
-    h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_stat));
+    h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_stat));
 
     // ---
 
     // Add the mc stat to the total data cov matrix
     // Convert the Covariance Matrix-- switching from MC CV deviations to Data CV deviation
-    _util.ConvertCovarianceUnits(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_stat),
-                           cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec),
-                           cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec));
+    _util.ConvertCovarianceUnits(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat),
+                           cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec),
+                           cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec));
     
-    h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_stat));
+    h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat));
 
     // ---
 
     // If we are using event rate mode, then we add the true mc xsec smeared covariance matrix (sys) to the total too
     if (std::string(_util.xsec_smear_mode) == "er" || std::string(_util.xsec_smear_mode) == "wiener"){
         
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_sys));
+        h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_sys));
         
         // Convert the Covariance Matrix-- switching from MC CV deviations to Data CV deviation
-        _util.ConvertCovarianceUnits(h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_sys),
-                               cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec),
-                               cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec));
+        _util.ConvertCovarianceUnits(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_sys),
+                               cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec),
+                               cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec));
         
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_sys));
+        h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_sys));
     }
 
 
@@ -2571,7 +2606,7 @@ void SystematicsHelper::PrintUncertaintySummary(){
 
     // Loop over the variables
     for (unsigned int var = 0; var < vars.size(); var++ ){
-        if (var == k_var_true_el_E) continue; // Skip the true var which doesnt make much sense
+        if (var == k_var_trueX) continue; // Skip the true var which doesnt make much sense
 
         std::cout <<"----------------------------------------------" << std::endl;
         std::cout <<"Differential Variable: " << vars.at(var) <<"\n"<< std::endl;
@@ -2590,16 +2625,16 @@ void SystematicsHelper::PrintUncertaintySummary(){
             std::cout << "Bin: " << bin+1 << " MC Stats:           " <<std::sqrt(v_err.at(k_err_mcstats).at(var).at(k_xsec_mcxsec)    .at(bin)) << " \%"<< std::endl;
             std::cout << "Bin: " << bin+1 << " Pi0 Tune:           " <<std::sqrt(v_err.at(k_err_pi0).at(var).at(k_xsec_mcxsec)        .at(bin)) << " \%"<< std::endl;
             
-            if ( (std::string(_util.xsec_smear_mode) == "er" || std::string(_util.xsec_smear_mode) == "wiener") && var == k_var_reco_el_E)
-                std::cout << "Bin: " << bin+1 << " Smearing:           " << std::sqrt(v_err.at(k_err_sys).at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(bin)) << " \%"<< std::endl;
+            if ( (std::string(_util.xsec_smear_mode) == "er" || std::string(_util.xsec_smear_mode) == "wiener") && var == k_var_recoX)
+                std::cout << "Bin: " << bin+1 << " Smearing:           " << std::sqrt(v_err.at(k_err_sys).at(k_var_trueX).at(k_xsec_mcxsec_smear).at(bin)) << " \%"<< std::endl;
 
             std::cout << std::endl;
             std::cout << "Bin: " << bin+1 << " Tot Data X-Sec Stat:                 " <<std::sqrt(v_err.at(k_err_stat).at(var).at(k_xsec_dataxsec).at(bin)) << " \%"<< std::endl;
             std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Stat:                   " <<std::sqrt(v_err.at(k_err_stat).at(var).at(k_xsec_mcxsec).at(bin))   << " \%"<< std::endl;
             std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Sys:                    " <<std::sqrt(v_err.at(k_err_sys) .at(var).at(k_xsec_mcxsec)   .at(bin)) << " \%"<< std::endl;
             
-            if ( (std::string(_util.xsec_smear_mode) == "er" || std::string(_util.xsec_smear_mode) == "wiener") && var == k_var_reco_el_E){
-                std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Uncertainty:            " <<std::sqrt(v_err.at(k_err_stat).at(var).at(k_xsec_dataxsec).at(bin) + v_err.at(k_err_stat).at(var).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_sys).at(var).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_sys).at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(bin)) << " \%"<< std::endl;
+            if ( (std::string(_util.xsec_smear_mode) == "er" || std::string(_util.xsec_smear_mode) == "wiener") && var == k_var_recoX){
+                std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Uncertainty:            " <<std::sqrt(v_err.at(k_err_stat).at(var).at(k_xsec_dataxsec).at(bin) + v_err.at(k_err_stat).at(var).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_sys).at(var).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_sys).at(k_var_trueX).at(k_xsec_mcxsec_smear).at(bin)) << " \%"<< std::endl;
             }
             else {
                 std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Uncertainty:            " <<std::sqrt(v_err.at(k_err_stat).at(var).at(k_xsec_dataxsec).at(bin) + v_err.at(k_err_stat).at(var).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_sys).at(var).at(k_xsec_mcxsec).at(bin)) << " \%"<< std::endl;
@@ -2613,24 +2648,24 @@ void SystematicsHelper::PrintUncertaintySummary(){
     bool print_debug = false;
     if (print_debug){
         // loop over rows
-        for (int i = 1; i < h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->GetNbinsX()+1; i++) {
+        for (int i = 1; i < h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot)->GetNbinsX()+1; i++) {
             
                 // Only set the bin content of the diagonals
-                double bin_diag = cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->GetBinContent(i);
-                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_genie_uni)->GetBinContent(i, i)) / bin_diag   << " genie_uni" << std::endl;
-                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_genie_multi)->GetBinContent(i, i)) / bin_diag << " genie_multi" << std::endl;
-                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_hp)->GetBinContent(i, i)) / bin_diag          << " hp" << std::endl;
-                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_beamline)->GetBinContent(i, i)) / bin_diag    << " beamline" << std::endl;
-                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_dirt)->GetBinContent(i, i)) / bin_diag        << " dirt" << std::endl;
-                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_pot)->GetBinContent(i, i)) / bin_diag         << " pot" << std::endl;
-                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_reint)->GetBinContent(i, i)) / bin_diag       << " reint" << std::endl;
-                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_detvar)->GetBinContent(i, i)) / bin_diag      << " detvar" << std::endl;
-                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_pi0)->GetBinContent(i, i)) / bin_diag         << " pi0" << std::endl;
-                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_mcstats)->GetBinContent(i, i)) / bin_diag     << " mcstats" << std::endl;
+                double bin_diag = cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec)->GetBinContent(i);
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_genie_uni)->GetBinContent(i, i)) / bin_diag   << " genie_uni" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_genie_multi)->GetBinContent(i, i)) / bin_diag << " genie_multi" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_hp)->GetBinContent(i, i)) / bin_diag          << " hp" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_beamline)->GetBinContent(i, i)) / bin_diag    << " beamline" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_dirt)->GetBinContent(i, i)) / bin_diag        << " dirt" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_pot)->GetBinContent(i, i)) / bin_diag         << " pot" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_reint)->GetBinContent(i, i)) / bin_diag       << " reint" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_detvar)->GetBinContent(i, i)) / bin_diag      << " detvar" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_pi0)->GetBinContent(i, i)) / bin_diag         << " pi0" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_mcstats)->GetBinContent(i, i)) / bin_diag     << " mcstats" << std::endl;
                 
-                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_stat)->GetBinContent(i, i)) / bin_diag << " data stat" << std::endl;
-                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_sys)->GetBinContent(i, i)) / bin_diag << " sys" << std::endl;
-                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->GetBinContent(i, i)) / bin_diag << " tot" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_stat)->GetBinContent(i, i)) / bin_diag << " data stat" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_sys)->GetBinContent(i, i)) / bin_diag << " sys" << std::endl;
+                std::cout << "Bin" << i << ": "<< 100 * std::sqrt(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot)->GetBinContent(i, i)) / bin_diag << " tot" << std::endl;
                 std::cout << std::endl;
         }
     }
@@ -2677,7 +2712,17 @@ void SystematicsHelper::SaveCovMatrix(TH2D* cov, std::string print_name){
     cov->GetXaxis()->CenterLabels(kTRUE);
     cov->GetYaxis()->CenterLabels(kTRUE);
     cov->GetZaxis()->CenterTitle();
-    cov->GetZaxis()->SetTitle("Covariance [cm^{4}GeV^{2}]");
+    if (std::string(_util.xsec_var) == "elec_E"){
+            cov->GetZaxis()->SetTitle("Covariance [cm^{4}/GeV^{2}]");
+    }
+    if (std::string(_util.xsec_var) == "elec_ang"){
+        cov->GetZaxis()->SetTitle("Covariance [cm^{4}/deg^{2}]");
+    }
+    if (std::string(_util.xsec_var) == "elec_cang"){
+        cov->GetZaxis()->SetTitle("Covariance [cm^{4}]");
+        cov->GetXaxis()->SetNdivisions(cov->GetNbinsX(), 0, 0, kFALSE);
+        cov->GetYaxis()->SetNdivisions(cov->GetNbinsY(), 0, 0, kFALSE);
+    }
     cov->GetZaxis()->SetTitleOffset(1.45);
     cov->SetTitle("Covariance Matrix");
     cov->Draw("colz");
@@ -2685,6 +2730,67 @@ void SystematicsHelper::SaveCovMatrix(TH2D* cov, std::string print_name){
     _util.Draw_ubooneSim(c, 0.30, 0.915, 0.30, 0.915);
     c->Print(print_name.c_str());
     delete c;
+
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::SaveCorMatrix(TH2D* cov, TH1D* h_CV, std::string print_name){
+
+    gStyle->SetPalette(kBlueGreenYellow);
+
+    TH2D* cor = (TH2D*)cov->Clone();
+    _util.CalcCorrelation(h_CV, cov, cor);
+
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+    cor->GetXaxis()->CenterLabels(kTRUE);
+    cor->GetYaxis()->CenterLabels(kTRUE);
+    cor->GetZaxis()->CenterTitle();
+    cor->GetZaxis()->SetTitleOffset(1.45);
+    cor->SetMarkerColor(kRed+1);
+    gStyle->SetPaintTextFormat("0.3f");
+    cor->SetTitle("Correlation Matrix");
+    cor->GetZaxis()->SetTitle("Correlation");
+    if (std::string(_util.xsec_var) == "elec_cang"){
+        cor->GetXaxis()->SetNdivisions(cor->GetNbinsX(), 0, 0, kFALSE);
+        cor->GetYaxis()->SetNdivisions(cor->GetNbinsY(), 0, 0, kFALSE);
+    }
+    cor->Draw("colz, text00");
+    _util.IncreaseLabelSize(cor, c);
+    cor->SetMarkerSize(1.3);
+    _util.Draw_ubooneSim(c, 0.30, 0.915, 0.30, 0.915);
+    c->Print(print_name.c_str());
+    delete c;
+    delete cor;
+
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::SaveFracCovMatrix(TH2D* cov, TH1D* h_CV, std::string print_name){
+
+    gStyle->SetPalette(kBlueGreenYellow);
+
+    TH2D* frac_cov= (TH2D*)cov->Clone();
+    _util.CalcCFracCovariance(h_CV, frac_cov);
+
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+    frac_cov->GetXaxis()->CenterLabels(kTRUE);
+    frac_cov->GetYaxis()->CenterLabels(kTRUE);
+    frac_cov->GetZaxis()->CenterTitle();
+    frac_cov->GetZaxis()->SetTitleOffset(1.45);
+    frac_cov->SetTitle("Fractional Covariance Matrix");
+    frac_cov->GetZaxis()->SetTitle("Frac. Covariance");
+    frac_cov->SetMarkerColor(kRed+1);
+    gStyle->SetPaintTextFormat("0.3f");
+    if (std::string(_util.xsec_var) == "elec_cang"){
+        frac_cov->GetXaxis()->SetNdivisions(frac_cov->GetNbinsX(), 0, 0, kFALSE);
+        frac_cov->GetYaxis()->SetNdivisions(frac_cov->GetNbinsY(), 0, 0, kFALSE);
+    }
+
+    frac_cov->Draw("colz,text00");
+    _util.IncreaseLabelSize(frac_cov, c);
+    frac_cov->SetMarkerSize(1.3);
+    _util.Draw_ubooneSim(c, 0.30, 0.915, 0.30, 0.915);
+    c->Print(print_name.c_str());
+    delete c;
+    delete frac_cov;
 
 }
 // -----------------------------------------------------------------------------
@@ -2806,13 +2912,13 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                 if (!is_detvar){
                     _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, label_up.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
                     
-                    if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
+                    if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
                         htemp->Scale(1.0, "width");
                 }
                 else {
                     _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
-                    if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
+                    if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
                         htemp->Scale(1.0, "width");
                 
                     // Also need to Scale the beamline histograms to the right POT
@@ -2833,13 +2939,13 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                 if (!is_detvar){
                     _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, label_dn.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
-                    if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
+                    if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
                         htemp->Scale(1.0, "width");
                 }
                 else {
                     _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
-                    if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && k != k_xsec_eff ))
+                    if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
                         htemp->Scale(1.0, "width");
                     
                     // Also need to Scale the beamline histograms to the right POT
@@ -2867,7 +2973,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
         // Loop over the types
         for (unsigned int  type = 0; type < cv_hist_vec.at(var).size(); type++ ){
 
-            if (vars.at(var) == "true_el_E" && type != k_xsec_eff) continue; // Skip the true var which doesnt make much sense
+            if (vars.at(var) == "true_el_E" && (type != k_xsec_eff && type != k_xsec_mcxsec_smear)) continue; // Skip the true var which doesnt make much sense
 
             // Get the CV histogram
             TH1D* h_CV_clone;
@@ -2880,7 +2986,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             else {
                 _util.GetHist(f_nuexsec, h_CV_clone, Form( "detvar_CV/%s/h_run%s_CV_0_%s_%s", vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(type).c_str()));
                 
-                if (scale_bins && ((var == k_var_reco_el_E || var == k_var_true_el_E) && type != k_xsec_eff ))
+                if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && type != k_xsec_eff ))
                         h_CV_clone->Scale(1.0, "width");
                 
                 h_CV_clone->SetLineWidth(2);
@@ -2904,12 +3010,15 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             h_CV_clone->SetTitle(Form("%s", unisim_type.c_str() ));
             
             // Set the Titles
-            if (type == k_xsec_mcxsec || type == k_xsec_dataxsec || k_xsec_mcxsec_smear)
+            if (type == k_xsec_mcxsec || type == k_xsec_dataxsec)
                 h_CV_clone->SetTitle(var_labels_xsec.at(var).c_str());
+            else if (type == k_xsec_mcxsec_smear)
+                h_CV_clone->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
             else if (type == k_xsec_eff)
                 h_CV_clone->SetTitle(var_labels_eff.at(var).c_str());
             else
                 h_CV_clone->SetTitle(var_labels_events.at(var).c_str());
+
 
 
             // else if (type == k_xsec_eff) h_CV_clone->GetYaxis()->SetTitle("Efficiency");
@@ -3374,8 +3483,8 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
         for (unsigned int type = 0; type < xsec_types.size(); type++){
             
             // Only look at the true efficeincy or select variables in reco space
-            if ( (var == k_var_true_el_E && (xsec_types.at(type) == "eff" || xsec_types.at(type) == "gen_smear" || xsec_types.at(type) == "mc_xsec_smear") ) || 
-                 (var == k_var_reco_el_E && (xsec_types.at(type) == "mc_xsec" || xsec_types.at(type) == "data_xsec" ||
+            if ( (var == k_var_trueX && (xsec_types.at(type) == "eff" || xsec_types.at(type) == "gen_smear" || xsec_types.at(type) == "mc_xsec_smear") ) || 
+                 (var == k_var_recoX && (xsec_types.at(type) == "mc_xsec" || xsec_types.at(type) == "data_xsec" ||
                                              xsec_types.at(type) == "eff" || xsec_types.at(type) == "sig" || 
                                              xsec_types.at(type) == "bkg" || xsec_types.at(type) == "sel" ))){
 
@@ -3463,7 +3572,7 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
 void SystematicsHelper::InitialseCovarianceVector(){
 
     // Initialise the covariance matrices -- this needs to be vectorized
-    int n_bins = cv_hist_vec.at(k_var_reco_el_E).at(0)->GetNbinsX();
+    int n_bins = cv_hist_vec.at(k_var_recoX).at(0)->GetNbinsX();
     
     // Resize to the number of variables
     h_cov_v.resize(vars.size());
@@ -3511,18 +3620,18 @@ void SystematicsHelper::ExportResult(TFile* f){
     TH2D* h_response;
     TH1D* h_mcxsec_fine;
 
-    int _var = k_var_reco_el_E;
+    int _var = k_var_recoX;
     std::string folder_name = "electron_energy";
     
     // MCC8 so get the smearing matrix
     if (std::string(_util.xsec_smear_mode) == "mcc8"){
-        h_response = (TH2D*)f->Get(Form("CV/%s/h_run%s_CV_0_smearing",vars.at(k_var_reco_el_E).c_str(),_util.run_period));
+        h_response = (TH2D*)f->Get(Form("CV/%s/h_run%s_CV_0_smearing",vars.at(k_var_recoX).c_str(),_util.run_period));
     }
     // Other modes we need the response matrix
     else {
-        h_response = (TH2D*)f->Get(Form("CV/%s/h_run%s_CV_0_smearing",vars.at(k_var_true_el_E).c_str(),_util.run_period));
-        h_mcxsec_fine = (TH1D*)f->Get(Form("CV/%s/h_run%s_CV_0_%s_mc_xsec_fine",vars.at(k_var_true_el_E).c_str(),_util.run_period, vars.at(k_var_true_el_E).c_str()));
-        _var = k_var_true_el_E;
+        h_response = (TH2D*)f->Get(Form("CV/%s/h_run%s_CV_0_smearing",vars.at(k_var_trueX).c_str(),_util.run_period));
+        h_mcxsec_fine = (TH1D*)f->Get(Form("CV/%s/h_run%s_CV_0_%s_mc_xsec_fine",vars.at(k_var_trueX).c_str(),_util.run_period, vars.at(k_var_trueX).c_str()));
+        _var = k_var_trueX;
     }
 
     // Choose whichj folder to put the stuff in
@@ -3575,22 +3684,22 @@ void SystematicsHelper::ExportResult(TFile* f){
         h_response->Write("h_smear", TObject::kOverwrite);
 
         // MC XSec Covariance Matrix  ---------------------------------
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->SetOption("col");
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Write("h_cov_tot_mcxsec_reco", TObject::kOverwrite);
+        h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot)->SetOption("col");
+        h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot)->Write("h_cov_tot_mcxsec_reco", TObject::kOverwrite);
 
         // MC XSec Reco  ---------------------------------
-        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->SetOption("hist");
-        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->Write("h_mc_xsec_reco", TObject::kOverwrite);
+        cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec)->SetOption("hist");
+        cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec)->Write("h_mc_xsec_reco", TObject::kOverwrite);
 
         // MC Efficiency Smear  ---------------------------------
-        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_eff)->SetOption("hist");
-        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_eff)->Write("h_mc_eff_reco", TObject::kOverwrite);
+        cv_hist_vec.at(k_var_recoX).at(k_xsec_eff)->SetOption("hist");
+        cv_hist_vec.at(k_var_recoX).at(k_xsec_eff)->Write("h_mc_eff_reco", TObject::kOverwrite);
 
         // MC Correlation Matrix  ---------------------------------
         TH2D* cor;
-        int n_bins = cv_hist_vec.at(k_var_reco_el_E).at(0)->GetNbinsX();
+        int n_bins = cv_hist_vec.at(k_var_recoX).at(0)->GetNbinsX();
         cor  = new TH2D("h_cor",   ";Bin i; Bin j",n_bins, 1, n_bins+1, n_bins, 1, n_bins+1 ); // Create the correlation matrix
-        _util.CalcCorrelation(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot), cor);
+        _util.CalcCorrelation(cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec), h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot), cor);
 
         cor->SetOption("colz");
         cor->Write("h_corr_tot_mcxsec_reco", TObject::kOverwrite);
@@ -3604,26 +3713,26 @@ void SystematicsHelper::ExportResult(TFile* f){
         h_response->Write("h_response", TObject::kOverwrite);
 
         // MC XSec Covariance Matrix  ---------------------------------
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->SetOption("col");
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot)->Write("h_cov_tot_mcxsec_reco", TObject::kOverwrite);
+        h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot)->SetOption("col");
+        h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot)->Write("h_cov_tot_mcxsec_reco", TObject::kOverwrite);
 
         // MC XSec Sys Covariance Matrix  ---------------------------------
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_sys)->SetOption("col");
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_sys)->Write("h_cov_sys_mcxsec_reco", TObject::kOverwrite);
+        h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_sys)->SetOption("col");
+        h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_sys)->Write("h_cov_sys_mcxsec_reco", TObject::kOverwrite);
 
         // MC XSec Smear MC Stats Covariance Matrix  ---------------------------------
-        h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_mcstats)->SetOption("col");
-        h_cov_v.at(k_var_true_el_E).at(k_xsec_mcxsec_smear).at(k_err_mcstats)->Write("h_cov_tot_mcxsec_smear_true", TObject::kOverwrite);
+        h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_mcstats)->SetOption("col");
+        h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_mcstats)->Write("h_cov_tot_mcxsec_smear_true", TObject::kOverwrite);
     
         // MC XSec Reco  ---------------------------------
-        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->SetOption("hist");
-        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec)->Write("h_mc_xsec_reco", TObject::kOverwrite);
+        cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec)->SetOption("hist");
+        cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec)->Write("h_mc_xsec_reco", TObject::kOverwrite);
 
         // MC Correlation Matrix  ---------------------------------
         TH2D* cor;
-        int n_bins = cv_hist_vec.at(k_var_reco_el_E).at(0)->GetNbinsX();
+        int n_bins = cv_hist_vec.at(k_var_recoX).at(0)->GetNbinsX();
         cor  = new TH2D("h_cor",   ";Bin i; Bin j",n_bins, 1, n_bins+1, n_bins, 1, n_bins+1 ); // Create the correlation matrix
-        _util.CalcCorrelation(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_mcxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_mcxsec).at(k_err_tot), cor);
+        _util.CalcCorrelation(cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec), h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot), cor);
 
         cor->SetOption("colz");
         cor->Write("h_corr_tot_mcxsec_reco", TObject::kOverwrite);
@@ -3669,38 +3778,38 @@ void SystematicsHelper::ExportResult(TFile* f){
         h_smear->Write("h_response", TObject::kOverwrite);
 
         // Data XSec Covariance Matrix ---------------------------------
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->SetOption("colz");
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot)->Write("h_cov_tot_dataxsec_reco", TObject::kOverwrite);
+        h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_tot)->SetOption("colz");
+        h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_tot)->Write("h_cov_tot_dataxsec_reco", TObject::kOverwrite);
 
         // Data XSec Stat Covariance Matrix ---------------------------------
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_stat)->SetOption("colz");
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_stat)->Write("h_cov_stat_dataxsec_reco", TObject::kOverwrite);
+        h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_stat)->SetOption("colz");
+        h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_stat)->Write("h_cov_stat_dataxsec_reco", TObject::kOverwrite);
 
         // Data XSec Sys Covariance Matrix ---------------------------------
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_sys)->SetOption("colz");
-        h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_sys)->Write("h_cov_sys_dataxsec_reco", TObject::kOverwrite);
+        h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_sys)->SetOption("colz");
+        h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_sys)->Write("h_cov_sys_dataxsec_reco", TObject::kOverwrite);
     
         // MC XSec True  ---------------------------------
-        cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->SetOption("hist");
-        cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec)->Write("h_mc_xsec_true", TObject::kOverwrite);
+        cv_hist_vec.at(k_var_trueX).at(k_xsec_mcxsec)->SetOption("hist");
+        cv_hist_vec.at(k_var_trueX).at(k_xsec_mcxsec)->Write("h_mc_xsec_true", TObject::kOverwrite);
 
         // MC Efficiency True  ---------------------------------
-        cv_hist_vec.at(k_var_true_el_E).at(k_xsec_eff)->SetOption("hist");
-        cv_hist_vec.at(k_var_true_el_E).at(k_xsec_eff)->Write("h_mc_eff_true", TObject::kOverwrite);
+        cv_hist_vec.at(k_var_trueX).at(k_xsec_eff)->SetOption("hist");
+        cv_hist_vec.at(k_var_trueX).at(k_xsec_eff)->Write("h_mc_eff_true", TObject::kOverwrite);
 
 
         // Data Correlation Matrix  ---------------------------------
         TH2D* cor;
-        int n_bins = cv_hist_vec.at(k_var_reco_el_E).at(0)->GetNbinsX();
+        int n_bins = cv_hist_vec.at(k_var_recoX).at(0)->GetNbinsX();
         cor  = new TH2D("h_cor",   ";Bin i; Bin j",n_bins, 1, n_bins+1, n_bins, 1, n_bins+1 ); // Create the correlation matrix
-        _util.CalcCorrelation(cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot), cor);
+        _util.CalcCorrelation(cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_tot), cor);
 
         cor->SetOption("colz");
         cor->Write("h_corr_tot_dataxsec_reco", TObject::kOverwrite);
 
         // Wiener SVD Unfolding  ---------------------------------
-        _wSVD.DoUnfolding(2, 0, cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec), h_smear, h_cov_v.at(k_var_reco_el_E).at(k_xsec_dataxsec).at(k_err_tot));
-        _wSVD.CompareModel(cv_hist_vec.at(k_var_true_el_E).at(k_xsec_mcxsec));
+        _wSVD.DoUnfolding(2, 0, cv_hist_vec.at(k_var_trueX).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), h_smear, h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_tot));
+        _wSVD.CompareModel(cv_hist_vec.at(k_var_trueX).at(k_xsec_mcxsec));
         _wSVD.unf->Write("h_data_xsec_unfolded", TObject::kOverwrite);
         _wSVD.unfcov->Write("h_data_cov_tot_unfolded", TObject::kOverwrite);
         _wSVD.smear->Write("h_ac", TObject::kOverwrite);
@@ -3708,27 +3817,27 @@ void SystematicsHelper::ExportResult(TFile* f){
     
 
     // Data XSec Reco (Stat Only)  ---------------------------------
-    cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetOption("E1,X0");
-    cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetLineColor(kRed+2);
-    cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetTitle(var_labels_xsec.at(k_var_reco_el_E).c_str());
-    cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_reco", TObject::kOverwrite);
+    cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->SetOption("E1,X0");
+    cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->SetLineColor(kRed+2);
+    cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
+    cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_reco", TObject::kOverwrite);
 
     // Data XSec Reco (Sys Only)  ---------------------------------
-    for (int bin = 0; bin < cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->GetNbinsX(); bin++){
-        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_sys).at(k_var_reco_el_E).at(k_xsec_mcxsec).at(bin)) * cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->GetBinContent(bin+1));
+    for (int bin = 0; bin < cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->GetNbinsX(); bin++){
+        cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_sys).at(k_var_recoX).at(k_xsec_mcxsec).at(bin)) * cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->GetBinContent(bin+1));
     }
 
-    cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetOption("E1,X0");
-    cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->Write("h_data_xsec_sys_reco", TObject::kOverwrite);
+    cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->SetOption("E1,X0");
+    cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->Write("h_data_xsec_sys_reco", TObject::kOverwrite);
 
 
     // Data XSec Reco (Stat + Sys)  ---------------------------------
-    for (int bin = 0; bin < cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->GetNbinsX(); bin++){
-        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_sys).at(k_var_reco_el_E).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_stat).at(k_var_reco_el_E).at(k_xsec_dataxsec).at(bin)) * cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->GetBinContent(bin+1));
+    for (int bin = 0; bin < cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->GetNbinsX(); bin++){
+        cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_sys).at(k_var_recoX).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_stat).at(k_var_recoX).at(k_xsec_dataxsec).at(bin)) * cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->GetBinContent(bin+1));
     }
 
-    cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetOption("E1,X0");
-    cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_sys_reco", TObject::kOverwrite);
+    cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->SetOption("E1,X0");
+    cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_sys_reco", TObject::kOverwrite);
 
 
     // Close the file ---------------------------------
@@ -3770,14 +3879,14 @@ void SystematicsHelper::ExportTotalCrossSectionResult(){
     cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->SetTitle(var_labels_xsec.at(k_var_integrated).c_str());
     // Data XSec Reco (Sys Only)  ---------------------------------
     for (int bin = 0; bin < cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->GetNbinsX(); bin++){
-        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_stat).at(k_var_integrated).at(k_xsec_mcxsec).at(bin)) * cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->GetBinContent(bin+1));
+        cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_stat).at(k_var_integrated).at(k_xsec_mcxsec).at(bin)) * cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->GetBinContent(bin+1));
     }
 
     cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_reco", TObject::kOverwrite);
 
     // Data XSec Reco (Sys Only)  ---------------------------------
     for (int bin = 0; bin < cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->GetNbinsX(); bin++){
-        cv_hist_vec.at(k_var_reco_el_E).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_sys).at(k_var_integrated).at(k_xsec_mcxsec).at(bin)) * cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->GetBinContent(bin+1));
+        cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_sys).at(k_var_integrated).at(k_xsec_mcxsec).at(bin)) * cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->GetBinContent(bin+1));
     }
 
     cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->SetOption("E1,X0");
