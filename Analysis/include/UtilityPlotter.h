@@ -160,6 +160,12 @@ class UtilityPlotter{
     // Get the response matrix from file and save it for the technote
     void SaveResponseMatrix();
     // -------------------------------------------------------------------------
+    // Check if the pi0 tune is covered by the genie systeamtics
+    void CheckPi0Coverage();
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
 
 }; // End Class UtilityPlotter

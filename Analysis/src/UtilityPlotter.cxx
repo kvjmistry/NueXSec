@@ -70,6 +70,7 @@ void UtilityPlotter::Initialise(Utility _utility){
         CompareFakeTotalCrossSec();
         CompareTotalDataCrossSections();
         CompareUnfoldedDataCrossSections();
+        CheckPi0Coverage();
         return;
     }
     else {
@@ -710,7 +711,7 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
 void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     
     // This changes the plot to average flux or not
-    bool draw_averge = true;
+    bool draw_averge =true;
 
     gStyle->SetOptStat(0);
 
@@ -768,7 +769,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     c->SetLogy();
     
     // Nue flux
-    h_nue->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu}_{e} / cm^{2} / 5 MeV / 0.9 #times 10^{20} POT");
+    h_nue->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu}_{e} / cm^{2} / 5 MeV / 2.0 #times 10^{20} POT");
     h_nue->GetXaxis()->CenterTitle();
     h_nue->GetYaxis()->CenterTitle();
 
@@ -791,7 +792,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     TH1D* h_nue_clone = (TH1D*)h_nue->Clone("h_nue_clone");
     
     // Nuebar flux
-    h_nuebar->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu}_{e} / cm^{2} / 5 MeV / 0.9 #times 10^{20} POT");
+    h_nuebar->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu}_{e} / cm^{2} / 5 MeV / 2.0 #times 10^{20} POT");
     h_nuebar->GetXaxis()->SetRangeUser(0,6);
     h_nuebar->SetLineColor(kGreen+2);
     h_nuebar->SetFillColor(16);
@@ -818,7 +819,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
         h_summed_flux_clone->SetBinContent(p, 0);
     }
 
-    summed_flux->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e} + #bar{#nu}_{e} / cm^{2} / 5 MeV / 0.9 #times 10^{20} POT");
+    summed_flux->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e} + #bar{#nu}_{e} / cm^{2} / 5 MeV / 2.0 #times 10^{20} POT");
     summed_flux->GetXaxis()->CenterTitle();
     summed_flux->GetYaxis()->CenterTitle();
     summed_flux->GetXaxis()->SetLabelFont(42);
@@ -877,7 +878,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
 
     h_summed_flux_clone->SetLineWidth(0);
     h_summed_flux_clone->SetFillColorAlpha(46, 0.4);
-    h_summed_flux_clone->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e} + #bar{#nu}_{e} / cm^{2} / 0.9 #times 10^{20} POT");
+    h_summed_flux_clone->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e} + #bar{#nu}_{e} / cm^{2} / 2.0 #times 10^{20} POT");
     if (draw_averge) h_summed_flux_clone->Draw("hist,same");
 
     
@@ -898,7 +899,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     if (!draw_averge)leg->Draw();
 
     // Draw MicroBooNE Simualtion
-    _util.Draw_ubooneSim(c, 0.37, 0.92, 0.37, 0.9);
+    _util.Draw_ubooneSim(c, 0.37, 0.93, 0.37, 0.91);
 
     // Draw the run period on the plot
     _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
@@ -3111,7 +3112,7 @@ void UtilityPlotter::SaveResponseMatrix(){
         if (variables.at(m) == "elec_ang"){
             h_response_index.at(m)->SetTitle("#beta_{e#lower[-0.5]{-} + e^{+}}");
         }
-        if (variables.at(m) == "elec_cang"){
+        if (variables.at(m) == "elec_"){
             h_response_index.at(m)->SetTitle("cos#beta_{e#lower[-0.5]{-} + e^{+}}");
         }
 
@@ -3150,5 +3151,71 @@ void UtilityPlotter::SaveResponseMatrix(){
 
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::CheckPi0Coverage(){
+
+    gStyle->SetOptStat(0);
+
+    // Load in the cross section output
+    TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
+
+    TH2D* h_temp_2D;
+    TH1D* h_temp;
+
+    // The covariance matrix
+    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/er/h_cov_genie_multi_mcxsec_reco",_util.xsec_var));
+    TH2D* h_cov = (TH2D*)h_temp_2D->Clone();
+    h_cov->SetDirectory(0);
+
+    fxsec->Close();
+
+    // Load in the cross section output
+    fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+
+    // MC R CV
+    h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", "CV", vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+    TH1D* h_CV = (TH1D*)h_temp->Clone();
+    h_CV->Scale(1.0, "width");
+
+    // MC R CV
+    h_temp  = (TH1D*)fxsec->Get(Form("nopi0tune/%s/h_run1_CV_0_%s_mc_xsec", vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+    TH1D* h_nopi0 = (TH1D*)h_temp->Clone();
+    h_nopi0->Scale(1.0, "width");
+
+
+    // Set the bin error of the cv to be for the genie multisim systematic uncertainty
+    for (int bin = 1; bin < h_CV->GetNbinsX(); bin++){
+        h_CV->SetBinError(bin, std::sqrt(h_cov->GetBinContent(bin, bin)));
+    }
+
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+    c->SetLeftMargin(0.2);
+    c->SetBottomMargin(0.15);
+    h_CV->GetYaxis()->SetTitleOffset(1.7);
+
+    // Set the line properties
+    h_CV->SetLineColor(kBlack);
+    h_nopi0->SetLineColor(kPink+1);
+
+    h_CV->SetLineWidth(2);
+    h_nopi0->SetLineWidth(2);
+
+    // Draw the CV
+    h_CV->Draw("hist,E");
+    h_nopi0->Draw("hist,same");
+    h_CV->Draw("hist,E,same");
+    
+    TLegend *leg = new TLegend(0.4, 0.5, 0.6, 0.85);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->SetTextSize(0.04);
+    leg->AddEntry(h_CV, "MC CV (Genie All Sys.)", "el");
+    leg->AddEntry(h_nopi0, "MC no #pi^{0} Tune", "l");
+    leg->Draw();
+
+    c->Print(Form("plots/run%s/Systematics/pi0/%s/run%s_pi0tune_sys_coverage_%s.pdf", _util.run_period, vars.at(k_var_recoX).c_str(), _util.run_period, vars.at(k_var_recoX).c_str()));
+    delete c;
+
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

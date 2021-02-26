@@ -94,6 +94,9 @@ class SystematicsHelper{
     // Fill vector with the statistical uncertainties
     void FillStatVector();
     // -------------------------------------------------------------------------
+    // Add the smearing covariance matrices to the reco covariance matrices
+    void AddSmearCovMatrix();
+    // -------------------------------------------------------------------------
     // Fill POT counting uncertainty vector
     void FillPOTCountingVector();
     // -------------------------------------------------------------------------
