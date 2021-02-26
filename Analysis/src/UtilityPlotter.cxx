@@ -1764,7 +1764,7 @@ void UtilityPlotter::TestModelDependence(){
     h_mcxsec_reco_model.at(k_model_mec)->Draw("hist,same");
     h_mcxsec_reco_model.at(k_model_nogtune)->Draw("hist,same");
     h_mcxsec_reco_model.at(k_model_nopi0tune)->Draw("hist,same");
-    // h_mcxsec_reco_model.at(k_model_FLUGG)->Draw("hist,same");
+    h_mcxsec_reco_model.at(k_model_FLUGG)->Draw("hist,same");
     h_mcxsec_reco_model.at(k_model_tune1)->Draw("hist,same");
     h_dataxsec->Draw("E1,X0,same");
     h_dataxsec_stat->Draw("E1,X0,same");
@@ -1794,8 +1794,8 @@ void UtilityPlotter::TestModelDependence(){
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_nopi0tune),  Form("MC (no #pi^{0} Tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     
     
-    // _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_FLUGG), h_dataxsec, h_cov, chi, ndof, pval);
-    // leg->AddEntry(h_mcxsec_reco_model.at(k_model_FLUGG),  Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_FLUGG), h_dataxsec, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_FLUGG),  Form("MC (FLUGG) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
 
     std::cout << "Tune 1" << std::endl;
     _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_tune1), h_dataxsec, h_cov, chi, ndof, pval);
@@ -2049,8 +2049,8 @@ void UtilityPlotter::CompareUnfoldedModels(){
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_nopi0tune), unf, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_nopi0tune),   Form("MC (no #pi^{0} Tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
     
-    // _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_FLUGG), unf, h_cov, chi, ndof, pval);
-    // leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_FLUGG),   Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_FLUGG), unf, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_FLUGG),   Form("MC (FLUGG) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
     std::cout << "Tune 1" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_tune1), unf, h_cov, chi, ndof, pval);
@@ -2095,8 +2095,8 @@ void UtilityPlotter::CompareUnfoldedModels(){
     h_mcxsec_true_model_smear.at(k_model_nopi0tune)->SetLineColor(kPink+1);
     h_mcxsec_true_model_smear.at(k_model_nopi0tune)->Draw("hist,same" );
 
-    // h_mcxsec_true_model_smear.at(k_model_FLUGG)->SetLineColor(kViolet-1);
-    // h_mcxsec_true_model_smear.at(k_model_FLUGG)->Draw("hist,same" );
+    h_mcxsec_true_model_smear.at(k_model_FLUGG)->SetLineColor(kViolet-1);
+    h_mcxsec_true_model_smear.at(k_model_FLUGG)->Draw("hist,same" );
 
     h_mcxsec_true_model_smear.at(k_model_tune1)->SetLineColor(kOrange-1);
     h_mcxsec_true_model_smear.at(k_model_tune1)->Draw("hist,same" );

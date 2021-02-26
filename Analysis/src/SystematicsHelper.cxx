@@ -693,7 +693,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeUnisim("POT",        var, "POT Count." );
 
         // Pi0 tune
-        PlotReweightingModeUnisim("pi0",        var, "#pi^{0}" );
+        // PlotReweightingModeUnisim("pi0",        var, "#pi^{0}" );
 
         // Plot the beamline unisims
         PlotReweightingModeUnisim("Horn1_x",            var, "Horn 1 x" );
@@ -3535,7 +3535,7 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
                 leg->AddEntry(h_uncertainty.at(k_err_reint),      "Geant4 Reinteractions", "l");
                 leg->AddEntry(h_uncertainty.at(k_err_pot),        "POT Counting", "l");
                 leg->AddEntry(h_uncertainty.at(k_err_dirt),       "Dirt", "l");
-                leg->AddEntry(h_uncertainty.at(k_err_pi0),        "Pi0 Tune", "l");
+                // leg->AddEntry(h_uncertainty.at(k_err_pi0),        "Pi0 Tune", "l");
                 leg->AddEntry(h_uncertainty.at(k_err_mcstats),    "MC Stats", "l");
 
                 leg->Draw();
