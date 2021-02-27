@@ -134,7 +134,7 @@ class SystematicsHelper{
     void SaveCutHistogramsDetVar();
     // -------------------------------------------------------------------------
     // Make a plot of the systematics in one plot
-    void MakeTotUncertaintyPlot();
+    void MakeTotUncertaintyPlot(bool AddStatErr);
     // -------------------------------------------------------------------------
     // Initialse the matrix of covariance matrices
     void InitialseCovarianceVector();

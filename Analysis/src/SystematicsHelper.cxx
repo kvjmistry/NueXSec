@@ -767,7 +767,8 @@ void SystematicsHelper::InitialiseReweightingMode(){
     PrintUncertaintySummary();
 
     // Plot the systematic uncertainty
-    MakeTotUncertaintyPlot();
+    MakeTotUncertaintyPlot(false);
+    MakeTotUncertaintyPlot(true);
 
     // Calculate a chi-squared using the total covariance matrix
     double chi, pval;
@@ -2474,7 +2475,7 @@ void SystematicsHelper::FillStatVector(){
                 }
             }
 
-            // Add the created stat diagonal cov matrix to the total 
+            // Add the created stat diagonal cov matrix to the total
             h_cov_v.at(var).at(type).at(k_err_tot)->Add(h_cov_v.at(var).at(type).at(k_err_stat));
         }
     }
@@ -2495,6 +2496,9 @@ void SystematicsHelper::FillStatVector(){
                            cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec), 
                            cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec));
 
+    // Add the MC stat err tot the total MC sys error
+    h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_sys)->Add(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat));
+
     // ---
 
     // Add the mc stat to the total data cov matrix
@@ -2504,6 +2508,7 @@ void SystematicsHelper::FillStatVector(){
                            cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec));
     
     h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat));
+    h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_sys)->Add(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat));
 
     // put it back
     // Convert the Covariance Matrix-- switching from data CV deviations to mc CV deviation
@@ -3456,13 +3461,13 @@ void SystematicsHelper::SaveCutHistogramsDetVar(){
 
 }
 // -----------------------------------------------------------------------------
-void SystematicsHelper::MakeTotUncertaintyPlot(){
+void SystematicsHelper::MakeTotUncertaintyPlot(bool AddStatErr){
 
 
     std::vector<TH1D*> h_uncertainty;
     h_uncertainty.resize(k_ERR_MAX);
 
-    // Loop over the variables
+    // Loop over the variables, int, reco, true.
     for (unsigned int var = 0; var < vars.size(); var++ ){
         
         // Loop over the types
@@ -3486,13 +3491,36 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
                 for (unsigned int bin = 0; bin < v_err.at(k_err_genie_uni).at(var).at(type).size(); bin++ ){
 
                     for (int err = 0; err < k_ERR_MAX; err++){
-                        h_uncertainty.at(err)->SetBinContent(bin+1, std::sqrt(v_err.at(err).at(var).at(type).at(bin)) );
+                        // h_uncertainty.at(err)->SetBinContent(bin+1, std::sqrt(v_err.at(err).at(var).at(type).at(bin)) );
+                        
+                        // In the case of MC stat error include the MC stat + response stat err in the same line
+                        if (var == k_var_recoX && err == k_err_mcstats && (type == k_xsec_dataxsec || type == k_xsec_mcxsec)){
+                            h_uncertainty.at(err)->SetBinContent(bin+1, 100 * std::sqrt(h_cov_v.at(var).at(type).at(err)->GetBinContent(bin+1, bin+1) + h_cov_v.at(var).at(k_xsec_mcxsec).at(k_err_stat)->GetBinContent(bin+1, bin+1)) / cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(bin+1));
+                        }
+                        // Plot data stat error in both cases
+                        else if (var == k_var_recoX && err == k_err_stat && (type == k_xsec_dataxsec || type == k_xsec_mcxsec)){
+                            h_uncertainty.at(err)->SetBinContent(bin+1, 100 * std::sqrt(h_cov_v.at(var).at(k_xsec_dataxsec).at(k_err_stat)->GetBinContent(bin+1, bin+1)) / cv_hist_vec.at(var).at(k_xsec_dataxsec)->GetBinContent(bin+1));
+                        }
+                        else {
+                            h_uncertainty.at(err)->SetBinContent(bin+1, 100 * std::sqrt(h_cov_v.at(var).at(type).at(err)->GetBinContent(bin+1, bin+1)) / cv_hist_vec.at(var).at(type)->GetBinContent(bin+1));
+                        }
+
                         h_uncertainty.at(err)->SetLineWidth(2);
                     }
                     
                 }
 
-                h_uncertainty.at(k_err_sys)->SetLineColor(kBlack);
+                // Choose if we want to draw only the sys error or sys + stat error
+                if (AddStatErr && (type == k_xsec_dataxsec || type == k_xsec_mcxsec)){
+                    h_uncertainty.at(k_err_tot)->SetLineColor(kBlack);
+                    h_uncertainty.at(k_err_stat)->SetLineColor(kBlack);
+                    h_uncertainty.at(k_err_stat)->SetLineStyle(2);
+                }
+                else { 
+                    h_uncertainty.at(k_err_sys)->SetLineColor(kBlack);
+                }
+
+                
                 h_uncertainty.at(k_err_genie_uni)->SetLineColor(95);
                 h_uncertainty.at(k_err_genie_multi)->SetLineColor(kPink+1);
                 h_uncertainty.at(k_err_beamline)->SetLineColor(28);
@@ -3505,12 +3533,26 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
                 h_uncertainty.at(k_err_mcstats)->SetLineColor(7);
 
                 TCanvas *c = new TCanvas("c", "c", 500, 500);
-                c->SetLeftMargin(0.13);
+                c->SetLeftMargin(0.15);
                 c->SetBottomMargin(0.13);
-                h_uncertainty.at(k_err_sys)->GetYaxis()->SetTitle("Uncertainty [%]");
-                h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 60);
+                
+                if (AddStatErr && (type == k_xsec_dataxsec || type == k_xsec_mcxsec)){
+                    h_uncertainty.at(k_err_tot)->SetTitle(xsec_types_pretty.at(type).c_str());
+                    h_uncertainty.at(k_err_tot)->GetYaxis()->SetTitle("Uncertainty [%]");
+                    h_uncertainty.at(k_err_tot)->GetYaxis()->SetRangeUser(0, 250);
+                    h_uncertainty.at(k_err_tot)->Draw("hist,same, text00");
+                    h_uncertainty.at(k_err_stat)->Draw("hist,same");
+                }
+                else {
+                    h_uncertainty.at(k_err_sys)->SetTitle(xsec_types_pretty.at(type).c_str());
+                    h_uncertainty.at(k_err_sys)->GetYaxis()->SetTitle("Uncertainty [%]");
+                    h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 120);
+                    h_uncertainty.at(k_err_sys)->Draw("hist,same, text00");
+                }
 
-                h_uncertainty.at(k_err_sys)->Draw("hist,same, text00");
+                if (type == k_xsec_bkg)
+                    h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 650);
+                
                 h_uncertainty.at(k_err_genie_uni)->Draw("hist,same");
                 h_uncertainty.at(k_err_genie_multi)->Draw("hist,same");
                 h_uncertainty.at(k_err_beamline)->Draw("hist,same");
@@ -3519,14 +3561,20 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
                 h_uncertainty.at(k_err_detvar)->Draw("hist,same");
                 h_uncertainty.at(k_err_dirt)->Draw("hist,same");
                 h_uncertainty.at(k_err_pot)->Draw("hist,same");
-                h_uncertainty.at(k_err_pi0)->Draw("hist,same");
+                // h_uncertainty.at(k_err_pi0)->Draw("hist,same");
                 h_uncertainty.at(k_err_mcstats)->Draw("hist,same");
 
                 TLegend *leg = new TLegend(0.18, 0.55, 0.88, 0.85);
                 leg->SetNColumns(2);
                 leg->SetBorderSize(0);
                 leg->SetFillStyle(0);
-                leg->AddEntry(h_uncertainty.at(k_err_sys),        "Total Sys.", "l");
+                if (AddStatErr && (type == k_xsec_dataxsec || type == k_xsec_mcxsec)){
+                    leg->AddEntry(h_uncertainty.at(k_err_tot),        "Total Stat. + Sys.", "l");
+                    leg->AddEntry(h_uncertainty.at(k_err_stat),       "Data Stat.", "l");
+                }
+                else {
+                    leg->AddEntry(h_uncertainty.at(k_err_sys),        "Total Sys.", "l");
+                }
                 leg->AddEntry(h_uncertainty.at(k_err_hp),         "Hadron Production", "l");
                 leg->AddEntry(h_uncertainty.at(k_err_detvar),     "Detector", "l");
                 leg->AddEntry(h_uncertainty.at(k_err_genie_multi),"GENIE Multisim", "l");
@@ -3536,12 +3584,16 @@ void SystematicsHelper::MakeTotUncertaintyPlot(){
                 leg->AddEntry(h_uncertainty.at(k_err_pot),        "POT Counting", "l");
                 leg->AddEntry(h_uncertainty.at(k_err_dirt),       "Dirt", "l");
                 // leg->AddEntry(h_uncertainty.at(k_err_pi0),        "Pi0 Tune", "l");
-                leg->AddEntry(h_uncertainty.at(k_err_mcstats),    "MC Stats", "l");
+                leg->AddEntry(h_uncertainty.at(k_err_mcstats),    "MC Stat", "l");
 
                 leg->Draw();
 
-
-                c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_%s_%s_tot_uncertainty.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(type).c_str()));
+                if (AddStatErr && (type == k_xsec_dataxsec || type == k_xsec_mcxsec)){
+                    c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_%s_%s_tot_uncertainty.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(type).c_str()));
+                }
+                else {
+                    c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_%s_%s_tot_sys_uncertainty.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(type).c_str()));
+                }
 
                 h_uncertainty.clear();
                 delete c;
