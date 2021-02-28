@@ -53,6 +53,9 @@ void WienerSVD::DoUnfolding(Int_t C_type, Float_t Norm_type, TH1D *sig, TH1D *me
     MSE       = new TH1D("MSE",       "Mean Square Error: variance+bias^2", n, Nuedges);
     MSE2      = new TH1D("MSE2",      "Mean Square Error: variance", n, Nuedges);
 
+    smear->SetTitle(_util.ac_hist_name.c_str());
+    unfcov->SetTitle(_util.ac_hist_name.c_str());
+
     // Core implementation of Wiener-SVD
     // Input as names read. AddSmear and WF to record the core information in the unfolding.
     TVectorD unfold = WienerSVDUnfold(response, signal, measure, covariance, C_type, Norm_type, AddSmear, WF, UnfoldCov);
@@ -162,7 +165,19 @@ void WienerSVD::CompareModel(TH1D *sig){
     gPad->SetLeftMargin(0.20);
     c->SetBottomMargin(0.15);
 
-    h_model_smear->SetMaximum(7);
+    if (std::string(_util.xsec_var) == "elec_E"){
+        h_model_smear->SetMaximum(7);
+    }
+    else if (std::string(_util.xsec_var) == "elec_ang"){
+        h_model_smear->SetMaximum(15);
+    }
+    else if (std::string(_util.xsec_var) == "elec_cang"){
+        h_model_smear->SetMaximum(30.0);
+        h_model_smear->GetXaxis()->SetLabelSize(0.035);
+        h_model_smear->GetXaxis()->SetTitleOffset(1.1);
+    }
+
+    h_model_smear->GetYaxis()->SetTitleOffset(1.5);
 
     h_model_smear->Draw("hist");
     h_model_smear_err->Draw("E2,same");
@@ -209,6 +224,8 @@ void WienerSVD::CompareModel(TH1D *sig){
     // Histograms to be printed to pdf
     _util.Save2DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_smear_%s.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), smear,    "colz");
     _util.Save2DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unfold_cov_%s.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov,   "colz");
+    _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_smear_%s_index.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), smear,    "colz");
+    _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unfold_cov_%s_index.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov,   "colz");
 
     _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_wiener_%s.pdf",    _util.run_period, _util.xsec_var ,_util.xsec_var), wiener,    "hist");
     _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unf_%s.pdf",       _util.run_period, _util.xsec_var ,_util.xsec_var), unf,       "hist");

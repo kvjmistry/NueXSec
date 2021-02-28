@@ -28,9 +28,6 @@ void SystematicsHelper::Initialise(Utility _utility){
     // Get the POT of the variations from the file
     GetPOT();
 
-    // Set the names of the histograms
-    _util.SetAxesNames(var_labels_xsec, var_labels_events, var_labels_eff, smear_hist_name, vars, xsec_scale);
-
     // Off beam mode to compare bnb and numi off beam samples
     if (std::string(_util.sysmode) == "ext"){
         var_string = { "NuMI", "BNB" };
@@ -657,7 +654,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
     InitialseCovarianceVector();
 
     // Loop over the cross-section variables
-    for (unsigned int var = 0; var <  vars.size(); var++){
+    for (unsigned int var = 0; var <  _util.vars.size(); var++){
 
         // Comparison plots for data to MC
         CompareVariationXSec("RPA",              var, "RPA" );
@@ -740,17 +737,17 @@ void SystematicsHelper::InitialiseReweightingMode(){
     CompareCVXSecNoRatio();
 
     // Save the total covariance matrices
-    _util.CreateDirectory("/Systematics/Covariance/" + vars.at(k_var_recoX));
-    _util.CreateDirectory("/Systematics/Correlation/" + vars.at(k_var_recoX));
-    _util.CreateDirectory("/Systematics/FracCovariance/" + vars.at(k_var_recoX));
+    _util.CreateDirectory("/Systematics/Covariance/" + _util.vars.at(k_var_recoX));
+    _util.CreateDirectory("/Systematics/Correlation/" + _util.vars.at(k_var_recoX));
+    _util.CreateDirectory("/Systematics/FracCovariance/" + _util.vars.at(k_var_recoX));
     for (unsigned int cov = 0; cov < h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).size(); cov++){
         
-        SaveCovMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(cov),                                                        Form("plots/run%s/Systematics/Covariance/%s/run%s_%s_%s_%s_cov.pdf",          _util.run_period, vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_mcxsec).c_str(),   vars.at(k_var_recoX).c_str()));
-        SaveCovMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(cov),                                                      Form("plots/run%s/Systematics/Covariance/%s/run%s_%s_%s_%s_cov.pdf",          _util.run_period, vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_dataxsec).c_str(), vars.at(k_var_recoX).c_str()));
-        SaveCorMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(cov),       cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec),   Form("plots/run%s/Systematics/Correlation/%s/run%s_%s_%s_%s_cor.pdf",         _util.run_period, vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_mcxsec).c_str(),   vars.at(k_var_recoX).c_str()));
-        SaveCorMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(cov),     cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), Form("plots/run%s/Systematics/Correlation/%s/run%s_%s_%s_%s_cor.pdf",         _util.run_period, vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_dataxsec).c_str(), vars.at(k_var_recoX).c_str()));
-        SaveFracCovMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(cov),   cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec),   Form("plots/run%s/Systematics/FracCovariance/%s/run%s_%s_%s_%s_frac_cov.pdf", _util.run_period, vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_mcxsec).c_str(),   vars.at(k_var_recoX).c_str()));
-        SaveFracCovMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(cov), cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), Form("plots/run%s/Systematics/FracCovariance/%s/run%s_%s_%s_%s_frac_cov.pdf", _util.run_period, vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_dataxsec).c_str(), vars.at(k_var_recoX).c_str()));
+        SaveCovMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(cov),                                                        Form("plots/run%s/Systematics/Covariance/%s/run%s_%s_%s_%s_cov.pdf",          _util.run_period, _util.vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_mcxsec).c_str(),   _util.vars.at(k_var_recoX).c_str()));
+        SaveCovMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(cov),                                                      Form("plots/run%s/Systematics/Covariance/%s/run%s_%s_%s_%s_cov.pdf",          _util.run_period, _util.vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_dataxsec).c_str(), _util.vars.at(k_var_recoX).c_str()));
+        SaveCorMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(cov),       cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec),   Form("plots/run%s/Systematics/Correlation/%s/run%s_%s_%s_%s_cor.pdf",         _util.run_period, _util.vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_mcxsec).c_str(),   _util.vars.at(k_var_recoX).c_str()));
+        SaveCorMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(cov),     cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), Form("plots/run%s/Systematics/Correlation/%s/run%s_%s_%s_%s_cor.pdf",         _util.run_period, _util.vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_dataxsec).c_str(), _util.vars.at(k_var_recoX).c_str()));
+        SaveFracCovMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(cov),   cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec),   Form("plots/run%s/Systematics/FracCovariance/%s/run%s_%s_%s_%s_frac_cov.pdf", _util.run_period, _util.vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_mcxsec).c_str(),   _util.vars.at(k_var_recoX).c_str()));
+        SaveFracCovMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(cov), cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), Form("plots/run%s/Systematics/FracCovariance/%s/run%s_%s_%s_%s_frac_cov.pdf", _util.run_period, _util.vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_dataxsec).c_str(), _util.vars.at(k_var_recoX).c_str()));
     }
 
     // Create the directories
@@ -887,7 +884,7 @@ void SystematicsHelper::SetLabelName(std::string label, std::string &label_up, s
 void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, std::string label_pretty){
 
     // Create the directory
-    _util.CreateDirectory("/Systematics/" + label + "/" + vars.at(var));
+    _util.CreateDirectory("/Systematics/" + label + "/" + _util.vars.at(var));
 
     std::vector<std::vector<TH1D*>> h_universe;
     
@@ -912,7 +909,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
 
     // Get the histograms and customise a bit
     for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
-        _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, label_up.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), _util.vars.at(var).c_str(), _util.run_period, label_up.c_str(), _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
         h_universe.at(k_up).at(k) = (TH1D*)htemp->Clone();
 
@@ -927,7 +924,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         h_universe.at(k_up).at(k)->GetYaxis()->SetTitleFont(44);
         h_universe.at(k_up).at(k)->GetYaxis()->SetTitleOffset(1.5);
         
-        _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, label_dn.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), _util.vars.at(var).c_str(), _util.run_period, label_dn.c_str(), _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
         h_universe.at(k_dn).at(k) = (TH1D*)htemp->Clone();
 
@@ -973,13 +970,13 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
 
         // Set the Titles
         if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
-            h_universe.at(k_up).at(k)->SetTitle(var_labels_xsec.at(var).c_str());
+            h_universe.at(k_up).at(k)->SetTitle(_util.var_labels_xsec.at(var).c_str());
         else if (k == k_xsec_mcxsec_smear)
-            h_universe.at(k_up).at(k)->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
+            h_universe.at(k_up).at(k)->SetTitle(_util.var_labels_xsec.at(k_var_recoX).c_str());
         else if (k == k_xsec_eff)
-            h_universe.at(k_up).at(k)->SetTitle(var_labels_eff.at(var).c_str());
+            h_universe.at(k_up).at(k)->SetTitle(_util.var_labels_eff.at(var).c_str());
         else
-            h_universe.at(k_up).at(k)->SetTitle(var_labels_events.at(var).c_str());
+            h_universe.at(k_up).at(k)->SetTitle(_util.var_labels_events.at(var).c_str());
         
         h_universe.at(k_up).at(k)->SetTitle(Form("%s", xsec_types_pretty.at(k).c_str() ));
         h_universe.at(k_up).at(k)->GetXaxis()->SetTitle("");
@@ -998,7 +995,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
         h_universe.at(k_up).at(k)->GetYaxis()->SetRangeUser(0, scale_val*1.2);
 
         // FIxed scaling for differential cross section
-        if (vars.at(var) != "integrated"){
+        if (_util.vars.at(var) != "integrated"){
             // h_universe.at(k_up).at(k)->GetYaxis()->SetRangeUser(0, 0.5e-39);
         }
 
@@ -1044,13 +1041,13 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
 
         // Set the Titles
         if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
-            h_err_up->SetTitle(var_labels_xsec.at(var).c_str());
+            h_err_up->SetTitle(_util.var_labels_xsec.at(var).c_str());
         else if (k == k_xsec_mcxsec_smear)
-            h_err_up->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
+            h_err_up->SetTitle(_util.var_labels_xsec.at(k_var_recoX).c_str());
         else if (k == k_xsec_eff)
-            h_err_up->SetTitle(var_labels_eff.at(var).c_str());
+            h_err_up->SetTitle(_util.var_labels_eff.at(var).c_str());
         else
-            h_err_up->SetTitle(var_labels_events.at(var).c_str());        
+            h_err_up->SetTitle(_util.var_labels_events.at(var).c_str());        
         
         SetRatioOptions(h_err_up);
         h_err_up->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
@@ -1101,7 +1098,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
              (var == k_var_trueX && (k == k_xsec_eff || k == k_xsec_mcxsec_smear)) ||
              (var == k_var_integrated && (k == k_xsec_mcxsec || k == k_xsec_dataxsec || k == k_xsec_bkg || k == k_xsec_sig || k == k_xsec_eff)) 
             ){
-            c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(), _util.run_period, label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+            c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", _util.run_period, label.c_str(), _util.vars.at(var).c_str(), _util.run_period, label.c_str(), _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
         }
 
         delete c;
@@ -1116,7 +1113,7 @@ void SystematicsHelper::PlotReweightingModeUnisim(std::string label, int var, st
 void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, int detvar_index, std::string label_pretty){
 
     // Create the directory
-    _util.CreateDirectory("/Systematics/" + label + "/" + vars.at(var));
+    _util.CreateDirectory("/Systematics/" + label + "/" + _util.vars.at(var));
 
     std::vector<TH1D*> h_universe;
     std::vector<TH1D*> h_CV;
@@ -1132,7 +1129,7 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
     for (unsigned int k = 0; k < h_universe.size(); k++){
         
         // Get the universe histograms
-        _util.GetHist(f_nuexsec, h_temp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label.c_str(), vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, h_temp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label.c_str(), _util.vars.at(var).c_str(), _util.run_period, _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
         h_universe.at(k) = (TH1D*)h_temp->Clone();
 
         if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
@@ -1144,7 +1141,7 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
         if (xsec_types.at(k) != "ext" && xsec_types.at(k) != "dirt" && xsec_types.at(k) != "data") h_universe.at(k)->Scale(scale_fact);
 
         // Get the CV histograms
-        _util.GetHist(f_nuexsec, h_temp, Form( "detvar_CV/%s/h_run%s_CV_0_%s_%s", vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, h_temp, Form( "detvar_CV/%s/h_run%s_CV_0_%s_%s", _util.vars.at(var).c_str(), _util.run_period, _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
         h_CV.at(k) = (TH1D*)h_temp->Clone();
 
         if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
@@ -1197,7 +1194,7 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
         h_universe.at(k)->GetYaxis()->SetRangeUser(0, scale_val*1.2);
 
         // FIxed scaling for differential cross section
-        if (vars.at(var) != "integrated"){
+        if (_util.vars.at(var) != "integrated"){
             // h_universe.at(k)->GetYaxis()->SetRangeUser(0, 0.5e-39);
         }
 
@@ -1224,13 +1221,13 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
         
         // Set the Titles
         if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
-            h_err->SetTitle(var_labels_xsec.at(var).c_str());
+            h_err->SetTitle(_util.var_labels_xsec.at(var).c_str());
         else if (k == k_xsec_mcxsec_smear)
-            h_err->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
+            h_err->SetTitle(_util.var_labels_xsec.at(k_var_recoX).c_str());
         else if (k == k_xsec_eff)
-            h_err->SetTitle(var_labels_eff.at(var).c_str());
+            h_err->SetTitle(_util.var_labels_eff.at(var).c_str());
         else
-            h_err->SetTitle(var_labels_events.at(var).c_str());
+            h_err->SetTitle(_util.var_labels_events.at(var).c_str());
         
         // h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
         
@@ -1264,7 +1261,7 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
              (var == k_var_trueX && (k == k_xsec_eff || k == k_xsec_mcxsec_smear)) ||
              (var == k_var_integrated && (k == k_xsec_mcxsec || k == k_xsec_dataxsec || k == k_xsec_bkg || k == k_xsec_sig || k == k_xsec_eff)) 
             ){
-            c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(), _util.run_period, label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+            c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", _util.run_period, label.c_str(), _util.vars.at(var).c_str(), _util.run_period, label.c_str(), _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
         }
 
         delete c;
@@ -1278,7 +1275,7 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
 void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, std::string label_pretty, int universes){
 
     // Create the directory
-    _util.CreateDirectory("/Systematics/" + label + "/" + vars.at(var));
+    _util.CreateDirectory("/Systematics/" + label + "/" + _util.vars.at(var));
 
     std::vector<std::vector<TH1D*>> h_universe; // Universe, <gen/sig/xsec etc>
     std::vector<std::vector<TH1D*>> h_err;
@@ -1286,7 +1283,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
     // Set the X Bins
     std::vector<double> bins;
     if
-        (vars.at(var) == "integrated") bins  = { 0.0, 1.1 };
+        (_util.vars.at(var) == "integrated") bins  = { 0.0, 1.1 };
     else {
         // Electron/Shower Energy
         if (std::string(_util.xsec_var) =="elec_E"){
@@ -1315,7 +1312,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
     std::vector<TH2D*> h_universe_2D;
     h_universe_2D.resize(xsec_types.size());
     // Set 2D bins for integrated bins
-    if (vars.at(var) == "integrated"){
+    if (_util.vars.at(var) == "integrated"){
 
         std::vector<double> int_bins_low;
         std::vector<double> int_bins_high;
@@ -1356,13 +1353,13 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         if (std::string(_util.xsec_smear_mode) == "mcc8" ){
             //               sel - bkg -   gen - gen_smear - sig  - eff - ext - dirt - data - mcxsec - mcxsec_smear - dataxsec
             diff_bins_low  = { 0,    0,      0,          0,    0,     0,    0,     0,      0,       0,            0,     0}; 
-            diff_bins_high = {2500, 1200, 16000,      2700, 2700,     5,   30,    40,    250, xsec_scale, xsec_scale,  xsec_scale}; 
+            diff_bins_high = {2500, 1200, 16000,      2700, 2700,     5,   30,    40,    250, _util.xsec_scale, _util.xsec_scale,  _util.xsec_scale}; 
         }
         // Event Rate Binning
         else {
             //               sel - bkg -   gen - gen_smear - sig  - eff - ext - dirt - data - mcxsec - mcxsec_smear - dataxsec
             diff_bins_low  = { 0,    0,      0,          0,    0,     0,    0,     0,      0,      0,             0,        0}; 
-            diff_bins_high = {4000, 1200, 16000,      2700, 2700,     0.5, 50,    50,    250, xsec_scale, xsec_scale, xsec_scale}; 
+            diff_bins_high = {4000, 1200, 16000,      2700, 2700,     0.5, 50,    50,    250, _util.xsec_scale, _util.xsec_scale, _util.xsec_scale}; 
 
         }
 
@@ -1405,7 +1402,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
     // Get the histograms and customise a bit
     for (int uni = 0; uni < universes; uni++){
         for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
-            _util.GetHist(f_nuexsec, h_universe.at(uni).at(k), Form( "%s/%s/h_run%s_%s_%i_%s_%s", label.c_str(), vars.at(var).c_str(), _util.run_period, label.c_str(), uni ,vars.at(var).c_str(), xsec_types.at(k).c_str()));
+            _util.GetHist(f_nuexsec, h_universe.at(uni).at(k), Form( "%s/%s/h_run%s_%s_%i_%s_%s", label.c_str(), _util.vars.at(var).c_str(), _util.run_period, label.c_str(), uni ,_util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
             if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
                 h_universe.at(uni).at(k)->Scale(1.0, "width");
@@ -1497,13 +1494,13 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
 
         // Set the Titles
         if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
-            h_universe_2D.at(k)->SetTitle(var_labels_xsec.at(var).c_str());
+            h_universe_2D.at(k)->SetTitle(_util.var_labels_xsec.at(var).c_str());
         else if (k == k_xsec_mcxsec_smear)
-            h_universe_2D.at(k)->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
+            h_universe_2D.at(k)->SetTitle(_util.var_labels_xsec.at(k_var_recoX).c_str());
         else if (k == k_xsec_eff)
-            h_universe_2D.at(k)->SetTitle(var_labels_eff.at(var).c_str());
+            h_universe_2D.at(k)->SetTitle(_util.var_labels_eff.at(var).c_str());
         else
-            h_universe_2D.at(k)->SetTitle(var_labels_events.at(var).c_str());
+            h_universe_2D.at(k)->SetTitle(_util.var_labels_events.at(var).c_str());
 
 
         h_universe_2D.at(k)->Draw("colz,same");
@@ -1562,13 +1559,13 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
 
         // Set the Titles
         if (k == k_xsec_mcxsec || k == k_xsec_dataxsec)
-            h_err->SetTitle(var_labels_xsec.at(var).c_str());
+            h_err->SetTitle(_util.var_labels_xsec.at(var).c_str());
         else if (k == k_xsec_mcxsec_smear)
-             h_err->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
+             h_err->SetTitle(_util.var_labels_xsec.at(k_var_recoX).c_str());
         else if (k == k_xsec_eff)
-            h_err->SetTitle(var_labels_eff.at(var).c_str());
+            h_err->SetTitle(_util.var_labels_eff.at(var).c_str());
         else
-            h_err->SetTitle(var_labels_events.at(var).c_str());
+            h_err->SetTitle(_util.var_labels_events.at(var).c_str());
 
         h_err->SetTitle(" ");
         h_err->SetMarkerColor(kBlack);
@@ -1594,7 +1591,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
              (var == k_var_trueX && (k == k_xsec_eff || k == k_xsec_mcxsec_smear)) ||
              (var == k_var_integrated && (k == k_xsec_mcxsec || k == k_xsec_dataxsec || k == k_xsec_bkg || k == k_xsec_sig || k == k_xsec_eff)) 
             ){
-                c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(),  _util.run_period, label.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+                c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", _util.run_period, label.c_str(), _util.vars.at(var).c_str(),  _util.run_period, label.c_str(), _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
             }
 
         delete c;
@@ -1611,7 +1608,7 @@ void SystematicsHelper::CompareCVXSec(){
     std::vector<std::string> error_type = {"stat", "sys", "tot"};
 
     // Loop over the variables
-    for (unsigned int var = 0; var < vars.size(); var++){
+    for (unsigned int var = 0; var < _util.vars.size(); var++){
 
         // Loop over the error labels
         for (unsigned int err_lab = 0; err_lab < error_type.size(); err_lab++){
@@ -1632,8 +1629,8 @@ void SystematicsHelper::CompareCVXSec(){
             h_mcxsec  ->SetLineColor(kRed+2);
 
             // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
-            if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(3.5, 10.5);
-            else h_dataxsec->GetYaxis()->SetRangeUser(0.0, xsec_scale);
+            if (_util.vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(3.5, 10.5);
+            else h_dataxsec->GetYaxis()->SetRangeUser(0.0, _util.xsec_scale);
 
             h_dataxsec->GetYaxis()->SetLabelSize(0.04);
             h_dataxsec->GetYaxis()->SetTitleSize(14);
@@ -1708,11 +1705,11 @@ void SystematicsHelper::CompareCVXSec(){
             h_err->GetYaxis()->SetRangeUser(-100, 100);
 
             // Set the Titles
-            h_err->SetTitle(var_labels_xsec.at(var).c_str());
+            h_err->SetTitle(_util.var_labels_xsec.at(var).c_str());
             h_err->GetYaxis()->SetTitle("Data - MC / Data [\%]");
             h_err->GetYaxis()->SetTitleOffset(2.5);
             // h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
-            if (vars.at(var) == "integrated")  h_err->GetXaxis()->SetLabelSize(0);
+            if (_util.vars.at(var) == "integrated")  h_err->GetXaxis()->SetLabelSize(0);
             h_err->SetMarkerSize(3.0);
             h_err->Draw("hist,text00");
 
@@ -1722,7 +1719,7 @@ void SystematicsHelper::CompareCVXSec(){
             _util.Draw_Data_POT(c, Data_POT, 0.47, 0.915, 0.47, 0.915);
 
             
-            c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_data_mc_comparison_%s.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), error_type.at(err_lab).c_str() ));
+            c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_data_mc_comparison_%s.pdf", _util.run_period, _util.vars.at(var).c_str(), _util.run_period, _util.vars.at(var).c_str(), error_type.at(err_lab).c_str() ));
             delete c;
             delete h_dataxsec;
             delete h_mcxsec;
@@ -1741,7 +1738,7 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
     std::vector<std::string> error_type = {"stat", "sys", "tot"};
 
     // Loop over the variables
-    for (unsigned int var = 0; var < vars.size(); var++){
+    for (unsigned int var = 0; var < _util.vars.size(); var++){
 
         // Loop over the error labels
         for (unsigned int err_lab = 0; err_lab < error_type.size(); err_lab++){
@@ -1759,13 +1756,13 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             h_mcxsec  ->SetLineColor(kRed+2);
 
             // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
-            if (vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(3.5, 10.5);
-            else h_dataxsec->GetYaxis()->SetRangeUser(0.0, xsec_scale);
+            if (_util.vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(3.5, 10.5);
+            else h_dataxsec->GetYaxis()->SetRangeUser(0.0, _util.xsec_scale);
 
             _util.IncreaseLabelSize(h_dataxsec, c);
-            if (vars.at(var) == "integrated")h_dataxsec->GetXaxis()->SetLabelSize(0);
+            if (_util.vars.at(var) == "integrated")h_dataxsec->GetXaxis()->SetLabelSize(0);
             h_dataxsec->GetYaxis()->SetTitleSize(0.04);
-            h_dataxsec->SetTitle(var_labels_xsec.at(var).c_str());
+            h_dataxsec->SetTitle(_util.var_labels_xsec.at(var).c_str());
             h_dataxsec->SetMarkerStyle(20);
             h_dataxsec->SetMarkerSize(0.5);
             h_dataxsec_tot->SetMarkerStyle(20);
@@ -1847,9 +1844,9 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             _util.Draw_Data_POT(c, Data_POT, 0.52, 0.92, 0.52, 0.92);
 
             if (_util.zoom)
-                c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_data_mc_comparison_%s_no_ratio_zoom.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), error_type.at(err_lab).c_str() ));
+                c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_data_mc_comparison_%s_no_ratio_zoom.pdf", _util.run_period, _util.vars.at(var).c_str(), _util.run_period, _util.vars.at(var).c_str(), error_type.at(err_lab).c_str() ));
             else
-                c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_data_mc_comparison_%s_no_ratio.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), error_type.at(err_lab).c_str() ));
+                c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_data_mc_comparison_%s_no_ratio.pdf", _util.run_period, _util.vars.at(var).c_str(), _util.run_period, _util.vars.at(var).c_str(), error_type.at(err_lab).c_str() ));
             delete c;
             delete h_dataxsec;
             delete h_mcxsec;
@@ -1866,19 +1863,19 @@ void SystematicsHelper::InitialsePlotCV(){
 
     // Get the CV histograms. These should stay constant througout the code
 
-    cv_hist_vec.resize(vars.size());
+    cv_hist_vec.resize(_util.vars.size());
     
-    for (unsigned int var = 0; var < vars.size(); var++){
+    for (unsigned int var = 0; var < _util.vars.size(); var++){
         cv_hist_vec.at(var).resize(xsec_types.size());
     }
 
 
-    // Loop over the vars
-    for (unsigned int var = 0; var < vars.size(); var++){
+    // Loop over the _util.vars
+    for (unsigned int var = 0; var < _util.vars.size(); var++){
         
         // Loop over the typrs
         for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
-            _util.GetHist(f_nuexsec, cv_hist_vec.at(var).at(k), Form( "CV/%s/h_run%s_CV_0_%s_%s", vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
+            _util.GetHist(f_nuexsec, cv_hist_vec.at(var).at(k), Form( "CV/%s/h_run%s_CV_0_%s_%s", _util.vars.at(var).c_str(), _util.run_period, _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
             if (cv_hist_vec.at(var).at(k) == NULL) std::cout << "Failed to get the histogram!" << std::endl;
 
@@ -1891,26 +1888,26 @@ void SystematicsHelper::InitialsePlotCV(){
 
             // Set the Titles
             if (k == k_xsec_mcxsec)
-                cv_hist_vec.at(var).at(k)->SetTitle(var_labels_xsec.at(var).c_str());
+                cv_hist_vec.at(var).at(k)->SetTitle(_util.var_labels_xsec.at(var).c_str());
             else if (k == k_xsec_mcxsec_smear)
-                cv_hist_vec.at(var).at(k)->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
+                cv_hist_vec.at(var).at(k)->SetTitle(_util.var_labels_xsec.at(k_var_recoX).c_str());
             else if (k == k_xsec_dataxsec)
-                cv_hist_vec.at(var).at(k)->SetTitle(var_labels_events.at(var).c_str());
+                cv_hist_vec.at(var).at(k)->SetTitle(_util.var_labels_events.at(var).c_str());
             else if (k == k_xsec_eff)
-                cv_hist_vec.at(var).at(k)->SetTitle(var_labels_eff.at(var).c_str());
+                cv_hist_vec.at(var).at(k)->SetTitle(_util.var_labels_eff.at(var).c_str());
             else
-                cv_hist_vec.at(var).at(k)->SetTitle(var_labels_events.at(var).c_str());
+                cv_hist_vec.at(var).at(k)->SetTitle(_util.var_labels_events.at(var).c_str());
 
         }
 
         // Create the CV directory and draw the CV
-        _util.CreateDirectory("/Systematics/CV/" + vars.at(var) + "/");
+        _util.CreateDirectory("/Systematics/CV/" + _util.vars.at(var) + "/");
     }
     
     TCanvas *c_cv;
     
-    // Loop over the vars
-    for (unsigned int var = 0; var < vars.size(); var++){
+    // Loop over the _util.vars
+    for (unsigned int var = 0; var < _util.vars.size(); var++){
         
         // Loop over the types
         for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
@@ -1928,7 +1925,7 @@ void SystematicsHelper::InitialsePlotCV(){
             // Draw the run period on the plot
             _util.Draw_Run_Period(c_cv, 0.86, 0.92, 0.86, 0.92);
 
-            c_cv->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_%s.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
+            c_cv->Print(Form("plots/run%s/Systematics/CV/%s/run%s_CV_%s_%s.pdf", _util.run_period, _util.vars.at(var).c_str(), _util.run_period, _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
             delete c_cv;
             delete leg;
@@ -1940,7 +1937,7 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
 
     
     // Create the directory
-    _util.CreateDirectory("/Systematics/" + label + "/" + vars.at(var));
+    _util.CreateDirectory("/Systematics/" + label + "/" + _util.vars.at(var));
 
     std::vector<std::vector<TH1D*>> h_universe;
     
@@ -1957,7 +1954,7 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
 
     // Get the histograms and customise a bit
     for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
-        _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, label_up.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), _util.vars.at(var).c_str(), _util.run_period, label_up.c_str(), _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
         h_universe.at(k_up).at(k) = (TH1D*)htemp->Clone();
 
@@ -1973,7 +1970,7 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
         h_universe.at(k_up).at(k)->GetYaxis()->SetTitleFont(44);
         h_universe.at(k_up).at(k)->GetYaxis()->SetTitleOffset(1.5);
         
-        _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, label_dn.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+        _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), _util.vars.at(var).c_str(), _util.run_period, label_dn.c_str(), _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
         h_universe.at(k_dn).at(k) = (TH1D*)htemp->Clone();
 
@@ -2011,7 +2008,7 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
 
 
     // FIxed scaling for differential cross section
-    if (vars.at(var) != "integrated"){
+    if (_util.vars.at(var) != "integrated"){
         // h_universe.at(k_up).at(k_xsec_dataxsec)->GetYaxis()->SetRangeUser(0, 0.5e-39);
     }
 
@@ -2052,13 +2049,13 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
 
     // Set the Titles
     if (var == k_xsec_mcxsec)
-        h_err_up->SetTitle(var_labels_xsec.at(var).c_str());
+        h_err_up->SetTitle(_util.var_labels_xsec.at(var).c_str());
     else if (var == k_xsec_dataxsec)
-        h_err_up->SetTitle(var_labels_events.at(var).c_str());
+        h_err_up->SetTitle(_util.var_labels_events.at(var).c_str());
     else if (var == k_xsec_eff)
-        h_err_up->SetTitle(var_labels_eff.at(var).c_str());
+        h_err_up->SetTitle(_util.var_labels_eff.at(var).c_str());
     else
-        h_err_up->SetTitle(var_labels_events.at(var).c_str());
+        h_err_up->SetTitle(_util.var_labels_events.at(var).c_str());
 
     // h_err_up->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
     
@@ -2066,7 +2063,7 @@ void SystematicsHelper::CompareVariationXSec(std::string label, int var, std::st
     h_err_dn->Draw("hist,same");
     h_err->Draw("hist,same");
 
-    c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_data_mc_comparison.pdf", _util.run_period, label.c_str(), vars.at(var).c_str(), _util.run_period, label.c_str(), vars.at(var).c_str() ));
+    c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_data_mc_comparison.pdf", _util.run_period, label.c_str(), _util.vars.at(var).c_str(), _util.run_period, label.c_str(), _util.vars.at(var).c_str() ));
 
     // Clear memory
     for (unsigned int k = 0; k < cv_hist_vec.at(var).size(); k++){
@@ -2437,7 +2434,7 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
 void SystematicsHelper::FillStatVector(){
 
     // Loop over the differential variables
-    for (unsigned int var = 0; var < vars.size(); var++ ){
+    for (unsigned int var = 0; var < _util.vars.size(); var++ ){
         
         // Loop over the types
         for (unsigned int type = 0; type < xsec_types.size(); type++ ){
@@ -2456,7 +2453,7 @@ void SystematicsHelper::FillStatVector(){
     // Lets also fill the diagonals of the statistical covariance matrix
 
      // Loop over the differential variables
-    for (unsigned int var = 0; var < vars.size(); var++ ){
+    for (unsigned int var = 0; var < _util.vars.size(); var++ ){
         
         // Loop over the types
         for (unsigned int type = 0; type < xsec_types.size(); type++ ){
@@ -2557,7 +2554,7 @@ void SystematicsHelper::AddSmearCovMatrix(){
 void SystematicsHelper::FillPOTCountingVector(){
 
     // Loop over the differential variables
-    for (unsigned int var = 0; var < vars.size(); var++ ){
+    for (unsigned int var = 0; var < _util.vars.size(); var++ ){
         
         // Loop over the types
         for (unsigned int type = 0; type < xsec_types.size(); type++ ){
@@ -2578,11 +2575,11 @@ void SystematicsHelper::FillPOTCountingVector(){
 void SystematicsHelper::PrintUncertaintySummary(){
 
     // Loop over the variables
-    for (unsigned int var = 0; var < vars.size(); var++ ){
+    for (unsigned int var = 0; var < _util.vars.size(); var++ ){
         if (var == k_var_trueX) continue; // Skip the true var which doesnt make much sense
 
         std::cout <<"----------------------------------------------" << std::endl;
-        std::cout <<"Differential Variable: " << vars.at(var) <<"\n"<< std::endl;
+        std::cout <<"Differential Variable: " << _util.vars.at(var) <<"\n"<< std::endl;
         
         // Loop over the bins
         for (unsigned int bin = 0; bin < v_err.front().at(var).at(k_xsec_mcxsec).size(); bin++ ){
@@ -2651,14 +2648,14 @@ void SystematicsHelper::InitialiseUncertaintyVectors(){
 
     // Loop over the systematic error types
     for (unsigned int err = 0; err < v_err.size(); err++){
-        v_err.at(err).resize(vars.size());
+        v_err.at(err).resize(_util.vars.size());
     }
 
     // Loop over the systematic error types
     for (unsigned int err = 0; err < v_err.size(); err++){
 
-        // Loop over the vars
-        for (unsigned int var = 0; var < vars.size(); var++ ){
+        // Loop over the _util.vars
+        for (unsigned int var = 0; var < _util.vars.size(); var++ ){
             v_err.at(err).at(var).resize(xsec_types.size());
         }
     }
@@ -2666,8 +2663,8 @@ void SystematicsHelper::InitialiseUncertaintyVectors(){
     // Loop over the systematic error types
     for (unsigned int err = 0; err < v_err.size(); err++){
         
-        // Loop over the vars
-        for (unsigned int var = 0; var < vars.size(); var++ ){
+        // Loop over the _util.vars
+        for (unsigned int var = 0; var < _util.vars.size(); var++ ){
             
             // Loop over the types
             for (unsigned int type = 0; type < xsec_types.size(); type++ ){
@@ -2822,13 +2819,13 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
     // Get all the universes so we can draw them on
     std::vector<std::vector<std::vector<std::vector<TH1D*>>>> h_universe; // var -- label -- Up/Dn -- Type
     
-    h_universe.resize(vars.size());
+    h_universe.resize(_util.vars.size());
     
     for (unsigned int var = 0; var < h_universe.size(); var++){
         h_universe.at(var).resize(unisim_names.size());
     }
     
-    // Loop over the vars
+    // Loop over the _util.vars
     for (unsigned int var = 0; var < h_universe.size(); var++){
         
         // Loop over and resize
@@ -2883,13 +2880,13 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                 
                 // Beamline have CV in the name because of the way the cross section helper works
                 if (!is_detvar){
-                    _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, label_up.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+                    _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_up.c_str(), _util.vars.at(var).c_str(), _util.run_period, label_up.c_str(), _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
                     
                     if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
                         htemp->Scale(1.0, "width");
                 }
                 else {
-                    _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label_up.c_str(), vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
+                    _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label_up.c_str(), _util.vars.at(var).c_str(), _util.run_period, _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
                     if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
                         htemp->Scale(1.0, "width");
@@ -2901,7 +2898,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                     if (xsec_types.at(k) != "ext" && xsec_types.at(k) != "dirt" && xsec_types.at(k) != "data") htemp->Scale(scale_fact);
                 }
 
-                h_universe.at(var).at(label).at(k_up).at(k) = (TH1D*) htemp->Clone(Form("h_clone_%s_%s_up", vars.at(var).c_str(), labels_up_v.at(label).c_str()));
+                h_universe.at(var).at(label).at(k_up).at(k) = (TH1D*) htemp->Clone(Form("h_clone_%s_%s_up", _util.vars.at(var).c_str(), labels_up_v.at(label).c_str()));
 
                 // Customise
                 h_universe.at(var).at(label).at(k_up).at(k)->SetLineWidth(2);
@@ -2910,13 +2907,13 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                 
                 // Beamline have CV in the name because of the way the cross section helper works
                 if (!is_detvar){
-                    _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, label_dn.c_str(), vars.at(var).c_str(), xsec_types.at(k).c_str()));
+                    _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_%s_0_%s_%s", label_dn.c_str(), _util.vars.at(var).c_str(), _util.run_period, label_dn.c_str(), _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
                     if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
                         htemp->Scale(1.0, "width");
                 }
                 else {
-                    _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label_dn.c_str(), vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(k).c_str()));
+                    _util.GetHist(f_nuexsec, htemp, Form( "%s/%s/h_run%s_CV_0_%s_%s", label_dn.c_str(), _util.vars.at(var).c_str(), _util.run_period, _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
 
                     if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && k != k_xsec_eff ))
                         htemp->Scale(1.0, "width");
@@ -2928,7 +2925,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                     if (xsec_types.at(k) != "ext" && xsec_types.at(k) != "dirt" && xsec_types.at(k) != "data") htemp->Scale(scale_fact);
                 }
 
-                h_universe.at(var).at(label).at(k_dn).at(k) = (TH1D*) htemp->Clone(Form("h_clone_%s_%s_up", vars.at(var).c_str(), labels_dn_v.at(label).c_str()));
+                h_universe.at(var).at(label).at(k_dn).at(k) = (TH1D*) htemp->Clone(Form("h_clone_%s_%s_up", _util.vars.at(var).c_str(), labels_dn_v.at(label).c_str()));
 
                 // Customise
                 h_universe.at(var).at(label).at(k_dn).at(k)->SetLineWidth(2);
@@ -2946,7 +2943,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
         // Loop over the types
         for (unsigned int  type = 0; type < cv_hist_vec.at(var).size(); type++ ){
 
-            if (vars.at(var) == "true_el_E" && (type != k_xsec_eff && type != k_xsec_mcxsec_smear)) continue; // Skip the true var which doesnt make much sense
+            if (_util.vars.at(var) == "true_el_E" && (type != k_xsec_eff && type != k_xsec_mcxsec_smear)) continue; // Skip the true var which doesnt make much sense
 
             // Get the CV histogram
             TH1D* h_CV_clone;
@@ -2957,7 +2954,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             }
             // For the beamline variations, we have a different CV
             else {
-                _util.GetHist(f_nuexsec, h_CV_clone, Form( "detvar_CV/%s/h_run%s_CV_0_%s_%s", vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(type).c_str()));
+                _util.GetHist(f_nuexsec, h_CV_clone, Form( "detvar_CV/%s/h_run%s_CV_0_%s_%s", _util.vars.at(var).c_str(), _util.run_period, _util.vars.at(var).c_str(), xsec_types.at(type).c_str()));
                 
                 if (scale_bins && ((var == k_var_recoX || var == k_var_trueX) && type != k_xsec_eff ))
                         h_CV_clone->Scale(1.0, "width");
@@ -2984,13 +2981,13 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             
             // Set the Titles
             if (type == k_xsec_mcxsec || type == k_xsec_dataxsec)
-                h_CV_clone->SetTitle(var_labels_xsec.at(var).c_str());
+                h_CV_clone->SetTitle(_util.var_labels_xsec.at(var).c_str());
             else if (type == k_xsec_mcxsec_smear)
-                h_CV_clone->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
+                h_CV_clone->SetTitle(_util.var_labels_xsec.at(k_var_recoX).c_str());
             else if (type == k_xsec_eff)
-                h_CV_clone->SetTitle(var_labels_eff.at(var).c_str());
+                h_CV_clone->SetTitle(_util.var_labels_eff.at(var).c_str());
             else
-                h_CV_clone->SetTitle(var_labels_events.at(var).c_str());
+                h_CV_clone->SetTitle(_util.var_labels_events.at(var).c_str());
 
 
 
@@ -3006,7 +3003,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
 
             TLegend *leg;
             
-            if (type != k_xsec_eff && vars.at(var) != "integrated") leg = new TLegend(0.35, 0.55, 0.85, 0.85);
+            if (type != k_xsec_eff && _util.vars.at(var) != "integrated") leg = new TLegend(0.35, 0.55, 0.85, 0.85);
             else {
                 
                 if (is_detvar)
@@ -3085,16 +3082,15 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             h_err->GetYaxis()->SetTitleOffset(1.5);
 
              // Set the Titles
-            if (var == k_xsec_mcxsec || var == k_xsec_dataxsec)
-                h_err->SetTitle(var_labels_xsec.at(var).c_str());
-            else if (var == k_xsec_mcxsec_smear)
-                h_err->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
-            else if (var == k_xsec_eff)
-                h_err->SetTitle(var_labels_eff.at(var).c_str());
+            if (type == k_xsec_mcxsec || type == k_xsec_dataxsec)
+                h_err->SetTitle(_util.var_labels_xsec.at(var).c_str());
+            else if (type == k_xsec_mcxsec_smear)
+                h_err->SetTitle(_util.var_labels_xsec.at(k_var_recoX).c_str());
+            else if (type == k_xsec_eff)
+                h_err->SetTitle(_util.var_labels_eff.at(var).c_str());
             else
-                h_err->SetTitle(var_labels_events.at(var).c_str());
-                
-            // h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
+                h_err->SetTitle(_util.var_labels_events.at(var).c_str());
+
             h_err->SetMarkerColor(kBlack);
             h_err->SetLineStyle(1);
             h_err->SetLineColor(kBlack);
@@ -3115,7 +3111,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                 (var == k_var_trueX && (type == k_xsec_eff || type == k_xsec_mcxsec_smear)) ||
                 (var == k_var_integrated && (type == k_xsec_mcxsec || type == k_xsec_dataxsec || type == k_xsec_bkg || type == k_xsec_sig || type == k_xsec_eff)) 
                 ){
-                c->Print(Form("plots/run%s/Systematics/%s/run%s_%s_%s_%s.pdf", _util.run_period, unisim_type.c_str(), _util.run_period, unisim_type.c_str(), vars.at(var).c_str(), xsec_types.at(type).c_str()));
+                c->Print(Form("plots/run%s/Systematics/%s/run%s_%s_%s_%s.pdf", _util.run_period, unisim_type.c_str(), _util.run_period, unisim_type.c_str(), _util.vars.at(var).c_str(), xsec_types.at(type).c_str()));
             }
 
             delete c;
@@ -3463,7 +3459,7 @@ void SystematicsHelper::MakeTotUncertaintyPlot(bool AddStatErr){
     h_uncertainty.resize(k_ERR_MAX);
 
     // Loop over the variables, int, reco, true.
-    for (unsigned int var = 0; var < vars.size(); var++ ){
+    for (unsigned int var = 0; var < _util.vars.size(); var++ ){
         
         // Loop over the types
         for (unsigned int type = 0; type < xsec_types.size(); type++){
@@ -3598,10 +3594,10 @@ void SystematicsHelper::MakeTotUncertaintyPlot(bool AddStatErr){
                 leg->Draw();
 
                 if (AddStatErr && (type == k_xsec_dataxsec || type == k_xsec_mcxsec)){
-                    c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_%s_%s_tot_uncertainty.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(type).c_str()));
+                    c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_%s_%s_tot_uncertainty.pdf", _util.run_period, _util.vars.at(var).c_str(), _util.run_period, _util.vars.at(var).c_str(), xsec_types.at(type).c_str()));
                 }
                 else {
-                    c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_%s_%s_tot_sys_uncertainty.pdf", _util.run_period, vars.at(var).c_str(), _util.run_period, vars.at(var).c_str(), xsec_types.at(type).c_str()));
+                    c->Print(Form("plots/run%s/Systematics/CV/%s/run%s_%s_%s_tot_sys_uncertainty.pdf", _util.run_period, _util.vars.at(var).c_str(), _util.run_period, _util.vars.at(var).c_str(), xsec_types.at(type).c_str()));
                 }
 
                 h_uncertainty.clear();
@@ -3622,14 +3618,14 @@ void SystematicsHelper::InitialseCovarianceVector(){
     int n_bins = cv_hist_vec.at(k_var_recoX).at(0)->GetNbinsX();
     
     // Resize to the number of variables
-    h_cov_v.resize(vars.size());
+    h_cov_v.resize(_util.vars.size());
 
-    // Loop over vars and resize to the number of types
+    // Loop over _util.vars and resize to the number of types
     for (unsigned int var = 0; var < h_cov_v.size(); var++) {
         h_cov_v.at(var).resize(xsec_types.size());
     }
     
-    // Loop over vars
+    // Loop over _util.vars
     for (unsigned int var = 0; var < h_cov_v.size(); var++) {
         
         // Loop over the types
@@ -3646,10 +3642,10 @@ void SystematicsHelper::InitialseCovarianceVector(){
             for (unsigned int cov = 0; cov < h_cov_v.at(var).at(type).size(); cov++){
                 
                 if (var == k_var_integrated){
-                    h_cov_v.at(var).at(type).at(cov) = new TH2D(Form("h_cov_%s_%s_%s", vars.at(var).c_str(), xsec_types.at(type).c_str(), systematic_names.at(cov).c_str()), "Covariance Matrix ;Bin i; Bin j", 1, 1, 2, 1, 1, 2);
+                    h_cov_v.at(var).at(type).at(cov) = new TH2D(Form("h_cov_%s_%s_%s", _util.vars.at(var).c_str(), xsec_types.at(type).c_str(), systematic_names.at(cov).c_str()), "Covariance Matrix ;Bin i; Bin j", 1, 1, 2, 1, 1, 2);
                 }
                 else { 
-                    h_cov_v.at(var).at(type).at(cov) = new TH2D(Form("h_cov_%s_%s_%s", vars.at(var).c_str(), xsec_types.at(type).c_str(), systematic_names.at(cov).c_str()), "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
+                    h_cov_v.at(var).at(type).at(cov) = new TH2D(Form("h_cov_%s_%s_%s", _util.vars.at(var).c_str(), xsec_types.at(type).c_str(), systematic_names.at(cov).c_str()), "Covariance Matrix ;Bin i; Bin j", n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
                 }
                 
             }
@@ -3672,12 +3668,12 @@ void SystematicsHelper::ExportResult(TFile* f){
     
     // MCC8 so get the smearing matrix
     if (std::string(_util.xsec_smear_mode) == "mcc8"){
-        h_response = (TH2D*)f->Get(Form("CV/%s/h_run%s_CV_0_smearing",vars.at(k_var_recoX).c_str(),_util.run_period));
+        h_response = (TH2D*)f->Get(Form("CV/%s/h_run%s_CV_0_smearing",_util.vars.at(k_var_recoX).c_str(),_util.run_period));
     }
     // Other modes we need the response matrix
     else {
-        h_response = (TH2D*)f->Get(Form("CV/%s/h_run%s_CV_0_smearing",vars.at(k_var_trueX).c_str(),_util.run_period));
-        h_mcxsec_fine = (TH1D*)f->Get(Form("CV/%s/h_run%s_CV_0_%s_mc_xsec_fine",vars.at(k_var_trueX).c_str(),_util.run_period, vars.at(k_var_trueX).c_str()));
+        h_response = (TH2D*)f->Get(Form("CV/%s/h_run%s_CV_0_smearing",_util.vars.at(k_var_trueX).c_str(),_util.run_period));
+        h_mcxsec_fine = (TH1D*)f->Get(Form("CV/%s/h_run%s_CV_0_%s_mc_xsec_fine",_util.vars.at(k_var_trueX).c_str(),_util.run_period, _util.vars.at(k_var_trueX).c_str()));
         _var = k_var_trueX;
     }
 
@@ -3870,7 +3866,7 @@ void SystematicsHelper::ExportResult(TFile* f){
     // Data XSec Reco (Stat Only)  ---------------------------------
     cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->SetOption("E1,X0");
     cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->SetLineColor(kRed+2);
-    cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
+    cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->SetTitle(_util.var_labels_xsec.at(k_var_recoX).c_str());
     cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->Write("h_data_xsec_stat_reco", TObject::kOverwrite);
 
     // Data XSec Reco (Sys Only)  ---------------------------------
@@ -3927,7 +3923,7 @@ void SystematicsHelper::ExportTotalCrossSectionResult(){
     // Data XSec Reco (Stat Only)  ---------------------------------
     cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->SetOption("E1,X0");
     cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->SetLineColor(kBlack);
-    cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->SetTitle(var_labels_xsec.at(k_var_integrated).c_str());
+    cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->SetTitle(_util.var_labels_xsec.at(k_var_integrated).c_str());
     // Data XSec Reco (Sys Only)  ---------------------------------
     for (int bin = 0; bin < cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->GetNbinsX(); bin++){
         cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec)->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_stat).at(k_var_integrated).at(k_xsec_mcxsec).at(bin)) * cv_hist_vec.at(k_var_integrated).at(k_xsec_dataxsec)->GetBinContent(bin+1));

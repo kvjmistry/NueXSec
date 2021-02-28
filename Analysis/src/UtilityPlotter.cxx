@@ -20,6 +20,7 @@ void UtilityPlotter::Initialise(Utility _utility){
         // Compare the efficiency for the det var CV and intrinsic nue det var CV
         // leave this commented out, needs speccific files for this to run 
         // CompareDetVarEfficiency();
+        
         // Save the Response Matrix
         SaveResponseMatrix();
 
@@ -55,8 +56,6 @@ void UtilityPlotter::Initialise(Utility _utility){
     }
     // This will call the code to optimise the bin widths
     else if (std::string(_util.uplotmode) == "models"){ 
-        // Set the names of the histograms
-        _util.SetAxesNames(var_labels_xsec, var_labels_events, var_labels_eff, smear_hist_name, vars, xsec_scale);
 
         _util.CreateDirectory("Models/" + std::string(_util.xsec_var));
         _util.CreateDirectory("Models/Total");
@@ -1728,12 +1727,12 @@ void UtilityPlotter::TestModelDependence(){
     for (unsigned int m = 0; m < models.size(); m++){
         
         // Response Matrix
-        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
+        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
         if (h_temp_2D == NULL) std::cout <<"Help!" << m << std::endl;
         h_response_model.at(m) = (TH2D*)h_temp_2D->Clone();
 
         // MC xsec in True
-        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));
         h_mcxsec_true_model.at(m) = (TH1D*)h_temp->Clone();
         h_mcxsec_reco_model.at(m) = (TH1D*)h_dataxsec->Clone();
        
@@ -1870,7 +1869,7 @@ void UtilityPlotter::CompareSmearing(){
     std::vector<TH1D*> h_mcxsec_reco_model(models.size());
     
     // MC Xsec True
-    h_temp  = (TH1D*)fxsec->Get(Form("CV/%s/h_run1_CV_0_%s_mc_xsec",vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
+    h_temp  = (TH1D*)fxsec->Get(Form("CV/%s/h_run1_CV_0_%s_mc_xsec",_util.vars.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));
     TH1D* h_mcxsec_true         = (TH1D*)h_temp->Clone();
     
     // Loop over each model
@@ -1880,7 +1879,7 @@ void UtilityPlotter::CompareSmearing(){
         h_mcxsec_reco_model.at(m) = (TH1D*)h_mcxsec_reco->Clone();
 
         // Get the response matrix
-        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
+        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
         h_response_model.at(m) = (TH2D*)h_temp_2D->Clone();
 
         // Apply the response matrix to the CV MC True dist
@@ -2015,7 +2014,7 @@ void UtilityPlotter::CompareUnfoldedModels(){
     // Loop over each model
     for (unsigned int m = 0; m < models.size(); m++){
         // MC Xsec True
-        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));
         h_mcxsec_true_model.at(m)         = (TH1D*)h_temp->Clone();
         h_mcxsec_true_model_smear.at(m)   = (TH1D*)h_temp->Clone();
 
@@ -2174,22 +2173,22 @@ void UtilityPlotter::CompareFakeDataReco(){
     double ymax = 1.0;
 
     // Get the cv hist 
-    htemp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", "CV", vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+    htemp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", "CV", _util.vars.at(k_var_recoX).c_str(), _util.vars.at(k_var_recoX).c_str()));
     TH1D *h_temp_CV = (TH1D*)htemp->Clone();
     h_temp_CV->Scale(1.0, "width");
     
     // Loop over each model
     for (unsigned int m = 0; m < models.size(); m++){
 
-        htemp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec",models.at(m).c_str(), vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
+        htemp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec",models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));
         h_true.at(m)        = (TH1D*)htemp->Clone();
         h_true_smear.at(m)  = (TH1D*)htemp->Clone();
 
-        htemp  = (TH1D*)fxsec->Get(Form("fake%s/%s/h_run1_CV_0_%s_data_xsec",models.at(m).c_str(), vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+        htemp  = (TH1D*)fxsec->Get(Form("fake%s/%s/h_run1_CV_0_%s_data_xsec",models.at(m).c_str(), _util.vars.at(k_var_recoX).c_str(), _util.vars.at(k_var_recoX).c_str()));
         h_fake.at(m)        = (TH1D*)htemp->Clone();
 
         // Get the response matrix
-        htemp2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
+        htemp2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
         h_response.at(m) = (TH2D*)htemp2D->Clone();
 
         // Get the Covariance matrix
@@ -2329,7 +2328,7 @@ void UtilityPlotter::CompareFakeDataTrue(){
     fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
 
     // Load in the CV data cross section
-    h_temp  = (TH1D*)fxsec->Get(Form("CV/%s/h_run%s_CV_0_%s_data_xsec",vars.at(k_var_recoX).c_str(), _util.run_period, vars.at(k_var_recoX).c_str()));
+    h_temp  = (TH1D*)fxsec->Get(Form("CV/%s/h_run%s_CV_0_%s_data_xsec",_util.vars.at(k_var_recoX).c_str(), _util.run_period, _util.vars.at(k_var_recoX).c_str()));
     TH1D* h_reco_data_xsec = (TH1D*)h_temp->Clone();
 
     std::vector<TH1D*> h_true(k_MODEL_MAX);
@@ -2340,11 +2339,11 @@ void UtilityPlotter::CompareFakeDataTrue(){
     for (unsigned int m = 0; m < models.size(); m++){
 
         // Get true model xsec
-        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run%s_CV_0_%s_mc_xsec", models.at(m).c_str(),vars.at(k_var_trueX).c_str(), _util.run_period, vars.at(k_var_trueX).c_str()));
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run%s_CV_0_%s_mc_xsec", models.at(m).c_str(),_util.vars.at(k_var_trueX).c_str(), _util.run_period, _util.vars.at(k_var_trueX).c_str()));
         h_true.at(m) = (TH1D*)h_temp->Clone();
 
         // Get fake Tune1 data
-        h_temp  = (TH1D*)fxsec->Get(Form("fake%s/%s/h_run%s_CV_0_%s_data_xsec", models.at(m).c_str(), vars.at(k_var_recoX).c_str(), _util.run_period, vars.at(k_var_recoX).c_str()));
+        h_temp  = (TH1D*)fxsec->Get(Form("fake%s/%s/h_run%s_CV_0_%s_data_xsec", models.at(m).c_str(), _util.vars.at(k_var_recoX).c_str(), _util.run_period, _util.vars.at(k_var_recoX).c_str()));
         h_fake.at(m) = (TH1D*)h_temp->Clone();
 
 
@@ -2744,7 +2743,7 @@ void UtilityPlotter::CompareDataCrossSections(){
     for (unsigned int m = 0; m < models.size(); m++){
     
         // Data X Sec MEC
-        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_data_xsec", models.at(m).c_str(), vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_data_xsec", models.at(m).c_str(), _util.vars.at(k_var_recoX).c_str(), _util.vars.at(k_var_recoX).c_str()));
         h_dataxsec_model.at(m) = (TH1D*)h_temp->Clone();
         h_dataxsec_model.at(m)->Scale(1.0, "width");
         h_dataxsec_model.at(m)->SetLineWidth(2);
@@ -2953,15 +2952,15 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
     for (unsigned int m = 0; m < models.size(); m++){
 
         // Get true model xsec
-        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run%s_CV_0_%s_mc_xsec", models.at(m).c_str(),vars.at(k_var_trueX).c_str(), _util.run_period, vars.at(k_var_trueX).c_str()));
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run%s_CV_0_%s_mc_xsec", models.at(m).c_str(),_util.vars.at(k_var_trueX).c_str(), _util.run_period, _util.vars.at(k_var_trueX).c_str()));
         h_true_model.at(m) = (TH1D*)h_temp->Clone();
 
         // Get data cross section extracted for model 
-        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run%s_CV_0_%s_data_xsec", models.at(m).c_str(), vars.at(k_var_recoX).c_str(), _util.run_period, vars.at(k_var_recoX).c_str()));
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run%s_CV_0_%s_data_xsec", models.at(m).c_str(), _util.vars.at(k_var_recoX).c_str(), _util.run_period, _util.vars.at(k_var_recoX).c_str()));
         h_data_model.at(m) = (TH1D*)h_temp->Clone();
 
         // Get the response matrix for model
-        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run%s_%s_0_smearing", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), _util.run_period, models.at(m).c_str()));
+        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run%s_%s_0_smearing", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), _util.run_period, models.at(m).c_str()));
         h_response_model.at(m) = (TH2D*)h_temp_2D->Clone();
 
         // Clone covariance matrix
@@ -3097,7 +3096,7 @@ void UtilityPlotter::SaveResponseMatrix(){
     for (unsigned int m = 0; m < variables.size(); m++){
         
         // Get the response matrix
-        h_response_index.at(m) = new TH2D("h_response", ";True Bin; Reco Bin", h_response.at(m)->GetNbinsX(), 0, h_response.at(m)->GetNbinsX(), h_response.at(m)->GetNbinsY(), 0, h_response.at(m)->GetNbinsY());
+        h_response_index.at(m) = new TH2D("h_response", ";Bin i;Bin j", h_response.at(m)->GetNbinsX(), 0, h_response.at(m)->GetNbinsX(), h_response.at(m)->GetNbinsY(), 0, h_response.at(m)->GetNbinsY());
     
         // Set the bin values
         for (int x = 1; x < h_response.at(m)->GetNbinsY()+1; x++){
@@ -3172,12 +3171,12 @@ void UtilityPlotter::CheckPi0Coverage(){
     fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
 
     // MC R CV
-    h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", "CV", vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+    h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", "CV", _util.vars.at(k_var_recoX).c_str(), _util.vars.at(k_var_recoX).c_str()));
     TH1D* h_CV = (TH1D*)h_temp->Clone();
     h_CV->Scale(1.0, "width");
 
     // MC R CV
-    h_temp  = (TH1D*)fxsec->Get(Form("nopi0tune/%s/h_run1_CV_0_%s_mc_xsec", vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+    h_temp  = (TH1D*)fxsec->Get(Form("nopi0tune/%s/h_run1_CV_0_%s_mc_xsec", _util.vars.at(k_var_recoX).c_str(), _util.vars.at(k_var_recoX).c_str()));
     TH1D* h_nopi0 = (TH1D*)h_temp->Clone();
     h_nopi0->Scale(1.0, "width");
 
@@ -3212,7 +3211,7 @@ void UtilityPlotter::CheckPi0Coverage(){
     leg->AddEntry(h_nopi0, "MC no #pi^{0} Tune", "l");
     leg->Draw();
 
-    c->Print(Form("plots/run%s/Systematics/pi0/%s/run%s_pi0tune_sys_coverage_%s.pdf", _util.run_period, vars.at(k_var_recoX).c_str(), _util.run_period, vars.at(k_var_recoX).c_str()));
+    c->Print(Form("plots/run%s/Systematics/pi0/%s/run%s_pi0tune_sys_coverage_%s.pdf", _util.run_period, _util.vars.at(k_var_recoX).c_str(), _util.run_period, _util.vars.at(k_var_recoX).c_str()));
     delete c;
 
 
