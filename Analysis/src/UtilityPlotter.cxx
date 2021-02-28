@@ -59,17 +59,18 @@ void UtilityPlotter::Initialise(Utility _utility){
 
         _util.CreateDirectory("Models/" + std::string(_util.xsec_var));
         _util.CreateDirectory("Models/Total");
-        TestModelDependence();
-        CompareDataCrossSections();
-        CompareSmearing();
-        CompareUnfoldedModels();
-        CompareFakeDataReco();
-        CompareFakeDataTrue();
-        CompareTotalCrossSec();
-        CompareFakeTotalCrossSec();
-        CompareTotalDataCrossSections();
-        CompareUnfoldedDataCrossSections();
-        CheckPi0Coverage();
+        // TestModelDependence();
+        // CompareDataCrossSections();
+        // CompareSmearing();
+        // CompareUnfoldedModels();
+        // CompareFakeDataReco();
+        // CompareFakeDataTrue();
+        // CompareTotalCrossSec();
+        // CompareFakeTotalCrossSec();
+        // CompareTotalDataCrossSections();
+        // CompareUnfoldedDataCrossSections();
+        // CheckPi0Coverage();
+        CompareMCC8Result();
         return;
     }
     else {
@@ -915,37 +916,11 @@ void UtilityPlotter::PlotTrueVar(){
     TTree * mc_tree;      // MC   Tree
 
     // Get the TTree
-    _util.GetFile(f_mc, "../ntuples/neutrinoselection_filt_run1_overlay_weight.root"); // Get the run 1 MC file
+    _util.GetFile(f_mc, "../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root"); // Get the run 1 MC file
     _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
 
-    // These are the variables we need
-    float true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z;
-    float nu_purity_from_pfp;
-    int npi0;
-    int ccnc;
-    int   nu_pdg;
-    float nu_e;
-    float elec_e;
-    float pi0_e;
-    float weightSplineTimesTune;
-    float ppfx_cv;    // Weight from PPFX CV
-    int   n_showers;
-    int   nslice;
-
-    mc_tree->SetBranchAddress("true_nu_vtx_sce_x", &true_nu_vtx_sce_x);
-    mc_tree->SetBranchAddress("true_nu_vtx_sce_y", &true_nu_vtx_sce_y);
-    mc_tree->SetBranchAddress("true_nu_vtx_sce_z", &true_nu_vtx_sce_z);
-    mc_tree->SetBranchAddress("nu_purity_from_pfp", &nu_purity_from_pfp);
-    mc_tree->SetBranchAddress("npi0", &npi0);
-    mc_tree->SetBranchAddress("ccnc",   &ccnc);
-    mc_tree->SetBranchAddress("nu_pdg", &nu_pdg);
-    mc_tree->SetBranchAddress("nu_e", &nu_e);
-    mc_tree->SetBranchAddress("elec_e", &elec_e);
-    mc_tree->SetBranchAddress("pi0_e", &pi0_e);
-    mc_tree->SetBranchAddress("weightSplineTimesTune",      &weightSplineTimesTune);
-    mc_tree->SetBranchAddress("ppfx_cv",                    &ppfx_cv);
-    mc_tree->SetBranchAddress("n_showers", &n_showers);
-    mc_tree->SetBranchAddress("nslice", &nslice);
+    SliceContainer SC;
+    SC.Initialise(mc_tree, _util.k_mc, _util);
 
     std::vector<std::string> vars = {"nu_e", "elec_e"};
 
@@ -956,10 +931,10 @@ void UtilityPlotter::PlotTrueVar(){
     TH1D *h_pi0_momentum = new TH1D("h_true_pi0_momentum", "; #pi^{0} Momentum [GeV/c]; Entries", 40, 0, 2.0);
     
     // 2D shower multiplicity vd nue/electron energy
-    TH2D *h_shr_multi_nue_E         = new TH2D("h_shr_multi_nue_E", "; Shower Multiplicty;#nu_{e} Energy [GeV] ", 6, 0, 6, 15, 0, 4.0);
-    TH2D *h_shr_multi_elec_e        = new TH2D("h_shr_multi_elec_e", "; Shower Multiplicty;Electron Energy [GeV] ", 6, 0, 6, 15, 0, 4.0);
-    TH2D *h_shr_multi_nuebar_E      = new TH2D("h_shr_multi_nuebar_E", "; Shower Multiplicty;#bar{#nu}_{e} Energy [GeV] ", 6, 0, 6, 15, 0, 4.0);
-    TH2D *h_shr_multi_elec_e_nuebar = new TH2D("h_shr_multi_elec_e_nuebar", "; Shower Multiplicty;Positron Energy [GeV] ", 6, 0, 6, 15, 0, 4.0);
+    TH2D *h_shr_multi_nue_E         = new TH2D("h_shr_multi_nue_E", "; Shower Multiplicty;#nu_{e} Energy [GeV] ", 6, 0, 6, 10, 0, 4.0);
+    TH2D *h_shr_multi_elec_e        = new TH2D("h_shr_multi_elec_e", "; Shower Multiplicty;Electron Energy [GeV] ", 6, 0, 6, 10, 0, 4.0);
+    TH2D *h_shr_multi_nuebar_E      = new TH2D("h_shr_multi_nuebar_E", "; Shower Multiplicty;#bar{#nu}_{e} Energy [GeV] ", 6, 0, 6, 10, 0, 4.0);
+    TH2D *h_shr_multi_elec_e_nuebar = new TH2D("h_shr_multi_elec_e_nuebar", "; Shower Multiplicty;Positron Energy [GeV] ", 6, 0, 6, 10, 0, 4.0);
     
     // Resize hit purity 
     h_hit_pur.resize(vars.size());
@@ -991,49 +966,48 @@ void UtilityPlotter::PlotTrueVar(){
         // Get the entry in the tree
         mc_tree->GetEntry(ievent); 
 
-        double weight = 1.0;
+        // Classify the event -- sets variable in the slice contianer
+        SC.SliceClassifier(_util.k_mc);      // Classification of the event
 
-        // Get the tune weight
-        if (_util.weight_tune) weight = weightSplineTimesTune;
+        // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
+        SC.SetThresholdEvent();
         
-        // Catch infinate/nan/unreasonably large tune weights
-        _util.CheckWeight(weight);
+        SC.SliceInteractionType(_util.k_mc); // Genie interaction type
+        SC.ParticleClassifier(_util.k_mc);   // The truth matched particle type of the leading shower
+        SC.Pi0Classifier(_util.k_mc); 
 
-        // Get the PPFX CV flux correction weight
-        double weight_flux = 1.0;
-        if (_util.weight_ppfx) weight_flux = ppfx_cv;
+        // Set derived variables in the slice container
+        SC.SetSignal();                // Set the event as either signal or other
+        SC.SetFakeData();              // Set the classifcation as data if fake data mode
+        SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
+        SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
+        SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
 
-        _util.CheckWeight(weight_flux);
+        bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
 
-        if (_util.weight_ppfx) weight = weight * weight_flux;
-
-        // Get the classification
-        std::pair<std::string, int> classification = Classify(true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z, nu_pdg, ccnc, nu_purity_from_pfp, npi0);      // Classification of the event
+        double weight = _util.GetCVWeight(_util.k_mc, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction);
         
         // True nue energy
-        h_hit_pur.at(0).at(classification.second)->Fill(nu_e, nu_purity_from_pfp, weight);
+        h_hit_pur.at(0).at(SC.classification.second)->Fill(SC.nu_e, SC.nu_purity_from_pfp, weight);
         
         // True electron energy
-        h_hit_pur.at(1).at(classification.second)->Fill(elec_e, nu_purity_from_pfp, weight);
+        h_hit_pur.at(1).at(SC.classification.second)->Fill(SC.elec_e, SC.nu_purity_from_pfp, weight);
 
         // Pi0 Momentum
-        bool is_in_fv = _util.in_fv(true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z);
-        if (is_in_fv) h_pi0_momentum->Fill(std::sqrt(pi0_e*pi0_e - 0.134*0.134), weight);
+        if (is_in_fv) 
+            h_pi0_momentum->Fill(std::sqrt(SC.pi0_e*SC.pi0_e - 0.134*0.134), weight);
 
         // Nue cc
-        if (nslice == 1 && nu_pdg == 12 && is_in_fv && nu_purity_from_pfp > 0.5 && ccnc == _util.k_CC){
+        if (SC.nslice == 1 && SC.nu_pdg == 12 && is_in_fv && SC.nu_purity_from_pfp > 0.5 && SC.ccnc == _util.k_CC){
 
-            h_shr_multi_nue_E->Fill(n_showers, nu_e, weight);
-            h_shr_multi_elec_e->Fill(n_showers, elec_e, weight);
+            h_shr_multi_nue_E->Fill(SC.n_showers, SC.nu_e, weight);
+            h_shr_multi_elec_e->Fill(SC.n_showers, SC.elec_e, weight);
         }
         // nuebar cc
-        if (nslice == 1 && nu_pdg == -12 && is_in_fv && nu_purity_from_pfp > 0.5 && ccnc == _util.k_CC){
-            h_shr_multi_nuebar_E->Fill(n_showers, nu_e, weight);
-            h_shr_multi_elec_e_nuebar->Fill(n_showers, elec_e, weight);
+        if (SC.nslice == 1 && SC.nu_pdg == -12 && is_in_fv && SC.nu_purity_from_pfp > 0.5 && SC.ccnc == _util.k_CC){
+            h_shr_multi_nuebar_E->Fill(SC.n_showers, SC.nu_e, weight);
+            h_shr_multi_elec_e_nuebar->Fill(SC.n_showers, SC.elec_e, weight);
         }
-
-        
-
     }
 
     // Create the resolutions directory for saving the plots to
@@ -1086,6 +1060,10 @@ void UtilityPlotter::PlotTrueVar(){
     ColumnNorm(h_shr_multi_nuebar_E);
     ColumnNorm(h_shr_multi_elec_e_nuebar);
 
+    // h_shr_multi_nue_E->GetZaxis()->SetRangeUser(0, 0.35);
+    // h_shr_multi_nuebar_E->GetZaxis()->SetRangeUser(0, 0.35);
+    // h_shr_multi_elec_e_nuebar->GetZaxis()->SetRangeUser(0, 0.65);
+    // h_shr_multi_elec_e->GetZaxis()->SetRangeUser(0, 0.65);
 
     h_shr_multi_nue_E->GetXaxis()->CenterLabels();
     h_shr_multi_elec_e->GetXaxis()->CenterLabels();
@@ -1099,67 +1077,6 @@ void UtilityPlotter::PlotTrueVar(){
     Save2DHists(Form("plots/run%s/Truth/h_shower_multiplicity_vs_nuebar_E.pdf", _util.run_period), h_shr_multi_nuebar_E);
     Save2DHists(Form("plots/run%s/Truth/h_shower_multiplicity_vs_elec_E_nuebar.pdf", _util.run_period), h_shr_multi_elec_e_nuebar);
     
-
-}
-// -----------------------------------------------------------------------------
-std::pair<std::string, int> UtilityPlotter::Classify(float true_nu_vtx_sce_x, float true_nu_vtx_sce_y, float true_nu_vtx_sce_z, int nu_pdg, int ccnc, float nu_purity_from_pfp, int npi0){
-   
-    bool is_in_fv = _util.in_fv(true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z);
-
-    // Out of Fiducial Volume Event
-    if (!is_in_fv) {
-        // std::cout << "Purity of out of FV event: "<< nu_purity_from_pfp << std::endl;
-        if (nu_purity_from_pfp < 0.0) return std::make_pair("unmatched",_util.k_unmatched);
-        else return std::make_pair("nu_out_fv",_util.k_nu_out_fv);
-    }
-    // In FV event
-    else {
-
-        // Charged Current 
-        if (ccnc == _util.k_CC){
-
-            // NuMu CC
-            if (nu_pdg == 14 || nu_pdg == -14){
-
-                // Purity is low so return cosmic
-                if (nu_purity_from_pfp < 0.0)return std::make_pair("unmatched",_util.k_unmatched);
-                
-                if (npi0 > 0) return std::make_pair("numu_cc_pi0", _util.k_numu_cc_pi0); // has a pi0
-                else return std::make_pair("numu_cc",_util.k_numu_cc);
-
-            }
-            // Nue CC
-            else if (nu_pdg == 12){
-                
-                if (nu_purity_from_pfp > 0.0)                                 return std::make_pair("nue_cc",       _util.k_nue_cc);    // purity > 0.5% so signal
-                else                                                          return std::make_pair("unmatched_nue",_util.k_unmatched_nue); // These events were not picked up by pandora at all
-
-            }
-            else if (nu_pdg == -12){
-                
-                if (nu_purity_from_pfp > 0.0)                                  return std::make_pair("nuebar_cc",       _util.k_nuebar_cc); // purity > 0.5% so signal
-                else                                                           return std::make_pair("unmatched_nuebar",_util.k_unmatched_nuebar); // These events were not picked up by pandora at all
-
-            }
-            // Unknown Neutrino Type
-            else {
-                std::cout << "Unknown Neutrino Type..., This will also mess up the efficecy if this occurs!" << std::endl;
-                return std::make_pair("unmatched",_util.k_unmatched);
-            }
-
-        }
-        // Neutral Current
-        else {
-
-            // Purity is low so return cosmic
-            if (nu_purity_from_pfp < 0) return std::make_pair("unmatched",_util.k_unmatched);
-
-            if (npi0 > 0) return std::make_pair("nc_pi0",_util.k_nc_pi0);
-            else return std::make_pair("nc",_util.k_nc);
-        }
-    
-    } // End if in FV
-
 
 }
 // -----------------------------------------------------------------------------
@@ -3217,4 +3134,117 @@ void UtilityPlotter::CheckPi0Coverage(){
 
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::CompareMCC8Result(){
+
+    std::cout <<"Here" << std::endl;
+
+    gStyle->SetOptStat(0);
+
+    TCanvas *c = new TCanvas("c", "c", 200, 350);
+    gPad->SetLeftMargin(0.3);
+    
+    // Data X-Sec with Stat Only
+    TH1D* h_data = new TH1D("h_data", ";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [cm^{2} / nucleon]", 2, 0, 2);
+    TH1D* h_data_mcc9 = new TH1D("h_data2", ";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [cm^{2} / nucleon]", 2, 0, 2);
+    
+    // X-Axis
+    h_data->GetXaxis()->SetRangeUser(0.0,2.0); 
+    // h_data->GetXaxis()->SetLabelOffset(999);
+    h_data->GetXaxis()->SetLabelSize(0.08);
+    h_data->GetXaxis()->SetTickLength(0);
+    
+    // Y-Axis
+    h_data->GetYaxis()->SetRangeUser(0.22e-38,1.22e-38);
+    h_data->GetYaxis()->CenterTitle();
+    h_data->GetYaxis()->SetLabelSize(0.1);
+    h_data->GetYaxis()->SetTitleSize(0.08);
+   
+    h_data->SetMarkerStyle(20);
+    h_data->SetMarkerSize(0.7);
+    h_data->SetLineColor(kBlack);
+
+    h_data_mcc9->SetMarkerStyle(23);
+    h_data_mcc9->SetMarkerSize(0.7);
+    h_data_mcc9->SetLineColor(kBlack);
+
+
+    // Fill it
+    h_data->Fill("MCC8", 6.8426915e-39); // new in FV flux
+    h_data->Fill("MCC9", 0.0); // new in FV flux
+    h_data->SetBinError(1, 6.8426915e-39 * 0.40); // new in FV flux
+    h_data->SetBinError(2, 0.0); // new in FV flux
+    h_data->Draw("E1,X0");
+    
+    // Stat Error
+    h_data_mcc9->Fill("MCC8", 0.0); // new in FV flux
+    h_data_mcc9->Fill("MCC9", 6.66441e-39); // new in FV flux
+    h_data_mcc9->SetBinError(1, 0.0); // new in FV flux
+    h_data_mcc9->SetBinError(2, 0.65509627e-39); // new in FV flux
+    h_data_mcc9->Draw("E1,X0,same");
+
+    // Statistical band
+    TH1D * h_data_stat = (TH1D*) h_data->Clone();
+    // h_data_stat->SetBinError(1, 0.144e-38);
+    h_data_stat->SetBinError(1, 6.8426915e-39 * 0.22 ); // new in FV flux
+    h_data_stat->SetLineColor(kBlack);
+    h_data_stat->Draw("E1,X0,same");
+
+
+    // Genie v12.2.2 nue + nuebar
+    TH1D* h_genie_v2_nue_nuebar = new TH1D("h_genie_v2", "", 1, 0.0, 2.0);
+    // h_genie_v2_nue_nuebar->Fill(0.5,7.19925e-39 );
+    h_genie_v2_nue_nuebar->Fill(0.5,7.3125100e-39 ); // with FV flux
+    h_genie_v2_nue_nuebar->SetLineColor(kViolet-5);
+    h_genie_v2_nue_nuebar->SetLineWidth(3); 
+    h_genie_v2_nue_nuebar->SetLineStyle(7);
+    h_genie_v2_nue_nuebar->Draw("hist,same");
+
+    // Genie v3 nue + nuebar
+    TH1D* h_genie_v3_nue_nuebar = new TH1D("h_genie_v3", "", 1, 0.0, 2.0);
+    // h_genie_v3_nue_nuebar->Fill(0.5,5.5228738e-39 );
+    h_genie_v3_nue_nuebar->Fill(0.5,5.5711475e-39 ); // with FV flux
+    h_genie_v3_nue_nuebar->SetLineColor(kBlue+2);
+    h_genie_v3_nue_nuebar->SetLineWidth(3);
+    h_genie_v3_nue_nuebar->SetLineStyle(8);
+    h_genie_v3_nue_nuebar->Draw("hist,same");
+
+    // NuWro nue + nuebar
+    TH1D* h_genie_NuWro_nue_nuebar = new TH1D("h_nuwro_v2", "", 1, 0.0, 2.0);
+    // h_genie_NuWro_nue_nuebar->Fill(0.5,3.8158e-39 );
+    h_genie_NuWro_nue_nuebar->Fill(0.5,5.9205940e-39 ); // with FV flux
+    h_genie_NuWro_nue_nuebar->SetLineColor(kRed+2);
+    h_genie_NuWro_nue_nuebar->SetLineWidth(3);
+    h_genie_NuWro_nue_nuebar->SetLineStyle(1);
+    h_genie_NuWro_nue_nuebar->Draw("hist,same");
+
+
+    h_data->Draw("E1,X0,same");
+    h_data_stat->Draw("E1,X0,same");
+
+
+    // Draw the Legend
+    TLegend *leg = new TLegend(0.35, 0.70, 0.70, 0.89);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(h_data, "Data (stat. + sys.)",      "ep");
+    leg->AddEntry(h_data_mcc9, "Data (stat.)",      "ep");
+    leg->AddEntry(h_genie_v2_nue_nuebar,   "GENIE v2.12.2",    "l");
+    leg->AddEntry(h_genie_v3_nue_nuebar,   "GENIE v3.0.6",    "l");
+    leg->AddEntry(h_genie_NuWro_nue_nuebar,   "NuWro v19.02.1",    "l");
+    
+    leg->Draw();
+
+    gStyle->SetLegendTextSize(0.06);
+   
+    TLatex *t = new TLatex(.34, .145, "#splitline{MicroBooNE NuMI}{Data}");
+    t->SetTextColor(kBlack);
+    t->SetNDC();
+    t->SetTextSize(2.0/30.);
+    t->SetTextAlign(11);
+    // t->Draw();
+
+
+    c->Print("plots/mcc8_mcc9_nuexsec_generator_plot.pdf");
+
+}
 // -----------------------------------------------------------------------------

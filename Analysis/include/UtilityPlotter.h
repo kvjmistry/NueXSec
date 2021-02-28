@@ -3,6 +3,7 @@
 
 #include "Utility.h"
 #include "WienerSVD.h"
+#include "SliceContainer.h"
 
 // Class for making plots of generic things, such as run vs run comparisons and 
 // separate stuies that people want me to do for the analsis
@@ -102,9 +103,6 @@ class UtilityPlotter{
     // e.g. the hit purity and pion mommentum
     void PlotTrueVar();
     // -------------------------------------------------------------------------
-    // Similar function to the slice container classifier, just re-implement it here for easier use
-    std::pair<std::string, int> Classify(float true_nu_vtx_sce_x, float true_nu_vtx_sce_y, float true_nu_vtx_sce_z, int nu_pdg, int ccnc, float nu_purity_from_pfp, int npi0);
-    // -------------------------------------------------------------------------
     // Function to save a few 2D histograms
     void Save2DHists(const char* printname, TH2D* hist);
     // -------------------------------------------------------------------------
@@ -163,6 +161,8 @@ class UtilityPlotter{
     // Check if the pi0 tune is covered by the genie systeamtics
     void CheckPi0Coverage();
     // -------------------------------------------------------------------------
+    // Compare the MCC9 result to MCC8
+    void CompareMCC8Result();
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
