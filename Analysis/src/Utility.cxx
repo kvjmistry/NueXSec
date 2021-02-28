@@ -19,7 +19,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
 
         // Histogram Mode
         if (strcmp(arg, "--hist") == 0) {
-            std::cout << yellow << "Making Histograms, file to make histograms with: "<< argv[i+1] << yellow <<std::endl;
+            std::cout << yellow << "Making Histograms, file to make histograms with: "<< argv[i+1] << reset <<std::endl;
             make_histos = true;
             run_selection = false; // switch this bool out
             hist_file_name = argv[i+1];
@@ -111,6 +111,20 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             _pi0_correction = atoi(argv[i+1]);
         }
 
+        // Turn off all tuning
+        if (strcmp(arg, "--notuning") == 0){
+            std::cout << "Turning off all tuning (using raw MC): " << std::endl;
+            _weight_tune = 0;
+            _weight_ppfx = 0;
+            _pi0_correction = 0;
+        }
+
+        // Tune the MEC events
+        if (strcmp(arg, "--tunemec") == 0){
+            std::cout << "Tuning the MEC events up by a factor of 1.5" << std::endl;
+            tune_mec = true;
+        }
+
         // Whats the verbose?
         if (strcmp(arg, "-v") == 0 || strcmp(arg, "--verbose") == 0 || strcmp(arg, "--v") == 0){
             std::cout << "Setting Verbose Level to : " << argv[i+1] << std::endl;
@@ -147,6 +161,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             
             variation = argv[i+2];
             mc_file_name = argv[i+1];
+            isvariation = true;
             
             mc_file_name_out      = Form("nuexsec_mc_run%s_%s.root", run_period, variation);
             mc_tree_file_name_out = Form("nuexsec_selected_tree_mc_run%s_%s.root", run_period, variation);
@@ -155,6 +170,10 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             std::cout <<yellow << "Output tree filename will be overwritten with name: " << mc_tree_file_name_out << reset <<  std::endl;
             
             overwritePOT = true;
+
+            // If using an alternate CV model via reweighting then we dont want to overwrite the POT values
+            if (std::string(variation) == "weight" || std::string(variation) == "mec" || std::string(variation) == "nogtune" || std::string(variation) == "nopi0tune" || std::string(variation) == "Input")
+                overwritePOT = false;
         }
 
         // Systematics
@@ -195,10 +214,59 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             std::cout << "Calculating a Cross-Section as function of: " << argv[i+1] << std::endl;
             xsec_var = argv[i+1];
 
-            if (std::string(xsec_var) != "elec_E" && std::string(xsec_var) != "elec_ang" ){
-                std::cout << red << "Error specified variable which is not supported! You can use: elec_E or elec_ang" << reset << std::endl;
+            if (std::string(xsec_var) != "elec_E" && std::string(xsec_var) != "elec_ang" && std::string(xsec_var) != "elec_cang" ){
+                std::cout << red << "Error specified variable which is not supported! You can use: elec_E or elec_ang or elec_cang" << reset << std::endl;
                 exit(5);
             }
+        }
+
+        // Use standard or fine bins to smear/unfold the cross section
+        if (strcmp(arg, "--xsecbins") == 0){
+            std::cout << "Using Truth Binning mode to build response matrix from: " << argv[i+1] << std::endl;
+            xsec_bin_mode = argv[i+1];
+
+            if (std::string(xsec_bin_mode) != "standard" && std::string(xsec_bin_mode) != "fine" && std::string(xsec_bin_mode) != "e_ang"){
+                std::cout << red << "Error specified variable which is not supported! You can use: standard or fine or e_ang" << reset << std::endl;
+                exit(5);
+            }
+        }
+
+        // What variable to do the cross section as a function of
+        if (strcmp(arg, "--xsec_smear") == 0){
+            std::cout << "Calculating a Cross-Section with smearing mode: " << argv[i+1] << std::endl;
+            xsec_smear_mode = argv[i+1];
+
+            // Modes must be mcc8 smearing or event rate
+            if (std::string(xsec_smear_mode) != "mcc8" && std::string(xsec_smear_mode) != "er" && std::string(xsec_smear_mode) != "wiener" ){
+                std::cout << red << "Error specified variable which is not supported! You can use: mcc8 or er or wiener" << reset << std::endl;
+                exit(5);
+            }
+        }
+
+        // Should we scale the cross section bins by the bin width?
+        if (strcmp(arg, "--binscaling") == 0){
+            std::cout << "Calculating a Cross-Section bin with scaling mode of: " << argv[i+1] << std::endl;
+            scale_bins = argv[i+1];
+
+            // Modes must be mcc8 smearing or event rate
+            if (std::string(scale_bins) != "standard" && std::string(scale_bins) != "width" ){
+                std::cout << red << "Error specified variable which is not supported! You can use: standard or width " << reset << std::endl;
+                exit(5);
+            }
+        }
+
+        // Zoom in on the plots
+        if (strcmp(arg, "--zoom") == 0){
+            std::cout << "Making final plots with a zoomed in scale" << std::endl;
+            zoom = true;
+        }
+
+        // Zoom in on the plots
+        if (strcmp(arg, "--fake") == 0){
+            std::cout << "The dataset being used is fake data with name: " << argv[i+1]<< std::endl;
+            isfakedata = true;
+            fakedataname = argv[i+1];
+            overwritePOT = true;
         }
 
         // Utility Plotter
@@ -269,34 +337,77 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     // Check the variaition mode setting and see if we want to overwrite the POT
     if (overwritePOT){
 
-        // Loop over the POT config names and overwrite the name of the CV MC POT
-        for (unsigned int p = 0; p < confignames.size(); p++){
-            
-            std::string match_name = Form("Run%s_MC_POT", run_period);
-            // std::string match_name = "Run1_MC_POT";
-            
-            // If matched then overwrite the POT config for the MC to the variation
-            if (confignames.at(p) == match_name){
-                confignames[p] = match_name + "_" + variation_str;
-                std::cout << red  <<"New MC POT config to search for is: " << confignames.at(p) << reset << std::endl;
+        if (isvariation){
+            // Loop over the POT config names and overwrite the name of the CV MC POT
+            for (unsigned int p = 0; p < confignames.size(); p++){
+                
+                std::string match_name = Form("Run%s_MC_POT", run_period);
+                
+                // If matched then overwrite the POT config for the variation
+                if (confignames.at(p) == match_name){
+                    confignames[p] = match_name + "_" + variation_str;
+                    std::cout << red  <<"New MC POT config to search for is: " << confignames.at(p) << reset << std::endl;
+                }
+            }
+
+            // We also want to set the intrinsic nue POT so the weighting is done correctly
+            // Loop over the POT config names and overwrite the name of the CV MC POT
+            for (unsigned int p = 0; p < confignames.size(); p++){
+                
+                std::string match_name = Form("Run%s_Intrinsic_POT", run_period);
+                // std::string match_name = "Run1_Intrinsic_POT";
+                
+                // If matched then overwrite the POT config for the MC to the variation
+                if (confignames.at(p) == match_name){
+                    confignames[p] = match_name + "_" + variation_str;
+                    std::cout << red << "New Intrinsic POT config to search for is: " << confignames.at(p) << reset <<std::endl;
+                }
             }
         }
 
-        // We also want to set the intrinsic nue POT so the weighting is done correctly
-        // Loop over the POT config names and overwrite the name of the CV MC POT
-        for (unsigned int p = 0; p < confignames.size(); p++){
-            
-            std::string match_name = Form("Run%s_Intrinsic_POT", run_period);
-            // std::string match_name = "Run1_Intrinsic_POT";
-            
-            // If matched then overwrite the POT config for the MC to the variation
-            if (confignames.at(p) == match_name){
-                confignames[p] = match_name + "_" + variation_str;
-                std::cout << red << "New MC POT config to search for is: " << confignames.at(p) << reset <<std::endl;
+        // We also want to overwrite the data POT in the case of fake data
+        if (isfakedata){
+
+            variation_str = std::string(fakedataname);
+
+            // Loop over the POT config names and overwrite the name of the CV MC POT
+            for (unsigned int p = 0; p < confignames.size(); p++){
+                
+                std::string match_name = Form("Run%s_Data_POT", run_period);
+                
+                // If matched then overwrite the POT config for the variation
+                if (confignames.at(p) == match_name){
+                    
+                    // If fake data mode we overwrite the data POT number instead
+                    if (std::string(fakedataname) == "weight" || std::string(fakedataname) == "mec" || std::string(fakedataname) == "nogtune" || std::string(fakedataname) == "nopi0tune" || std::string(fakedataname) == "Input")
+                        confignames[p] = Form("Run%s_MC_POT", run_period);
+                    else
+                        confignames[p] = Form("Run%s_MC_POT_%s", run_period, variation_str.c_str());
+                    
+                    std::cout << red  <<"New Data POT config to search for is: " << confignames.at(p) << reset << std::endl;
+                }
+            }
+
+            // We also want to set the intrinsic nue POT so the weighting is done correctly
+            // Loop over the POT config names and overwrite the name of the CV MC POT
+            for (unsigned int p = 0; p < confignames.size(); p++){
+                
+                std::string match_name = Form("Run%s_Intrinsic_POT", run_period);
+                // std::string match_name = "Run1_Intrinsic_POT";
+                
+                // If matched then overwrite the POT config for the MC to the variation
+                if (confignames.at(p) == match_name){
+                    
+                    if (std::string(fakedataname) == "weight" || std::string(fakedataname) == "mec" || std::string(fakedataname) == "nogtune" || std::string(fakedataname) == "nopi0tune" || std::string(fakedataname) == "Input")
+                        confignames[p] = match_name;
+                    else
+                        confignames[p] = match_name + "_" + variation_str;
+                    
+                    std::cout << red << "New Intrinsic POT config to search for is: " << confignames.at(p) << reset <<std::endl;
+                }
             }
         }
-    
-    
+
     }
 
     // Get the congigureation parameters
@@ -383,6 +494,38 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         std::cout << "Using Correction factor for ext"<< std::endl;
     }
 
+    // Set output file names for fake data  ----------
+    
+    if (std::string(mc_file_name) != "empty" && isfakedata){
+        // Use the MC stream, but output the file with the name data
+        mc_file_name_out      = Form("nuexsec_data_run%s_%s.root", run_period, fakedataname);
+        mc_tree_file_name_out = Form("nuexsec_selected_tree_data_run%s_%s.root", run_period, fakedataname);
+
+        std::cout  <<yellow << "Output filename will be overwritten with name: "      << mc_file_name_out << reset <<  std::endl;
+        std::cout <<yellow << "Output tree filename will be overwritten with name: " << mc_tree_file_name_out << reset <<  std::endl;
+    }
+
+    if (std::string(ext_file_name) != "empty" && isfakedata){
+        // Use the MC stream, but output the file with the name data
+        ext_file_name_out      = Form("nuexsec_ext_run%s_fake.root", run_period);
+        ext_tree_file_name_out = Form("nuexsec_selected_tree_ext_run%s_fake.root", run_period);
+
+        std::cout  <<yellow << "Output filename will be overwritten with name: "      << ext_file_name_out << reset <<  std::endl;
+        std::cout <<yellow << "Output tree filename will be overwritten with name: " << ext_tree_file_name_out << reset <<  std::endl;
+    }
+
+    if (std::string(dirt_file_name) != "empty" && isfakedata){
+        // Use the MC stream, but output the file with the name data
+        dirt_file_name_out      = Form("nuexsec_dirt_run%s_fake.root", run_period);
+        dirt_tree_file_name_out = Form("nuexsec_selected_tree_dirt_run%s_fake.root", run_period);
+
+        std::cout  <<yellow << "Output filename will be overwritten with name: "      << dirt_file_name_out << reset <<  std::endl;
+        std::cout <<yellow << "Output tree filename will be overwritten with name: " << dirt_tree_file_name_out << reset <<  std::endl;
+    }
+
+    // ---------
+
+
     // Pi0 correction
     pi0_correction = _pi0_correction;
     if (pi0_correction == 0){
@@ -397,21 +540,76 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
 
     // Set the scale factors
     if (strcmp(run_period, "1") == 0){
+
+        // For fake data adjust these scale factors
+        if (isfakedata){
+            config_v.at(k_Run1_Data_trig)  = 1.0;
+            config_v.at(k_Run1_EXT_trig)   = 0.98;
+            config_v.at(k_Run1_Dirt_POT)   = 0.75*config_v.at(k_Run1_Data_POT);
+        }
+
         mc_scale_factor     = config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_MC_POT);
         dirt_scale_factor   = 0.75*config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_Dirt_POT);
         ext_scale_factor    = 0.98*config_v.at(k_Run1_Data_trig) / config_v.at(k_Run1_EXT_trig);
-        intrinsic_weight    = config_v.at(k_Run1_MC_POT)    / config_v.at(k_Run1_Intrinsic_POT);
+        
+        // If fake data then scale to the fake data POT
+        if (isfakedata){
+            intrinsic_weight    = config_v.at(k_Run1_Data_POT)    / config_v.at(k_Run1_Intrinsic_POT);
+        }
+        // Otherwise scale to the MC POT
+        else {
+            intrinsic_weight    = config_v.at(k_Run1_MC_POT)    / config_v.at(k_Run1_Intrinsic_POT);
+        }
+        
     }
     else if (strcmp(run_period, "3") == 0){
+
+        // For fake data adjust these scale factors
+        if (isfakedata){
+            config_v.at(k_Run3_Data_trig)  = 1.0;
+            config_v.at(k_Run3_EXT_trig)   = 0.98;
+            config_v.at(k_Run3_Dirt_POT)   = 0.35*config_v.at(k_Run3_Data_POT);
+        }
+
+
         mc_scale_factor     = config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_MC_POT);
         dirt_scale_factor   = 0.35*config_v.at(k_Run3_Data_POT)  / config_v.at(k_Run3_Dirt_POT);
         ext_scale_factor    = 0.98*config_v.at(k_Run3_Data_trig) / config_v.at(k_Run3_EXT_trig);
-        intrinsic_weight    = config_v.at(k_Run3_MC_POT)    / config_v.at(k_Run3_Intrinsic_POT);
+        
+        // If fake data then scale to the fake data POT
+        if (isfakedata){
+            intrinsic_weight    = config_v.at(k_Run3_Data_POT)    / config_v.at(k_Run3_Intrinsic_POT);
+        }
+        // Otherwise scale to the MC POT
+        else {
+            intrinsic_weight    = config_v.at(k_Run3_MC_POT)    / config_v.at(k_Run3_Intrinsic_POT);
+        }
     }
     else {
         std::cout << "Error Krish... You havent specified the run period!" << std::endl;
         std::cout << usage <<  usage2 << usage3 << std::endl;
         exit(1);
+    }
+
+    if (std::string(run_period) == "1"){
+        std::cout << "\033[0;32m-------------------------------" << std::endl;
+        std::cout << red << "POT Read In:" << reset << "\n" << green <<
+        "Data POT:         "   << config_v.at(k_Run1_Data_POT)     << "\n" <<
+        "Data Triggers:    "   << config_v.at(k_Run1_Data_trig)    << "\n" <<
+        "MC POT:           "   << config_v.at(k_Run1_MC_POT)       << "\n" <<
+        "Dirt POT:         "   << config_v.at(k_Run1_Dirt_POT)     << "\n" <<
+        "EXT HW Triggers:  "   << config_v.at(k_Run1_EXT_trig)     << std::endl;
+        std::cout << "-------------------------------\033[0m" << std::endl;
+    }
+    else if (std::string(run_period) == "3"){
+        std::cout << "\033[0;32m-------------------------------" << std::endl;
+        std::cout << red << "POT Read In:" << reset << "\n" << green <<
+        "Data POT:         "   << config_v.at(k_Run3_Data_POT)     << "\n" <<
+        "Data Triggers:    "   << config_v.at(k_Run3_Data_trig)    << "\n" <<
+        "MC POT:           "   << config_v.at(k_Run3_MC_POT)       << "\n" <<
+        "Dirt POT:         "   << config_v.at(k_Run3_Dirt_POT)     << "\n" <<
+        "EXT HW Triggers:  "   << config_v.at(k_Run3_EXT_trig)     << std::endl;
+        std::cout << "-------------------------------\033[0m" << std::endl;
     }
 
     std::cout << "\033[0;32m-------------------------------" << std::endl;
@@ -427,7 +625,8 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         std::cout << "-------------------------------" << reset << std::endl;
     }
 
-    std::cout << "Using Energy Threshold of: " << red << energy_threshold * 1000 << " MeV" << reset <<  std::endl;
+    std::cout << "Using a Neutrino Energy Threshold of: " << red << energy_threshold * 1000 << " MeV" << reset <<  std::endl;
+    std::cout << "Using a Electron Energy Threshold of: " << red << elec_threshold * 1000 << " MeV" << reset <<  std::endl;
     std::cout << green << "-------------------------------" << reset << std::endl;
 
     if (use_gpvm)
@@ -437,6 +636,9 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     
     // Create txt file list directory
     gSystem->Exec("if [ ! -d \"files/txt/\" ]; then echo \"\ntxt folder does not exist... creating\"; mkdir -p files/txt; fi"); 
+
+    // Set The axes names
+    SetAxesNames();
 }
 // -----------------------------------------------------------------------------
 bool Utility::GetFile(TFile* &f, TString string){
@@ -504,6 +706,8 @@ template<typename T> void Utility::CheckWeight(T &weight){
     
     // Negative weight
     else if (weight < 0.)              weight = 1.0;
+
+    else if (weight > 0.0 && weight < 1.0e-4) weight = 0.0;
     
     else {
         // Do nothing to the weight
@@ -513,10 +717,27 @@ template<typename T> void Utility::CheckWeight(T &weight){
 template void Utility::CheckWeight<double>(double &weight);
 template void Utility::CheckWeight<float>(float   &weight);
 // -----------------------------------------------------------------------------
-double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv){
+double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv, int interaction){
 
     // Always give weights of 1 to the data
-    if (type == k_data || type == k_ext) return 1.0;
+    if (type == k_data) return 1.0;
+
+    if (type == k_ext){
+        
+        // If not fake data then keep ext weights to 1.0;
+        if (!isfakedata){
+            return 1.0;
+        }
+        // Weight ext events to zero for fake data
+        else {
+            return 0.0;
+        }
+    }
+
+    // Weight dirt events to zero for fake data
+    if (type == k_dirt && isfakedata){
+        return 0.0;
+    }
 
     double weight = 1.0;
 
@@ -534,8 +755,10 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
 
     if (weight_ppfx) weight = weight * weight_flux;
 
-    // Weight the below threshold events to zero. Current threhsold is 125 MeV
-    if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12) && nu_e <= energy_threshold) weight = 0.0;
+    // Weight the below threshold events to zero. Current threhsold is 125 MeV -- now moved to bkg so commented
+    if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12) && nu_e <= energy_threshold) {
+        // weight = 0.0;
+    }
 
     // This is the intrinsic nue weight that scales it to the standard overlay sample
     if (std::string(intrinsic_mode) == "intrinsic" && type == k_mc){
@@ -548,6 +771,10 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
 
     // Create a random energy dependent nue weight for testing model dependence
     // if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12)) weight *= nu_e*nu_e;
+
+    if (tune_mec && interaction == k_mec){
+        weight *=1.5;
+    }
 
 
     return weight;
@@ -591,7 +818,6 @@ void Utility::GetPiZeroWeight(double &weight, int pizero_mode, int nu_pdg, int c
 
 }
 // -----------------------------------------------------------------------------
-
 bool Utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     d = (TDirectory*)f->Get(string);
     if (d == NULL) {
@@ -599,6 +825,7 @@ bool Utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
         return false;
     }
     else {
+        // std::cout << "Directory: " << string << std::endl;
         return true;
     }
 }
@@ -683,6 +910,8 @@ void Utility::Tabulate(bool inFV, std::string interaction, std::string classific
         if (classification == "cosmic_nue")       counter_v.at(k_count_cosmic_nue)       += weight;
         if (classification == "unmatched_nuebar") counter_v.at(k_count_unmatched_nuebar) += weight;
         if (classification == "cosmic_nuebar")    counter_v.at(k_count_cosmic_nuebar)    += weight;
+        if (classification == "thr_nue")          counter_v.at(k_count_thr_nue)          += weight;
+        if (classification == "thr_nuebar")       counter_v.at(k_count_thr_nuebar)       += weight;
 
         // Total selected MC events
         counter_v.at(k_count_total_mc) += weight;
@@ -892,7 +1121,7 @@ void Utility::SetTPadOptions(TPad *topPad, TPad *bottomPad){
     topPad->SetBottomMargin(0.05);
     topPad->SetTopMargin(0.15);
     bottomPad->SetTopMargin(0.04);
-    bottomPad->SetBottomMargin(0.25);
+    bottomPad->SetBottomMargin(0.3);
     bottomPad->SetGridy();
     topPad->SetLeftMargin(0.15);
     topPad->SetRightMargin(0.1);
@@ -1086,18 +1315,12 @@ void Utility::CalcCFracCovariance(TH1D *h_CV, TH2D *h_frac_cov){
 
 }
 // -----------------------------------------------------------------------------
-void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov){
+void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov, double &chi, int &ndof, double &pval){
 
     // Clone them so we can scale them 
     TH1D* h_model_clone = (TH1D*)h_model->Clone();
     TH1D* h_data_clone  = (TH1D*)h_data->Clone();
     TH2D* h_cov_clone   = (TH2D*)cov->Clone();
-
-    // We need to scale the histograms because the matrix inversion has problems
-    // with the small numbers
-    h_model_clone->Scale(1.0e39);
-    h_data_clone->Scale(1.0e39);
-    h_cov_clone->Scale(1.0e78);
 
     // Getting covariance matrix in TMatrix form
     TMatrix cov_m;
@@ -1108,7 +1331,7 @@ void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov){
     for (int i = 0; i < h_cov_clone->GetNbinsX(); i++) {
 
         // loop over columns
-        for (int j = 0; j < h_cov_clone->GetNbinsX(); j++) {
+        for (int j = 0; j < h_cov_clone->GetNbinsY(); j++) {
             cov_m[i][j] = h_cov_clone->GetBinContent(i+1, j+1);
         }
     
@@ -1119,15 +1342,18 @@ void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov){
 
     // Calculating the chi2 = Summation_ij{ (x_i - mu_j)*E_ij^(-1)*(x_j - mu_j)  }
     // x = data, mu = model, E^(-1) = inverted covariance matrix 
-    double chi2 = 0;
+    chi = 0;
     for (int i = 0; i < h_cov_clone->GetNbinsX(); i++) {
-        for (int j = 0; j < h_cov_clone->GetNbinsX(); j++) {
-            chi2 += (h_data_clone->GetBinContent(i+1) - h_model_clone->GetBinContent(i+1)) * inverse_cov_m[i][j] * (h_data_clone->GetBinContent(j+1) - h_model_clone->GetBinContent(j+1));
+        for (int j = 0; j < h_cov_clone->GetNbinsY(); j++) {
+            chi += (h_data_clone->GetBinContent(i+1) - h_model_clone->GetBinContent(i+1)) * inverse_cov_m[i][j] * (h_data_clone->GetBinContent(j+1) - h_model_clone->GetBinContent(j+1));
         }
     }
 
-    std::cout << blue << "Chi2/dof: " << chi2 << "/" << h_data_clone->GetNbinsX() << " = " << chi2/double(h_data_clone->GetNbinsX())  << reset <<  std::endl;
-    std::cout << red << "p-value: " << TMath::Prob(chi2, h_data_clone->GetNbinsX())  << reset <<  std::endl;
+    ndof = h_data_clone->GetNbinsX();
+    pval = TMath::Prob(chi, ndof);
+
+    std::cout << blue << "Chi2/dof: " << chi << "/" << h_data_clone->GetNbinsX() << " = " << chi/double(ndof)  << reset <<  std::endl;
+    std::cout << red << "p-value: " <<  pval << reset << "\n" <<  std::endl;
 
     delete h_model_clone;
     delete h_data_clone;
@@ -1135,55 +1361,162 @@ void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov){
 
 }
 // -----------------------------------------------------------------------------
-void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vector<std::string> &var_labels_events,
-                           std::vector<std::string> &var_labels_eff,  std::string &smear_hist_name, std::vector<std::string> &vars){
+void Utility::CalcChiSquaredNoCorr(TH1D* h_model, TH1D* h_data, TH2D* cov, double &chi, int &ndof, double &pval){
+
+    // Clone them so we can scale them 
+    TH1D* h_model_clone = (TH1D*)h_model->Clone();
+    TH1D* h_data_clone  = (TH1D*)h_data->Clone();
+    TH2D* h_cov_clone   = (TH2D*)cov->Clone();
+
+
+
+    // Getting covariance matrix in TMatrix form
+    TMatrix cov_m;
+    cov_m.Clear();
+    cov_m.ResizeTo(h_cov_clone->GetNbinsX(), h_cov_clone->GetNbinsX());
+
+    // loop over rows
+    for (int i = 0; i < h_cov_clone->GetNbinsX(); i++) {
+
+        // loop over columns
+        for (int j = 0; j < h_cov_clone->GetNbinsY(); j++) {
+            cov_m[i][j] = h_cov_clone->GetBinContent(i+1, j+1);
+        }
+    
+    }
+
+    // Inverting the covariance matrix
+    // TMatrix inverse_cov_m = cov_m.Invert();
+
+    // Calculating the chi2 = Summation_ij{ (x_i - mu_j)*E_ij^(-1)*(x_j - mu_j)  }
+    // x = data, mu = model, E^(-1) = inverted covariance matrix 
+    chi = 0;
+    for (int i = 0; i < h_cov_clone->GetNbinsX(); i++) {
+        // std::cout <<h_model_clone->GetBinContent(i+1) << "  " << 100 *  std::sqrt(cov_m[i][i]) / h_model_clone->GetBinContent(i+1) << std::endl;
+        chi += (h_data_clone->GetBinContent(i+1) - h_model_clone->GetBinContent(i+1)) * (h_data_clone->GetBinContent(i+1) - h_model_clone->GetBinContent(i+1)) / cov_m[i][i];
+    }
+
+    ndof = h_data_clone->GetNbinsX();
+    pval = TMath::Prob(chi, ndof);
+
+    std::cout << blue << "Chi2/dof (no corr): " << chi << "/" << h_data_clone->GetNbinsX() << " = " << chi/double(ndof)  << reset <<  std::endl;
+    std::cout << red << "p-value (no corr): " <<  pval << reset <<  std::endl;
+
+    delete h_model_clone;
+    delete h_data_clone;
+    delete h_cov_clone;
+
+}
+// -----------------------------------------------------------------------------
+void Utility::SetAxesNames(){
 
     // Electron/Shower Energy
     if (std::string(xsec_var) =="elec_E"){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                           ";Reco. Leading Shower Energy [GeV];#frac{d#sigma}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon]",
-                           ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];#frac{d#sigma}{dE^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon"
+                           ";E^{reco}_{e} [GeV];#frac{dR}{dE^{reco}_{e}} [10^{-39} cm^{2}/GeV/nucleon]",
+                           ";E^{true}_{e} [GeV];#frac{d#sigma}{dE^{true}_{e}} [10^{-39} cm^{2}/GeV/nucleon"
                           };
 
 
         var_labels_events = {";;Entries",
-                             ";Reco. Leading Shower Energy [GeV]; Entries / GeV",
-                             ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries / GeV"
+                             ";E^{reco}_{e} [GeV]; Entries / GeV",
+                             ";E^{true}_{e} [GeV]; Entries / GeV"
                             };
 
         var_labels_eff = {";;Efficiency",
-                          ";Reco. Leading Shower Energy [GeV]; Efficiency",
-                          ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency"
+                          ";E^{reco}_{e} [GeV]; Efficiency",
+                          ";E^{true}_{e} [GeV]; Efficiency"
                          };
 
-        smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]";
+        smear_hist_name = ";E^{true}_{e} [GeV];E^{reco}_{e} [GeV]";
+
+        ac_hist_name = ";E^{true}_{e} [GeV];E^{true}_{e} [GeV]";
 
         vars = {"integrated", "reco_el_E", "true_el_E" };
+
+        if (std::string(xsec_smear_mode) == "mcc8"){
+            xsec_scale = 13.0; // X-Section
+        }
+        else {
+            xsec_scale = 2.0; // Event Rate
+
+            if (std::string(scale_bins) == "standard")
+                xsec_scale*=0.3;
+        }        
     
     }
     // Electron/Shower effective angle
     else if (std::string(xsec_var) =="elec_ang"){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                           ";Reco. Leading Effective Angle [deg];#frac{d#sigma}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/deg/nucleon]",
-                           ";True e#lower[-0.5]{-} + e^{+} Effective Angle [deg];#frac{d#sigma}{dE^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/deg/nucleon"
+                           ";#beta^{reco}_{e} [deg];#frac{dR}{d#beta^{reco}_{e}} [10^{-37} cm^{2}/deg/nucleon]",
+                           ";#beta^{true}_{e} [deg];#frac{d#sigma}{d#beta^{true}_{e}} [10^{-37} cm^{2}/deg/nucleon]"
                           };
 
 
         var_labels_events = {";;Entries",
-                             ";Reco. Leading Shower Effective Angle [deg]; Entries / deg",
-                             ";True e#lower[-0.5]{-} + e^{+} Effective Angle [deg]; Entries / deg"
+                             ";#beta^{reco}_{e} [deg]; Entries / deg",
+                             ";#beta^{true}_{e} [deg]; Entries / deg"
                             };
 
         var_labels_eff = {";;Efficiency",
-                          ";Reco. Leading Shower Effective Angle [deg]]; Efficiency",
-                          ";True e#lower[-0.5]{-} + e^{+} Effective Angle [deg]; Efficiency"
+                          ";#beta^{reco}_{e} [deg]; Efficiency",
+                          ";#beta^{true}_{e} [deg]; Efficiency"
                          };
 
-        smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Effective Angle [deg];Leading Shower Effective Angle [deg]";
+        smear_hist_name = ";#beta^{true}_{e} [deg];#beta^{reco}_{e} [deg]";
+
+        ac_hist_name = ";#beta^{true}_{e} [deg];#beta^{true}_{e} [deg]";
 
         vars = {"integrated", "reco_el_ang", "true_el_ang" };
+
+        if (std::string(xsec_smear_mode) == "mcc8"){
+            xsec_scale = 15.0; // X-Section
+        }
+        else {
+            xsec_scale = 5.0; // Event Rate
+
+            if (std::string(scale_bins) == "standard")
+                xsec_scale*=0.3;
+        }
+
+    }
+    // Electron/Shower cos beta
+    else if (std::string(xsec_var) =="elec_cang"){
+        
+        var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
+                           ";cos#beta^{reco}_{e};#frac{dR}{dcos#beta^{reco}_{e}} [10^{-39} cm^{2}/nucleon]",
+                           ";cos#beta^{true}_{e};#frac{d#sigma}{dcos#beta^{true}_{e}} [10^{-39} cm^{2}/nucleon]"
+                          };
+
+
+        var_labels_events = {";;Entries",
+                             ";cos#beta^{reco}_{e}; Entries",
+                             ";cos#beta^{true}_{e}; Entries"
+                            };
+
+        var_labels_eff = {";;Efficiency",
+                          ";cos#beta^{reco}_{e}; Efficiency",
+                          ";cos#beta^{true}_{e}; Efficiency"
+                         };
+
+        smear_hist_name = ";cos#beta^{true}_{e};cos#beta^{reco}_{e}";
+
+        ac_hist_name = ";cos#beta^{true}_{e};cos#beta^{true}_{e}";
+
+        vars = {"integrated", "reco_el_cang", "true_el_cang" };
+
+        if (std::string(xsec_smear_mode) == "mcc8"){
+            xsec_scale = 100.0; // X-Section
+        }
+        else {
+            xsec_scale = 10.0; // Event Rate
+
+            if (std::string(scale_bins) == "standard")
+                xsec_scale*=0.3;
+        }
+
     }
     else {
         std::cout << "Unsupported parameter...exiting!" << std::endl;
@@ -1192,3 +1525,139 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
 
 }
 // -----------------------------------------------------------------------------
+void Utility::UndoBinWidthScaling(TH1D* &hist){
+
+    for (int bin = 0; bin < hist->GetNbinsX()+1; bin++){
+        if ( hist->GetBinWidth(bin) == 0){
+            hist->SetBinContent(bin, 0.0);
+            hist->SetBinError(  bin, 0.0);
+        }
+        else {
+            hist->SetBinContent(bin, hist->GetBinContent(bin) * hist->GetBinWidth(bin));
+            hist->SetBinError(  bin, hist->GetBinError(bin)   * hist->GetBinWidth(bin));
+        }
+
+    }
+
+}
+// -----------------------------------------------------------------------------
+void Utility::Save1DHists(const char *print_name, TH1D* hist, const char* draw_option) {
+
+    TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
+    
+    c->SetTopMargin(0.11);
+    hist->SetStats(kFALSE);
+    hist->SetLineColor(kBlack);
+    IncreaseLabelSize(hist, c);
+    hist->SetLineWidth(2);
+    hist->Draw(draw_option);
+    
+    Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
+    c->Print(print_name);
+    
+    delete c;
+}
+// -----------------------------------------------------------------------------
+void Utility::Save2DHists(const char *print_name, TH2D* hist, const char* draw_option) {
+
+    TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
+    
+    c->SetTopMargin(0.11);
+    gStyle->SetPaintTextFormat("4.2f");
+    gStyle->SetPalette(kBlueGreenYellow);
+    hist->SetStats(kFALSE);
+    IncreaseLabelSize(hist, c);
+    hist->Draw(draw_option);
+    Draw_Run_Period(c, 0.82, 0.915, 0.82, 0.915);
+    c->Print(print_name);
+    
+    delete c;
+}
+// -----------------------------------------------------------------------------
+void Utility::Save2DHistsBinIndex(const char *print_name, TH2D* hist, const char* draw_option) {
+
+
+    // Get make the 2D hist
+    TH2D* h_2D_index = new TH2D("h_2D", ";Bin i;Bin j",hist->GetNbinsX(), 0, hist->GetNbinsX(), hist->GetNbinsY(), 0, hist->GetNbinsY());
+
+    // Set the bin values
+    for (int x = 1; x < hist->GetNbinsY()+1; x++){
+        for (int y = 1; y < hist->GetNbinsX()+1; y++){
+                h_2D_index->SetBinContent(x,y,hist->GetBinContent(x,y));
+        }
+    }
+
+    TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
+    c->SetTopMargin(0.11);
+    gStyle->SetPaintTextFormat("4.2f");
+    h_2D_index->SetStats(kFALSE);
+    gStyle->SetPalette(kBlueGreenYellow);
+    IncreaseLabelSize(hist, c);
+    h_2D_index->SetMarkerSize(1.0);
+    h_2D_index->SetMarkerColor(kRed+2);
+    h_2D_index->Draw(draw_option);
+    h_2D_index->Draw("colz,text00");
+    Draw_Run_Period(c, 0.82, 0.915, 0.82, 0.915);
+    h_2D_index->GetXaxis()->CenterLabels(kTRUE);
+    h_2D_index->GetYaxis()->CenterLabels(kTRUE);
+    h_2D_index->GetXaxis()->SetNdivisions(h_2D_index->GetNbinsX(), 0, 0, kFALSE);
+    h_2D_index->GetYaxis()->SetNdivisions(h_2D_index->GetNbinsY(), 0, 0, kFALSE);
+    c->Print(print_name);
+    
+    delete h_2D_index;
+    delete c;
+}
+// -----------------------------------------------------------------------------
+void Utility::MatrixMultiply(TH1D* h_true, TH1D* &h_reco, TH2D* matrix, std::string option, bool norm){
+
+
+    // Smear the MC xsec through the response matrix
+    // Clear the Bins
+    for (int bin = 0; bin < h_reco->GetNbinsX()+2; bin++){
+        h_reco->SetBinContent(bin, 0);
+        h_reco->SetBinError(bin, 0);
+    }
+
+    // --- Do the matrix multiplication --- 
+    // Loop over cols
+    for (int i=1; i<matrix->GetYaxis()->GetNbins()+2; i++){
+
+        // Now normalise the column entries by the number of events in the 1D generated histogram
+        for (int j=1; j<matrix->GetXaxis()->GetNbins()+2; j++) { 
+            
+            // x axis true, y axis reco
+            if (option == "true_reco")
+                h_reco->SetBinContent(i, h_reco->GetBinContent(i) + matrix->GetBinContent(j, i) * h_true->GetBinContent(j));
+            // x axis reco, y axis true
+            else if (option == "reco_true")
+                h_reco->SetBinContent(i, h_reco->GetBinContent(i) + matrix->GetBinContent(i, j) * h_true->GetBinContent(j));
+            else
+                std::cout << "Unknown Option Specified!!!" << std::endl;
+        }
+
+        h_reco->SetBinError(i, (h_reco->GetBinContent(i) * h_true->GetBinError(i)) / h_true->GetBinContent(i));
+
+    } 
+
+    if (norm)
+        h_reco->Scale(1.0, "width");
+
+}
+// -----------------------------------------------------------------------------
+void Utility::ConvertCovarianceUnits(TH2D* &h_cov, TH1D *h_input, TH1D* h_output){
+
+    // Loop over the bins of the covariance matrix and convert deviations to percentages
+    for (int i = 1; i < h_cov->GetNbinsY()+1; i++) {
+
+        for (int j = 1; j < h_cov->GetNbinsX()+1; j++) {
+            double conversion;
+            
+            if (h_input->GetBinContent(i) * h_input->GetBinContent(j) == 0)
+                conversion  = 0.0;
+            else
+                conversion = (h_output->GetBinContent(i) * h_output->GetBinContent(j) * h_cov->GetBinContent(i,j) / (h_input->GetBinContent(i) * h_input->GetBinContent(j)));
+            
+            h_cov->SetBinContent(i, j, conversion);
+        }
+    }
+}

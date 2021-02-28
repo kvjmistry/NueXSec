@@ -8,7 +8,7 @@
 <!ENTITY file_type "mc">
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
-<!ENTITY name "searchingfornues_run1_overlay_detvar_CV">
+<!ENTITY name "searchingfornues_run3_overlay_detvar_CV">
 <!ENTITY version "v1">
 ]>
 
@@ -45,15 +45,17 @@
     <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</logdir>
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
-    <maxfilesperjob>5</maxfilesperjob>
-    <numjobs></numjobs>
+    <maxfilesperjob>2</maxfilesperjob>
+    <numjobs>171</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <disk>25GB</disk>
-    <schema>root</schema>
-    <inputdef></inputdef>
+    <schema>gsiftp</schema>
+    <prestagefraction>1</prestagefraction>
+    <endscript>/pnfs/uboone/resilient/users/kmistry/zip_logs.sh</endscript>
+    <inputdef>prod_numi_overlay_mcc9_v08_00_00_48_run3b_standard_CV_run_3b_reco2</inputdef>
     <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/RHC/flux_cached_entries.root</jobsub>
-    <jobsub_start>  --expected-lifetime=short</jobsub_start>
+    <jobsub_start>  --expected-lifetime=long</jobsub_start>
   </stage>
   
   <!-- file type -->

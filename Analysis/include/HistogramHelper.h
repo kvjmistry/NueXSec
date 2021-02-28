@@ -137,8 +137,10 @@ class HistogramHelper{
         k_reco_hits_ratio_ldg_th,                                               // Ratio hits from leading shower to slice with a minimum hit requirement
         k_reco_shower_score,                                                    // Shower score
         k_reco_track_score,                                                     // Track score
-        k_reco_shower_energy_tot_cali,                                          // Calibrated energy of all the showers
-        k_reco_shower_energy_tot_cali_rebin,                                    // Calibrated energy of all the showers with optimised bins
+        k_reco_effective_angle,                                                 // Angle between vector from target to vertex and shower direction.
+        k_reco_effective_angle_rebin,                                           // Angle between vector from target to vertex and shower direction.
+        k_reco_effective_cosangle,                                              // Cosine of the Angle between vector from target to vertex and shower direction.
+        k_reco_effective_cosangle_rebin,                                        // Cosine of the Angle between vector from target to vertex and shower direction.
         k_reco_shower_energy_cali,                                              // Calibrated energy of just the leading shower 
         k_reco_shower_energy_cali_rebin,                                        // Calibrated energy of just the leading shower with optimised bins
         k_reco_shr_hits_tot,                                                    // Total number of hits for all showers
@@ -188,8 +190,6 @@ class HistogramHelper{
         k_reco_crthitpe,                                                        // CRT hit pe
         k_reco_shr_ang_numi,                                                    // Angle of the reconstructed leading shower relative to the numi beamline
         k_reco_single_bin,                                                      // Just fill with weight. We need this to get the uncertainty on the purity
-        k_reco_effective_angle,                                                 // Angle between vector from target to vertex and shower direction.
-        k_reco_effective_cosangle,                                              // Cosine of the Angle between vector from target to vertex and shower direction.
         k_reco_trk_pid_score,                                                   // The PID score for tracks in the event
         k_TH1D_MAX
     };
@@ -220,7 +220,14 @@ class HistogramHelper{
         k_eff_nu_phi,                // Efficiency as a function of nu phi
         k_eff_elec_theta,            // Efficiency as a function of electron theta
         k_eff_elec_phi,              // Efficiency as a function of electron phi
-        k_eff_effective_ang,         // Efficiency as a function of the effective angle (angle between nu dir and elec dir)
+        k_eff_beta,                  // beta
+        k_eff_beta_rebin,            // beta with uneven bins
+        k_eff_beta_rebin_nue,        // beta with uneven bins nue
+        k_eff_beta_rebin_nuebar,     // beta with uneven bins nueber
+        k_eff_cosine_beta,           // cosine beta
+        k_eff_cosine_beta_rebin,     // cosine beta with uneven bins
+        k_eff_cosine_beta_rebin_nue, // cosine beta with uneven bins
+        k_eff_cosine_beta_rebin_nuebar, // cosine beta with uneven bins
         k_eff_proton_multi,          // Efficiency as a function of the number of true protons in the interaction.
         k_eff_proton_multi_nue,      // Efficiency as a function of the number of true protons in the interaction. Nue events only
         k_eff_proton_multi_nuebar,   // Efficiency as a function of the number of true protons in the interaction. Nuebar events only
@@ -286,6 +293,13 @@ class HistogramHelper{
         k_true_shr_energy_completeness,     // Actually completeness as a function of reco shower
         k_true_shr_energy_resolution_reco,  // Actually resolution normed to reco as a function of reco shower
         k_true_shr_energy_resolution_true,  // Actually resolution normed to true as a function of reco shower
+        k_true_shr_cosbeta_purity,           // Actually purity as a function of reco shower
+        k_true_shr_cosbeta_completeness,     // Actually completeness as a function of reco shower
+        k_true_shr_cosbeta_resolution_reco,  // Actually resolution normed to reco as a function of reco shower
+        k_true_shr_cosbeta_resolution_true,  // Actually resolution normed to true as a function of reco shower
+        k_elec_true_beta_reco_beta,
+        k_elec_true_theta_reco_theta,
+        k_elec_true_phi_reco_phi,
         k_TH2D_true_MAX
     };
 
@@ -333,12 +347,17 @@ class HistogramHelper{
         k_int_nu_E_nue_single_bin,
         k_int_nu_E_nuebar_single_bin,
         k_int_elec_E,
+        k_int_elec_E_nue,
+        k_int_elec_E_nuebar,
         k_int_elec_E_rebin,
         k_int_elec_E_rebin_nue,
         k_int_elec_E_rebin_nuebar,
         k_int_elec_theta,
         k_int_elec_phi,
         k_int_effective_ang,
+        k_int_beta_nue,
+        k_int_beta_nuebar,
+        k_int_cosbeta,
         k_INTERACTION_MAX
     };
 

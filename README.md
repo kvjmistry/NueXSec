@@ -27,7 +27,7 @@ if data file is given then zarko's script will be called into action.
 Please see this wiki for how to read these numbers:
 https://cdcvs.fnal.gov/redmine/projects/uboone-physics-analysis/wiki/NuMI_Documentation#How-to-do-NuMI-POT-counting
 
-Make sure to update the POT numbers in the main.h header when running the selection next.
+Make sure to update the POT numbers in the `config.txt` file when running the selection next.
 
 
 ## Running the Selection Code
@@ -54,7 +54,7 @@ Note that mc is configuring an overlay file, same for dirt.
 
 In general, there are not as many nue events in the standard MC file. We can replace these events by running over the intrinsic nue file:
 
-`./nuexsec --run 1 --mc [--mc <path_to_intrinsic_nue_file>]  --intrinsic intrinsic` 
+`./nuexsec --run 1 [--mc <path_to_intrinsic_nue_file>]  --intrinsic intrinsic` 
 
 # Printing the Selection
 To print the selection results (which read the files in the `files/trees` folder) we can run the command:
@@ -66,7 +66,7 @@ Configuration quantities such as the POT and fiducial volume boundary can be fou
 
 Full options and more documentation is available by doing `./nuexsec --h`. 
 
-# Making Histograms
+# Making Plots
 To make plots from the output of the selection, we need to merge the individual files we produced in the selection stage. I have wrote a merge script to combine these files to one and can be run like:
 
 `source merge/merge_run1_files.sh files/nuexsec_mc_run1.root files/nuexsec_run1_merged.root`
@@ -108,23 +108,26 @@ To run the systematics code, we run the cross section helper in `reweight` mode.
 ```
 This creates a new folder in `files/crosssec_run1.root` with the systematic plots you have just ran.
 
+If you are running on the gpvm, its more useful to run this in a tmux session and run them all in one go instead:
+`./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel all --xsecvar elec_E`
+
 # Running the Systematics: Detector Variations
-Detector variations are made in different samples so we cant use the CV file. We need to run the selection, create a unique file and then run the xsec code over it like it was a CV. E.g. in the case of `LY_Down`, this can be done by:
+Detector variations are made in different samples so we cant use the CV file. We need to run the selection, create a unique file and then run the xsec code over it like it was a CV. E.g. in the case of `LYDown`, this can be done by:
 
 ```
-./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_LY_Down.root LY_Down
+./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_LYDown.root LYDown
 
 # Overwrite the true nue information
-./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_LY_Down_intrinsic.root LY_Down --intrinsic intrinsic
+./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_LYDown_intrinsic.root LYDown --intrinsic intrinsic
 
 # Merge and plot histograms
-source merge/merge_run1_files.sh files/nuexsec_mc_run1_LY_Down.root files/nuexsec_run1_LY_Down_merged.root
-./nuexsec --run 1 --hist files/nuexsec_run1_LY_Down_merged.root --var dummy LY_Down
+source merge/merge_run1_files.sh files/nuexsec_mc_run1_LYDown.root files/nuexsec_run1_LYDown_merged.root
+./nuexsec --run 1 --hist files/nuexsec_run1_LYDown_merged.root --var dummy LYDown
 
-root -l -b -q 'merge/merge_uneaventrees.C("1", true, "files/trees/nuexsec_selected_tree_mc_run1_'"LY_Down"'.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "'"LY_Down"'")'
+root -l -b -q 'merge/merge_uneaventrees.C("1", true, "files/trees/nuexsec_selected_tree_mc_run1_'"LYDown"'.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "'"LYDown"'")'
 
 # Run the xsec code
-./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_LY_Down.root --var dummy LY_Down --xsecmode default --xsecvar elec_E
+./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_LYDown.root --var dummy LYDown --xsecmode default --xsecvar elec_E
 ```
 
 Thankfully we have wrote an automation of this process which can be run by doing:
@@ -142,7 +145,7 @@ We now need to plot the cross section and calculate the uncertainties along with
 This reads in all the stuff in `files/crosssec_run1.root`, and creates all the final plots.
 
 # Creating Systematics by Selection Stage
-This is pretty cpu intensive, so try to minise how often you run this. But basically to calculate the systematics for select plots at each cut stage, we can use a different mode of the cross section helper:
+This is pretty cpu intensive, so try to minimise how often you run this. But basically to calculate the systematics for select plots at each cut stage, we can use a different mode of the cross section helper:
 This is running the so called rw_cuts stage and adds a cut folder in `files/crosssec_run1.root`. *This can take hours to run*.
 ```
 ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --mc ../ntuples/neutrinoselection_filt_run1_overlay.root --xsecmode reweight --xseclabel unisim --xsecplot rw_cuts --intrinsic intrinsic
@@ -151,13 +154,16 @@ This is running the so called rw_cuts stage and adds a cut folder in `files/cros
 ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --mc ../ntuples/neutrinoselection_filt_run1_overlay.root --xsecmode reweight --xseclabel reint  --xsecplot rw_cuts --intrinsic intrinsic
 ```
 
+If you are running on the gpvm, its more useful to run this in a tmux session and run them all in one go instead (this command will probably take a really really long time!):
+`./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --mc ../ntuples/neutrinoselection_filt_run1_overlay.root --xsecmode reweight --xseclabel all --xsecplot rw_cuts --intrinsic intrinsic`
+
 Once you have done this, we need to store the total uncertainties to a file so we can plot them. We can do this by running a function in the systematics helper class:
 `./nuexsec --run 1 --sys reweightcuts`
-Warning this is a bit buggy and so may seg fault. This issue still needs to be resolved. 
 
 We can additionally store the detector variations to the file by running the default mode of the systematics helper class:
 `./nuexsec --run 1 --sys default`
-This might need to be run before the `reweightcuts` mode.
+
+The output of both these `--sys` commands creates a file called `files/run1_sys_var.root` which is then read in by the histogram plotter class. To then plot the uncertainties you should then use the `--plotsys tot` option.
 
 # Creating File Lists for Events
 We might want to save the selected events with their weights in a txt file so we can use with a package like ReMu or give to someone else to test. You can do this by running the cross section code in a different mode:

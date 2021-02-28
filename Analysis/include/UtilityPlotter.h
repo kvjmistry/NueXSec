@@ -2,6 +2,8 @@
 #define UTILITYPLOTTER_H
 
 #include "Utility.h"
+#include "WienerSVD.h"
+#include "SliceContainer.h"
 
 // Class for making plots of generic things, such as run vs run comparisons and 
 // separate stuies that people want me to do for the analsis
@@ -48,8 +50,25 @@ class UtilityPlotter{
     std::vector<float> *all_shr_energies = NULL;
     std::vector<unsigned short> *weightsPPFX = NULL ;
 
+    std::vector<std::string> var_labels_xsec = {};
 
+    std::vector<std::string> var_labels_events = {};
 
+    std::vector<std::string> var_labels_eff = {};
+
+    std::string smear_hist_name;
+    
+    std::vector<std::string> vars = {};
+
+    double xsec_scale;
+
+    // enum for histogram vars
+    enum TH1D_xsec_var_vars {
+        k_var_integrated,     // Total X-Section
+        k_var_recoX,          // X-Sec as a function of a Reconstructed variable
+        k_var_trueX,          // X-Sec as a function of a True variable
+        k_TH1D_xsec_var_MAX
+    };
 
     // -------------------------------------------------------------------------
     // Initialiser function
@@ -66,7 +85,7 @@ class UtilityPlotter{
     void CompareSignalPurity();
     // -------------------------------------------------------------------------
     // Function to optimise binning for the selection
-    void GetFitResult(double &mean, double &sigma, float bin_lower_edge, float bin_upper_edge, TTree* tree, bool save_hist, bool &converged, bool draw_fit_results);
+    void GetFitResult(double &mean, double &sigma, float bin_lower_edge, float bin_upper_edge, TTree* tree, bool save_hist, bool &converged, bool draw_fit_results, std::string var);
     // -------------------------------------------------------------------------
     // Caller function to optimise the bins
     void OptimiseBins();
@@ -75,7 +94,7 @@ class UtilityPlotter{
     void PlotVarbyRecoBin();
     // -------------------------------------------------------------------------
     // Function that plots a variable in different bin ranges
-    void PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string variable);
+    void PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string xvar, std::string reco_var, std::string true_var);
     // -------------------------------------------------------------------------
     // Get the integrated flux, draw threshold line for technote
     void PlotIntegratedFluxwithThrehold();
@@ -83,9 +102,6 @@ class UtilityPlotter{
     // Function to plot a number of true variables at the start of the selection
     // e.g. the hit purity and pion mommentum
     void PlotTrueVar();
-    // -------------------------------------------------------------------------
-    // Similar function to the slice container classifier, just re-implement it here for easier use
-    std::pair<std::string, int> Classify(float true_nu_vtx_sce_x, float true_nu_vtx_sce_y, float true_nu_vtx_sce_z, int nu_pdg, int ccnc, float nu_purity_from_pfp, int npi0);
     // -------------------------------------------------------------------------
     // Function to save a few 2D histograms
     void Save2DHists(const char* printname, TH2D* hist);
@@ -105,8 +121,51 @@ class UtilityPlotter{
     // Compare the efficiency in the standard det var CV and intrinsic nue det var sample
     void CompareDetVarEfficiency();
     // -------------------------------------------------------------------------
+    // Function to compare how making a smearing matrix with a different model impacts
+    // the measured cross section.
+    void TestModelDependence();
     // -------------------------------------------------------------------------
-
+    // Compare the extracted data cross section for different models
+    void CompareDataCrossSections();
+    // -------------------------------------------------------------------------
+    // See how a response matrix made with a different model impacts the 
+    // smeared MC truth prediction
+    void CompareSmearing();
+    // -------------------------------------------------------------------------
+    // Compare the cross sections for different models in true space
+    void CompareUnfoldedModels();
+    // -------------------------------------------------------------------------
+    // Compare the true cross section of fake data to the extracted cross section
+    // in reco space
+    void CompareFakeDataReco();
+    // -------------------------------------------------------------------------
+     // Compare the true cross section of fake data to the extracted cross section
+    // in true space
+    void CompareFakeDataTrue();
+    // -------------------------------------------------------------------------
+    // Compare the data to a number of alternative models
+    void CompareTotalCrossSec();
+    // -------------------------------------------------------------------------
+    // Compare the total cross section for each fake data model
+    void CompareFakeTotalCrossSec();
+    // -------------------------------------------------------------------------
+    // Compare the total data cross sections extracted for each model
+    void CompareTotalDataCrossSections();
+    // -------------------------------------------------------------------------
+    // Compare the unfolded data cross section extracted with different models
+    void CompareUnfoldedDataCrossSections();
+    // -------------------------------------------------------------------------
+    // Get the response matrix from file and save it for the technote
+    void SaveResponseMatrix();
+    // -------------------------------------------------------------------------
+    // Check if the pi0 tune is covered by the genie systeamtics
+    void CheckPi0Coverage();
+    // -------------------------------------------------------------------------
+    // Compare the MCC9 result to MCC8
+    void CompareMCC8Result();
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
 
 }; // End Class UtilityPlotter

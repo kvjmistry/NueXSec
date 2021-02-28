@@ -81,13 +81,13 @@ void Selection::Initialise(Utility _utility){
         // Initialise all the data slice container
         data_SC.Initialise(data_tree, _util.k_data, _util);
 
+        // Initialise the Tree Helper
+        _thelper.at(_util.k_data).Initialise(_util.k_data, _util.data_tree_file_name_out, _util);
+
         // Initialise the histogram helper
         if (!_util.slim) _hhelper.at(_util.k_data).Initialise(_util.k_data, _util.data_file_name_out, _util);
         if (!_util.slim) _hhelper.at(_util.k_data).InitHistograms();
         
-        // Initialise the Tree Helper
-        _thelper.at(_util.k_data).Initialise(_util.k_data, "empty", _util);
-
         data_tree_total_entries = data_tree->GetEntries();
         std::cout << "Total Data Events:         " << data_tree_total_entries << std::endl;
 
@@ -104,13 +104,13 @@ void Selection::Initialise(Utility _utility){
         // Initialise all the data slice container
         ext_SC.Initialise(ext_tree, _util.k_ext, _util);
 
+        // Initialise the Tree Helper
+        _thelper.at(_util.k_ext).Initialise(_util.k_ext, _util.ext_tree_file_name_out, _util);
+
         // Initialise the histogram helper
         if (!_util.slim) _hhelper.at(_util.k_ext).Initialise(_util.k_ext, _util.ext_file_name_out, _util);
         if (!_util.slim) _hhelper.at(_util.k_ext).InitHistograms();
         
-        // Initialise the Tree Helper
-        _thelper.at(_util.k_ext).Initialise(_util.k_ext, "empty", _util);
-
         ext_tree_total_entries = ext_tree->GetEntries();
         std::cout << "Total EXT Events:        " << ext_tree_total_entries << std::endl;
 
@@ -127,12 +127,14 @@ void Selection::Initialise(Utility _utility){
         // Initialise all the data slice container
         dirt_SC.Initialise(dirt_tree, _util.k_dirt, _util);
 
+        // Initialise the Tree Helper
+        _thelper.at(_util.k_dirt).Initialise(_util.k_dirt, _util.dirt_tree_file_name_out, _util);
+
         // Initialise the histogram helper
         if (!_util.slim) _hhelper.at(_util.k_dirt).Initialise(_util.k_dirt, _util.dirt_file_name_out ,_util);
         if (!_util.slim) _hhelper.at(_util.k_dirt).InitHistograms();
         
-        // Initialise the Tree Helper
-        _thelper.at(_util.k_dirt).Initialise(_util.k_dirt, "empty", _util);
+        
 
         dirt_tree_total_entries = dirt_tree->GetEntries();
         std::cout << "Total Dirt Events:         " << dirt_tree_total_entries << std::endl;
@@ -184,8 +186,17 @@ void Selection::MakeSelection(){
             // Apply the Selection cuts 
             bool pass = ApplyCuts(_util.k_mc, counter_v, mc_SC);
 
+            // Only fill passed events for fake data
+            if (_util.isfakedata){
+                
+                if (pass)
+                    _thelper.at(_util.k_mc).FillVars(mc_SC, pass);
+            }
             // Fill the output tree if the event passed or it was signal
-            if (pass || mc_SC.is_signal) _thelper.at(_util.k_mc).FillVars(mc_SC, pass);
+            else {
+                if (pass || mc_SC.is_signal)
+                    _thelper.at(_util.k_mc).FillVars(mc_SC, pass);
+            }
             
             // If the event passed the selection then save the run subrun event to file
             if (pass) run_subrun_file_mc << mc_SC.run << " " << mc_SC.sub << " " << mc_SC.evt << '\n';
@@ -384,12 +395,17 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
 
     // Classify the event -- sets variable in the slice contianer
     SC.SliceClassifier(type);      // Classification of the event
+
+    // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
+    SC.SetThresholdEvent();
+    
     SC.SliceInteractionType(type); // Genie interaction type
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
     SC.Pi0Classifier(type); 
 
     // Set derived variables in the slice container
     SC.SetSignal();                // Set the event as either signal or other
+    SC.SetFakeData();              // Set the classifcation as data if fake data mode
     SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
     SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
     SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
@@ -500,10 +516,12 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     SelectionFill(type, SC, _util.k_dEdx_max_no_tracks, counter_v );
 
     // Skip unnaturally high shower energies?
-    // if (SC.shr_energy_cali > 6.0)
-    //     std::cout << "reco shr energy: "  << SC.shr_energy_cali << "  elec E: "<< SC.elec_e << "  nu E: " << SC.nu_e<< std::endl;
+    if (SC.shr_energy_cali > 6.0 && type == _util.k_data){
+        return false;
+    }
 
     // if (SC.is_signal && SC.nu_e < 0.3) std::cout<<"Low elec E!: " <<SC.elec_e*1000 << " MeV" << "  | E Nu: "<< SC.nu_e*1000 << " MeV" <<  std::endl; 
+    // if (SC.is_signal && SC.elec_e < 0.1) std::cout<<"Low elec E!: " <<SC.elec_e*1000 << " MeV" << "  | E Nu: "<< SC.nu_e*1000 << " MeV" << "  |Reco Shr Energy: " <<  SC.shr_energy_cali *1000<<  std::endl; 
     // if (type == _util.k_mc && (SC.nu_pdg == -12 || SC.nu_pdg == 12) && SC.nu_e <= 0.125 && SC.ccnc == _util.k_NC) std::cout << "Got nue NC event selected thats below th: " << SC.nu_e << std::endl;
 
 
@@ -527,15 +545,32 @@ void Selection::SavetoFile(){
             _hhelper.at(_util.k_mc).WriteTEfficiency();
             _hhelper.at(_util.k_mc).WriteTrue();
             _hhelper.at(_util.k_mc).WriteInteractions();
-            _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
             _hhelper.at(_util.k_mc).Write_2DSigBkgHists();
+            
+            if (_util.isfakedata){
+                if (std::string(_util.intrinsic_mode) == "default"){
+                    _hhelper.at(_util.k_mc).WriteReco(_util.k_data);
+                }
+            }
+            else
+                _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
         }
         
         if (std::string(_util.intrinsic_mode) == "default") {
-            _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_mc);
             _hhelper.at(_util.k_mc).WriteFlash();
-            _hhelper.at(_util.k_mc).WritePiZero(_util.k_mc);
-            _hhelper.at(_util.k_mc).WriteNuMu(_util.k_mc);
+            
+            if (_util.isfakedata){
+                if (std::string(_util.intrinsic_mode) == "default"){
+                    _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_data);
+                    _hhelper.at(_util.k_mc).WritePiZero(_util.k_data);
+                    _hhelper.at(_util.k_mc).WriteNuMu(_util.k_data);
+                }
+            }
+            else {
+                _hhelper.at(_util.k_mc).WriteRecoPar(_util.k_mc);
+                _hhelper.at(_util.k_mc).WritePiZero(_util.k_mc);
+                _hhelper.at(_util.k_mc).WriteNuMu(_util.k_mc);
+            }
         }
 
         _thelper.at(_util.k_mc).WriteTree(_util.k_mc);
@@ -585,7 +620,7 @@ void Selection::SelectionFill(int type, SliceContainer &SC, int cut_index, std::
     // *************************************************************************
     double weight = 1.0;
     bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
-    weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv);
+    weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction);
 
     // Try scaling the pi0 -- need to implement this as a configurable option
     // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
@@ -622,6 +657,10 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
 
     // Classify the event
     SC.SliceClassifier(type);      // Classification of the event
+
+    // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
+    SC.SetThresholdEvent();
+
     SC.SliceInteractionType(type); // Genie interaction type
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
         
@@ -634,7 +673,7 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
     bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
 
     // Get the Central Value weight
-    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv);
+    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction);
     double weight_norm = weight;
     double weight_Escale = weight;
 
@@ -658,6 +697,10 @@ void Selection::ApplyNuMuSelection(int type, SliceContainer &SC){
 
     // Classify the event
     SC.SliceClassifier(type);      // Classification of the event
+
+    // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
+    SC.SetThresholdEvent();
+
     SC.SliceInteractionType(type); // Genie interaction type
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
     
@@ -718,7 +761,7 @@ void Selection::ApplyNuMuSelection(int type, SliceContainer &SC){
     bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
 
     // Get the Central Value weight
-    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv);
+    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction);
     
     // Also apply the pi0 weight
     _util.GetPiZeroWeight(weight, _util.pi0_correction, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);

@@ -29,7 +29,11 @@ int main(int argc, char *argv[]){
     "\033[0;33m[--weight_dirt <weight mode>]\033[0m                          \033[0;32mTurn on/off the weighting of dirt 1 == on, 0 == off \033[0m\n\n"
     "\033[0;33m[--weight_ext <weight mode>]\033[0m                           \033[0;32mTurn on/off the weighting of ext 1 == on, 0 == off \033[0m\n\n"
     "\033[0;33m[--weight_pi0 <weight mode>]\033[0m                           \033[0;32mTurn on/off the weighting of pi0 0 == off, 1 == norm factor, 2 == E dep. scaling \033[0m\n\n"
+    "\033[0;33m[--notuning]\033[0m                                           \033[0;32mTurn off ppfx, genie tune and pi0 tunings. \033[0m\n\n"
     "\033[0;33m[--slim]\033[0m                                               \033[0;32mWhen this extension is added, the histogram helper class is not initalised and no histograms will be filled or saved. This is to speed up the selection code if you just want to run the selection.\033[0m\n\n"
+    "\033[0;33m[--intrinsic <intrinsic mode>]\033[0m                         \033[0;32mWhen this is on, we overwrite the signal events that get written to file with events from an intrinsic file. Events are also weighted by an additional intrinsic factor. Must be used with --mc option. Options are intrinsic.\033[0m\n\n"
+    "\033[0;33m[--tunemec]\033[0m                                            \033[0;32mApply a 1.5 scale factor to MEC events. Default is off \033[0m\n\n"
+    "\033[0;33m[--fake <fake data name>]\033[0m                              \033[0;32mConfigure input file as fake data also give it a name of the fake data. This weights all ext and dirt events to zero. \033[0m\n\n"
     // "\033[0;33m[--verbose <verbose level>]\033[0m                            \033[0;32mDoes not print the selection cut results, 1 (default) currently prints everything\033[0m\n\n"
     "-------------------------------------------------------"
     "\n\nTo print the results of the selection, run: \n\n"
@@ -53,18 +57,25 @@ int main(int argc, char *argv[]){
     "\n\nTo run the cross section calculation code, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --xsec <input merged nuexsec tree file> [options (see below)]\033[0m \n\n"
     "The <input merged nuexsec ttree file> corresponds to merged ttree file of the mc, data, ext and dirt. See the bash script merge_uneaventrees.C for more details\n\n"
-    "\033[0;34m[--xsecmode <cross-section mode> [labels] ]\033[0m                      \033[0;32mThe input mode of xsec code to run. Options are default or reweight. Labels are optional, but can be all/unisim/ppfx/genie/reint \033[0m\n\n"
+    "\033[0;34m[--xsecmode <cross-section mode> ]\033[0m                     \033[0;32mThe input mode of xsec code to run. Options are default or reweight. Labels are optional, but can be all/unisim/ppfx/genie/reint \033[0m\n\n"
+    "\033[0;34m[--xseclabel <cross-section label> ]\033[0m                   \033[0;32mThe systematic variation to run over in the xsec calc. Default is all. Options are all/unisim/ppfx/genie/reint \033[0m\n\n"
+    "\033[0;34m[--xsecplot <cross-section plot mode> ]\033[0m                \033[0;32mChoose to use the cross section code to reweight all the cut plots [very slow]. Options are default or rw_cuts. \033[0m\n\n"
+    "\033[0;34m[--xsecvar <cross-section var>]\033[0m                        \033[0;32mTThe variable to bin the cross section as a function of. Default is elec_E. Options are elec_E or elec_ang. \033[0m\n\n"
+    "\033[0;34m[--xsecbins <cross-section bin mode> ]\033[0m                 \033[0;32mChoose whether to use a fine binned smearing/response matrix in truth. Default is standard. Options are standard or fine. \033[0m\n\n"
+    "\033[0;34m[--xsec_smear <cross-section smear mode> ]\033[0m             \033[0;32mChoose how to define the cross section. Default is mcc8. Options are mcc8 or er. \033[0m\n\n"
     "-------------------------------------------------------\n\n";
 
     std::string usage3 = "\n\nTo run the detector systematics code, run: \n\n"
-    "\033[0;31m./nuexsec --run <run period num> --sys <systematics mode>\033[0m \n\n"
+    "\033[0;31m./nuexsec --run <run period num> --sys <systematics mode> [options (see below)]\033[0m \n\n"
     "\033[0;34m[--sys <systematics mode>]\033[0m                             \033[0;32mThe input mode of systematics to run. Options are default/ext/reweight \033[0m\n\n"
-    "This will run the detector systematics plotting code\n\n"
+    "\033[0;34m[--xsec_smear <cross-section smear mode> ]\033[0m             \033[0;32mChoose how to define the cross section. Default is er. Options are mcc8 or er or wiener.\033[0m\n\n"
+    "\033[0;34m[--binscaling <bin scaling option> ]\033[0m                   \033[0;32mChoose whether we want to apply a bin width scaling to the histogram. Default is width. Options are standard or width. \033[0m\n\n"
     "-------------------------------------------------------\n\n"
     "\n\nTo run the utility plotter code, run: \n\n"
     "\033[0;31m./nuexsec --run <run period num> --uplot <utility plotter mode>\033[0m \n\n"
-    "\033[0;34m[--uplot <utility plotter mode>]\033[0m                             \033[0;32mThe input mode of the utility plotter to run. Options are default/bins \033[0m\n\n"
-    "This will run the utility plotting code\n\n";
+    "\033[0;34m[--uplot <utility plotter mode>]\033[0m                        \033[0;32mThe input mode of the utility plotter to run. Options are default/bins/true/models. See UtilityPlotter Initalise function to see what functions are called. \033[0m\n\n"
+    "\033[0;34m[--zoom]\033[0m                                                \033[0;32mZoom in on the plots. \033[0m\n\n"
+    "\n\n";
 
 
     // -------------------------------------------------------------------------

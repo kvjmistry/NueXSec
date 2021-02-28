@@ -2,7 +2,7 @@
 
 <!-- Production Project -->
 <!DOCTYPE project [
-<!ENTITY release "v08_00_00_46">
+<!ENTITY release "v08_00_00_51">
 <!ENTITY file_type "mc">
 <!ENTITY run_type "physics">
 <!ENTITY user "kmistry">
@@ -23,44 +23,151 @@
   <os>SL7</os>
 
   <!-- Batch resources -->
-  <resource>DEDICATED,OPPORTUNISTIC,OFFSITE</resource>
+  <resource>DEDICATED,OPPORTUNISTIC</resource>
 
   <!-- Larsoft information -->
   <larsoft>
     <tag>&release;</tag>
     <qual>e17:prof</qual>
-    <local>/pnfs/uboone/resilient/users/kmistry/tars/uboonecode_mcc9_v08_00_00_46_sl7.tar</local>
+    <local>/pnfs/uboone/resilient/users/kmistry/tars/uboonecode_mcc9_v08_00_00_51_sl7.tar</local>
   </larsoft>
 
-  <!-- <check>1</check> -->
-  <!-- <copy>1</copy> -->
-  
   <!-- Project stages -->
-  <stage name="ntuple">
+  <stage name="ntuple0">
     <fcl>run_redk2nu_rhc.fcl</fcl>
     <fcl>standard_overlay_notpc_numi_uboone_updated.fcl</fcl>
-    <fcl>run_eventweight_microboone_mar18_numi_rhc.fcl</fcl>
-    <fcl>run_eventweight_microboone_mar18_extragenieall_1_numi_rhc.fcl</fcl>
-    <fcl>run_eventweight_microboone_mar18_extragenieall_2_numi_rhc.fcl</fcl>
-    <fcl>run_eventweight_microboone_mar18_extragenieall_3_numi_rhc.fcl</fcl>
-    <fcl>run_eventweight_microboone_mar18_extragenieall_4_numi_rhc.fcl</fcl>
-    <fcl>run_eventweight_microboone_mar18_extragenieall_5_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_1_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_2_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_3_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_4_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_5_numi_rhc.fcl</fcl>
     <fcl>run_neutrinoselectionfilter_run3_overlay_cc0pinp_numi.fcl</fcl>
-    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</outdir>
-    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple/&version;</logdir>
-    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
-    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
-    <maxfilesperjob>1</maxfilesperjob>
-    <numjobs>5000</numjobs>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple0/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple0/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple0/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple0/&version;</bookdir>
+    <maxfilesperjob>4</maxfilesperjob>
+    <numjobs>800</numjobs>
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
-    <schema>root</schema>
-    <inputdef>prodgenie_numi_uboone_overlay_rhc_mcc9_run3b_v28_all_snapshot</inputdef>
-    <jobsub>--expected-lifetime=6h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/RHC/flux_cached_entries.root</jobsub>
-    <jobsub_start>  --expected-lifetime=short</jobsub_start>
-    <blacklist>Lancaster</blacklist>
+    <schema>gsiftp</schema>
+    <inputdef>prodgenie_numi_uboone_overlay_rhc_mcc9_run3b_v28_all_snapshot_Set0</inputdef>
+    <prestagefraction>1</prestagefraction>
+    <endscript>/pnfs/uboone/resilient/users/kmistry/zip_logs.sh</endscript>
+    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/RHC/flux_cached_entries.root</jobsub>
+    <jobsub_start>  --expected-lifetime=long</jobsub_start>
   </stage>
-  
+ 
+<!-- Project stages -->
+  <stage name="ntuple1">
+    <fcl>run_redk2nu_rhc.fcl</fcl>
+    <fcl>standard_overlay_notpc_numi_uboone_updated.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_1_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_2_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_3_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_4_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_5_numi_rhc.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run3_overlay_cc0pinp_numi.fcl</fcl>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple1/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple1/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple1/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple1/&version;</bookdir>
+    <maxfilesperjob>4</maxfilesperjob>
+    <numjobs>800</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <schema>gsiftp</schema>
+    <inputdef>prodgenie_numi_uboone_overlay_rhc_mcc9_run3b_v28_all_snapshot_Set1</inputdef>
+    <prestagefraction>1</prestagefraction>
+    <endscript>/pnfs/uboone/resilient/users/kmistry/zip_logs.sh</endscript>
+    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/RHC/flux_cached_entries.root</jobsub>
+    <jobsub_start>  --expected-lifetime=long</jobsub_start>
+  </stage>
+
+<!-- Project stages -->
+  <stage name="ntuple2">
+    <fcl>run_redk2nu_rhc.fcl</fcl>
+    <fcl>standard_overlay_notpc_numi_uboone_updated.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_1_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_2_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_3_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_4_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_5_numi_rhc.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run3_overlay_cc0pinp_numi.fcl</fcl>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple2/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple2/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple2/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple2/&version;</bookdir>
+    <maxfilesperjob>4</maxfilesperjob>
+    <numjobs>800</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <schema>gsiftp</schema>
+    <inputdef>prodgenie_numi_uboone_overlay_rhc_mcc9_run3b_v28_all_snapshot_Set2</inputdef>
+    <prestagefraction>1</prestagefraction>
+    <endscript>/pnfs/uboone/resilient/users/kmistry/zip_logs.sh</endscript>
+    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/RHC/flux_cached_entries.root</jobsub>
+    <jobsub_start>  --expected-lifetime=long</jobsub_start>
+  </stage>
+
+<!-- Project stages -->
+  <stage name="ntuple3">
+    <fcl>run_redk2nu_rhc.fcl</fcl>
+    <fcl>standard_overlay_notpc_numi_uboone_updated.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_1_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_2_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_3_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_4_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_5_numi_rhc.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run3_overlay_cc0pinp_numi.fcl</fcl>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple3/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple3/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple3/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple3/&version;</bookdir>
+    <maxfilesperjob>4</maxfilesperjob>
+    <numjobs>800</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <schema>gsiftp</schema>
+    <inputdef>prodgenie_numi_uboone_overlay_rhc_mcc9_run3b_v28_all_snapshot_Set3</inputdef>
+    <prestagefraction>1</prestagefraction>
+    <endscript>/pnfs/uboone/resilient/users/kmistry/zip_logs.sh</endscript>
+    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/RHC/flux_cached_entries.root</jobsub>
+    <jobsub_start>  --expected-lifetime=long</jobsub_start>
+  </stage>
+
+<!-- Project stages -->
+  <stage name="ntuple4">
+    <fcl>run_redk2nu_rhc.fcl</fcl>
+    <fcl>standard_overlay_notpc_numi_uboone_updated.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_1_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_2_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_3_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_4_numi_rhc.fcl</fcl>
+    <fcl>run_eventweight_microboone_sept24_extragenieall_5_numi_rhc.fcl</fcl>
+    <fcl>run_neutrinoselectionfilter_run3_overlay_cc0pinp_numi.fcl</fcl>
+    <outdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple4/&version;</outdir>
+    <logdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/ntuple4/&version;</logdir>
+    <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple4/&version;</workdir>
+    <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple4/&version;</bookdir>
+    <maxfilesperjob>4</maxfilesperjob>
+    <numjobs>90</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>2000</memory>
+    <schema>gsiftp</schema>
+    <inputdef>prodgenie_numi_uboone_overlay_rhc_mcc9_run3b_v28_all_snapshot_Set4</inputdef>
+    <prestagefraction>1</prestagefraction>
+    <endscript>/pnfs/uboone/resilient/users/kmistry/zip_logs.sh</endscript>
+    <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/RHC/flux_cached_entries.root</jobsub>
+    <jobsub_start>  --expected-lifetime=24h</jobsub_start>
+  </stage>
+
+ 
   <!-- file type -->
   <filetype>&file_type;</filetype>
 

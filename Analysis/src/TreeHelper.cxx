@@ -19,15 +19,26 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
         
         // File not already open, open the file
         if (!gROOT->GetListOfFiles()->FindObject( file_name.c_str() ) ) {
-            f_nuexsec = new TFile( file_name.c_str(), "UPDATE");
+            f_nuexsec_tree = new TFile( file_name.c_str(), "UPDATE");
+            f_nuexsec_tree->cd();
         }
 
         // Create the TTree
-        tree             = new TTree("mc_tree",                "mc_tree");
-        nue_tree         = new TTree("mc_nue_tree",            "mc_nue_tree");
-        dedx_tree        = new TTree("mc_dedx_tree",           "mc_dedx_tree");
-        counter_tree     = new TTree("mc_counter_tree",        "mc_counter_tree");
-        nue_counter_tree = new TTree("mc_nue_counter_tree",    "mc_nue_counter_tree");
+        if (_util.isfakedata){
+            tree             = new TTree("data_tree",                "data_tree");
+            nue_tree         = new TTree("data_nue_tree",            "data_nue_tree");
+            dedx_tree        = new TTree("data_dedx_tree",           "data_dedx_tree");
+            counter_tree     = new TTree("data_counter_tree",        "data_counter_tree");
+            nue_counter_tree = new TTree("data_nue_counter_tree",    "data_nue_counter_tree");
+        }
+        else {
+            tree             = new TTree("mc_tree",                "mc_tree");
+            nue_tree         = new TTree("mc_nue_tree",            "mc_nue_tree");
+            dedx_tree        = new TTree("mc_dedx_tree",           "mc_dedx_tree");
+            counter_tree     = new TTree("mc_counter_tree",        "mc_counter_tree");
+            nue_counter_tree = new TTree("mc_nue_counter_tree",    "mc_nue_counter_tree");
+        }
+        
     }
     else if (type == _util.k_data){
         
@@ -37,7 +48,8 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
 
         // File not already open, open the file
         if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
-            f_nuexsec = new TFile(file_name.c_str(), "UPDATE");
+            f_nuexsec_tree = new TFile(file_name.c_str(), "UPDATE");
+            f_nuexsec_tree->cd();
         }
 
         // Create the TTree
@@ -54,7 +66,8 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
         
         // File not already open, open the file
         if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
-            f_nuexsec = new TFile(file_name.c_str(), "UPDATE");
+            f_nuexsec_tree = new TFile(file_name.c_str(), "UPDATE");
+            f_nuexsec_tree->cd();
         }
 
         // Create the TTree
@@ -71,7 +84,8 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
 
         // File not already open, open the file
         if (!gROOT->GetListOfFiles()->FindObject(file_name.c_str()) ) {
-            f_nuexsec = new TFile(file_name.c_str(), "UPDATE");
+            f_nuexsec_tree = new TFile(file_name.c_str(), "UPDATE");
+            f_nuexsec_tree->cd();
         }
 
         // Create the TTree
@@ -156,20 +170,22 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
         counter_tree    ->Branch("count_pi0_nc_nopi0",        &count_pi0_nc_nopi0);
         counter_tree    ->Branch("count_pi0_nc_pi0",          &count_pi0_nc_pi0);
         
-        nue_counter_tree->Branch("count_nue_cc",       &count_nue_cc);
-        nue_counter_tree->Branch("count_nuebar_cc",    &count_nuebar_cc);
-        counter_tree    ->Branch("count_nu_out_fv",    &count_nu_out_fv);
-        counter_tree    ->Branch("count_cosmic",       &count_cosmic);
-        counter_tree    ->Branch("count_numu_cc",      &count_numu_cc);
-        counter_tree    ->Branch("count_numu_cc_pi0",  &count_numu_cc_pi0);
-        counter_tree    ->Branch("count_nc",           &count_nc);
-        counter_tree    ->Branch("count_nc_pi0",       &count_nc_pi0);
-        nue_counter_tree->Branch("count_unmatched",    &count_unmatched);
+        nue_counter_tree->Branch("count_nue_cc",          &count_nue_cc);
+        nue_counter_tree->Branch("count_nuebar_cc",       &count_nuebar_cc);
+        counter_tree    ->Branch("count_nu_out_fv",       &count_nu_out_fv);
+        counter_tree    ->Branch("count_cosmic",          &count_cosmic);
+        counter_tree    ->Branch("count_numu_cc",         &count_numu_cc);
+        counter_tree    ->Branch("count_numu_cc_pi0",     &count_numu_cc_pi0);
+        counter_tree    ->Branch("count_nc",              &count_nc);
+        counter_tree    ->Branch("count_nc_pi0",          &count_nc_pi0);
+        nue_counter_tree->Branch("count_unmatched",       &count_unmatched);
         nue_counter_tree->Branch("count_unmatched_nue",   &count_unmatched_nue);
         nue_counter_tree->Branch("count_cosmic_nue",      &count_cosmic_nue);
         nue_counter_tree->Branch("count_unmatched_nuebar",&count_unmatched_nuebar);
         nue_counter_tree->Branch("count_cosmic_nuebar",   &count_cosmic_nuebar);
-        counter_tree    ->Branch("count_total_mc",     &count_total_mc);
+        nue_counter_tree->Branch("count_thr_nue",         &count_thr_nue);
+        nue_counter_tree->Branch("count_thr_nuebar",      &count_thr_nuebar);
+        counter_tree    ->Branch("count_total_mc",        &count_total_mc);
     }
         
     
@@ -185,7 +201,7 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
 // -----------------------------------------------------------------------------
 void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
 
-    f_nuexsec->cd();
+    f_nuexsec_tree->cd();
 
     run                      = SC.run;
     subrun                   = SC.sub;
@@ -238,6 +254,8 @@ void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
     knobRPA_CCQE_Reducedup = SC.knobRPA_CCQE_Reducedup;
     knobNormCCCOHup        = SC.knobNormCCCOHup;
     knobNormNCCOHup        = SC.knobNormNCCOHup;
+    knobxsr_scc_Fv3up      = SC.knobxsr_scc_Fv3up;
+    knobxsr_scc_Fa3up      = SC.knobxsr_scc_Fa3up;
     knobRPAdn              = SC.knobRPAdn;
     knobCCMECdn            = SC.knobCCMECdn;
     knobAxFFCCQEdn         = SC.knobAxFFCCQEdn;
@@ -248,6 +266,8 @@ void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
     knobRPA_CCQE_Reduceddn = SC.knobRPA_CCQE_Reduceddn;
     knobNormCCCOHdn        = SC.knobNormCCCOHdn;
     knobNormNCCOHdn        = SC.knobNormNCCOHdn;
+    knobxsr_scc_Fv3dn      = SC.knobxsr_scc_Fv3dn;
+    knobxsr_scc_Fa3dn      = SC.knobxsr_scc_Fa3dn;
 
     // Fill the nue tree
     if (std::string(_util.intrinsic_mode) == "intrinsic")
@@ -259,7 +279,7 @@ void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
 // -----------------------------------------------------------------------------
 void TreeHelper::Fill_dedxVars(SliceContainer &SC, std::pair<std::string, int> _classification, std::string _cut, double _weight){
 
-    f_nuexsec->cd();
+    f_nuexsec_tree->cd();
 
     classification = _classification.first;
     weight = _weight;
@@ -306,7 +326,7 @@ void TreeHelper::Fill_dedxVars(SliceContainer &SC, std::pair<std::string, int> _
 // -----------------------------------------------------------------------------
 void TreeHelper::WriteTree(int type){
 
-    f_nuexsec->cd();
+    f_nuexsec_tree->cd();
 
     if (std::string(_util.intrinsic_mode) == "intrinsic")
         nue_tree->Write("",TObject::kOverwrite);
@@ -326,7 +346,7 @@ void TreeHelper::WriteTree(int type){
 // -----------------------------------------------------------------------------
 void TreeHelper::Fill_counters(std::vector<double> counter_v, bool bool_use_mc, bool bool_use_ext, bool bool_use_data, bool bool_use_dirt){
 
-    f_nuexsec->cd();
+    f_nuexsec_tree->cd();
 
     if (bool_use_mc){
         count_nue_cc_qe  = counter_v.at(_util.k_count_nue_cc_qe);
@@ -385,6 +405,8 @@ void TreeHelper::Fill_counters(std::vector<double> counter_v, bool bool_use_mc, 
         count_cosmic_nue       = counter_v.at(_util.k_count_cosmic_nue);
         count_unmatched_nuebar = counter_v.at(_util.k_count_unmatched_nuebar);
         count_cosmic_nuebar    = counter_v.at(_util.k_count_cosmic_nuebar);
+        count_thr_nue          = counter_v.at(_util.k_count_thr_nue);
+        count_thr_nuebar       = counter_v.at(_util.k_count_thr_nuebar);
         count_total_mc         = counter_v.at(_util.k_count_total_mc);
     }
 
@@ -463,6 +485,10 @@ void TreeHelper::SetBranches(TTree * tree){
     tree->Branch("knobNormCCCOHdn",       &knobNormCCCOHdn,       "knobNormCCCOHdn/D");
     tree->Branch("knobNormNCCOHup",       &knobNormNCCOHup,       "knobNormNCCOHup/D");
     tree->Branch("knobNormNCCOHdn",       &knobNormNCCOHdn,       "knobNormNCCOHdn/D");
+    tree->Branch("knobxsr_scc_Fv3up",     &knobxsr_scc_Fv3up,     "knobxsr_scc_Fv3up/D");
+    tree->Branch("knobxsr_scc_Fv3dn",     &knobxsr_scc_Fv3dn,     "knobxsr_scc_Fv3dn/D");
+    tree->Branch("knobxsr_scc_Fa3up",     &knobxsr_scc_Fa3up,     "knobxsr_scc_Fa3up/D");
+    tree->Branch("knobxsr_scc_Fa3dn",     &knobxsr_scc_Fa3dn,     "knobxsr_scc_Fa3dn/D");
 
 }
 // -----------------------------------------------------------------------------

@@ -12,7 +12,7 @@ void PrintHelper::Initialise(Utility _utility ){
     std::string file_name;
 
     // define this to scale the MC to a desired POT
-    // double additional_scaling = 6.0e20/_util.config_v.at(_util.k_Run1_Data_POT); // Use this to scale the POT to set amount -- also chnage the run POT
+    // double additional_scaling = 2.0e20/_util.config_v.at(_util.k_Run1_Data_POT); // Use this to scale the POT to set amount -- also chnage the run POT
     double additional_scaling = 1.0; // Use this to use default
     if ( additional_scaling != 1.0) std::cout << "\033[0;34mWarning using an additional POT scale factor to print the selection results\033[0m" << std::endl;
 
@@ -177,6 +177,8 @@ void PrintHelper::Initialise(Utility _utility ){
         mc_nue_counter_tree->SetBranchAddress("count_cosmic_nue",      &count_cosmic_nue);
         mc_nue_counter_tree->SetBranchAddress("count_unmatched_nuebar",&count_unmatched_nuebar);
         mc_nue_counter_tree->SetBranchAddress("count_cosmic_nuebar",   &count_cosmic_nuebar);
+        mc_nue_counter_tree->SetBranchAddress("count_thr_nue",         &count_thr_nue);
+        mc_nue_counter_tree->SetBranchAddress("count_thr_nuebar",      &count_thr_nuebar);
         mc_counter_tree    ->SetBranchAddress("count_total_mc",        &count_total_mc);
     }
 
@@ -228,6 +230,8 @@ void PrintHelper::PrintResults(){
             init_count_cosmic_nue       = count_cosmic_nue;
             init_count_unmatched_nuebar = count_unmatched_nuebar;
             init_count_cosmic_nuebar    = count_cosmic_nuebar;
+            init_count_thr_nue          = count_thr_nue;
+            init_count_thr_nuebar       = count_thr_nuebar;
             if (_util.print_ext) init_count_ext = count_ext;
             if (_util.print_dirt) init_count_dirt = count_dirt;
 
@@ -285,6 +289,8 @@ void PrintHelper::PrintResults(){
             printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Cosmic",               count_cosmic,           double(count_cosmic           * mc_scale_factor  ), " ", double( 100 * count_cosmic / init_count_cosmic),                     double(-100 * (count_cosmic           - prev_count_cosmic)           / prev_count_cosmic));
             printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Cosmic Nue CC",        count_cosmic_nue,       double(count_cosmic_nue       * mc_scale_factor  ), " ", double( 100 * count_cosmic_nue / init_count_cosmic_nue),             double(-100 * (count_cosmic_nue       - prev_count_cosmic_nue)       / prev_count_cosmic_nue));
             printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Cosmic Nuebar CC",     count_cosmic_nuebar,    double(count_cosmic_nuebar    * mc_scale_factor  ), " ", double( 100 * count_cosmic_nuebar),                                  double(-100 * (count_cosmic_nuebar    - prev_count_cosmic_nuebar)    / prev_count_cosmic_nuebar));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Below Th Nue CC",      count_thr_nue,          double(count_thr_nue          * mc_scale_factor  ), " ", double( 100 * count_thr_nue),                                        double(-100 * (count_thr_nue       - prev_count_thr_nue)       / prev_count_thr_nue));
+            printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Below Th Nuebar CC",   count_thr_nuebar,       double(count_thr_nuebar       * mc_scale_factor  ), " ", double( 100 * count_thr_nuebar),                                     double(-100 * (count_thr_nuebar    - prev_count_thr_nuebar)    / prev_count_thr_nuebar));
             if (p == 0) printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Non-Reco'd Nue CC",    count_unmatched_nue,    double(count_unmatched_nue    * mc_scale_factor  ), " ", double( 100 * count_unmatched_nue / init_count_unmatched_nue),       double(-100 * (count_unmatched_nue    - prev_count_unmatched_nue)    / prev_count_unmatched_nue));
             if (p == 0) printf (" %-20s: %-10.2f %-10.2f %-10s %-12.1f %-10.1f\n", "Non-Reco'd Nuebar CC", count_unmatched_nuebar, double(count_unmatched_nuebar * mc_scale_factor  ), " ", double( 100 * count_unmatched_nuebar / init_count_unmatched_nuebar), double(-100 * (count_unmatched_nuebar - prev_count_unmatched_nuebar) / prev_count_unmatched_nuebar));
        }
@@ -295,7 +301,7 @@ void PrintHelper::PrintResults(){
         }
 
         if (_util.print_mc && _util.print_dirt){
-            double tot_mc_bkg = count_nu_out_fv + count_numu_cc + count_numu_cc_pi0 + count_nc + count_nc_pi0;
+            double tot_mc_bkg = count_nu_out_fv + count_numu_cc + count_numu_cc_pi0 + count_nc + count_nc_pi0 + count_thr_nue + count_thr_nuebar;
             printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Beam Bkg", tot_mc_bkg + count_dirt * (dirt_scale_factor / mc_scale_factor), double(tot_mc_bkg * mc_scale_factor + count_dirt * dirt_scale_factor ) );
         }
 
@@ -389,6 +395,8 @@ void PrintHelper::PrintResults(){
         prev_count_cosmic_nue       = count_cosmic_nue;
         prev_count_unmatched_nuebar = count_unmatched_nuebar;
         prev_count_cosmic_nuebar    = count_cosmic_nuebar;
+        prev_count_thr_nue          = count_thr_nue;
+        prev_count_thr_nuebar       = count_thr_nuebar;
         if (_util.print_ext) prev_count_ext = count_ext;
         if (_util.print_dirt) prev_count_dirt = count_dirt;
         
