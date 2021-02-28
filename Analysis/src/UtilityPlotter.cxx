@@ -1811,7 +1811,7 @@ void UtilityPlotter::TestModelDependence(){
     if (_util.zoom)
         c->Print(Form("plots/run%s/Models/%s/DataModelComparison_zoom.pdf", _util.run_period, _util.xsec_var));
     else
-        c->Print(Form("plots/run%s/Models/%s/DataModelComparison.pdf", _util.run_period, _util.xsec_var));
+        c->Print(Form("plots/run%s/Models/%s/run%s_DataModelComparison_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var));
 
     fxsec->Close();
 
@@ -1938,7 +1938,7 @@ void UtilityPlotter::CompareSmearing(){
     leg->Draw();
 
     // Save and close
-    c->Print(Form("plots/run%s/Models/%s/SmearingModelComparison.pdf", _util.run_period, _util.xsec_var));
+    c->Print(Form("plots/run%s/Models/%s/run%s_SmearingModelComparison_%s.pdf", _util.run_period, _util.xsec_var,  _util.run_period, _util.xsec_var));
 
     fxsec->Close();
 
@@ -2114,7 +2114,7 @@ void UtilityPlotter::CompareUnfoldedModels(){
     if (_util.zoom)
         c->Print(Form("plots/run%s/Models/%s/DataModelUnfoldedComparison_zoom.pdf", _util.run_period, _util.xsec_var));
     else
-        c->Print(Form("plots/run%s/Models/%s/DataModelUnfoldedComparison.pdf", _util.run_period, _util.xsec_var));
+        c->Print(Form("plots/run%s/Models/%s/run%s_DataModelUnfoldedComparison_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var));
 
     delete c;
 
@@ -2267,7 +2267,7 @@ void UtilityPlotter::CompareFakeDataReco(){
         leg->Draw();
 
         // Save and close
-        c->Print(Form("plots/run%s/Models/%s/FakeDataComparison_%s.pdf", _util.run_period, _util.xsec_var, models.at(m).c_str()));
+        c->Print(Form("plots/run%s/Models/%s/run%s_FakeDataComparison_%s_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var, models.at(m).c_str()));
         delete c;
     }
 
@@ -2421,7 +2421,7 @@ void UtilityPlotter::CompareFakeDataTrue(){
         leg->Draw();
 
         
-        c->Print(Form("plots/run%s/Models/%s/UnfoldedFakeDataComparison_%s.pdf", _util.run_period, _util.xsec_var, models.at(m).c_str()));
+        c->Print(Form("plots/run%s/Models/%s/run%s_UnfoldedFakeDataComparison_%s_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var, models.at(m).c_str()));
         delete c;
 
         delete _wSVD.smear;
@@ -2582,7 +2582,7 @@ void UtilityPlotter::CompareTotalCrossSec(){
     t->Draw();
 
 
-    c->Print(Form("plots/run%s/Models/Total/TotalCrossSectionComparison.pdf", _util.run_period));
+    c->Print(Form("plots/run%s/Models/Total/run%s_TotalCrossSectionComparison.pdf", _util.run_period, _util.run_period));
 
     delete c;
 
@@ -2691,7 +2691,7 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
 
         gStyle->SetLegendTextSize(0.06);
 
-        c->Print(Form("plots/run%s/Models/Total/FakeTotalCrossSectionComparison_%s.pdf", _util.run_period, models.at(m).c_str()));
+        c->Print(Form("plots/run%s/Models/Total/run%s_FakeTotalCrossSectionComparison_%s.pdf", _util.run_period, _util.run_period,  models.at(m).c_str()));
         delete c;
     
     }
@@ -2783,7 +2783,7 @@ void UtilityPlotter::CompareDataCrossSections(){
     leg->AddEntry(h_dataxsec_model.at(k_model_tune1)    , "Data Tune 1", "l");
     leg->Draw();
 
-    c->Print(Form("plots/run%s/Models/%s/ModelDataComparison.pdf", _util.run_period, _util.xsec_var));
+    c->Print(Form("plots/run%s/Models/%s/run%s_ModelDataComparison_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var));
     delete c;
 
     fxsec->Close();
@@ -2886,7 +2886,7 @@ void UtilityPlotter::CompareTotalDataCrossSections(){
 
     gStyle->SetLegendTextSize(0.06);
 
-    c->Print(Form("plots/run%s/Models/Total/ModelDataComparison.pdf", _util.run_period));
+    c->Print(Form("plots/run%s/Models/Total/run%s_ModelDataComparison.pdf", _util.run_period, _util.run_period));
     delete c;
 
     fxsec->Close();
@@ -3043,7 +3043,7 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
     gStyle->SetLegendTextSize(0.06);
     leg->Draw();
 
-    c->Print(Form("plots/run%s/Models/%s/UnfoldedDataComparison.pdf", _util.run_period, _util.xsec_var));
+    c->Print(Form("plots/run%s/Models/%s/run%s_UnfoldedDataComparison_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var));
     delete c;
 
 }

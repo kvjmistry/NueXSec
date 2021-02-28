@@ -3093,9 +3093,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                 h_err->SetTitle(var_labels_eff.at(var).c_str());
             else
                 h_err->SetTitle(var_labels_events.at(var).c_str());
-
-
-            h_err->SetTitle(" ");
+                
             // h_err->GetXaxis()->SetTitle(var_labels_x.at(var).c_str());
             h_err->SetMarkerColor(kBlack);
             h_err->SetLineStyle(1);
@@ -3113,18 +3111,15 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
             else _util.Draw_Data_POT(c, Data_POT, 0.50, 0.915, 0.50, 0.915);
 
             // Choose what histograms to save
-        if ( (var == k_var_recoX && (type == k_xsec_mcxsec || type == k_xsec_dataxsec || type == k_xsec_bkg || type == k_xsec_sig)) || 
-             (var == k_var_trueX && (type == k_xsec_eff || type == k_xsec_mcxsec_smear)) ||
-             (var == k_var_integrated && (type == k_xsec_mcxsec || type == k_xsec_dataxsec || type == k_xsec_bkg || type == k_xsec_sig || type == k_xsec_eff)) 
-            ){
-            c->Print(Form("plots/run%s/Systematics/%s/run%s_%s_%s_%s.pdf", _util.run_period, unisim_type.c_str(), _util.run_period, unisim_type.c_str(), vars.at(var).c_str(), xsec_types.at(type).c_str()));
-        }
-
+            if ( (var == k_var_recoX && (type == k_xsec_mcxsec || type == k_xsec_dataxsec || type == k_xsec_bkg || type == k_xsec_sig)) || 
+                (var == k_var_trueX && (type == k_xsec_eff || type == k_xsec_mcxsec_smear)) ||
+                (var == k_var_integrated && (type == k_xsec_mcxsec || type == k_xsec_dataxsec || type == k_xsec_bkg || type == k_xsec_sig || type == k_xsec_eff)) 
+                ){
+                c->Print(Form("plots/run%s/Systematics/%s/run%s_%s_%s_%s.pdf", _util.run_period, unisim_type.c_str(), _util.run_period, unisim_type.c_str(), vars.at(var).c_str(), xsec_types.at(type).c_str()));
+            }
 
             delete c;
             delete h_CV_clone;
-
-
         }
     
     
@@ -3539,19 +3534,33 @@ void SystematicsHelper::MakeTotUncertaintyPlot(bool AddStatErr){
                 if (AddStatErr && (type == k_xsec_dataxsec || type == k_xsec_mcxsec)){
                     h_uncertainty.at(k_err_tot)->SetTitle(xsec_types_pretty.at(type).c_str());
                     h_uncertainty.at(k_err_tot)->GetYaxis()->SetTitle("Uncertainty [%]");
-                    h_uncertainty.at(k_err_tot)->GetYaxis()->SetRangeUser(0, 250);
+                    
+                    if (std::string(_util.xsec_var) == "elec_E")
+                        h_uncertainty.at(k_err_tot)->GetYaxis()->SetRangeUser(0, 250);
+                    else 
+                        h_uncertainty.at(k_err_tot)->GetYaxis()->SetRangeUser(0, 100);
+                    
                     h_uncertainty.at(k_err_tot)->Draw("hist,same, text00");
                     h_uncertainty.at(k_err_stat)->Draw("hist,same");
                 }
                 else {
                     h_uncertainty.at(k_err_sys)->SetTitle(xsec_types_pretty.at(type).c_str());
                     h_uncertainty.at(k_err_sys)->GetYaxis()->SetTitle("Uncertainty [%]");
-                    h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 120);
+                    
+                    if (std::string(_util.xsec_var) == "elec_E")
+                        h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 120);
+                    else 
+                        h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 100);
+                    
                     h_uncertainty.at(k_err_sys)->Draw("hist,same, text00");
                 }
 
-                if (type == k_xsec_bkg)
-                    h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 650);
+                if (type == k_xsec_bkg){
+                    if (std::string(_util.xsec_var) == "elec_E")
+                        h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 650);
+                    else
+                        h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 300);
+                }
                 
                 h_uncertainty.at(k_err_genie_uni)->Draw("hist,same");
                 h_uncertainty.at(k_err_genie_multi)->Draw("hist,same");
