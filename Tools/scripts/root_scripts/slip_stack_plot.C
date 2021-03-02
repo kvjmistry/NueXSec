@@ -148,8 +148,9 @@ void slip_stack_plot(){
     slipstacktree->Draw(" pot4p6:run  >> htemprun4p6", "pot4p6", "colz");
     SetHistProperties(c2, htemprun4p6);
     c2->SetTopMargin(0.11);
-    htemprun4p6->GetXaxis()->SetLabelSize(0.03);
+    htemprun4p6->GetXaxis()->SetLabelSize(0.02);
     gStyle->SetPalette(kBlueGreenYellow);
+    // pt->Draw();
     c2->Print("plots/run1_4p6_slip_stacking_Intensity.pdf");
 
     // Now Lets query the TTree and make some plots!
@@ -158,7 +159,7 @@ void slip_stack_plot(){
     slipstacktree->Draw(" pot6p6:run  >> htemprun6p6", "pot6p6", "colz");
     SetHistProperties(c3, htemprun6p6);
     c3->SetTopMargin(0.11);
-    htemprun6p6->GetXaxis()->SetLabelSize(0.03);
+    htemprun6p6->GetXaxis()->SetLabelSize(0.02);
     gStyle->SetPalette(kBlueGreenYellow);
     c3->Print("plots/run1_6p6_slip_stacking_Intensity.pdf");
 

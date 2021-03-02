@@ -238,10 +238,14 @@ void Selection::MakeSelection(){
             if (std::string(_util.run_period) == "1" ){
 
                 // 4p6
-                // if (data_SC.run > 5900) continue;
-
+                // if ((data_SC.run > 6035 && data_SC.run < 6284) || data_SC.run > 6510 ){
+                //     continue;
+                // }
                 // 6p6
-                // if (data_SC.run < 6600) continue;
+                // if ((data_SC.run > 6285 && data_SC.run < 6510) || data_SC.run < 6035 ){
+                //     continue;
+                // }
+
             }
 
             // Apply Pi0 Selection

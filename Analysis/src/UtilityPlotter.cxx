@@ -59,17 +59,17 @@ void UtilityPlotter::Initialise(Utility _utility){
 
         _util.CreateDirectory("Models/" + std::string(_util.xsec_var));
         _util.CreateDirectory("Models/Total");
-        // TestModelDependence();
-        // CompareDataCrossSections();
-        // CompareSmearing();
-        // CompareUnfoldedModels();
-        // CompareFakeDataReco();
-        // CompareFakeDataTrue();
-        // CompareTotalCrossSec();
-        // CompareFakeTotalCrossSec();
-        // CompareTotalDataCrossSections();
-        // CompareUnfoldedDataCrossSections();
-        // CheckPi0Coverage();
+        TestModelDependence();
+        CompareDataCrossSections();
+        CompareSmearing();
+        CompareUnfoldedModels();
+        CompareFakeDataReco();
+        CompareFakeDataTrue();
+        CompareTotalCrossSec();
+        CompareFakeTotalCrossSec();
+        CompareTotalDataCrossSections();
+        CompareUnfoldedDataCrossSections();
+        CheckPi0Coverage();
         CompareMCC8Result();
         return;
     }
@@ -2141,8 +2141,6 @@ void UtilityPlotter::CompareFakeDataReco(){
             ymax = h_fake.at(m)->GetMaximum();
     }
 
-    
-
     // Now lets plot
     TCanvas *c;
     
@@ -2164,11 +2162,11 @@ void UtilityPlotter::CompareFakeDataReco(){
         if (m == k_model_FLUGG)    h_true_smear.at(k_model_FLUGG)    ->SetLineColor(kViolet-1);
         if (m == k_model_tune1)    h_true_smear.at(k_model_tune1)    ->SetLineColor(kOrange-1);
 
-        h_true_smear.at(m)->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
+        h_true_smear.at(m)->SetTitle(_util.var_labels_xsec.at(k_var_recoX).c_str());
 
         TH1D* h_error_hist = (TH1D*)h_true_smear.at(m)->Clone();
         h_error_hist->SetFillColorAlpha(12, 0.15);
-        
+
         h_true_smear.at(m)->Draw("hist");
         h_error_hist->Draw("e2, same");
         h_fake.at(m)->Draw("E,same");
@@ -2307,10 +2305,21 @@ void UtilityPlotter::CompareFakeDataTrue(){
         if (_wSVD.unf->GetMaximum() > ymax)
             ymax = _wSVD.unf->GetMaximum();
 
-        h_fake_xsec_smear->SetMinimum(0);
         h_fake_xsec_smear->SetMaximum(ymax + ymax*0.4);
         h_fake_xsec_smear->SetLineWidth(2);
         h_fake_xsec_smear->SetLineColor(kRed+2);
+
+        if (std::string(_util.xsec_var) == "elec_E"){
+            h_fake_xsec_smear->SetMaximum(8);
+        }
+        else if (std::string(_util.xsec_var) == "elec_ang"){
+            h_fake_xsec_smear->SetMaximum(15);
+        }
+        else if (std::string(_util.xsec_var) == "elec_cang"){
+            h_fake_xsec_smear->SetMaximum(30.0);
+        }
+
+        h_fake_xsec_smear->SetMinimum(0);
 
         // Set the line colours
         if (m == k_model_input)    h_fake_xsec_smear->SetLineColor(kRed+2);
@@ -2699,6 +2708,11 @@ void UtilityPlotter::CompareDataCrossSections(){
     leg->AddEntry(h_dataxsec_model.at(k_model_tune1)    , "Data Tune 1", "l");
     leg->Draw();
 
+    // Draw the run period on the plot
+    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+
+    _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.52, 0.92, 0.52, 0.92);
+
     c->Print(Form("plots/run%s/Models/%s/run%s_ModelDataComparison_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var));
     delete c;
 
@@ -2921,7 +2935,7 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
             _util.IncreaseLabelSize( h_unf_model.at(m), c);
             gPad->SetLeftMargin(0.20);
             c->SetBottomMargin(0.15);
-            h_unf_model.at(m)->SetTitle(var_labels_xsec.at(k_var_trueX).c_str());
+            h_unf_model.at(m)->SetTitle(_util.var_labels_xsec.at(k_var_trueX).c_str());
             h_unf_model.at(m)->Draw("E,same");
             h_unf_model.at(m)->GetYaxis()->SetTitleOffset(1.4);
         }
@@ -2929,6 +2943,8 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
             h_unf_model.at(m)->Draw("hist,same");
 
         h_unf_model.at(m)->SetLineWidth(2);
+
+        h_unf_model.at(m)->SetMinimum(0);
 
         
         if (m == k_model_input) {
@@ -2958,6 +2974,11 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
     h_unf_model.at(k_model_input)->Draw("E,same");
     gStyle->SetLegendTextSize(0.06);
     leg->Draw();
+
+    // Draw the run period on the plot
+    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+
+    _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.52, 0.92, 0.52, 0.92);
 
     c->Print(Form("plots/run%s/Models/%s/run%s_UnfoldedDataComparison_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var));
     delete c;
@@ -3135,8 +3156,6 @@ void UtilityPlotter::CheckPi0Coverage(){
 }
 // -----------------------------------------------------------------------------
 void UtilityPlotter::CompareMCC8Result(){
-
-    std::cout <<"Here" << std::endl;
 
     gStyle->SetOptStat(0);
 

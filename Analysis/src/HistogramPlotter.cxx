@@ -110,11 +110,12 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_eff_charg_par_multi_nue",     false, false, "True #nu_{e} Charged Particle Multi.; Efficiency",                "True #nu_{e} Events in FV",                        "charg_par_multi_nue" );
         MakeEfficiencyPlotByCut("h_eff_charg_par_multi_nuebar",  false, false, "True #bar{#nu}_{e} Charged Particle Multi.; Efficiency",          "True #bar{#nu}_{e} Events in FV",                  "charg_par_multi_nuebar" );
 
-        MakeEfficiencyPlotByCutTot("h_true_nu_E",           "h_true_nu_E_nue",           "h_true_nu_E_nuebar",          "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   false, false, "True Neutrino Energy [GeV]; Efficiency",         "nu_E");
-        MakeEfficiencyPlotByCutTot("h_true_elec_E_rebin",   "h_true_elec_E_rebin_nue",   "h_true_elec_E_rebin_nuebar",  "e#lower[-0.5]{-} + e^{+}","e#lower[-0.5]{-}", "e^{+}",           false, false, "True Electron Energy [GeV]; Efficiency",         "elec_E_rebin");
-        MakeEfficiencyPlotByCutTot("h_eff_proton_multi",    "h_eff_proton_multi_nue",    "h_eff_proton_multi_nuebar",   "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   false, false, "True Proton Multiplicity; Efficiency",           "prot_multi");
-        MakeEfficiencyPlotByCutTot("h_eff_pion_multi",      "h_eff_pion_multi_nue",      "h_eff_pion_multi_nuebar",     "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   false, false, "True Pion Multiplicity; Efficiency",             "pion_multi");
-        MakeEfficiencyPlotByCutTot("h_eff_charg_par_multi", "h_eff_charg_par_multi_nue", "h_eff_charg_par_multi_nuebar","#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   false, false, "True Charged Particle Multiplicity; Efficiency", "charg_par_multi");
+        MakeEfficiencyPlotByCutTot("h_true_nu_E",             "h_true_nu_E_nue",             "h_true_nu_E_nuebar",             "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Neutrino Energy [GeV]; Efficiency",         "nu_E");
+        MakeEfficiencyPlotByCutTot("h_true_elec_E_rebin",     "h_true_elec_E_rebin_nue",     "h_true_elec_E_rebin_nuebar",     "e#lower[-0.5]{-} + e^{+}","e#lower[-0.5]{-}", "e^{+}",           true, false, "True Electron Energy [GeV]; Efficiency",         "elec_E_rebin");
+        MakeEfficiencyPlotByCutTot("h_eff_cosine_beta_rebin", "h_eff_cosine_beta_rebin_nue", "h_eff_cosine_beta_rebin_nuebar", "e#lower[-0.5]{-} + e^{+}","e#lower[-0.5]{-}", "e^{+}",           true, false, "True cos#beta; Efficiency",         "cosine_beta_rebin");
+        MakeEfficiencyPlotByCutTot("h_eff_proton_multi",      "h_eff_proton_multi_nue",      "h_eff_proton_multi_nuebar",      "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Proton Multiplicity; Efficiency",           "prot_multi");
+        MakeEfficiencyPlotByCutTot("h_eff_pion_multi",        "h_eff_pion_multi_nue",        "h_eff_pion_multi_nuebar",        "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Pion Multiplicity; Efficiency",             "pion_multi");
+        MakeEfficiencyPlotByCutTot("h_eff_charg_par_multi",   "h_eff_charg_par_multi_nue",   "h_eff_charg_par_multi_nuebar",   "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Charged Particle Multiplicity; Efficiency", "charg_par_multi");
 
         // Create the interaction folder
         _util.CreateDirectory("Interaction");
