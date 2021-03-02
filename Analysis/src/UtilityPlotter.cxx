@@ -852,6 +852,9 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     double average_num = 0; // flux numerator
     double average_den = h_nue->Integral( xbin_th, h_nue->GetNbinsX()+1) +  h_nuebar->Integral(xbin_th, h_nuebar->GetNbinsX()+1); // flux denominator
 
+    // double average_den = h_nue->Integral( xbin_th, h_nue->GetNbinsX()+1); // flux denominator nue only
+    // double average_den = h_nuebar->Integral(xbin_th, h_nuebar->GetNbinsX()+1); // flux denominator nuebar only
+
     int nue_flux_bins  = h_nue->GetNbinsX();
     int anue_flux_bins = h_nuebar->GetNbinsX();
 
@@ -3196,9 +3199,9 @@ void UtilityPlotter::CompareMCC8Result(){
     
     // Stat Error
     h_data_mcc9->Fill("MCC8", 0.0); // new in FV flux
-    h_data_mcc9->Fill("MCC9", 6.66441e-39); // new in FV flux
+    h_data_mcc9->Fill("MCC9", 6.62447e-39); // new in FV flux
     h_data_mcc9->SetBinError(1, 0.0); // new in FV flux
-    h_data_mcc9->SetBinError(2, 0.65509627e-39); // new in FV flux
+    h_data_mcc9->SetBinError(2, 6.62447e-39 * 0.244); // new in FV flux
     h_data_mcc9->Draw("E1,X0,same");
 
     // Statistical band
@@ -3207,6 +3210,13 @@ void UtilityPlotter::CompareMCC8Result(){
     h_data_stat->SetBinError(1, 6.8426915e-39 * 0.22 ); // new in FV flux
     h_data_stat->SetLineColor(kBlack);
     h_data_stat->Draw("E1,X0,same");
+
+    // Statistical band
+    TH1D * h_data_stat_mcc9 = (TH1D*) h_data_mcc9->Clone();
+    // h_data_stat->SetBinError(1, 0.144e-38);
+    h_data_stat_mcc9->SetBinError(2, 6.62447e-39 * 0.0987 ); // new in FV flux
+    h_data_stat_mcc9->SetLineColor(kBlack);
+    h_data_stat_mcc9->Draw("E1,X0,same");
 
 
     // Genie v12.2.2 nue + nuebar
@@ -3246,7 +3256,7 @@ void UtilityPlotter::CompareMCC8Result(){
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(h_data, "Data (stat. + sys.)",      "ep");
-    leg->AddEntry(h_data_mcc9, "Data (stat.)",      "ep");
+    leg->AddEntry(h_data_mcc9, "Data (stat. + sys.)",      "ep");
     leg->AddEntry(h_genie_v2_nue_nuebar,   "GENIE v2.12.2",    "l");
     leg->AddEntry(h_genie_v3_nue_nuebar,   "GENIE v3.0.6",    "l");
     leg->AddEntry(h_genie_NuWro_nue_nuebar,   "NuWro v19.02.1",    "l");

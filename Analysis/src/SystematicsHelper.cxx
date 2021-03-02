@@ -1826,7 +1826,7 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
                 index = index = k_err_tot;
             }
 
-            _util.CalcChiSquared(cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(index), chi, ndof, pval);
+            _util.CalcChiSquared(cv_hist_vec.at(var).at(k_xsec_mcxsec), cv_hist_vec.at(var).at(k_xsec_dataxsec), h_cov_v.at(var).at(k_xsec_mcxsec).at(index), chi, ndof, pval);
             
 
             TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);

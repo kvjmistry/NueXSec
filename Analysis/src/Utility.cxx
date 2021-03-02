@@ -326,6 +326,11 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         if (strcmp(arg, "--gpvm") == 0) {
             use_gpvm = true;
         }
+
+        // Use the flugg flux and reweighting
+        if (strcmp(arg, "--usefluggflux") == 0) {
+            usefluggflux = true;
+        }
    
     }
 

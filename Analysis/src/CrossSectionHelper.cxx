@@ -77,7 +77,10 @@ void CrossSectionHelper::Initialise(Utility _utility){
     integrated_flux = GetIntegratedFluxCV();
 
     // Turn this on for using the FLUGG flux as the integrated flux
-    // integrated_flux = GetIntegratedFluxFLUGG();
+    if (_util.usefluggflux){
+        std::cout << "Overwriting default with flugg flux input"<< std::endl;
+        integrated_flux = GetIntegratedFluxFLUGG();
+    }
 
 
     // Now lets open the beamline variation files
@@ -786,11 +789,32 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
                                            std::string _classification, double cv_weight, int uni, int _nu_pdg, double _true_energy, double _numi_ang, int _npi0, double _pi0_e ){
 
     // Weight equal to universe weight times cv weight
-    if (label == "weightsReint" || label == "weightsPPFX" || label == "CV" || label == "xsr_scc_Fv3up" || label == "xsr_scc_Fa3up" || label == "xsr_scc_Fv3dn" || label == "xsr_scc_Fa3dn"){
+    if (label == "weightsReint" || label == "CV" || label == "xsr_scc_Fv3up" || label == "xsr_scc_Fa3up" || label == "xsr_scc_Fv3dn" || label == "xsr_scc_Fa3dn"){
         
         _util.CheckWeight(vec_universes[uni]);
 
         weight_uni = cv_weight * vec_universes[uni];
+    }
+    // Hadron Production weights
+    else if (label == "weightsPPFX"){
+
+        // Get weight from ratio of flux histograms
+        if (_util.usefluggflux){
+            weight_uni = cv_weight * GetHPWeight(uni, "ppfx_ms_UBPPFX", _nu_pdg,  _true_energy, _numi_ang);
+
+            if (std::isnan(weight_uni) == 1 || std::isinf(weight_uni) || weight_uni < 0 || weight_uni > 30 || weight_uni == 1.0) {
+                 weight_uni = cv_weight;
+            }
+
+        }
+        // Get weight from the art-root event
+        else {
+
+            _util.CheckWeight(vec_universes[uni]);
+
+            weight_uni = cv_weight * vec_universes[uni];
+        }
+
     }
     // This is a mc stats variation which studies the statisitcal uncertainty on the smearing matrix and efficiency by 
     // varying the signal and generated events

@@ -258,6 +258,7 @@ public:
     bool zoom{false};        // bool to decide whether to zoom in on the plots
     bool isfakedata{false};  // bool for using MC as fake data
     bool isvariation{false}; // Is some different input to the selection
+    bool usefluggflux{false};
 
 
     // Weight configurations
