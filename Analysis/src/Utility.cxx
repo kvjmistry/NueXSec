@@ -172,7 +172,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             overwritePOT = true;
 
             // If using an alternate CV model via reweighting then we dont want to overwrite the POT values
-            if (std::string(variation) == "weight" || std::string(variation) == "mec" || std::string(variation) == "nogtune" || std::string(variation) == "nopi0tune" || std::string(variation) == "Input")
+            if (std::string(variation) == "weight" || std::string(variation) == "mec" || std::string(variation) == "nogtune" || std::string(variation) == "nopi0tune" || std::string(variation) == "Input" || std::string(variation) == "geniev3")
                 overwritePOT = false;
         }
 
@@ -384,7 +384,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
                 if (confignames.at(p) == match_name){
                     
                     // If fake data mode we overwrite the data POT number instead
-                    if (std::string(fakedataname) == "weight" || std::string(fakedataname) == "mec" || std::string(fakedataname) == "nogtune" || std::string(fakedataname) == "nopi0tune" || std::string(fakedataname) == "Input")
+                    if (std::string(fakedataname) == "weight" || std::string(fakedataname) == "mec" || std::string(fakedataname) == "nogtune" || std::string(fakedataname) == "nopi0tune" || std::string(fakedataname) == "Input" || std::string(fakedataname) == "geniev3")
                         confignames[p] = Form("Run%s_MC_POT", run_period);
                     else
                         confignames[p] = Form("Run%s_MC_POT_%s", run_period, variation_str.c_str());
@@ -403,7 +403,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
                 // If matched then overwrite the POT config for the MC to the variation
                 if (confignames.at(p) == match_name){
                     
-                    if (std::string(fakedataname) == "weight" || std::string(fakedataname) == "mec" || std::string(fakedataname) == "nogtune" || std::string(fakedataname) == "nopi0tune" || std::string(fakedataname) == "Input")
+                    if (std::string(fakedataname) == "weight" || std::string(fakedataname) == "mec" || std::string(fakedataname) == "nogtune" || std::string(fakedataname) == "nopi0tune" || std::string(fakedataname) == "Input" || std::string(fakedataname) == "geniev3")
                         confignames[p] = match_name;
                     else
                         confignames[p] = match_name + "_" + variation_str;

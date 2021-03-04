@@ -401,8 +401,8 @@ void CrossSectionHelper::LoopEvents(){
 
                 // Calculate the efficiency histogram with smearing of the truth
                 if (var == k_var_recoX){
-                    Smear(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen),
-                          h_smear.at(label).at(uni).at(k_var_recoX), h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_eff));
+                    // Smear(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen),
+                    //       h_smear.at(label).at(uni).at(k_var_recoX), h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_eff));
                 }
                 // Calculate the efficiency histogram by dividing the sig and gen
                 else{ 

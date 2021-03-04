@@ -2998,7 +2998,11 @@ void UtilityPlotter::SaveResponseMatrix(){
 
     std::vector<std::string> variables = {"elec_E", "elec_ang", "elec_cang"};
 
-    std::vector<std::string> var_names = {"reco_el_E", "reco_el_ang", "reco_el_cang"};
+    // For smearing
+    // std::vector<std::string> var_names = {"reco_el_E", "reco_el_ang", "reco_el_cang"};
+
+    // For response
+    std::vector<std::string> var_names = {"true_el_E", "true_el_ang", "true_el_cang"};
 
     // Vector for storing the response matrix
     std::vector<TH2D*> h_response(variables.size());

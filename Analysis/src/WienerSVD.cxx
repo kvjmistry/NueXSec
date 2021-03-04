@@ -156,6 +156,7 @@ void WienerSVD::CompareModel(TH1D *sig){
     // Now scale the bin widths for plotting
     h_model_smear->Scale(1.0, "width");
     unf->Scale(1.0, "width");
+    unf->SetLineWidth(2);
 
     // Make an error histogram
     TH1D* h_model_smear_err = (TH1D*)h_model_smear->Clone();

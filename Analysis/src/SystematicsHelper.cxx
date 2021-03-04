@@ -719,9 +719,9 @@ void SystematicsHelper::InitialiseReweightingMode(){
         // PlotReweightingModeDetVar("WireModdEdX",                        var, k_WireModdEdX,                        var_string_pretty.at(k_WireModdEdX));
 
         // Plot the multisims
-        PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 500);
+        PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 600);
         PlotReweightingModeMultisim("weightsReint", var,  "Geant Reinteractions", 1000);
-        PlotReweightingModeMultisim("weightsPPFX",  var,  "Hadron Production", 500);
+        PlotReweightingModeMultisim("weightsPPFX",  var,  "Hadron Production", 600);
         PlotReweightingModeMultisim("MCStats",      var,  "MC Stats", 1000);
         
     }
@@ -3212,9 +3212,9 @@ void SystematicsHelper::InitialiseReweightingModeCut(){
         std::make_tuple("Beam_shift_y",     2,   "unisim"),
         std::make_tuple("Target_z",         2,   "unisim"),
         std::make_tuple("Decay_pipe_Bfield",2,   "unisim"),
-        std::make_tuple("weightsGenie",     500, "multisim"),
+        std::make_tuple("weightsGenie",     600, "multisim"),
         std::make_tuple("weightsReint",     1000,"multisim"),
-        std::make_tuple("weightsPPFX",      500, "multisim")
+        std::make_tuple("weightsPPFX",      600, "multisim")
     };
 
 
@@ -3556,6 +3556,20 @@ void SystematicsHelper::MakeTotUncertaintyPlot(bool AddStatErr){
                         h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 650);
                     else
                         h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 300);
+                }
+
+                if (type == k_xsec_mcxsec_smear){
+                    if (std::string(_util.xsec_var) == "elec_E")
+                        h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 45);
+                    else
+                        h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 25);
+                }
+
+                if (type == k_xsec_sig){
+                    if (std::string(_util.xsec_var) == "elec_E")
+                        h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 90);
+                    else
+                        h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 60);
                 }
                 
                 h_uncertainty.at(k_err_genie_uni)->Draw("hist,same");
