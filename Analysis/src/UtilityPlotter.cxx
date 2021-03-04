@@ -20,12 +20,15 @@ void UtilityPlotter::Initialise(Utility _utility){
         // Compare the efficiency for the det var CV and intrinsic nue det var CV
         // leave this commented out, needs speccific files for this to run 
         // CompareDetVarEfficiency();
+        
+        // Save the Response Matrix
+        SaveResponseMatrix();
 
         // Compare the efficiency in run 1 and run 3
         CompareEfficiency();
 
         // Function that plots all the ppfx universe weights on one plot for the backgrounds
-        StudyPPFXWeights();
+        // StudyPPFXWeights();
 
         // Look to see if the shower with the most hits is the same as the shower with the most energy
         CompareHitstoEnergy();
@@ -53,8 +56,6 @@ void UtilityPlotter::Initialise(Utility _utility){
     }
     // This will call the code to optimise the bin widths
     else if (std::string(_util.uplotmode) == "models"){ 
-        // Set the names of the histograms
-        _util.SetAxesNames(var_labels_xsec, var_labels_events, var_labels_eff, smear_hist_name, vars, xsec_scale);
 
         _util.CreateDirectory("Models/" + std::string(_util.xsec_var));
         _util.CreateDirectory("Models/Total");
@@ -68,6 +69,9 @@ void UtilityPlotter::Initialise(Utility _utility){
         CompareFakeTotalCrossSec();
         CompareTotalDataCrossSections();
         CompareUnfoldedDataCrossSections();
+        CheckPi0Coverage();
+        CompareMCC8Result();
+        ForwardFoldedGeneratorComparison();
         return;
     }
     else {
@@ -520,58 +524,77 @@ void UtilityPlotter::OptimiseBins(){
 void UtilityPlotter::PlotVarbyRecoBin(){
 
     // Create the resolutions directory for saving the plots to
-    _util.CreateDirectory("Resolution");
+    _util.CreateDirectory("Resolution/" + std::string(_util.xsec_var));
 
-    _util.CreateDirectory("Purity_Completeness");
+    _util.CreateDirectory("Purity/" + std::string(_util.xsec_var));
+
+    _util.CreateDirectory("Completeness/" + std::string(_util.xsec_var));
 
 
     // Get the vector of bins
-    std::vector<double> bins = _util.reco_shr_bins;
+    std::vector<double> bins;
+    std::string reco_var, true_var;
+    
+    if (std::string(_util.xsec_var) == "elec_E"){
+        bins = _util.reco_shr_bins;
+        reco_var = "shr_energy_cali";
+        true_var = "elec_e";
+    }
+    else if (std::string(_util.xsec_var) == "elec_ang"){
+        bins = _util.reco_shr_bins_ang;
+        reco_var = "effective_angle";
+        true_var = "true_effective_angle";
+    }
+     else if (std::string(_util.xsec_var) == "elec_cang"){
+        bins = _util.reco_shr_bins_cang;
+        reco_var = "cos_effective_angle";
+        true_var = "cos_true_effective_angle";
+    }
+    
+     
     
     // Loop over the bins
     for (float bin = 0; bin < bins.size()-1; bin++ ){
 
         std::cout <<"\nBin Range: " << bins.at(bin) << " - " << bins.at(bin+1) << " GeV" << std::endl;
         
-        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "reco_e");
-        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "true_e");
-        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "purity");
-        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "completeness");
+        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "res_reco", reco_var, true_var);
+        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "res_true", reco_var, true_var);
+        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "purity", reco_var, true_var);
+        PlotQuery(bins.at(bin), bins.at(bin+1), tree, "completeness", reco_var, true_var);
 
 
     }
     
 }
 // -----------------------------------------------------------------------------
-void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string variable_str){
+void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string x_var, std::string reco_var, std::string true_var){
     
-    TCut generic_query = "(classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && !gen && elec_e > 0"; // This gets selected signal events in the MC
-    TCut bin_query = Form("shr_energy_cali > %f && shr_energy_cali < %f", bin_lower_edge, bin_upper_edge); // Get the reconstructed shower energy range
-
-    TCut query = Form(" weight*(  ((classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && passed_selection) && shr_energy_cali > %f && shr_energy_cali < %f )", bin_lower_edge, bin_upper_edge); 
+    TCut query = Form(" weight*(  ((classification.c_str()==\"nue_cc\" || classification.c_str()==\"nuebar_cc\") && passed_selection) && %s > %f && %s < %f )", reco_var.c_str(), bin_lower_edge, reco_var.c_str(), bin_upper_edge); 
     
-    TCanvas * c = new TCanvas(Form("c_%f_%f_%s", bin_upper_edge, bin_lower_edge, variable_str.c_str()), "c", 500, 500);
+    TCanvas * c = new TCanvas("c", "c", 500, 500);
 
     TH1D *htemp;
-    if      (variable_str == "reco_e") htemp = new TH1D("htemp","", 30, -1.2, 1.2);
-    else if (variable_str == "true_e") htemp = new TH1D("htemp","", 30, -1.2, 1.2);
-    else if (variable_str == "purity") htemp = new TH1D("htemp","", 21, 0, 1.1);
-    else if (variable_str == "completeness") htemp = new TH1D("htemp","", 21, 0, 1.1);
+    if      (x_var == "res_reco" || x_var == "res_true") htemp = new TH1D("htemp","", 30, -1.2, 1.2);
+    else if (x_var == "purity") htemp = new TH1D("htemp","", 21, 0, 1.1);
+    else if (x_var == "completeness") htemp = new TH1D("htemp","", 21, 0, 1.1);
     else {
         std::cout << "incorrect variable input" << std::endl;
         return;
     }
+
+    
      
 
     // Draw the Query -- adjust by query type
-    if      (variable_str == "reco_e") tree->Draw("(shr_energy_cali - elec_e) / shr_energy_cali >> htemp", query);
-    else if (variable_str == "true_e") tree->Draw("(shr_energy_cali - elec_e) / elec_e >> htemp", query);
-    else if (variable_str == "purity") tree->Draw("shr_bkt_purity >> htemp", query);
-    else if (variable_str == "completeness") tree->Draw("shr_bkt_completeness >> htemp", query);
+    if      (x_var == "res_reco") tree->Draw(Form("(%s - %s) / %s >> htemp", reco_var.c_str(), true_var.c_str(), reco_var.c_str()), query);
+    else if (x_var == "res_true") tree->Draw(Form("(%s - %s) / %s >> htemp", reco_var.c_str(), true_var.c_str(), true_var.c_str()), query);
+    else if (x_var == "purity") tree->Draw("shr_bkt_purity >> htemp", query);
+    else if (x_var == "completeness") tree->Draw("shr_bkt_completeness >> htemp", query);
     else {
         std::cout << "incorrect variable input" << std::endl;
         return;
-    }
+    }    
             
     // Draw the histogram
     htemp->SetLineWidth(2);
@@ -579,7 +602,17 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     htemp->Draw("hist");
 
     // Draw the text specifying the bin range
-    TLatex* range = new TLatex(0.65,0.91, Form("Reco Energy %0.2f - %0.2f GeV",bin_lower_edge, bin_upper_edge ));
+    TLatex* range;
+    if (true_var == "elec_e"){
+        range  = new TLatex(0.65,0.91, Form("Reco Energy %0.2f - %0.2f GeV",bin_lower_edge, bin_upper_edge ));
+    }
+    if (true_var == "true_effective_angle"){
+        range  = new TLatex(0.65,0.91, Form("Reco #beta %0.2f - %0.2f deg",bin_lower_edge, bin_upper_edge ));
+    }
+     if (true_var == "cos_true_effective_angle"){
+        range  = new TLatex(0.65,0.91, Form("Reco cos#beta %0.2f - %0.2f",bin_lower_edge, bin_upper_edge ));
+    }
+
     _util.SetTextProperties(range);
     range->Draw();
 
@@ -598,10 +631,10 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     _util.SetTextProperties(text_rms);
     text_rms->Draw();
 
-    if (variable_str == "reco_e")      htemp->SetTitle("; Reco - True / Reco; Entries");
-    else if (variable_str == "true_e") htemp->SetTitle("; Reco - True / True; Entries");
-    else if (variable_str == "purity") htemp->SetTitle("; Reco Shower Purity; Entries");
-    else if (variable_str == "completeness") htemp->SetTitle("; Reco Shower Completeness; Entries");
+    if (x_var == "res_reco")          htemp->SetTitle("; Reco - True / Reco; Entries");
+    else if (x_var == "res_true")     htemp->SetTitle("; Reco - True / True; Entries");
+    else if (x_var == "purity")       htemp->SetTitle("; Reco Shower Purity; Entries");
+    else if (x_var == "completeness") htemp->SetTitle("; Reco Shower Completeness; Entries");
     else {
         std::cout << "incorrect variable input" << std::endl;
         return;
@@ -617,16 +650,61 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     
 
     // Save it 
-    if (variable_str== "reco_e")       c->Print(Form("plots/run%s/Resolution/resolution_%0.0fMeV_to_%0.0f_MeV_reco.pdf", _util.run_period, bin_lower_edge*1000, bin_upper_edge*1000 ));
-    else if (variable_str == "true_e") c->Print(Form("plots/run%s/Resolution/resolution_%0.0fMeV_to_%0.0f_MeV_true.pdf", _util.run_period, bin_lower_edge*1000, bin_upper_edge*1000 ));
-    else if (variable_str == "purity") c->Print(Form("plots/run%s/Purity_Completeness/purity_%0.0fMeV_to_%0.0f_MeV.pdf", _util.run_period, bin_lower_edge*1000, bin_upper_edge*1000 ));
-    else if (variable_str == "completeness") c->Print(Form("plots/run%s/Purity_Completeness/completeness_%0.0fMeV_to_%0.0f_MeV.pdf", _util.run_period, bin_lower_edge*1000, bin_upper_edge*1000 ));
+    if (x_var== "res_reco"){
+        if (true_var == "elec_e"){
+            c->Print(Form("plots/run%s/Resolution/%s/resolution_%0.2fMeV_to_%0.2fMeV_reco.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        if (true_var == "true_effective_angle"){
+            c->Print(Form("plots/run%s/Resolution/%s/resolution_%0.1fdeg_to_%0.1fdeg_reco.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        if (true_var == "cos_true_effective_angle"){
+            c->Print(Form("plots/run%s/Resolution/%s/resolution_%0.2f_to_%0.2f_reco.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+    }
+    else if (x_var == "res_true"){
+        if (true_var == "elec_e"){
+            c->Print(Form("plots/run%s/Resolution/%s/resolution_%0.2fMeV_to_%0.2fMeV_true.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        if (true_var == "true_effective_angle"){
+            c->Print(Form("plots/run%s/Resolution/%s/resolution_%0.1fdeg_to_%0.1fdeg_true.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        if (true_var == "cos_true_effective_angle"){
+            c->Print(Form("plots/run%s/Resolution/%s/resolution_%0.2f_to_%0.2f_true.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        
+    }       
+    else if (x_var == "purity"){
+        if (true_var == "elec_e"){
+            c->Print(Form("plots/run%s/Purity/%s/purity_%0.2fMeV_to_%0.2fMeV.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        if (true_var == "true_effective_angle"){
+            c->Print(Form("plots/run%s/Purity/%s/purity_%0.1fdeg_to_%0.1fdeg.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        if (true_var == "cos_true_effective_angle"){
+            c->Print(Form("plots/run%s/Purity/%s/purity_%0.2f_to_%0.2f.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+
+        
+    }
+    else if (x_var == "completeness"){
+        if (true_var == "elec_e"){
+            c->Print(Form("plots/run%s/Completeness/%s/completeness_%0.2fMeV_to_%0.2fMeV.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        if (true_var == "true_effective_angle"){
+            c->Print(Form("plots/run%s/Completeness/%s/completeness_%0.1fdeg_to_%0.1fdeg.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        if (true_var == "cos_true_effective_angle"){
+            c->Print(Form("plots/run%s/Completeness/%s/completeness_%0.2f_to_%0.2f.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
+        }
+        
+    }
     else {
         std::cout << "incorrect variable input" << std::endl;
         return;
     }
 
     delete htemp;
+    delete c;
 
 
 }
@@ -634,7 +712,7 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
 void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     
     // This changes the plot to average flux or not
-    bool draw_averge = true;
+    bool draw_averge =true;
 
     gStyle->SetOptStat(0);
 
@@ -692,7 +770,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     c->SetLogy();
     
     // Nue flux
-    h_nue->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu}_{e} / cm^{2} / 5 MeV / 0.9 #times 10^{20} POT");
+    h_nue->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu}_{e} / cm^{2} / 5 MeV / 2.0 #times 10^{20} POT");
     h_nue->GetXaxis()->CenterTitle();
     h_nue->GetYaxis()->CenterTitle();
 
@@ -715,7 +793,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     TH1D* h_nue_clone = (TH1D*)h_nue->Clone("h_nue_clone");
     
     // Nuebar flux
-    h_nuebar->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu}_{e} / cm^{2} / 5 MeV / 0.9 #times 10^{20} POT");
+    h_nuebar->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu}_{e} / cm^{2} / 5 MeV / 2.0 #times 10^{20} POT");
     h_nuebar->GetXaxis()->SetRangeUser(0,6);
     h_nuebar->SetLineColor(kGreen+2);
     h_nuebar->SetFillColor(16);
@@ -742,7 +820,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
         h_summed_flux_clone->SetBinContent(p, 0);
     }
 
-    summed_flux->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e} + #bar{#nu}_{e} / cm^{2} / 5 MeV / 0.9 #times 10^{20} POT");
+    summed_flux->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e} + #bar{#nu}_{e} / cm^{2} / 5 MeV / 2.0 #times 10^{20} POT");
     summed_flux->GetXaxis()->CenterTitle();
     summed_flux->GetYaxis()->CenterTitle();
     summed_flux->GetXaxis()->SetLabelFont(42);
@@ -775,6 +853,9 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     double average_num = 0; // flux numerator
     double average_den = h_nue->Integral( xbin_th, h_nue->GetNbinsX()+1) +  h_nuebar->Integral(xbin_th, h_nuebar->GetNbinsX()+1); // flux denominator
 
+    // double average_den = h_nue->Integral( xbin_th, h_nue->GetNbinsX()+1); // flux denominator nue only
+    // double average_den = h_nuebar->Integral(xbin_th, h_nuebar->GetNbinsX()+1); // flux denominator nuebar only
+
     int nue_flux_bins  = h_nue->GetNbinsX();
     int anue_flux_bins = h_nuebar->GetNbinsX();
 
@@ -801,7 +882,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
 
     h_summed_flux_clone->SetLineWidth(0);
     h_summed_flux_clone->SetFillColorAlpha(46, 0.4);
-    h_summed_flux_clone->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e} + #bar{#nu}_{e} / cm^{2} / 0.9 #times 10^{20} POT");
+    h_summed_flux_clone->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e} + #bar{#nu}_{e} / cm^{2} / 2.0 #times 10^{20} POT");
     if (draw_averge) h_summed_flux_clone->Draw("hist,same");
 
     
@@ -822,7 +903,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     if (!draw_averge)leg->Draw();
 
     // Draw MicroBooNE Simualtion
-    _util.Draw_ubooneSim(c, 0.37, 0.92, 0.37, 0.9);
+    _util.Draw_ubooneSim(c, 0.37, 0.93, 0.37, 0.91);
 
     // Draw the run period on the plot
     _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
@@ -839,37 +920,11 @@ void UtilityPlotter::PlotTrueVar(){
     TTree * mc_tree;      // MC   Tree
 
     // Get the TTree
-    _util.GetFile(f_mc, "../ntuples/neutrinoselection_filt_run1_overlay_weight.root"); // Get the run 1 MC file
+    _util.GetFile(f_mc, "../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root"); // Get the run 1 MC file
     _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
 
-    // These are the variables we need
-    float true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z;
-    float nu_purity_from_pfp;
-    int npi0;
-    int ccnc;
-    int   nu_pdg;
-    float nu_e;
-    float elec_e;
-    float pi0_e;
-    float weightSplineTimesTune;
-    float ppfx_cv;    // Weight from PPFX CV
-    int   n_showers;
-    int   nslice;
-
-    mc_tree->SetBranchAddress("true_nu_vtx_sce_x", &true_nu_vtx_sce_x);
-    mc_tree->SetBranchAddress("true_nu_vtx_sce_y", &true_nu_vtx_sce_y);
-    mc_tree->SetBranchAddress("true_nu_vtx_sce_z", &true_nu_vtx_sce_z);
-    mc_tree->SetBranchAddress("nu_purity_from_pfp", &nu_purity_from_pfp);
-    mc_tree->SetBranchAddress("npi0", &npi0);
-    mc_tree->SetBranchAddress("ccnc",   &ccnc);
-    mc_tree->SetBranchAddress("nu_pdg", &nu_pdg);
-    mc_tree->SetBranchAddress("nu_e", &nu_e);
-    mc_tree->SetBranchAddress("elec_e", &elec_e);
-    mc_tree->SetBranchAddress("pi0_e", &pi0_e);
-    mc_tree->SetBranchAddress("weightSplineTimesTune",      &weightSplineTimesTune);
-    mc_tree->SetBranchAddress("ppfx_cv",                    &ppfx_cv);
-    mc_tree->SetBranchAddress("n_showers", &n_showers);
-    mc_tree->SetBranchAddress("nslice", &nslice);
+    SliceContainer SC;
+    SC.Initialise(mc_tree, _util.k_mc, _util);
 
     std::vector<std::string> vars = {"nu_e", "elec_e"};
 
@@ -880,10 +935,10 @@ void UtilityPlotter::PlotTrueVar(){
     TH1D *h_pi0_momentum = new TH1D("h_true_pi0_momentum", "; #pi^{0} Momentum [GeV/c]; Entries", 40, 0, 2.0);
     
     // 2D shower multiplicity vd nue/electron energy
-    TH2D *h_shr_multi_nue_E         = new TH2D("h_shr_multi_nue_E", "; Shower Multiplicty;#nu_{e} Energy [GeV] ", 6, 0, 6, 15, 0, 4.0);
-    TH2D *h_shr_multi_elec_e        = new TH2D("h_shr_multi_elec_e", "; Shower Multiplicty;Electron Energy [GeV] ", 6, 0, 6, 15, 0, 4.0);
-    TH2D *h_shr_multi_nuebar_E      = new TH2D("h_shr_multi_nuebar_E", "; Shower Multiplicty;#bar{#nu}_{e} Energy [GeV] ", 6, 0, 6, 15, 0, 4.0);
-    TH2D *h_shr_multi_elec_e_nuebar = new TH2D("h_shr_multi_elec_e_nuebar", "; Shower Multiplicty;Positron Energy [GeV] ", 6, 0, 6, 15, 0, 4.0);
+    TH2D *h_shr_multi_nue_E         = new TH2D("h_shr_multi_nue_E", "; Shower Multiplicty;#nu_{e} Energy [GeV] ", 6, 0, 6, 10, 0, 4.0);
+    TH2D *h_shr_multi_elec_e        = new TH2D("h_shr_multi_elec_e", "; Shower Multiplicty;Electron Energy [GeV] ", 6, 0, 6, 10, 0, 4.0);
+    TH2D *h_shr_multi_nuebar_E      = new TH2D("h_shr_multi_nuebar_E", "; Shower Multiplicty;#bar{#nu}_{e} Energy [GeV] ", 6, 0, 6, 10, 0, 4.0);
+    TH2D *h_shr_multi_elec_e_nuebar = new TH2D("h_shr_multi_elec_e_nuebar", "; Shower Multiplicty;Positron Energy [GeV] ", 6, 0, 6, 10, 0, 4.0);
     
     // Resize hit purity 
     h_hit_pur.resize(vars.size());
@@ -915,49 +970,48 @@ void UtilityPlotter::PlotTrueVar(){
         // Get the entry in the tree
         mc_tree->GetEntry(ievent); 
 
-        double weight = 1.0;
+        // Classify the event -- sets variable in the slice contianer
+        SC.SliceClassifier(_util.k_mc);      // Classification of the event
 
-        // Get the tune weight
-        if (_util.weight_tune) weight = weightSplineTimesTune;
+        // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
+        SC.SetThresholdEvent();
         
-        // Catch infinate/nan/unreasonably large tune weights
-        _util.CheckWeight(weight);
+        SC.SliceInteractionType(_util.k_mc); // Genie interaction type
+        SC.ParticleClassifier(_util.k_mc);   // The truth matched particle type of the leading shower
+        SC.Pi0Classifier(_util.k_mc); 
 
-        // Get the PPFX CV flux correction weight
-        double weight_flux = 1.0;
-        if (_util.weight_ppfx) weight_flux = ppfx_cv;
+        // Set derived variables in the slice container
+        SC.SetSignal();                // Set the event as either signal or other
+        SC.SetFakeData();              // Set the classifcation as data if fake data mode
+        SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
+        SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
+        SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
 
-        _util.CheckWeight(weight_flux);
+        bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
 
-        if (_util.weight_ppfx) weight = weight * weight_flux;
-
-        // Get the classification
-        std::pair<std::string, int> classification = Classify(true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z, nu_pdg, ccnc, nu_purity_from_pfp, npi0);      // Classification of the event
+        double weight = _util.GetCVWeight(_util.k_mc, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction);
         
         // True nue energy
-        h_hit_pur.at(0).at(classification.second)->Fill(nu_e, nu_purity_from_pfp, weight);
+        h_hit_pur.at(0).at(SC.classification.second)->Fill(SC.nu_e, SC.nu_purity_from_pfp, weight);
         
         // True electron energy
-        h_hit_pur.at(1).at(classification.second)->Fill(elec_e, nu_purity_from_pfp, weight);
+        h_hit_pur.at(1).at(SC.classification.second)->Fill(SC.elec_e, SC.nu_purity_from_pfp, weight);
 
         // Pi0 Momentum
-        bool is_in_fv = _util.in_fv(true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z);
-        if (is_in_fv) h_pi0_momentum->Fill(std::sqrt(pi0_e*pi0_e - 0.134*0.134), weight);
+        if (is_in_fv) 
+            h_pi0_momentum->Fill(std::sqrt(SC.pi0_e*SC.pi0_e - 0.134*0.134), weight);
 
         // Nue cc
-        if (nslice == 1 && nu_pdg == 12 && is_in_fv && nu_purity_from_pfp > 0.5 && ccnc == _util.k_CC){
+        if (SC.nslice == 1 && SC.nu_pdg == 12 && is_in_fv && SC.nu_purity_from_pfp > 0.5 && SC.ccnc == _util.k_CC){
 
-            h_shr_multi_nue_E->Fill(n_showers, nu_e, weight);
-            h_shr_multi_elec_e->Fill(n_showers, elec_e, weight);
+            h_shr_multi_nue_E->Fill(SC.n_showers, SC.nu_e, weight);
+            h_shr_multi_elec_e->Fill(SC.n_showers, SC.elec_e, weight);
         }
         // nuebar cc
-        if (nslice == 1 && nu_pdg == -12 && is_in_fv && nu_purity_from_pfp > 0.5 && ccnc == _util.k_CC){
-            h_shr_multi_nuebar_E->Fill(n_showers, nu_e, weight);
-            h_shr_multi_elec_e_nuebar->Fill(n_showers, elec_e, weight);
+        if (SC.nslice == 1 && SC.nu_pdg == -12 && is_in_fv && SC.nu_purity_from_pfp > 0.5 && SC.ccnc == _util.k_CC){
+            h_shr_multi_nuebar_E->Fill(SC.n_showers, SC.nu_e, weight);
+            h_shr_multi_elec_e_nuebar->Fill(SC.n_showers, SC.elec_e, weight);
         }
-
-        
-
     }
 
     // Create the resolutions directory for saving the plots to
@@ -1010,6 +1064,10 @@ void UtilityPlotter::PlotTrueVar(){
     ColumnNorm(h_shr_multi_nuebar_E);
     ColumnNorm(h_shr_multi_elec_e_nuebar);
 
+    // h_shr_multi_nue_E->GetZaxis()->SetRangeUser(0, 0.35);
+    // h_shr_multi_nuebar_E->GetZaxis()->SetRangeUser(0, 0.35);
+    // h_shr_multi_elec_e_nuebar->GetZaxis()->SetRangeUser(0, 0.65);
+    // h_shr_multi_elec_e->GetZaxis()->SetRangeUser(0, 0.65);
 
     h_shr_multi_nue_E->GetXaxis()->CenterLabels();
     h_shr_multi_elec_e->GetXaxis()->CenterLabels();
@@ -1023,67 +1081,6 @@ void UtilityPlotter::PlotTrueVar(){
     Save2DHists(Form("plots/run%s/Truth/h_shower_multiplicity_vs_nuebar_E.pdf", _util.run_period), h_shr_multi_nuebar_E);
     Save2DHists(Form("plots/run%s/Truth/h_shower_multiplicity_vs_elec_E_nuebar.pdf", _util.run_period), h_shr_multi_elec_e_nuebar);
     
-
-}
-// -----------------------------------------------------------------------------
-std::pair<std::string, int> UtilityPlotter::Classify(float true_nu_vtx_sce_x, float true_nu_vtx_sce_y, float true_nu_vtx_sce_z, int nu_pdg, int ccnc, float nu_purity_from_pfp, int npi0){
-   
-    bool is_in_fv = _util.in_fv(true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z);
-
-    // Out of Fiducial Volume Event
-    if (!is_in_fv) {
-        // std::cout << "Purity of out of FV event: "<< nu_purity_from_pfp << std::endl;
-        if (nu_purity_from_pfp < 0.0) return std::make_pair("unmatched",_util.k_unmatched);
-        else return std::make_pair("nu_out_fv",_util.k_nu_out_fv);
-    }
-    // In FV event
-    else {
-
-        // Charged Current 
-        if (ccnc == _util.k_CC){
-
-            // NuMu CC
-            if (nu_pdg == 14 || nu_pdg == -14){
-
-                // Purity is low so return cosmic
-                if (nu_purity_from_pfp < 0.0)return std::make_pair("unmatched",_util.k_unmatched);
-                
-                if (npi0 > 0) return std::make_pair("numu_cc_pi0", _util.k_numu_cc_pi0); // has a pi0
-                else return std::make_pair("numu_cc",_util.k_numu_cc);
-
-            }
-            // Nue CC
-            else if (nu_pdg == 12){
-                
-                if (nu_purity_from_pfp > 0.0)                                 return std::make_pair("nue_cc",       _util.k_nue_cc);    // purity > 0.5% so signal
-                else                                                          return std::make_pair("unmatched_nue",_util.k_unmatched_nue); // These events were not picked up by pandora at all
-
-            }
-            else if (nu_pdg == -12){
-                
-                if (nu_purity_from_pfp > 0.0)                                  return std::make_pair("nuebar_cc",       _util.k_nuebar_cc); // purity > 0.5% so signal
-                else                                                           return std::make_pair("unmatched_nuebar",_util.k_unmatched_nuebar); // These events were not picked up by pandora at all
-
-            }
-            // Unknown Neutrino Type
-            else {
-                std::cout << "Unknown Neutrino Type..., This will also mess up the efficecy if this occurs!" << std::endl;
-                return std::make_pair("unmatched",_util.k_unmatched);
-            }
-
-        }
-        // Neutral Current
-        else {
-
-            // Purity is low so return cosmic
-            if (nu_purity_from_pfp < 0) return std::make_pair("unmatched",_util.k_unmatched);
-
-            if (npi0 > 0) return std::make_pair("nc_pi0",_util.k_nc_pi0);
-            else return std::make_pair("nc",_util.k_nc);
-        }
-    
-    } // End if in FV
-
 
 }
 // -----------------------------------------------------------------------------
@@ -1651,12 +1648,12 @@ void UtilityPlotter::TestModelDependence(){
     for (unsigned int m = 0; m < models.size(); m++){
         
         // Response Matrix
-        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
+        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
         if (h_temp_2D == NULL) std::cout <<"Help!" << m << std::endl;
         h_response_model.at(m) = (TH2D*)h_temp_2D->Clone();
 
         // MC xsec in True
-        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));
         h_mcxsec_true_model.at(m) = (TH1D*)h_temp->Clone();
         h_mcxsec_reco_model.at(m) = (TH1D*)h_dataxsec->Clone();
        
@@ -1687,7 +1684,7 @@ void UtilityPlotter::TestModelDependence(){
     h_mcxsec_reco_model.at(k_model_mec)->Draw("hist,same");
     h_mcxsec_reco_model.at(k_model_nogtune)->Draw("hist,same");
     h_mcxsec_reco_model.at(k_model_nopi0tune)->Draw("hist,same");
-    // h_mcxsec_reco_model.at(k_model_FLUGG)->Draw("hist,same");
+    h_mcxsec_reco_model.at(k_model_FLUGG)->Draw("hist,same");
     h_mcxsec_reco_model.at(k_model_tune1)->Draw("hist,same");
     h_dataxsec->Draw("E1,X0,same");
     h_dataxsec_stat->Draw("E1,X0,same");
@@ -1717,8 +1714,8 @@ void UtilityPlotter::TestModelDependence(){
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_nopi0tune),  Form("MC (no #pi^{0} Tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     
     
-    // _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_FLUGG), h_dataxsec, h_cov, chi, ndof, pval);
-    // leg->AddEntry(h_mcxsec_reco_model.at(k_model_FLUGG),  Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_FLUGG), h_dataxsec, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_FLUGG),  Form("MC (FLUGG) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
 
     std::cout << "Tune 1" << std::endl;
     _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_tune1), h_dataxsec, h_cov, chi, ndof, pval);
@@ -1734,7 +1731,7 @@ void UtilityPlotter::TestModelDependence(){
     if (_util.zoom)
         c->Print(Form("plots/run%s/Models/%s/DataModelComparison_zoom.pdf", _util.run_period, _util.xsec_var));
     else
-        c->Print(Form("plots/run%s/Models/%s/DataModelComparison.pdf", _util.run_period, _util.xsec_var));
+        c->Print(Form("plots/run%s/Models/%s/run%s_DataModelComparison_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var));
 
     fxsec->Close();
 
@@ -1746,7 +1743,7 @@ void UtilityPlotter::CompareSmearing(){
 
     gStyle->SetOptStat(0);
 
-    /// Load in the cross section output
+    // Load in the cross section output
     TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
 
     TH1D* h_temp;
@@ -1793,7 +1790,7 @@ void UtilityPlotter::CompareSmearing(){
     std::vector<TH1D*> h_mcxsec_reco_model(models.size());
     
     // MC Xsec True
-    h_temp  = (TH1D*)fxsec->Get(Form("CV/%s/h_run1_CV_0_%s_mc_xsec",vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
+    h_temp  = (TH1D*)fxsec->Get(Form("CV/%s/h_run1_CV_0_%s_mc_xsec",_util.vars.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));
     TH1D* h_mcxsec_true         = (TH1D*)h_temp->Clone();
     
     // Loop over each model
@@ -1803,7 +1800,7 @@ void UtilityPlotter::CompareSmearing(){
         h_mcxsec_reco_model.at(m) = (TH1D*)h_mcxsec_reco->Clone();
 
         // Get the response matrix
-        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
+        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
         h_response_model.at(m) = (TH2D*)h_temp_2D->Clone();
 
         // Apply the response matrix to the CV MC True dist
@@ -1861,7 +1858,7 @@ void UtilityPlotter::CompareSmearing(){
     leg->Draw();
 
     // Save and close
-    c->Print(Form("plots/run%s/Models/%s/SmearingModelComparison.pdf", _util.run_period, _util.xsec_var));
+    c->Print(Form("plots/run%s/Models/%s/run%s_SmearingModelComparison_%s.pdf", _util.run_period, _util.xsec_var,  _util.run_period, _util.xsec_var));
 
     fxsec->Close();
 
@@ -1938,7 +1935,7 @@ void UtilityPlotter::CompareUnfoldedModels(){
     // Loop over each model
     for (unsigned int m = 0; m < models.size(); m++){
         // MC Xsec True
-        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));
         h_mcxsec_true_model.at(m)         = (TH1D*)h_temp->Clone();
         h_mcxsec_true_model_smear.at(m)   = (TH1D*)h_temp->Clone();
 
@@ -1972,8 +1969,8 @@ void UtilityPlotter::CompareUnfoldedModels(){
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_nopi0tune), unf, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_nopi0tune),   Form("MC (no #pi^{0} Tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
     
-    // _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_FLUGG), unf, h_cov, chi, ndof, pval);
-    // leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_FLUGG),   Form("MC (FLUGG Flux) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_FLUGG), unf, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_FLUGG),   Form("MC (FLUGG) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
     std::cout << "Tune 1" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_tune1), unf, h_cov, chi, ndof, pval);
@@ -2018,8 +2015,8 @@ void UtilityPlotter::CompareUnfoldedModels(){
     h_mcxsec_true_model_smear.at(k_model_nopi0tune)->SetLineColor(kPink+1);
     h_mcxsec_true_model_smear.at(k_model_nopi0tune)->Draw("hist,same" );
 
-    // h_mcxsec_true_model_smear.at(k_model_FLUGG)->SetLineColor(kViolet-1);
-    // h_mcxsec_true_model_smear.at(k_model_FLUGG)->Draw("hist,same" );
+    h_mcxsec_true_model_smear.at(k_model_FLUGG)->SetLineColor(kViolet-1);
+    h_mcxsec_true_model_smear.at(k_model_FLUGG)->Draw("hist,same" );
 
     h_mcxsec_true_model_smear.at(k_model_tune1)->SetLineColor(kOrange-1);
     h_mcxsec_true_model_smear.at(k_model_tune1)->Draw("hist,same" );
@@ -2037,7 +2034,7 @@ void UtilityPlotter::CompareUnfoldedModels(){
     if (_util.zoom)
         c->Print(Form("plots/run%s/Models/%s/DataModelUnfoldedComparison_zoom.pdf", _util.run_period, _util.xsec_var));
     else
-        c->Print(Form("plots/run%s/Models/%s/DataModelUnfoldedComparison.pdf", _util.run_period, _util.xsec_var));
+        c->Print(Form("plots/run%s/Models/%s/run%s_DataModelUnfoldedComparison_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var));
 
     delete c;
 
@@ -2097,22 +2094,22 @@ void UtilityPlotter::CompareFakeDataReco(){
     double ymax = 1.0;
 
     // Get the cv hist 
-    htemp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", "CV", vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+    htemp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", "CV", _util.vars.at(k_var_recoX).c_str(), _util.vars.at(k_var_recoX).c_str()));
     TH1D *h_temp_CV = (TH1D*)htemp->Clone();
     h_temp_CV->Scale(1.0, "width");
     
     // Loop over each model
     for (unsigned int m = 0; m < models.size(); m++){
 
-        htemp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec",models.at(m).c_str(), vars.at(k_var_trueX).c_str(), vars.at(k_var_trueX).c_str()));
+        htemp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec",models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));
         h_true.at(m)        = (TH1D*)htemp->Clone();
         h_true_smear.at(m)  = (TH1D*)htemp->Clone();
 
-        htemp  = (TH1D*)fxsec->Get(Form("fake%s/%s/h_run1_CV_0_%s_data_xsec",models.at(m).c_str(), vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+        htemp  = (TH1D*)fxsec->Get(Form("fake%s/%s/h_run1_CV_0_%s_data_xsec",models.at(m).c_str(), _util.vars.at(k_var_recoX).c_str(), _util.vars.at(k_var_recoX).c_str()));
         h_fake.at(m)        = (TH1D*)htemp->Clone();
 
         // Get the response matrix
-        htemp2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
+        htemp2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
         h_response.at(m) = (TH2D*)htemp2D->Clone();
 
         // Get the Covariance matrix
@@ -2148,8 +2145,6 @@ void UtilityPlotter::CompareFakeDataReco(){
             ymax = h_fake.at(m)->GetMaximum();
     }
 
-    
-
     // Now lets plot
     TCanvas *c;
     
@@ -2171,11 +2166,11 @@ void UtilityPlotter::CompareFakeDataReco(){
         if (m == k_model_FLUGG)    h_true_smear.at(k_model_FLUGG)    ->SetLineColor(kViolet-1);
         if (m == k_model_tune1)    h_true_smear.at(k_model_tune1)    ->SetLineColor(kOrange-1);
 
-        h_true_smear.at(m)->SetTitle(var_labels_xsec.at(k_var_recoX).c_str());
+        h_true_smear.at(m)->SetTitle(_util.var_labels_xsec.at(k_var_recoX).c_str());
 
         TH1D* h_error_hist = (TH1D*)h_true_smear.at(m)->Clone();
         h_error_hist->SetFillColorAlpha(12, 0.15);
-        
+
         h_true_smear.at(m)->Draw("hist");
         h_error_hist->Draw("e2, same");
         h_fake.at(m)->Draw("E,same");
@@ -2190,7 +2185,7 @@ void UtilityPlotter::CompareFakeDataReco(){
         leg->Draw();
 
         // Save and close
-        c->Print(Form("plots/run%s/Models/%s/FakeDataComparison_%s.pdf", _util.run_period, _util.xsec_var, models.at(m).c_str()));
+        c->Print(Form("plots/run%s/Models/%s/run%s_FakeDataComparison_%s_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var, models.at(m).c_str()));
         delete c;
     }
 
@@ -2252,7 +2247,7 @@ void UtilityPlotter::CompareFakeDataTrue(){
     fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
 
     // Load in the CV data cross section
-    h_temp  = (TH1D*)fxsec->Get(Form("CV/%s/h_run%s_CV_0_%s_data_xsec",vars.at(k_var_recoX).c_str(), _util.run_period, vars.at(k_var_recoX).c_str()));
+    h_temp  = (TH1D*)fxsec->Get(Form("CV/%s/h_run%s_CV_0_%s_data_xsec",_util.vars.at(k_var_recoX).c_str(), _util.run_period, _util.vars.at(k_var_recoX).c_str()));
     TH1D* h_reco_data_xsec = (TH1D*)h_temp->Clone();
 
     std::vector<TH1D*> h_true(k_MODEL_MAX);
@@ -2263,11 +2258,11 @@ void UtilityPlotter::CompareFakeDataTrue(){
     for (unsigned int m = 0; m < models.size(); m++){
 
         // Get true model xsec
-        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run%s_CV_0_%s_mc_xsec", models.at(m).c_str(),vars.at(k_var_trueX).c_str(), _util.run_period, vars.at(k_var_trueX).c_str()));
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run%s_CV_0_%s_mc_xsec", models.at(m).c_str(),_util.vars.at(k_var_trueX).c_str(), _util.run_period, _util.vars.at(k_var_trueX).c_str()));
         h_true.at(m) = (TH1D*)h_temp->Clone();
 
         // Get fake Tune1 data
-        h_temp  = (TH1D*)fxsec->Get(Form("fake%s/%s/h_run%s_CV_0_%s_data_xsec", models.at(m).c_str(), vars.at(k_var_recoX).c_str(), _util.run_period, vars.at(k_var_recoX).c_str()));
+        h_temp  = (TH1D*)fxsec->Get(Form("fake%s/%s/h_run%s_CV_0_%s_data_xsec", models.at(m).c_str(), _util.vars.at(k_var_recoX).c_str(), _util.run_period, _util.vars.at(k_var_recoX).c_str()));
         h_fake.at(m) = (TH1D*)h_temp->Clone();
 
 
@@ -2314,10 +2309,21 @@ void UtilityPlotter::CompareFakeDataTrue(){
         if (_wSVD.unf->GetMaximum() > ymax)
             ymax = _wSVD.unf->GetMaximum();
 
-        h_fake_xsec_smear->SetMinimum(0);
         h_fake_xsec_smear->SetMaximum(ymax + ymax*0.4);
         h_fake_xsec_smear->SetLineWidth(2);
         h_fake_xsec_smear->SetLineColor(kRed+2);
+
+        if (std::string(_util.xsec_var) == "elec_E"){
+            h_fake_xsec_smear->SetMaximum(8);
+        }
+        else if (std::string(_util.xsec_var) == "elec_ang"){
+            h_fake_xsec_smear->SetMaximum(15);
+        }
+        else if (std::string(_util.xsec_var) == "elec_cang"){
+            h_fake_xsec_smear->SetMaximum(30.0);
+        }
+
+        h_fake_xsec_smear->SetMinimum(0);
 
         // Set the line colours
         if (m == k_model_input)    h_fake_xsec_smear->SetLineColor(kRed+2);
@@ -2344,7 +2350,7 @@ void UtilityPlotter::CompareFakeDataTrue(){
         leg->Draw();
 
         
-        c->Print(Form("plots/run%s/Models/%s/UnfoldedFakeDataComparison_%s.pdf", _util.run_period, _util.xsec_var, models.at(m).c_str()));
+        c->Print(Form("plots/run%s/Models/%s/run%s_UnfoldedFakeDataComparison_%s_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var, models.at(m).c_str()));
         delete c;
 
         delete _wSVD.smear;
@@ -2505,7 +2511,7 @@ void UtilityPlotter::CompareTotalCrossSec(){
     t->Draw();
 
 
-    c->Print(Form("plots/run%s/Models/Total/TotalCrossSectionComparison.pdf", _util.run_period));
+    c->Print(Form("plots/run%s/Models/Total/run%s_TotalCrossSectionComparison.pdf", _util.run_period, _util.run_period));
 
     delete c;
 
@@ -2614,7 +2620,7 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
 
         gStyle->SetLegendTextSize(0.06);
 
-        c->Print(Form("plots/run%s/Models/Total/FakeTotalCrossSectionComparison_%s.pdf", _util.run_period, models.at(m).c_str()));
+        c->Print(Form("plots/run%s/Models/Total/run%s_FakeTotalCrossSectionComparison_%s.pdf", _util.run_period, _util.run_period,  models.at(m).c_str()));
         delete c;
     
     }
@@ -2667,7 +2673,7 @@ void UtilityPlotter::CompareDataCrossSections(){
     for (unsigned int m = 0; m < models.size(); m++){
     
         // Data X Sec MEC
-        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_data_xsec", models.at(m).c_str(), vars.at(k_var_recoX).c_str(), vars.at(k_var_recoX).c_str()));
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_data_xsec", models.at(m).c_str(), _util.vars.at(k_var_recoX).c_str(), _util.vars.at(k_var_recoX).c_str()));
         h_dataxsec_model.at(m) = (TH1D*)h_temp->Clone();
         h_dataxsec_model.at(m)->Scale(1.0, "width");
         h_dataxsec_model.at(m)->SetLineWidth(2);
@@ -2706,7 +2712,12 @@ void UtilityPlotter::CompareDataCrossSections(){
     leg->AddEntry(h_dataxsec_model.at(k_model_tune1)    , "Data Tune 1", "l");
     leg->Draw();
 
-    c->Print(Form("plots/run%s/Models/%s/ModelDataComparison.pdf", _util.run_period, _util.xsec_var));
+    // Draw the run period on the plot
+    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+
+    _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.52, 0.92, 0.52, 0.92);
+
+    c->Print(Form("plots/run%s/Models/%s/run%s_ModelDataComparison_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var));
     delete c;
 
     fxsec->Close();
@@ -2809,7 +2820,7 @@ void UtilityPlotter::CompareTotalDataCrossSections(){
 
     gStyle->SetLegendTextSize(0.06);
 
-    c->Print(Form("plots/run%s/Models/Total/ModelDataComparison.pdf", _util.run_period));
+    c->Print(Form("plots/run%s/Models/Total/run%s_ModelDataComparison.pdf", _util.run_period, _util.run_period));
     delete c;
 
     fxsec->Close();
@@ -2876,15 +2887,15 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
     for (unsigned int m = 0; m < models.size(); m++){
 
         // Get true model xsec
-        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run%s_CV_0_%s_mc_xsec", models.at(m).c_str(),vars.at(k_var_trueX).c_str(), _util.run_period, vars.at(k_var_trueX).c_str()));
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run%s_CV_0_%s_mc_xsec", models.at(m).c_str(),_util.vars.at(k_var_trueX).c_str(), _util.run_period, _util.vars.at(k_var_trueX).c_str()));
         h_true_model.at(m) = (TH1D*)h_temp->Clone();
 
         // Get data cross section extracted for model 
-        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run%s_CV_0_%s_data_xsec", models.at(m).c_str(), vars.at(k_var_recoX).c_str(), _util.run_period, vars.at(k_var_recoX).c_str()));
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run%s_CV_0_%s_data_xsec", models.at(m).c_str(), _util.vars.at(k_var_recoX).c_str(), _util.run_period, _util.vars.at(k_var_recoX).c_str()));
         h_data_model.at(m) = (TH1D*)h_temp->Clone();
 
         // Get the response matrix for model
-        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run%s_%s_0_smearing", models.at(m).c_str(), vars.at(k_var_trueX).c_str(), _util.run_period, models.at(m).c_str()));
+        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run%s_%s_0_smearing", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), _util.run_period, models.at(m).c_str()));
         h_response_model.at(m) = (TH2D*)h_temp_2D->Clone();
 
         // Clone covariance matrix
@@ -2928,7 +2939,7 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
             _util.IncreaseLabelSize( h_unf_model.at(m), c);
             gPad->SetLeftMargin(0.20);
             c->SetBottomMargin(0.15);
-            h_unf_model.at(m)->SetTitle(var_labels_xsec.at(k_var_trueX).c_str());
+            h_unf_model.at(m)->SetTitle(_util.var_labels_xsec.at(k_var_trueX).c_str());
             h_unf_model.at(m)->Draw("E,same");
             h_unf_model.at(m)->GetYaxis()->SetTitleOffset(1.4);
         }
@@ -2936,6 +2947,8 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
             h_unf_model.at(m)->Draw("hist,same");
 
         h_unf_model.at(m)->SetLineWidth(2);
+
+        h_unf_model.at(m)->SetMinimum(0);
 
         
         if (m == k_model_input) {
@@ -2966,11 +2979,433 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
     gStyle->SetLegendTextSize(0.06);
     leg->Draw();
 
-    c->Print(Form("plots/run%s/Models/%s/UnfoldedDataComparison.pdf", _util.run_period, _util.xsec_var));
+    // Draw the run period on the plot
+    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+
+    _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.52, 0.92, 0.52, 0.92);
+
+    c->Print(Form("plots/run%s/Models/%s/run%s_UnfoldedDataComparison_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var));
     delete c;
 
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::SaveResponseMatrix(){
+
+    TFile *fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+
+    _util.CreateDirectory("Response/");
+
+    TH2D* h_temp_2D;
+
+    std::vector<std::string> variables = {"elec_E", "elec_ang", "elec_cang"};
+
+    // For smearing
+    // std::vector<std::string> var_names = {"reco_el_E", "reco_el_ang", "reco_el_cang"};
+
+    // For response
+    std::vector<std::string> var_names = {"true_el_E", "true_el_ang", "true_el_cang"};
+
+    // Vector for storing the response matrix
+    std::vector<TH2D*> h_response(variables.size());
+    std::vector<TH2D*> h_response_index(variables.size());
+
+    for (unsigned int m = 0; m < variables.size(); m++){
+        
+        // Get the response matrix
+        h_temp_2D  = (TH2D*)fxsec->Get(Form("CV/%s/h_run1_CV_0_smearing", var_names.at(m).c_str()));
+        h_response.at(m) = (TH2D*)h_temp_2D->Clone();
+    
+        // Now we got the histogram lets save it!
+        TCanvas * c = new TCanvas("c", "c", 500, 500);
+        c->SetTopMargin(0.11);
+
+        h_response.at(m)->SetStats(kFALSE);
+
+        _util.IncreaseLabelSize(h_response.at(m), c);
+
+        gStyle->SetPalette(kBlueGreenYellow);
+        gStyle->SetPaintTextFormat("4.2f");
+        h_response.at(m)->SetMarkerSize(0.4);
+        h_response.at(m)->SetMarkerColor(kRed+2);
+
+        h_response.at(m)->Draw("colz");
+
+        // Draw the run period on the plot
+        _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);
+
+        c->Print(Form("plots/run%s/Response/Response_run%s_%s.pdf", _util.run_period, _util.run_period, variables.at(m).c_str()));
+        delete c;
+    
+    }
+
+    // Now convert the histogram to bin indexes to read the response matrix more clearly
+    for (unsigned int m = 0; m < variables.size(); m++){
+        
+        // Get the response matrix
+        h_response_index.at(m) = new TH2D("h_response", ";Bin i;Bin j", h_response.at(m)->GetNbinsX(), 0, h_response.at(m)->GetNbinsX(), h_response.at(m)->GetNbinsY(), 0, h_response.at(m)->GetNbinsY());
+    
+        // Set the bin values
+        for (int x = 1; x < h_response.at(m)->GetNbinsY()+1; x++){
+            for (int y = 1; y < h_response.at(m)->GetNbinsX()+1; y++){
+                 h_response_index.at(m)->SetBinContent(x,y,h_response.at(m)->GetBinContent(x,y));
+            }
+        }
+
+        if (variables.at(m) == "elec_E"){
+            h_response_index.at(m)->SetTitle("E_{e#lower[-0.5]{-} + e^{+}}");
+        }
+        if (variables.at(m) == "elec_ang"){
+            h_response_index.at(m)->SetTitle("#beta_{e#lower[-0.5]{-} + e^{+}}");
+        }
+        if (variables.at(m) == "elec_"){
+            h_response_index.at(m)->SetTitle("cos#beta_{e#lower[-0.5]{-} + e^{+}}");
+        }
+
+
+
+        // Now we got the histogram lets save it!
+        TCanvas * c = new TCanvas("c", "c", 500, 500);
+        c->SetTopMargin(0.11);
+
+        h_response_index.at(m)->SetStats(kFALSE);
+
+        _util.IncreaseLabelSize(h_response_index.at(m), c);
+
+        gStyle->SetPalette(kBlueGreenYellow);
+        gStyle->SetPaintTextFormat("4.2f");
+        h_response_index.at(m)->SetMarkerSize(1.0);
+        h_response_index.at(m)->SetMarkerColor(kRed+2);
+
+        h_response_index.at(m)->Draw("colz,text00");
+        h_response_index.at(m)->GetXaxis()->CenterLabels(kTRUE);
+        h_response_index.at(m)->GetYaxis()->CenterLabels(kTRUE);
+        h_response_index.at(m)->GetXaxis()->SetNdivisions(h_response.at(m)->GetNbinsX(), 0, 0, kFALSE);
+        h_response_index.at(m)->GetYaxis()->SetNdivisions(h_response.at(m)->GetNbinsY(), 0, 0, kFALSE);
+
+
+        // Draw the run period on the plot
+        _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);
+
+        c->Print(Form("plots/run%s/Response/Response_run%s_%s_index.pdf", _util.run_period, _util.run_period, variables.at(m).c_str()));
+        delete c;
+    
+    }
+
+
+    fxsec->Close();
+
+}
 // -----------------------------------------------------------------------------
+void UtilityPlotter::CheckPi0Coverage(){
+
+    gStyle->SetOptStat(0);
+
+    // Load in the cross section output
+    TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
+
+    TH2D* h_temp_2D;
+    TH1D* h_temp;
+
+    // The covariance matrix
+    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/er/h_cov_genie_multi_mcxsec_reco",_util.xsec_var));
+    TH2D* h_cov = (TH2D*)h_temp_2D->Clone();
+    h_cov->SetDirectory(0);
+
+    fxsec->Close();
+
+    // Load in the cross section output
+    fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+
+    // MC R CV
+    h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", "CV", _util.vars.at(k_var_recoX).c_str(), _util.vars.at(k_var_recoX).c_str()));
+    TH1D* h_CV = (TH1D*)h_temp->Clone();
+    h_CV->Scale(1.0, "width");
+
+    // MC R CV
+    h_temp  = (TH1D*)fxsec->Get(Form("nopi0tune/%s/h_run1_CV_0_%s_mc_xsec", _util.vars.at(k_var_recoX).c_str(), _util.vars.at(k_var_recoX).c_str()));
+    TH1D* h_nopi0 = (TH1D*)h_temp->Clone();
+    h_nopi0->Scale(1.0, "width");
+
+
+    // Set the bin error of the cv to be for the genie multisim systematic uncertainty
+    for (int bin = 1; bin < h_CV->GetNbinsX(); bin++){
+        h_CV->SetBinError(bin, std::sqrt(h_cov->GetBinContent(bin, bin)));
+    }
+
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+    c->SetLeftMargin(0.2);
+    c->SetBottomMargin(0.15);
+    h_CV->GetYaxis()->SetTitleOffset(1.7);
+
+    // Set the line properties
+    h_CV->SetLineColor(kBlack);
+    h_nopi0->SetLineColor(kPink+1);
+
+    h_CV->SetLineWidth(2);
+    h_nopi0->SetLineWidth(2);
+
+    // Draw the CV
+    h_CV->Draw("hist,E");
+    h_nopi0->Draw("hist,same");
+    h_CV->Draw("hist,E,same");
+    
+    TLegend *leg = new TLegend(0.4, 0.5, 0.6, 0.85);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->SetTextSize(0.04);
+    leg->AddEntry(h_CV, "MC CV (Genie All Sys.)", "el");
+    leg->AddEntry(h_nopi0, "MC no #pi^{0} Tune", "l");
+    leg->Draw();
+
+    c->Print(Form("plots/run%s/Systematics/pi0/%s/run%s_pi0tune_sys_coverage_%s.pdf", _util.run_period, _util.vars.at(k_var_recoX).c_str(), _util.run_period, _util.vars.at(k_var_recoX).c_str()));
+    delete c;
+
+
+}
 // -----------------------------------------------------------------------------
+void UtilityPlotter::CompareMCC8Result(){
+
+    gStyle->SetOptStat(0);
+
+    TCanvas *c = new TCanvas("c", "c", 200, 350);
+    gPad->SetLeftMargin(0.3);
+    
+    // Data X-Sec with Stat Only
+    TH1D* h_data = new TH1D("h_data", ";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [cm^{2} / nucleon]", 2, 0, 2);
+    TH1D* h_data_mcc9 = new TH1D("h_data2", ";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [cm^{2} / nucleon]", 2, 0, 2);
+    
+    // X-Axis
+    h_data->GetXaxis()->SetRangeUser(0.0,2.0); 
+    // h_data->GetXaxis()->SetLabelOffset(999);
+    h_data->GetXaxis()->SetLabelSize(0.08);
+    h_data->GetXaxis()->SetTickLength(0);
+    
+    // Y-Axis
+    h_data->GetYaxis()->SetRangeUser(0.22e-38,1.22e-38);
+    h_data->GetYaxis()->CenterTitle();
+    h_data->GetYaxis()->SetLabelSize(0.1);
+    h_data->GetYaxis()->SetTitleSize(0.08);
+   
+    h_data->SetMarkerStyle(20);
+    h_data->SetMarkerSize(0.7);
+    h_data->SetLineColor(kBlack);
+
+    h_data_mcc9->SetMarkerStyle(23);
+    h_data_mcc9->SetMarkerSize(0.7);
+    h_data_mcc9->SetLineColor(kBlack);
+
+
+    // Fill it
+    h_data->Fill("MCC8", 6.8426915e-39); // new in FV flux
+    h_data->Fill("MCC9", 0.0); // new in FV flux
+    h_data->SetBinError(1, 6.8426915e-39 * 0.40); // new in FV flux
+    h_data->SetBinError(2, 0.0); // new in FV flux
+    h_data->Draw("E1,X0");
+    
+    // Stat Error
+    h_data_mcc9->Fill("MCC8", 0.0); // new in FV flux
+    h_data_mcc9->Fill("MCC9", 6.62447e-39); // new in FV flux
+    h_data_mcc9->SetBinError(1, 0.0); // new in FV flux
+    h_data_mcc9->SetBinError(2, 6.62447e-39 * 0.244); // new in FV flux
+    h_data_mcc9->Draw("E1,X0,same");
+
+    // Statistical band
+    TH1D * h_data_stat = (TH1D*) h_data->Clone();
+    // h_data_stat->SetBinError(1, 0.144e-38);
+    h_data_stat->SetBinError(1, 6.8426915e-39 * 0.22 ); // new in FV flux
+    h_data_stat->SetLineColor(kBlack);
+    h_data_stat->Draw("E1,X0,same");
+
+    // Statistical band
+    TH1D * h_data_stat_mcc9 = (TH1D*) h_data_mcc9->Clone();
+    // h_data_stat->SetBinError(1, 0.144e-38);
+    h_data_stat_mcc9->SetBinError(2, 6.62447e-39 * 0.0987 ); // new in FV flux
+    h_data_stat_mcc9->SetLineColor(kBlack);
+    h_data_stat_mcc9->Draw("E1,X0,same");
+
+
+    // Genie v12.2.2 nue + nuebar
+    TH1D* h_genie_v2_nue_nuebar = new TH1D("h_genie_v2", "", 1, 0.0, 2.0);
+    // h_genie_v2_nue_nuebar->Fill(0.5,7.19925e-39 );
+    h_genie_v2_nue_nuebar->Fill(0.5,7.3125100e-39 ); // with FV flux
+    h_genie_v2_nue_nuebar->SetLineColor(kViolet-5);
+    h_genie_v2_nue_nuebar->SetLineWidth(3); 
+    h_genie_v2_nue_nuebar->SetLineStyle(7);
+    h_genie_v2_nue_nuebar->Draw("hist,same");
+
+    // Genie v3 nue + nuebar
+    TH1D* h_genie_v3_nue_nuebar = new TH1D("h_genie_v3", "", 1, 0.0, 2.0);
+    // h_genie_v3_nue_nuebar->Fill(0.5,5.5228738e-39 );
+    h_genie_v3_nue_nuebar->Fill(0.5,5.5711475e-39 ); // with FV flux
+    h_genie_v3_nue_nuebar->SetLineColor(kBlue+2);
+    h_genie_v3_nue_nuebar->SetLineWidth(3);
+    h_genie_v3_nue_nuebar->SetLineStyle(8);
+    h_genie_v3_nue_nuebar->Draw("hist,same");
+
+    // NuWro nue + nuebar
+    TH1D* h_genie_NuWro_nue_nuebar = new TH1D("h_nuwro_v2", "", 1, 0.0, 2.0);
+    // h_genie_NuWro_nue_nuebar->Fill(0.5,3.8158e-39 );
+    h_genie_NuWro_nue_nuebar->Fill(0.5,5.9205940e-39 ); // with FV flux
+    h_genie_NuWro_nue_nuebar->SetLineColor(kRed+2);
+    h_genie_NuWro_nue_nuebar->SetLineWidth(3);
+    h_genie_NuWro_nue_nuebar->SetLineStyle(1);
+    h_genie_NuWro_nue_nuebar->Draw("hist,same");
+
+
+    h_data->Draw("E1,X0,same");
+    h_data_stat->Draw("E1,X0,same");
+
+
+    // Draw the Legend
+    TLegend *leg = new TLegend(0.35, 0.70, 0.70, 0.89);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(h_data, "Data (stat. + sys.)",      "ep");
+    leg->AddEntry(h_data_mcc9, "Data (stat. + sys.)",      "ep");
+    leg->AddEntry(h_genie_v2_nue_nuebar,   "GENIE v2.12.2",    "l");
+    leg->AddEntry(h_genie_v3_nue_nuebar,   "GENIE v3.0.6",    "l");
+    leg->AddEntry(h_genie_NuWro_nue_nuebar,   "NuWro v19.02.1",    "l");
+    
+    leg->Draw();
+
+    gStyle->SetLegendTextSize(0.06);
+   
+    TLatex *t = new TLatex(.34, .145, "#splitline{MicroBooNE NuMI}{Data}");
+    t->SetTextColor(kBlack);
+    t->SetNDC();
+    t->SetTextSize(2.0/30.);
+    t->SetTextAlign(11);
+    // t->Draw();
+
+
+    c->Print("plots/mcc8_mcc9_nuexsec_generator_plot.pdf");
+
+}
 // -----------------------------------------------------------------------------
+void UtilityPlotter::ForwardFoldedGeneratorComparison(){
+
+    gStyle->SetOptStat(0);
+
+    // Load in the cross section output
+    TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
+
+    TH2D* h_temp_2D;
+    TH1D* h_temp;
+
+    // The covariance matrix
+    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/er/h_cov_tot_mcxsec_reco",_util.xsec_var));
+    TH2D* h_cov = (TH2D*)h_temp_2D->Clone();
+    h_cov->SetDirectory(0);
+
+    // Data XSec
+    h_temp  = (TH1D*)fxsec->Get(Form("%s/er/h_data_xsec_stat_sys_reco", _util.xsec_var));
+    TH1D* h_dataxsec = (TH1D*)h_temp->Clone();
+    h_dataxsec->SetDirectory(0);
+    h_dataxsec->SetLineColor(kBlack);
+    h_dataxsec->SetMarkerStyle(20);
+    h_dataxsec->SetMarkerSize(0.5);
+
+    h_temp  = (TH1D*)fxsec->Get(Form("%s/er/h_data_xsec_stat_reco", _util.xsec_var));
+    TH1D* h_dataxsec_stat = (TH1D*)h_temp->Clone();
+    h_dataxsec_stat->SetDirectory(0);
+    h_dataxsec_stat->SetLineColor(kBlack);
+    h_dataxsec_stat->SetMarkerStyle(20);
+    h_dataxsec_stat->SetMarkerSize(0.5);
+
+    fxsec->Close();
+
+    // Load in the cross section output
+    fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+
+    // Create a vector for the models
+    std::vector<std::string> models = {
+        "CV",
+        "geniev3"
+    };
+
+    // enums for the models
+    enum enum_models {
+        k_model_CV,
+        k_model_geniev3,
+        k_MODEL_MAX
+    };
+
+    // Create the vector of histograms
+    std::vector<TH2D*> h_response_model(models.size());
+    std::vector<TH1D*> h_mcxsec_true_model(models.size());
+    std::vector<TH1D*> h_mcxsec_reco_model(models.size());
+
+
+    // Loop over each model
+    for (unsigned int m = 0; m < models.size(); m++){
+        
+        // Response Matrix
+        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
+        if (h_temp_2D == NULL) std::cout <<"Help!" << m << std::endl;
+        h_response_model.at(m) = (TH2D*)h_temp_2D->Clone();
+
+        // MC xsec in True
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));
+        h_mcxsec_true_model.at(m) = (TH1D*)h_temp->Clone();
+        h_mcxsec_reco_model.at(m) = (TH1D*)h_dataxsec->Clone();
+       
+        _util.MatrixMultiply(h_mcxsec_true_model.at(m), h_mcxsec_reco_model.at(m), h_response_model.at(k_model_CV), "true_reco", true);
+    }
+
+    // Set the line colours
+    h_mcxsec_reco_model.at(k_model_CV)       ->SetLineColor(kRed+2);
+    h_mcxsec_reco_model.at(k_model_geniev3)  ->SetLineColor(kGreen+2);
+
+    // Set the line styles
+    h_mcxsec_reco_model.at(k_model_CV)       ->SetLineStyle(1);
+    h_mcxsec_reco_model.at(k_model_geniev3)  ->SetLineStyle(2);
+    
+
+    // Now lets plot
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+    c->SetLeftMargin(0.2);
+    c->SetBottomMargin(0.15);
+    h_dataxsec->GetYaxis()->SetTitleOffset(1.7);
+    // h_mcxsec_reco->SetMaximum(1.5);
+    h_dataxsec->Draw("E1,X0,same");
+
+    if (_util.zoom && std::string(_util.xsec_var) == "elec_cang")
+        h_dataxsec->GetXaxis()->SetRangeUser(0.6, 1.0);
+    
+    h_mcxsec_reco_model.at(k_model_CV)->Draw("hist,same");
+    h_mcxsec_reco_model.at(k_model_geniev3)->Draw("hist,same");
+    h_dataxsec->Draw("E1,X0,same");
+    h_dataxsec_stat->Draw("E1,X0,same");
+
+    TLegend *leg = new TLegend(0.4, 0.6, 0.75, 0.85);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(h_dataxsec, "Data (Stat. + Sys.)", "ep");
+    
+    double chi, pval;
+    int ndof;
+    std::cout << "CV" << std::endl;
+    _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_CV), h_dataxsec, h_cov, chi, ndof, pval);
+    // _util.CalcChiSquaredNoCorr(h_mcxsec_reco_model.at(k_model_CV), h_dataxsec, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_CV),  Form("MC #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    
+    std::cout << "Genie v3" << std::endl;
+    _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_geniev3), h_dataxsec, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_geniev3),  Form("GENIE v3.0.6 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+
+    gStyle->SetLegendTextSize(0.03);
+    
+    leg->Draw();
+
+    // Draw the run period on the plot
+    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+
+    _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.52, 0.92, 0.52, 0.92);
+    
+    c->Print(Form("plots/run%s/Models/%s/run%s_DataGeneratorComparison_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var));
+
+    fxsec->Close();
+
+    delete c;
+
+}

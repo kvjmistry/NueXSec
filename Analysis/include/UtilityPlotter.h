@@ -3,6 +3,7 @@
 
 #include "Utility.h"
 #include "WienerSVD.h"
+#include "SliceContainer.h"
 
 // Class for making plots of generic things, such as run vs run comparisons and 
 // separate stuies that people want me to do for the analsis
@@ -93,7 +94,7 @@ class UtilityPlotter{
     void PlotVarbyRecoBin();
     // -------------------------------------------------------------------------
     // Function that plots a variable in different bin ranges
-    void PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string variable);
+    void PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree* tree, std::string xvar, std::string reco_var, std::string true_var);
     // -------------------------------------------------------------------------
     // Get the integrated flux, draw threshold line for technote
     void PlotIntegratedFluxwithThrehold();
@@ -101,9 +102,6 @@ class UtilityPlotter{
     // Function to plot a number of true variables at the start of the selection
     // e.g. the hit purity and pion mommentum
     void PlotTrueVar();
-    // -------------------------------------------------------------------------
-    // Similar function to the slice container classifier, just re-implement it here for easier use
-    std::pair<std::string, int> Classify(float true_nu_vtx_sce_x, float true_nu_vtx_sce_y, float true_nu_vtx_sce_z, int nu_pdg, int ccnc, float nu_purity_from_pfp, int npi0);
     // -------------------------------------------------------------------------
     // Function to save a few 2D histograms
     void Save2DHists(const char* printname, TH2D* hist);
@@ -157,7 +155,19 @@ class UtilityPlotter{
     // Compare the unfolded data cross section extracted with different models
     void CompareUnfoldedDataCrossSections();
     // -------------------------------------------------------------------------
-
+    // Get the response matrix from file and save it for the technote
+    void SaveResponseMatrix();
+    // -------------------------------------------------------------------------
+    // Check if the pi0 tune is covered by the genie systeamtics
+    void CheckPi0Coverage();
+    // -------------------------------------------------------------------------
+    // Compare the MCC9 result to MCC8
+    void CompareMCC8Result();
+    // -------------------------------------------------------------------------
+    // Compare generator predictions to the data
+    void ForwardFoldedGeneratorComparison();
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
 
 }; // End Class UtilityPlotter

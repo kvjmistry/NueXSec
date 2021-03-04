@@ -293,6 +293,10 @@ class HistogramHelper{
         k_true_shr_energy_completeness,     // Actually completeness as a function of reco shower
         k_true_shr_energy_resolution_reco,  // Actually resolution normed to reco as a function of reco shower
         k_true_shr_energy_resolution_true,  // Actually resolution normed to true as a function of reco shower
+        k_true_shr_cosbeta_purity,           // Actually purity as a function of reco shower
+        k_true_shr_cosbeta_completeness,     // Actually completeness as a function of reco shower
+        k_true_shr_cosbeta_resolution_reco,  // Actually resolution normed to reco as a function of reco shower
+        k_true_shr_cosbeta_resolution_true,  // Actually resolution normed to true as a function of reco shower
         k_elec_true_beta_reco_beta,
         k_elec_true_theta_reco_theta,
         k_elec_true_phi_reco_phi,
@@ -353,6 +357,7 @@ class HistogramHelper{
         k_int_effective_ang,
         k_int_beta_nue,
         k_int_beta_nuebar,
+        k_int_cosbeta,
         k_INTERACTION_MAX
     };
 

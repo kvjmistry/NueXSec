@@ -238,10 +238,14 @@ void Selection::MakeSelection(){
             if (std::string(_util.run_period) == "1" ){
 
                 // 4p6
-                // if (data_SC.run > 5900) continue;
-
+                // if ((data_SC.run > 6035 && data_SC.run < 6284) || data_SC.run > 6510 ){
+                //     continue;
+                // }
                 // 6p6
-                // if (data_SC.run < 6600) continue;
+                // if ((data_SC.run > 6285 && data_SC.run < 6510) || data_SC.run < 6035 ){
+                //     continue;
+                // }
+
             }
 
             // Apply Pi0 Selection
@@ -516,8 +520,9 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     SelectionFill(type, SC, _util.k_dEdx_max_no_tracks, counter_v );
 
     // Skip unnaturally high shower energies?
-    if (SC.shr_energy_cali > 6.0 && type == _util.k_data)
-        std::cout << "reco shr energy: "  << SC.shr_energy_cali << "  elec E: "<< SC.elec_e << "  nu E: " << SC.nu_e<< std::endl;
+    if (SC.shr_energy_cali > 6.0 && type == _util.k_data){
+        return false;
+    }
 
     // if (SC.is_signal && SC.nu_e < 0.3) std::cout<<"Low elec E!: " <<SC.elec_e*1000 << " MeV" << "  | E Nu: "<< SC.nu_e*1000 << " MeV" <<  std::endl; 
     // if (SC.is_signal && SC.elec_e < 0.1) std::cout<<"Low elec E!: " <<SC.elec_e*1000 << " MeV" << "  | E Nu: "<< SC.nu_e*1000 << " MeV" << "  |Reco Shr Energy: " <<  SC.shr_energy_cali *1000<<  std::endl; 

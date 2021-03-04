@@ -172,7 +172,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             overwritePOT = true;
 
             // If using an alternate CV model via reweighting then we dont want to overwrite the POT values
-            if (std::string(variation) == "weight" || std::string(variation) == "mec" || std::string(variation) == "nogtune" || std::string(variation) == "nopi0tune" || std::string(variation) == "Input")
+            if (std::string(variation) == "weight" || std::string(variation) == "mec" || std::string(variation) == "nogtune" || std::string(variation) == "nopi0tune" || std::string(variation) == "Input" || std::string(variation) == "geniev3")
                 overwritePOT = false;
         }
 
@@ -326,6 +326,11 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         if (strcmp(arg, "--gpvm") == 0) {
             use_gpvm = true;
         }
+
+        // Use the flugg flux and reweighting
+        if (strcmp(arg, "--usefluggflux") == 0) {
+            usefluggflux = true;
+        }
    
     }
 
@@ -379,7 +384,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
                 if (confignames.at(p) == match_name){
                     
                     // If fake data mode we overwrite the data POT number instead
-                    if (std::string(fakedataname) == "weight" || std::string(fakedataname) == "mec" || std::string(fakedataname) == "nogtune" || std::string(fakedataname) == "nopi0tune" || std::string(fakedataname) == "Input")
+                    if (std::string(fakedataname) == "weight" || std::string(fakedataname) == "mec" || std::string(fakedataname) == "nogtune" || std::string(fakedataname) == "nopi0tune" || std::string(fakedataname) == "Input" || std::string(fakedataname) == "geniev3")
                         confignames[p] = Form("Run%s_MC_POT", run_period);
                     else
                         confignames[p] = Form("Run%s_MC_POT_%s", run_period, variation_str.c_str());
@@ -398,7 +403,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
                 // If matched then overwrite the POT config for the MC to the variation
                 if (confignames.at(p) == match_name){
                     
-                    if (std::string(fakedataname) == "weight" || std::string(fakedataname) == "mec" || std::string(fakedataname) == "nogtune" || std::string(fakedataname) == "nopi0tune" || std::string(fakedataname) == "Input")
+                    if (std::string(fakedataname) == "weight" || std::string(fakedataname) == "mec" || std::string(fakedataname) == "nogtune" || std::string(fakedataname) == "nopi0tune" || std::string(fakedataname) == "Input" || std::string(fakedataname) == "geniev3")
                         confignames[p] = match_name;
                     else
                         confignames[p] = match_name + "_" + variation_str;
@@ -636,6 +641,9 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     
     // Create txt file list directory
     gSystem->Exec("if [ ! -d \"files/txt/\" ]; then echo \"\ntxt folder does not exist... creating\"; mkdir -p files/txt; fi"); 
+
+    // Set The axes names
+    SetAxesNames();
 }
 // -----------------------------------------------------------------------------
 bool Utility::GetFile(TFile* &f, TString string){
@@ -815,7 +823,6 @@ void Utility::GetPiZeroWeight(double &weight, int pizero_mode, int nu_pdg, int c
 
 }
 // -----------------------------------------------------------------------------
-
 bool Utility::GetDirectory(TFile* f, TDirectory* &d, TString string){
     d = (TDirectory*)f->Get(string);
     if (d == NULL) {
@@ -1119,7 +1126,7 @@ void Utility::SetTPadOptions(TPad *topPad, TPad *bottomPad){
     topPad->SetBottomMargin(0.05);
     topPad->SetTopMargin(0.15);
     bottomPad->SetTopMargin(0.04);
-    bottomPad->SetBottomMargin(0.25);
+    bottomPad->SetBottomMargin(0.3);
     bottomPad->SetGridy();
     topPad->SetLeftMargin(0.15);
     topPad->SetRightMargin(0.1);
@@ -1406,29 +1413,30 @@ void Utility::CalcChiSquaredNoCorr(TH1D* h_model, TH1D* h_data, TH2D* cov, doubl
 
 }
 // -----------------------------------------------------------------------------
-void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vector<std::string> &var_labels_events,
-                           std::vector<std::string> &var_labels_eff,  std::string &smear_hist_name, std::vector<std::string> &vars, double &xsec_scale){
+void Utility::SetAxesNames(){
 
     // Electron/Shower Energy
     if (std::string(xsec_var) =="elec_E"){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                           ";E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV];#frac{d#sigma}{dE^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon]",
-                           ";E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV];#frac{d#sigma}{dE^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/GeV/nucleon"
+                           ";E^{reco}_{e} [GeV];#frac{dR}{dE^{reco}_{e}} [10^{-39} cm^{2}/GeV/nucleon]",
+                           ";E^{true}_{e} [GeV];#frac{d#sigma}{dE^{true}_{e}} [10^{-39} cm^{2}/GeV/nucleon"
                           };
 
 
         var_labels_events = {";;Entries",
-                             ";E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV]; Entries / GeV",
-                             ";E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV]; Entries / GeV"
+                             ";E^{reco}_{e} [GeV]; Entries / GeV",
+                             ";E^{true}_{e} [GeV]; Entries / GeV"
                             };
 
         var_labels_eff = {";;Efficiency",
-                          ";E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV]; Efficiency",
-                          ";E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV]; Efficiency"
+                          ";E^{reco}_{e} [GeV]; Efficiency",
+                          ";E^{true}_{e} [GeV]; Efficiency"
                          };
 
-        smear_hist_name = ";E^{true}_{e#lower[-0.5]{-} + e^{+}} [GeV];E^{reco}_{e#lower[-0.5]{-} + e^{+}} [GeV]";
+        smear_hist_name = ";E^{true}_{e} [GeV];E^{reco}_{e} [GeV]";
+
+        ac_hist_name = ";E^{true}_{e} [GeV];E^{true}_{e} [GeV]";
 
         vars = {"integrated", "reco_el_E", "true_el_E" };
 
@@ -1447,22 +1455,24 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
     else if (std::string(xsec_var) =="elec_ang"){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                           ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg];#frac{d#sigma}{d#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-37} cm^{2}/deg/nucleon]",
-                           ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg];#frac{d#sigma}{d#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]} [10^{-37} cm^{2}/deg/nucleon]"
+                           ";#beta^{reco}_{e} [deg];#frac{dR}{d#beta^{reco}_{e}} [10^{-37} cm^{2}/deg/nucleon]",
+                           ";#beta^{true}_{e} [deg];#frac{d#sigma}{d#beta^{true}_{e}} [10^{-37} cm^{2}/deg/nucleon]"
                           };
 
 
         var_labels_events = {";;Entries",
-                             ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]; Entries / deg",
-                             ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]; Entries / deg"
+                             ";#beta^{reco}_{e} [deg]; Entries / deg",
+                             ";#beta^{true}_{e} [deg]; Entries / deg"
                             };
 
         var_labels_eff = {";;Efficiency",
-                          ";#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]; Efficiency",
-                          ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg]; Efficiency"
+                          ";#beta^{reco}_{e} [deg]; Efficiency",
+                          ";#beta^{true}_{e} [deg]; Efficiency"
                          };
 
-        smear_hist_name = ";#beta^{true}_{e#lower[-0.5]{-} + e^{+}} [deg];#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} [deg]";
+        smear_hist_name = ";#beta^{true}_{e} [deg];#beta^{reco}_{e} [deg]";
+
+        ac_hist_name = ";#beta^{true}_{e} [deg];#beta^{true}_{e} [deg]";
 
         vars = {"integrated", "reco_el_ang", "true_el_ang" };
 
@@ -1481,22 +1491,24 @@ void Utility::SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vecto
     else if (std::string(xsec_var) =="elec_cang"){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
-                           ";cos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}};#frac{d#sigma}{dcos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/nucleon]",
-                           ";cos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}};#frac{d#sigma}{dcos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}}} [10^{-39} cm^{2}/nucleon]"
+                           ";cos#beta^{reco}_{e};#frac{dR}{dcos#beta^{reco}_{e}} [10^{-39} cm^{2}/nucleon]",
+                           ";cos#beta^{true}_{e};#frac{d#sigma}{dcos#beta^{true}_{e}} [10^{-39} cm^{2}/nucleon]"
                           };
 
 
         var_labels_events = {";;Entries",
-                             ";cos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}}; Entries",
-                             ";cos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}}; Entries"
+                             ";cos#beta^{reco}_{e}; Entries",
+                             ";cos#beta^{true}_{e}; Entries"
                             };
 
         var_labels_eff = {";;Efficiency",
-                          ";cos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}}; Efficiency",
-                          ";cos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}}; Efficiency"
+                          ";cos#beta^{reco}_{e}; Efficiency",
+                          ";cos#beta^{true}_{e}; Efficiency"
                          };
 
-        smear_hist_name = ";cos(#beta)^{true}_{e#lower[-0.5]{-} + e^{+}};cos(#beta)^{reco}_{e#lower[-0.5]{-} + e^{+}}";
+        smear_hist_name = ";cos#beta^{true}_{e};cos#beta^{reco}_{e}";
+
+        ac_hist_name = ";cos#beta^{true}_{e};cos#beta^{true}_{e}";
 
         vars = {"integrated", "reco_el_cang", "true_el_cang" };
 
@@ -1557,12 +1569,47 @@ void Utility::Save2DHists(const char *print_name, TH2D* hist, const char* draw_o
     
     c->SetTopMargin(0.11);
     gStyle->SetPaintTextFormat("4.2f");
+    gStyle->SetPalette(kBlueGreenYellow);
     hist->SetStats(kFALSE);
     IncreaseLabelSize(hist, c);
     hist->Draw(draw_option);
     Draw_Run_Period(c, 0.82, 0.915, 0.82, 0.915);
     c->Print(print_name);
     
+    delete c;
+}
+// -----------------------------------------------------------------------------
+void Utility::Save2DHistsBinIndex(const char *print_name, TH2D* hist, const char* draw_option) {
+
+
+    // Get make the 2D hist
+    TH2D* h_2D_index = new TH2D("h_2D", ";Bin i;Bin j",hist->GetNbinsX(), 0, hist->GetNbinsX(), hist->GetNbinsY(), 0, hist->GetNbinsY());
+
+    // Set the bin values
+    for (int x = 1; x < hist->GetNbinsY()+1; x++){
+        for (int y = 1; y < hist->GetNbinsX()+1; y++){
+                h_2D_index->SetBinContent(x,y,hist->GetBinContent(x,y));
+        }
+    }
+
+    TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
+    c->SetTopMargin(0.11);
+    gStyle->SetPaintTextFormat("4.2f");
+    h_2D_index->SetStats(kFALSE);
+    gStyle->SetPalette(kBlueGreenYellow);
+    IncreaseLabelSize(hist, c);
+    h_2D_index->SetMarkerSize(1.0);
+    h_2D_index->SetMarkerColor(kRed+2);
+    h_2D_index->Draw(draw_option);
+    h_2D_index->Draw("colz,text00");
+    Draw_Run_Period(c, 0.82, 0.915, 0.82, 0.915);
+    h_2D_index->GetXaxis()->CenterLabels(kTRUE);
+    h_2D_index->GetYaxis()->CenterLabels(kTRUE);
+    h_2D_index->GetXaxis()->SetNdivisions(h_2D_index->GetNbinsX(), 0, 0, kFALSE);
+    h_2D_index->GetYaxis()->SetNdivisions(h_2D_index->GetNbinsY(), 0, 0, kFALSE);
+    c->Print(print_name);
+    
+    delete h_2D_index;
     delete c;
 }
 // -----------------------------------------------------------------------------

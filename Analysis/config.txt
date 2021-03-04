@@ -20,14 +20,14 @@ Run1_Dirt_POT 1.67392e+21 // new genie tune
 -
 // Run1_Data_POT 8.885e+19       // v3 with michel veto updated pawels tool
 Run1_Data_POT 2.0e+20       // v5 pawels tool
-// Run1_Data_POT 6.913e+19 // Run 1 Only 4+6 (< 5900)
-// Run1_Data_POT 2.32e19 // Run 1 Only 6+6 (> 6600)
+// Run1_Data_POT 1.375e+20 // Run 1 Only 4+6 
+// Run1_Data_POT 6.316e+19 // Run 1 Only 6+6 
 -
 // Run 1 data HW Triggers (EA9CNT) 
 // Run1_Data_trig 2347745.0       // v3 with michel veto updated pawels tool
 Run1_Data_trig 5268051.0       // v5 pawels tool
-// Run1_Data_trig 1779971.0  // Run 1 Only 4+6 (< 5900)
-// Run1_Data_trig 550567.0  // Run 1 Only 6+6 (> 6600)
+// Run1_Data_trig 3534367.0  // Run 1 Only 4+6
+// Run1_Data_trig 1753227.0   // Run 1 Only 6+6
 -
 // Run 1 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
 // Run1_EXT_trig 4015961.990000 // v3 with michel veto updated

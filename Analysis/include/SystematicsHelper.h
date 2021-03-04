@@ -94,6 +94,9 @@ class SystematicsHelper{
     // Fill vector with the statistical uncertainties
     void FillStatVector();
     // -------------------------------------------------------------------------
+    // Add the smearing covariance matrices to the reco covariance matrices
+    void AddSmearCovMatrix();
+    // -------------------------------------------------------------------------
     // Fill POT counting uncertainty vector
     void FillPOTCountingVector();
     // -------------------------------------------------------------------------
@@ -105,6 +108,12 @@ class SystematicsHelper{
     // -------------------------------------------------------------------------
     // Save the covariance matrix
     void SaveCovMatrix(TH2D* cov, std::string print_name);
+    // -------------------------------------------------------------------------
+    // Save the correlation matrix
+    void SaveCorMatrix(TH2D* cov, TH1D* h_CV, std::string print_name);
+    // -------------------------------------------------------------------------
+    // Save the frac covariance matrix
+    void SaveFracCovMatrix(TH2D* cov, TH1D* h_CV, std::string print_name);
     // -------------------------------------------------------------------------
     // Make the total beamline sys error plots
     void PlotTotUnisim(std::string unisim_type);
@@ -125,7 +134,7 @@ class SystematicsHelper{
     void SaveCutHistogramsDetVar();
     // -------------------------------------------------------------------------
     // Make a plot of the systematics in one plot
-    void MakeTotUncertaintyPlot();
+    void MakeTotUncertaintyPlot(bool AddStatErr);
     // -------------------------------------------------------------------------
     // Initialse the matrix of covariance matrices
     void InitialseCovarianceVector();
@@ -231,33 +240,16 @@ class SystematicsHelper{
     // enum for histogram vars
     enum TH1D_xsec_var_vars {
         k_var_integrated,     // Integrated X-Section
-        k_var_reco_el_E,      // Reconstructed electron energy
-        k_var_true_el_E,      // True electron energy
+        k_var_recoX,      // Reconstructed electron energy
+        k_var_trueX,      // True electron energy
         k_TH1D_xsec_var_MAX
     };
 
     // Names for cross section histograms
     std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "data_xsec"};
-    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Smeared Prediction", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC", "MC Smear",  "Data"};
+    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Smeared Prediction", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC Event Rate", "MC Event Rate Response",  "Data Event Rate"};
 
     std::vector<std::string> vars = {"integrated","recoX", "trueX" };
-
-    // Choose the cross section scale to set the histogram
-    double xsec_scale = 13.0;
-    
-    // Use these for when we do the flux normalised event rate
-    // std::vector<std::string> var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}]",
-    //                                        ";Reco. Leading Shower Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]",
-    //                                        ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];#nu_{e} + #bar{#nu}_{e} CC Flux Norm. Event Rate [cm^{2}/GeV]"
-                                        // };
-    
-    std::vector<std::string> var_labels_xsec = {};
-
-    std::vector<std::string> var_labels_events = {};
-
-    std::vector<std::string> var_labels_eff = {};
-
-    std::string smear_hist_name = ";True e#lower[-0.5]{-} + e^{+} Energy [GeV];Leading Shower Energy [GeV]";
 
     // Containter for the central value histograms
     std::vector<std::vector<TH1D*>> cv_hist_vec; // reco elec e, <gen, sig, etc>

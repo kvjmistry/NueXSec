@@ -82,7 +82,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_true_nu_E_nuebar_single_bin", true,  true,  "True #bar{#nu}_{e}; Efficiency",                                  "True #bar{#nu}_{e} Events in FV",                  "nu_E_nuebar_single_bin");
         
         MakeEfficiencyPlotByCut("h_true_elec_E",                 false, false, "True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_E");
-        MakeEfficiencyPlotByCut("h_eff_elec_E_many_bins",        false, false, "True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_E_many_bins");
+        MakeEfficiencyPlotByCut("h_eff_elec_E_many_bins",        true,  false, "True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_E_many_bins");
         MakeEfficiencyPlotByCut("h_eff_nu_theta",                false, false, "True #nu_{e} + #bar{#nu}_{e} #theta [deg]; Efficiency",           "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "nu_theta" );
         MakeEfficiencyPlotByCut("h_eff_nu_phi",                  false, false, "True #nu_{e} + #bar{#nu}_{e} #phi [deg]; Efficiency",             "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "nu_phi" );
         MakeEfficiencyPlotByCut("h_eff_elec_theta",              false, false, "True e#lower[-0.5]{-} + e^{+} #theta [deg]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_theta" );
@@ -110,11 +110,12 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_eff_charg_par_multi_nue",     false, false, "True #nu_{e} Charged Particle Multi.; Efficiency",                "True #nu_{e} Events in FV",                        "charg_par_multi_nue" );
         MakeEfficiencyPlotByCut("h_eff_charg_par_multi_nuebar",  false, false, "True #bar{#nu}_{e} Charged Particle Multi.; Efficiency",          "True #bar{#nu}_{e} Events in FV",                  "charg_par_multi_nuebar" );
 
-        MakeEfficiencyPlotByCutTot("h_true_nu_E",           "h_true_nu_E_nue",           "h_true_nu_E_nuebar",          "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   false, false, "True Neutrino Energy [GeV]; Efficiency",         "nu_E");
-        MakeEfficiencyPlotByCutTot("h_true_elec_E_rebin",   "h_true_elec_E_rebin_nue",   "h_true_elec_E_rebin_nuebar",  "e#lower[-0.5]{-} + e^{+}","e#lower[-0.5]{-}", "e^{+}",           false, false, "True Electron Energy [GeV]; Efficiency",         "elec_E_rebin");
-        MakeEfficiencyPlotByCutTot("h_eff_proton_multi",    "h_eff_proton_multi_nue",    "h_eff_proton_multi_nuebar",   "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   false, false, "True Proton Multiplicity; Efficiency",           "prot_multi");
-        MakeEfficiencyPlotByCutTot("h_eff_pion_multi",      "h_eff_pion_multi_nue",      "h_eff_pion_multi_nuebar",     "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   false, false, "True Pion Multiplicity; Efficiency",             "pion_multi");
-        MakeEfficiencyPlotByCutTot("h_eff_charg_par_multi", "h_eff_charg_par_multi_nue", "h_eff_charg_par_multi_nuebar","#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   false, false, "True Charged Particle Multiplicity; Efficiency", "charg_par_multi");
+        MakeEfficiencyPlotByCutTot("h_true_nu_E",             "h_true_nu_E_nue",             "h_true_nu_E_nuebar",             "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Neutrino Energy [GeV]; Efficiency",         "nu_E");
+        MakeEfficiencyPlotByCutTot("h_true_elec_E_rebin",     "h_true_elec_E_rebin_nue",     "h_true_elec_E_rebin_nuebar",     "e#lower[-0.5]{-} + e^{+}","e#lower[-0.5]{-}", "e^{+}",           true, false, "True Electron Energy [GeV]; Efficiency",         "elec_E_rebin");
+        MakeEfficiencyPlotByCutTot("h_eff_cosine_beta_rebin", "h_eff_cosine_beta_rebin_nue", "h_eff_cosine_beta_rebin_nuebar", "e#lower[-0.5]{-} + e^{+}","e#lower[-0.5]{-}", "e^{+}",           true, false, "True cos#beta; Efficiency",         "cosine_beta_rebin");
+        MakeEfficiencyPlotByCutTot("h_eff_proton_multi",      "h_eff_proton_multi_nue",      "h_eff_proton_multi_nuebar",      "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Proton Multiplicity; Efficiency",           "prot_multi");
+        MakeEfficiencyPlotByCutTot("h_eff_pion_multi",        "h_eff_pion_multi_nue",        "h_eff_pion_multi_nuebar",        "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Pion Multiplicity; Efficiency",             "pion_multi");
+        MakeEfficiencyPlotByCutTot("h_eff_charg_par_multi",   "h_eff_charg_par_multi_nue",   "h_eff_charg_par_multi_nuebar",   "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Charged Particle Multiplicity; Efficiency", "charg_par_multi");
 
         // Create the interaction folder
         _util.CreateDirectory("Interaction");
@@ -142,8 +143,9 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
             MakeInteractionPlot("h_int_elec_theta",             true, ";True e#lower[-0.5]{-} + e^{+} #theta [deg]; Entries",   "elec_theta",             cut_stage, 600);
             MakeInteractionPlot("h_int_elec_phi",               true, ";True e#lower[-0.5]{-} + e^{+} #phi [deg]; Entries",     "elec_phi",               cut_stage, 500);
             MakeInteractionPlot("h_int_effective_ang",          true, ";True e#lower[-0.5]{-} + e^{+} Eff Ang. [deg]; Entries", "eff_ang",                cut_stage, 600);
-            MakeInteractionPlot("h_int_beta_nue",               true, ";True e#lower[-0.5]{-} #beta [deg]; Entries",                  "eff_ang_nue",            cut_stage, 600);
+            MakeInteractionPlot("h_int_beta_nue",               true, ";True e#lower[-0.5]{-} #beta [deg]; Entries",            "eff_ang_nue",            cut_stage, 600);
             MakeInteractionPlot("h_int_beta_nuebar",            true, ";True e^{+} #beta [deg]; Entries",                       "eff_ang_nuebar",         cut_stage, 600);
+            MakeInteractionPlot("h_int_cosbeta",                true, ";True e#lower[-0.5]{-} + e^{+} cos#beta; Entries",       "cosbeta",                cut_stage, 600);
         }
         
         MakeInteractionEfficiency("h_true_nue_E",                 false, ";True #nu_{e} Energy [GeV]; Efficiency",                    "nue_E");
@@ -158,9 +160,10 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeInteractionEfficiency("h_int_elec_E_rebin_nuebar",    false, ";True e^{+} Energy [GeV]; Efficiency",                      "elec_E_rebin_nuebar");
         MakeInteractionEfficiency("h_int_elec_theta",             false, ";True e#lower[-0.5]{-} + e^{+} #theta [deg]; Efficiency",   "elec_theta");
         MakeInteractionEfficiency("h_int_elec_phi",               false, ";True e#lower[-0.5]{-} + e^{+} #phi [deg]; Efficiency",     "elec_phi");
-        MakeInteractionEfficiency("h_int_effective_ang",          false, ";True e#lower[-0.5]{-} + e^{+} Eff Ang. [deg]; Efficiency", "eff_ang");
+        MakeInteractionEfficiency("h_int_effective_ang",          false, ";True e#lower[-0.5]{-} + e^{+} #beta [deg]; Efficiency",    "eff_ang");
         MakeInteractionEfficiency("h_int_beta_nue",               false, ";True e#lower[-0.5]{-} #beta [deg]; Efficiency",            "eff_ang_nue");
         MakeInteractionEfficiency("h_int_beta_nuebar",            false, ";True e^{+} #beta [deg]; Efficiency",                       "eff_ang_nuebar");
+        MakeInteractionEfficiency("h_int_cosbeta",                false, ";True e#lower[-0.5]{-} + e^{+} cos#beta; Efficiency",       "cosbeta");
 
         // Create the 2D folder
         _util.CreateDirectory("2D");
@@ -205,26 +208,31 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
             Save1DHists(Form("plots/run%s/Truth/reco_true_nu_ang_%s.pdf", _util.run_period, cut_type.c_str()),     "h_reco_true_ang", cut_type, true);
 
             // Make the 2D histograms
-            Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta_%s.pdf",          _util.run_period, cut_type.c_str()), "h_true_nue_phi_theta", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_theta_%s.pdf",       _util.run_period, cut_type.c_str()), "h_true_nue_energy_theta", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_phi_%s.pdf",         _util.run_period, cut_type.c_str()), "h_true_nue_energy_phi", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_angle_%s.pdf",       _util.run_period, cut_type.c_str()), "h_true_nue_energy_angle", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_%s.pdf",            _util.run_period, cut_type.c_str()), "h_true_nue_vtx_z_y", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_sce_%s.pdf",        _util.run_period, cut_type.c_str()), "h_true_nue_vtx_z_y_sce", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s.pdf",     _util.run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type, true);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nu_E_reco_nu_E_%s.pdf",         _util.run_period, cut_type.c_str()), "h_true_nu_E_reco_nu_E", cut_type, true);
-            Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_extra_bins_%s.pdf",     _util.run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E_extra_bins", cut_type, true);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nu_E_reco_nu_E_extra_bins_%s.pdf",         _util.run_period, cut_type.c_str()), "h_true_nu_E_reco_nu_E_extra_bins", cut_type, true);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_x_reco_nu_vtx_x_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_nu_vtx_x_reco_nu_vtx_x", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_y_reco_nu_vtx_y_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_nu_vtx_y_reco_nu_vtx_y", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_z_reco_nu_vtx_z_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_nu_vtx_z_reco_nu_vtx_z", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_purity_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_shr_energy_purity", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_completeness_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_shr_energy_completeness", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_resolution_reco_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_shr_energy_resolution_reco", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_resolution_true_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_shr_energy_resolution_true", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_elec_true_beta_reco_beta_%s.pdf",   _util.run_period, cut_type.c_str()), "h_elec_true_beta_reco_beta",   cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_elec_true_theta_reco_theta_%s.pdf", _util.run_period, cut_type.c_str()), "h_elec_true_theta_reco_theta", cut_type, false);
-            Save2DHists(Form("plots/run%s/Truth/h_elec_true_phi_reco_phi_%s.pdf",     _util.run_period, cut_type.c_str()), "h_elec_true_phi_reco_phi",     cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta_%s.pdf",                _util.run_period, cut_type.c_str()), "h_true_nue_phi_theta", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_theta_%s.pdf",             _util.run_period, cut_type.c_str()), "h_true_nue_energy_theta", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_phi_%s.pdf",               _util.run_period, cut_type.c_str()), "h_true_nue_energy_phi", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_energy_angle_%s.pdf",             _util.run_period, cut_type.c_str()), "h_true_nue_energy_angle", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_%s.pdf",                  _util.run_period, cut_type.c_str()), "h_true_nue_vtx_z_y", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_sce_%s.pdf",              _util.run_period, cut_type.c_str()), "h_true_nue_vtx_z_y_sce", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s.pdf",           _util.run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type, true);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nu_E_reco_nu_E_%s.pdf",               _util.run_period, cut_type.c_str()), "h_true_nu_E_reco_nu_E", cut_type, true);
+            Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_extra_bins_%s.pdf",_util.run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E_extra_bins", cut_type, true);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nu_E_reco_nu_E_extra_bins_%s.pdf",    _util.run_period, cut_type.c_str()), "h_true_nu_E_reco_nu_E_extra_bins", cut_type, true);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_x_reco_nu_vtx_x_%s.pdf",       _util.run_period, cut_type.c_str()), "h_true_nu_vtx_x_reco_nu_vtx_x", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_y_reco_nu_vtx_y_%s.pdf",       _util.run_period, cut_type.c_str()), "h_true_nu_vtx_y_reco_nu_vtx_y", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_z_reco_nu_vtx_z_%s.pdf",       _util.run_period, cut_type.c_str()), "h_true_nu_vtx_z_reco_nu_vtx_z", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_purity_%s.pdf",            _util.run_period, cut_type.c_str()), "h_true_shr_energy_purity", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_completeness_%s.pdf",      _util.run_period, cut_type.c_str()), "h_true_shr_energy_completeness", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_resolution_reco_%s.pdf",   _util.run_period, cut_type.c_str()), "h_true_shr_energy_resolution_reco", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_energy_resolution_true_%s.pdf",   _util.run_period, cut_type.c_str()), "h_true_shr_energy_resolution_true", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_elec_true_beta_reco_beta_%s.pdf",          _util.run_period, cut_type.c_str()), "h_elec_true_beta_reco_beta",   cut_type, true);
+            Save2DHists(Form("plots/run%s/Truth/h_elec_true_theta_reco_theta_%s.pdf",        _util.run_period, cut_type.c_str()), "h_elec_true_theta_reco_theta", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_elec_true_phi_reco_phi_%s.pdf",            _util.run_period, cut_type.c_str()), "h_elec_true_phi_reco_phi",     cut_type, false);
+
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_cosbeta_purity_%s.pdf",            _util.run_period, cut_type.c_str()), "h_true_shr_cosbeta_purity", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_cosbeta_completeness_%s.pdf",      _util.run_period, cut_type.c_str()), "h_true_shr_cosbeta_completeness", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_cosbeta_resolution_reco_%s.pdf",   _util.run_period, cut_type.c_str()), "h_true_shr_cosbeta_resolution_reco", cut_type, false);
+            Save2DHists(Form("plots/run%s/Truth/h_true_shr_cosbeta_resolution_true_%s.pdf",   _util.run_period, cut_type.c_str()), "h_true_shr_cosbeta_resolution_true", cut_type, false);
 
             // Normalised by reco (row)
             Save2DHistsNorm(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s_row_norm_reco.pdf",     _util.run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type, true, "reco");
@@ -2629,6 +2637,7 @@ void HistogramPlotter::Save2DHists(const char *print_name, const char *histname,
 
     TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
     c->SetTopMargin(0.11);
+    gStyle->SetPalette(kBlueGreenYellow);
 
     hist->SetStats(kFALSE);
 
@@ -2666,6 +2675,7 @@ void HistogramPlotter::Save2DHistsNorm(const char *print_name, const char *histn
 
     TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
     c->SetTopMargin(0.11);
+    gStyle->SetPalette(kBlueGreenYellow);
 
     hist->SetStats(kFALSE);
 

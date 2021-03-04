@@ -30,12 +30,18 @@ vars=(
 
 # Do the copy
 for i in ${!vars[*]}; do 
-    echo "cp $file_path${vars[$i]}/reco_el_E/*bkg* $copy_path"
-    cp $file_path${vars[$i]}/reco_el_E/*bkg* $copy_path
+    echo "cp $file_path${vars[$i]}/reco_el_E/*data_xsec* $copy_path"
+    cp $file_path${vars[$i]}/reco_el_E/*data_xsec* $copy_path
     echo "cp $file_path${vars[$i]}/reco_el_E/*mc_xsec* $copy_path"
     cp $file_path${vars[$i]}/reco_el_E/*mc_xsec* $copy_path
-    echo "cp $file_path${vars[$i]}/true_el_E/*eff* $copy_path"
-    cp $file_path${vars[$i]}/true_el_E/*eff* $copy_path
+    echo "cp $file_path${vars[$i]}/true_el_E/*mc_xsec_smear* $copy_path"
+    cp $file_path${vars[$i]}/true_el_E/*mc_xsec_smear* $copy_path
+    echo "cp $file_path${vars[$i]}/reco_el_cang/*data_xsec* $copy_path"
+    cp $file_path${vars[$i]}/reco_el_cang/*data_xsec* $copy_path
+    echo "cp $file_path${vars[$i]}/reco_el_cang/*mc_xsec* $copy_path"
+    cp $file_path${vars[$i]}/reco_el_cang/*mc_xsec* $copy_path
+    echo "cp $file_path${vars[$i]}/true_el_cang/*mc_xsec_smear* $copy_path"
+    cp $file_path${vars[$i]}/true_el_cang/*mc_xsec_smear* $copy_path
 done
 
 
@@ -53,19 +59,26 @@ vars=(
   DecayAngMEC
   ThetaDelta2Npi
   ThetaDelta2NRad
-  RPA_CCQE_Reduced
   NormCCCOH
   NormNCCOH
+  xsr_scc_Fa3
+  xsr_scc_Fv3
 )
 
 # Do the copy
 for i in ${!vars[*]}; do 
-    echo "cp $file_path${vars[$i]}/reco_el_E/*bkg* $copy_path"
-    cp $file_path${vars[$i]}/reco_el_E/*bkg* $copy_path
+    echo "cp $file_path${vars[$i]}/reco_el_E/*data_xsec* $copy_path"
+    cp $file_path${vars[$i]}/reco_el_E/*data_xsec* $copy_path
     echo "cp $file_path${vars[$i]}/reco_el_E/*mc_xsec* $copy_path"
     cp $file_path${vars[$i]}/reco_el_E/*mc_xsec* $copy_path
-    echo "cp $file_path${vars[$i]}/true_el_E/*eff* $copy_path"
-    cp $file_path${vars[$i]}/true_el_E/*eff* $copy_path
+    echo "cp $file_path${vars[$i]}/true_el_E/*mc_xsec_smear* $copy_path"
+    cp $file_path${vars[$i]}/true_el_E/*mc_xsec_smear* $copy_path
+     echo "cp $file_path${vars[$i]}/reco_el_cang/*data_xsec* $copy_path"
+    cp $file_path${vars[$i]}/reco_el_cang/*data_xsec* $copy_path
+    echo "cp $file_path${vars[$i]}/reco_el_cang/*mc_xsec* $copy_path"
+    cp $file_path${vars[$i]}/reco_el_cang/*mc_xsec* $copy_path
+    echo "cp $file_path${vars[$i]}/true_el_cang/*mc_xsec_smear* $copy_path"
+    cp $file_path${vars[$i]}/true_el_cang/*mc_xsec_smear* $copy_path
 done
 
 copy_path=$USER_PATH/NueXSec/Analysis/plots/run1/Systematics/DetVar
@@ -89,12 +102,18 @@ vars=(
 
 # Do the copy
 for i in ${!vars[*]}; do 
-    echo "cp $file_path${vars[$i]}/reco_el_E/*bkg* $copy_path"
-    cp $file_path${vars[$i]}/reco_el_E/*bkg* $copy_path
+    echo "cp $file_path${vars[$i]}/reco_el_E/*data_xsec* $copy_path"
+    cp $file_path${vars[$i]}/reco_el_E/*data_xsec* $copy_path
     echo "cp $file_path${vars[$i]}/reco_el_E/*mc_xsec* $copy_path"
     cp $file_path${vars[$i]}/reco_el_E/*mc_xsec* $copy_path
-    echo "cp $file_path${vars[$i]}/true_el_E/*eff* $copy_path"
-    cp $file_path${vars[$i]}/true_el_E/*eff* $copy_path
+    echo "cp $file_path${vars[$i]}/true_el_E/*mc_xsec_smear* $copy_path"
+    cp $file_path${vars[$i]}/true_el_E/*mc_xsec_smear* $copy_path
+    echo "cp $file_path${vars[$i]}/reco_el_cang/*data_xsec* $copy_path"
+    cp $file_path${vars[$i]}/reco_el_cang/*data_xsec* $copy_path
+    echo "cp $file_path${vars[$i]}/reco_el_cang/*mc_xsec* $copy_path"
+    cp $file_path${vars[$i]}/reco_el_cang/*mc_xsec* $copy_path
+    echo "cp $file_path${vars[$i]}/true_el_cang/*mc_xsec_smear* $copy_path"
+    cp $file_path${vars[$i]}/true_el_cang/*mc_xsec_smear* $copy_path
 done
 
 

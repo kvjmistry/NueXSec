@@ -142,8 +142,7 @@ public:
     void CalcChiSquaredNoCorr(TH1D* h_model, TH1D* h_data, TH2D* cov, double &chi, int &ndof, double &pval);
     // -------------------------------------------------------------------------
     // Set the axes names of the cross section plots
-    void SetAxesNames(std::vector<std::string> &var_labels_xsec, std::vector<std::string> &var_labels_events,
-                      std::vector<std::string> &var_labels_eff,  std::string &smear_hist_name, std::vector<std::string> &vars, double  &xsec_scale);
+    void SetAxesNames();
     // -------------------------------------------------------------------------
     // Undo a bin width scaling
     void UndoBinWidthScaling(TH1D* &hist);
@@ -153,6 +152,9 @@ public:
     // -------------------------------------------------------------------------
     // Save a 2D hsitogram as a PDF
     void Save2DHists(const char *print_name, TH2D* hist, const char* draw_option);
+    // -------------------------------------------------------------------------
+    // Convert 2D histogram to bin index and then save it to pdf
+    void Save2DHistsBinIndex(const char *print_name, TH2D* hist, const char* draw_option);
     // -------------------------------------------------------------------------
     // Apply matrix to smear from true to reco space
     void MatrixMultiply(TH1D* h_true, TH1D* &h_reco, TH2D* matrix, std::string option, bool norm);
@@ -256,6 +258,7 @@ public:
     bool zoom{false};        // bool to decide whether to zoom in on the plots
     bool isfakedata{false};  // bool for using MC as fake data
     bool isvariation{false}; // Is some different input to the selection
+    bool usefluggflux{false};
 
 
     // Weight configurations
@@ -698,6 +701,22 @@ public:
         "WireModThetaYZ_withoutSigmaSplines",
         "WireModdEdX"
    };
+
+
+    // Global access to histogram names
+    std::vector<std::string> var_labels_xsec = {};
+
+    std::vector<std::string> var_labels_events = {};
+
+    std::vector<std::string> var_labels_eff = {};
+
+    std::string smear_hist_name;
+    
+    std::string ac_hist_name;
+
+    std::vector<std::string> vars = {};
+
+    double xsec_scale;
 
 }; // End Class Utility
 
