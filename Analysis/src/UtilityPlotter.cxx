@@ -71,6 +71,7 @@ void UtilityPlotter::Initialise(Utility _utility){
         CompareUnfoldedDataCrossSections();
         CheckPi0Coverage();
         CompareMCC8Result();
+        ForwardFoldedGeneratorComparison();
         return;
     }
     else {
@@ -3281,3 +3282,126 @@ void UtilityPlotter::CompareMCC8Result(){
 
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::ForwardFoldedGeneratorComparison(){
+
+    gStyle->SetOptStat(0);
+
+    // Load in the cross section output
+    TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
+
+    TH2D* h_temp_2D;
+    TH1D* h_temp;
+
+    // The covariance matrix
+    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/er/h_cov_tot_mcxsec_reco",_util.xsec_var));
+    TH2D* h_cov = (TH2D*)h_temp_2D->Clone();
+    h_cov->SetDirectory(0);
+
+    // Data XSec
+    h_temp  = (TH1D*)fxsec->Get(Form("%s/er/h_data_xsec_stat_sys_reco", _util.xsec_var));
+    TH1D* h_dataxsec = (TH1D*)h_temp->Clone();
+    h_dataxsec->SetDirectory(0);
+    h_dataxsec->SetLineColor(kBlack);
+    h_dataxsec->SetMarkerStyle(20);
+    h_dataxsec->SetMarkerSize(0.5);
+
+    h_temp  = (TH1D*)fxsec->Get(Form("%s/er/h_data_xsec_stat_reco", _util.xsec_var));
+    TH1D* h_dataxsec_stat = (TH1D*)h_temp->Clone();
+    h_dataxsec_stat->SetDirectory(0);
+    h_dataxsec_stat->SetLineColor(kBlack);
+    h_dataxsec_stat->SetMarkerStyle(20);
+    h_dataxsec_stat->SetMarkerSize(0.5);
+
+    fxsec->Close();
+
+    // Load in the cross section output
+    fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+
+    // Create a vector for the models
+    std::vector<std::string> models = {
+        "CV",
+        "geniev3"
+    };
+
+    // enums for the models
+    enum enum_models {
+        k_model_CV,
+        k_model_geniev3,
+        k_MODEL_MAX
+    };
+
+    // Create the vector of histograms
+    std::vector<TH2D*> h_response_model(models.size());
+    std::vector<TH1D*> h_mcxsec_true_model(models.size());
+    std::vector<TH1D*> h_mcxsec_reco_model(models.size());
+
+
+    // Loop over each model
+    for (unsigned int m = 0; m < models.size(); m++){
+        
+        // Response Matrix
+        h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/%s/h_run1_%s_0_smearing", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), models.at(m).c_str()));
+        if (h_temp_2D == NULL) std::cout <<"Help!" << m << std::endl;
+        h_response_model.at(m) = (TH2D*)h_temp_2D->Clone();
+
+        // MC xsec in True
+        h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));
+        h_mcxsec_true_model.at(m) = (TH1D*)h_temp->Clone();
+        h_mcxsec_reco_model.at(m) = (TH1D*)h_dataxsec->Clone();
+       
+        _util.MatrixMultiply(h_mcxsec_true_model.at(m), h_mcxsec_reco_model.at(m), h_response_model.at(k_model_CV), "true_reco", true);
+    }
+
+    // Set the line colours
+    h_mcxsec_reco_model.at(k_model_CV)       ->SetLineColor(kRed+2);
+    h_mcxsec_reco_model.at(k_model_geniev3)      ->SetLineColor(kGreen+2);
+    
+
+    // Now lets plot
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+    c->SetLeftMargin(0.2);
+    c->SetBottomMargin(0.15);
+    h_dataxsec->GetYaxis()->SetTitleOffset(1.7);
+    // h_mcxsec_reco->SetMaximum(1.5);
+    h_dataxsec->Draw("E1,X0,same");
+
+    if (_util.zoom && std::string(_util.xsec_var) == "elec_cang")
+        h_dataxsec->GetXaxis()->SetRangeUser(0.6, 1.0);
+    
+    h_mcxsec_reco_model.at(k_model_CV)->Draw("hist,same");
+    h_mcxsec_reco_model.at(k_model_geniev3)->Draw("hist,same");
+    h_dataxsec->Draw("E1,X0,same");
+    h_dataxsec_stat->Draw("E1,X0,same");
+
+    TLegend *leg = new TLegend(0.4, 0.6, 0.75, 0.85);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(h_dataxsec, "Data (Stat. + Sys.)", "ep");
+    
+    double chi, pval;
+    int ndof;
+    std::cout << "CV" << std::endl;
+    _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_CV), h_dataxsec, h_cov, chi, ndof, pval);
+    // _util.CalcChiSquaredNoCorr(h_mcxsec_reco_model.at(k_model_CV), h_dataxsec, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_CV),  Form("MC #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    
+    std::cout << "Genie v3" << std::endl;
+    _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_geniev3), h_dataxsec, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_geniev3),  Form("GENIE v3.0.6 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+
+    gStyle->SetLegendTextSize(0.03);
+    
+    leg->Draw();
+
+    // Draw the run period on the plot
+    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+
+    _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.52, 0.92, 0.52, 0.92);
+    
+    c->Print(Form("plots/run%s/Models/%s/run%s_DataGeneratorComparison_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var));
+
+    fxsec->Close();
+
+    delete c;
+
+}

@@ -164,6 +164,8 @@ class UtilityPlotter{
     // Compare the MCC9 result to MCC8
     void CompareMCC8Result();
     // -------------------------------------------------------------------------
+    // Compare generator predictions to the data
+    void ForwardFoldedGeneratorComparison();
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 
