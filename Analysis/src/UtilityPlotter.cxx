@@ -3354,7 +3354,11 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
 
     // Set the line colours
     h_mcxsec_reco_model.at(k_model_CV)       ->SetLineColor(kRed+2);
-    h_mcxsec_reco_model.at(k_model_geniev3)      ->SetLineColor(kGreen+2);
+    h_mcxsec_reco_model.at(k_model_geniev3)  ->SetLineColor(kGreen+2);
+
+    // Set the line styles
+    h_mcxsec_reco_model.at(k_model_CV)       ->SetLineStyle(1);
+    h_mcxsec_reco_model.at(k_model_geniev3)  ->SetLineStyle(2);
     
 
     // Now lets plot
