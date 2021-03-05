@@ -140,8 +140,8 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
         
         nue_counter_tree->Branch("count_nue_cc_infv",      &count_nue_cc_infv);
         nue_counter_tree->Branch("count_nuebar_cc_infv",   &count_nuebar_cc_infv);
-        nue_counter_tree->Branch("count_nue_cc_incryo",    &count_nue_cc_incryo);
-        nue_counter_tree->Branch("count_nuebar_cc_incryo", &count_nuebar_cc_incryo);
+        counter_tree->Branch("count_nue_cc_incryo",    &count_nue_cc_incryo);
+        counter_tree->Branch("count_nuebar_cc_incryo", &count_nuebar_cc_incryo);
         
         counter_tree    ->Branch("count_numu_cc_qe",  &count_numu_cc_qe);
         counter_tree    ->Branch("count_numu_cc_res", &count_numu_cc_res);

@@ -3858,6 +3858,10 @@ void SystematicsHelper::ExportResult(TFile* f){
         cv_hist_vec.at(k_var_trueX).at(k_xsec_eff)->SetOption("hist");
         cv_hist_vec.at(k_var_trueX).at(k_xsec_eff)->Write("h_mc_eff_true", TObject::kOverwrite);
 
+        // MC XSec Covariance Matrix ---------------------------------
+        h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot)->SetOption("colz");
+        h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot)->Write("h_cov_tot_mcxsec_reco", TObject::kOverwrite);
+
 
         // Data Correlation Matrix  ---------------------------------
         TH2D* cor;
