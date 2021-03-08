@@ -199,7 +199,8 @@ class SystematicsHelper{
         "WM X",
         "WM YZ",
         "WM Theta XZ",
-        "WM Theta YZ w/ Spl.",
+        "WM Theta YZ",
+        // "WM Theta YZ w/ Spl.",
         // "WM Theta YZ w/o Spl.",
         // "WM dE/dX" 
     };

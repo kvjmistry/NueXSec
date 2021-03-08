@@ -3553,9 +3553,9 @@ void SystematicsHelper::MakeTotUncertaintyPlot(bool AddStatErr){
 
                 if (type == k_xsec_bkg){
                     if (std::string(_util.xsec_var) == "elec_E")
-                        h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 650);
+                        h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 240);
                     else
-                        h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 300);
+                        h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 120);
                 }
 
                 if (type == k_xsec_mcxsec_smear){

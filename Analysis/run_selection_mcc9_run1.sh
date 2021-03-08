@@ -106,7 +106,7 @@ fi
 # Could loop these to make it easier to run them all!
 
 if [ "$1" == "var" ]; then
-  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_$2.root $2
+  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/extra_stats/neutrinoselection_filt_run1_overlay_$2.root $2
   
   # Overwrite the true nue information
   ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_$2_intrinsic.root $2 --intrinsic intrinsic
@@ -117,7 +117,9 @@ if [ "$1" == "var" ]; then
 
   root -l -b -q 'merge/merge_uneaventrees.C("1", true, false, "files/trees/nuexsec_selected_tree_mc_run1_'"$2"'.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "'"$2"'")'
 
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$2.root --var dummy $2 --xsecmode default --xsecvar elec_E --xsec_smear $sm
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$2.root --var dummy $2 --xsecmode default --xsecvar elec_E --xsec_smear er
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$2.root --var dummy $2 --xsecmode default --xsecvar elec_ang --xsec_smear er
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$2.root --var dummy $2 --xsecmode default --xsecvar elec_cang --xsec_smear er
 
 fi
 

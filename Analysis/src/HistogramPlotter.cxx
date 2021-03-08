@@ -234,6 +234,9 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
             Save2DHists(Form("plots/run%s/Truth/h_true_shr_cosbeta_resolution_reco_%s.pdf",   _util.run_period, cut_type.c_str()), "h_true_shr_cosbeta_resolution_reco", cut_type, false);
             Save2DHists(Form("plots/run%s/Truth/h_true_shr_cosbeta_resolution_true_%s.pdf",   _util.run_period, cut_type.c_str()), "h_true_shr_cosbeta_resolution_true", cut_type, false);
 
+            Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_rebin_%s.pdf",_util.run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E_rebin", cut_type, true);
+            Save2DHists(Form("plots/run%s/Truth/h_elec_true_cosbeta_reco_cosbeta_rebin_%s.pdf",_util.run_period, cut_type.c_str()), "h_elec_true_cosbeta_reco_cosbeta_rebin", cut_type, true);
+
             // Normalised by reco (row)
             Save2DHistsNorm(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s_row_norm_reco.pdf",     _util.run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type, true, "reco");
 
@@ -1279,7 +1282,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Leading shower multiplicity
     MakeStack("h_reco_shower_multiplicity", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.5, "Shower Multiplicty",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 2.0, "Shower Multiplicty",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shower_multiplicity.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, true, true);
     MakeStack("h_reco_shower_multiplicity", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, true, 80, "Shower Multiplicty",  0.35, 0.85, 0.55, 0.85, Data_POT,
@@ -1293,7 +1296,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Leading track multiplicity
     MakeStack("h_reco_track_multiplicity", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.5, "Track Multiplicty",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 2.0, "Track Multiplicty",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_track_multiplicity.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, true, true);
 
     // Topological Score
@@ -1552,6 +1555,11 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
     MakeStack("h_reco_trk_pid_score", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.0, "Track LLR PID Score",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_trk_pid_score.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
+
+    // Pi0 Mass peak plot
+    MakeStack("h_reco_pi0mass", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.0, "#pi^{0} Mass [MeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_pi0mass.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Stacked Histograms by particle type
 
@@ -2642,6 +2650,10 @@ void HistogramPlotter::Save2DHists(const char *print_name, const char *histname,
     hist->SetStats(kFALSE);
 
     _util.IncreaseLabelSize(hist, c);
+    c->SetRightMargin(0.25);
+
+    if (std::string(histname) == "h_elec_true_cosbeta_reco_cosbeta_rebin")
+        hist->GetXaxis()->SetLabelSize(0.03);
 
     hist->Draw("colz");
 
@@ -2650,8 +2662,7 @@ void HistogramPlotter::Save2DHists(const char *print_name, const char *histname,
     // If yex (y=x) draw a y=x line to guide the eye
     TLine * line;
     if (yex){
-    
-        line = new TLine(0, 0, gPad->GetUymax(), gPad->GetUymax());
+        line = new TLine(gPad->GetUymin(), gPad->GetUymin(), gPad->GetUymax(), gPad->GetUymax());
         line->SetLineColor(kRed);
         line->SetLineWidth(2);
         line->Draw();
@@ -2660,7 +2671,15 @@ void HistogramPlotter::Save2DHists(const char *print_name, const char *histname,
     // Draw the run period on the plot
     _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);
 
+    _util.Draw_ubooneSim(c, 0.33, 0.92, 0.33, 0.90);
+
+    hist->GetZaxis()->SetTitle("Entries");
+    hist->GetZaxis()->SetTitleOffset(1.5);
+    hist->GetXaxis()->CenterTitle();
+
     c->Print(print_name);
+
+    delete c;
 }
 // -----------------------------------------------------------------------------
 void HistogramPlotter::Save2DHistsNorm(const char *print_name, const char *histname, std::string cut_type, bool yex, std::string normtype) {

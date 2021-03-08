@@ -148,6 +148,10 @@ void WienerSVD::CompareModel(TH1D *sig){
 
     } 
 
+    // Clone the covariance matrix for-bin width version
+    TH2D* unfcov_width = (TH2D*)unfcov->Clone();
+    _util.ConvertCovarianceBinWidth(unfcov_width, unf);
+
     // Now calculate the chi-squared
     double chi, pval;
     int ndof;
@@ -228,6 +232,9 @@ void WienerSVD::CompareModel(TH1D *sig){
     _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_smear_%s_index.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), smear,    "colz");
     _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unfold_cov_%s_index.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov,   "colz");
 
+    _util.Save2DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unfold_cov_%s_converted.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov_width,   "colz");
+    _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unfold_cov_%s_index_converted.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov_width,   "colz");
+
     _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_wiener_%s.pdf",    _util.run_period, _util.xsec_var ,_util.xsec_var), wiener,    "hist");
     _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unf_%s.pdf",       _util.run_period, _util.xsec_var ,_util.xsec_var), unf,       "hist");
     _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_diff_%s.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), diff,      "hist");
@@ -237,6 +244,8 @@ void WienerSVD::CompareModel(TH1D *sig){
     _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_absError_%s.pdf",  _util.run_period, _util.xsec_var ,_util.xsec_var), absError,  "hist");
     _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_MSE_%s.pdf",       _util.run_period, _util.xsec_var ,_util.xsec_var), MSE,       "hist");
     _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_MSE2_%s.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), MSE2,      "hist");
+
+    delete unfcov_width;
 }
 // -----------------------------------------------------------------------------
 TMatrixD WienerSVD::Matrix(Int_t row, Int_t column) {
