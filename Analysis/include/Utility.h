@@ -400,7 +400,7 @@ public:
                 "CC_DIS",
                 "CC_Coh",
                 "CC_MEC",
-                "NC"
+                "CC_Tot"
                 };
     
      // Names of the Particle types
@@ -456,7 +456,7 @@ public:
         k_plot_dis,
         k_plot_coh,
         k_plot_mec,
-        k_plot_nc,
+        k_plot_tot,
         k_interactions_MAX
     };
 

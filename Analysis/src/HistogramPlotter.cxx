@@ -73,7 +73,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_true_nu_E_nue",               true,  false, "True #nu_{e} Energy [GeV]; Efficiency",                           "True #nu_{e} Events in FV",                        "nu_E_nue");
         MakeEfficiencyPlotByCut("h_true_nu_E_nuebar",            true,  false, "True #bar{#nu}_{e} Energy [GeV]; Efficiency",                     "True #bar{#nu}_{e} Events in FV",                  "nu_E_nuebar");   
         
-        MakeEfficiencyPlotByCut("h_true_elec_E_rebin",           true,  false, "True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV / GeV", "elec_E_rebin");
+        MakeEfficiencyPlotByCut("h_true_elec_E_rebin",           true,  false, "Generated Electron Energy [GeV]; Efficiency",                     "True e#lower[-0.5]{-}/e^{+} Events in FV / GeV",   "elec_E_rebin");
         MakeEfficiencyPlotByCut("h_true_elec_E_rebin_nue",       true,  false, "True e#lower[-0.5]{-} Energy [GeV]; Efficiency",                  "True e#lower[-0.5]{-} Events in FV / GeV",         "elec_E_rebin_nue");
         MakeEfficiencyPlotByCut("h_true_elec_E_rebin_nuebar",    true,  false, "True e^{+} Energy [GeV]; Efficiency",                             "True e^{+} Events in FV / GeV",                    "elec_E_rebin_nuebar");
         
@@ -82,7 +82,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_true_nu_E_nuebar_single_bin", true,  true,  "True #bar{#nu}_{e}; Efficiency",                                  "True #bar{#nu}_{e} Events in FV",                  "nu_E_nuebar_single_bin");
         
         MakeEfficiencyPlotByCut("h_true_elec_E",                 false, false, "True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_E");
-        MakeEfficiencyPlotByCut("h_eff_elec_E_many_bins",        true,  false, "True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_E_many_bins");
+        MakeEfficiencyPlotByCut("h_eff_elec_E_many_bins",        true,  false, "Generated Electron Energy [GeV]; Efficiency",                     "True e#lower[-0.5]{-}/e^{+} Events in FV",         "elec_E_many_bins");
         MakeEfficiencyPlotByCut("h_eff_nu_theta",                false, false, "True #nu_{e} + #bar{#nu}_{e} #theta [deg]; Efficiency",           "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "nu_theta" );
         MakeEfficiencyPlotByCut("h_eff_nu_phi",                  false, false, "True #nu_{e} + #bar{#nu}_{e} #phi [deg]; Efficiency",             "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "nu_phi" );
         MakeEfficiencyPlotByCut("h_eff_elec_theta",              false, false, "True e#lower[-0.5]{-} + e^{+} #theta [deg]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_theta" );
@@ -93,7 +93,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_eff_beta_rebin_nue",          true, false, "True e#lower[-0.5]{-} [deg]; Efficiency",                          "True e#lower[-0.5]{-} Events in FV",                "beta_rebin_nue" );
         MakeEfficiencyPlotByCut("h_eff_beta_rebin_nuebar",       true, false, "True e^{+} #beta [deg]; Efficiency",                               "True e^{+} Events in FV",                           "beta_rebin_nuebar" );
 
-        MakeEfficiencyPlotByCut("h_eff_cosine_beta",             false, false, "True e#lower[-0.5]{-} + e^{+} cos(#beta); Efficiency",            "True e#lower[-0.5]{-} + e^{+} Events in FV",        "cosine_beta" );
+        MakeEfficiencyPlotByCut("h_eff_cosine_beta",             false, false, "Generated Electron cos(#beta); Efficiency",                       "True e#lower[-0.5]{-}/e^{+} Events in FV",          "cosine_beta" );
         MakeEfficiencyPlotByCut("h_eff_cosine_beta_rebin",       true, false,  "True e#lower[-0.5]{-} + e^{+} cos(#beta); Efficiency",            "True e#lower[-0.5]{-} + e^{+} Events in FV",        "cosine_beta_rebin" );
         MakeEfficiencyPlotByCut("h_eff_cosine_beta_rebin_nue",   true, false,  "True e#lower[-0.5]{-} cos(#beta); Efficiency",                    "True e#lower[-0.5]{-} Events in FV",                "cosine_beta_rebin_nue" );
         MakeEfficiencyPlotByCut("h_eff_cosine_beta_rebin_nuebar",true, false,  "True e^{+} cos(#beta); Efficiency",                               "True e^{+} Events in FV",                           "cosine_beta_rebin_nuebar" );
@@ -155,7 +155,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeInteractionEfficiency("h_int_nu_E_nue_single_bin",    true,  "True #nu_{e};; Efficiency",                                 "nu_E_nue_single_bin");
         MakeInteractionEfficiency("h_int_nu_E_nuebar_single_bin", true,  "True #bar{#nu}_{e};; Efficiency",                           "nu_E_nuebar_single_bin");
         MakeInteractionEfficiency("h_int_elec_E",                 false, ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",   "elec_E");
-        MakeInteractionEfficiency("h_int_elec_E_rebin",           false, ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",   "elec_E_rebin");
+        MakeInteractionEfficiency("h_int_elec_E_rebin",           false, ";Generated Electron Energy [GeV]; Efficiency",              "elec_E_rebin");
         MakeInteractionEfficiency("h_int_elec_E_rebin_nue",       false, ";True e#lower[-0.5]{-} Energy [GeV]; Efficiency",           "elec_E_rebin_nue");
         MakeInteractionEfficiency("h_int_elec_E_rebin_nuebar",    false, ";True e^{+} Energy [GeV]; Efficiency",                      "elec_E_rebin_nuebar");
         MakeInteractionEfficiency("h_int_elec_theta",             false, ";True e#lower[-0.5]{-} + e^{+} #theta [deg]; Efficiency",   "elec_theta");
@@ -163,7 +163,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeInteractionEfficiency("h_int_effective_ang",          false, ";True e#lower[-0.5]{-} + e^{+} #beta [deg]; Efficiency",    "eff_ang");
         MakeInteractionEfficiency("h_int_beta_nue",               false, ";True e#lower[-0.5]{-} #beta [deg]; Efficiency",            "eff_ang_nue");
         MakeInteractionEfficiency("h_int_beta_nuebar",            false, ";True e^{+} #beta [deg]; Efficiency",                       "eff_ang_nuebar");
-        MakeInteractionEfficiency("h_int_cosbeta",                false, ";True e#lower[-0.5]{-} + e^{+} cos#beta; Efficiency",       "cosbeta");
+        MakeInteractionEfficiency("h_int_cosbeta",                false, ";Generated Electron cos#beta; Efficiency",       "cosbeta");
 
         // Create the 2D folder
         _util.CreateDirectory("2D");
@@ -1220,6 +1220,11 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         
 
     delete c;
+
+
+    // Make the relavent purity plots
+    if ((hist_name == "h_reco_shower_energy_cali_rebin" || hist_name == "h_reco_effective_cosangle_rebin") && cut_name == _util.cut_dirs.at(_util.k_cuts_MAX-1))
+        MakePurityPlot(h_stack, hist.at(_util.k_nue_cc), hist.at(_util.k_nuebar_cc), hist_name);
 
     // clear up some memory
     for (unsigned int h = 0 ; h < hist.size(); h++){
@@ -2348,10 +2353,14 @@ void HistogramPlotter::MakeInteractionPlot(std::string var, bool scale, const ch
     hist.at(_util.k_plot_dis)->SetFillColor(28);
     hist.at(_util.k_plot_coh)->SetFillColor(42);
     hist.at(_util.k_plot_mec)->SetFillColor(kOrange-3);
-    hist.at(_util.k_plot_nc) ->SetFillColor(1);
+    hist.at(_util.k_plot_tot) ->SetFillColor(kBlack);
 
     // Add the histograms to the stack
     for (unsigned int k = 0; k < hist.size(); k++) {
+        
+        if (k == _util.k_plot_tot)
+            continue;
+
         h_stack->Add(hist.at(k));
     }
 
@@ -2390,7 +2399,6 @@ void HistogramPlotter::MakeInteractionPlot(std::string var, bool scale, const ch
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
 
-    // leg_stack->AddEntry(hist.at(_util.k_plot_nc), "NC", "f");
     leg_stack->AddEntry(hist.at(_util.k_plot_mec), Form("CC MEC (%2.1f%%)", 100 * hist_integrals.at(_util.k_plot_mec) / sum_integrals), "f");
     leg_stack->AddEntry(hist.at(_util.k_plot_coh), Form("CC Coh (%2.1f%%)", 100 * hist_integrals.at(_util.k_plot_coh) / sum_integrals), "f");
     leg_stack->AddEntry(hist.at(_util.k_plot_dis), Form("CC DIS (%2.1f%%)", 100 * hist_integrals.at(_util.k_plot_dis) / sum_integrals), "f");
@@ -2487,28 +2495,34 @@ void HistogramPlotter::MakeInteractionEfficiency(std::string var, bool mask_ax_l
         if (type == _util.k_plot_mec){
             h_ratio.at(_util.k_plot_mec)->SetLineColor(kOrange-3);
         }
+        if (type == _util.k_plot_tot){
+            h_ratio.at(_util.k_plot_tot)->SetLineColor(kBlack);
+        }
 
 
         _util.IncreaseLabelSize(h_ratio.at(type), c);
+
+        if (var == "h_int_cosbeta"){
+            h_ratio.at(type)->GetXaxis()->SetLabelSize(0.035);
+            h_ratio.at(type)->GetXaxis()->SetLabelSize(0.035);
+        }
+
         h_ratio.at(type) ->SetFillColor(0);
         h_ratio.at(type)->GetYaxis()->SetRangeUser(0, 0.6);
         // h_ratio.at(type)->GetXaxis()->SetRangeUser(0, 6.0);
         h_ratio.at(type)->SetLineWidth(2);
 
-        if (type == _util.k_plot_nc || type == _util.k_plot_coh) continue; // Too low stats for the plot
+        if (type == _util.k_plot_coh) continue; // Too low stats for the plot
         h_ratio.at(type)->Draw("hist,E,same");
 
     }
-
-    
-    
 
     TLegend *leg_stack = new TLegend(0.30, 0.7, 0.70, 0.89);
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
     leg_stack->SetNColumns(2);
 
-    // leg_stack->AddEntry(hist.at(_util.k_plot_nc), "NC", "f");
+    leg_stack->AddEntry(h_ratio.at(_util.k_plot_tot), "All CC", "l");
     leg_stack->AddEntry(h_ratio.at(_util.k_plot_mec), "CC MEC", "l");
     // leg_stack->AddEntry(h_ratio.at(_util.k_plot_coh), "CC Coh", "l"); // Too low stats for the plot
     leg_stack->AddEntry(h_ratio.at(_util.k_plot_dis), "CC DIS", "l");
@@ -2518,7 +2532,9 @@ void HistogramPlotter::MakeInteractionEfficiency(std::string var, bool mask_ax_l
     leg_stack->Draw();
 
     // Draw the run period on the plot
-    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
+    // _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
+
+    _util.Draw_ubooneSim(c, 0.33, 0.92, 0.33, 0.90);
 
     // Add the weight labels
     // Draw_WeightLabels(c);
@@ -2858,5 +2874,56 @@ void HistogramPlotter::AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D* 
 
 }
 // -----------------------------------------------------------------------------
+void HistogramPlotter::MakePurityPlot(THStack *h_stack, TH1D *h_nue, TH1D* h_nuebar, std::string histname){
+
+    TH1D* h_purity = (TH1D*) h_nue->Clone();
+    
+
+    TH1D *last = (TH1D*)h_stack->GetStack()->Last();
+
+    // Calculate the purity
+    for (int bin = 1; bin < h_nue->GetNbinsX()+1; bin ++){
+
+        double den = last->GetBinContent(bin);
+        double num = h_nue->GetBinContent(bin) + h_nuebar->GetBinContent(bin);
+
+        if (den == 0 || num == 0)
+            h_purity->SetBinContent(bin, 0.0);
+        else
+            h_purity->SetBinContent(bin,100 * num / den);
+
+    }
+
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+
+    
+    
+    h_purity->SetLineColor(kBlue+2);
+    h_purity->SetLineWidth(3);
+    h_purity->SetMinimum(0);
+    h_purity->SetMaximum(100);
+    h_purity->SetFillColor(0);
+
+    _util.IncreaseLabelSize(h_purity, c);
+
+    if (histname == "h_reco_shower_energy_cali_rebin")
+        h_purity->SetTitle(";Measured Electron Energy [GeV]; Purity [\%]");
+
+    if (histname == "h_reco_effective_cosangle_rebin"){
+        h_purity->SetTitle(";Measured Electron cos#beta; Purity [\%]");
+        h_purity->GetXaxis()->SetLabelSize(0.035);
+    }
+
+    h_purity->Draw("hist");
+    
+    _util.Draw_ubooneSim(c, 0.33, 0.925, 0.33, 0.925);
+    
+    c->Print(Form("plots/run%s/Efficiency/Purity_%s.pdf", _util.run_period, histname.c_str()));
+
+
+    delete c;
+    delete h_purity;
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

@@ -145,7 +145,11 @@ void CrossSectionHelper::Initialise(Utility _utility){
         meta_tree->Fill();
     }
 
-
+    // Load in the detector variation CV only if detector variation
+    if (_util.isvariation && std::string(_util.variation) != "CV"){
+        LoadDetvarCVHist();
+    }
+    
 
     // Now loop over events and caluclate the cross section
     LoopEvents();
@@ -414,8 +418,18 @@ void CrossSectionHelper::LoopEvents(){
                     
                     // Use standard binning to smear
                     if (std::string(_util.xsec_bin_mode) == "standard"){
-                        ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
-                        h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_trueX));
+
+                        // Apply the response matrix to the detvar CV for detector variations
+                        if (_util.isvariation && std::string(_util.variation) != "CV"){
+                            
+                            ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
+                            h_detvar_cv, h_smear.at(label).at(uni).at(k_var_trueX));
+                        }
+                        else {
+
+                            ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
+                            h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_trueX));
+                        }
                     }
                     // Use Fine bins in truth to smear
                     else {
@@ -2720,5 +2734,23 @@ int CrossSectionHelper::GetBinIndex(){
     return xbin*ybin;
 }
 // -----------------------------------------------------------------------------
+void CrossSectionHelper::LoadDetvarCVHist(){
+
+    std::cout << _util.red << "Loading in detector variation CV histogram to smear" << _util.reset << std::endl;
+    
+    // Load in the cross section file
+    TFile* f = new TFile( Form("files/crosssec_run%s.root", _util.run_period) , "UPDATE");
+    
+    TH1D* h_temp;
+    
+    // Get the CV histogram we want to smear
+    h_temp = (TH1D*)f->Get(Form("detvar_CV/%s/h_run%s_CV_0_%s_gen", _util.vars.at(k_var_trueX).c_str(), _util.run_period, _util.vars.at(k_var_trueX).c_str()));
+    h_detvar_cv = (TH1D*)h_temp->Clone();
+    h_detvar_cv->SetDirectory(0);
+
+    delete h_temp;
+
+    f->Close();
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

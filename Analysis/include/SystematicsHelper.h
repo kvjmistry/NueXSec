@@ -301,7 +301,6 @@ class SystematicsHelper{
     // Vector to store total uncertainty histograms
     std::vector<std::vector<std::vector<TH1D*>>> h_cut_err; // label -- cut -- variable
 
-
 }; // End Class SystematicsHelper
 
 #endif
