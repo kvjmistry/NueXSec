@@ -65,7 +65,7 @@ public:
 
     bool in_fv(double x, double y, double z);
     double GetNuMIAngle(double px, double py, double pz);
-    double SetPPFXCVWeight();
+    double SetPPFXCVWeight(double _nu_e, double _nu_ang, int _nu_pdg);
     
 
 private:
@@ -272,7 +272,7 @@ void GeneratorReader::analyze(art::Event const& e) {
     infv = in_fv(true_nu_vtx_x, true_nu_vtx_y, true_nu_vtx_z);
 
     if (fPPFX_origin == "calculate")
-        ppfx_cv = SetPPFXCVWeight();
+        ppfx_cv = SetPPFXCVWeight(nu_e, nu_ang, nu_pdg);
 
 
     elec_px     = (neutrino.Lepton().Px() / neutrino.Lepton().P());
