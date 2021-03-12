@@ -32,6 +32,7 @@ physics:
       module_type: "GeneratorReader"
       MCPproducer: "largeant"
       MCTproducer: "generator"
+      PPFX_origin: "calculate" # calculate/artroot
 
     }
   }

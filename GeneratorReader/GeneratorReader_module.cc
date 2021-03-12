@@ -64,6 +64,8 @@ public:
     void analyze(art::Event const& e) override;
 
     bool in_fv(double x, double y, double z);
+    double GetNuMIAngle(double px, double py, double pz);
+    double SetPPFXCVWeight();
     
 
 private:
@@ -85,7 +87,7 @@ private:
 
     int ccnc;
     int interaction;
-    double nu_e;
+    double nu_e, nu_ang;
     int nu_pdg;
 
     double true_nu_vtx_t;
@@ -105,6 +107,29 @@ private:
     art::InputTag fMCTproducer;     // MCTruth from neutrino generator
     art::InputTag fMCPproducer;     // MCParticle from Geant4 stage
 
+    std::string fPPFX_origin;
+
+    enum flav {
+    k_numu,
+    k_numubar,
+    k_nue,
+    k_nuebar,
+    k_FLAV_MAX
+    };
+
+    std::vector<std::string> flav_str = {
+        "numu",
+        "numubar",
+        "nue",
+        "nuebar"
+    };
+
+    // Hiatograms to store the flux histograms ratios
+    std::vector<TH2D*> hist_ratio;
+    std::vector<TH2D*> hist_ratio_uw;
+
+    TFile *f_flux;
+
 };
 //______________________________________________________________________________
 GeneratorReader::GeneratorReader(fhicl::ParameterSet const& p) : EDAnalyzer{p} {
@@ -112,6 +137,7 @@ GeneratorReader::GeneratorReader(fhicl::ParameterSet const& p) : EDAnalyzer{p} {
     // MC Truth/Particle product labels
     fMCTproducer = p.get<art::InputTag>("MCTproducer");
     fMCPproducer = p.get<art::InputTag>("MCPproducer");
+    fPPFX_origin = p.get<std::string>("PPFX_origin");
 
 }
 //______________________________________________________________________________
@@ -129,6 +155,7 @@ void GeneratorReader::beginJob() {
     Tree = new TTree("tree","tree");
     Tree->SetDirectory(output);
     Tree -> Branch("nu_e", &nu_e);
+    Tree -> Branch("nu_ang", &nu_ang);
     Tree -> Branch("nu_pdg", &nu_pdg);
     Tree -> Branch("ppfx_cv", &ppfx_cv);
     Tree -> Branch("ccnc", &ccnc);
@@ -148,6 +175,28 @@ void GeneratorReader::beginJob() {
     Tree -> Branch("beta", &beta);
     Tree -> Branch("cosbeta", &cosbeta);
 
+    TFile *f_flux = TFile::Open("/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold_v46/FHC/output_uboone_fhc_run0_merged.root", "READ");
+
+    hist_ratio.resize(k_FLAV_MAX);
+    hist_ratio_uw.resize(k_FLAV_MAX);
+
+    // Get the flux histograms
+    for (unsigned int f = 0; f < flav_str.size(); f++){
+        hist_ratio.at(f)      = (TH2D*) f_flux->Get(Form("%s/Detsmear/%s_CV_AV_TPC_2D", flav_str.at(f).c_str(), flav_str.at(f).c_str()));
+        hist_ratio_uw.at(f)   = (TH2D*) f_flux->Get(Form("%s/Detsmear/%s_unweighted_AV_TPC_2D", flav_str.at(f).c_str(), flav_str.at(f).c_str()));
+
+        hist_ratio.at(f)->SetDirectory(0);
+        hist_ratio_uw.at(f)->SetDirectory(0);
+
+        // Take the ratio
+        hist_ratio.at(f)->Divide(hist_ratio_uw.at(f));
+
+    }
+
+    f_flux->Close();
+
+    output->cd();
+
 }
 //______________________________________________________________________________
 void GeneratorReader::analyze(art::Event const& e) {
@@ -160,6 +209,7 @@ void GeneratorReader::analyze(art::Event const& e) {
     ccnc = 0;
     interaction = 0;
     nu_e = 0.0;
+    nu_ang = 0.0;
     nu_pdg = 0;
     true_nu_vtx_x = 0.0;
     true_nu_vtx_y = 0.0;
@@ -171,7 +221,8 @@ void GeneratorReader::analyze(art::Event const& e) {
 
     std::vector<art::InputTag> vecTag;
     art::InputTag eventweight_tag_00("eventweight","","EventWeightSept24");
-    //vecTag.push_back(eventweight_tag_00);
+    if (fPPFX_origin == "artroot")
+        vecTag.push_back(eventweight_tag_00);
 
 
     for(auto& thisTag : vecTag){
@@ -199,10 +250,6 @@ void GeneratorReader::analyze(art::Event const& e) {
     // load MCTruth
     auto const &mct_h = e.getValidHandle<std::vector<simb::MCTruth>>(fMCTproducer);
 
-    // load MCTruth [from geant]
-    // auto const &mcp_h = e.getValidHandle<std::vector<simb::MCParticle>>(fMCPproducer);
-
-
     auto mct = mct_h->at(0);
     auto neutrino = mct.GetNeutrino();
     auto nu = neutrino.Nu();
@@ -220,8 +267,12 @@ void GeneratorReader::analyze(art::Event const& e) {
     true_nu_py = nu.Py();
     true_nu_pz = nu.Pz();
 
+    nu_ang = GetNuMIAngle(true_nu_px, true_nu_py, true_nu_pz);
 
     infv = in_fv(true_nu_vtx_x, true_nu_vtx_y, true_nu_vtx_z);
+
+    if (fPPFX_origin == "calculate")
+        ppfx_cv = SetPPFXCVWeight();
 
 
     elec_px     = (neutrino.Lepton().Px() / neutrino.Lepton().P());
@@ -241,10 +292,12 @@ void GeneratorReader::analyze(art::Event const& e) {
     std::cout << 
     "Nu PDG: " << nu_pdg << "\n" <<
     "Nu E: " << nu_e*1000 << "\n" <<
+    "Nu Ang: " << nu_ang << "\n" <<
     "Elec E: " << elec_e*1000 << "\n" <<
     "Beta: " << beta << "\n" <<
     "cosbeta: " << cosbeta << "\n" <<
     "FV: " << infv << "\n" <<
+    "PPFX CV: " << ppfx_cv << "\n" <<
     std::endl;
     
 
@@ -286,6 +339,81 @@ bool GeneratorReader::in_fv(double x, double y, double z){
         return true;   // pass
     }  
     else return false; // fail
+}
+
+//___________________________________________________________________________
+double GeneratorReader::GetNuMIAngle(double px, double py, double pz){
+
+    // Variables
+    TRotation RotDet2Beam;             // Rotations
+    TVector3  detxyz, BeamCoords;      // Translations
+    std::vector<double> rotmatrix;     // Inputs
+
+    // input detector coordinates to translate
+    detxyz = {px, py, pz};     
+
+    // From beam to detector rotation matrix
+    rotmatrix = {
+        0.92103853804025681562, 0.022713504803924120662, 0.38880857519374290021,
+        4.6254001262154668408e-05, 0.99829162468141474651, -0.058427989452906302359,
+        -0.38947144863934973769, 0.053832413938664107345, 0.91946400794392302291 };
+
+    // Return the TRotation
+    TVector3 newX, newY, newZ;
+    newX = TVector3(rotmatrix[0], rotmatrix[1], rotmatrix[2]);
+    newY = TVector3(rotmatrix[3], rotmatrix[4], rotmatrix[5]);
+    newZ = TVector3(rotmatrix[6], rotmatrix[7], rotmatrix[8]);
+
+    RotDet2Beam.RotateAxes(newX, newY, newZ); // Return the TRotation now det to beam
+    // RotDet2Beam.Invert(); // Invert back to the beam to det
+
+    // Rotate to beam coords
+    BeamCoords = RotDet2Beam * detxyz;
+
+    TVector3 beamdir = {0 , 0 , 1};;
+    
+    // Get the angle wrt to the beam
+    beamdir = {0 , 0 , 1};
+
+    double angle = BeamCoords.Angle(beamdir) * 180 / 3.1415926;
+
+    return angle;
+}
+
+double GeneratorReader::SetPPFXCVWeight(double _nu_e, double _nu_ang, int _nu_pdg){
+    
+    float weight = 1.0;
+
+    double xbin{1.0},ybin{1.0};
+
+    if (_nu_pdg == 14) {
+        xbin =  hist_ratio.at(k_numu)->GetXaxis()->FindBin(_nu_e);
+        ybin =  hist_ratio.at(k_numu)->GetYaxis()->FindBin(_nu_ang);
+        weight =  hist_ratio.at(k_numu)->GetBinContent(xbin, ybin);
+    }
+    if (_nu_pdg == -14) {
+        xbin =  hist_ratio.at(k_numubar)->GetXaxis()->FindBin(_nu_e);
+        ybin = hist_ratio.at(k_numubar)->GetYaxis()->FindBin(_nu_ang);
+        weight = hist_ratio.at(k_numubar)->GetBinContent(xbin, ybin);
+    }
+    if (_nu_pdg == 12) {
+        xbin = hist_ratio.at(k_nue)->GetXaxis()->FindBin(_nu_e);
+        ybin = hist_ratio.at(k_nue)->GetYaxis()->FindBin(_nu_ang);
+        weight = hist_ratio.at(k_nue)->GetBinContent(xbin, ybin);
+    }
+    if (_nu_pdg == -12) {
+        xbin = hist_ratio.at(k_nuebar)->GetXaxis()->FindBin(_nu_e);
+        ybin = hist_ratio.at(k_nuebar)->GetYaxis()->FindBin(_nu_ang);
+        weight = hist_ratio.at(k_nuebar)->GetBinContent(xbin, ybin);
+    }
+
+    // Add some catches to remove unphysical weights
+    if (std::isinf(weight))      weight = 1.0; 
+    if (std::isnan(weight) == 1) weight = 1.0;
+    if (weight > 100)            weight = 1.0;
+
+    return weight;
+
 }
 
 //______________________________________________________________________________
