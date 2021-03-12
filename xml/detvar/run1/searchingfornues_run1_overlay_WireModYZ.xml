@@ -48,14 +48,15 @@
     <workdir>/pnfs/uboone/scratch/users/&user;/MCC9/&name;/work/ntuple/&version;</workdir>
     <bookdir>/uboone/data/users/&user;/book/MCC9/&name;/ntuple/&version;</bookdir>
     <maxfilesperjob>5</maxfilesperjob>
-    <numjobs>912</numjobs> <!-- 912 -->
+    <numjobs>1790</numjobs> <!-- 1790 -->
     <datatier>reconstructed</datatier>
     <memory>2000</memory>
     <disk>25GB</disk>
     <schema>root</schema>
-    <inputdef>prodgenie_numi_standard_Reco2_run1_WireModYZ_v08_00_00_48_reco2_run1_reco2</inputdef>
+    <prestagefraction>1</prestagefraction>
+    <inputdef>prodgenie_numi_nu_overlay_detvar_WireModYZ_run1_reco2_run1_reco2</inputdef>
     <jobsub>--expected-lifetime=24h -e IFDH_CP_UNLINK_ON_ERROR=1 -f /pnfs/uboone/resilient/users/guzowski/numi_flux/cache/FHC/flux_cached_entries.root</jobsub>
-    <jobsub_start>  --expected-lifetime=short</jobsub_start>
+    <jobsub_start>  --expected-lifetime=long</jobsub_start>
   </stage>
   
   <!-- file type -->

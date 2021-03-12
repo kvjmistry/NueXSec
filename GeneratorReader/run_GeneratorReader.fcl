@@ -1,0 +1,40 @@
+#include "services_microboone.fcl"
+
+process_name : GeneratorReader
+
+services:
+{
+}
+
+source:
+{
+  module_type: RootInput
+  maxEvents: -1
+}
+
+outputs:
+{
+ out1:
+ {
+   module_type: RootOutput
+   dataTier:    "reco"
+   compressionLevel: 1
+ }
+}
+
+physics:
+{
+  analyzers:
+  {
+    GeneratorReader:
+    {
+
+      module_type: "GeneratorReader"
+      MCPproducer: "largeant"
+      MCTproducer: "generator"
+
+    }
+  }
+  analysis: [GeneratorReader]
+  end_paths: [analysis]
+}
