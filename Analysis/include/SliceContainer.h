@@ -34,8 +34,8 @@ public:
     // Function to classify the event by particle type of the leading shower
     void ParticleClassifier(int type);
     // -------------------------------------------------------------------------
-    // Function to Get the PPFX CV correction weight
-    double GetPPFXCVWeight();
+    // Function to Set the PPFX CV correction weight based on histogram ratio
+    void SetPPFXCVWeight();
     // -------------------------------------------------------------------------
     // Get the dEdx on the plane with the most hits
     double GetdEdxMax();
@@ -64,12 +64,9 @@ public:
     void SetFakeData();
     // -------------------------------------------------------------------------
 
+    enum flav { k_numu, k_numubar, k_nue, k_nuebar, k_FLAV_MAX};
 
-
-
-
-
-
+    std::vector<std::string> flav_str = {"numu","numubar","nue","nuebar"};
 
     Utility _util;
 
@@ -669,10 +666,8 @@ public:
     std::vector<float> *trk_llr_pid_v        = nullptr;
     std::vector<float> *trk_llr_pid_score_v  = nullptr;
     
-    TH1D* h_2D_CV_UW_PPFX_ratio_nue;
-    TH1D* h_2D_CV_UW_PPFX_ratio_nuebar;
-    TH1D* h_2D_CV_UW_PPFX_ratio_numu;
-    TH1D* h_2D_CV_UW_PPFX_ratio_numubar;
+   std::vector<TH2D*> hist_ratio;
+   std::vector<TH2D*> hist_ratio_uw;
 
 };
 

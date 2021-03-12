@@ -191,6 +191,7 @@ class HistogramHelper{
         k_reco_shr_ang_numi,                                                    // Angle of the reconstructed leading shower relative to the numi beamline
         k_reco_single_bin,                                                      // Just fill with weight. We need this to get the uncertainty on the purity
         k_reco_trk_pid_score,                                                   // The PID score for tracks in the event
+        k_reco_pi0mass,                                                         // What does the pi0 mass peak look like in a nuecc enriched sample
         k_TH1D_MAX
     };
 
@@ -300,6 +301,8 @@ class HistogramHelper{
         k_elec_true_beta_reco_beta,
         k_elec_true_theta_reco_theta,
         k_elec_true_phi_reco_phi,
+        k_elec_true_cosbeta_reco_cosbeta_rebin, 
+        k_true_elec_E_reco_elec_E_rebin,
         k_TH2D_true_MAX
     };
 

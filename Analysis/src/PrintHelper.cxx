@@ -135,8 +135,8 @@ void PrintHelper::Initialise(Utility _utility ){
         
         mc_nue_counter_tree->SetBranchAddress("count_nue_cc_infv",      &count_nue_cc_infv);
         mc_nue_counter_tree->SetBranchAddress("count_nuebar_cc_infv",   &count_nuebar_cc_infv);
-        mc_nue_counter_tree->SetBranchAddress("count_nue_cc_incryo",    &count_nue_cc_incryo);
-        mc_nue_counter_tree->SetBranchAddress("count_nuebar_cc_incryo", &count_nuebar_cc_incryo);
+        mc_counter_tree->SetBranchAddress("count_nue_cc_incryo",    &count_nue_cc_incryo);
+        mc_counter_tree->SetBranchAddress("count_nuebar_cc_incryo", &count_nuebar_cc_incryo);
         
         mc_counter_tree->SetBranchAddress("count_numu_cc_qe",  &count_numu_cc_qe);
         mc_counter_tree->SetBranchAddress("count_numu_cc_res", &count_numu_cc_res);

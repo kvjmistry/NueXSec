@@ -162,6 +162,8 @@ public:
     // Change units of covariane matrix so we can add them
     void ConvertCovarianceUnits(TH2D* &h_cov, TH1D *h_input, TH1D* h_output);
     // -------------------------------------------------------------------------
+    // Convert a covariance matrix from un-bin width normalised to bin-width normalised units
+    void ConvertCovarianceBinWidth(TH2D* &h_cov, TH1D *h_input);
     // -------------------------------------------------------------------------
 
 
@@ -398,7 +400,7 @@ public:
                 "CC_DIS",
                 "CC_Coh",
                 "CC_MEC",
-                "NC"
+                "CC_Tot"
                 };
     
      // Names of the Particle types
@@ -454,7 +456,7 @@ public:
         k_plot_dis,
         k_plot_coh,
         k_plot_mec,
-        k_plot_nc,
+        k_plot_tot,
         k_interactions_MAX
     };
 

@@ -167,6 +167,11 @@ class UtilityPlotter{
     // Compare generator predictions to the data
     void ForwardFoldedGeneratorComparison();
     // -------------------------------------------------------------------------
+    // Compare the total cross section generator comparisons
+    void CompareGeneratorTotalCrossSec();
+    // -------------------------------------------------------------------------
+    // Compare unfoldef generators
+    void CompareGeneratorUnfoldedModels();
     // -------------------------------------------------------------------------
 
 

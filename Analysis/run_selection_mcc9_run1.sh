@@ -106,7 +106,7 @@ fi
 # Could loop these to make it easier to run them all!
 
 if [ "$1" == "var" ]; then
-  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_$2.root $2
+  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/extra_stats/neutrinoselection_filt_run1_overlay_$2.root $2
   
   # Overwrite the true nue information
   ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_$2_intrinsic.root $2 --intrinsic intrinsic
@@ -117,7 +117,9 @@ if [ "$1" == "var" ]; then
 
   root -l -b -q 'merge/merge_uneaventrees.C("1", true, false, "files/trees/nuexsec_selected_tree_mc_run1_'"$2"'.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "'"$2"'")'
 
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$2.root --var dummy $2 --xsecmode default --xsecvar elec_E --xsec_smear $sm
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$2.root --var dummy $2 --xsecmode default --xsecvar elec_E --xsec_smear er
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$2.root --var dummy $2 --xsecmode default --xsecvar elec_ang --xsec_smear er
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$2.root --var dummy $2 --xsecmode default --xsecvar elec_cang --xsec_smear er
 
 fi
 
@@ -234,9 +236,9 @@ fi
 # Make a new file with genie tune1 model
 if [ "$1" == "tune1" ]; then
 
-  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_tune1.root tune1 --weight_tune 0
+  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_tune1.root tune1 --weight_tune 0 --weight_pi0 0
 
-  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_tune1_intrinsic.root tune1 --intrinsic intrinsic --weight_tune 0
+  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_tune1_intrinsic.root tune1 --intrinsic intrinsic --weight_tune 0 --weight_pi0 0
 
   source merge/merge_run1_files.sh files/nuexsec_mc_run1_tune1.root files/nuexsec_run1_tune1_merged.root
 
@@ -247,6 +249,25 @@ if [ "$1" == "tune1" ]; then
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_tune1.root --var dummy tune1 --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_tune1.root --var dummy tune1 --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_tune1.root --var dummy tune1 --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang
+
+fi
+
+# Make a new file with nuwro
+if [ "$1" == "nuwro" ]; then
+
+  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_nuwro.root nuwro --weight_tune 0 --weight_pi0 0
+
+  # ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_nuwro_intrinsic.root nuwro --intrinsic intrinsic --weight_tune 0 --weight_pi0 0
+
+  source merge/merge_run1_files.sh files/nuexsec_mc_run1_nuwro.root files/nuexsec_run1_nuwro_merged.root
+
+  ./nuexsec --run 1 --hist files/nuexsec_run1_nuwro_merged.root --var dummy nuwro
+
+  root -l -b -q 'merge/merge_uneaventrees.C("1", false, false, "files/trees/nuexsec_selected_tree_mc_run1_nuwro.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "nuwro")'
+
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_nuwro.root --var dummy nuwro --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_nuwro.root --var dummy nuwro --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_nuwro.root --var dummy nuwro --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang
 
 fi
 
@@ -360,9 +381,9 @@ fi
 if [ "$1" == "faketune1" ]; then
 
   # Run the cross sec calculation in fake data mode
-  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_tune1.root --fake tune1 --weight_tune 0
+  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_tune1.root --fake tune1 --weight_tune 0 --weight_pi0 0
 
-  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_tune1_intrinsic.root --fake tune1 --intrinsic intrinsic --weight_tune 0
+  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_tune1_intrinsic.root --fake tune1 --intrinsic intrinsic --weight_tune 0 --weight_pi0 0
 
   # Merge the files
   hadd -f -T files/nuexsec_run1_merged_faketune1.root files/nuexsec_data_run1_tune1.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root

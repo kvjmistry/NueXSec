@@ -1666,3 +1666,14 @@ void Utility::ConvertCovarianceUnits(TH2D* &h_cov, TH1D *h_input, TH1D* h_output
         }
     }
 }
+// -----------------------------------------------------------------------------
+void Utility::ConvertCovarianceBinWidth(TH2D* &h_cov, TH1D *h_input){
+
+    TH1D* h_input_width = (TH1D*)h_input->Clone();
+
+    h_input_width->Scale(1.0, "width");
+
+    ConvertCovarianceUnits(h_cov, h_input, h_input_width);
+
+    delete h_input_width;
+}

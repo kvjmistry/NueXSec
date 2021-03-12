@@ -95,6 +95,10 @@ class HistogramPlotter{
     // Add in the systematic uncertainty from file to the stacked histograms
     void AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D* h_dirt, std::string histname, std::string cut_name, std::string label, std::string mode);
     // -------------------------------------------------------------------------
+    // Plot the Purity in each bin
+    void MakePurityPlot(THStack *h_stack, TH1D *h_nue, TH1D* h_nuebar, std::string histname);
+    // --------------------------------------------------------------------------
+    
 
     private:
 

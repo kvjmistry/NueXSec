@@ -43,56 +43,59 @@ Run1_Intrinsic_POT 2.37838e+22 //  new Genie tune
 -
 // Run 1 Det var CV
 // Run1_MC_POT_CV 3.65214e+20
-Run1_MC_POT_CV 3.68983e+20 // newtune
+Run1_MC_POT_CV 7.59732e+20 // newtune
 -
 // Run 1 Det var LYAttenuation
 // Run1_MC_POT_LYAttenuation 3.67755e+20
-Run1_MC_POT_LYAttenuation 3.64207e+20 // new tune
+Run1_MC_POT_LYAttenuation 7.51336e+20 // new tune
 -
 // Run 1 Det var LYRayleigh
 // Run1_MC_POT_LYRayleigh 3.60847e+20
-Run1_MC_POT_LYRayleigh 3.68926e+20 // new tune
+Run1_MC_POT_LYRayleigh 7.60573e+20 // new tune
 -
 // Run 1 Det var LYDown
-Run1_MC_POT_LYDown 3.566e+20 // new tune
+Run1_MC_POT_LYDown 7.43109e+20 // new tune
 -
 // Run 1 Det var SCE
 // Run1_MC_POT_SCE 3.66636e+20
-Run1_MC_POT_SCE 3.71139e+20 // new tune
+Run1_MC_POT_SCE 7.39875e+20 // new tune
 -
 // Run 1 Det var Recomb2
 // Run1_MC_POT_Recomb2 3.72107e+20
-Run1_MC_POT_Recomb2 3.72109e+20 // new tune
+Run1_MC_POT_Recomb2 7.59105e+20 // new tune
 -
 // Run 1 Det var WireModX
 // Run1_MC_POT_WireModX 3.67495e+20
-Run1_MC_POT_WireModX 3.6749e+20 // new tune
+Run1_MC_POT_WireModX 7.64918e+20 // new tune
 -
 // Run 1 Det var WireModYZ
 // Run1_MC_POT_WireModYZ 3.68494e+20
-Run1_MC_POT_WireModYZ 3.69849e+20 // new tune
+Run1_MC_POT_WireModYZ 7.532e+20 // new tune
 -
 // Run 1 Det var WireModThetaXZ
 // Run1_MC_POT_WireModThetaXZ 3.64542e+20
-Run1_MC_POT_WireModThetaXZ 3.68008e+20 // new tune
+Run1_MC_POT_WireModThetaXZ 7.64282e+20 // new tune
 -
 // Run 1 Det var WireModThetaYZ_withSigmaSplines
 // Run1_MC_POT_WireModThetaYZ_withSigmaSplines 3.67869e+20
-Run1_MC_POT_WireModThetaYZ_withSigmaSplines 3.68995e+20 //new tune
+Run1_MC_POT_WireModThetaYZ_withSigmaSplines 7.64543e+20 //new tune
 -
 // Run 1 Det var WireModThetaYZ_withoutSigmaSplines
 // Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 3.69423e+20
-Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 3.69422e+20 // new tune
+Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 7.5783e+20 // new tune
 -
 // Run 1 Det var WireModdEdX
 // Run1_MC_POT_WireModdEdX 3.6318e+20
-Run1_MC_POT_WireModdEdX 3.66871e+20 // new tune
+Run1_MC_POT_WireModdEdX 7.60036e+20 // new tune
 -
 // Run 1 Det Var for flugg
 Run1_MC_POT_FLUGG 8.87591e+20
 -
 // Run 1 Det Var for tune1
 Run1_MC_POT_tune1 6.0093e+20 
+-
+// Run 1 Det Var for nuwro
+Run1_MC_POT_nuwro 6.64422e+20
 -
 // Run 1 Det var CV intrinsic nue sample
 // Run1_Intrinsic_POT_CV 2.68294e+22

@@ -1137,8 +1137,9 @@ void SystematicsHelper::PlotReweightingModeDetVar(std::string label, int var, in
 
         double scale_fact = POT_v.at(k_CV) / POT_v.at(detvar_index);
         
-        // Scale the histograms, but only in the case of MC variables
-        if (xsec_types.at(k) != "ext" && xsec_types.at(k) != "dirt" && xsec_types.at(k) != "data") h_universe.at(k)->Scale(scale_fact);
+        // Scale the histograms, but only in the case of certain variables
+        if (xsec_types.at(k) == "sel" || xsec_types.at(k) == "gen" || xsec_types.at(k) == "bkg" || xsec_types.at(k) == "sig") 
+            h_universe.at(k)->Scale(scale_fact);
 
         // Get the CV histograms
         _util.GetHist(f_nuexsec, h_temp, Form( "detvar_CV/%s/h_run%s_CV_0_%s_%s", _util.vars.at(var).c_str(), _util.run_period, _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));
@@ -1756,8 +1757,10 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             h_mcxsec  ->SetLineColor(kRed+2);
 
             // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
-            if (_util.vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(3.5, 10.5);
-            else h_dataxsec->GetYaxis()->SetRangeUser(0.0, _util.xsec_scale);
+            if (_util.vars.at(var) == "integrated")
+                h_dataxsec->GetYaxis()->SetRangeUser(3.5, 10.5);
+            else
+                h_dataxsec->GetYaxis()->SetRangeUser(0.0, _util.xsec_scale);
 
             _util.IncreaseLabelSize(h_dataxsec, c);
             if (_util.vars.at(var) == "integrated")h_dataxsec->GetXaxis()->SetLabelSize(0);
@@ -2583,17 +2586,22 @@ void SystematicsHelper::PrintUncertaintySummary(){
         
         // Loop over the bins
         for (unsigned int bin = 0; bin < v_err.front().at(var).at(k_xsec_mcxsec).size(); bin++ ){
+
+            int _type = k_xsec_mcxsec;
+
+            if (var == k_var_integrated)
+                _type = k_xsec_dataxsec;
             
-            std::cout << "Bin: " << bin+1 << " GENIE Unisim:       " <<std::sqrt(v_err.at(k_err_genie_uni).at(var).at(k_xsec_mcxsec)  .at(bin)) << " \%"<< std::endl;
-            std::cout << "Bin: " << bin+1 << " GENIE Multisim:     " <<std::sqrt(v_err.at(k_err_genie_multi).at(var).at(k_xsec_mcxsec).at(bin)) << " \%"<< std::endl;
-            std::cout << "Bin: " << bin+1 << " Beamline:           " <<std::sqrt(v_err.at(k_err_beamline).at(var).at(k_xsec_mcxsec)   .at(bin)) << " \%"<< std::endl;
-            std::cout << "Bin: " << bin+1 << " Hadron Prod.:       " <<std::sqrt(v_err.at(k_err_hp).at(var).at(k_xsec_mcxsec)         .at(bin)) << " \%"<< std::endl;
-            std::cout << "Bin: " << bin+1 << " Geant Rein.:        " <<std::sqrt(v_err.at(k_err_reint).at(var).at(k_xsec_mcxsec)      .at(bin)) << " \%"<< std::endl;
-            std::cout << "Bin: " << bin+1 << " Detector:           " <<std::sqrt(v_err.at(k_err_detvar).at(var).at(k_xsec_mcxsec)     .at(bin)) << " \%"<< std::endl;
-            std::cout << "Bin: " << bin+1 << " Dirt:               " <<std::sqrt(v_err.at(k_err_dirt).at(var).at(k_xsec_mcxsec)       .at(bin)) << " \%"<< std::endl;
-            std::cout << "Bin: " << bin+1 << " POT Counting:       " <<std::sqrt(v_err.at(k_err_pot).at(var).at(k_xsec_mcxsec)        .at(bin)) << " \%"<< std::endl;
-            std::cout << "Bin: " << bin+1 << " MC Stats:           " <<std::sqrt(v_err.at(k_err_mcstats).at(var).at(k_xsec_mcxsec)    .at(bin)) << " \%"<< std::endl;
-            std::cout << "Bin: " << bin+1 << " Pi0 Tune:           " <<std::sqrt(v_err.at(k_err_pi0).at(var).at(k_xsec_mcxsec)        .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " GENIE Unisim:       " <<std::sqrt(v_err.at(k_err_genie_uni).at(var).at(_type)  .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " GENIE Multisim:     " <<std::sqrt(v_err.at(k_err_genie_multi).at(var).at(_type).at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " Beamline:           " <<std::sqrt(v_err.at(k_err_beamline).at(var).at(_type)   .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " Hadron Prod.:       " <<std::sqrt(v_err.at(k_err_hp).at(var).at(_type)         .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " Geant Rein.:        " <<std::sqrt(v_err.at(k_err_reint).at(var).at(_type)      .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " Detector:           " <<std::sqrt(v_err.at(k_err_detvar).at(var).at(_type)     .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " Dirt:               " <<std::sqrt(v_err.at(k_err_dirt).at(var).at(_type)       .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " POT Counting:       " <<std::sqrt(v_err.at(k_err_pot).at(var).at(_type)        .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " MC Stats:           " <<std::sqrt(v_err.at(k_err_mcstats).at(var).at(_type)    .at(bin)) << " \%"<< std::endl;
+            std::cout << "Bin: " << bin+1 << " Pi0 Tune:           " <<std::sqrt(v_err.at(k_err_pi0).at(var).at(_type)        .at(bin)) << " \%"<< std::endl;
             
             if ( (std::string(_util.xsec_smear_mode) == "er" || std::string(_util.xsec_smear_mode) == "wiener") && var == k_var_recoX)
                 std::cout << "Bin: " << bin+1 << " Smearing:           " << std::sqrt(v_err.at(k_err_sys).at(k_var_trueX).at(k_xsec_mcxsec_smear).at(bin)) << " \%"<< std::endl;
@@ -2601,13 +2609,20 @@ void SystematicsHelper::PrintUncertaintySummary(){
             std::cout << std::endl;
             std::cout << "Bin: " << bin+1 << " Tot Data X-Sec Stat:                 " <<std::sqrt(v_err.at(k_err_stat).at(var).at(k_xsec_dataxsec).at(bin)) << " \%"<< std::endl;
             std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Stat:                   " <<std::sqrt(v_err.at(k_err_stat).at(var).at(k_xsec_mcxsec).at(bin))   << " \%"<< std::endl;
-            std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Sys:                    " <<std::sqrt(v_err.at(k_err_sys) .at(var).at(k_xsec_mcxsec)   .at(bin)) << " \%"<< std::endl;
+            
+            if (var == k_var_integrated)
+                std::cout << "Bin: " << bin+1 << " Tot Data X-Sec Sys:                  " <<std::sqrt(v_err.at(k_err_sys) .at(var).at(k_xsec_dataxsec)   .at(bin)) << " \%"<< std::endl;
+            else
+                std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Sys:                    " <<std::sqrt(v_err.at(k_err_sys) .at(var).at(k_xsec_mcxsec)   .at(bin)) << " \%"<< std::endl;
             
             if ( (std::string(_util.xsec_smear_mode) == "er" || std::string(_util.xsec_smear_mode) == "wiener") && var == k_var_recoX){
                 std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Uncertainty:            " <<std::sqrt(v_err.at(k_err_stat).at(var).at(k_xsec_dataxsec).at(bin) + v_err.at(k_err_stat).at(var).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_sys).at(var).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_sys).at(k_var_trueX).at(k_xsec_mcxsec_smear).at(bin)) << " \%"<< std::endl;
             }
             else {
-                std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Uncertainty:            " <<std::sqrt(v_err.at(k_err_stat).at(var).at(k_xsec_dataxsec).at(bin) + v_err.at(k_err_stat).at(var).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_sys).at(var).at(k_xsec_mcxsec).at(bin)) << " \%"<< std::endl;
+                if (var == k_var_integrated)
+                    std::cout << "Bin: " << bin+1 << " Tot Data X-Sec Uncertainty:          " <<std::sqrt(v_err.at(k_err_stat).at(var).at(k_xsec_dataxsec).at(bin) + v_err.at(k_err_stat).at(var).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_sys).at(var).at(k_xsec_dataxsec).at(bin)) << " \%"<< std::endl;
+                else
+                    std::cout << "Bin: " << bin+1 << " Tot MC X-Sec Uncertainty:            " <<std::sqrt(v_err.at(k_err_stat).at(var).at(k_xsec_dataxsec).at(bin) + v_err.at(k_err_stat).at(var).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_sys).at(var).at(k_xsec_mcxsec).at(bin)) << " \%"<< std::endl;
             }
             std::cout <<"\n--" << std::endl;       
         }
@@ -2894,8 +2909,9 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                     // Also need to Scale the beamline histograms to the right POT
                     double scale_fact = POT_v.at(k_CV) / POT_v.at(label);
                     
-                    // Scale the histograms, but only in the case of MC variables
-                    if (xsec_types.at(k) != "ext" && xsec_types.at(k) != "dirt" && xsec_types.at(k) != "data") htemp->Scale(scale_fact);
+                    // Scale the histograms, but only in the case of certain variables
+                    if (xsec_types.at(k) == "sel" || xsec_types.at(k) == "gen" || xsec_types.at(k) == "bkg" || xsec_types.at(k) == "sig")
+                        htemp->Scale(scale_fact);
                 }
 
                 h_universe.at(var).at(label).at(k_up).at(k) = (TH1D*) htemp->Clone(Form("h_clone_%s_%s_up", _util.vars.at(var).c_str(), labels_up_v.at(label).c_str()));
@@ -3553,9 +3569,9 @@ void SystematicsHelper::MakeTotUncertaintyPlot(bool AddStatErr){
 
                 if (type == k_xsec_bkg){
                     if (std::string(_util.xsec_var) == "elec_E")
-                        h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 650);
+                        h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 240);
                     else
-                        h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 300);
+                        h_uncertainty.at(k_err_sys)->GetYaxis()->SetRangeUser(0, 120);
                 }
 
                 if (type == k_xsec_mcxsec_smear){
@@ -3857,6 +3873,10 @@ void SystematicsHelper::ExportResult(TFile* f){
         // MC Efficiency True  ---------------------------------
         cv_hist_vec.at(k_var_trueX).at(k_xsec_eff)->SetOption("hist");
         cv_hist_vec.at(k_var_trueX).at(k_xsec_eff)->Write("h_mc_eff_true", TObject::kOverwrite);
+
+        // MC XSec Covariance Matrix ---------------------------------
+        h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot)->SetOption("colz");
+        h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot)->Write("h_cov_tot_mcxsec_reco", TObject::kOverwrite);
 
 
         // Data Correlation Matrix  ---------------------------------

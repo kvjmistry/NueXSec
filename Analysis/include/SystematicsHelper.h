@@ -199,7 +199,8 @@ class SystematicsHelper{
         "WM X",
         "WM YZ",
         "WM Theta XZ",
-        "WM Theta YZ w/ Spl.",
+        "WM Theta YZ",
+        // "WM Theta YZ w/ Spl.",
         // "WM Theta YZ w/o Spl.",
         // "WM dE/dX" 
     };
@@ -299,7 +300,6 @@ class SystematicsHelper{
 
     // Vector to store total uncertainty histograms
     std::vector<std::vector<std::vector<TH1D*>>> h_cut_err; // label -- cut -- variable
-
 
 }; // End Class SystematicsHelper
 
