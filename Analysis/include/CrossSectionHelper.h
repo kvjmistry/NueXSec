@@ -422,6 +422,9 @@ class CrossSectionHelper{
     // Load in the detector variation CV so we can smear it
     void LoadDetvarCVHist();
     // -------------------------------------------------------------------------
+    // Unfold the data in an unregularized way
+    void UnregularizedUnfold(TH1D *h_data_xsec_reco, TH1D* h_data_xsec_true, TH2D* h_response);
+    // -------------------------------------------------------------------------
 
 
 

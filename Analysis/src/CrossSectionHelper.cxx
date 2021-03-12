@@ -405,8 +405,8 @@ void CrossSectionHelper::LoopEvents(){
 
                 // Calculate the efficiency histogram with smearing of the truth
                 if (var == k_var_recoX){
-                    // Smear(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen),
-                    //       h_smear.at(label).at(uni).at(k_var_recoX), h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_eff));
+                    Smear(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen),
+                          h_smear.at(label).at(uni).at(k_var_recoX), h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_eff));
                 }
                 // Calculate the efficiency histogram by dividing the sig and gen
                 else{ 
@@ -452,19 +452,21 @@ void CrossSectionHelper::LoopEvents(){
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig),  // N Sig
                                  N_target_MC, "MC", var);
 
-                // Data Cross section -- currently using eventrate
-                CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_data), // N Sel
-                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff),   // Eff
-                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),   // N Bkg
-                                _util.mc_scale_factor,
-                                weight_POT * temp_integrated_flux * data_flux_scale_factor, // Flux
-                                _util.ext_scale_factor,
-                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),   // N EXT
-                                _util.dirt_scale_factor,
-                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dirt),  // N Dirt
-                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dataxsec),
-                                h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig),   // N Sig
-                                N_target_Data, "Data", var);
+                if (var != k_var_trueX){
+                    // Data Cross section -- currently using eventrate
+                    CalcCrossSecHist(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_data), // N Sel
+                                    h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff),   // Eff
+                                    h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),   // N Bkg
+                                    _util.mc_scale_factor,
+                                    weight_POT * temp_integrated_flux * data_flux_scale_factor, // Flux
+                                    _util.ext_scale_factor,
+                                    h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),   // N EXT
+                                    _util.dirt_scale_factor,
+                                    h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dirt),  // N Dirt
+                                    h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dataxsec),
+                                    h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig),   // N Sig
+                                    N_target_Data, "Data", var);
+                }
 
                 if (var == k_var_trueX){
                     // Calculate the the smeared cross section prediction
@@ -482,6 +484,7 @@ void CrossSectionHelper::LoopEvents(){
                         h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_smear)->Scale(100);
                         h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_fine)->Scale(100);
                     }
+
                 }
 
                 // Scale the histograms to avoid working with really small numbers
@@ -493,6 +496,11 @@ void CrossSectionHelper::LoopEvents(){
                     h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec)->Scale(100);
                     h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dataxsec)->Scale(100);
                 }
+
+                if (var == k_var_trueX){
+                    UnregularizedUnfold(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_dataxsec), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_dataxsec),  h_smear.at(label).at(uni).at(k_var_trueX));
+                }
+
 
                 // if (var == 0) std::cout << reweighter_labels.at(label) << ": " << _util.red << h_cross_sec.at(label).at(uni).at(k_var_integrated).at(k_xsec_mcxsec)  ->Integral() << _util.reset<< " x10^-39 cm2/nucleon" << std::endl;
 
@@ -2476,18 +2484,33 @@ void CrossSectionHelper::Smear(TH1D* h_sig, TH1D* h_gen, TH2D* h_smear, TH1D* h_
         }
     } 
 
+    double nbins;
+
+    // Electron/Shower Energy
+    if (std::string(_util.xsec_var) =="elec_E"){
+        nbins = _util.reco_shr_bins.size()+1;
+    }
+    // Electron/Shower beta
+    else if (std::string(_util.xsec_var) =="elec_ang"){
+        nbins = _util.reco_shr_bins_ang.size()+1;
+    }
+    // Electron/Shower cos(beta)
+    else if (std::string(_util.xsec_var) =="elec_cang"){
+        nbins = _util.reco_shr_bins_cang.size()+1;
+    }
+
     // Convert the smearing matrix and histograms to a Matrix
-    TMatrixD SMatrix(_util.reco_shr_bins.size()+1,_util.reco_shr_bins.size()+1,h_smear->GetArray(), "F");
-    TMatrixD SigMatrix(_util.reco_shr_bins.size()+1,1,h_sig->GetArray(), "F");
-    TMatrixD GenMatrix(_util.reco_shr_bins.size()+1,1,h_gen->GetArray(), "F");
+    TMatrixD SMatrix(nbins, nbins, h_smear->GetArray(), "F");
+    TMatrixD SigMatrix(nbins, 1, h_sig->GetArray(), "F");
+    TMatrixD GenMatrix(nbins, 1, h_gen->GetArray(), "F");
     
 
     // Smear the signal selected events
-    TMatrixD SigMatrixSmear(_util.reco_shr_bins.size()+1,1);
+    TMatrixD SigMatrixSmear(nbins, 1);
     SigMatrixSmear.Mult(SMatrix,SigMatrix);
     
     // Smear the generated events
-    TMatrixD GenMatrixSmear(_util.reco_shr_bins.size()+1,1);
+    TMatrixD GenMatrixSmear(nbins, 1);
     GenMatrixSmear.Mult(SMatrix,GenMatrix);
 
     if (debug){
@@ -2500,7 +2523,12 @@ void CrossSectionHelper::Smear(TH1D* h_sig, TH1D* h_gen, TH2D* h_smear, TH1D* h_
 
     // Set the efficiency bins
     for (int bin = 1; bin < h_sig->GetNbinsX()+1; bin++){
-        h_eff->SetBinContent(bin, SigMatrixSmear(bin,0) / GenMatrixSmear(bin,0));
+        
+        if (GenMatrixSmear(bin,0) == 0)
+            h_eff->SetBinContent(bin, 0.0);
+        else
+            h_eff->SetBinContent(bin, SigMatrixSmear(bin,0) / GenMatrixSmear(bin,0));
+        
         h_eff->SetBinError(bin, 0);
         
         if (debug)
@@ -2753,4 +2781,65 @@ void CrossSectionHelper::LoadDetvarCVHist(){
     f->Close();
 }
 // -----------------------------------------------------------------------------
+void CrossSectionHelper::UnregularizedUnfold(TH1D *h_data_xsec_reco, TH1D* h_data_xsec_true, TH2D* h_response){
+
+    // Getting covariance matrix in TMatrix form
+    TMatrix res_inv;
+    res_inv.Clear();
+    res_inv.ResizeTo(h_response->GetNbinsX(), h_response->GetNbinsY());
+
+    // loop over rows
+    for (int i = 0; i < h_response->GetNbinsX(); i++) {
+
+        // loop over columns
+        for (int j = 0; j < h_response->GetNbinsY(); j++) {
+            res_inv[i][j] = h_response->GetBinContent(i+1, j+1);
+        }
+    
+    }
+
+    // res_inv.Print();
+
+    // Inverting the response matrix
+    TMatrix inverse_res_m = res_inv.Invert();
+
+    // inverse_res_m.Print();
+
+
+    double nbins;
+
+    // Electron/Shower Energy
+    if (std::string(_util.xsec_var) =="elec_E"){
+        nbins = _util.reco_shr_bins.size();
+    }
+    // Electron/Shower beta
+    else if (std::string(_util.xsec_var) =="elec_ang"){
+        nbins = _util.reco_shr_bins_ang.size();
+    }
+    // Electron/Shower cos(beta)
+    else if (std::string(_util.xsec_var) =="elec_cang"){
+        nbins = _util.reco_shr_bins_cang.size();
+    }
+
+    // Clear the Bins
+    for (int bin = 0; bin < h_data_xsec_true->GetNbinsX()+2; bin++){
+        h_data_xsec_true->SetBinContent(bin, 0);
+    }
+
+    // --- Do the matrix multiplication --- 
+    // Loop over cols
+    for (int i=0; i<inverse_res_m.GetNcols(); i++){
+
+        // Now normalise the column entries by the number of events in the 1D generated histogram
+        for (int j=0; j<inverse_res_m.GetNrows(); j++) {         
+            
+            h_data_xsec_true->SetBinContent(i+1, h_data_xsec_true->GetBinContent(i+1) + inverse_res_m[j][i] * (h_data_xsec_reco->GetBinContent(j+1)));
+        }
+
+        h_data_xsec_true->SetBinError(i+1, h_data_xsec_true->GetBinContent(i+1) * (h_data_xsec_reco->GetBinError(i+1) / h_data_xsec_reco->GetBinContent(i+1)) );
+
+    } 
+
+
+}
 // -----------------------------------------------------------------------------

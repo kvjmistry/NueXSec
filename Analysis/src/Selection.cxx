@@ -414,6 +414,10 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
     SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
 
+    // In the case of Nuwro, we need to manually set the weight
+    if (std::string(_util.variation) == "nuwro")
+        SC.SetPPFXCVWeight();
+
     // *************************************************************************
     // Unselected---------------------------------------------------------------
     // *************************************************************************

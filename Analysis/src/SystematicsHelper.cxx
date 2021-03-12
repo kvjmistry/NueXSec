@@ -1757,8 +1757,10 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             h_mcxsec  ->SetLineColor(kRed+2);
 
             // h_dataxsec->GetYaxis()->SetRangeUser(0, 0.5e-39);
-            if (_util.vars.at(var) == "integrated") h_dataxsec->GetYaxis()->SetRangeUser(3.5, 10.5);
-            else h_dataxsec->GetYaxis()->SetRangeUser(0.0, _util.xsec_scale);
+            if (_util.vars.at(var) == "integrated")
+                h_dataxsec->GetYaxis()->SetRangeUser(3.5, 10.5);
+            else
+                h_dataxsec->GetYaxis()->SetRangeUser(0.0, _util.xsec_scale);
 
             _util.IncreaseLabelSize(h_dataxsec, c);
             if (_util.vars.at(var) == "integrated")h_dataxsec->GetXaxis()->SetLabelSize(0);
