@@ -289,6 +289,10 @@ void GeneratorReader::analyze(art::Event const& e) {
     beta = elec_dir.Angle(nu_dir) * 180 / 3.14159;
     cosbeta = std::cos(elec_dir.Angle(nu_dir));
 
+    // Skip NC interactions
+    if (ccnc == 1)
+        continue;
+
     std::cout << 
     "Nu PDG: " << nu_pdg << "\n" <<
     "Nu E: " << nu_e*1000 << "\n" <<
@@ -297,9 +301,9 @@ void GeneratorReader::analyze(art::Event const& e) {
     "Beta: " << beta << "\n" <<
     "cosbeta: " << cosbeta << "\n" <<
     "FV: " << infv << "\n" <<
+    "CCNC: " << ccnc << "\n" <<
     "PPFX CV: " << ppfx_cv << "\n" <<
     std::endl;
-    
 
     Tree->Fill();
 
