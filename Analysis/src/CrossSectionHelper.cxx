@@ -150,6 +150,11 @@ void CrossSectionHelper::Initialise(Utility _utility){
         LoadDetvarCVHist();
     }
     
+    // Load in NuWro file and add true cross section to file
+    if (std::string(_util.xsec_rw_mode) == "gen"){
+        SaveGenXSec();
+        return;
+    }
 
     // Now loop over events and caluclate the cross section
     LoopEvents();
@@ -2839,6 +2844,69 @@ void CrossSectionHelper::UnregularizedUnfold(TH1D *h_data_xsec_reco, TH1D* h_dat
         h_data_xsec_true->SetBinError(i+1, h_data_xsec_true->GetBinContent(i+1) * (h_data_xsec_reco->GetBinError(i+1) / h_data_xsec_reco->GetBinContent(i+1)) );
 
     } 
+
+
+}
+// -----------------------------------------------------------------------------
+void CrossSectionHelper::SaveGenXSec(){
+
+    // To run :
+    // ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecplot gen --var ../ntuples/genie_v2_intrinsic_events.root geniev2gen
+    // ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecplot gen --var ../ntuples/nuwro_intrinsic_events.root nuwrogen
+
+    TFile *f_gen = TFile::Open(_util.mc_file_name, "READ");
+
+
+    TTree *t_gen = (TTree*)f_gen->Get("tree");
+
+    double* edges = &_util.reco_shr_bins[0]; // Cast to an array 
+    TH1D *htemp_e= new TH1D("h_elec_E","", _util.reco_shr_bins.size()-1, edges);
+
+    edges = &_util.reco_shr_bins_cang[0]; // Cast to an array 
+    TH1D *htemp_cang= new TH1D("h_elec_cang","", _util.reco_shr_bins_cang.size()-1, edges);
+
+    TH1D *htemp_tot= new TH1D("h_elec_tot","", 1, 0, 1.1);
+
+    t_gen->Draw("elec_e >> h_elec_E", "ppfx_cv*(elec_e > 0.12 && nu_e > 0.06 && infv && ccnc == 0)");
+    t_gen->Draw("cosbeta >> h_elec_cang", "ppfx_cv*(elec_e > 0.12 && nu_e > 0.06 && infv && ccnc == 0)");
+    t_gen->Draw("0.5 >> h_elec_tot", "ppfx_cv*(elec_e > 0.12 && nu_e > 0.06 && infv && ccnc == 0)");
+
+    TFile *f_out = TFile::Open(Form("files/crosssec_run%s.root", _util.run_period), "UPDATE");
+
+    htemp_e->Scale(1.0 / (integrated_flux * mc_flux_scale_factor * N_target_MC));
+    htemp_cang->Scale(1.0 / (integrated_flux * mc_flux_scale_factor * N_target_MC));
+    htemp_tot->Scale(1.0 / (integrated_flux * mc_flux_scale_factor * N_target_MC));
+
+    htemp_e->Scale(1.0e39);
+    htemp_cang->Scale(1.0e39);
+    htemp_tot->Scale(1.0e39);
+
+    htemp_e->SetOption("hist");
+    htemp_cang->SetOption("hist");
+    htemp_tot->SetOption("hist");
+    
+    // Create a directory to save the histograms
+    TDirectory *dir;
+    
+    // Get the directory 
+    bool bool_dir = _util.GetDirectory(f_out, dir, _util.variation );
+
+    // Make the directory
+    if (!bool_dir){
+        dir = f_out->mkdir(_util.variation);
+        _util.GetDirectory(f_out, dir, _util.variation );
+    }
+
+    dir->cd();
+
+    htemp_e->Write("",TObject::kOverwrite);
+    htemp_cang->Write("",TObject::kOverwrite);
+    htemp_tot->Write("",TObject::kOverwrite);
+
+    f_out->Close();
+
+    f_gen->cd();
+    f_gen->Close();
 
 
 }

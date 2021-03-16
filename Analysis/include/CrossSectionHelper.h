@@ -425,6 +425,9 @@ class CrossSectionHelper{
     // Unfold the data in an unregularized way
     void UnregularizedUnfold(TH1D *h_data_xsec_reco, TH1D* h_data_xsec_true, TH2D* h_response);
     // -------------------------------------------------------------------------
+    // Make and save generator histograms to file
+    void SaveGenXSec();
+    // -------------------------------------------------------------------------
 
 
 

@@ -59,7 +59,7 @@ int main(int argc, char *argv[]){
     "The <input merged nuexsec ttree file> corresponds to merged ttree file of the mc, data, ext and dirt. See the bash script merge_uneaventrees.C for more details\n\n"
     "\033[0;34m[--xsecmode <cross-section mode> ]\033[0m                     \033[0;32mThe input mode of xsec code to run. Options are default or reweight. Labels are optional, but can be all/unisim/ppfx/genie/reint \033[0m\n\n"
     "\033[0;34m[--xseclabel <cross-section label> ]\033[0m                   \033[0;32mThe systematic variation to run over in the xsec calc. Default is all. Options are all/unisim/ppfx/genie/reint \033[0m\n\n"
-    "\033[0;34m[--xsecplot <cross-section plot mode> ]\033[0m                \033[0;32mChoose to use the cross section code to reweight all the cut plots [very slow]. Options are default or rw_cuts. \033[0m\n\n"
+    "\033[0;34m[--xsecplot <cross-section plot mode> ]\033[0m                \033[0;32mChoose to use the cross section code to reweight all the cut plots [very slow]. Gen mode saves the generator hist to file. Options are default or rw_cuts or gen. \033[0m\n\n"
     "\033[0;34m[--xsecvar <cross-section var>]\033[0m                        \033[0;32mTThe variable to bin the cross section as a function of. Default is elec_E. Options are elec_E or elec_ang. \033[0m\n\n"
     "\033[0;34m[--xsecbins <cross-section bin mode> ]\033[0m                 \033[0;32mChoose whether to use a fine binned smearing/response matrix in truth. Default is standard. Options are standard or fine. \033[0m\n\n"
     "\033[0;34m[--xsec_smear <cross-section smear mode> ]\033[0m             \033[0;32mChoose how to define the cross section. Default is mcc8. Options are mcc8 or er. \033[0m\n\n"
