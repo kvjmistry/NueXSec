@@ -257,13 +257,13 @@ if [ "$1" == "nuwro" ]; then
 
   ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_nuwro.root nuwro --weight_tune 0 --weight_pi0 0
 
-  # ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_nuwro_intrinsic.root nuwro --intrinsic intrinsic --weight_tune 0 --weight_pi0 0
+  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_nuwro_intrinsic.root nuwro --intrinsic intrinsic --weight_tune 0 --weight_pi0 0
 
   source merge/merge_run1_files.sh files/nuexsec_mc_run1_nuwro.root files/nuexsec_run1_nuwro_merged.root
 
   ./nuexsec --run 1 --hist files/nuexsec_run1_nuwro_merged.root --var dummy nuwro
 
-  root -l -b -q 'merge/merge_uneaventrees.C("1", false, false, "files/trees/nuexsec_selected_tree_mc_run1_nuwro.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "nuwro")'
+  root -l -b -q 'merge/merge_uneaventrees.C("1", true, false, "files/trees/nuexsec_selected_tree_mc_run1_nuwro.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "nuwro")'
 
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_nuwro.root --var dummy nuwro --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_nuwro.root --var dummy nuwro --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_ang

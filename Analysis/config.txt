@@ -98,10 +98,10 @@ Run1_MC_POT_tune1 6.0093e+20
 Run1_MC_POT_nuwro 6.64422e+20
 -
 // Run 1 Det Var for nuwro -- straight generated events
-Run1_MC_POT_nuwrogen 5.59427e+21
+Run1_MC_POT_nuwrogen 1.76264e+22
 -
 // Run 1 Det Var for geniev2 -- straight generated events
-Run1_MC_POT_geniev2gen 7.07931e+21
+Run1_MC_POT_geniev2gen 1.48536e+22
 -
 // Run 1 Det var CV intrinsic nue sample
 // Run1_Intrinsic_POT_CV 2.68294e+22
@@ -155,6 +155,9 @@ Run1_Intrinsic_POT_FLUGG 3.00768e+22
 -
 // Run 1 Det var CV intrinsic nue sample genie tune1
 Run1_Intrinsic_POT_tune1 2.08494e+22
+-
+// Run 1 Det var CV intrinsic nue sample nuwro
+Run1_Intrinsic_POT_nuwro 1.7071e+22
 -
 // Run 1 Det Var BNB diffusion -- unused now
 Run1_MC_POT_BNB_Diffusion 4.19732e+20

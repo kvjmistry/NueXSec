@@ -3394,7 +3394,7 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
     
     h_mcxsec_reco_model.at(k_model_CV)->Draw("hist,same");
     h_mcxsec_reco_model.at(k_model_geniev3)->Draw("hist,same");
-    h_mcxsec_reco_model.at(k_model_geniev2gen)->Draw("hist,same");
+    // h_mcxsec_reco_model.at(k_model_geniev2gen)->Draw("hist,same");
     h_mcxsec_reco_model.at(k_model_nuwrogen)->Draw("hist,same");
     h_dataxsec->Draw("E1,X0,same");
     h_dataxsec_stat->Draw("E1,X0,same");
@@ -3417,7 +3417,7 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
 
     std::cout << "Geniev2" << std::endl;
     _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_geniev2gen), h_dataxsec, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_reco_model.at(k_model_geniev2gen),  Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    // leg->AddEntry(h_mcxsec_reco_model.at(k_model_geniev2gen),  Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
 
     std::cout << "NuWro" << std::endl;
     _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_nuwrogen), h_dataxsec, h_cov, chi, ndof, pval);
@@ -3429,7 +3429,7 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
     leg->Draw();
 
     // Draw the run period on the plot
-    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+    // _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
 
     _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.52, 0.92, 0.52, 0.92);
     
@@ -3554,7 +3554,7 @@ void UtilityPlotter::CompareGeneratorTotalCrossSec(){
     leg->SetFillStyle(0);
     h_data->SetMarkerSize(0.4);
     leg->AddEntry(h_data, "Data (stat. + sys.)",        "ep");
-    leg->AddEntry( h_model_xsec.at(k_model_CV),         "CV", "lf");
+    leg->AddEntry( h_model_xsec.at(k_model_CV),         "MC", "lf");
     leg->AddEntry( h_model_xsec.at(k_model_geniev3),    "GENIE v3.0.6", "lf");
     leg->AddEntry( h_model_xsec.at(k_model_geniev2gen), "GENIE v2.12.2", "lf");
     leg->AddEntry( h_model_xsec.at(k_model_nuwrogen),      "NuWro v19.02.02", "lf");
@@ -3683,7 +3683,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
 
     std::cout << "CV" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_CV), unf, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_CV),   Form("CV #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_CV),   Form("MC #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
     
     std::cout << "Genie v3" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_geniev3), unf, h_cov, chi, ndof, pval);
@@ -3691,7 +3691,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
 
     std::cout << "Genie v2" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_geniev2gen), unf, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_geniev2gen),   Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    // leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_geniev2gen),   Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
     std::cout << "NuWro" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_nuwrogen), unf, h_cov, chi, ndof, pval);
@@ -3742,7 +3742,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     h_mcxsec_true_model_smear.at(k_model_geniev3)->Draw("hist,same" );
 
     h_mcxsec_true_model_smear.at(k_model_geniev2gen)->SetLineColor(kOrange-1);
-    h_mcxsec_true_model_smear.at(k_model_geniev2gen)->Draw("hist,same" );
+    // h_mcxsec_true_model_smear.at(k_model_geniev2gen)->Draw("hist,same" );
 
     h_mcxsec_true_model_smear.at(k_model_nuwrogen)->SetLineColor(kPink+1);
     h_mcxsec_true_model_smear.at(k_model_nuwrogen)->Draw("hist,same" );
@@ -3750,7 +3750,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     unf->Draw("E1,X0,same");
 
     // Draw the run period on the plot
-    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+    // _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
 
     _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.52, 0.92, 0.52, 0.92);
     
