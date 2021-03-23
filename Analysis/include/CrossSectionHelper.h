@@ -428,6 +428,8 @@ class CrossSectionHelper{
     // Make and save generator histograms to file
     void SaveGenXSec();
     // -------------------------------------------------------------------------
+    // Compare the nuwro and genie pi0 cross sections
+    void CheckPi0CrossSection();
 
 
 

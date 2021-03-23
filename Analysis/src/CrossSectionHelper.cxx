@@ -156,6 +156,12 @@ void CrossSectionHelper::Initialise(Utility _utility){
         return;
     }
 
+    // Load in NuWro file and add true cross section to file
+    if (std::string(_util.xsec_rw_mode) == "pi0"){
+        CheckPi0CrossSection();
+        return;
+    }
+
     // Now loop over events and caluclate the cross section
     LoopEvents();
 
@@ -2911,3 +2917,69 @@ void CrossSectionHelper::SaveGenXSec(){
 
 }
 // -----------------------------------------------------------------------------
+void CrossSectionHelper::CheckPi0CrossSection(){
+
+
+    TFile *f_genie = TFile::Open("../ntuples/neutrinoselection_filt_run1_overlay_newtune.root", "READ");
+    TTree *t_genie = (TTree*)f_genie->Get("nuselection/NeutrinoSelectionFilter");
+
+    TH1D *h_genie_cc = new TH1D("h_genie_cc","GENIE v3;#pi^{0} energy [GeV]; CC events", 20, 0, 0.6);
+    TH1D *h_genie_nc = new TH1D("h_genie_nc","GENIE v3;#pi^{0} energy [GeV]; NC events", 20, 0, 0.6);
+    TH1D *h_genie    = new TH1D("h_genie","GENIE v3;#pi^{0} energy [GeV]; CC + NC events", 20, 0, 0.6);
+
+    t_genie->Draw("pi0_e >> h_genie_cc", "npi0 > 0 && ccnc == 0");
+    t_genie->Draw("pi0_e >> h_genie_nc", "npi0 > 0 && ccnc == 1");
+    t_genie->Draw("pi0_e >> h_genie",    "npi0 > 0");
+
+    TFile *f_nuwro = TFile::Open("../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_nuwro.root", "READ");
+    TTree *t_nuwro = (TTree*)f_nuwro->Get("nuselection/NeutrinoSelectionFilter");
+
+    TH1D *h_nuwro_cc = new TH1D("h_nuwro_cc","NuWro;#pi^{0} energy [GeV]; CC events", 20, 0, 0.6);
+    TH1D *h_nuwro_nc = new TH1D("h_nuwro_nc","NuWro;#pi^{0} energy [GeV]; NC events", 20, 0, 0.6);
+    TH1D *h_nuwro    = new TH1D("h_nuwro","NuWro;#pi^{0} energy [GeV]; CC + NCevents", 20, 0, 0.6);
+
+    t_nuwro->Draw("pi0_e >> h_nuwro_cc", "npi0 > 0 && ccnc == 0");
+    t_nuwro->Draw("pi0_e >> h_nuwro_nc", "npi0 > 0 && ccnc == 1");
+    t_nuwro->Draw("pi0_e >> h_nuwro",    "npi0 > 0");
+
+    h_nuwro_cc->Scale(3.5165631);
+    h_nuwro_nc->Scale(3.5165631);
+    h_nuwro   ->Scale(3.5165631);
+
+    TFile *f_out = TFile::Open("files/pi0_ratios.root", "RECREATE");
+
+    h_genie_cc->SetOption("hist");
+    h_genie_nc->SetOption("hist");
+    h_genie->SetOption("hist");
+    h_genie_cc->SetLineWidth(3);
+    h_genie_nc->SetLineWidth(3);
+    h_genie->SetLineWidth(3);
+    h_genie_cc->SetLineColor(kRed+2);
+    h_genie_nc->SetLineColor(kRed+2);
+    h_genie->SetLineColor(kRed+2);
+
+    h_genie_cc->Write();
+    h_genie_nc->Write();
+    h_genie->Write();
+
+    h_genie_cc->Divide(h_nuwro_cc);
+    h_genie_nc->Divide(h_nuwro_nc);
+    h_genie->Divide(h_nuwro);
+
+    h_genie_cc->SetTitle("GENIE v3/ NuWro CC #pi^{0};#pi^{0} energy [GeV]; Ratio");
+    h_genie_nc->SetTitle("GENIE v3/ NuWro NC #pi^{0};#pi^{0} energy [GeV]; Ratio");
+    h_genie->SetTitle("GENIE v3/ NuWro CC+NC #pi^{0};#pi^{0} energy [GeV]; Ratio");
+
+    
+
+    h_nuwro_cc->Write();
+    h_nuwro_nc->Write();
+    h_nuwro->Write();
+
+    h_genie_cc->Write("h_ratio_cc");
+    h_genie_nc->Write("h_ratio_nc");
+    h_genie->Write("h_ratio");
+
+    f_out->Close();
+
+}
