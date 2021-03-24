@@ -84,7 +84,7 @@ public:
     void CreateDirectory(std::string folder);
     // -------------------------------------------------------------------------
     // Function to tabulate all the nuetrino types and flavours
-    void Tabulate(bool inFV, std::string interaction, std::string classification, std::string pi0_classification, int type, std::vector<double> &counter_v, double weight);
+    void Tabulate(bool inFV, std::string interaction, std::string classification, std::string pi0_classification, int type, std::vector<double> &counter_v, double weight, bool &filled);
     // -------------------------------------------------------------------------
     // Function calculate theta
     double GetNuMIAngle(double px, double py, double pz, std::string direction);
@@ -195,8 +195,8 @@ public:
 
     // Neutrino Energy Threshold to integrate from
     // Flux bins are 0.00 ,0.06, 0.125, 0.25, 0.5, 0.75, 1.00, 1.25, 1.50, 1.75, 2.00, 2.25, 2.50, 2.75, 3.00, 3.25, 3.50, 4.00, 5.00
-    double energy_threshold = 0.06; // GeV
-    double elec_threshold   = 0.12; // GeV
+    double energy_threshold = 0.25; // GeV
+    double elec_threshold   = 0.00; // GeV
 
     // For MCC8 values
     // double energy_threshold = 0.25; // GeV
@@ -251,11 +251,11 @@ public:
     char * fakedataname            = (char *)"empty";
     int num_events{-1};
     int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
-    int _weight_tune{1}; // Use the GENIE Tune
-    int _weight_ppfx{1}; // Use the PPFX CV Corr
-    int _weight_dirt{1}; // Weight the Dirt events
-    int _weight_ext{1};  // Weight the EXT events
-    int _pi0_correction{1};  // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
+    int _weight_tune{0}; // Use the GENIE Tune
+    int _weight_ppfx{0}; // Use the PPFX CV Corr
+    int _weight_dirt{0}; // Weight the Dirt events
+    int _weight_ext{0};  // Weight the EXT events
+    int _pi0_correction{0};  // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
 
     bool zoom{false};        // bool to decide whether to zoom in on the plots
     bool isfakedata{false};  // bool for using MC as fake data
@@ -327,34 +327,40 @@ public:
     // Cut directory names
     std::vector<std::string> cut_dirs = {
             "Unselected",     // Unselected
-            "SoftwareTrig",   // Software Trigger
-            "Slice_ID",       // Slice ID
-            "e_candidate",    // Electron Candidate
-            "In_FV",          // In FV
-            "Contained_Frac", // Slice Contained Fraction
-            "Topo_Score",     // Topological Score
-            "Cosmic_IP",      // Pandora Cosmic Impact Parameter
-            "Shower_Score",   // Track Score < 0.5
-            "HitRatio",       // Ratio of shr hits and slice hits
-            "Moliere_Avg",    // Shower Moliere Average
-            "ShrVtxDist_dEdx_max", // 2D cut for shower to vertex distance and dedx
-            "dEdx_max_no_tracks"  // dEdx all planes no tracks
+            "In_Time",
+            "Flash_PE",
+            "Reco_Nue",
+            "In_FV",
+            "Vtx_to_Flash",
+            "Shr_to_Vtx",
+            "Track_to_Vtx",
+            "Hit_Thresh",
+            "Hit_Thresh_Y",
+            "Open_Angle",
+            "dEdx",
+            "Shr_Vtx_Dist_gt_1shr",
+            "Hit_per_Lenth",
+            "Trk_Shr_Lengh",
+            "Trk_Containment"
             };
     
     std::vector<std::string> cut_dirs_pretty = {
-            "Unselected",                                 // Unselected
-            "Software Trigger",                           // Software Trigger
-            "Slice ID",                                   // Slice ID
-            "Electron Candidate",                         // Electron Candidate
-            "In Fiducial Volume",                         // In FV
-            "Contained Fraction",                         // Slice Contained Fraction
-            "Topological Score",                          // Topological Score
-            "Cosimc IP",                                  // Pandora Cosmic Impact Parameter
-            "Shower Score",                               // Track Score < 0.5
-            "Hit Ratio",                                  // Ratio of shr hits and slice hits
-            "Moliere Average",                            // Shower Moliere Average
-            "2D Shower Vtx Dist, dE/dx",                  // 2D cut for shower to vertex distance and dedx
-            "dE/dx, 0 Tracks"                             // dEdx all planes no tracks
+            "Unselected",     // Unselected
+            "In_Time",
+            "Flash_PE",
+            "Reco_Nue",
+            "In_FV",
+            "Vtx_to_Flash",
+            "Shr_to_Vtx",
+            "Track_to_Vtx",
+            "Hit_Thresh",
+            "Hit_Thresh_Y",
+            "Open_Angle",
+            "dEdx",
+            "Shr_Vtx_Dist_gt_1shr",
+            "Hit_per_Lenth",
+            "Trk_Shr_Lengh",
+            "Trk_Containment"
             };
 
 
@@ -425,18 +431,21 @@ public:
     // enums for cut dirs
     enum enum_cut_dirs {
                 k_unselected,        // Unselected 
-                k_swtrig,            // Software Trigger
-                k_slice_id,          // Slice ID
-                k_e_candidate,       // Electron Candidate
-                k_in_fv,             // Reco Nu Vtx (SC Corr) In the FV 
-                k_contained_frac,    // Slice Contained Fraction
-                k_topo_score,        // Topo Score
-                k_cosmic_ip,         // Pandora Cosmic Impact Param 3D
-                k_shower_score,      // Shower Score
-                k_hit_ratio,         // Ratio of shr hits and slice hits
-                k_shr_moliere_avg,   // Shower Moliere Average
-                k_vtx_dist_dedx,     //  2D cut for shower to vertex distance and dEdx. Only applied for > 1 track
-                k_dEdx_max_no_tracks,// dEdx all planes when there is no tracks
+                k_in_time,
+                k_flash_pe,
+                k_reco_nue,
+                k_in_fv,
+                k_vtx_to_flash,
+                k_shr_to_vtx,
+                k_track_to_vtx,
+                k_hit_thresh,
+                k_hit_thresh_y,
+                k_open_angle,
+                k_dedx,
+                k_shr_vtx_dist_gt_1shr,
+                k_hit_per_lenth,
+                k_trk_shr_lengh,
+                k_trk_containment,
                 k_cuts_MAX
                 }; 
 

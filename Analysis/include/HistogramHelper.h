@@ -145,6 +145,9 @@ class HistogramHelper{
         k_reco_shower_energy_cali_rebin,                                        // Calibrated energy of just the leading shower with optimised bins
         k_reco_shr_hits_tot,                                                    // Total number of hits for all showers
         k_reco_shr_hits_y_tot,                                                  // Total number of hits for all showers in the collection plane
+        k_reco_shr_hits_u_tot,                                                  // Total number of hits for all showers in the u plane
+        k_reco_shr_hits_v_tot,                                                  // Total number of hits for all showers in the v plane
+        k_reco_track_shower_ratio,
         k_reco_shr_trkfit_2cm_dEdx_u,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use first 2 cm u plane
         k_reco_shr_trkfit_2cm_dEdx_v,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use first 2 cm v plane
         k_reco_shr_trkfit_2cm_dEdx_y,                                           // dE/dx of the leading shower on the Y plane with the track fitting, use first 2 cm y plane
@@ -192,6 +195,8 @@ class HistogramHelper{
         k_reco_single_bin,                                                      // Just fill with weight. We need this to get the uncertainty on the purity
         k_reco_trk_pid_score,                                                   // The PID score for tracks in the event
         k_reco_pi0mass,                                                         // What does the pi0 mass peak look like in a nuecc enriched sample
+        k_reco_n_tpc_obj,                                                       // Number of tpc objects in the event
+        k_reco_n_tpc_obj_passed,                                                // Number of passed tpc objects in the event
         k_TH1D_MAX
     };
 

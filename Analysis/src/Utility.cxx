@@ -553,9 +553,9 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             config_v.at(k_Run1_Dirt_POT)   = 0.75*config_v.at(k_Run1_Data_POT);
         }
 
-        mc_scale_factor     = config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_MC_POT);
-        dirt_scale_factor   = 0.75*config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_Dirt_POT);
-        ext_scale_factor    = 0.98*config_v.at(k_Run1_Data_trig) / config_v.at(k_Run1_EXT_trig);
+        mc_scale_factor     = 0.1301;
+        dirt_scale_factor   = 0.16411;
+        ext_scale_factor    = 1.0154;
         
         // If fake data then scale to the fake data POT
         if (isfakedata){
@@ -846,9 +846,13 @@ void Utility::CreateDirectory(std::string folder){
     system(command.c_str());
 }
 // -----------------------------------------------------------------------------
-void Utility::Tabulate(bool inFV, std::string interaction, std::string classification, std::string pi0_classification, int type, std::vector<double> &counter_v, double weight) {
+void Utility::Tabulate(bool inFV, std::string interaction, std::string classification, std::string pi0_classification, int type, std::vector<double> &counter_v, double weight, bool &filled) {
 
     if (type == k_mc){
+
+        double weight_temp = weight;
+
+        if (filled == true) weight = 0;
         
         // Require in FV condition
         if (inFV){
@@ -920,6 +924,9 @@ void Utility::Tabulate(bool inFV, std::string interaction, std::string classific
 
         // Total selected MC events
         counter_v.at(k_count_total_mc) += weight;
+
+        // Set the counter that we have already filled
+        filled = true;
     
     }
     else if (type == k_data) {

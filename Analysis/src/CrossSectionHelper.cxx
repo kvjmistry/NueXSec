@@ -626,106 +626,106 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
         return false;
     }
 
-    // *************************************************************************
-    // Unselected---------------------------------------------------------------
-    // *************************************************************************
-    FillCutHists(type, SC, SC.classification, _util.k_unselected );
+    // // *************************************************************************
+    // // Unselected---------------------------------------------------------------
+    // // *************************************************************************
+    // FillCutHists(type, SC, SC.classification, _util.k_unselected );
     
-    // *************************************************************************
-    // Software Trigger -- MC Only  --------------------------------------------
-    // *************************************************************************
-    pass = _scuts.swtrig(SC, type);
-    if(!pass) return false; // Failed the cut!
+    // // *************************************************************************
+    // // Software Trigger -- MC Only  --------------------------------------------
+    // // *************************************************************************
+    // pass = _scuts.swtrig(SC, type);
+    // if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, SC.classification, _util.k_swtrig );
+    // FillCutHists(type, SC, SC.classification, _util.k_swtrig );
 
-    // *************************************************************************
-    // Slice ID ----------------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.slice_id(SC);
-    if(!pass) return false; // Failed the cut!
+    // // *************************************************************************
+    // // Slice ID ----------------------------------------------------------------
+    // // *************************************************************************
+    // pass = _scuts.slice_id(SC);
+    // if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, SC.classification, _util.k_slice_id );
+    // FillCutHists(type, SC, SC.classification, _util.k_slice_id );
     
-    // *************************************************************************
-    // Electron Candidate ------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.e_candidate(SC);
-    if(!pass) return false; // Failed the cut!
+    // // *************************************************************************
+    // // Electron Candidate ------------------------------------------------------
+    // // *************************************************************************
+    // pass = _scuts.e_candidate(SC);
+    // if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, SC.classification, _util.k_e_candidate );
+    // FillCutHists(type, SC, SC.classification, _util.k_e_candidate );
 
-    // *************************************************************************
-    // In FV -------------------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.in_fv(SC);
-    if(!pass) return false; // Failed the cut!
+    // // *************************************************************************
+    // // In FV -------------------------------------------------------------------
+    // // *************************************************************************
+    // pass = _scuts.in_fv(SC);
+    // if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, SC.classification, _util.k_in_fv );
+    // FillCutHists(type, SC, SC.classification, _util.k_in_fv );
     
-    // *************************************************************************
-    // Slice Contained Fraction ------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.contained_frac(SC);
-    if(!pass) return false; // Failed the cut!
+    // // *************************************************************************
+    // // Slice Contained Fraction ------------------------------------------------
+    // // *************************************************************************
+    // pass = _scuts.contained_frac(SC);
+    // if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, SC.classification, _util.k_contained_frac );
+    // FillCutHists(type, SC, SC.classification, _util.k_contained_frac );
 
-    // *************************************************************************
-    // Topological Score -------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.topo_score(SC);
-    if(!pass) return false; // Failed the cut!
+    // // *************************************************************************
+    // // Topological Score -------------------------------------------------------
+    // // *************************************************************************
+    // pass = _scuts.topo_score(SC);
+    // if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, SC.classification, _util.k_topo_score );
+    // FillCutHists(type, SC, SC.classification, _util.k_topo_score );
 
-    // *************************************************************************
-    // Cosmic Impact Parameter -------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.shr_cosmic_IP(SC);
-    if(!pass) return false; // Failed the cut!
+    // // *************************************************************************
+    // // Cosmic Impact Parameter -------------------------------------------------
+    // // *************************************************************************
+    // pass = _scuts.shr_cosmic_IP(SC);
+    // if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, SC.classification, _util.k_cosmic_ip );
+    // FillCutHists(type, SC, SC.classification, _util.k_cosmic_ip );
 
-    // *************************************************************************
-    // Shower Score ------------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.shower_score(SC);
-    if(!pass) return false; // Failed the cut!
+    // // *************************************************************************
+    // // Shower Score ------------------------------------------------------------
+    // // *************************************************************************
+    // pass = _scuts.shower_score(SC);
+    // if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, SC.classification, _util.k_shower_score );
+    // FillCutHists(type, SC, SC.classification, _util.k_shower_score );
 
-    // *************************************************************************
-    // Shower Hit Ratio  -------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.shr_hitratio(SC);
-    if(!pass) return false; // Failed the cut!
+    // // *************************************************************************
+    // // Shower Hit Ratio  -------------------------------------------------------
+    // // *************************************************************************
+    // pass = _scuts.shr_hitratio(SC);
+    // if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, SC.classification, _util.k_hit_ratio );
+    // FillCutHists(type, SC, SC.classification, _util.k_hit_ratio );
 
-    // *************************************************************************
-    // Shower Moliere Average --------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.shr_moliere_avg(SC);
-    if(!pass) return false; // Failed the cut!
+    // // *************************************************************************
+    // // Shower Moliere Average --------------------------------------------------
+    // // *************************************************************************
+    // pass = _scuts.shr_moliere_avg(SC);
+    // if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, SC.classification, _util.k_shr_moliere_avg );
+    // FillCutHists(type, SC, SC.classification, _util.k_shr_moliere_avg );
 
-    // *************************************************************************
-    // 2D cut for Shower to Vertex Distance and dEdx ---------------------------
-    // *************************************************************************
-    pass = _scuts.shr_dist_dEdx_max(SC);
-    if(!pass) return false; // Failed the cut!
+    // // *************************************************************************
+    // // 2D cut for Shower to Vertex Distance and dEdx ---------------------------
+    // // *************************************************************************
+    // pass = _scuts.shr_dist_dEdx_max(SC);
+    // if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, SC.classification, _util.k_vtx_dist_dedx );
+    // FillCutHists(type, SC, SC.classification, _util.k_vtx_dist_dedx );
 
-    // *************************************************************************
-    // dEdx in all planes for 0 track events -----------------------------------
-    // *************************************************************************
-    pass = _scuts.dEdx_max_no_tracks(SC);
-    if(!pass) return false; // Failed the cut!
+    // // *************************************************************************
+    // // dEdx in all planes for 0 track events -----------------------------------
+    // // *************************************************************************
+    // pass = _scuts.dEdx_max_no_tracks(SC);
+    // if(!pass) return false; // Failed the cut!
     
-    FillCutHists(type, SC, SC.classification, _util.k_dEdx_max_no_tracks );
+    // FillCutHists(type, SC, SC.classification, _util.k_dEdx_max_no_tracks );
 
     // **************************************************************************
     return true;

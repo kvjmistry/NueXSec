@@ -70,14 +70,45 @@ public:
 
     Utility _util;
 
-    int   run;                   // Run
-    int   sub;                   // Subrun
-    int   evt;                   // Event
+    int   run{0};                   // Run
+    int   sub{0};                   // Subrun
+    int   evt{0};                   // Event
     
     std::pair<std::string, int> classification; // The event classification e.g nue cc
     std::string genie_interaction;              // The interaction type e.g. nue cc qe
     std::pair<std::string, int> particle_type;  // The truth matched particle of the leading shower
     std::string pi0_classification;             // Stores whether the true interaction has a pi0 in or not e.g. nue cc pi0 or numu cc pi0
+
+    int tpc_obj_counter = 1;
+    int tpc_obj_counter_prev = 0;
+    
+    int number_tpcobj; // number of tpc objects in the event
+
+    int tpc_obj_index;
+
+    std::vector<bool> already_filled; // bool to ensure we can keep track of the neutrino counting per event
+
+    int has_nue;
+    int has_valid_shr;
+    double flash_vtx_dist;
+    double flash_vtx_dist_updated;
+    double flash_vtx_y, flash_vtx_z;
+    double flash_vtx_y_updated, flash_vtx_z_updated;
+
+    int failed_intime_cut;
+    int failed_flash_cut;
+
+    std::vector<double> *flash_time_v = nullptr;
+
+    std::vector<double> *trk_vtx_dist_v = nullptr;
+    std::vector<double> *shr_vtx_dist_v = nullptr;
+    std::vector<double> *sec_shr_vtx_dist_v = nullptr;
+
+    double shr_dedx_Y;            // Shower: dE/dx of the leading shower on the Y plane with the 1x4 cm box method| Plane 2
+    double shr_dedx_V;            // Shower: dE/dx of the leading shower on the V plane with the 1x4 cm box method| Plane 1
+    double shr_dedx_U;            // Shower: dE/dx of the leading shower on the U plane with the 1x4 cm box method| Plane 0
+
+    double shr_len;
 
     double cv_weight;
 
@@ -92,20 +123,20 @@ public:
     float shr_energy_tot_cali;   // Shower: Sum of the energy of the calibrated showers (in GeV). Used only at pre-selection as a “Michel veto”.  does not take into account pi0. Only accounts for the fact the shower could be broken up.
     float shr_energy_cali;       // Shower: Energy of the calibrated shower with the largest number of hits (in GeV)
     
-    float shr_theta;             // Shower: Reconstructed theta angle for the leading shower
-    float shr_phi;               // Shower: Reconstructed phi angle for the leading shower
+    double shr_theta;             // Shower: Reconstructed theta angle for the leading shower
+    double shr_phi;               // Shower: Reconstructed phi angle for the leading shower
     double shr_ang_numi;         // Shower: angle of the reconstructed shower relative to the NuMI target to detector vector
     
     float shr_pca_0;             // Shower: First eigenvalue of the PCAxis of the leading shower
     float shr_pca_1;             // Shower: Second eigenvalue of the PCAxis of the leading shower
     float shr_pca_2;             // Shower: Third eigenvalue of the PCAxis of the leading shower
     
-    float shr_px;                // Shower: X component of the reconstructed momentum of the leading shower (in GeV/c)
-    float shr_py;                // Shower: Y component of the reconstructed momentum of the leading shower (in GeV/c)
-    float shr_pz;                // Shower: Z component of the reconstructed momentum of the leading shower (in GeV/c)
+    double shr_px;                // Shower: X component of the reconstructed momentum of the leading shower (in GeV/c)
+    double shr_py;                // Shower: Y component of the reconstructed momentum of the leading shower (in GeV/c)
+    double shr_pz;                // Shower: Z component of the reconstructed momentum of the leading shower (in GeV/c)
     double shr_p;                // Shower: reconstructed momentum of the leading shower (in GeV/c)
     
-    float shr_openangle;         // Shower: Opening angle of the shower -- variable does not work...
+    double shr_openangle;         // Shower: Opening angle of the shower -- variable does not work...
     
     float shr_tkfit_start_x;     // Shower: Start x coordinate of the leading shower obtained with the track fitting
     float shr_tkfit_start_y;     // Shower: Start y coordinate of the leading shower obtained with the track fitting
@@ -114,9 +145,9 @@ public:
     float shr_tkfit_theta;       // Shower: Track angle of the leading shower obtained with the track fitting
     float shr_tkfit_phi;         // Shower: Phi angle of the leading shower obtained with the track fitting
     
-    float shr_start_x;           // Shower: Start x coordinate of the leading shower
-    float shr_start_y;           // Shower: Start y coordinate of the leading shower
-    float shr_start_z;           // Shower: Start z coordinate of the leading shower
+    double shr_start_x;           // Shower: Start x coordinate of the leading shower
+    double shr_start_y;           // Shower: Start y coordinate of the leading shower
+    double shr_start_z;           // Shower: Start z coordinate of the leading shower
     
     float shr_tkfit_dedx_Y;      // Shower: dE/dx of the leading shower on the Y plane with the track fitting
     float shr_tkfit_dedx_V;      // Shower: dE/dx of the leading shower on the V plane with the track fitting
@@ -183,7 +214,7 @@ public:
     float tksh_distance;        // Distance between leading shower vertex and longest track vertex
     float tksh_angle;           // Angle between leading shower vertex and longest track vertex
 
-    float shr_distance;         // Shower: Distance between leading shower vertex and reconstructed neutrino vertex. Labelled as shower_vtx_dist in technote
+    double shr_distance;         // Shower: Distance between leading shower vertex and reconstructed neutrino vertex. Labelled as shower_vtx_dist in technote
     float shr_score;            // Shower: Pandora track score for the leading shower
     
     int   shr_bkt_pdg;          // Shower: PDG code of the MCParticle matched to the leading shower
@@ -191,7 +222,7 @@ public:
     float shr_bkt_completeness; // Shower: Completeness of the leading shower - e.g. how many hits from the true electron were missed
     float shr_bkt_E;            // Shower: Energy of the MCParticle matched to the leading shower
     
-    float trk_len;              // Track: Length of the longest track
+    double trk_len;              // Track: Length of the longest track
     float trk_theta;            // Track: Reconstructed theta angle for the longest track
     float trk_phi;              // Track: Reconstructed phi angle for the longest track
     float trk_energy;           // Track: Energy of the longest track assuming it's a proton and using stopping power in LAr 
@@ -297,8 +328,8 @@ public:
     int   nu_pdg;      // True neutrino PDG
     int   ccnc;        // True CC or NC Interaction
     int   interaction; // True Interaction code from GENIE
-    float nu_e;        // True Neutrino Energy [GeV]
-    float nu_pt;       // True Neutrino Transverse Energy of Interaction
+    double nu_e;        // True Neutrino Energy [GeV]
+    double nu_pt;       // True Neutrino Transverse Energy of Interaction
     float theta;       // True Neutrino Theta
     bool  isVtxInFiducial; // True Neutrino Vertex in FV
     double nu_p;
@@ -314,10 +345,10 @@ public:
     // in TPC or deposit at least 100 MeV in TPC
     bool truthFiducial;
     
-    float true_nu_vtx_t;         // True Neutrino Vtx t
-    float true_nu_vtx_x;         // True Neutrino Vtx x
-    float true_nu_vtx_y;         // True Neutrino Vtx y
-    float true_nu_vtx_z;         // True Neutrino Vtx z
+    double true_nu_vtx_t;         // True Neutrino Vtx t
+    double true_nu_vtx_x;         // True Neutrino Vtx x
+    double true_nu_vtx_y;         // True Neutrino Vtx y
+    double true_nu_vtx_z;         // True Neutrino Vtx z
     float true_nu_vtx_sce_x;     // True Neutrino Vtx Space Charge x
     float true_nu_vtx_sce_y;     // True Neutrino Vtx Space Charge y
     float true_nu_vtx_sce_z;     // True Neutrino Vtx Space Charge z
@@ -326,9 +357,9 @@ public:
     float true_nu_pz;            // True Neutrino Pz
     double true_effective_angle; // True angle between electron and neutrino vectors
     
-    float reco_nu_vtx_x;         // Reco Neutrino Vtx x
-    float reco_nu_vtx_y;         // Reco Neutrino Vtx y
-    float reco_nu_vtx_z;         // Reco Neutrino Vtx z
+    double reco_nu_vtx_x;         // Reco Neutrino Vtx x
+    double reco_nu_vtx_y;         // Reco Neutrino Vtx y
+    double reco_nu_vtx_z;         // Reco Neutrino Vtx z
     float reco_nu_vtx_sce_x;     // Reco Reconstructed neutrino interaction vertex in (x,y,z) coordinates. The space charged correction is applied
     float reco_nu_vtx_sce_y;     // Reco Neutrino Vtx Space Charge y
     float reco_nu_vtx_sce_z;     // Reco Neutrino Vtx Space Charge z
@@ -339,7 +370,7 @@ public:
     float muon_p;  // Muon Purity
      
     int   nelec;   // Truth Number of electrons
-    float elec_e;  // Truth Electron Energy
+    double elec_e;  // Truth Electron Energy
     float elec_c;  // Electron Completeness
     float elec_p;  // Electron Purity
     
@@ -398,8 +429,8 @@ public:
     int   filter_ncpi0;
     int   filter_pi0;
     int   filter_ccinclusive;
-    float flash_pe;                     // Reco Flash PE
-    float flash_time;                   // Reco Flash Time
+    double flash_pe;                     // Reco Flash PE
+    double flash_time;                   // Reco Flash Time
     float nu_flashmatch_score;          // Reco Neutrino Flashmatch Score
     float best_cosmic_flashmatch_score; // Reco Best Cosmic Flashmatch Score
     
@@ -456,7 +487,7 @@ public:
     int   slothnhits;  // Slice Other Number of Hits
     
     float nu_completeness_from_pfp; // Neutrino Completeness from PFP (how many of the hits reconstructed for the neutrino were from the true neutrino? )
-    float nu_purity_from_pfp;       // Neutrino Purity from PFP (how many out of all the hits are the neutrino)
+    double nu_purity_from_pfp;       // Neutrino Purity from PFP (how many out of all the hits are the neutrino)
     int   n_tracks_pandora;         // Number of Tracks Returned by Pandora
     
     double _closestNuCosmicDist; // Distance between the neutrino vertex and (closest?) cosmic trajectory tagged from CRT

@@ -288,8 +288,10 @@ void HistogramHelper::InitHistograms(){
             // Total number of hits for the leading shower
             TH1D_hists.at(k_reco_shr_hits_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 1600);
             
-            // Total number of hits for the leading shower in the collection plane
-            TH1D_hists.at(k_reco_shr_hits_y_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_y_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 1600);
+             // Total number of hits for the leading shower in the collection plane
+            TH1D_hists.at(k_reco_shr_hits_y_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_y_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 1000);
+            TH1D_hists.at(k_reco_shr_hits_u_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_u_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 1000);
+            TH1D_hists.at(k_reco_shr_hits_v_tot).at(i).at(j) = new TH1D (Form("h_reco_shr_hits_v_tot_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 30, 0, 1000);
 
             // Shower Track fit dEdx variables
             TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_u).at(i).at(j)   = new TH1D ( Form("h_reco_shr_trkfit_2cm_dEdx_u_%s_%s",_util.cut_dirs.at(i).c_str(),     _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
@@ -392,6 +394,15 @@ void HistogramHelper::InitHistograms(){
             TH1D_hists.at(k_reco_trk_pid_score).at(i).at(j) = new TH1D ( Form("h_reco_trk_pid_score_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 25, -1, 1);
 
             TH1D_hists.at(k_reco_pi0mass).at(i).at(j) = new TH1D ( Form("h_reco_pi0mass_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 500);
+
+            // Number of tpc objects in the event
+            TH1D_hists.at(k_reco_n_tpc_obj).at(i).at(j) = new TH1D ( Form("h_reco_n_tpc_obj_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 10, 0, 10);
+
+            // Number of tpc objects that passed in the event
+            TH1D_hists.at(k_reco_n_tpc_obj_passed).at(i).at(j) = new TH1D ( Form("h_reco_n_tpc_obj_passed_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 10, 0, 10);
+
+            // Track shower ratio
+            TH1D_hists.at(k_reco_track_shower_ratio).at(i).at(j) = new TH1D (Form("h_reco_track_shower_ratio_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 3);
 
         }
         
@@ -722,156 +733,55 @@ void HistogramHelper::InitHistograms(){
 void HistogramHelper::FillHists(int type, int classification_index, std::string interaction, int _par_type, int cut_index, SliceContainer SC, double weight){
 
     // Check if the interaction was in the FV
-    bool true_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z);
+    bool true_in_fv = _util.in_fv(SC.true_nu_vtx_x, SC.true_nu_vtx_y, SC.true_nu_vtx_z);
 
     // Get the trkfit dedx max variable
     double dedx_max = SC.GetdEdxMax();
     
-    // Now fill the histograms!
+    double track_shr_ratio = SC.trk_len / SC.shr_len;
+    
+    // // Now fill the histograms!
     TH1D_hists.at(k_reco_vtx_x).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_x, weight);
     TH1D_hists.at(k_reco_vtx_y).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_y, weight);
     TH1D_hists.at(k_reco_vtx_z).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_z, weight);
-
-    TH1D_hists.at(k_reco_vtx_x_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_x, weight);
-    TH1D_hists.at(k_reco_vtx_y_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_y, weight);
-    TH1D_hists.at(k_reco_vtx_z_sce).at(cut_index).at(classification_index)->Fill(SC.reco_nu_vtx_sce_z, weight);
- 
-    TH1D_hists.at(k_reco_leading_mom).at(cut_index).at(classification_index)->Fill(SC.shr_p, weight);
     
-    TH1D_hists.at(k_reco_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.shr_distance, weight);
-
-    TH1D_hists.at(k_reco_track_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.trk_distance, weight);
+    // TH1D_hists.at(k_reco_leading_mom).at(cut_index).at(classification_index)->Fill(reco_shr_p, weight);
+    for (unsigned int u = 0; u < SC.shr_vtx_dist_v->size(); u++){
+        TH1D_hists.at(k_reco_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.shr_vtx_dist_v->at(u), weight);
+    }
     
-    TH1D_hists.at(k_reco_shr_hits_max).at(cut_index).at(classification_index)->Fill(SC.shr_hits_max, weight);
     
-    TH1D_hists.at(k_reco_n_track_contained).at(cut_index).at(classification_index)->Fill(SC.n_tracks_contained, weight);
+    TH1D_hists.at(k_reco_leading_shower_phi).at(cut_index).at(classification_index)->Fill(SC.shr_phi, weight);
     
-    TH1D_hists.at(k_reco_n_shower_contained).at(cut_index).at(classification_index)->Fill(SC.n_showers_contained, weight);
-    
-    TH1D_hists.at(k_reco_leading_shower_phi).at(cut_index).at(classification_index)->Fill(SC.shr_phi * 180/3.14159, weight);
-    
-    TH1D_hists.at(k_reco_leading_shower_theta).at(cut_index).at(classification_index)->Fill(SC.shr_theta * 180/3.14159, weight);
-    
-    TH1D_hists.at(k_reco_leading_shower_cos_theta).at(cut_index).at(classification_index)->Fill(std::cos(SC.shr_theta), weight);
+    TH1D_hists.at(k_reco_leading_shower_theta).at(cut_index).at(classification_index)->Fill(SC.shr_theta, weight);
     
     TH1D_hists.at(k_reco_shower_multiplicity).at(cut_index).at(classification_index)->Fill(SC.n_showers, weight);
     
     TH1D_hists.at(k_reco_track_multiplicity).at(cut_index).at(classification_index)->Fill(SC.n_tracks, weight);
 
-    TH1D_hists.at(k_reco_topological_score).at(cut_index).at(classification_index)->Fill(SC.topological_score, weight);
-
-    TH1D_hists.at(k_reco_track_shower_dist).at(cut_index).at(classification_index)->Fill(SC.tksh_distance, weight);
-
-    if (SC.n_tracks > 0) TH1D_hists.at(k_reco_track_shower_angle).at(cut_index).at(classification_index)->Fill(SC.tksh_angle*180/3.14159, weight);
-
-    TH1D_hists.at(k_reco_hits_ratio).at(cut_index).at(classification_index)->Fill(SC.hits_ratio, weight);
-
-    if (SC.shr_hits_max > 50) TH1D_hists.at(k_reco_hits_ratio_th).at(cut_index).at(classification_index)->Fill(SC.hits_ratio, weight);
-
-    if (SC.slnhits > 0) TH1D_hists.at(k_reco_hits_ratio_ldg).at(cut_index).at(classification_index)->Fill(double(SC.shr_hits_max)/double(SC.slnhits), weight);
-    
-    if (SC.shr_hits_max > 50 && SC.slnhits > 0) TH1D_hists.at(k_reco_hits_ratio_ldg_th).at(cut_index).at(classification_index)->Fill(double(SC.shr_hits_max)/double(SC.slnhits), weight);
-
-    TH1D_hists.at(k_reco_shower_score).at(cut_index).at(classification_index)->Fill(SC.shr_score, weight);
-
-    TH1D_hists.at(k_reco_track_score).at(cut_index).at(classification_index)->Fill(SC.trk_score, weight);
-
-    TH1D_hists.at(k_reco_shower_energy_cali).at(cut_index).at(classification_index)->Fill(SC.shr_energy_cali, weight);
-    TH1D_hists.at(k_reco_shower_energy_cali_rebin).at(cut_index).at(classification_index)->Fill(SC.shr_energy_cali, weight);
+    if (SC.n_tracks > 0) TH1D_hists.at(k_reco_track_shower_ratio).at(cut_index).at(classification_index)->Fill(track_shr_ratio, weight);
 
     TH1D_hists.at(k_reco_shr_hits_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_tot, weight);
+    TH1D_hists.at(k_reco_shr_hits_max).at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot + SC.shr_hits_u_tot + SC.shr_hits_v_tot, weight);
+    
 
     TH1D_hists.at(k_reco_shr_hits_y_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_y_tot, weight);
+    TH1D_hists.at(k_reco_shr_hits_u_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_u_tot, weight);
+    TH1D_hists.at(k_reco_shr_hits_v_tot).at(cut_index).at(classification_index)->Fill(SC.shr_hits_v_tot, weight);
 
-    TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_u).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_2cm_dedx_U, weight);
-    TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_2cm_dedx_V, weight);    
-    TH1D_hists.at(k_reco_shr_trkfit_2cm_dEdx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_2cm_dedx_Y, weight);
-    
-    TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx_u).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap05_dedx_U, weight);
-    TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap05_dedx_V, weight);
-    TH1D_hists.at(k_reco_shr_trkfit_gap05_dEdx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap05_dedx_Y, weight);
-    
-    
-    TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx_u).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap10_dedx_U, weight);
-    TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap10_dedx_V, weight);
-    TH1D_hists.at(k_reco_shr_trkfit_gap10_dEdx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_gap10_dedx_Y, weight);
+    TH1D_hists.at(k_reco_shr_tkfit_dedx_v).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_V, weight);    
+    TH1D_hists.at(k_reco_shr_tkfit_dedx_u).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_U, weight);
+    TH1D_hists.at(k_reco_shr_tkfit_dedx_y).at(cut_index).at(classification_index)->Fill(SC.shr_dedx_Y, weight);
 
-
-    TH1D_hists.at(k_reco_opfilter_beam).at(cut_index).at(classification_index)->Fill(SC.opfilter_pe_beam, weight);
-    TH1D_hists.at(k_reco_opfilter_veto).at(cut_index).at(classification_index)->Fill(SC.opfilter_pe_veto, weight);
-    
-    TH1D_hists.at(k_reco_softwaretrig).at(cut_index).at(classification_index)->Fill(SC.swtrig, weight);
-    
-    TH1D_hists.at(k_reco_nslice).at(cut_index).at(classification_index)->Fill(SC.nslice, weight);
-
-    TH1D_hists.at(k_reco_slclustfrac).at(cut_index).at(classification_index)->Fill(SC.slclustfrac, weight);
-
-    TH1D_hists.at(k_reco_cosmicIP).at(cut_index).at(classification_index)->Fill(SC.CosmicIP, weight);
-    TH1D_hists.at(k_reco_CosmicIPAll3D).at(cut_index).at(classification_index)->Fill(SC.CosmicIPAll3D, weight);
-    TH1D_hists.at(k_reco_CosmicDirAll3D).at(cut_index).at(classification_index)->Fill(SC.CosmicDirAll3D, weight);
-
-    TH1D_hists.at(k_reco_shr_tkfit_dedx_u).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_U, weight);
-    TH1D_hists.at(k_reco_shr_tkfit_dedx_v).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_V, weight);
-    TH1D_hists.at(k_reco_shr_tkfit_dedx_y).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
-    TH1D_hists.at(k_reco_shr_tkfit_dedx_max).at(cut_index).at(classification_index)->Fill(dedx_max, weight);
-    if (SC.n_tracks > 0) TH1D_hists.at(k_reco_shr_tkfit_dedx_max_with_tracks).at(cut_index).at(classification_index)->Fill(dedx_max, weight);
-    
-    if (SC.n_tracks == 0) TH1D_hists.at(k_reco_shr_tkfit_dedx_y_no_tracks).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
-    if (SC.n_tracks == 0) TH1D_hists.at(k_reco_shr_tkfit_dedx_max_no_tracks).at(cut_index).at(classification_index)->Fill(dedx_max,  weight);
-
-    // Split the dedx into good and bad angles
-    
-    if (SC.shr_theta * 180/3.14159 > 80 && SC.shr_theta * 180/3.14159 < 100) {
-        TH1D_hists.at(k_reco_shr_tkfit_dedx_y_bad_theta).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
-        TH1D_hists.at(k_reco_shr_tkfit_dedx_v_bad_theta).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_V, weight);
-        TH1D_hists.at(k_reco_shr_tkfit_dedx_u_bad_theta).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_U, weight);
-    }
-    else {
-        TH1D_hists.at(k_reco_shr_tkfit_dedx_y_good_theta).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
-    }
-     
-
-    TH1D_hists.at(k_reco_shrsubclusters).at(cut_index).at(classification_index)->Fill(SC.shrsubclusters0 + SC.shrsubclusters1 + SC.shrsubclusters2, weight);
-
-    TH1D_hists.at(k_reco_shrmoliereavg).at(cut_index).at(classification_index)->Fill(SC.shrmoliereavg, weight);
-    TH1D_hists.at(k_reco_shrmoliererms).at(cut_index).at(classification_index)->Fill(SC.shrmoliererms, weight);
-    
-    TH1D_hists.at(k_reco_shrPCA1CMed_5cm).at(cut_index).at(classification_index)->Fill(SC.shrPCA1CMed_5cm, weight);
-    
-    TH1D_hists.at(k_reco_shrMCSMom).at(cut_index).at(classification_index)->Fill(SC.shrMCSMom, weight);
-
-    TH1D_hists.at(k_reco_closestNuCosmicDist).at(cut_index).at(classification_index)->Fill(SC._closestNuCosmicDist, weight);
+    TH1D_hists.at(k_reco_shrmoliereavg).at(cut_index).at(classification_index)->Fill(SC.shr_openangle, weight);
 
     if (SC.n_tracks > 0) TH1D_hists.at(k_reco_trk_len).at(cut_index).at(classification_index)->Fill(SC.trk_len, weight);
 
-    TH1D_hists.at(k_reco_nu_e).at(cut_index).at(classification_index)->Fill(SC.reco_e, weight);
+    // if we havent already filled the histogram then fill this plot
+    if (SC.already_filled.at(cut_index) == false) TH1D_hists.at(k_reco_n_tpc_obj).at(cut_index).at(classification_index)->Fill(SC.number_tpcobj, weight);
 
-    TH1D_hists.at(k_reco_contained_fraction).at(cut_index).at(classification_index)->Fill(SC.contained_fraction, weight);
-
-    TH1D_hists.at(k_reco_run_number).at(cut_index).at(classification_index)->Fill(SC.run, weight);
-
-    TH1D_hists.at(k_reco_nu_purity_from_pfp).at(cut_index).at(classification_index)->Fill(SC.nu_purity_from_pfp, weight);
-
-    TH1D_hists.at(k_reco_crtveto).at(cut_index).at(classification_index)->Fill(SC.crtveto, weight);
-
-    TH1D_hists.at(k_reco_crthitpe).at(cut_index).at(classification_index)->Fill(SC.crthitpe, weight);
-
-    TH1D_hists.at(k_reco_shr_ang_numi).at(cut_index).at(classification_index)->Fill(SC.shr_ang_numi, weight);
-
-    TH1D_hists.at(k_reco_single_bin).at(cut_index).at(classification_index)->Fill(weight);
-
-    TH1D_hists.at(k_reco_effective_angle).at(cut_index).at(classification_index)->Fill(SC.effective_angle, weight);
-    TH1D_hists.at(k_reco_effective_angle_rebin).at(cut_index).at(classification_index)->Fill(SC.effective_angle, weight);
+    if (SC.tpc_obj_index == 0) TH1D_hists.at(k_reco_n_tpc_obj_passed).at(cut_index).at(classification_index)->Fill(SC.tpc_obj_counter_prev, weight);
     
-    TH1D_hists.at(k_reco_effective_cosangle).at(cut_index).at(classification_index)->Fill(SC.cos_effective_angle, weight);
-    TH1D_hists.at(k_reco_effective_cosangle_rebin).at(cut_index).at(classification_index)->Fill(SC.cos_effective_angle, weight);
-    
-    for (unsigned int trk = 0; trk < SC.trk_llr_pid_score_v->size(); trk++){
-        TH1D_hists.at(k_reco_trk_pid_score).at(cut_index).at(classification_index)->Fill(SC.trk_llr_pid_score_v->at(trk), weight);
-    }
-
-    if (SC.n_showers > 1)
-        TH1D_hists.at(k_reco_pi0mass).at(cut_index).at(classification_index)->Fill(SC.pi0_mass_Y, weight);
 
     
     // -------------------------------------------------------------------------
@@ -1151,7 +1061,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
     // -----------------------------------------------------------------------------
 
     // Only do this for after the software trigger
-    if (cut_index == _util.k_swtrig){
+    // if (cut_index == _util.k_swtrig){
 
         // Flash histograms
         if (type == _util.k_mc){
@@ -1218,62 +1128,9 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
             }
         }
         
-    }
+    // }
 
-    // Fill 2D histograms for signal background rejection -- only for MC, dirt and EXT
-    if (_type != _util.k_data){ 
 
-        // For the comparisons of dedx and shr vtx distance with the moliere average we make the histogram just before the cut is applied
-        if (cut_index == _util.k_shr_moliere_avg - 1 ){
-            
-            // This is the signal -- dont include the unmathced cases since they should all be removed by this point
-            if (classification_index == _util.k_nue_cc || classification_index == _util.k_nuebar_cc){
-                TH2D_hists.at(k_reco_shr_dEdx_moliere).at(_util.k_signal)->Fill(SC.shr_tkfit_dedx_Y, SC.shrmoliereavg, weight);
-                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_moliere_shr_dist).at(_util.k_signal)->Fill(SC.shrmoliereavg, SC.shr_distance, weight);
-            }
-            // This is the background
-            else {
-                TH2D_hists.at(k_reco_shr_dEdx_moliere).at(_util.k_background)->Fill(SC.shr_tkfit_dedx_Y, SC.shrmoliereavg, weight);
-                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_moliere_shr_dist).at(_util.k_background)->Fill(SC.shrmoliereavg, SC.shr_distance, weight);
-            }
-
-        }
-        
-        // For the dEdx vs shower distance we make the histogram just before the cut is applied
-        if (cut_index == _util.k_vtx_dist_dedx - 1 ){
-            
-            // This is the signal -- dont include the unmathced cases since they should all be removed by this point
-            if (classification_index == _util.k_nue_cc || classification_index == _util.k_nuebar_cc){
-                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(_util.k_signal)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
-                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_max_shr_dist).at(_util.k_signal)->Fill(dedx_max, SC.shr_distance, weight);
-                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist_large_dedx).at(_util.k_signal)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
-            }
-            // This is the background
-            else {
-                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(_util.k_background)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
-                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_max_shr_dist).at(_util.k_background)->Fill(dedx_max, SC.shr_distance, weight);
-                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist_large_dedx).at(_util.k_background)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
-            }
-
-        }
-
-        // For the dEdx vs shower distance we make the histogram after the cut is applied
-        if (cut_index == _util.k_vtx_dist_dedx ){
-            
-            // This is the signal -- dont include the unmathced cases since they should all be removed by this point
-            if (classification_index == _util.k_nue_cc || classification_index == _util.k_nuebar_cc){
-                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist_post).at(_util.k_signal)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
-                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_max_shr_dist_post).at(_util.k_signal)->Fill(dedx_max, SC.shr_distance, weight);
-            }
-            // This is the background
-            else {
-                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_shr_dist_post).at(_util.k_background)->Fill(SC.shr_tkfit_dedx_Y, SC.shr_distance, weight);
-                if (SC.n_tracks > 0) TH2D_hists.at(k_reco_shr_dEdx_max_shr_dist_post).at(_util.k_background)->Fill(dedx_max, SC.shr_distance, weight);
-            }
-
-        }
-
-    }
     
 
 }

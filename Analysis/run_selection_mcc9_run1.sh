@@ -13,10 +13,11 @@ fi
 
 if [ -z "$1" ]; then
   # Run the selection
-  mc="./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root"
-  data="./nuexsec --run 1 --data ../ntuples/neutrinoselection_filt_run1_beamon_beamgood.root"
-  ext="./nuexsec --run 1 --ext ../ntuples/neutrinoselection_filt_run1_beamoff.root"
-  dirt="./nuexsec --run 1 --dirt ../ntuples/neutrinoselection_filt_run1_dirt_overlay_newtune.root"
+ mc="./nuexsec --run 1 --mc ../files/f_mc_mcc8.root"
+ data="./nuexsec --run 1 --data ../files/f_data_mcc8.root"
+ ext="./nuexsec --run 1 --ext ../files/f_ext_mcc8.root"
+ dirt="./nuexsec --run 1 --dirt ../files/f_dirt_mcc8.root"
+
 
   # This runs each of the strings above in parallel to maximise cpu usage
   eval $mc | tee log/run1_mc.log | sed -e 's/^/[MC] /' &
@@ -34,9 +35,6 @@ if [ -z "$1" ]; then
     cat "$i" >> log/run1.log 
   done
 
-  # Overwrite the Nue cc events with a higher stats version
-  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root --intrinsic intrinsic
-
   # Print the selection
   ./nuexsec --run 1 --printonly --printall | tee -a log/run1.log 
   
@@ -48,10 +46,10 @@ if [ -z "$1" ]; then
   # ./nuexsec --run 1 --hist files/nuexsec_run1_merged.root --plotsys tot
 
   # Merge the ttrees to one file
-  root -l -b -q 'merge/merge_uneaventrees.C("1", true, false, "files/trees/nuexsec_selected_tree_mc_run1.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "")'
+  # root -l -b -q 'merge/merge_uneaventrees.C("1", true, false, "files/trees/nuexsec_selected_tree_mc_run1.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "")'
 
   # Now run the cross section calculator
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode default --xsec_smear $sm | tee -a log/run1.log 
+  # ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode default --xsec_smear $sm | tee -a log/run1.log 
 fi
 # ---------------------
 
