@@ -126,6 +126,7 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
             Save1DHists(Form("plots/run%s/Truth/true_nue_py_%s.pdf",    run_period, cut_type.c_str()), "h_true_nue_py", cut_type);
             Save1DHists(Form("plots/run%s/Truth/true_nue_pz_%s.pdf",    run_period, cut_type.c_str()), "h_true_nue_pz", cut_type);
             Save1DHists(Form("plots/run%s/Truth/true_nue_e_%s.pdf",     run_period, cut_type.c_str()), "h_true_nue_e", cut_type);
+             Save1DHists(Form("plots/run%s/Truth/true_elec_e_%s.pdf",     run_period, cut_type.c_str()), "h_true_elec_e", cut_type);
             Save1DHists(Form("plots/run%s/Truth/true_nue_p_%s.pdf",     run_period, cut_type.c_str()), "h_true_nue_p", cut_type);
             Save1DHists(Form("plots/run%s/Truth/true_vtx_x_%s.pdf",     run_period, cut_type.c_str()), "h_true_vtx_x", cut_type);
             Save1DHists(Form("plots/run%s/Truth/true_vtx_y_%s.pdf",     run_period, cut_type.c_str()), "h_true_vtx_y", cut_type);
@@ -144,6 +145,7 @@ void histogram_plotter::MakeHistograms(const char *hist_file_name, const char *r
             Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_%s.pdf",            run_period, cut_type.c_str()), "h_true_nue_vtx_z_y", cut_type);
             Save2DHists(Form("plots/run%s/Truth/h_true_nue_vtx_z_y_sce_%s.pdf",        run_period, cut_type.c_str()), "h_true_nue_vtx_z_y_sce", cut_type);
             Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s.pdf",     run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type);
+            Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_shr_hits_%s.pdf",     run_period, cut_type.c_str()), "h_true_elec_E_shr_hits", cut_type);
             Save2DHists(Form("plots/run%s/Truth/h_true_nu_E_reco_nu_E_%s.pdf",         run_period, cut_type.c_str()), "h_true_nu_E_reco_nu_E", cut_type);
             Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_x_reco_nu_vtx_x_%s.pdf", run_period, cut_type.c_str()), "h_true_nu_vtx_x_reco_nu_vtx_x", cut_type);
             Save2DHists(Form("plots/run%s/Truth/h_true_nu_vtx_y_reco_nu_vtx_y_%s.pdf", run_period, cut_type.c_str()), "h_true_nu_vtx_y_reco_nu_vtx_y", cut_type);
@@ -2282,7 +2284,7 @@ void histogram_plotter::Save2DHists(const char *print_name, const char *histname
     if (hist == NULL)
         std::cout << "couldn't get the hist!" << std::endl;
 
-    TCanvas *c = new TCanvas();
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
     gPad->SetFixedAspectRatio();
 
     hist->SetStats(kFALSE);
@@ -2295,6 +2297,7 @@ void histogram_plotter::Save2DHists(const char *print_name, const char *histname
     Draw_Run_Period(c);
 
     c->Print(print_name);
+    delete c;
 }
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

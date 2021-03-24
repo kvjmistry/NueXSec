@@ -569,7 +569,8 @@ bool selection::ApplyCuts(int type, int ievent,std::vector<std::vector<double>> 
 
     if (SC.tpc_obj_index == 0) SC.tpc_obj_counter_prev = 0; // Set back to 0
     else                       SC.tpc_obj_counter_prev++;   // Add to counter
-            
+        
+    // if (( SC.nu_pdg == 12 || SC.nu_pdg == -12 ) && SC.nu_e < 0.3) std::cout << "\033[0;33m" << SC.nu_e << "\033[0m" << std::endl;
 
     // ************************************************************************n*
     return true;

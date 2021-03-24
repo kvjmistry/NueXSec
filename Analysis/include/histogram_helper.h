@@ -209,6 +209,7 @@ class histogram_helper{
         k_true_nue_py,        // True nue py
         k_true_nue_pz,        // True nue pz
         k_true_nue_e,         // True nue energy
+        k_true_elec_e,        // True electron energy
         k_true_nue_p,         // True nue momentum
         k_true_vtx_x,         // True Vertex X
         k_true_vtx_y,         // True Vertex Y
@@ -240,6 +241,7 @@ class histogram_helper{
         k_true_nue_vtx_z_y,
         k_true_nue_vtx_z_y_sce,
         k_true_elec_E_reco_elec_E,
+        k_true_elec_E_shr_hits,
         k_true_nu_E_reco_nu_E,
         k_true_nu_vtx_x_reco_nu_vtx_x,
         k_true_nu_vtx_y_reco_nu_vtx_y,
