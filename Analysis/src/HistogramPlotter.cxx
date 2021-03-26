@@ -1152,10 +1152,10 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         // h_ratio->GetYaxis()->SetRangeUser(-0.5,0.5);
         // h_ratio->GetYaxis()->SetRangeUser(-0.2, 0.2);
 
-        // For ratio
-        if (cut_name == "Unselected" || cut_name == "SoftwareTrig"  || cut_name == "Slice_ID")
-            h_ratio->GetYaxis()->SetRangeUser(0.8, 1.2);
-        else
+        // // For ratio
+        // if (cut_name == "Unselected" || cut_name == "SoftwareTrig"  || cut_name == "Slice_ID")
+        //     h_ratio->GetYaxis()->SetRangeUser(0.8, 1.2);
+        // else
             h_ratio->GetYaxis()->SetRangeUser(0, 2.0);
 
         h_ratio->GetYaxis()->SetTitle("#frac{Beam-On}{(MC + Beam-Off)}");
@@ -1183,7 +1183,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     }
 
     // Draw the run period on the plot
-    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
+    // _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
 
     // Draw variation mode if in that mode
     Draw_VarMode(c);
@@ -2022,7 +2022,9 @@ void HistogramPlotter::MakeEfficiencyPlot(const char *print_name) {
     h_pur->GetXaxis()->SetTickLength(0.00);
 
     // Draw the run period on the plot
-    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+    // _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+
+    _util.Draw_ubooneSim(c, 0.33, 0.925, 0.33, 0.905);
 
     c->Print(print_name);
 
@@ -2604,7 +2606,9 @@ void HistogramPlotter::Plot2D_Signal_Background(const char *print_name, const ch
     leg_stack->Draw();
 
     // Draw the run period on the plot
-    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
+    // _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
+
+    _util.Draw_ubooneSim(c, 0.33, 0.92, 0.33, 0.90);
 
     c->Print(print_name);
 }

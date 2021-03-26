@@ -1090,6 +1090,8 @@ void Utility::Draw_Data_POT(TCanvas *c, double pot, double x1, double y1, double
 
     pt = new TPaveText(x1, y1, x2, y2, "NDC");
     pt->AddText(Form("MicroBooNE NuMI Data: %2.1f#times10^{20} POT", POT));
+    // pt = new TPaveText(x1+0.05, y1, x2+0.05, y2, "NDC");
+    // pt->AddText(Form("MicroBooNE In Progress, NuMI Data: %2.1f#times10^{20} POT", POT));
     pt->SetBorderSize(0);
     pt->SetFillColor(0);
     pt->SetFillStyle(0);
@@ -1106,6 +1108,7 @@ void Utility::Draw_ubooneSim(TCanvas *c, double x1, double y1, double x2, double
 
     pt = new TPaveText(x1, y1, x2, y2,"NDC");
     pt->AddText("MicroBooNE Simulation");
+    // pt->AddText("MicroBooNE Simulation In Progress");
     pt->SetTextColor(kBlack);
     pt->SetBorderSize(0);
     pt->SetFillColor(0);

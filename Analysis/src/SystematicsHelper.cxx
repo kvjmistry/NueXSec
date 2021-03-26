@@ -207,7 +207,7 @@ void SystematicsHelper::MakeHistograms(){
 
             for(unsigned int j=0; j < _util.vec_hist_name.size(); j++){
                     
-                SysVariations(j, Form("plots/run%s/detvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()), i, _util.vec_axis_label.at(j).c_str());
+                SysVariations(j, Form("plots/run%s/detvar/comparisons/cuts/%s/%s.pdf", _util.run_period, _util.cut_dirs.at(i).c_str(), _util.vec_hist_name.at(j).c_str()), i, _util.vec_axis_label.at(j).c_str(), true);
 
             }
         }
@@ -286,7 +286,7 @@ void SystematicsHelper::MakeHistograms(){
 
 }
 // ----------------------------------------------------------------------------
-void SystematicsHelper::SysVariations(int hist_index, const char* print_name, int cut, const char* x_axis_name){
+void SystematicsHelper::SysVariations(int hist_index, const char* print_name, int cut, const char* x_axis_name, bool plotdata){
 
     // ------------------------------------------------------------
     // Some initial configurations and work around fixes
@@ -303,6 +303,26 @@ void SystematicsHelper::SysVariations(int hist_index, const char* print_name, in
     hist.resize(k_vars_MAX);
     hist_diff.resize(k_vars_MAX);
     hist_ratio.resize(k_vars_MAX);
+
+    // Get the data histogram
+    TFile *f_data;
+    TH1D *h_data, *h_dirt, *h_ext;
+
+    if (plotdata){
+        f_data= TFile::Open("files/nuexsec_run1_merged.root", "READ");
+        _util.GetHist(f_data, h_data, Form("Stack/%s/%s/%s_%s_%s", _util.cut_dirs.at(cut).c_str(), "data", _util.vec_hist_name.at(hist_index).c_str(), _util.cut_dirs.at(cut).c_str(), "data"));
+        _util.GetHist(f_data, h_dirt, Form("Stack/%s/%s/%s_%s_%s", _util.cut_dirs.at(cut).c_str(), "dirt", _util.vec_hist_name.at(hist_index).c_str(), _util.cut_dirs.at(cut).c_str(), "dirt"));
+        _util.GetHist(f_data, h_ext, Form("Stack/%s/%s/%s_%s_%s",  _util.cut_dirs.at(cut).c_str(), "ext",  _util.vec_hist_name.at(hist_index).c_str(), _util.cut_dirs.at(cut).c_str(), "ext"));
+        h_data->SetDirectory(0);
+        h_dirt->SetDirectory(0);
+        h_ext->SetDirectory(0);
+        f_data->Close();
+        h_data->SetMarkerStyle(20);
+        h_data->SetMarkerSize(0.5);
+        h_dirt->Scale(_util.dirt_scale_factor);
+        h_ext->Scale(_util.ext_scale_factor);
+    }
+
 
     TCanvas * c      = new TCanvas("","",500,500);
     TPad * topPad    = new TPad("topPad", "", 0, 0.3, 1, 1.0);
@@ -351,6 +371,12 @@ void SystematicsHelper::SysVariations(int hist_index, const char* print_name, in
         // std::cout << "scale factor: " << scale_fact << std::endl;
         hist.at(y)->Scale(scale_fact);
 
+        if (plotdata){
+            hist.at(y)->Scale(_util.mc_scale_factor*3.0754529); // extra factor to scale to main mc pot rather than detvar -- hack
+            hist.at(y)->Add(h_dirt, 1.0);
+            hist.at(y)->Add(h_ext, 1.0);
+        }
+
         if (y == k_CV){
             // Clone a histogram to plot the CV error as a grey band
             h_error_hist = (TH1D*) hist.at(k_CV)->Clone("h_error_hist");
@@ -387,12 +413,15 @@ void SystematicsHelper::SysVariations(int hist_index, const char* print_name, in
         }
     }
 
+    if (plotdata)
+         leg->AddEntry(h_data, "Beam-On", "lep"); // add histogram to legend
+
     // -----------------------------------------------------------------
     // Drawing histograms on top pad
 
     // setting hist config to the first one that we drawn
     hist.at(0)->GetYaxis()->SetRangeUser(0,max_bin*1.2);
-    hist.at(0)->GetYaxis()->SetTitle("Entries / bin");
+    hist.at(0)->GetYaxis()->SetTitle("Entries");
     hist.at(0)->GetXaxis()->SetLabelSize(0);
     hist.at(0)->GetYaxis()->SetTitleSize(0.05);
     hist.at(0)->GetYaxis()->SetLabelSize(0.05);
@@ -458,6 +487,9 @@ void SystematicsHelper::SysVariations(int hist_index, const char* print_name, in
     // drawing CV again to make sure it is on top of everything else
     hist.at(k_CV)->Draw("hist, same");
 
+    if (plotdata)
+        h_data->Draw("same PE");
+
     // drawing legend
     leg->Draw();
 
@@ -481,7 +513,7 @@ void SystematicsHelper::SysVariations(int hist_index, const char* print_name, in
     h_det_sys_tot->GetXaxis()->SetTitleFont(46);
     h_det_sys_tot->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
     h_det_sys_tot->GetYaxis()->SetRangeUser(0, 1.0);
-    h_det_sys_tot->GetYaxis()->SetTitle("Tot Det Sys Uncert");
+    h_det_sys_tot->GetYaxis()->SetTitle("Tot Frac Unc.");
     h_det_sys_tot->GetYaxis()->SetTitleSize(13); // 13
     h_det_sys_tot->GetYaxis()->SetTitleFont(44);
     h_det_sys_tot->GetYaxis()->SetLabelSize(15); // new
@@ -496,12 +528,15 @@ void SystematicsHelper::SysVariations(int hist_index, const char* print_name, in
     c->cd();
     TLatex *lat = new TLatex(0.15, 0.91, Form("Selection stage: %s", _util.cut_dirs_pretty.at(cut).c_str()));
     lat->SetTextSize(0.03);
-    lat->Draw();
+    if (!plotdata)lat->Draw();
     c->Modified();
 
     // Draw the run period on the plot
-    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
- 
+    if (!plotdata)_util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
+
+    if (plotdata)
+        _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.45, 0.915, 0.45, 0.915);
+
     //---------------------------------------------------------------
     // draw final canvas as pdf
 
@@ -509,6 +544,14 @@ void SystematicsHelper::SysVariations(int hist_index, const char* print_name, in
 
     // close the canvas to avoid warning messages on the terminal
     c->Close();  
+
+
+    if (plotdata){
+        delete h_data;
+        delete h_dirt;
+        delete h_ext;
+    }
+
 
 }
 // ----------------------------------------------------------------------------
