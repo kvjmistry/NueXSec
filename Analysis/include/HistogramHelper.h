@@ -361,6 +361,8 @@ class HistogramHelper{
         k_int_beta_nue,
         k_int_beta_nuebar,
         k_int_cosbeta,
+        k_int_cosbeta_rebin_nue,
+        k_int_cosbeta_rebin_nuebar,
         k_INTERACTION_MAX
     };
 

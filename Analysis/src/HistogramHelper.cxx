@@ -623,6 +623,8 @@ void HistogramHelper::InitHistograms(){
             TH1D_interaction_hists.at(k_int_beta_nuebar).at(i).at(p)            = new TH1D( Form("h_int_beta_nuebar_%s_%s",            _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e#lower[-0.5]{-} + e^{+} #beta [deg]; Entries", 13, 0, 190 );
             edges = &_util.reco_shr_bins_cang[0]; // Cast to an array 
             TH1D_interaction_hists.at(k_int_cosbeta).at(i).at(p)                = new TH1D( Form("h_int_cosbeta_%s_%s",                _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e#lower[-0.5]{-} + e^{+} cos#beta; Entries", _util.reco_shr_bins_cang.size()-1, edges );
+            TH1D_interaction_hists.at(k_int_cosbeta_rebin_nue).at(i).at(p)      = new TH1D( Form("h_int_cosbeta_rebin_nue_%s_%s",      _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e#lower[-0.5]{-} cos#beta; Entries",         _util.reco_shr_bins_cang.size()-1, edges );
+            TH1D_interaction_hists.at(k_int_cosbeta_rebin_nuebar).at(i).at(p)   = new TH1D( Form("h_int_cosbeta_rebin_nuebar_%s_%s",   _util.interaction_types.at(p).c_str(), stage.c_str() ), "; True e^{+} cos#beta; Entries",                    _util.reco_shr_bins_cang.size()-1, edges );
         }
     }
         
@@ -1003,6 +1005,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
                     TH1D_interaction_hists.at(k_int_elec_E_rebin_nue)   .at(index).at(_util.k_plot_qe)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_elec_E_nue)     .at(index).at(_util.k_plot_qe)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_beta_nue).at(index).at(_util.k_plot_qe)->Fill(SC.true_effective_angle, weight);
+                    TH1D_interaction_hists.at(k_int_cosbeta_rebin_nue).at(index).at(_util.k_plot_qe)->Fill(true_cosbeta, weight);
                 }
 
                 // Nuebar
@@ -1012,6 +1015,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
                     TH1D_interaction_hists.at(k_int_elec_E_rebin_nuebar)   .at(index).at(_util.k_plot_qe)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_elec_E_nuebar)   .at(index).at(_util.k_plot_qe)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_beta_nuebar).at(index).at(_util.k_plot_qe)->Fill(SC.true_effective_angle, weight);
+                    TH1D_interaction_hists.at(k_int_cosbeta_rebin_nuebar).at(index).at(_util.k_plot_qe)->Fill(true_cosbeta, weight);
                 }
             }
             else if (interaction == "nue_cc_res" || interaction == "nue_bar_cc_res"){
@@ -1033,6 +1037,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
                     TH1D_interaction_hists.at(k_int_elec_E_rebin_nue)   .at(index).at(_util.k_plot_res)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_elec_E_nue)         .at(index).at(_util.k_plot_res)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_beta_nue).at(index).at(_util.k_plot_res)->Fill(SC.true_effective_angle, weight);
+                    TH1D_interaction_hists.at(k_int_cosbeta_rebin_nue).at(index).at(_util.k_plot_res)->Fill(true_cosbeta, weight);
                 }
 
                 // Nuebar
@@ -1042,6 +1047,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
                     TH1D_interaction_hists.at(k_int_elec_E_rebin_nuebar)   .at(index).at(_util.k_plot_res)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_elec_E_nuebar)         .at(index).at(_util.k_plot_res)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_beta_nuebar).at(index).at(_util.k_plot_res)->Fill(SC.true_effective_angle, weight);
+                    TH1D_interaction_hists.at(k_int_cosbeta_rebin_nuebar).at(index).at(_util.k_plot_res)->Fill(true_cosbeta, weight);
                 }
             }
             else if (interaction == "nue_cc_dis" || interaction == "nue_bar_cc_dis"){
@@ -1063,6 +1069,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
                     TH1D_interaction_hists.at(k_int_elec_E_rebin_nue)   .at(index).at(_util.k_plot_dis)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_elec_E_nue)         .at(index).at(_util.k_plot_dis)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_beta_nue).at(index).at(_util.k_plot_dis)->Fill(SC.true_effective_angle, weight);
+                    TH1D_interaction_hists.at(k_int_cosbeta_rebin_nue).at(index).at(_util.k_plot_dis)->Fill(true_cosbeta, weight);
                 }
 
                 // Nuebar
@@ -1072,6 +1079,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
                     TH1D_interaction_hists.at(k_int_elec_E_rebin_nuebar)   .at(index).at(_util.k_plot_dis)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_elec_E_nuebar)         .at(index).at(_util.k_plot_dis)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_beta_nuebar).at(index).at(_util.k_plot_dis)->Fill(SC.true_effective_angle, weight);
+                    TH1D_interaction_hists.at(k_int_cosbeta_rebin_nuebar).at(index).at(_util.k_plot_dis)->Fill(true_cosbeta, weight);
                 }
             }
             else if (interaction == "nue_cc_coh" || interaction == "nue_bar_cc_coh"){
@@ -1093,6 +1101,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
                     TH1D_interaction_hists.at(k_int_elec_E_rebin_nue)   .at(index).at(_util.k_plot_coh)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_elec_E_nue)         .at(index).at(_util.k_plot_coh)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_beta_nue).at(index).at(_util.k_plot_coh)->Fill(SC.true_effective_angle, weight);
+                    TH1D_interaction_hists.at(k_int_cosbeta_rebin_nue).at(index).at(_util.k_plot_coh)->Fill(true_cosbeta, weight);
                 }
 
                 // Nuebar
@@ -1102,6 +1111,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
                     TH1D_interaction_hists.at(k_int_elec_E_rebin_nuebar)   .at(index).at(_util.k_plot_coh)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_elec_E_nuebar)         .at(index).at(_util.k_plot_coh)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_beta_nuebar).at(index).at(_util.k_plot_coh)->Fill(SC.true_effective_angle, weight);
+                    TH1D_interaction_hists.at(k_int_cosbeta_rebin_nuebar).at(index).at(_util.k_plot_coh)->Fill(true_cosbeta, weight);
                 }
             }
             else if (interaction == "nue_cc_mec" || interaction == "nue_bar_cc_mec"){
@@ -1123,6 +1133,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
                     TH1D_interaction_hists.at(k_int_elec_E_rebin_nue)   .at(index).at(_util.k_plot_mec)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_elec_E_nue)         .at(index).at(_util.k_plot_mec)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_beta_nue).at(index).at(_util.k_plot_mec)->Fill(SC.true_effective_angle, weight);
+                    TH1D_interaction_hists.at(k_int_cosbeta_rebin_nue).at(index).at(_util.k_plot_mec)->Fill(true_cosbeta, weight);
                 }
 
                 // Nuebar
@@ -1132,6 +1143,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
                     TH1D_interaction_hists.at(k_int_elec_E_rebin_nuebar)   .at(index).at(_util.k_plot_mec)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_elec_E_nuebar)         .at(index).at(_util.k_plot_mec)->Fill(SC.elec_e, weight);
                     TH1D_interaction_hists.at(k_int_beta_nuebar).at(index).at(_util.k_plot_mec)->Fill(SC.true_effective_angle, weight);
+                    TH1D_interaction_hists.at(k_int_cosbeta_rebin_nuebar).at(index).at(_util.k_plot_mec)->Fill(true_cosbeta, weight);
                 }
             }
             // CC Tot

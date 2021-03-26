@@ -145,7 +145,9 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
             MakeInteractionPlot("h_int_effective_ang",          true, ";True e#lower[-0.5]{-} + e^{+} Eff Ang. [deg]; Entries", "eff_ang",                cut_stage, 600);
             MakeInteractionPlot("h_int_beta_nue",               true, ";True e#lower[-0.5]{-} #beta [deg]; Entries",            "eff_ang_nue",            cut_stage, 600);
             MakeInteractionPlot("h_int_beta_nuebar",            true, ";True e^{+} #beta [deg]; Entries",                       "eff_ang_nuebar",         cut_stage, 600);
-            MakeInteractionPlot("h_int_cosbeta",                true, ";True e#lower[-0.5]{-} + e^{+} cos#beta; Entries",       "cosbeta",                cut_stage, 600);
+            MakeInteractionPlot("h_int_cosbeta",                true, ";True e#lower[-0.5]{-} + e^{+} cos#beta; Entries",       "cosbeta_rebin",          cut_stage, 600);
+            MakeInteractionPlot("h_int_cosbeta_rebin_nue",      true, ";True e#lower[-0.5]{-} cos#beta; Entries",               "cosbeta_rebin_nue",      cut_stage, 600);
+            MakeInteractionPlot("h_int_cosbeta_rebin_nuebar",   true, ";True e^{+} cos#beta; Entries",                          "cosbeta_rebin_nuebar",   cut_stage, 600);
         }
         
         MakeInteractionEfficiency("h_true_nue_E",                 false, ";True #nu_{e} Energy [GeV]; Efficiency",                    "nue_E");
@@ -2391,6 +2393,9 @@ void HistogramPlotter::MakeInteractionPlot(std::string var, bool scale, const ch
     // Get The sum so we can draw the stat err bar
     TH1D *h_sum = (TH1D *)hist.at(_util.k_plot_qe)->Clone("h_sum");
     for (unsigned int i = 1; i < hist.size(); i++) {
+        if (i == _util.k_plot_tot)
+            continue;
+
         h_sum->Add(hist.at(i), 1);
     }
     h_sum->SetLineWidth(1);
