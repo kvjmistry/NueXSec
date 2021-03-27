@@ -1061,10 +1061,10 @@ void UtilityPlotter::PlotTrueVar(){
 
     delete c;
 
-    ColumnNorm(h_shr_multi_nue_E);
-    ColumnNorm(h_shr_multi_elec_e);
-    ColumnNorm(h_shr_multi_nuebar_E);
-    ColumnNorm(h_shr_multi_elec_e_nuebar);
+    RowNorm(h_shr_multi_nue_E);
+    RowNorm(h_shr_multi_elec_e);
+    RowNorm(h_shr_multi_nuebar_E);
+    RowNorm(h_shr_multi_elec_e_nuebar);
 
     // h_shr_multi_nue_E->GetZaxis()->SetRangeUser(0, 0.35);
     // h_shr_multi_nuebar_E->GetZaxis()->SetRangeUser(0, 0.35);
@@ -1104,20 +1104,20 @@ void UtilityPlotter::Save2DHists(const char* printname, TH2D* hist){
 
 }
 // -----------------------------------------------------------------------------
-void UtilityPlotter::ColumnNorm(TH2D* hist){
+void UtilityPlotter::RowNorm(TH2D* hist){
 
     // Loop over rows
-    for (int row=1; row<hist->GetXaxis()->GetNbins()+1; row++) {
+    for (int col=1; col<hist->GetYaxis()->GetNbins()+1; col++) {
         double integral = 0;
 
         // Loop over columns and get the integral
-        for (int col=1; col<hist->GetYaxis()->GetNbins()+1; col++){
+        for (int row=1; row<hist->GetXaxis()->GetNbins()+1; row++){
             integral+=hist->GetBinContent(row, col);            
         }
 
         // Now normalise the column entries by the integral
-        for (int col=1; col<hist->GetYaxis()->GetNbins()+1; col++){
-            hist->SetBinContent(row,col, hist->GetBinContent(row, col)/ integral );
+        for (int row=1; row<hist->GetXaxis()->GetNbins()+1; row++){
+            hist->SetBinContent(row, col, hist->GetBinContent(row, col)/ integral );
             
         }
     } 
