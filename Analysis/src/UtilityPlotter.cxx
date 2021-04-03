@@ -49,6 +49,11 @@ void UtilityPlotter::Initialise(Utility _utility){
         return;
 
     }
+    // Compare the GENIE and NuWro true Pi0 Energies
+    else if (std::string(_util.uplotmode) == "genpi0"){
+        CompareGeneratorPi0();
+        return;
+    }
     // This will call the code to optimise the bin widths
     else if (std::string(_util.uplotmode) == "bins"){
         OptimiseBins();
@@ -3766,3 +3771,165 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
 
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::CompareGeneratorPi0(){
+
+    // Load in the root file
+    TFile *f_mc, *f_mc_nuwro;
+    TTree *mc_tree, *mc_tree_nuwro;
+
+    // Get the TTree
+    _util.GetFile(f_mc, "../ntuples/neutrinoselection_filt_run1_overlay_newtune.root"); // Get the run 1 MC file
+    _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
+
+    SliceContainer SC;
+    SC.Initialise(mc_tree, _util.k_mc, _util);
+    
+    // 1D pi0 momentum
+    TH1D *h_pi0_e_genie = new TH1D("h_true_pi0_e_genie", "; #pi^{0} Energy [GeV]; Entries", 40, 0, 1.0);
+    TH1D *h_pi0_e_nuwro = new TH1D("h_true_pi0_e_nuwro", "; #pi^{0} Energy [GeV]; Entries", 40, 0, 1.0);
+    
+    int mc_tree_total_entries = mc_tree->GetEntries();
+    std::cout << "Total MC Events:         " << mc_tree_total_entries << std::endl;
+
+    // Event loop
+    for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
+
+        // See if we want to process all the events
+        if (_util.num_events > 0){
+            if (ievent >= _util.num_events) break;
+        }
+
+        // Alert the user
+        if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
+    
+        // Get the entry in the tree
+        mc_tree->GetEntry(ievent); 
+
+        // Classify the event -- sets variable in the slice contianer
+        SC.SliceClassifier(_util.k_mc);      // Classification of the event
+
+        // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
+        SC.SetThresholdEvent(_util.k_mc);
+
+        // If the backtracked pdg of the leading shower is not an electron then alter classification
+        SC.SetNonLdgShrEvent(_util.k_mc);
+        
+        SC.SliceInteractionType(_util.k_mc); // Genie interaction type
+        SC.ParticleClassifier(_util.k_mc);   // The truth matched particle type of the leading shower
+        SC.Pi0Classifier(_util.k_mc); 
+
+        // Set derived variables in the slice container
+        SC.SetSignal();                // Set the event as either signal or other
+        SC.SetFakeData();              // Set the classifcation as data if fake data mode
+        SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
+        SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
+        SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
+
+        bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+
+        double weight = _util.GetCVWeight(_util.k_mc, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction);
+        
+        // Pi0 Energy
+        if (is_in_fv && SC.npi0>0) 
+            h_pi0_e_genie->Fill(SC.pi0_e, weight);
+    }
+
+    // Get the TTree
+    _util.GetFile(f_mc_nuwro, "../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_nuwro.root"); // Get the run 1 MC file
+    _util.GetTree(f_mc_nuwro, mc_tree_nuwro, "nuselection/NeutrinoSelectionFilter");
+
+    SliceContainer SC_nuwro;
+    SC_nuwro.Initialise(mc_tree_nuwro, _util.k_mc, _util);
+
+    int mc_tree_total_entries_nuwro = mc_tree_nuwro->GetEntries();
+    std::cout << "Total MC Events:         " << mc_tree_total_entries_nuwro << std::endl;
+
+    // Event loop
+    for (int ievent = 0; ievent < mc_tree_total_entries_nuwro; ievent++){
+
+        // See if we want to process all the events
+        if (_util.num_events > 0){
+            if (ievent >= _util.num_events) break;
+        }
+
+        // Alert the user
+        if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
+    
+        // Get the entry in the tree
+        mc_tree_nuwro->GetEntry(ievent); 
+
+        // Classify the event -- sets variable in the slice contianer
+        SC_nuwro.SliceClassifier(_util.k_mc);      // Classification of the event
+
+        // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
+        SC_nuwro.SetThresholdEvent(_util.k_mc);
+
+        // If the backtracked pdg of the leading shower is not an electron then alter classification
+        SC_nuwro.SetNonLdgShrEvent(_util.k_mc);
+        
+        SC_nuwro.SliceInteractionType(_util.k_mc); // Genie interaction type
+        SC_nuwro.ParticleClassifier(_util.k_mc);   // The truth matched particle type of the leading shower
+        SC_nuwro.Pi0Classifier(_util.k_mc); 
+
+        // Set derived variables in the slice container
+        SC_nuwro.SetSignal();                // Set the event as either signal or other
+        SC_nuwro.SetFakeData();              // Set the classifcation as data if fake data mode
+        SC_nuwro.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
+        SC_nuwro.SetNuMIAngularVariables();  // Set the NuMI angular variables
+        SC_nuwro.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
+
+        SC_nuwro.SetPPFXCVWeight();
+
+        bool is_in_fv = _util.in_fv(SC_nuwro.true_nu_vtx_sce_x, SC_nuwro.true_nu_vtx_sce_y, SC_nuwro.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+
+        double weight = _util.GetCVWeight(_util.k_mc, SC_nuwro.weightSplineTimesTune, SC_nuwro.ppfx_cv, SC_nuwro.nu_e, SC_nuwro.nu_pdg, is_in_fv, SC_nuwro.interaction);
+        
+        // Pi0 Energy
+        if (is_in_fv && SC_nuwro.npi0>0) 
+            h_pi0_e_nuwro->Fill(SC_nuwro.pi0_e, weight);
+    }
+
+
+
+
+
+    // Now save the Pi0 Momentum plot
+    _util.CreateDirectory("pi0");
+    TCanvas * c = new TCanvas("c", "c", 500, 500);
+    c->SetTopMargin(0.11);
+
+    h_pi0_e_genie->SetStats(kFALSE);
+    h_pi0_e_nuwro->SetStats(kFALSE);
+
+    _util.IncreaseLabelSize(h_pi0_e_genie, c);
+
+    h_pi0_e_genie->SetLineColor(kAzure - 6);
+    h_pi0_e_genie->SetLineWidth(2);
+    h_pi0_e_genie->Draw("hist,E");
+
+    h_pi0_e_nuwro->Scale(3.6248214);
+    h_pi0_e_nuwro->SetLineColor(kRed+2);
+    h_pi0_e_nuwro->SetLineWidth(2);
+    h_pi0_e_nuwro->Draw("hist,E,same");
+
+    double yscale = h_pi0_e_genie->GetMaximum();
+    if (h_pi0_e_nuwro->GetMaximum() > yscale)
+        yscale = h_pi0_e_nuwro->GetMaximum();
+
+    h_pi0_e_genie->SetMaximum(yscale*1.3);
+
+    TLegend *leg = new TLegend(0.55, 0.89, 0.9, 0.7);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+
+    leg->SetHeader(Form("GENIE/NuWro: %2.3f", h_pi0_e_genie->Integral() / h_pi0_e_nuwro->Integral()),"C");
+    leg->AddEntry(h_pi0_e_genie, "GENIE v3", "l");
+    leg->AddEntry(h_pi0_e_nuwro, "NuWro", "l");
+    leg->Draw();
+    
+    c->Print(Form("plots/run%s/pi0/h_pi0_comparison.pdf", _util.run_period));
+
+    delete c;
+
+
+}

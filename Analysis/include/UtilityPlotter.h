@@ -173,6 +173,9 @@ class UtilityPlotter{
     // Compare unfoldef generators
     void CompareGeneratorUnfoldedModels();
     // -------------------------------------------------------------------------
+    // Compare the True generator pi0 distributions
+    void CompareGeneratorPi0();
+    // -------------------------------------------------------------------------
 
 
 }; // End Class UtilityPlotter
