@@ -49,7 +49,7 @@ void CrossSectionHelper::Initialise(Utility _utility){
         if (!_util.use_gpvm)
             flux_file_name = "Systematics/output_fhc_uboone_run0.root";
         else
-            flux_file_name = "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold_v46/FHC/output_uboone_fhc_run0_merged.root";
+            flux_file_name = "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold_v46/FHC/sept/output_uboone_fhc_run0_merged.root";
 
 
         std::cout << "Using Flux file name: \033[0;31m" << flux_file_name << "\033[0m" <<  std::endl;
@@ -57,11 +57,10 @@ void CrossSectionHelper::Initialise(Utility _utility){
         if (boolfile == false) gSystem->Exit(0); 
     }
     else if (std::string(_util.run_period) == "3") {
-        
         if (!_util.use_gpvm)
             flux_file_name = "Systematics/output_rhc_uboone_run0.root";
         else
-            flux_file_name = "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold_v46/RHC/output_uboone_rhc_run0_merged.root";
+            flux_file_name = "/uboone/data/users/kmistry/work/PPFX/uboone/beamline_zero_threshold_v46/RHC/sept/output_uboone_rhc_run0_merged.root";
         
         
         std::cout << "Using Flux file name: \033[0;31m" << flux_file_name << "\033[0m" <<  std::endl;
