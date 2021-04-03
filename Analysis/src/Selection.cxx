@@ -401,7 +401,10 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     SC.SliceClassifier(type);      // Classification of the event
 
     // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
-    SC.SetThresholdEvent();
+    SC.SetThresholdEvent(type);
+
+    // If the backtracked pdg of the leading shower is not an electron then alter classification
+    SC.SetNonLdgShrEvent(type);
     
     SC.SliceInteractionType(type); // Genie interaction type
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
@@ -417,6 +420,8 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     // In the case of Nuwro, we need to manually set the weight
     if (std::string(_util.variation) == "nuwro")
         SC.SetPPFXCVWeight();
+
+    
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
@@ -528,7 +533,6 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     
     SelectionFill(type, SC, _util.k_dEdx_max_no_tracks, counter_v );
 
-   
 
     // if (SC.is_signal && SC.nu_e < 0.3) std::cout<<"Low elec E!: " <<SC.elec_e*1000 << " MeV" << "  | E Nu: "<< SC.nu_e*1000 << " MeV" <<  std::endl; 
     // if (SC.is_signal && SC.elec_e < 0.1) std::cout<<"Low elec E!: " <<SC.elec_e*1000 << " MeV" << "  | E Nu: "<< SC.nu_e*1000 << " MeV" << "  |Reco Shr Energy: " <<  SC.shr_energy_cali *1000<<  std::endl; 
@@ -667,10 +671,6 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
 
     // Classify the event
     SC.SliceClassifier(type);      // Classification of the event
-
-    // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
-    SC.SetThresholdEvent();
-
     SC.SliceInteractionType(type); // Genie interaction type
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
         
@@ -707,9 +707,6 @@ void Selection::ApplyNuMuSelection(int type, SliceContainer &SC){
 
     // Classify the event
     SC.SliceClassifier(type);      // Classification of the event
-
-    // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
-    SC.SetThresholdEvent();
 
     SC.SliceInteractionType(type); // Genie interaction type
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
