@@ -1030,15 +1030,17 @@ void SliceContainer::CalibrateShowerEnergy(){
 
 }
 // -----------------------------------------------------------------------------
-void SliceContainer::SetThresholdEvent(){
+void SliceContainer::SetThresholdEvent(int type){
 
-    // Below threshold of nue or electron energy
-    if (nu_e < _util.energy_threshold || elec_e < _util.elec_threshold){
-        if (nu_pdg == 12){
-            classification = std::make_pair("thr_nue",_util.k_thr_nue);
-        }
-        if (nu_pdg == -12){
-            classification = std::make_pair("thr_nuebar",_util.k_thr_nuebar);
+    if (type == _util.k_mc){
+        // Below threshold of nue or electron energy
+        if (nu_e < _util.energy_threshold || elec_e < _util.elec_threshold){
+            if (nu_pdg == 12){
+                classification = std::make_pair("thr_nue",_util.k_thr_nue);
+            }
+            if (nu_pdg == -12){
+                classification = std::make_pair("thr_nuebar",_util.k_thr_nuebar);
+            }
         }
     }
 
@@ -1050,13 +1052,15 @@ void SliceContainer::SetFakeData(){
         classification = std::make_pair("data",_util.k_leg_data);
 }
 // -----------------------------------------------------------------------------
-void SliceContainer::SetNonLdgShrEvent(){
+void SliceContainer::SetNonLdgShrEvent(int type){
 
-    // Leading shower is not an electron
-    if (classification.first == "nue_cc" && shr_bkt_pdg != 11){
-        classification = std::make_pair("cosmic_nue",   _util.k_cosmic_nue);
-    }
-    if (classification.first == "nuebar_cc" && shr_bkt_pdg != -11){
-        classification = std::make_pair("cosmic_nuebar",   _util.k_cosmic_nuebar);
+    if (type == _util.k_mc){
+        // Leading shower is not an electron
+        if (classification.first == "nue_cc" && shr_bkt_pdg != 11){
+            classification = std::make_pair("cosmic_nue",   _util.k_cosmic_nue);
+        }
+        if (classification.first == "nuebar_cc" && shr_bkt_pdg != -11){
+            classification = std::make_pair("cosmic_nuebar",   _util.k_cosmic_nuebar);
+        }
     }
 }

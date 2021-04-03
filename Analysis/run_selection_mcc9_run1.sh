@@ -305,7 +305,6 @@ if [ "$1" == "Input" ]; then
 
 fi
 
-
 # To generate the file lists with all event weights then use this command
 # ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode txtlist --xseclabel all --xsecvar elec_E
 
@@ -374,8 +373,6 @@ if [ "$1" == "fakenopi0tune" ]; then
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_fakenopi0tune.root --fake nopi0tune --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_cang
 
 fi
-
-
 
 # Use the tune 1 model as fake data
 if [ "$1" == "faketune1" ]; then

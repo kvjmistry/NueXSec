@@ -95,7 +95,7 @@ Run1_MC_POT_FLUGG 8.87591e+20
 Run1_MC_POT_tune1 6.0093e+20 
 -
 // Run 1 Det Var for nuwro
-Run1_MC_POT_nuwro 6.64422e+20
+Run1_MC_POT_nuwro 6.44859e+20
 -
 // Run 1 Det Var for nuwro -- straight generated events
 Run1_MC_POT_nuwrogen 1.76264e+22

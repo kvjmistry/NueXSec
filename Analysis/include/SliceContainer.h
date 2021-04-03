@@ -58,13 +58,13 @@ public:
     void CalibrateShowerEnergy();
     // -------------------------------------------------------------------------
     // Set events that are below threshold to a new category
-    void SetThresholdEvent();
+    void SetThresholdEvent(int type);
     // -------------------------------------------------------------------------
     // Set the event as fake data
     void SetFakeData();
     // -------------------------------------------------------------------------
     // Backtracked pdg of leading shower is not an electron
-    void SetNonLdgShrEvent();
+    void SetNonLdgShrEvent(int type);
     // -------------------------------------------------------------------------
 
 
