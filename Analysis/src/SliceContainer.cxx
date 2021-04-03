@@ -438,9 +438,6 @@ template void SliceContainer::Initialise<TTree>(TTree *tree, int type, Utility u
 template void SliceContainer::Initialise<TChain>(TChain *tree, int type, Utility util );
 // -----------------------------------------------------------------------------
 void SliceContainer::SliceClassifier(int type){
-
-    if (nu_purity_from_pfp == 0.0 && std::string(_util.variation) == "nuwro")
-        nu_purity_from_pfp = 1.0;
     
     // MC Specific classsifications
     if (type == _util.k_mc){
@@ -1051,4 +1048,15 @@ void SliceContainer::SetFakeData(){
     
     if (_util.isfakedata)
         classification = std::make_pair("data",_util.k_leg_data);
+}
+// -----------------------------------------------------------------------------
+void SliceContainer::SetNonLdgShrEvent(){
+
+    // Leading shower is not an electron
+    if (classification.first == "nue_cc" && shr_bkt_pdg != 11){
+        classification = std::make_pair("cosmic_nue",   _util.k_cosmic_nue);
+    }
+    if (classification.first == "nuebar_cc" && shr_bkt_pdg != -11){
+        classification = std::make_pair("cosmic_nuebar",   _util.k_cosmic_nuebar);
+    }
 }

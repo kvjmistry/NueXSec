@@ -157,7 +157,7 @@ Run1_Intrinsic_POT_FLUGG 3.00768e+22
 Run1_Intrinsic_POT_tune1 2.08494e+22
 -
 // Run 1 Det var CV intrinsic nue sample nuwro
-Run1_Intrinsic_POT_nuwro 1.7071e+22
+Run1_Intrinsic_POT_nuwro 1.68375e+22
 -
 // Run 1 Det Var BNB diffusion -- unused now
 Run1_MC_POT_BNB_Diffusion 4.19732e+20

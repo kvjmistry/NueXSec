@@ -63,6 +63,10 @@ public:
     // Set the event as fake data
     void SetFakeData();
     // -------------------------------------------------------------------------
+    // Backtracked pdg of leading shower is not an electron
+    void SetNonLdgShrEvent();
+    // -------------------------------------------------------------------------
+
 
     enum flav { k_numu, k_numubar, k_nue, k_nuebar, k_FLAV_MAX};
 
