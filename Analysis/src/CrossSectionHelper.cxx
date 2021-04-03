@@ -624,12 +624,13 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     SC.SliceClassifier(type);      // Classification of the event
 
     // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
-    SC.SetThresholdEvent();
+    SC.SetThresholdEvent(type);
 
     SC.SetSignal();                // Set the event as either signal or other
     SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
     SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
     SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
+    SC.SetNonLdgShrEvent(type);    // If the backtracked pdg of the leading shower is not an electron
 
     // Skip signal events in the standard MC file so we dont double count the signal events
     if (treeNum == 1 && SC.is_signal){

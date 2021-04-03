@@ -252,40 +252,6 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
             Save2DHistsNorm(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s_col_norm_true.pdf",     _util.run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type, true, "true");
         }
 
-        // Stacked histograms for pi0
-        // Create the Truth folder
-        _util.CreateDirectory("pi0");
-
-        // pi0 mass peak unweighted
-        MakeStack("h_pi0_mass", " ",
-                area_norm, false, 1.6, "Mass [MeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-                Form("plots/run%s/pi0/pi0_mass.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
-
-        // pi0 mass normlaisation fixed
-        MakeStack("h_pi0_mass_norm", " ",
-                area_norm, false, 1.6, "Mass [MeV] (Normalisation Fixed)",  0.35, 0.85, 0.55, 0.85, Data_POT,
-                Form("plots/run%s/pi0/pi0_mass_norm.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
-
-        // pi0 mass peak unweighted
-        MakeStack("h_pi0_mass_EScale", " ",
-                area_norm, false, 1.6, "Mass [MeV] (E Dependent Scaling)",  0.35, 0.85, 0.55, 0.85, Data_POT,
-                Form("plots/run%s/pi0/pi0_mass_EScale.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
-
-        // pi0 energy unweighted
-        MakeStack("h_pi0_energy", " ",
-                area_norm, false, 1.5, "#pi^{0} Energy [MeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-                Form("plots/run%s/pi0/pi0_energy.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
-
-        // pi0 energy normlaisation fixed
-        MakeStack("h_pi0_energy_norm", " ",
-                area_norm, false, 1.5, "#pi^{0} Energy [MeV] (Normalisation Fixed)",  0.35, 0.85, 0.55, 0.85, Data_POT,
-                Form("plots/run%s/pi0/pi0_energy_norm.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
-
-        // pi0 energy unweighted
-        MakeStack("h_pi0_energy_EScale", " ",
-                area_norm, false, 1.5, "#pi^{0} Energy [MeV] (E Dependent Scaling)",  0.35, 0.85, 0.55, 0.85, Data_POT,
-                Form("plots/run%s/pi0/pi0_energy_EScale.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
-
         // Stacked histograms for numu
         // Create the Truth folder
         _util.CreateDirectory("numu");
@@ -310,6 +276,45 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
                 area_norm, false, 1.0, "Topological Score",  0.35, 0.85, 0.55, 0.85, Data_POT,
                 Form("plots/run%s/numu/topo_score.pdf", _util.run_period), false, "classifications_numu", false, false, true);
 
+    }
+
+    if (!_util.isfakedata){
+
+        // Stacked histograms for pi0
+        // Create the Truth folder
+        _util.CreateDirectory("pi0");
+
+        // pi0 mass peak unweighted
+        MakeStack("h_pi0_mass", " ",
+                area_norm, false, 1.6, "Mass [MeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                Form("plots/run%s/pi0/pi0_mass.pdf", _util.run_period), false, "classifications_pi0", true, false, true);
+
+
+        // pi0 mass normlaisation fixed
+        MakeStack("h_pi0_mass_norm", " ",
+                area_norm, false, 1.6, "Mass [MeV] (Normalisation Fixed)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                Form("plots/run%s/pi0/pi0_mass_norm.pdf", _util.run_period), false, "classifications_pi0", true, false, true);
+
+        // pi0 mass peak unweighted
+        MakeStack("h_pi0_mass_EScale", " ",
+                area_norm, false, 1.6, "Mass [MeV] (E Dependent Scaling)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                Form("plots/run%s/pi0/pi0_mass_EScale.pdf", _util.run_period), false, "classifications_pi0", true, false, true);
+
+        // pi0 energy unweighted
+        MakeStack("h_pi0_energy", " ",
+                area_norm, false, 1.5, "#pi^{0} Energy [MeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                Form("plots/run%s/pi0/pi0_energy.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
+
+        // pi0 energy normlaisation fixed
+        MakeStack("h_pi0_energy_norm", " ",
+                area_norm, false, 1.5, "#pi^{0} Energy [MeV] (Normalisation Fixed)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                Form("plots/run%s/pi0/pi0_energy_norm.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
+
+        // pi0 energy unweighted
+        MakeStack("h_pi0_energy_EScale", " ",
+                area_norm, false, 1.5, "#pi^{0} Energy [MeV] (E Dependent Scaling)",  0.35, 0.85, 0.55, 0.85, Data_POT,
+                Form("plots/run%s/pi0/pi0_energy_EScale.pdf", _util.run_period), false, "classifications_pi0", false, false, true);
+        
     }
 
     // Loop over the cuts and plot histograms by plot type
@@ -1214,7 +1219,10 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     // std::cout << print_name<< std::endl;
 
     if (plotmode == "classifications_pi0" || plotmode == "classifications_numu"){
-        c->Print(print_name);
+        if (_util.isvariation)
+            c->Print(Form("plots/run%s/detvar/%s/%s.pdf", _util.run_period, _util.variation, hist_name.c_str()));
+        else
+            c->Print(print_name);
         delete c;
         return;
     }

@@ -976,7 +976,10 @@ void UtilityPlotter::PlotTrueVar(){
         SC.SliceClassifier(_util.k_mc);      // Classification of the event
 
         // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
-        SC.SetThresholdEvent();
+        SC.SetThresholdEvent(_util.k_mc);
+
+        // If the backtracked pdg of the leading shower is not an electron then alter classification
+        SC.SetNonLdgShrEvent(_util.k_mc);
         
         SC.SliceInteractionType(_util.k_mc); // Genie interaction type
         SC.ParticleClassifier(_util.k_mc);   // The truth matched particle type of the leading shower
