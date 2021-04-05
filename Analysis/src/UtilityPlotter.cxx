@@ -2540,8 +2540,8 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
     std::vector<std::string> models = {
         "Input",
         "mec",
-        "nogtune",
-        "nopi0tune",
+        "geniev3",
+        "nuwro",
         "FLUGG",
         "tune1"
     };
@@ -2550,8 +2550,8 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
     enum enum_models {
         k_model_input,
         k_model_mec,
-        k_model_nogtune,
-        k_model_nopi0tune,
+        k_model_geniev3,
+        k_model_nuwro,
         k_model_FLUGG,
         k_model_tune1,
         k_MODEL_MAX
@@ -2587,13 +2587,18 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
         h_fake_xsec.at(m) = (TH1D*)h_temp->Clone();
 
         // Set the error to be equal to the total systematic uncertainty of ~21%
-        h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * 0.21 );
+        if (m == k_model_FLUGG)
+            h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * 0.20983 );
+        else if(m == k_model_nuwro || m == k_model_tune1)
+            h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * std::sqrt(0.04551*0.04551 + 0.0374*0.0374 + 0.08*0.08) ); // GENIE + MC STAT + bkg tuning change
+        else
+            h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * std::sqrt(0.04551*0.04551 + 0.0374*0.0374) );
 
         // Set the line colours
         if (m == k_model_input)    h_model_xsec.at(k_model_input)    ->SetLineColor(kRed+2);
         if (m == k_model_mec)      h_model_xsec.at(k_model_mec)      ->SetLineColor(kGreen+2);
-        if (m == k_model_nogtune)  h_model_xsec.at(k_model_nogtune)  ->SetLineColor(kBlue+2);
-        if (m == k_model_nopi0tune)h_model_xsec.at(k_model_nopi0tune)->SetLineColor(kPink+1);
+        if (m == k_model_geniev3)  h_model_xsec.at(k_model_geniev3)  ->SetLineColor(kBlue+2);
+        if (m == k_model_nuwro)    h_model_xsec.at(k_model_nuwro)    ->SetLineColor(kPink+1);
         if (m == k_model_FLUGG)    h_model_xsec.at(k_model_FLUGG)    ->SetLineColor(kViolet-1);
         if (m == k_model_tune1)    h_model_xsec.at(k_model_tune1)    ->SetLineColor(kOrange-1);
         

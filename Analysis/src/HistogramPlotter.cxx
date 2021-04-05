@@ -1578,9 +1578,9 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
               Form("cuts/%s/reco_trk_pid_score.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Pi0 Mass peak plot
-    MakeStack("h_reco_pi0mass", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "#pi^{0} Mass [MeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_pi0mass.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
+    // MakeStack("h_reco_pi0mass", _util.cut_dirs.at(cut_index).c_str(),
+    //           area_norm, false, 1.0, "#pi^{0} Mass [MeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+    //           Form("cuts/%s/reco_pi0mass.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Stacked Histograms by particle type
 

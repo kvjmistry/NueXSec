@@ -3836,6 +3836,18 @@ void SystematicsHelper::ExportResult(TFile* f){
         h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_sys)->SetOption("col");
         h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_sys)->Write("h_cov_sys_mcxsec_reco", TObject::kOverwrite);
 
+        // MC XSec GENIE Covariance Matrix  ---------------------------------
+        TH2D* h_cov_xsec_sys_tot = (TH2D*)h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_genie_multi)->Clone();
+        h_cov_xsec_sys_tot->Add(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_genie_uni));
+        h_cov_xsec_sys_tot->SetOption("col");
+        h_cov_xsec_sys_tot->Write("h_cov_xsec_sys_mcxsec_reco", TObject::kOverwrite);
+
+        // MC XSec Flux Covariance Matrix  ---------------------------------
+        TH2D* h_cov_flux_sys_tot = (TH2D*)h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_hp)->Clone();
+        h_cov_flux_sys_tot->Add(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_beamline));
+        h_cov_flux_sys_tot->SetOption("col");
+        h_cov_flux_sys_tot->Write("h_cov_flux_sys_mcxsec_reco", TObject::kOverwrite);
+
         // MC XSec Genie All Covariance Matrix  ---------------------------------
         h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_genie_multi)->SetOption("col");
         h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_genie_multi)->Write("h_cov_genie_multi_mcxsec_reco", TObject::kOverwrite);
