@@ -66,6 +66,11 @@ public:
     // Backtracked pdg of leading shower is not an electron
     void SetNonLdgShrEvent(int type);
     // -------------------------------------------------------------------------
+    // For cases where there were two nus in the event and the backtracked pdg was
+    // an electron then there was a nue in the event and we need to set the pdg to 
+    // an electron neutrino 
+    void ReClassifyPileUps(int type);
+    // -------------------------------------------------------------------------
 
 
     enum flav { k_numu, k_numubar, k_nue, k_nuebar, k_FLAV_MAX};

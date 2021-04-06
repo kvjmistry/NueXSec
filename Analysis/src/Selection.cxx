@@ -397,6 +397,8 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     // Here we apply the Selection cuts ----------------------------------------
     bool pass; // A flag to see if an event passes an event
 
+    SC.ReClassifyPileUps(type);
+
     // Classify the event -- sets variable in the slice contianer
     SC.SliceClassifier(type);      // Classification of the event
 
@@ -418,10 +420,8 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
 
     // In the case of Nuwro, we need to manually set the weight
-    if (std::string(_util.variation) == "nuwro")
+    if (std::string(_util.variation) == "nuwro" || std::string(_util.fakedataname) == "nuwro")
         SC.SetPPFXCVWeight();
-
-    
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
@@ -530,14 +530,7 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
         return false;
     }
     
-    
     SelectionFill(type, SC, _util.k_dEdx_max_no_tracks, counter_v );
-
-
-    // if (SC.is_signal && SC.nu_e < 0.3) std::cout<<"Low elec E!: " <<SC.elec_e*1000 << " MeV" << "  | E Nu: "<< SC.nu_e*1000 << " MeV" <<  std::endl; 
-    // if (SC.is_signal && SC.elec_e < 0.1) std::cout<<"Low elec E!: " <<SC.elec_e*1000 << " MeV" << "  | E Nu: "<< SC.nu_e*1000 << " MeV" << "  |Reco Shr Energy: " <<  SC.shr_energy_cali *1000<<  std::endl; 
-    // if (type == _util.k_mc && (SC.nu_pdg == -12 || SC.nu_pdg == 12) && SC.nu_e <= 0.125 && SC.ccnc == _util.k_NC) std::cout << "Got nue NC event selected thats below th: " << SC.nu_e << std::endl;
-
 
     // Future versions of this code needs to add the CRT veto to run 3 
     // improves the purity by about 5% with a small drop in efficiency
@@ -634,7 +627,7 @@ void Selection::SelectionFill(int type, SliceContainer &SC, int cut_index, std::
     // *************************************************************************
     double weight = 1.0;
     bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
-    weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction);
+    weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);
 
     // Try scaling the pi0 -- need to implement this as a configurable option
     // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
@@ -683,7 +676,7 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
     bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
 
     // Get the Central Value weight
-    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction);
+    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);
     double weight_norm = weight;
     double weight_Escale = weight;
 
@@ -768,7 +761,7 @@ void Selection::ApplyNuMuSelection(int type, SliceContainer &SC){
     bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
 
     // Get the Central Value weight
-    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction);
+    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);
     
     // Also apply the pi0 weight
     _util.GetPiZeroWeight(weight, _util.pi0_correction, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);

@@ -1064,3 +1064,21 @@ void SliceContainer::SetNonLdgShrEvent(int type){
         }
     }
 }
+// -----------------------------------------------------------------------------
+void SliceContainer::ReClassifyPileUps(int type){
+
+    if (type == _util.k_mc){
+        
+        // Leave the nues alone
+        if (std::abs(nu_pdg) == 12)
+            return;
+
+        // If the true backtracked pdg was an electron and the energy > 50 MeV then change to a nue
+        if ( shr_bkt_pdg == 11 && shr_bkt_E > 0.05 )
+            nu_pdg = 12;
+
+        if ( shr_bkt_pdg == -11 && shr_bkt_E > 0.05 )
+            nu_pdg = -12;
+    }
+
+}

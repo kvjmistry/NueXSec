@@ -76,7 +76,7 @@ public:
     template<typename T> void CheckWeight(T &weight);
     // -------------------------------------------------------------------------
     // Get the CV weight correction
-    double GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv, int interaction);
+    double GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv, int interaction, double elec_e);
     // -------------------------------------------------------------------------
     // Get the pi0 weight correction
     void GetPiZeroWeight(double &weight, int pizero_mode, int nu_pdg, int ccnc, int npi0, double pi0_e);

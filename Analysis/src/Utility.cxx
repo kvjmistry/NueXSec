@@ -722,7 +722,7 @@ template<typename T> void Utility::CheckWeight(T &weight){
 template void Utility::CheckWeight<double>(double &weight);
 template void Utility::CheckWeight<float>(float   &weight);
 // -----------------------------------------------------------------------------
-double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv, int interaction){
+double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv, int interaction, double elec_e){
 
     // Always give weights of 1 to the data
     if (type == k_data) return 1.0;
@@ -772,6 +772,16 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
         if (!infv) weight = 0.0; 
         else weight = weight * intrinsic_weight;
         
+    }
+
+    // We need to kill the weights for below threshold nues in the standard overlay sample to avoid double counting
+    if (std::string(intrinsic_mode) != "intrinsic" && type == k_mc){
+
+        if (nu_e < energy_threshold || elec_e < elec_threshold){
+            if (nu_pdg == 12 || nu_pdg == -12){
+                weight = 0.0; 
+            }
+        }
     }
 
     // Create a random energy dependent nue weight for testing model dependence
