@@ -411,6 +411,9 @@ void SystematicsHelper::SysVariations(int hist_index, const char* print_name, in
             if (hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()) > max_bin)
                 max_bin = hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()); // for scale purposes
         }
+
+        if (cut == _util.k_shr_moliere_avg && hist_index == _util.k_cut_shr_tkfit_dedx_max) 
+            CalcdEdxRMSMean(hist.at(y), var_string_pretty.at(y).c_str());
     }
 
     if (plotdata)
@@ -679,6 +682,26 @@ void SystematicsHelper::PlotVariationsEXT(std::string hist_name, const char* pri
 
 
 }
+// ----------------------------------------------------------------------------
+void SystematicsHelper::CalcdEdxRMSMean(TH1D* hist, std::string variation){
+
+    // Calculate the Mean and RMS
+    double mean_e =0, mean_g = 0; // electron and photon peak
+    double rms_e =0, rms_g = 0; // electron and photon peak
+
+    hist->GetXaxis()->SetRange(7, 12);
+    mean_e = hist->GetMean();
+    rms_e = hist->GetRMS();
+
+    hist->GetXaxis()->SetRange(14, 20);
+    mean_g = hist->GetMean();
+    rms_g = hist->GetRMS();
+
+    std::cout << variation <<": El Mean: "<< mean_e << " rms: "<< rms_e <<" Photon Mean: "<< mean_g << " rms: "<< rms_g <<  std::endl;
+
+    hist->GetXaxis()->SetRange(1, hist->GetNbinsX());
+
+}
 // -----------------------------------------------------------------------------
 void SystematicsHelper::InitialiseReweightingMode(){
 
@@ -758,7 +781,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeDetVar("WireModYZ",                          var, k_WireModYZ,                          var_string_pretty.at(k_WireModYZ));
         PlotReweightingModeDetVar("WireModThetaXZ",                     var, k_WireModThetaXZ,                     var_string_pretty.at(k_WireModThetaXZ));
         PlotReweightingModeDetVar("WireModThetaYZ_withSigmaSplines",    var, k_WireModThetaYZ_withSigmaSplines,    var_string_pretty.at(k_WireModThetaYZ_withSigmaSplines));
-        // // PlotReweightingModeDetVar("WireModThetaYZ_withoutSigmaSplines", var, k_WireModThetaYZ_withoutSigmaSplines, var_string_pretty.at(k_WireModThetaYZ_withoutSigmaSplines));
+        // PlotReweightingModeDetVar("WireModThetaYZ_withoutSigmaSplines", var, k_WireModThetaYZ_withoutSigmaSplines, var_string_pretty.at(k_WireModThetaYZ_withoutSigmaSplines));
         // PlotReweightingModeDetVar("WireModdEdX",                        var, k_WireModdEdX,                        var_string_pretty.at(k_WireModdEdX));
 
         // Plot the multisims

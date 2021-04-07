@@ -1421,7 +1421,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
     // Slice ID
     MakeStack("h_reco_nslice", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.6, "Pandora Slice ID",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_nslice.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
+              Form("cuts/%s/reco_nslice.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
     MakeStack("h_reco_nslice", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, true, 10000, "Pandora Slice ID",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_nslice_logy.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
@@ -1443,37 +1443,37 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Shower dEdx with the track fitter u plane
     MakeStack("h_reco_shr_tkfit_dedx_u", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "U Plane dEdx (track fitter) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.0, "U Plane dE/dx (track fitter) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_u.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Shower dEdx with the track fitter v plane
     MakeStack("h_reco_shr_tkfit_dedx_v", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "V Plane dEdx (track fitter) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.0, "V Plane dE/dx (track fitter) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_v.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // Shower dEdx with the track fitter y plane
     MakeStack("h_reco_shr_tkfit_dedx_y", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.0, "Leading Shower dEdx (Collection Plane) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.0, "Leading Shower dE/dx (Collection Plane) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_y.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Shower dEdx with the track fitter plane with the most hits
     MakeStack("h_reco_shr_tkfit_dedx_max", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.1, "Leading Shower dEdx (All Planes) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.1, "Leading Shower dE/dx (All Planes) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_max.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Shower dEdx with the track fitter plane with the most hits for events with tracks only
     MakeStack("h_reco_shr_tkfit_dedx_max_with_tracks", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.1, "Leading Shower dEdx (All Planes) (with tracks) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.1, "Leading Shower dE/dx (All Planes) (with tracks) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_max_with_tracks.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Shower dEdx with the track fitter y plane when there is no tracks
     MakeStack("h_reco_shr_tkfit_dedx_y_no_tracks", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.1, "Leading Shower dEdx (Collection Plane) (0 tracks) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.1, "Leading Shower dE/dx (Collection Plane) (0 tracks) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_y_no_tracks.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Shower dEdx with the track fitter plane with most hits when there is no tracks
     MakeStack("h_reco_shr_tkfit_dedx_max_no_tracks", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.5, "Leading Shower dEdx (All Planes) (0 tracks) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.5, "Leading Shower dE/dx (All Planes) (0 tracks) [MeV/cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_shr_tkfit_dedx_max_no_tracks.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Shower Flash Time

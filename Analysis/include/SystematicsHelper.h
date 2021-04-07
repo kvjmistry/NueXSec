@@ -145,6 +145,8 @@ class SystematicsHelper{
     // Save the total data cross section result to file
     void ExportTotalCrossSectionResult();
     // -------------------------------------------------------------------------
+    // Calculate the Mean and RMS in a range
+    void CalcdEdxRMSMean(TH1D* hist, std::string variation);
 
 
 

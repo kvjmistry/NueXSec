@@ -645,14 +645,14 @@ void HistogramHelper::InitHistograms(){
     // Loop over the types 
     for (unsigned int k =0 ; k< TH2D_hists.at(0).size(); k++){
         // dEdx vs shower vertex distance 
-        TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(k)              = new TH2D( Form("h_reco_shr_dEdx_shr_dist_%s",            _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dEdx (Collection Plane) [MeV/cm];Leading Shower to Vertex Distance [cm]", 40, 0, 10, 15, 0, 20);
-        TH2D_hists.at(k_reco_shr_dEdx_shr_dist_post).at(k)         = new TH2D( Form("h_reco_shr_dEdx_shr_dist_post_%s",       _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dEdx (Collection Plane) [MeV/cm];Leading Shower to Vertex Distance [cm]", 40, 0, 10, 15, 0, 20);
-        TH2D_hists.at(k_reco_shr_dEdx_max_shr_dist).at(k)          = new TH2D( Form("h_reco_shr_dEdx_max_shr_dist_%s",        _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dEdx (All Planes) [MeV/cm];Leading Shower to Vertex Distance [cm]", 40, 0, 10, 15, 0, 20);
-        TH2D_hists.at(k_reco_shr_dEdx_max_shr_dist_post).at(k)     = new TH2D( Form("h_reco_shr_dEdx_max_shr_dist_post_%s",   _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dEdx (All Planes) [MeV/cm];Leading Shower to Vertex Distance [cm]", 40, 0, 10, 15, 0, 20);
-        TH2D_hists.at(k_reco_shr_dEdx_shr_dist_large_dedx).at(k)   = new TH2D( Form("h_reco_shr_dEdx_shr_dist_large_dedx_%s", _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dEdx (Collection Plane) [MeV/cm];Leading Shower to Vertex Distance [cm]", 80, 10, 30, 15, 0, 20);
+        TH2D_hists.at(k_reco_shr_dEdx_shr_dist).at(k)              = new TH2D( Form("h_reco_shr_dEdx_shr_dist_%s",            _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dE/dx (Collection Plane) [MeV/cm];Leading Shower to Vertex Distance [cm]", 40, 0, 10, 15, 0, 20);
+        TH2D_hists.at(k_reco_shr_dEdx_shr_dist_post).at(k)         = new TH2D( Form("h_reco_shr_dEdx_shr_dist_post_%s",       _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dE/dx (Collection Plane) [MeV/cm];Leading Shower to Vertex Distance [cm]", 40, 0, 10, 15, 0, 20);
+        TH2D_hists.at(k_reco_shr_dEdx_max_shr_dist).at(k)          = new TH2D( Form("h_reco_shr_dEdx_max_shr_dist_%s",        _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dE/dx (All Planes) [MeV/cm];Leading Shower to Vertex Distance [cm]", 40, 0, 10, 15, 0, 20);
+        TH2D_hists.at(k_reco_shr_dEdx_max_shr_dist_post).at(k)     = new TH2D( Form("h_reco_shr_dEdx_max_shr_dist_post_%s",   _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dE/dx (All Planes) [MeV/cm];Leading Shower to Vertex Distance [cm]", 40, 0, 10, 15, 0, 20);
+        TH2D_hists.at(k_reco_shr_dEdx_shr_dist_large_dedx).at(k)   = new TH2D( Form("h_reco_shr_dEdx_shr_dist_large_dedx_%s", _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dE/dx (Collection Plane) [MeV/cm];Leading Shower to Vertex Distance [cm]", 80, 10, 30, 15, 0, 20);
     
         // dEdx vs Moliere Average
-        TH2D_hists.at(k_reco_shr_dEdx_moliere).at(k)          = new TH2D( Form("h_reco_shr_dEdx_moliere_%s", _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dEdx (Collection Plane) [MeV/cm];Leading Shower Moliere Avg [deg]", 40, 0, 10, 20, 0, 30);
+        TH2D_hists.at(k_reco_shr_dEdx_moliere).at(k)          = new TH2D( Form("h_reco_shr_dEdx_moliere_%s", _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower dE/dx (Collection Plane) [MeV/cm];Leading Shower Moliere Avg [deg]", 40, 0, 10, 20, 0, 30);
     
         // Moliere Average vs Shower vtx distance
         TH2D_hists.at(k_reco_shr_moliere_shr_dist).at(k)      = new TH2D( Form("h_reco_shr_moliere_shr_dist_%s", _util.sig_bkg_prefix.at(k).c_str()),";Leading Shower Moliere Avg [deg];Leading Shower to Vertex Distance [cm]", 20, 0, 30, 15, 0, 20);

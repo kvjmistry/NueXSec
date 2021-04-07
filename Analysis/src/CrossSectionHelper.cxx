@@ -530,6 +530,7 @@ void CrossSectionHelper::LoopEvents(){
     "Signal MC:       " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_sig) ->Integral() << "\n" << 
     "Background MC:   " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_bkg) ->Integral() << "\n" << 
     "Generated MC:    " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_gen) ->Integral() << "\n" << 
+    "Efficiency:      " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_eff) ->Integral() << "\n" << 
     "EXT MC:          " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_ext) ->Integral()* (_util.ext_scale_factor / _util.mc_scale_factor) << "\n" << 
     "Dirt MC:         " << h_cross_sec.at(0).at(0).at(k_var_integrated).at(k_xsec_dirt)->Integral()* (_util.dirt_scale_factor / _util.mc_scale_factor) << "\n\n" << 
     
@@ -1044,8 +1045,8 @@ double CrossSectionHelper::GetIntegratedFluxCV(){
     std::cout << "\nIntegral Nuebar Flux: " << flux_scale_factor * integral_nuebar / POT_flux << " nuebar / POT / cm2" << "\n" << std::endl;
 
     // Print the flux scaled to the MC and Data POT
-    std::cout << "Integral Flux MC POT: "   << mc_flux_scale_factor * integral_nuebar / POT_flux   << " nu / MC POT / cm2"   << "\n" << std::endl;
-    std::cout << "Integral Flux Data POT: " << data_flux_scale_factor * integral_nuebar / POT_flux << " nu / Data POT / cm2" << "\n" << std::endl;
+    std::cout << "Integral Flux MC POT: "   << mc_flux_scale_factor * (integral_nue + integral_nuebar) / POT_flux   << " nu / MC POT / cm2"   << "\n" << std::endl;
+    std::cout << "Integral Flux Data POT: " << data_flux_scale_factor * (integral_nue + integral_nuebar) / POT_flux << " nu / Data POT / cm2" << "\n" << std::endl;
 
     // Return the flux per POT
     return (integral_nue + integral_nuebar) / POT_flux;

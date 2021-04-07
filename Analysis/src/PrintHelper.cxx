@@ -301,22 +301,23 @@ void PrintHelper::PrintResults(){
         }
 
         if (_util.print_mc && _util.print_dirt){
-            double tot_mc_bkg = count_nu_out_fv + count_numu_cc + count_numu_cc_pi0 + count_nc + count_nc_pi0 + count_thr_nue + count_thr_nuebar;
-            printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Beam Bkg", tot_mc_bkg + count_dirt * (dirt_scale_factor / mc_scale_factor), double(tot_mc_bkg * mc_scale_factor + count_dirt * dirt_scale_factor ) );
+            double tot_mc_bkg = count_nu_out_fv + count_numu_cc + count_numu_cc_pi0 + count_nc + count_nc_pi0 + count_thr_nue + count_thr_nuebar + count_cosmic + count_cosmic_nue + count_cosmic_nuebar;
+            // printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Beam Bkg", tot_mc_bkg + count_dirt * (dirt_scale_factor / mc_scale_factor), double(tot_mc_bkg * mc_scale_factor + count_dirt * dirt_scale_factor ) );
+            printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Overlay Bkg", tot_mc_bkg, double(tot_mc_bkg * mc_scale_factor ) );
         }
 
         if (_util.print_mc && _util.print_ext){
             double tot_cosmic_bkg = count_cosmic + count_cosmic_nue + count_cosmic_nuebar;
             printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Cosmic Bkg", tot_cosmic_bkg + count_ext * (ext_scale_factor / mc_scale_factor), double(tot_cosmic_bkg * mc_scale_factor + count_ext * ext_scale_factor ));
         }
-        
-        if (_util.print_mc){
-            printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Candidate Nue", sum_mc_dirt_ext, double(sum_mc_dirt_ext         * mc_scale_factor  ));
-        }
 
         if (_util.print_mc){
-            double tot_MC = count_nue_cc + count_nuebar_cc + count_nu_out_fv + count_cosmic + count_numu_cc + count_numu_cc_pi0 + count_nc + count_nc_pi0 + count_cosmic_nue + count_cosmic_nuebar;
-            printf ("\n %-20s: %-10.2f %-10.2f\n", "Total MC Events", tot_MC , double(tot_MC         * mc_scale_factor  ));
+            double tot_MC = count_nue_cc + count_nuebar_cc + count_nu_out_fv + count_cosmic + count_numu_cc + count_numu_cc_pi0 + count_nc + count_nc_pi0 + count_cosmic_nue + count_cosmic_nuebar + count_thr_nue + count_thr_nuebar;
+            printf ("\n %-20s: %-10.2f %-10.2f\n", "Total Overlay S+B", tot_MC , double(tot_MC         * mc_scale_factor  ));
+        }
+        
+        if (_util.print_mc){
+            printf ("\n %-20s: %-10.2f %-10.2f\n", "Total MC+EXT+Dirt", sum_mc_dirt_ext, double(sum_mc_dirt_ext         * mc_scale_factor  ));
         }
   
         if (_util.print_mc){

@@ -206,6 +206,10 @@ if [ "$1" == "nopi0tune" ]; then
 
   ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root nopi0tune --intrinsic intrinsic --weight_pi0 0
 
+  source merge/merge_run1_files.sh files/nuexsec_mc_run1_nopi0tune.root files/nuexsec_run1_nopi0tune_merged.root
+
+  ./nuexsec --run 1 --hist files/nuexsec_run1_nopi0tune_merged.root --var dummy nopi0tune
+
   root -l -b -q 'merge/merge_uneaventrees.C("1", true, false, "files/trees/nuexsec_selected_tree_mc_run1_nopi0tune.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "nopi0tune")'
 
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_nopi0tune.root --var dummy nopi0tune --xsecmode default --xsec_smear er --xsecbins standard --xsecvar elec_E
@@ -240,6 +244,8 @@ if [ "$1" == "tune1" ]; then
 
   ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_tune1_intrinsic.root tune1 --intrinsic intrinsic --weight_tune 0 --weight_pi0 0
 
+  ./nuexsec --run 1 --printonly --printall --var nuexsec_selected_tree_mc_run1_tune1.root tune1
+
   source merge/merge_run1_files.sh files/nuexsec_mc_run1_tune1.root files/nuexsec_run1_tune1_merged.root
 
   ./nuexsec --run 1 --hist files/nuexsec_run1_tune1_merged.root --var dummy tune1
@@ -259,6 +265,8 @@ if [ "$1" == "nuwro" ]; then
 
   ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_nuwro_intrinsic.root nuwro --intrinsic intrinsic --weight_tune 0 --weight_pi0 0
 
+  ./nuexsec --run 1 --printonly --printall --var nuexsec_selected_tree_mc_run1_nuwro.root nuwro
+
   source merge/merge_run1_files.sh files/nuexsec_mc_run1_nuwro.root files/nuexsec_run1_nuwro_merged.root
 
   ./nuexsec --run 1 --hist files/nuexsec_run1_nuwro_merged.root --var dummy nuwro
@@ -277,6 +285,8 @@ if [ "$1" == "geniev3" ]; then
   ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root geniev3 --weight_tune 0 --weight_pi0 0
 
   ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root geniev3 --intrinsic intrinsic --weight_tune 0 --weight_pi0 0
+
+  ./nuexsec --run 1 --printonly --printall --var nuexsec_selected_tree_mc_run1_geniev3.root geniev3
 
   source merge/merge_run1_files.sh files/nuexsec_mc_run1_geniev3.root files/nuexsec_run1_geniev3_merged.root
 
