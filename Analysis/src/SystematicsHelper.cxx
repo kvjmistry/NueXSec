@@ -756,7 +756,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeUnisim("POT",        var, "POT Count." );
 
         // Pi0 tune
-        // PlotReweightingModeUnisim("pi0",        var, "#pi^{0}" );
+        PlotReweightingModeUnisim("pi0",        var, "#pi^{0}" );
 
         // Plot the beamline unisims
         PlotReweightingModeUnisim("Horn1_x",            var, "Horn 1 x" );

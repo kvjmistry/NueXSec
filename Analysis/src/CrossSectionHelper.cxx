@@ -874,9 +874,9 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
     else if ( label == "Dirtup" || label == "Dirtdn"){
         
         if (label == "Dirtup")
-            weight_dirt = cv_weight*2.0; // increase the dirt by 100%
+            weight_dirt = cv_weight*1.25; // increase the dirt by 25%
         else
-            weight_dirt = cv_weight*0.0; // decrease the dirt by 100%
+            weight_dirt = cv_weight*0.75; // decrease the dirt by 25%
         
         weight_uni = cv_weight;
     }
@@ -892,7 +892,7 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
         if (_util.pi0_correction == 1){
             
             if (_npi0 > 0) {
-                weight_uni = cv_weight / 0.759; 
+                weight_uni = cv_weight * 0.91; 
             }
             else {
                 weight_uni = cv_weight;
@@ -924,6 +924,12 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
     else {
         // Note we actually dont want to divide out by the spline, but since this is 1 in numi, it doesnt matter!
         // We do this because the interaction systematics are shifted about the genie tune as the CV
+
+        // Dont weight the pi0s since we constrain them
+        if (_npi0 > 0) {
+            weight_uni = cv_weight;
+            return;
+        }
 
         // Check the spline times tune weight
         _util.CheckWeight(_weightSplineTimesTune);
