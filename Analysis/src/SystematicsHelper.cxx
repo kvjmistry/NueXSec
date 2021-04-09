@@ -3952,6 +3952,44 @@ void SystematicsHelper::ExportResult(TFile* f){
         // Data XSec Sys Covariance Matrix ---------------------------------
         h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_sys)->SetOption("colz");
         h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_sys)->Write("h_cov_sys_dataxsec_reco", TObject::kOverwrite);
+
+        // Data XSec Covariance Matrix  ---------------------------------
+        TH2D* h_cov_xsec_sys_tot = (TH2D*)h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_genie_multi)->Clone();
+        h_cov_xsec_sys_tot->Add(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_genie_uni));
+        h_cov_xsec_sys_tot->Add(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_pi0));
+        
+        // Create a temp matrix to gather all the MC smear and stat before adding to the data
+        TH2D* h_cov_xsec_sys_tot_temp = (TH2D*)h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat)->Clone();
+        h_cov_xsec_sys_tot_temp->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_genie_multi));
+        h_cov_xsec_sys_tot_temp->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_genie_uni));
+        h_cov_xsec_sys_tot_temp->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_pi0));
+
+        // Convert the Covariance Matrix-- switching from MC CV deviations to Data CV deviation
+        _util.ConvertCovarianceUnits(h_cov_xsec_sys_tot_temp,
+                           cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec),
+                           cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec));
+        
+        h_cov_xsec_sys_tot->Add(h_cov_xsec_sys_tot_temp);
+        h_cov_xsec_sys_tot->SetOption("col");
+        h_cov_xsec_sys_tot->Write("h_cov_xsec_sys_dataxsec_reco", TObject::kOverwrite);
+
+        // Data Flux Covariance Matrix  ---------------------------------
+        TH2D* h_cov_flux_sys_tot = (TH2D*)h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_hp)->Clone();
+        h_cov_flux_sys_tot->Add(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_beamline));
+        
+        // Create a temp matrix to gather all the MC smear and stat before adding to the data
+        TH2D* h_cov_flux_sys_tot_temp = (TH2D*)h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat)->Clone();
+        h_cov_flux_sys_tot_temp->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_hp));
+        h_cov_flux_sys_tot_temp->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_beamline));
+
+        // Convert the Covariance Matrix-- switching from MC CV deviations to Data CV deviation
+        _util.ConvertCovarianceUnits(h_cov_flux_sys_tot_temp,
+                           cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec),
+                           cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec));
+        
+        h_cov_flux_sys_tot->Add(h_cov_flux_sys_tot_temp);
+        h_cov_flux_sys_tot->SetOption("col");
+        h_cov_flux_sys_tot->Write("h_cov_flux_sys_dataxsec_reco", TObject::kOverwrite);
     
         // MC XSec True  ---------------------------------
         cv_hist_vec.at(k_var_trueX).at(k_xsec_mcxsec)->SetOption("hist");

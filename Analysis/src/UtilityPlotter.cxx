@@ -2270,6 +2270,16 @@ void UtilityPlotter::CompareFakeDataTrue(){
     TH2D* h_cov_reco = (TH2D*)h_temp_2D->Clone();
     h_cov_reco->SetDirectory(0);
 
+    // Flux Covariance Matrix
+    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/wiener/h_cov_flux_sys_dataxsec_reco",_util.xsec_var));
+    TH2D* h_cov_reco_flux = (TH2D*)h_temp_2D->Clone();
+    h_cov_reco_flux->SetDirectory(0);
+
+    // Xsec Covariance Matrix
+    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/wiener/h_cov_xsec_sys_dataxsec_reco",_util.xsec_var));
+    TH2D* h_cov_reco_xsec = (TH2D*)h_temp_2D->Clone();
+    h_cov_reco_xsec->SetDirectory(0);
+
     fxsec->Close();
 
     // Now Get the Models
@@ -2299,9 +2309,12 @@ void UtilityPlotter::CompareFakeDataTrue(){
 
 
         // Set diagonals of covariance matrix
-        h_cov_diag.at(m) = (TH2D*)h_cov_reco->Clone();
+        if (m == k_model_FLUGG)
+            h_cov_diag.at(m) = (TH2D*)h_cov_reco_flux->Clone();
+        else
+            h_cov_diag.at(m) = (TH2D*)h_cov_reco_xsec->Clone();
         
-        // Convert the Covariance Matrix-- switching from MC CV deviations to Fake Data CV deviation
+        // Convert the Covariance Matrix-- switching from data deviations to Fake Data CV deviation
         _util.ConvertCovarianceUnits(h_cov_diag.at(m),
                                h_reco_data_xsec,
                                h_fake.at(m));
@@ -2788,8 +2801,8 @@ void UtilityPlotter::CompareTotalDataCrossSections(){
     // Create a vector for the models
     std::vector<std::string> models = {
         "mec",
-        "nogtune",
-        "nopi0tune",
+        "geniev3",
+        "nuwro",
         "FLUGG",
         "tune1"
     };
@@ -2797,8 +2810,8 @@ void UtilityPlotter::CompareTotalDataCrossSections(){
     // enums for the models
     enum enum_models {
         k_model_mec,
-        k_model_nogtune,
-        k_model_nopi0tune,
+        k_model_geniev3,
+        k_model_nuwro,
         k_model_FLUGG,
         k_model_tune1,
         k_MODEL_MAX
@@ -2814,7 +2827,14 @@ void UtilityPlotter::CompareTotalDataCrossSections(){
     TH1D* h_dataxsec = (TH1D*)h_temp->Clone();
 
     // Set the error to be 21% total systematic uncertainty
-    h_dataxsec->SetBinError(1, h_dataxsec->GetBinContent(1) * 0.21);
+    // if (m == k_model_FLUGG)
+    //     h_dataxsec->SetBinError(1,h_dataxsec->GetBinContent(1) * 0.20983 );
+    // else if(m == k_model_nuwro || m == k_model_tune1)
+    //     h_dataxsec->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * 0.52 ); // GENIE + MC STAT + bkg tuning change
+    // else
+        h_dataxsec->SetBinError(1,h_dataxsec->GetBinContent(1) * std::sqrt(0.04551*0.04551 + 0.0374*0.0374) );
+    
+    // h_dataxsec->SetBinError(1, h_dataxsec->GetBinContent(1) * 0.21);
     h_dataxsec->SetLineColor(kBlack);
     h_dataxsec->SetMarkerStyle(20);
     h_dataxsec->SetMarkerSize(0.5);
@@ -2842,8 +2862,8 @@ void UtilityPlotter::CompareTotalDataCrossSections(){
 
         // Set the line colours
         if (m == k_model_mec)      h_dataxsec_model.at(k_model_mec)      ->SetLineColor(kGreen+2);
-        if (m == k_model_nogtune)  h_dataxsec_model.at(k_model_nogtune)  ->SetLineColor(kBlue+2);
-        if (m == k_model_nopi0tune)h_dataxsec_model.at(k_model_nopi0tune)->SetLineColor(kPink+1);
+        if (m == k_model_geniev3)  h_dataxsec_model.at(k_model_geniev3)  ->SetLineColor(kBlue+2);
+        if (m == k_model_nuwro)    h_dataxsec_model.at(k_model_nuwro)    ->SetLineColor(kPink+1);
         if (m == k_model_FLUGG)    h_dataxsec_model.at(k_model_FLUGG)    ->SetLineColor(kViolet-1);
         if (m == k_model_tune1)    h_dataxsec_model.at(k_model_tune1)    ->SetLineColor(kOrange-1);
     
@@ -2867,8 +2887,8 @@ void UtilityPlotter::CompareTotalDataCrossSections(){
     leg->SetFillStyle(0);
     leg->AddEntry(h_dataxsec, "Data (Sys.)", "ep");
     leg->AddEntry(h_dataxsec_model.at(k_model_mec)      , "Data 1.5 #times MEC", "l");
-    leg->AddEntry(h_dataxsec_model.at(k_model_nogtune)  , "Data no gTune", "l");
-    leg->AddEntry(h_dataxsec_model.at(k_model_nopi0tune), "Data no #pi^{0} Tune", "l");
+    leg->AddEntry(h_dataxsec_model.at(k_model_geniev3)  , "Data GENIE v3", "l");
+    leg->AddEntry(h_dataxsec_model.at(k_model_nuwro)    ,"Data NuWro", "l");
     leg->AddEntry(h_dataxsec_model.at(k_model_FLUGG)    , "Data FLUGG", "l");
     leg->AddEntry(h_dataxsec_model.at(k_model_tune1)    , "Data Tune 1", "l");
     leg->Draw();
