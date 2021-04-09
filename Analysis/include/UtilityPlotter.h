@@ -177,6 +177,9 @@ class UtilityPlotter{
     // Compare the True generator pi0 distributions
     void CompareGeneratorPi0();
     // -------------------------------------------------------------------------
+    // Compare pi0 distributions across generators
+    void CompareSelectedPi0();
+    // -------------------------------------------------------------------------
 
 
 }; // End Class UtilityPlotter

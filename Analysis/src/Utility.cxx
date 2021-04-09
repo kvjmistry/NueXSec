@@ -1017,7 +1017,7 @@ bool Utility::in_fv(double x, double y, double z){
 // -----------------------------------------------------------------------------
 void Utility::IncreaseLabelSize(TH1D *h, TCanvas *c){
 
-    h->GetXaxis()->SetLabelSize(0.05);
+    h->GetXaxis()->SetLabelSize(0.04);
     h->GetXaxis()->SetTitleSize(0.05);
     h->GetYaxis()->SetLabelSize(0.05);
     h->GetYaxis()->SetTitleSize(0.05);

@@ -51,7 +51,8 @@ void UtilityPlotter::Initialise(Utility _utility){
     }
     // Compare the GENIE and NuWro true Pi0 Energies
     else if (std::string(_util.uplotmode) == "genpi0"){
-        CompareGeneratorPi0();
+        // CompareGeneratorPi0();
+        CompareSelectedPi0();
         return;
     }
     // This will call the code to optimise the bin widths
@@ -4144,5 +4145,119 @@ void UtilityPlotter::CompareGeneratorPi0(){
     c->Print(Form("plots/run%s/pi0/h_pi0_comparison_pass.pdf", _util.run_period));
  
     delete c;
+
+}
+// -----------------------------------------------------------------------------
+void UtilityPlotter::CompareSelectedPi0(){
+
+    gStyle->SetOptStat(0);
+
+    // enums for legend
+    enum enum_gens {k_cv, k_geniev3, k_nuwro, k_tune1, k_gen_MAX};
+    std::vector<int> cols = {kBlack, kBlue+2, kPink+1, kOrange-2};
+    
+    std::vector<std::string> gen_names = {"CV", "geniev3", "nuwro", "tune1"};
+    std::vector<double> sf = {1.0, 1.0,3.6248214, 3.8881733};
+
+    std::vector<TH1D*> h_pimass(k_gen_MAX);
+    std::vector<TH1D*> h_shr_E(k_gen_MAX);
+    std::vector<TH1D*> h_shr_cosbeta(k_gen_MAX);
+
+    std::vector<TFile*> f(k_gen_MAX);
+
+    TLegend *leg = new TLegend(0.45, 0.89, 0.85, 0.7);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+
+    std::string mode = "nc_pi0";
+    // std::string mode = "numu_cc_pi0";
+
+    for (unsigned int m = 0; m < gen_names.size(); m++){
+        
+        if (m == k_cv)
+            f.at(m) = TFile::Open(Form("files/nuexsec_mc_run1%s.root", ""), "READ");
+        else
+            f.at(m) = TFile::Open(Form("files/nuexsec_mc_run1_%s.root", gen_names.at(m).c_str()), "READ");
+
+        if (m == k_cv)
+            _util.GetHist(f.at(m), h_pimass.at(m), Form("pizero/h_pi0_mass_norm_%s",mode.c_str()));
+        else
+            _util.GetHist(f.at(m), h_pimass.at(m), Form("pizero/h_pi0_mass_%s", mode.c_str()));
+        
+        h_pimass.at(m)->Scale(sf.at(m));
+        h_pimass.at(m)->SetLineColor(cols.at(m));
+        h_pimass.at(m)->SetLineWidth(2);
+        h_pimass.at(m)->SetTitle(Form("%s;#pi^{0} Mass [MeV];Entries", mode.c_str()));
+        leg->AddEntry(h_pimass.at(m), gen_names.at(m).c_str(), "l");
+
+        _util.GetHist(f.at(m), h_shr_E.at(m), Form("Stack/dEdx_max_no_tracks/%s/h_reco_shower_energy_cali_rebin_dEdx_max_no_tracks_%s", mode.c_str(), mode.c_str()));
+        h_shr_E.at(m)->Scale(sf.at(m));
+        h_shr_E.at(m)->SetLineColor(cols.at(m));
+        h_shr_E.at(m)->SetLineWidth(2);
+        h_shr_E.at(m)->Scale(1.0, "width");
+        h_shr_E.at(m)->SetTitle(Form("%s;Shower Energy [GeV];Entries", mode.c_str()));
+
+        _util.GetHist(f.at(m), h_shr_cosbeta.at(m), Form("Stack/dEdx_max_no_tracks/%s/h_reco_effective_cosangle_dEdx_max_no_tracks_%s", mode.c_str(), mode.c_str()));
+        h_shr_cosbeta.at(m)->Scale(sf.at(m));
+        h_shr_cosbeta.at(m)->SetLineColor(cols.at(m));
+        h_shr_cosbeta.at(m)->SetLineWidth(2);
+        h_shr_cosbeta.at(m)->Scale(1.0, "width");
+        h_shr_cosbeta.at(m)->SetTitle(Form("%s;Shower cos#beta;Entries", mode.c_str()));
+
+
+    }
+
+    // Now Draw the histograms
+    TCanvas * c, *c2, *c3; 
+    
+    for (unsigned int m = 0; m < gen_names.size(); m++){
+
+        if (m == k_cv){
+            c = new TCanvas("c", "c", 500, 500);
+            c->SetTopMargin(0.11);
+            c2 = new TCanvas("c2", "c", 500, 500);
+            c2->SetTopMargin(0.11);
+            c3 = new TCanvas("c3", "c", 500, 500);
+            c3->SetTopMargin(0.11);
+        }
+
+        c->cd();
+        _util.IncreaseLabelSize(h_pimass.at(m), c);
+
+        h_pimass.at(m)->Draw("hist,same");
+
+        double yscale = h_pimass.at(k_cv)->GetMaximum();
+        h_pimass.at(k_cv)->SetMaximum(yscale*1.2);
+        leg->Draw();
+
+        c2->cd();
+        _util.IncreaseLabelSize(h_shr_E.at(m), c2);
+
+        h_shr_E.at(m)->Draw("hist,same");
+
+        yscale = h_shr_E.at(k_cv)->GetMaximum();
+        h_shr_E.at(k_cv)->SetMaximum(yscale*1.3);
+        leg->Draw();
+
+        c3->cd();
+        _util.IncreaseLabelSize(h_shr_cosbeta.at(m), c3);
+
+        h_shr_cosbeta.at(m)->Draw("hist,same");
+
+        yscale = h_shr_cosbeta.at(k_cv)->GetMaximum();
+        h_shr_cosbeta.at(k_cv)->SetMaximum(yscale*1.3);
+        leg->Draw();
+
+        if (m == k_gen_MAX-1){
+
+            c->Print(Form("plots/run%s/pi0/h_%s_mass_comparison.pdf", _util.run_period, mode.c_str()));
+            c2->Print(Form("plots/run%s/pi0/h_%s_energy_comparison.pdf", _util.run_period, mode.c_str()));
+            c3->Print(Form("plots/run%s/pi0/h_%s_cosbeta_comparison.pdf", _util.run_period, mode.c_str()));
+            delete c;
+            delete c2;
+        }
+    }
+
+    
 
 }
