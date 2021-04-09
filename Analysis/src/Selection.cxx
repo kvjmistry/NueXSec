@@ -532,6 +532,10 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     
     SelectionFill(type, SC, _util.k_dEdx_max_no_tracks, counter_v );
 
+
+    // if (SC.classification.first == "cosmic")
+    //     std::cout << SC.nu_purity_from_pfp<< " " << SC.nu_pdg << " " << SC.shr_bkt_pdg <<" " << SC.trk_bkt_pdg<< std::endl; 
+
     // Future versions of this code needs to add the CRT veto to run 3 
     // improves the purity by about 5% with a small drop in efficiency
     // It will bring the purity and efficiency to a similar level to Run 1

@@ -412,9 +412,13 @@ void SystematicsHelper::SysVariations(int hist_index, const char* print_name, in
                 max_bin = hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()); // for scale purposes
         }
 
-        if (cut == _util.k_shr_moliere_avg && hist_index == _util.k_cut_shr_tkfit_dedx_max) 
+        if (cut == _util.k_shr_moliere_avg && hist_index == _util.k_cut_shr_tkfit_dedx_max)
             CalcdEdxRMSMean(hist.at(y), var_string_pretty.at(y).c_str());
     }
+
+    if (cut == _util.k_shr_moliere_avg && hist_index == _util.k_cut_shr_tkfit_dedx_max)
+        CalcdEdxRMSMean(h_data, "data");
+
 
     if (plotdata)
          leg->AddEntry(h_data, "Beam-On", "lep"); // add histogram to legend
@@ -3859,9 +3863,14 @@ void SystematicsHelper::ExportResult(TFile* f){
         h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_sys)->SetOption("col");
         h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_sys)->Write("h_cov_sys_mcxsec_reco", TObject::kOverwrite);
 
-        // MC XSec GENIE Covariance Matrix  ---------------------------------
+        // MC XSec Covariance Matrix  ---------------------------------
         TH2D* h_cov_xsec_sys_tot = (TH2D*)h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_genie_multi)->Clone();
         h_cov_xsec_sys_tot->Add(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_genie_uni));
+        h_cov_xsec_sys_tot->Add(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_pi0));
+        h_cov_xsec_sys_tot->Add(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat));
+        h_cov_xsec_sys_tot->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_genie_multi));
+        h_cov_xsec_sys_tot->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_genie_uni));
+        h_cov_xsec_sys_tot->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_pi0));
         h_cov_xsec_sys_tot->SetOption("col");
         h_cov_xsec_sys_tot->Write("h_cov_xsec_sys_mcxsec_reco", TObject::kOverwrite);
 

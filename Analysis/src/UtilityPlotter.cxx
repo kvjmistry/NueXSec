@@ -2064,6 +2064,14 @@ void UtilityPlotter::CompareFakeDataReco(){
     TH2D* h_cov_tot = (TH2D*)h_temp_2D->Clone();
     h_cov_tot->SetDirectory(0);
 
+    h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/er/h_cov_xsec_sys_mcxsec_reco", _util.xsec_var ));
+    TH2D* h_cov_xsec = (TH2D*)h_temp_2D->Clone();
+    h_cov_xsec->SetDirectory(0);
+
+    h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/er/h_cov_flux_sys_mcxsec_reco", _util.xsec_var ));
+    TH2D* h_cov_flux = (TH2D*)h_temp_2D->Clone();
+    h_cov_flux->SetDirectory(0);
+
     fxsec->Close();
 
     /// Load in the cross section output
@@ -2073,8 +2081,8 @@ void UtilityPlotter::CompareFakeDataReco(){
     std::vector<std::string> models = {
         "Input",
         "mec",
-        "nogtune",
-        "nopi0tune",
+        "geniev3",
+        "nuwro",
         "FLUGG",
         "tune1"
     };
@@ -2083,8 +2091,8 @@ void UtilityPlotter::CompareFakeDataReco(){
     enum enum_models {
         k_model_input,
         k_model_mec,
-        k_model_nogtune,
-        k_model_nopi0tune,
+        k_model_geniev3,
+        k_model_nuwro,
         k_model_FLUGG,
         k_model_tune1,
         k_MODEL_MAX
@@ -2123,7 +2131,10 @@ void UtilityPlotter::CompareFakeDataReco(){
         h_response.at(m) = (TH2D*)htemp2D->Clone();
 
         // Get the Covariance matrix
-        h_cov_m.at(m) = (TH2D*)h_cov_tot->Clone();
+        if (m == k_model_FLUGG)
+            h_cov_m.at(m) = (TH2D*) h_cov_flux->Clone();
+        else
+            h_cov_m.at(m) = (TH2D*) h_cov_xsec->Clone();
 
         // Apply the response matrix to the model MC True dist to get the reco dist back
         _util.MatrixMultiply(h_true.at(m), h_true_smear.at(m), h_response.at(m), "true_reco", true);
@@ -2171,8 +2182,8 @@ void UtilityPlotter::CompareFakeDataReco(){
         // Set the line colours
         if (m == k_model_input)    h_true_smear.at(k_model_input)    ->SetLineColor(kRed+2);
         if (m == k_model_mec)      h_true_smear.at(k_model_mec)      ->SetLineColor(kGreen+2);
-        if (m == k_model_nogtune)  h_true_smear.at(k_model_nogtune)  ->SetLineColor(kBlue+2);
-        if (m == k_model_nopi0tune)h_true_smear.at(k_model_nopi0tune)->SetLineColor(kPink+1);
+        if (m == k_model_geniev3)  h_true_smear.at(k_model_geniev3)  ->SetLineColor(kBlue+2);
+        if (m == k_model_nuwro)    h_true_smear.at(k_model_nuwro)    ->SetLineColor(kPink+1);
         if (m == k_model_FLUGG)    h_true_smear.at(k_model_FLUGG)    ->SetLineColor(kViolet-1);
         if (m == k_model_tune1)    h_true_smear.at(k_model_tune1)    ->SetLineColor(kOrange-1);
 
@@ -2182,6 +2193,10 @@ void UtilityPlotter::CompareFakeDataReco(){
         h_error_hist->SetFillColorAlpha(12, 0.15);
 
         h_true_smear.at(m)->Draw("hist");
+
+        if (m != k_model_input)
+            h_true_smear.at(k_model_input)->Draw("hist,same");
+
         h_error_hist->Draw("e2, same");
         h_fake.at(m)->Draw("E,same");
 
@@ -2190,6 +2205,10 @@ void UtilityPlotter::CompareFakeDataReco(){
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
         if (m == k_model_input) models.at(m) = "CV";
+
+        if (m != k_model_input)
+            leg->AddEntry( h_true_smear.at(k_model_input), "CV", "lf");
+
         leg->AddEntry(h_error_hist, Form("True %s (stat.)", models.at(m).c_str()), "lf");
         leg->AddEntry(h_fake.at(m), Form("Fake %s (sys.)", models.at(m).c_str()), "elp");
         leg->Draw();
@@ -2211,8 +2230,8 @@ void UtilityPlotter::CompareFakeDataTrue(){
     std::vector<std::string> models = {
         "Input",
         "mec",
-        "nogtune",
-        "nopi0tune",
+        "geniev3",
+        "nuwro",
         "FLUGG",
         "tune1"
     };
@@ -2221,8 +2240,8 @@ void UtilityPlotter::CompareFakeDataTrue(){
     enum enum_models {
         k_model_input,
         k_model_mec,
-        k_model_nogtune,
-        k_model_nopi0tune,
+        k_model_geniev3,
+        k_model_nuwro,
         k_model_FLUGG,
         k_model_tune1,
         k_MODEL_MAX
@@ -2263,6 +2282,8 @@ void UtilityPlotter::CompareFakeDataTrue(){
     std::vector<TH1D*> h_true(k_MODEL_MAX);
     std::vector<TH1D*> h_fake(k_MODEL_MAX);
     std::vector<TH2D*> h_cov_diag(k_MODEL_MAX);
+
+    TH1D* h_fake_xsec_smear_CV;
 
     // Loop over each model
     for (unsigned int m = 0; m < models.size(); m++){
@@ -2338,23 +2359,34 @@ void UtilityPlotter::CompareFakeDataTrue(){
         // Set the line colours
         if (m == k_model_input)    h_fake_xsec_smear->SetLineColor(kRed+2);
         if (m == k_model_mec)      h_fake_xsec_smear->SetLineColor(kGreen+2);
-        if (m == k_model_nogtune)  h_fake_xsec_smear->SetLineColor(kBlue+2);
-        if (m == k_model_nopi0tune)h_fake_xsec_smear->SetLineColor(kPink+1);
+        if (m == k_model_geniev3)  h_fake_xsec_smear->SetLineColor(kBlue+2);
+        if (m == k_model_nuwro)    h_fake_xsec_smear->SetLineColor(kPink+1);
         if (m == k_model_FLUGG)    h_fake_xsec_smear->SetLineColor(kViolet-1);
         if (m == k_model_tune1)    h_fake_xsec_smear->SetLineColor(kOrange-1);
+
+        if (m == k_model_input)
+            h_fake_xsec_smear_CV = (TH1D*)h_fake_xsec_smear->Clone();
 
         TH1D* h_error_hist = (TH1D*)h_fake_xsec_smear->Clone();
         h_error_hist->SetFillColorAlpha(12, 0.15);
 
         h_fake_xsec_smear->Draw("hist");
+
+        if (m != k_model_input)
+            h_fake_xsec_smear_CV->Draw("hist,same");
+
         h_error_hist->Draw("E2, same");
         _wSVD.unf->Draw("E,same");
+
 
         // Create the legend
         TLegend *leg = new TLegend(0.4, 0.5, 0.85, 0.85);
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
         if (m == k_model_input) models.at(m) = "CV";
+
+        if (m != k_model_input)
+            leg->AddEntry(h_fake_xsec_smear_CV, "CV", "lf");
         leg->AddEntry(h_error_hist, Form("True %s (stat.)", models.at(m).c_str()), "lf");
         leg->AddEntry(_wSVD.unf, Form("Fake %s (sys.)", models.at(m).c_str()), "elp");
         leg->Draw();
@@ -2412,7 +2444,7 @@ void UtilityPlotter::CompareTotalCrossSec(){
         "CV",
         "mec",
         "nogtune",
-        "nopi0tune",
+        "nuwro",
         "FLUGG",
         "tune1"
     };
@@ -2422,7 +2454,7 @@ void UtilityPlotter::CompareTotalCrossSec(){
         k_model_CV,
         k_model_mec,
         k_model_nogtune,
-        k_model_nopi0tune,
+        k_model_nuwro,
         k_model_FLUGG,
         k_model_tune1,
         k_MODEL_MAX
@@ -2443,7 +2475,7 @@ void UtilityPlotter::CompareTotalCrossSec(){
     h_model_xsec.at(k_model_CV)->SetLineColor(kRed+2);
     h_model_xsec.at(k_model_mec)->SetLineColor(kGreen+2);
     h_model_xsec.at(k_model_nogtune)->SetLineColor(kBlue+2);
-    h_model_xsec.at(k_model_nopi0tune)->SetLineColor(kPink+1);
+    h_model_xsec.at(k_model_nuwro)->SetLineColor(kPink+1);
     h_model_xsec.at(k_model_FLUGG)->SetLineColor(kViolet-1);
     h_model_xsec.at(k_model_tune1)->SetLineColor(kOrange-1);
 
@@ -2489,7 +2521,7 @@ void UtilityPlotter::CompareTotalCrossSec(){
     leg->AddEntry( h_model_xsec.at(k_model_CV),         "MC (CV)", "lf");
     leg->AddEntry( h_model_xsec.at(k_model_mec),        "MC (1.5 #times MEC)", "lf");
     leg->AddEntry( h_model_xsec.at(k_model_nogtune),    "MC (no gTune)", "lf");
-    leg->AddEntry( h_model_xsec.at(k_model_nopi0tune),  "MC (no #pi^{0} Tune)", "lf");
+    leg->AddEntry( h_model_xsec.at(k_model_nuwro),      "MC (NuWro)", "lf");
     leg->AddEntry( h_model_xsec.at(k_model_FLUGG),      "MC (FLUGG Flux)", "lf");
     leg->AddEntry( h_model_xsec.at(k_model_tune1),      "MC (Tune 1)", "lf");
     
@@ -2589,8 +2621,8 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
         // Set the error to be equal to the total systematic uncertainty of ~21%
         if (m == k_model_FLUGG)
             h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * 0.20983 );
-        else if(m == k_model_nuwro || m == k_model_tune1)
-            h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * std::sqrt(0.04551*0.04551 + 0.0374*0.0374 + 0.08*0.08) ); // GENIE + MC STAT + bkg tuning change
+        // else if(m == k_model_nuwro || m == k_model_tune1)
+        //     h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * 0.52 ); // GENIE + MC STAT + bkg tuning change
         else
             h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * std::sqrt(0.04551*0.04551 + 0.0374*0.0374) );
 
@@ -2622,15 +2654,22 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
         h_model_xsec.at(m)->Draw("hist,E,same");
         h_fake_xsec.at(m)->Draw("E1,X0,same");
 
+        if (m != k_model_input)
+            h_model_xsec.at(k_model_input)->Draw("hist,E,same");
+
+
         // Draw the Legend
         TLegend *leg = new TLegend(0.35, 0.70, 0.70, 0.89);
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
         h_fake_xsec.at(m)->SetMarkerSize(0.4);
         if (m == k_model_input) models.at(m) = "CV";
+
+        if (m != k_model_input)
+            leg->AddEntry(h_model_xsec.at(k_model_input), "CV", "l");
+
         leg->AddEntry(h_model_xsec.at(m), Form("True %s", models.at(m).c_str()), "l");
         leg->AddEntry(h_fake_xsec.at(m),  Form("Fake %s", models.at(m).c_str()),  "ep");
-        
         leg->Draw();
 
         gStyle->SetLegendTextSize(0.06);
@@ -3779,8 +3818,8 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
 void UtilityPlotter::CompareGeneratorPi0(){
 
     // Load in the root file
-    TFile *f_mc, *f_mc_nuwro;
-    TTree *mc_tree, *mc_tree_nuwro;
+    TFile *f_mc, *f_mc_nuwro, *f_mc_tune1;
+    TTree *mc_tree, *mc_tree_nuwro, *mc_tree_tune1;
 
     // Get the TTree
     _util.GetFile(f_mc, "../ntuples/neutrinoselection_filt_run1_overlay_newtune.root"); // Get the run 1 MC file
@@ -3788,10 +3827,19 @@ void UtilityPlotter::CompareGeneratorPi0(){
 
     SliceContainer SC;
     SC.Initialise(mc_tree, _util.k_mc, _util);
+
+    SelectionCuts _scuts;
+    _scuts.Initalise(_util);
+
     
     // 1D pi0 momentum
-    TH1D *h_pi0_e_genie = new TH1D("h_true_pi0_e_genie", "; #pi^{0} Energy [GeV]; Entries", 40, 0, 1.0);
-    TH1D *h_pi0_e_nuwro = new TH1D("h_true_pi0_e_nuwro", "; #pi^{0} Energy [GeV]; Entries", 40, 0, 1.0);
+    TH1D *h_pi0_e_genie = new TH1D("h_true_pi0_e_genie", "; #pi^{0} Energy [GeV]; Entries", 15, 0, 1.5);
+    TH1D *h_pi0_e_nuwro = new TH1D("h_true_pi0_e_nuwro", "; #pi^{0} Energy [GeV]; Entries", 15, 0, 1.5);
+    TH1D *h_pi0_e_tune1 = new TH1D("h_true_pi0_e_tune1", "; #pi^{0} Energy [GeV]; Entries", 15, 0, 1.5);
+
+    TH1D *h_pi0_e_genie_pass = new TH1D("h_true_pi0_e_genie_pass", "; #pi^{0} Energy [GeV]; Entries", 5, 0.0, 1.5);
+    TH1D *h_pi0_e_nuwro_pass = new TH1D("h_true_pi0_e_nuwro_pass", "; #pi^{0} Energy [GeV]; Entries", 5, 0.0, 1.5);
+    TH1D *h_pi0_e_tune1_pass = new TH1D("h_true_pi0_e_tune1_pass", "; #pi^{0} Energy [GeV]; Entries", 5, 0.0, 1.5);
     
     int mc_tree_total_entries = mc_tree->GetEntries();
     std::cout << "Total MC Events:         " << mc_tree_total_entries << std::endl;
@@ -3832,11 +3880,31 @@ void UtilityPlotter::CompareGeneratorPi0(){
 
         bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
 
-        double weight = _util.GetCVWeight(_util.k_mc, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);
+        double weight = _util.GetCVWeight(_util.k_mc, 1.0, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e); // Turn off the genie tune
         
         // Pi0 Energy
-        if (is_in_fv && SC.npi0>0) 
+        if (is_in_fv && SC.npi0>0 && SC.ccnc == 1) 
             h_pi0_e_genie->Fill(SC.pi0_e, weight);
+
+
+        // Require Passed cuts
+        if (_scuts.swtrig(SC, _util.k_mc) &&
+        _scuts.slice_id(SC)            &&
+        _scuts.e_candidate(SC)         &&
+        _scuts.in_fv(SC)               &&
+        _scuts.contained_frac(SC)      &&
+        _scuts.topo_score(SC)          &&
+        _scuts.shr_cosmic_IP(SC)       &&
+        _scuts.shower_score(SC)        &&
+        _scuts.shr_hitratio(SC)        &&
+        _scuts.shr_moliere_avg(SC)     &&
+        _scuts.shr_dist_dEdx_max(SC)   &&
+        _scuts.dEdx_max_no_tracks(SC)){
+            if (is_in_fv && SC.npi0>0 && SC.ccnc == 1) 
+                h_pi0_e_genie_pass->Fill(SC.pi0_e, weight);
+        }
+
+
     }
 
     // Get the TTree
@@ -3890,8 +3958,98 @@ void UtilityPlotter::CompareGeneratorPi0(){
         double weight = _util.GetCVWeight(_util.k_mc, SC_nuwro.weightSplineTimesTune, SC_nuwro.ppfx_cv, SC_nuwro.nu_e, SC_nuwro.nu_pdg, is_in_fv, SC_nuwro.interaction, SC_nuwro.elec_e);
         
         // Pi0 Energy
-        if (is_in_fv && SC_nuwro.npi0>0) 
+        if (is_in_fv && SC_nuwro.npi0>0 && SC_nuwro.ccnc == 1) 
             h_pi0_e_nuwro->Fill(SC_nuwro.pi0_e, weight);
+
+        // Require Passed cuts
+        if (_scuts.swtrig(SC_nuwro, _util.k_mc) &&
+        _scuts.slice_id(SC_nuwro)            &&
+        _scuts.e_candidate(SC_nuwro)         &&
+        _scuts.in_fv(SC_nuwro)               &&
+        _scuts.contained_frac(SC_nuwro)      &&
+        _scuts.topo_score(SC_nuwro)          &&
+        _scuts.shr_cosmic_IP(SC_nuwro)       &&
+        _scuts.shower_score(SC_nuwro)        &&
+        _scuts.shr_hitratio(SC_nuwro)        &&
+        _scuts.shr_moliere_avg(SC_nuwro)     &&
+        _scuts.shr_dist_dEdx_max(SC_nuwro)   &&
+        _scuts.dEdx_max_no_tracks(SC_nuwro)){
+            if (is_in_fv && SC_nuwro.npi0>0 && SC_nuwro.ccnc == 1) 
+                h_pi0_e_nuwro_pass->Fill(SC_nuwro.pi0_e, weight);
+        }
+    }
+
+    // Get the TTree
+    _util.GetFile(f_mc_tune1, "../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_tune1.root"); // Get the run 1 MC file
+    _util.GetTree(f_mc_tune1, mc_tree_tune1, "nuselection/NeutrinoSelectionFilter");
+
+    SliceContainer SC_tune1;
+    SC_tune1.Initialise(mc_tree_tune1, _util.k_mc, _util);
+
+    int mc_tree_total_entries_tune1 = mc_tree_tune1->GetEntries();
+    std::cout << "Total MC Events:         " << mc_tree_total_entries_tune1 << std::endl;
+
+    // Event loop
+    for (int ievent = 0; ievent < mc_tree_total_entries_tune1; ievent++){
+
+        // See if we want to process all the events
+        if (_util.num_events > 0){
+            if (ievent >= _util.num_events) break;
+        }
+
+        // Alert the user
+        if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
+    
+        // Get the entry in the tree
+        mc_tree_tune1->GetEntry(ievent); 
+
+        // Classify the event -- sets variable in the slice contianer
+        SC_tune1.SliceClassifier(_util.k_mc);      // Classification of the event
+
+        // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
+        SC_tune1.SetThresholdEvent(_util.k_mc);
+
+        // If the backtracked pdg of the leading shower is not an electron then alter classification
+        SC_tune1.SetNonLdgShrEvent(_util.k_mc);
+        
+        SC_tune1.SliceInteractionType(_util.k_mc); // Genie interaction type
+        SC_tune1.ParticleClassifier(_util.k_mc);   // The truth matched particle type of the leading shower
+        SC_tune1.Pi0Classifier(_util.k_mc); 
+
+        // Set derived variables in the slice container
+        SC_tune1.SetSignal();                // Set the event as either signal or other
+        SC_tune1.SetFakeData();              // Set the classifcation as data if fake data mode
+        SC_tune1.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
+        SC_tune1.SetNuMIAngularVariables();  // Set the NuMI angular variables
+        SC_tune1.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
+
+        // SC_tune1.SetPPFXCVWeight();
+
+        bool is_in_fv = _util.in_fv(SC_tune1.true_nu_vtx_sce_x, SC_tune1.true_nu_vtx_sce_y, SC_tune1.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+
+        double weight = _util.GetCVWeight(_util.k_mc, SC_tune1.weightSplineTimesTune, SC_tune1.ppfx_cv, SC_tune1.nu_e, SC_tune1.nu_pdg, is_in_fv, SC_tune1.interaction, SC_tune1.elec_e);
+        
+        // Pi0 Energy
+        if (is_in_fv && SC_tune1.npi0>0 && SC_tune1.ccnc == 1) 
+            h_pi0_e_tune1->Fill(SC_tune1.pi0_e, weight);
+
+
+         // Require Passed cuts
+        if (_scuts.swtrig(SC_tune1, _util.k_mc) &&
+        _scuts.slice_id(SC_tune1)            &&
+        _scuts.e_candidate(SC_tune1)         &&
+        _scuts.in_fv(SC_tune1)               &&
+        _scuts.contained_frac(SC_tune1)      &&
+        _scuts.topo_score(SC_tune1)          &&
+        _scuts.shr_cosmic_IP(SC_tune1)       &&
+        _scuts.shower_score(SC_tune1)        &&
+        _scuts.shr_hitratio(SC_tune1)        &&
+        _scuts.shr_moliere_avg(SC_tune1)     &&
+        _scuts.shr_dist_dEdx_max(SC_tune1)   &&
+        _scuts.dEdx_max_no_tracks(SC_tune1)){
+            if (is_in_fv && SC_tune1.npi0>0 && SC_tune1.ccnc == 1) 
+                h_pi0_e_tune1_pass->Fill(SC_tune1.pi0_e, weight);
+        }
     }
 
 
@@ -3905,6 +4063,7 @@ void UtilityPlotter::CompareGeneratorPi0(){
 
     h_pi0_e_genie->SetStats(kFALSE);
     h_pi0_e_nuwro->SetStats(kFALSE);
+    h_pi0_e_tune1->SetStats(kFALSE);
 
     _util.IncreaseLabelSize(h_pi0_e_genie, c);
 
@@ -3917,24 +4076,73 @@ void UtilityPlotter::CompareGeneratorPi0(){
     h_pi0_e_nuwro->SetLineWidth(2);
     h_pi0_e_nuwro->Draw("hist,E,same");
 
+    h_pi0_e_tune1->Scale(3.8881733);
+    h_pi0_e_tune1->SetLineColor(kGreen+2);
+    h_pi0_e_tune1->SetLineWidth(2);
+    h_pi0_e_tune1->Draw("hist,E,same");
+
     double yscale = h_pi0_e_genie->GetMaximum();
     if (h_pi0_e_nuwro->GetMaximum() > yscale)
         yscale = h_pi0_e_nuwro->GetMaximum();
 
     h_pi0_e_genie->SetMaximum(yscale*1.3);
 
-    TLegend *leg = new TLegend(0.55, 0.89, 0.9, 0.7);
+    TLegend *leg = new TLegend(0.45, 0.89, 0.85, 0.7);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
 
-    leg->SetHeader(Form("GENIE/NuWro: %2.3f", h_pi0_e_genie->Integral() / h_pi0_e_nuwro->Integral()),"C");
+    leg->SetHeader(Form("GENIE/NuWro: %2.3f, GENIE/Tune 1: %2.3f", h_pi0_e_genie->Integral() / h_pi0_e_nuwro->Integral(), h_pi0_e_genie->Integral() / h_pi0_e_tune1->Integral()),"C");
     leg->AddEntry(h_pi0_e_genie, "GENIE v3", "l");
     leg->AddEntry(h_pi0_e_nuwro, "NuWro", "l");
+    leg->AddEntry(h_pi0_e_tune1, "Tune 1", "l");
     leg->Draw();
     
     c->Print(Form("plots/run%s/pi0/h_pi0_comparison.pdf", _util.run_period));
 
     delete c;
 
+    c = new TCanvas("c", "c", 500, 500);
+    c->SetTopMargin(0.11);
+
+    h_pi0_e_genie_pass->SetStats(kFALSE);
+    h_pi0_e_nuwro_pass->SetStats(kFALSE);
+    h_pi0_e_tune1_pass->SetStats(kFALSE);
+
+    _util.IncreaseLabelSize(h_pi0_e_genie_pass, c);
+
+    h_pi0_e_genie_pass->SetLineColor(kAzure - 6);
+    h_pi0_e_genie_pass->SetLineWidth(2);
+    h_pi0_e_genie_pass->Draw("hist,E");
+
+    h_pi0_e_nuwro_pass->Scale(3.6248214);
+    h_pi0_e_nuwro_pass->SetLineColor(kRed+2);
+    h_pi0_e_nuwro_pass->SetLineWidth(2);
+    h_pi0_e_nuwro_pass->Draw("hist,E,same");
+
+    h_pi0_e_tune1_pass->Scale(3.8881733);
+    h_pi0_e_tune1_pass->SetLineColor(kGreen+2);
+    h_pi0_e_tune1_pass->SetLineWidth(2);
+    h_pi0_e_tune1_pass->Draw("hist,E,same");
+
+    yscale = h_pi0_e_genie_pass->GetMaximum();
+    if (h_pi0_e_nuwro_pass->GetMaximum() > yscale)
+        yscale = h_pi0_e_nuwro_pass->GetMaximum();
+
+    h_pi0_e_genie_pass->SetMaximum(yscale*1.5);
+    h_pi0_e_genie_pass->GetXaxis()->SetRangeUser(0, 1.5);
+
+    TLegend *leg2 = new TLegend(0.45, 0.89, 0.85, 0.7);
+    leg2->SetBorderSize(0);
+    leg2->SetFillStyle(0);
+
+    leg2->SetHeader(Form("GENIE/NuWro: %2.3f, GENIE/Tune 1: %2.3f", h_pi0_e_genie_pass->Integral() / h_pi0_e_nuwro_pass->Integral(), h_pi0_e_genie_pass->Integral() / h_pi0_e_tune1_pass->Integral()),"C");
+    leg2->AddEntry(h_pi0_e_genie_pass, "GENIE v3", "l");
+    leg2->AddEntry(h_pi0_e_nuwro_pass, "NuWro", "l");
+    leg2->AddEntry(h_pi0_e_tune1_pass, "Tune 1", "l");
+    leg2->Draw();
+    
+    c->Print(Form("plots/run%s/pi0/h_pi0_comparison_pass.pdf", _util.run_period));
+ 
+    delete c;
 
 }

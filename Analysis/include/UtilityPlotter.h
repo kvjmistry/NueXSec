@@ -4,6 +4,7 @@
 #include "Utility.h"
 #include "WienerSVD.h"
 #include "SliceContainer.h"
+#include "SelectionCuts.h"
 
 // Class for making plots of generic things, such as run vs run comparisons and 
 // separate stuies that people want me to do for the analsis

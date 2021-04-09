@@ -439,6 +439,9 @@ template void SliceContainer::Initialise<TChain>(TChain *tree, int type, Utility
 // -----------------------------------------------------------------------------
 void SliceContainer::SliceClassifier(int type){
     
+    // if ( (nu_purity_from_pfp>=0 && nu_purity_from_pfp <= 0.1) && shr_bkt_pdg !=0)
+    //     nu_purity_from_pfp = 1.0;
+
     // MC Specific classsifications
     if (type == _util.k_mc){
         
