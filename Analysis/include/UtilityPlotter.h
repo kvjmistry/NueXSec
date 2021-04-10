@@ -4,6 +4,7 @@
 #include "Utility.h"
 #include "WienerSVD.h"
 #include "SliceContainer.h"
+#include "SelectionCuts.h"
 
 // Class for making plots of generic things, such as run vs run comparisons and 
 // separate stuies that people want me to do for the analsis
@@ -106,8 +107,8 @@ class UtilityPlotter{
     // Function to save a few 2D histograms
     void Save2DHists(const char* printname, TH2D* hist);
     // -------------------------------------------------------------------------
-    // Column Normalise 2D histogram
-    void ColumnNorm(TH2D* hist);
+    // Row Normalise 2D histogram
+    void RowNorm(TH2D* hist);
     // -------------------------------------------------------------------------
     // Study the ppfx weights for each event classification
     void StudyPPFXWeights();
@@ -164,7 +165,20 @@ class UtilityPlotter{
     // Compare the MCC9 result to MCC8
     void CompareMCC8Result();
     // -------------------------------------------------------------------------
+    // Compare generator predictions to the data
+    void ForwardFoldedGeneratorComparison();
     // -------------------------------------------------------------------------
+    // Compare the total cross section generator comparisons
+    void CompareGeneratorTotalCrossSec();
+    // -------------------------------------------------------------------------
+    // Compare unfoldef generators
+    void CompareGeneratorUnfoldedModels();
+    // -------------------------------------------------------------------------
+    // Compare the True generator pi0 distributions
+    void CompareGeneratorPi0();
+    // -------------------------------------------------------------------------
+    // Compare pi0 distributions across generators
+    void CompareSelectedPi0();
     // -------------------------------------------------------------------------
 
 

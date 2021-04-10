@@ -191,6 +191,7 @@ class HistogramHelper{
         k_reco_shr_ang_numi,                                                    // Angle of the reconstructed leading shower relative to the numi beamline
         k_reco_single_bin,                                                      // Just fill with weight. We need this to get the uncertainty on the purity
         k_reco_trk_pid_score,                                                   // The PID score for tracks in the event
+        k_reco_pi0mass,                                                         // What does the pi0 mass peak look like in a nuecc enriched sample
         k_TH1D_MAX
     };
 
@@ -285,6 +286,8 @@ class HistogramHelper{
         k_true_elec_E_reco_elec_E,
         k_true_nu_E_reco_nu_E,
         k_true_elec_E_reco_elec_E_extra_bins,
+        k_true_elec_E_reco_elec_E_extra_bins_nue,
+        k_true_elec_E_reco_elec_E_extra_bins_nuebar,
         k_true_nu_E_reco_nu_E_extra_bins,
         k_true_nu_vtx_x_reco_nu_vtx_x,
         k_true_nu_vtx_y_reco_nu_vtx_y,
@@ -298,8 +301,12 @@ class HistogramHelper{
         k_true_shr_cosbeta_resolution_reco,  // Actually resolution normed to reco as a function of reco shower
         k_true_shr_cosbeta_resolution_true,  // Actually resolution normed to true as a function of reco shower
         k_elec_true_beta_reco_beta,
+        k_elec_true_beta_reco_beta_nue,
+        k_elec_true_beta_reco_beta_nuebar,
         k_elec_true_theta_reco_theta,
         k_elec_true_phi_reco_phi,
+        k_elec_true_cosbeta_reco_cosbeta_rebin, 
+        k_true_elec_E_reco_elec_E_rebin,
         k_TH2D_true_MAX
     };
 
@@ -358,6 +365,8 @@ class HistogramHelper{
         k_int_beta_nue,
         k_int_beta_nuebar,
         k_int_cosbeta,
+        k_int_cosbeta_rebin_nue,
+        k_int_cosbeta_rebin_nuebar,
         k_INTERACTION_MAX
     };
 

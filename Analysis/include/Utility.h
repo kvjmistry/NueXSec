@@ -39,6 +39,7 @@
 #include "TVectorD.h"
 #include "TChain.h"
 #include "TDecompSVD.h"
+#include "TObjString.h"
 
 /*
 
@@ -75,7 +76,7 @@ public:
     template<typename T> void CheckWeight(T &weight);
     // -------------------------------------------------------------------------
     // Get the CV weight correction
-    double GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv, int interaction);
+    double GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv, int interaction, double elec_e);
     // -------------------------------------------------------------------------
     // Get the pi0 weight correction
     void GetPiZeroWeight(double &weight, int pizero_mode, int nu_pdg, int ccnc, int npi0, double pi0_e);
@@ -162,6 +163,8 @@ public:
     // Change units of covariane matrix so we can add them
     void ConvertCovarianceUnits(TH2D* &h_cov, TH1D *h_input, TH1D* h_output);
     // -------------------------------------------------------------------------
+    // Convert a covariance matrix from un-bin width normalised to bin-width normalised units
+    void ConvertCovarianceBinWidth(TH2D* &h_cov, TH1D *h_input);
     // -------------------------------------------------------------------------
 
 
@@ -258,6 +261,7 @@ public:
     bool zoom{false};        // bool to decide whether to zoom in on the plots
     bool isfakedata{false};  // bool for using MC as fake data
     bool isvariation{false}; // Is some different input to the selection
+    bool usefluggflux{false};
 
 
     // Weight configurations
@@ -397,7 +401,7 @@ public:
                 "CC_DIS",
                 "CC_Coh",
                 "CC_MEC",
-                "NC"
+                "CC_Tot"
                 };
     
      // Names of the Particle types
@@ -453,7 +457,7 @@ public:
         k_plot_dis,
         k_plot_coh,
         k_plot_mec,
-        k_plot_nc,
+        k_plot_tot,
         k_interactions_MAX
     };
 

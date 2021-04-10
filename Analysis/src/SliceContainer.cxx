@@ -401,6 +401,37 @@ template<typename T> void SliceContainer::Initialise(T *tree, int type, Utility 
     tree->SetBranchAddress("trk_range_muon_mom_v",     &trk_range_muon_mom_v);
     tree->SetBranchAddress("trk_llr_pid_score_v",      &trk_llr_pid_score_v);
 
+
+    // Load in the flux histogram
+    if (type == _util.k_mc){
+        TFile *f_flux;
+        
+        if (std::string(_util.run_period) == "1")
+            f_flux= TFile::Open("Systematics/output_fhc_uboone_run0.root", "READ");
+        else if (std::string(_util.run_period) == "3")
+            f_flux= TFile::Open("Systematics/output_rhc_uboone_run0.root", "READ");
+        else
+            return;
+
+        hist_ratio.resize(k_FLAV_MAX);
+        hist_ratio_uw.resize(k_FLAV_MAX);
+
+        // Get the flux histograms
+        for (unsigned int f = 0; f < flav_str.size(); f++){
+            hist_ratio.at(f)      = (TH2D*) f_flux->Get(Form("%s/Detsmear/%s_CV_AV_TPC_2D", flav_str.at(f).c_str(), flav_str.at(f).c_str()));
+            hist_ratio_uw.at(f)   = (TH2D*) f_flux->Get(Form("%s/Detsmear/%s_unweighted_AV_TPC_2D", flav_str.at(f).c_str(), flav_str.at(f).c_str()));
+
+            hist_ratio.at(f)->SetDirectory(0);
+            hist_ratio_uw.at(f)->SetDirectory(0);
+
+            // Take the ratio
+            hist_ratio.at(f)->Divide(hist_ratio_uw.at(f));
+
+        }
+
+        f_flux->Close();
+    }
+
 }
 // Explicitly initialise the templates for this function which include TTree and TChain
 template void SliceContainer::Initialise<TTree>(TTree *tree, int type, Utility util);
@@ -408,6 +439,9 @@ template void SliceContainer::Initialise<TChain>(TChain *tree, int type, Utility
 // -----------------------------------------------------------------------------
 void SliceContainer::SliceClassifier(int type){
     
+    // if ( (nu_purity_from_pfp>=0 && nu_purity_from_pfp <= 0.1) && shr_bkt_pdg !=0)
+    //     nu_purity_from_pfp = 1.0;
+
     // MC Specific classsifications
     if (type == _util.k_mc){
         
@@ -798,33 +832,31 @@ void SliceContainer::Pi0Classifier(int type){
 
 }
 // -----------------------------------------------------------------------------
-double SliceContainer::GetPPFXCVWeight(){
+void SliceContainer::SetPPFXCVWeight(){
     
-    double weight = 1.0;
-
-    double nu_theta = _util.GetNuMIAngle(true_nu_px, true_nu_py, true_nu_pz, "beam");
+    float weight = 1.0;
 
     double xbin{1.0},ybin{1.0};
 
     if (nu_pdg == 14) {
-        xbin = h_2D_CV_UW_PPFX_ratio_numu->GetXaxis()->FindBin(nu_e);
-        ybin = h_2D_CV_UW_PPFX_ratio_numu->GetYaxis()->FindBin(nu_theta);
-        weight = h_2D_CV_UW_PPFX_ratio_numu->GetBinContent(xbin, ybin);
+        xbin =  hist_ratio.at(k_numu)->GetXaxis()->FindBin(nu_e);
+        ybin =  hist_ratio.at(k_numu)->GetYaxis()->FindBin(nu_angle);
+        weight =  hist_ratio.at(k_numu)->GetBinContent(xbin, ybin);
     }
     if (nu_pdg == -14) {
-        xbin = h_2D_CV_UW_PPFX_ratio_numubar->GetXaxis()->FindBin(nu_e);
-        ybin = h_2D_CV_UW_PPFX_ratio_numubar->GetYaxis()->FindBin(nu_theta);
-        weight = h_2D_CV_UW_PPFX_ratio_numubar->GetBinContent(xbin, ybin);
+        xbin =  hist_ratio.at(k_numubar)->GetXaxis()->FindBin(nu_e);
+        ybin = hist_ratio.at(k_numubar)->GetYaxis()->FindBin(nu_angle);
+        weight = hist_ratio.at(k_numubar)->GetBinContent(xbin, ybin);
     }
     if (nu_pdg == 12) {
-        xbin = h_2D_CV_UW_PPFX_ratio_nue->GetXaxis()->FindBin(nu_e);
-        ybin = h_2D_CV_UW_PPFX_ratio_nue->GetYaxis()->FindBin(nu_theta);
-        weight = h_2D_CV_UW_PPFX_ratio_nue->GetBinContent(xbin, ybin);
+        xbin = hist_ratio.at(k_nue)->GetXaxis()->FindBin(nu_e);
+        ybin = hist_ratio.at(k_nue)->GetYaxis()->FindBin(nu_angle);
+        weight = hist_ratio.at(k_nue)->GetBinContent(xbin, ybin);
     }
     if (nu_pdg == -12) {
-        xbin = h_2D_CV_UW_PPFX_ratio_nuebar->GetXaxis()->FindBin(nu_e);
-        ybin = h_2D_CV_UW_PPFX_ratio_nuebar->GetYaxis()->FindBin(nu_theta);
-        weight = h_2D_CV_UW_PPFX_ratio_nuebar->GetBinContent(xbin, ybin);
+        xbin = hist_ratio.at(k_nuebar)->GetXaxis()->FindBin(nu_e);
+        ybin = hist_ratio.at(k_nuebar)->GetYaxis()->FindBin(nu_angle);
+        weight = hist_ratio.at(k_nuebar)->GetBinContent(xbin, ybin);
     }
 
     // Add some catches to remove unphysical weights
@@ -832,9 +864,8 @@ double SliceContainer::GetPPFXCVWeight(){
     if (std::isnan(weight) == 1) weight = 1.0;
     if (weight > 100)            weight = 1.0;
 
-    // std::cout << nu_theta << "  " << nu_e <<  "  " << weight << std::endl;
+    ppfx_cv =  weight;
 
-    return weight;
 }
 // -----------------------------------------------------------------------------
 double SliceContainer::GetdEdxMax(){
@@ -1002,15 +1033,17 @@ void SliceContainer::CalibrateShowerEnergy(){
 
 }
 // -----------------------------------------------------------------------------
-void SliceContainer::SetThresholdEvent(){
+void SliceContainer::SetThresholdEvent(int type){
 
-    // Below threshold of nue or electron energy
-    if (nu_e < _util.energy_threshold || elec_e < _util.elec_threshold){
-        if (nu_pdg == 12){
-            classification = std::make_pair("thr_nue",_util.k_thr_nue);
-        }
-        if (nu_pdg == -12){
-            classification = std::make_pair("thr_nuebar",_util.k_thr_nuebar);
+    if (type == _util.k_mc){
+        // Below threshold of nue or electron energy
+        if (nu_e < _util.energy_threshold || elec_e < _util.elec_threshold){
+            if (nu_pdg == 12){
+                classification = std::make_pair("thr_nue",_util.k_thr_nue);
+            }
+            if (nu_pdg == -12){
+                classification = std::make_pair("thr_nuebar",_util.k_thr_nuebar);
+            }
         }
     }
 
@@ -1020,4 +1053,35 @@ void SliceContainer::SetFakeData(){
     
     if (_util.isfakedata)
         classification = std::make_pair("data",_util.k_leg_data);
+}
+// -----------------------------------------------------------------------------
+void SliceContainer::SetNonLdgShrEvent(int type){
+
+    if (type == _util.k_mc){
+        // Leading shower is not an electron
+        if (classification.first == "nue_cc" && shr_bkt_pdg != 11){
+            classification = std::make_pair("cosmic_nue",   _util.k_cosmic_nue);
+        }
+        if (classification.first == "nuebar_cc" && shr_bkt_pdg != -11){
+            classification = std::make_pair("cosmic_nuebar",   _util.k_cosmic_nuebar);
+        }
+    }
+}
+// -----------------------------------------------------------------------------
+void SliceContainer::ReClassifyPileUps(int type){
+
+    if (type == _util.k_mc){
+        
+        // Leave the nues alone
+        if (std::abs(nu_pdg) == 12)
+            return;
+
+        // If the true backtracked pdg was an electron and the energy > 50 MeV then change to a nue
+        if ( shr_bkt_pdg == 11 && shr_bkt_E > 0.05 )
+            nu_pdg = 12;
+
+        if ( shr_bkt_pdg == -11 && shr_bkt_E > 0.05 )
+            nu_pdg = -12;
+    }
+
 }

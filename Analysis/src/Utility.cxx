@@ -172,7 +172,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
             overwritePOT = true;
 
             // If using an alternate CV model via reweighting then we dont want to overwrite the POT values
-            if (std::string(variation) == "weight" || std::string(variation) == "mec" || std::string(variation) == "nogtune" || std::string(variation) == "nopi0tune" || std::string(variation) == "Input")
+            if (std::string(variation) == "weight" || std::string(variation) == "mec" || std::string(variation) == "nogtune" || std::string(variation) == "nopi0tune" || std::string(variation) == "Input" || std::string(variation) == "geniev3")
                 overwritePOT = false;
         }
 
@@ -326,6 +326,11 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         if (strcmp(arg, "--gpvm") == 0) {
             use_gpvm = true;
         }
+
+        // Use the flugg flux and reweighting
+        if (strcmp(arg, "--usefluggflux") == 0) {
+            usefluggflux = true;
+        }
    
     }
 
@@ -379,7 +384,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
                 if (confignames.at(p) == match_name){
                     
                     // If fake data mode we overwrite the data POT number instead
-                    if (std::string(fakedataname) == "weight" || std::string(fakedataname) == "mec" || std::string(fakedataname) == "nogtune" || std::string(fakedataname) == "nopi0tune" || std::string(fakedataname) == "Input")
+                    if (std::string(fakedataname) == "weight" || std::string(fakedataname) == "mec" || std::string(fakedataname) == "nogtune" || std::string(fakedataname) == "nopi0tune" || std::string(fakedataname) == "Input" || std::string(fakedataname) == "geniev3")
                         confignames[p] = Form("Run%s_MC_POT", run_period);
                     else
                         confignames[p] = Form("Run%s_MC_POT_%s", run_period, variation_str.c_str());
@@ -398,7 +403,7 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
                 // If matched then overwrite the POT config for the MC to the variation
                 if (confignames.at(p) == match_name){
                     
-                    if (std::string(fakedataname) == "weight" || std::string(fakedataname) == "mec" || std::string(fakedataname) == "nogtune" || std::string(fakedataname) == "nopi0tune" || std::string(fakedataname) == "Input")
+                    if (std::string(fakedataname) == "weight" || std::string(fakedataname) == "mec" || std::string(fakedataname) == "nogtune" || std::string(fakedataname) == "nopi0tune" || std::string(fakedataname) == "Input" || std::string(fakedataname) == "geniev3")
                         confignames[p] = match_name;
                     else
                         confignames[p] = match_name + "_" + variation_str;
@@ -534,8 +539,11 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     else if (pi0_correction == 1){
          std::cout << "Using "<< blue << "normalisation factor" << reset<< " to correct pi0" << std::endl;
     }
-    else {
+    else if (pi0_correction == 2){
         std::cout << "Using :"<< blue << "energy dependent scaling" << reset << "to correct pi0" << std::endl;
+    }
+    else {
+        std::cout << "Using "<< blue << "normalisation factor" << reset<< " to correct pi0, but not nues" << std::endl;
     }
 
     // Set the scale factors
@@ -717,7 +725,7 @@ template<typename T> void Utility::CheckWeight(T &weight){
 template void Utility::CheckWeight<double>(double &weight);
 template void Utility::CheckWeight<float>(float   &weight);
 // -----------------------------------------------------------------------------
-double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv, int interaction){
+double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv, int interaction, double elec_e){
 
     // Always give weights of 1 to the data
     if (type == k_data) return 1.0;
@@ -769,6 +777,16 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
         
     }
 
+    // We need to kill the weights for below threshold nues in the standard overlay sample to avoid double counting
+    if (std::string(intrinsic_mode) != "intrinsic" && type == k_mc){
+
+        if (nu_e < energy_threshold || elec_e < elec_threshold){
+            if (nu_pdg == 12 || nu_pdg == -12){
+                weight = 0.0; 
+            }
+        }
+    }
+
     // Create a random energy dependent nue weight for testing model dependence
     // if (type == k_mc && (nu_pdg == -12 || nu_pdg == 12)) weight *= nu_e*nu_e;
 
@@ -809,6 +827,17 @@ void Utility::GetPiZeroWeight(double &weight, int pizero_mode, int nu_pdg, int c
                 weight = weight * (1. - 0.4 * pi0emax);
             }
             
+        }
+    }
+    // Only tune the backgrounds with scale factor
+    else if (pizero_mode == 3){
+        
+        // Leave the singal events alone
+        if ( (nu_pdg == 12 || nu_pdg == -12) && ccnc == k_CC) 
+            return;
+        
+        if (npi0 > 0) {
+            weight = weight * 0.759;
         }
     }
     else {
@@ -1002,7 +1031,7 @@ bool Utility::in_fv(double x, double y, double z){
 // -----------------------------------------------------------------------------
 void Utility::IncreaseLabelSize(TH1D *h, TCanvas *c){
 
-    h->GetXaxis()->SetLabelSize(0.05);
+    h->GetXaxis()->SetLabelSize(0.04);
     h->GetXaxis()->SetTitleSize(0.05);
     h->GetYaxis()->SetLabelSize(0.05);
     h->GetYaxis()->SetTitleSize(0.05);
@@ -1085,6 +1114,8 @@ void Utility::Draw_Data_POT(TCanvas *c, double pot, double x1, double y1, double
 
     pt = new TPaveText(x1, y1, x2, y2, "NDC");
     pt->AddText(Form("MicroBooNE NuMI Data: %2.1f#times10^{20} POT", POT));
+    // pt = new TPaveText(x1+0.05, y1, x2+0.05, y2, "NDC");
+    // pt->AddText(Form("MicroBooNE In Progress, NuMI Data: %2.1f#times10^{20} POT", POT));
     pt->SetBorderSize(0);
     pt->SetFillColor(0);
     pt->SetFillStyle(0);
@@ -1101,6 +1132,7 @@ void Utility::Draw_ubooneSim(TCanvas *c, double x1, double y1, double x2, double
 
     pt = new TPaveText(x1, y1, x2, y2,"NDC");
     pt->AddText("MicroBooNE Simulation");
+    // pt->AddText("MicroBooNE Simulation In Progress");
     pt->SetTextColor(kBlack);
     pt->SetBorderSize(0);
     pt->SetFillColor(0);
@@ -1660,4 +1692,15 @@ void Utility::ConvertCovarianceUnits(TH2D* &h_cov, TH1D *h_input, TH1D* h_output
             h_cov->SetBinContent(i, j, conversion);
         }
     }
+}
+// -----------------------------------------------------------------------------
+void Utility::ConvertCovarianceBinWidth(TH2D* &h_cov, TH1D *h_input){
+
+    TH1D* h_input_width = (TH1D*)h_input->Clone();
+
+    h_input_width->Scale(1.0, "width");
+
+    ConvertCovarianceUnits(h_cov, h_input, h_input_width);
+
+    delete h_input_width;
 }

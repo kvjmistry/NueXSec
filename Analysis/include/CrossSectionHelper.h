@@ -120,6 +120,8 @@ class CrossSectionHelper{
 
     TH2D* h_2D_CV_binning; // Histogram to define the bin indexes for a response matrix in energy and angle
 
+    TH1D *h_detvar_cv; // the detector variation cv for us to apply the response matrix to. 
+
     // enum for histogram types
     enum TH1D_xsec_hist_vars {
         k_xsec_sel,          // Selected event histogram binned in energy
@@ -417,6 +419,17 @@ class CrossSectionHelper{
     // Return the bin index from a 2D histogram
     int GetBinIndex();
     // -------------------------------------------------------------------------
+    // Load in the detector variation CV so we can smear it
+    void LoadDetvarCVHist();
+    // -------------------------------------------------------------------------
+    // Unfold the data in an unregularized way
+    void UnregularizedUnfold(TH1D *h_data_xsec_reco, TH1D* h_data_xsec_true, TH2D* h_response);
+    // -------------------------------------------------------------------------
+    // Make and save generator histograms to file
+    void SaveGenXSec();
+    // -------------------------------------------------------------------------
+    // Compare the nuwro and genie pi0 cross sections
+    void CheckPi0CrossSection();
 
 
 

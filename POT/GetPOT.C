@@ -82,12 +82,14 @@ void GetPOT(const char *_file1, std::string type){
         for (int i = 0; i < mytree->GetEntries(); i++){
             mytree->GetEntry(i);
 
-            //if (run < 16880) continue;
-            //if (run > 16880) continue;
-            //if (run >6748.22) continue;
-            //
+            // 4p6 run1
+            //if ((run > 6035 && run < 6284) || run > 6510 ) continue;
+            
+            // 6p6 run 1
+            //if ((run > 6285 && run < 6510) || run < 6035 ) continue;
+            
             //if (run < 7013) continue;
-            if (run == 16228) continue;
+            //if (run == 16228) continue;
 
             run_subrun_file << run << " " << subrun << '\n';
         }

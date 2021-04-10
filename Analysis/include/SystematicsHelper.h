@@ -45,7 +45,7 @@ class SystematicsHelper{
     void PlotVariationsEXT(std::string hist_name, const char* print_name, std::string cut_name, const char* x_axis_name);
     // -------------------------------------------------------------------------
     // Plots the Sys Variations
-    void SysVariations(int hist_index, const char* print_name, int cut, const char* x_axis_name);
+    void SysVariations(int hist_index, const char* print_name, int cut, const char* x_axis_name, bool plotdata);
     // -------------------------------------------------------------------------
     void SetVariationProperties(TH1D* h, int index);
     // -------------------------------------------------------------------------
@@ -145,6 +145,8 @@ class SystematicsHelper{
     // Save the total data cross section result to file
     void ExportTotalCrossSectionResult();
     // -------------------------------------------------------------------------
+    // Calculate the Mean and RMS in a range
+    void CalcdEdxRMSMean(TH1D* hist, std::string variation);
 
 
 
@@ -199,7 +201,8 @@ class SystematicsHelper{
         "WM X",
         "WM YZ",
         "WM Theta XZ",
-        "WM Theta YZ w/ Spl.",
+        "WM Theta YZ",
+        // "WM Theta YZ w/ Spl.",
         // "WM Theta YZ w/o Spl.",
         // "WM dE/dX" 
     };
@@ -299,7 +302,6 @@ class SystematicsHelper{
 
     // Vector to store total uncertainty histograms
     std::vector<std::vector<std::vector<TH1D*>>> h_cut_err; // label -- cut -- variable
-
 
 }; // End Class SystematicsHelper
 
