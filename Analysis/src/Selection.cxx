@@ -406,6 +406,7 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     SC.SetThresholdEvent(type);
 
     // If the backtracked pdg of the leading shower is not an electron then alter classification
+    // Turn these off to get the efficiencies at low energies correct
     SC.SetNonLdgShrEvent(type);
     
     SC.SliceInteractionType(type); // Genie interaction type

@@ -1780,19 +1780,19 @@ void UtilityPlotter::CompareSmearing(){
     // Create a vector for the models
     std::vector<std::string> models = {
         "mec",
-        "nogtune",
-        "nopi0tune",
+        "geniev3",
+        "nuwro",
         "FLUGG",
-        "tune1"
+        // "tune1"
     };
 
     // enums for the models
     enum enum_models {
         k_model_mec,
-        k_model_nogtune,
-        k_model_nopi0tune,
+        k_model_geniev3,
+        k_model_nuwro,
         k_model_FLUGG,
-        k_model_tune1,
+        // k_model_tune1,
         k_MODEL_MAX
     };
 
@@ -1820,10 +1820,10 @@ void UtilityPlotter::CompareSmearing(){
 
     // Set the line colours
     h_mcxsec_reco_model.at(k_model_mec)      ->SetLineColor(kGreen+2);
-    h_mcxsec_reco_model.at(k_model_nogtune)  ->SetLineColor(kBlue+2);
-    h_mcxsec_reco_model.at(k_model_nopi0tune)->SetLineColor(kPink+1);
+    h_mcxsec_reco_model.at(k_model_geniev3)  ->SetLineColor(kBlue+2);
+    h_mcxsec_reco_model.at(k_model_nuwro)->SetLineColor(kPink+1);
     h_mcxsec_reco_model.at(k_model_FLUGG)    ->SetLineColor(kViolet-1);
-    h_mcxsec_reco_model.at(k_model_tune1)    ->SetLineColor(kOrange-1);
+    // h_mcxsec_reco_model.at(k_model_tune1)    ->SetLineColor(kOrange-1);
 
     // Set the Bin errors for the MC truth
     for (int bin = 1; bin < h_mcxsec_reco->GetNbinsX()+1; bin++){
@@ -1850,10 +1850,10 @@ void UtilityPlotter::CompareSmearing(){
     
     // Choose what models to draw
     h_mcxsec_reco_model.at(k_model_mec)      ->Draw("hist,same");
-    h_mcxsec_reco_model.at(k_model_nogtune)  ->Draw("hist,same");
-    h_mcxsec_reco_model.at(k_model_nopi0tune)->Draw("hist,same");
+    h_mcxsec_reco_model.at(k_model_geniev3)  ->Draw("hist,same");
+    h_mcxsec_reco_model.at(k_model_nuwro)    ->Draw("hist,E,same");
     h_mcxsec_reco_model.at(k_model_FLUGG)    ->Draw("hist,E,same");
-    h_mcxsec_reco_model.at(k_model_tune1)    ->Draw("hist,E,same");
+    // h_mcxsec_reco_model.at(k_model_tune1)    ->Draw("hist,E,same");
     h_mcxsec_reco->Draw("hist,E,same");
 
     // Create the legend
@@ -1862,10 +1862,10 @@ void UtilityPlotter::CompareSmearing(){
     leg->SetFillStyle(0);
     leg->AddEntry(h_mcxsec_reco, "MC (Stat.)", "el");
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_mec),      "Smear MC CV with 1.5 #times MEC Model", "l");
-    leg->AddEntry(h_mcxsec_reco_model.at(k_model_nogtune),  "Smear MC CV with no gTune Model",       "l");
-    leg->AddEntry(h_mcxsec_reco_model.at(k_model_nopi0tune),"Smear MC CV with #pi^{0} Tune Model",   "l");
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_geniev3),  "Smear MC CV with GENIE v3 Model",       "l");
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_nuwro),    "Smear MC CV with NuWro Model",   "le");
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_FLUGG),    "Smear MC CV with FLUGG  Model (Stat.)",         "le");
-    leg->AddEntry(h_mcxsec_reco_model.at(k_model_tune1),    "Smear MC CV with Tune 1 Model (Stat.)", "le");
+    // leg->AddEntry(h_mcxsec_reco_model.at(k_model_tune1),    "Smear MC CV with Tune 1 Model (Stat.)", "le");
     leg->Draw();
 
     // Save and close
@@ -2697,8 +2697,8 @@ void UtilityPlotter::CompareDataCrossSections(){
 
     gStyle->SetOptStat(0);
 
-    // std::string genmode = "flux";
-    std::string genmode = "other";
+    std::string genmode = "flux";
+    // std::string genmode = "other";
 
     /// Load in the cross section output
     TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
@@ -2993,8 +2993,8 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
         "mec",
         "geniev3",
         "nuwro",
-        "FLUGG",
-        "tune1"
+        "FLUGG"
+        // "tune1"
     };
 
     // enums for the models
@@ -3004,7 +3004,7 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
         k_model_geniev3,
         k_model_nuwro,
         k_model_FLUGG,
-        k_model_tune1,
+        // k_model_tune1,
         k_MODEL_MAX
     };
 
@@ -3015,7 +3015,7 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
     TH1D* h_temp;
 
     // Total Covariance Matrix
-    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/wiener/h_cov_sys_dataxsec_reco",_util.xsec_var));
+    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/wiener/h_cov_tot_dataxsec_reco",_util.xsec_var));
     TH2D* h_cov_reco = (TH2D*)h_temp_2D->Clone();
     h_cov_reco->SetDirectory(0);
 
@@ -3098,7 +3098,7 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
         if (m == k_model_geniev3)  h_unf_model.at(m)->SetLineColor(kBlue+2);
         if (m == k_model_nuwro)    h_unf_model.at(m)->SetLineColor(kPink+1);
         if (m == k_model_FLUGG)    h_unf_model.at(m)->SetLineColor(kViolet-1);
-        if (m == k_model_tune1)    h_unf_model.at(m)->SetLineColor(kOrange-1);
+        // if (m == k_model_tune1)    h_unf_model.at(m)->SetLineColor(kOrange-1);
         
         
         h_unf_model.at(m)->Scale(1.0, "width");
@@ -3111,8 +3111,9 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
             h_unf_model.at(m)->Draw("E,same");
             h_unf_model.at(m)->GetYaxis()->SetTitleOffset(1.4);
         }
-        else
+        else {
             h_unf_model.at(m)->Draw("hist,same");
+        }
 
         h_unf_model.at(m)->SetLineWidth(2);
 
@@ -3121,13 +3122,13 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
         
         if (m == k_model_input) {
             models.at(m) = "CV";
-            leg->AddEntry(h_unf_model.at(m), "Data (Sys.)", "ep");
+            leg->AddEntry(h_unf_model.at(m), "Data (Stat. + Sys.)", "ep");
         }
         if (m == k_model_mec)      leg->AddEntry(h_unf_model.at(m), "Data 1.5 #times MEC", "l");
         if (m == k_model_geniev3)  leg->AddEntry(h_unf_model.at(m), "Data GENIE v3", "l");
         if (m == k_model_nuwro)    leg->AddEntry(h_unf_model.at(m), "Data NuWro", "l");
         if (m == k_model_FLUGG)    leg->AddEntry(h_unf_model.at(m), "Data FLUGG", "l");
-        if (m == k_model_tune1)    leg->AddEntry(h_unf_model.at(m), "Data Tune 1", "l");
+        // if (m == k_model_tune1)    leg->AddEntry(h_unf_model.at(m), "Data Tune 1", "l");
         
 
         delete _wSVD.smear;
@@ -3560,7 +3561,7 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
     
     h_mcxsec_reco_model.at(k_model_CV)->Draw("hist,same");
     h_mcxsec_reco_model.at(k_model_geniev3)->Draw("hist,same");
-    // h_mcxsec_reco_model.at(k_model_geniev2gen)->Draw("hist,same");
+    h_mcxsec_reco_model.at(k_model_geniev2gen)->Draw("hist,same");
     h_mcxsec_reco_model.at(k_model_nuwrogen)->Draw("hist,same");
     h_dataxsec->Draw("E1,X0,same");
     h_dataxsec_stat->Draw("E1,X0,same");
@@ -3583,7 +3584,7 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
 
     std::cout << "Geniev2" << std::endl;
     _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_geniev2gen), h_dataxsec, h_cov, chi, ndof, pval);
-    // leg->AddEntry(h_mcxsec_reco_model.at(k_model_geniev2gen),  Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_geniev2gen),  Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
 
     std::cout << "NuWro" << std::endl;
     _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_nuwrogen), h_dataxsec, h_cov, chi, ndof, pval);
@@ -3857,7 +3858,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
 
     std::cout << "Genie v2" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_geniev2gen), unf, h_cov, chi, ndof, pval);
-    // leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_geniev2gen),   Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_geniev2gen),   Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
     std::cout << "NuWro" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_nuwrogen), unf, h_cov, chi, ndof, pval);
@@ -3908,7 +3909,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     h_mcxsec_true_model_smear.at(k_model_geniev3)->Draw("hist,same" );
 
     h_mcxsec_true_model_smear.at(k_model_geniev2gen)->SetLineColor(kOrange-1);
-    // h_mcxsec_true_model_smear.at(k_model_geniev2gen)->Draw("hist,same" );
+    h_mcxsec_true_model_smear.at(k_model_geniev2gen)->Draw("hist,same" );
 
     h_mcxsec_true_model_smear.at(k_model_nuwrogen)->SetLineColor(kPink+1);
     h_mcxsec_true_model_smear.at(k_model_nuwrogen)->Draw("hist,same" );
@@ -4266,11 +4267,11 @@ void UtilityPlotter::CompareSelectedPi0(){
     gStyle->SetOptStat(0);
 
     // enums for legend
-    enum enum_gens {k_cv, k_geniev3, k_nuwro, k_tune1, k_gen_MAX};
-    std::vector<int> cols = {kBlack, kBlue+2, kPink+1, kOrange-2};
+    enum enum_gens {k_cv, k_geniev3, k_tune1, k_nuwro, k_gen_MAX};
+    std::vector<int> cols = {kBlack, kBlue+2, kOrange-2, kPink+1};
     
-    std::vector<std::string> gen_names = {"CV", "geniev3", "nuwro", "tune1"};
-    std::vector<double> sf = {1.0, 1.0,3.6248214, 3.8881733};
+    std::vector<std::string> gen_names = {"CV", "geniev3", "tune1", "nuwro"};
+    std::vector<double> sf = {1.0, 1.0, 3.8881733, 3.6248214};
 
     std::vector<TH1D*> h_pimass(k_gen_MAX);
     std::vector<TH1D*> h_shr_E(k_gen_MAX);
@@ -4286,6 +4287,9 @@ void UtilityPlotter::CompareSelectedPi0(){
     // std::string mode = "numu_cc_pi0";
 
     for (unsigned int m = 0; m < gen_names.size(); m++){
+
+        if (m == k_tune1)
+            continue;
         
         if (m == k_cv)
             f.at(m) = TFile::Open(Form("files/nuexsec_mc_run1%s.root", ""), "READ");
@@ -4325,6 +4329,10 @@ void UtilityPlotter::CompareSelectedPi0(){
     
     for (unsigned int m = 0; m < gen_names.size(); m++){
 
+        if (m == k_tune1)
+            continue;
+
+        
         if (m == k_cv){
             c = new TCanvas("c", "c", 500, 500);
             c->SetTopMargin(0.11);
@@ -4339,6 +4347,8 @@ void UtilityPlotter::CompareSelectedPi0(){
 
         h_pimass.at(m)->Draw("hist,same");
 
+        std::cout << gen_names.at(m) <<" Integral: "<< h_pimass.at(m)->Integral() << std::endl;
+
         double yscale = h_pimass.at(k_cv)->GetMaximum();
         h_pimass.at(k_cv)->SetMaximum(yscale*1.2);
         leg->Draw();
@@ -4348,6 +4358,8 @@ void UtilityPlotter::CompareSelectedPi0(){
 
         h_shr_E.at(m)->Draw("hist,same");
 
+        std::cout << gen_names.at(m) <<" Integral: "<< h_shr_E.at(m)->Integral() << std::endl;
+
         yscale = h_shr_E.at(k_cv)->GetMaximum();
         h_shr_E.at(k_cv)->SetMaximum(yscale*1.3);
         leg->Draw();
@@ -4356,6 +4368,8 @@ void UtilityPlotter::CompareSelectedPi0(){
         _util.IncreaseLabelSize(h_shr_cosbeta.at(m), c3);
 
         h_shr_cosbeta.at(m)->Draw("hist,same");
+
+        std::cout << gen_names.at(m) <<" Integral: "<< h_shr_cosbeta.at(m)->Integral() << std::endl;
 
         yscale = h_shr_cosbeta.at(k_cv)->GetMaximum();
         h_shr_cosbeta.at(k_cv)->SetMaximum(yscale*1.3);

@@ -1559,7 +1559,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
     // Angle between vector from NuMI targ to shower direction
     MakeStack("h_reco_effective_angle_rebin", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.5, "#beta [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_effective_angle_rebin.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
+              Form("cuts/%s/reco_effective_angle_rebin.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Cosine of the Angle between vector from NuMI targ to shower direction
     MakeStack("h_reco_effective_cosangle", _util.cut_dirs.at(cut_index).c_str(),
@@ -1570,7 +1570,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
     // Cosine of the Angle between vector from NuMI targ to shower direction
     MakeStack("h_reco_effective_cosangle_rebin", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.5, "cos(#beta)",  0.35, 0.85, 0.55, 0.85, Data_POT,
-              Form("cuts/%s/reco_effective_cosangle_rebin.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
+              Form("cuts/%s/reco_effective_cosangle_rebin.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Track LLR PID score
     MakeStack("h_reco_trk_pid_score", _util.cut_dirs.at(cut_index).c_str(),
