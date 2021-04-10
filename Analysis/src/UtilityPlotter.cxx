@@ -2635,10 +2635,9 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
         // Set the error to be equal to the total systematic uncertainty of ~21%
         if (m == k_model_FLUGG)
             h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * 0.20983 );
-        // else if(m == k_model_nuwro || m == k_model_tune1)
-        //     h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * 0.52 ); // GENIE + MC STAT + bkg tuning change
         else
-            h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * std::sqrt(0.04551*0.04551 + 0.0374*0.0374) );
+            h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * std::sqrt(0.0323*0.0323 + 0.0249*0.0249) );
+            // h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * std::sqrt(0.04551*0.04551 + 0.0374*0.0374) );
 
         // Set the line colours
         if (m == k_model_input)    h_model_xsec.at(k_model_input)    ->SetLineColor(kRed+2);
@@ -2698,6 +2697,9 @@ void UtilityPlotter::CompareDataCrossSections(){
 
     gStyle->SetOptStat(0);
 
+    // std::string genmode = "flux";
+    std::string genmode = "other";
+
     /// Load in the cross section output
     TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
 
@@ -2711,22 +2713,39 @@ void UtilityPlotter::CompareDataCrossSections(){
     h_dataxsec->SetMarkerStyle(20);
     h_dataxsec->SetMarkerSize(0.5);
 
+    // Get the MC covariance Matrix
+    TH2D* h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/er/h_cov_sys_mcxsec_reco", _util.xsec_var ));
+    TH2D* h_cov_tot = (TH2D*)h_temp_2D->Clone();
+    h_cov_tot->SetDirectory(0);
+
+    h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/er/h_cov_xsec_sys_mcxsec_reco", _util.xsec_var ));
+    TH2D* h_cov_xsec = (TH2D*)h_temp_2D->Clone();
+    h_cov_xsec->SetDirectory(0);
+
+    h_temp_2D  = (TH2D*)fxsec->Get(Form("%s/er/h_cov_flux_sys_mcxsec_reco", _util.xsec_var ));
+    TH2D* h_cov_flux = (TH2D*)h_temp_2D->Clone();
+    h_cov_flux->SetDirectory(0);
+
     fxsec->Close();
+
+    TH2D* h_cov_reco;
 
     // Create a vector for the models
     std::vector<std::string> models = {
+        "Input",
         "mec",
-        "nogtune",
-        "nopi0tune",
+        "geniev3",
+        "nuwro",
         "FLUGG",
         "tune1"
     };
 
     // enums for the models
     enum enum_models {
+        k_model_input,
         k_model_mec,
-        k_model_nogtune,
-        k_model_nopi0tune,
+        k_model_geniev3,
+        k_model_nuwro,
         k_model_FLUGG,
         k_model_tune1,
         k_MODEL_MAX
@@ -2748,11 +2767,26 @@ void UtilityPlotter::CompareDataCrossSections(){
 
         // Set the line colours
         if (m == k_model_mec)      h_dataxsec_model.at(k_model_mec)      ->SetLineColor(kGreen+2);
-        if (m == k_model_nogtune)  h_dataxsec_model.at(k_model_nogtune)  ->SetLineColor(kBlue+2);
-        if (m == k_model_nopi0tune)h_dataxsec_model.at(k_model_nopi0tune)->SetLineColor(kPink+1);
+        if (m == k_model_geniev3)  h_dataxsec_model.at(k_model_geniev3)  ->SetLineColor(kBlue+2);
+        if (m == k_model_nuwro)    h_dataxsec_model.at(k_model_nuwro)    ->SetLineColor(kPink+1);
         if (m == k_model_FLUGG)    h_dataxsec_model.at(k_model_FLUGG)    ->SetLineColor(kViolet-1);
         if (m == k_model_tune1)    h_dataxsec_model.at(k_model_tune1)    ->SetLineColor(kOrange-1);
-    
+    }
+
+    // Get the Covariance matrix
+    if (genmode == "flux")
+        h_cov_reco = (TH2D*) h_cov_flux->Clone();
+    else
+        h_cov_reco = (TH2D*) h_cov_xsec->Clone();
+
+    // Convert the Covariance Matrix-- switching from MC CV deviations to Data CV deviation
+    _util.ConvertCovarianceUnits(h_cov_reco,
+                            h_dataxsec_model.at(k_model_input),
+                            h_dataxsec);
+
+    // Now set the bin errors
+    for (int bin = 1; bin < h_dataxsec->GetNbinsX()+1; bin++ ){    
+        h_dataxsec->SetBinError(bin, std::sqrt(h_cov_reco->GetBinContent(bin, bin)));
     }
 
     TCanvas *c = new TCanvas("c", "c", 500, 500);
@@ -2763,7 +2797,22 @@ void UtilityPlotter::CompareDataCrossSections(){
     
     // Draw the model data xsections
     for (unsigned int m = 0; m < models.size(); m++){
-        h_dataxsec_model.at(m)->Draw("hist,same");
+
+         if (m == k_model_input)
+            continue;
+
+        if (genmode == "flux"){
+            h_dataxsec_model.at(k_model_FLUGG)->Draw("hist,same");
+            break;
+        }
+        else {
+            // Skip Tune 1
+            if (m == k_model_tune1 || m  == k_model_FLUGG)
+                continue;
+
+            h_dataxsec_model.at(m)->Draw("hist,same");
+        }
+
     }
     
     h_dataxsec->Draw("E1,same,X0");
@@ -2773,11 +2822,18 @@ void UtilityPlotter::CompareDataCrossSections(){
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(h_dataxsec, "Data (Sys.)", "ep");
-    leg->AddEntry(h_dataxsec_model.at(k_model_mec)      , "Data 1.5 #times MEC", "l");
-    leg->AddEntry(h_dataxsec_model.at(k_model_nogtune)  , "Data no gTune", "l");
-    leg->AddEntry(h_dataxsec_model.at(k_model_nopi0tune), "Data no #pi^{0} Tune", "l");
-    leg->AddEntry(h_dataxsec_model.at(k_model_FLUGG)    , "Data FLUGG", "l");
-    leg->AddEntry(h_dataxsec_model.at(k_model_tune1)    , "Data Tune 1", "l");
+    
+    if (genmode == "flux"){
+        leg->AddEntry(h_dataxsec_model.at(k_model_FLUGG)    , "Data FLUGG", "l");
+    }
+    else {
+        leg->AddEntry(h_dataxsec_model.at(k_model_mec)      , "Data 1.5 #times MEC", "l");
+        leg->AddEntry(h_dataxsec_model.at(k_model_geniev3)  , "Data GENIE v3", "l");
+        leg->AddEntry(h_dataxsec_model.at(k_model_nuwro)    , "Data NuWro", "l");
+        // leg->AddEntry(h_dataxsec_model.at(k_model_tune1)    , "Data Tune 1", "l");
+    }
+
+    
     leg->Draw();
 
     // Draw the run period on the plot
@@ -2785,7 +2841,11 @@ void UtilityPlotter::CompareDataCrossSections(){
 
     _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.52, 0.92, 0.52, 0.92);
 
-    c->Print(Form("plots/run%s/Models/%s/run%s_ModelDataComparison_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var));
+    if (genmode == "flux")
+        c->Print(Form("plots/run%s/Models/%s/run%s_ModelDataComparison_%s_FLUGG.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var));
+    else
+        c->Print(Form("plots/run%s/Models/%s/run%s_ModelDataComparison_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var));
+    
     delete c;
 
     fxsec->Close();
@@ -2797,6 +2857,10 @@ void UtilityPlotter::CompareTotalDataCrossSections(){
     gStyle->SetOptStat(0);
 
     TH1D* h_temp;
+
+    std::string genmode = "flux";
+    // std::string genmode = "other";
+
 
     // Create a vector for the models
     std::vector<std::string> models = {
@@ -2827,12 +2891,10 @@ void UtilityPlotter::CompareTotalDataCrossSections(){
     TH1D* h_dataxsec = (TH1D*)h_temp->Clone();
 
     // Set the error to be 21% total systematic uncertainty
-    // if (m == k_model_FLUGG)
-    //     h_dataxsec->SetBinError(1,h_dataxsec->GetBinContent(1) * 0.20983 );
-    // else if(m == k_model_nuwro || m == k_model_tune1)
-    //     h_dataxsec->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * 0.52 ); // GENIE + MC STAT + bkg tuning change
-    // else
-        h_dataxsec->SetBinError(1,h_dataxsec->GetBinContent(1) * std::sqrt(0.04551*0.04551 + 0.0374*0.0374) );
+    if (genmode == "flux")
+        h_dataxsec->SetBinError(1,h_dataxsec->GetBinContent(1) * 0.20983 );
+    else
+        h_dataxsec->SetBinError(1,h_dataxsec->GetBinContent(1) * std::sqrt(0.0323*0.0323 + 0.0249*0.0249) );
     
     // h_dataxsec->SetBinError(1, h_dataxsec->GetBinContent(1) * 0.21);
     h_dataxsec->SetLineColor(kBlack);
@@ -2857,7 +2919,6 @@ void UtilityPlotter::CompareTotalDataCrossSections(){
         // Data X Sec MEC
         h_temp  = (TH1D*)fxsec->Get(Form("%s/integrated/h_run%s_CV_0_integrated_data_xsec", models.at(m).c_str(), _util.run_period));
         h_dataxsec_model.at(m) = (TH1D*)h_temp->Clone();
-        h_dataxsec_model.at(m)->Scale(1.0, "width");
         h_dataxsec_model.at(m)->SetLineWidth(2);
 
         // Set the line colours
@@ -2875,7 +2936,18 @@ void UtilityPlotter::CompareTotalDataCrossSections(){
     
     // Draw the model data xsections
     for (unsigned int m = 0; m < models.size(); m++){
-        h_dataxsec_model.at(m)->Draw("hist,same");
+        
+        if (genmode == "flux"){
+            h_dataxsec_model.at(k_model_FLUGG)->Draw("hist,same");
+            break;
+        }
+        else {
+            // Skip Tune 1
+            if (m == k_model_tune1 || m  == k_model_FLUGG)
+                continue;
+
+            h_dataxsec_model.at(m)->Draw("hist,same");
+        }
     }
     
     h_dataxsec->Draw("E1,same,X0");
@@ -2886,16 +2958,25 @@ void UtilityPlotter::CompareTotalDataCrossSections(){
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(h_dataxsec, "Data (Sys.)", "ep");
-    leg->AddEntry(h_dataxsec_model.at(k_model_mec)      , "Data 1.5 #times MEC", "l");
-    leg->AddEntry(h_dataxsec_model.at(k_model_geniev3)  , "Data GENIE v3", "l");
-    leg->AddEntry(h_dataxsec_model.at(k_model_nuwro)    ,"Data NuWro", "l");
-    leg->AddEntry(h_dataxsec_model.at(k_model_FLUGG)    , "Data FLUGG", "l");
-    leg->AddEntry(h_dataxsec_model.at(k_model_tune1)    , "Data Tune 1", "l");
+    
+    if (genmode == "flux"){
+        leg->AddEntry(h_dataxsec_model.at(k_model_FLUGG)    , "Data FLUGG", "l");
+    }
+    else {
+        leg->AddEntry(h_dataxsec_model.at(k_model_mec)      , "Data 1.5 #times MEC", "l");
+        leg->AddEntry(h_dataxsec_model.at(k_model_geniev3)  , "Data GENIE v3", "l");
+        leg->AddEntry(h_dataxsec_model.at(k_model_nuwro)    , "Data NuWro", "l");
+        // leg->AddEntry(h_dataxsec_model.at(k_model_tune1)    , "Data Tune 1", "l");
+    }
     leg->Draw();
 
     gStyle->SetLegendTextSize(0.06);
 
-    c->Print(Form("plots/run%s/Models/Total/run%s_ModelDataComparison.pdf", _util.run_period, _util.run_period));
+    if (genmode == "flux")
+        c->Print(Form("plots/run%s/Models/Total/run%s_ModelDataComparison_FLUGG.pdf", _util.run_period, _util.run_period));
+    else 
+        c->Print(Form("plots/run%s/Models/Total/run%s_ModelDataComparison.pdf", _util.run_period, _util.run_period));
+    
     delete c;
 
     fxsec->Close();
@@ -2910,8 +2991,8 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
     std::vector<std::string> models = {
         "Input",
         "mec",
-        "nogtune",
-        "nopi0tune",
+        "geniev3",
+        "nuwro",
         "FLUGG",
         "tune1"
     };
@@ -2920,8 +3001,8 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
     enum enum_models {
         k_model_input,
         k_model_mec,
-        k_model_nogtune,
-        k_model_nopi0tune,
+        k_model_geniev3,
+        k_model_nuwro,
         k_model_FLUGG,
         k_model_tune1,
         k_MODEL_MAX
@@ -2934,9 +3015,19 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
     TH1D* h_temp;
 
     // Total Covariance Matrix
-    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/wiener/h_cov_tot_dataxsec_reco",_util.xsec_var));
+    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/wiener/h_cov_sys_dataxsec_reco",_util.xsec_var));
     TH2D* h_cov_reco = (TH2D*)h_temp_2D->Clone();
     h_cov_reco->SetDirectory(0);
+
+    // Flux Covariance Matrix
+    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/wiener/h_cov_flux_sys_dataxsec_reco",_util.xsec_var));
+    TH2D* h_cov_reco_flux = (TH2D*)h_temp_2D->Clone();
+    h_cov_reco_flux->SetDirectory(0);
+
+    // Xsec Covariance Matrix
+    h_temp_2D = (TH2D*)fxsec->Get(Form("%s/wiener/h_cov_xsec_sys_dataxsec_reco",_util.xsec_var));
+    TH2D* h_cov_reco_xsec = (TH2D*)h_temp_2D->Clone();
+    h_cov_reco_xsec->SetDirectory(0);
 
     fxsec->Close();
 
@@ -2974,14 +3065,16 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
         h_response_model.at(m) = (TH2D*)h_temp_2D->Clone();
 
         // Clone covariance matrix
+        // Set diagonals of covariance matrix
+        // if (m == k_model_FLUGG)
+        //     h_cov_diag.at(m) = (TH2D*)h_cov_reco_xsec->Clone();
+        // else if (m == k_model_input)
+        //     h_cov_diag.at(m) = (TH2D*)h_cov_reco->Clone();
+        // else
+        //     h_cov_diag.at(m) = (TH2D*)h_cov_reco_xsec->Clone();
+        
         h_cov_diag.at(m) = (TH2D*)h_cov_reco->Clone();
         
-        // Convert the Covariance Matrix-- switching from MC CV deviations to Fake Data CV deviation
-        // _util.ConvertCovarianceUnits(h_cov_diag.at(m),
-        //                        h_data_model.at(k_model_input),
-        //                        h_data_model.at(m));
-
-
         // Initialise the WienerSVD class
         WienerSVD _wSVD;
         _wSVD.Initialise(_util);
@@ -3002,8 +3095,8 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
         }    
         
         if (m == k_model_mec)      h_unf_model.at(m)->SetLineColor(kGreen+2);
-        if (m == k_model_nogtune)  h_unf_model.at(m)->SetLineColor(kBlue+2);
-        if (m == k_model_nopi0tune)h_unf_model.at(m)->SetLineColor(kPink+1);
+        if (m == k_model_geniev3)  h_unf_model.at(m)->SetLineColor(kBlue+2);
+        if (m == k_model_nuwro)    h_unf_model.at(m)->SetLineColor(kPink+1);
         if (m == k_model_FLUGG)    h_unf_model.at(m)->SetLineColor(kViolet-1);
         if (m == k_model_tune1)    h_unf_model.at(m)->SetLineColor(kOrange-1);
         
@@ -3028,11 +3121,11 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
         
         if (m == k_model_input) {
             models.at(m) = "CV";
-            leg->AddEntry(h_unf_model.at(m), "Data (Stat + Sys.)", "ep");
+            leg->AddEntry(h_unf_model.at(m), "Data (Sys.)", "ep");
         }
         if (m == k_model_mec)      leg->AddEntry(h_unf_model.at(m), "Data 1.5 #times MEC", "l");
-        if (m == k_model_nogtune)  leg->AddEntry(h_unf_model.at(m), "Data no gTune", "l");
-        if (m == k_model_nopi0tune)leg->AddEntry(h_unf_model.at(m), "Data no #pi^{0} Tune", "l");
+        if (m == k_model_geniev3)  leg->AddEntry(h_unf_model.at(m), "Data GENIE v3", "l");
+        if (m == k_model_nuwro)    leg->AddEntry(h_unf_model.at(m), "Data NuWro", "l");
         if (m == k_model_FLUGG)    leg->AddEntry(h_unf_model.at(m), "Data FLUGG", "l");
         if (m == k_model_tune1)    leg->AddEntry(h_unf_model.at(m), "Data Tune 1", "l");
         
@@ -3051,7 +3144,7 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
     }
 
     h_unf_model.at(k_model_input)->Draw("E,same");
-    gStyle->SetLegendTextSize(0.06);
+    gStyle->SetLegendTextSize(0.04);
     leg->Draw();
 
     // Draw the run period on the plot

@@ -539,8 +539,11 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
     else if (pi0_correction == 1){
          std::cout << "Using "<< blue << "normalisation factor" << reset<< " to correct pi0" << std::endl;
     }
-    else {
+    else if (pi0_correction == 2){
         std::cout << "Using :"<< blue << "energy dependent scaling" << reset << "to correct pi0" << std::endl;
+    }
+    else {
+        std::cout << "Using "<< blue << "normalisation factor" << reset<< " to correct pi0, but not nues" << std::endl;
     }
 
     // Set the scale factors
@@ -824,6 +827,17 @@ void Utility::GetPiZeroWeight(double &weight, int pizero_mode, int nu_pdg, int c
                 weight = weight * (1. - 0.4 * pi0emax);
             }
             
+        }
+    }
+    // Only tune the backgrounds with scale factor
+    else if (pizero_mode == 3){
+        
+        // Leave the singal events alone
+        if ( (nu_pdg == 12 || nu_pdg == -12) && ccnc == k_CC) 
+            return;
+        
+        if (npi0 > 0) {
+            weight = weight * 0.759;
         }
     }
     else {

@@ -261,10 +261,6 @@ void CrossSectionHelper::LoopEvents(){
                     // Fill histograms
                     if (std::string(_util.xsecmode) != "txtlist"){
 
-                        // if (*classification == "nc_pi0"){
-                        //     weight_uni*=0.759*0.5;
-                        //     cv_weight*=0.759*0.5;
-                        // }
 
                         FillHists(label, uni, k_xsec_bkg, weight_uni, recoX, trueX);
                         FillHists(label, uni, k_xsec_sel, cv_weight, recoX, trueX);  // Selected events (N term) we dont weight
