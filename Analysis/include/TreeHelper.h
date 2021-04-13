@@ -74,6 +74,7 @@ class TreeHelper{
     int npi0{0};
     double pi0_e{0.0};
     int interaction{0};
+    int ccnc{0};
     std::vector<float> all_shr_hits;
     std::vector<float> all_shr_energies;
     double effective_angle{0.0};     // The angle between the vector from the target to nu vtx compared to the reconstructed shower direction.

@@ -46,6 +46,7 @@ class CrossSectionHelper{
     double cos_effective_angle{0.0}; // The cosine of the angle between the vector from the target to nu vtx compared to the reconstructed shower direction.
     double true_effective_angle{0.0};     // True angle between electron and neutrino vectors
     double cos_true_effective_angle{0.0}; // True angle between electron and neutrino vectors
+    int ccnc{0};
 
     // Weights
     std::vector<unsigned short> *weightsGenie = NULL;
@@ -345,7 +346,7 @@ class CrossSectionHelper{
     // -------------------------------------------------------------------------
     // Set the weight for universe i depending on the variation 
     void SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double _weightSplineTimesTune,
-                           std::string _classification, double cv_weight, int uni, int _nu_pdg, double _true_energy, double _numi_ang, int _npi0, double _pi0_e);
+                           std::string _classification, double cv_weight, int uni, int _nu_pdg, double _true_energy, double _numi_ang, int _npi0, double _pi0_e, int _ccnc);
     // -------------------------------------------------------------------------
     // Function to calculate the cross section
     double CalcCrossSec(double sel, double gen, double sig, double bkg, double flux, double ext, double dirt, double targ);

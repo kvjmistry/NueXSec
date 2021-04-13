@@ -2697,8 +2697,8 @@ void UtilityPlotter::CompareDataCrossSections(){
 
     gStyle->SetOptStat(0);
 
-    std::string genmode = "flux";
-    // std::string genmode = "other";
+    // std::string genmode = "flux";
+    std::string genmode = "other";
 
     /// Load in the cross section output
     TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
