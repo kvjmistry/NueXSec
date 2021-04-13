@@ -180,6 +180,9 @@ class UtilityPlotter{
     // Compare pi0 distributions across generators
     void CompareSelectedPi0();
     // -------------------------------------------------------------------------
+    // Compare the distributions from events gernated from dk2nu files and genie
+    // generated events
+    void Compare1DFluxGeneratedEvents();
 
 
 }; // End Class UtilityPlotter

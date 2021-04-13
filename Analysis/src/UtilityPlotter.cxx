@@ -55,6 +55,10 @@ void UtilityPlotter::Initialise(Utility _utility){
         CompareSelectedPi0();
         return;
     }
+    else if(std::string(_util.uplotmode) == "gencomp"){
+        Compare1DFluxGeneratedEvents();
+        return;
+    }
     // This will call the code to optimise the bin widths
     else if (std::string(_util.uplotmode) == "bins"){
         OptimiseBins();
@@ -4387,4 +4391,113 @@ void UtilityPlotter::CompareSelectedPi0(){
 
     
 
+}
+// -----------------------------------------------------------------------------
+void UtilityPlotter::Compare1DFluxGeneratedEvents(){
+
+    gStyle->SetOptStat(0);
+
+    std::string flav = "nuebar";
+    std::string var = "elec_e"; // nu_e, elec_e, cosbeta
+
+    std::string title = "#nu_{e}";
+    if (flav == "nuebar")
+        title = "#bar{#nu}_{e}";
+
+    // Load in the Nue file
+    TFile *f_nue;    
+    TTree *t_nue;
+    
+    
+    if (flav == "nue"){
+        f_nue = TFile::Open("../ntuples/genie_gen_nue.gst.root", "READ");
+        _util.GetTree(f_nue, t_nue, "gst");
+    }
+    else {
+       f_nue = TFile::Open("../ntuples/genie_gen_nuebar.gst.root", "READ");
+       _util.GetTree(f_nue, t_nue, "gst");
+    }
+
+    TFile *f_xsec   = TFile::Open("files/trees/nuexsec_selected_tree_mc_run1.root");
+    TTree *t_xsec;
+    _util.GetTree(f_xsec, t_xsec, "mc_nue_tree");
+    
+    std::string signal_def = "cc==1 && Ev>0.06 && El>0.12";
+    std::string signal_def2;
+    
+    if (flav == "nue")
+        signal_def2 = "ppfx_cv*(nu_pdg == 12)";
+    else
+        signal_def2 = "ppfx_cv*(nu_pdg == -12)";
+
+    std::string query;
+    
+    if (var == "cosbeta")
+        query = "(pxv*pxl + pyv*pyl + pzv*pzl) / (sqrt(pxv*pxv + pyv*pyv + pzv*pzv) * sqrt(pxl*pxl + pyl*pyl + pzl*pzl) )";
+    else if (var == "elec_e")
+        query = "El";
+    else
+        query = "Ev";
+        
+
+    TCanvas * c = new TCanvas("c", "c", 500, 500);
+    TH1D *htemp, *htemp2;
+    
+    if (var == "cosbeta"){
+        htemp  = new TH1D("htemp", Form("%s;cos#beta;", title.c_str()), 100, -1, 1);
+        htemp2 = new TH1D("htemp2",Form("%s;cos#beta;", title.c_str()), 100, -1, 1);
+    }
+    else if (var == "elec_e"){
+        htemp   = new TH1D("htemp", Form("%s;Electron Energy [GeV];", title.c_str()), 100, 0, 5);
+        htemp2  = new TH1D("htemp2",Form("%s;Electron Energy [GeV];", title.c_str()), 100, 0, 5);
+    }
+    else {
+        htemp   = new TH1D("htemp", Form("%s;Neutrino Energy [GeV];", title.c_str()), 100, 0, 5);
+        htemp2  = new TH1D("htemp2",Form("%s;Neutrino Energy [GeV];", title.c_str()), 100, 0, 5);
+    }
+
+    // Draw the Query -- adjust by query type
+    t_nue->Draw(Form("%s >> htemp", query.c_str()), signal_def.c_str());
+    
+    if (var == "cosbeta")
+        t_xsec->Draw(Form("%s >> htemp2", "cos_true_effective_angle"), signal_def2.c_str());
+    else if (var == "elec_e")
+        t_xsec->Draw(Form("%s >> htemp2", "elec_e"), signal_def2.c_str());
+    else
+        t_xsec->Draw(Form("%s >> htemp2", "true_energy"), signal_def2.c_str());
+
+    TLegend *leg = new TLegend(0.45, 0.89, 0.85, 0.7);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(htemp2, "MC", "l");
+    leg->AddEntry(htemp, "Gevgen 1D Flux", "l");
+
+
+    // Draw the histogram
+    htemp->SetLineWidth(2);
+    htemp->SetLineColor(kBlack);
+    htemp2->SetLineWidth(2);
+    htemp2->SetLineColor(kBlue+2);
+    
+    htemp->Scale(htemp2->Integral()/htemp->Integral());
+
+    _util.IncreaseLabelSize(htemp, c);
+    
+    htemp->Draw("hist,E");
+    htemp2->Draw("hist,E,same");
+
+    leg->Draw();
+
+    TPaveText *pt;
+
+    pt = new TPaveText(0.3215, 0.936, 0.3215, 0.936, "NDC");
+    pt->AddText("Area Normalised");
+    pt->SetTextColor(kGreen + 2);
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.03);
+    pt->Draw();
+
+    c->Print(Form("plots/run%s/Truth/1D_flux_comparisons_%s_%s.pdf", _util.run_period, flav.c_str(),var.c_str() ));
 }
