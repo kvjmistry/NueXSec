@@ -2638,9 +2638,9 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
 
         // Set the error to be equal to the total systematic uncertainty of ~21%
         if (m == k_model_FLUGG)
-            h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * 0.20983 );
+            h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * 0.216 );
         else
-            h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * std::sqrt(0.0323*0.0323 + 0.0249*0.0249) );
+            h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * std::sqrt(0.032*0.032 + 0.056*0.056) ); 
             // h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * std::sqrt(0.04551*0.04551 + 0.0374*0.0374) );
 
         // Set the line colours
@@ -2896,9 +2896,9 @@ void UtilityPlotter::CompareTotalDataCrossSections(){
 
     // Set the error to be 21% total systematic uncertainty
     if (genmode == "flux")
-        h_dataxsec->SetBinError(1,h_dataxsec->GetBinContent(1) * 0.20983 );
+        h_dataxsec->SetBinError(1,h_dataxsec->GetBinContent(1) * 0.216 );
     else
-        h_dataxsec->SetBinError(1,h_dataxsec->GetBinContent(1) * std::sqrt(0.0323*0.0323 + 0.0249*0.0249) );
+        h_dataxsec->SetBinError(1,h_dataxsec->GetBinContent(1) * std::sqrt(0.032*0.032 + 0.056*0.056) );
     
     // h_dataxsec->SetBinError(1, h_dataxsec->GetBinContent(1) * 0.21);
     h_dataxsec->SetLineColor(kBlack);

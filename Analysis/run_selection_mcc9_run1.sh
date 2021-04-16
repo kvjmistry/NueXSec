@@ -71,20 +71,21 @@ if [ "$1" == "weight" ]; then
   ./nuexsec --run 1 --sys reweight --xsec_smear wiener --binscaling standard --xsecvar elec_E
   ./nuexsec --run 1 --sys reweight --xsec_smear er --binscaling width --xsecvar elec_E
 
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_mec.root       --var dummy mec       --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_nogtune.root   --var dummy nogtune   --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_nopi0tune.root --var dummy nopi0tune --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_FLUGG.root     --var dummy FLUGG     --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E 
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_tune1.root     --var dummy tune1     --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
+  # ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_mec.root       --var dummy mec       --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
+  # ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_nogtune.root   --var dummy nogtune   --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
+  # ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_nopi0tune.root --var dummy nopi0tune --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
+  # ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_FLUGG.root     --var dummy FLUGG     --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E 
+  # ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_tune1.root     --var dummy tune1     --xsecmode default  --xsec_smear er --xsecbins standard --xsecvar elec_E
 
-  # Electron Angle
-  # ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel unisim  --xsecvar elec_ang --xsec_smear $sm
-  # ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel ppfx    --xsecvar elec_ang --xsec_smear $sm
-  # ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel genie   --xsecvar elec_ang --xsec_smear $sm
-  # ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel reint   --xsecvar elec_ang --xsec_smear $sm
-  # ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel mcstats --xsecvar elec_ang --xsec_smear $sm
+  # Electron cosbeta
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel unisim  --xsecvar elec_cang --xsec_smear er
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel ppfx    --xsecvar elec_cang --xsec_smear er
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel genie   --xsecvar elec_cang --xsec_smear er
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel reint   --xsecvar elec_cang --xsec_smear er
+  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel mcstats --xsecvar elec_cang --xsec_smear er
 
-  # ./nuexsec --run 1 --sys reweight --xsecvar elec_ang --xsec_smear $sm
+  # ./nuexsec --run 1 --sys reweight --xsec_smear wiener --binscaling standard --xsecvar elec_cang
+  # ./nuexsec --run 1 --sys reweight --xsec_smear er --binscaling width --xsecvar elec_cang
 
   # -- 
 
@@ -162,7 +163,7 @@ if [ "$1" == "allvarxsec" ]; then
   # run the above script for every det variation 
   for i in "${var[@]}"
   do
-    ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$i.root --var dummy $i --xsecmode default --xsecvar elec_cang --xsec_smear $sm --xsecbins standard
+    ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$i.root --var dummy $i --xsecmode default --xsecvar elec_cang --xsec_smear er --xsecbins standard
   done
 
 fi
@@ -202,9 +203,9 @@ fi
 # Make a new file with a reweighted no pi0 tune model
 if [ "$1" == "nopi0tune" ]; then
 
-  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root nopi0tune --weight_pi0 0
+  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root nopi0tune --weight_pi0 1
 
-  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root nopi0tune --intrinsic intrinsic --weight_pi0 0
+  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root nopi0tune --intrinsic intrinsic --weight_pi0 1
 
   source merge/merge_run1_files.sh files/nuexsec_mc_run1_nopi0tune.root files/nuexsec_run1_nopi0tune_merged.root
 
@@ -221,9 +222,9 @@ fi
 # Make a new file with a reweighted no pi0 tune model
 if [ "$1" == "FLUGG" ]; then
 
-  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_FLUGG.root FLUGG --weight_ppfx 3
+  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_FLUGG.root FLUGG --weight_ppfx 0
 
-  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_FLUGG_intrinsic.root FLUGG --intrinsic intrinsic --weight_ppfx 3
+  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_FLUGG_intrinsic.root FLUGG --intrinsic intrinsic --weight_ppfx 0
 
   source merge/merge_run1_files.sh files/nuexsec_mc_run1_FLUGG.root files/nuexsec_run1_FLUGG_merged.root
 
@@ -240,9 +241,9 @@ fi
 # Make a new file with genie tune1 model
 if [ "$1" == "tune1" ]; then
 
-  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_tune1.root tune1 --weight_tune 0 --weight_pi0 3
+  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_tune1.root tune1 --weight_tune 0
 
-  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_tune1_intrinsic.root tune1 --intrinsic intrinsic --weight_tune 0 --weight_pi0 3
+  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_tune1_intrinsic.root tune1 --intrinsic intrinsic --weight_tune 0
 
   ./nuexsec --run 1 --printonly --printall --var nuexsec_selected_tree_mc_run1_tune1.root tune1
 
@@ -261,9 +262,9 @@ fi
 # Make a new file with nuwro
 if [ "$1" == "nuwro" ]; then
 
-  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_nuwro.root nuwro --weight_tune 0 --weight_pi0 3
+  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_nuwro.root nuwro --weight_tune 0
 
-  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_nuwro_intrinsic.root nuwro --intrinsic intrinsic --weight_tune 0 --weight_pi0 3
+  ./nuexsec --run 1 --var ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_nuwro_intrinsic.root nuwro --intrinsic intrinsic --weight_tune 0
 
   ./nuexsec --run 1 --printonly --printall --var nuexsec_selected_tree_mc_run1_nuwro.root nuwro
 
@@ -282,9 +283,9 @@ fi
 # Geniev3 lines
 if [ "$1" == "geniev3" ]; then
 
-  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root geniev3 --weight_tune 0 --weight_pi0 3
+  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root geniev3 --weight_tune 0
 
-  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root geniev3 --intrinsic intrinsic --weight_tune 0 --weight_pi0 3
+  ./nuexsec --run 1 --var ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root geniev3 --intrinsic intrinsic --weight_tune 0
 
   ./nuexsec --run 1 --printonly --printall --var nuexsec_selected_tree_mc_run1_geniev3.root geniev3
 
@@ -390,9 +391,9 @@ fi
 if [ "$1" == "faketune1" ]; then
 
   # Run the cross sec calculation in fake data mode
-  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_tune1.root --fake tune1 --weight_tune 0 --weight_pi0 3
+  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_tune1.root --fake tune1 --weight_tune 0
 
-  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_tune1_intrinsic.root --fake tune1 --intrinsic intrinsic --weight_tune 0 --weight_pi0 3
+  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_tune1_intrinsic.root --fake tune1 --intrinsic intrinsic --weight_tune 0
 
   # Merge the files
   hadd -f -T files/nuexsec_run1_merged_faketune1.root files/nuexsec_data_run1_tune1.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root
@@ -412,9 +413,9 @@ fi
 if [ "$1" == "fakeFLUGG" ]; then
 
   # Run the cross sec calculation in fake data mode
-  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_FLUGG.root --fake FLUGG  --weight_ppfx 3
+  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_FLUGG.root --fake FLUGG  --weight_ppfx 0
 
-  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_FLUGG_intrinsic.root --fake FLUGG --intrinsic intrinsic --weight_ppfx 3
+  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_FLUGG_intrinsic.root --fake FLUGG --intrinsic intrinsic --weight_ppfx 0
 
   # Merge the files
   hadd -f -T files/nuexsec_run1_merged_fakeFLUGG.root files/nuexsec_data_run1_FLUGG.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root
@@ -456,9 +457,9 @@ fi
 if [ "$1" == "fakenuwro" ]; then
 
   # Run the cross sec calculation in fake data mode
-  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_nuwro.root --fake nuwro --weight_tune 0 --weight_pi0 3
+  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_nuwro.root --fake nuwro --weight_tune 0
 
-  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_nuwro_intrinsic.root --fake nuwro --intrinsic intrinsic --weight_tune 0 --weight_pi0 3
+  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_nuwro_intrinsic.root --fake nuwro --intrinsic intrinsic --weight_tune 0
 
   # Merge the files
   hadd -f -T files/nuexsec_run1_merged_fakenuwro.root files/nuexsec_data_run1_nuwro.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root
@@ -478,9 +479,9 @@ fi
 if [ "$1" == "fakegeniev3" ]; then
 
   # Run the cross sec calculation in fake data mode
-  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake geniev3 --weight_tune 0 --weight_pi0 3
+  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake geniev3 --weight_tune 0
 
-  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root --fake geniev3 --intrinsic intrinsic --weight_tune 0 --weight_pi0 3
+  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root --fake geniev3 --intrinsic intrinsic --weight_tune 0
 
   # Merge the files
   hadd -f -T files/nuexsec_run1_merged_fakegeniev3.root files/nuexsec_data_run1_geniev3.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root

@@ -256,7 +256,7 @@ public:
     int _weight_ppfx{1}; // Use the PPFX CV Corr
     int _weight_dirt{1}; // Weight the Dirt events
     int _weight_ext{1};  // Weight the EXT events
-    int _pi0_correction{1};  // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
+    int _pi0_correction{0};  // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
 
     bool zoom{false};        // bool to decide whether to zoom in on the plots
     bool isfakedata{false};  // bool for using MC as fake data
@@ -269,7 +269,7 @@ public:
     bool weight_ppfx{true}; // Use the PPFX CV Corr
     bool weight_dirt{true}; // Weight the Dirt events
     bool weight_ext{true};  // Weight the EXT events
-    int  pi0_correction{1}; // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
+    int  pi0_correction{0}; // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
     bool tune_mec{false};
 
     // Scale factors to scale samples to data)

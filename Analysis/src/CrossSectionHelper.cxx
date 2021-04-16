@@ -927,10 +927,10 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
         // Note we actually dont want to divide out by the spline, but since this is 1 in numi, it doesnt matter!
         // We do this because the interaction systematics are shifted about the genie tune as the CV
 
-        if (_npi0 > 0) {
-            weight_uni = cv_weight;
-            return;
-        }
+        // if (_npi0 > 0) {
+        //     weight_uni = cv_weight;
+        //     return;
+        // }
 
         // Check the spline times tune weight
         _util.CheckWeight(_weightSplineTimesTune);
