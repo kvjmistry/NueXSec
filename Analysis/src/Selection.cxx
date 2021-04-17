@@ -405,10 +405,6 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
     SC.SetThresholdEvent(type);
 
-    // If the backtracked pdg of the leading shower is not an electron then alter classification
-    // Turn these off to get the efficiencies at low energies correct
-    SC.SetNonLdgShrEvent(type);
-    
     SC.SliceInteractionType(type); // Genie interaction type
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
     SC.Pi0Classifier(type); 
@@ -530,6 +526,11 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     if (SC.shr_energy_cali > 6.0 && type == _util.k_data){
         return false;
     }
+
+    // If the backtracked pdg of the leading shower is not an electron then alter classification
+    // Turn these off to get the efficiencies at low energies correct
+    SC.SetNonLdgShrEvent(type);
+    
     
     SelectionFill(type, SC, _util.k_dEdx_max_no_tracks, counter_v );
 

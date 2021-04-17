@@ -1092,7 +1092,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     h_error_hist->SetFillColorAlpha(12, 0.15);
     h_error_hist->SetLineWidth(0);
     h_error_hist->Draw("e2, same");
-    if (hist_name == "h_reco_track_multiplicity")h_error_hist->Draw("e2, same, TEXT00"); // for the track multiplicity plot draw the event count so we can get the % of 0 track events
+    // if (hist_name == "h_reco_track_multiplicity")h_error_hist->Draw("e2, same, TEXT00"); // for the track multiplicity plot draw the event count so we can get the % of 0 track events
 
     // Set the legend ----------------------------------------------------------
     TLegend *leg_stack;

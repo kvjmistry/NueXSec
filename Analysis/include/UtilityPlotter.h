@@ -183,6 +183,9 @@ class UtilityPlotter{
     // Compare the distributions from events gernated from dk2nu files and genie
     // generated events
     void Compare1DFluxGeneratedEvents();
+    // -------------------------------------------------------------------------
+    // Compare the unfolded cross section extracted with and without the pi0 tune
+    void CompareXsecPi0Tunings();
 
 
 }; // End Class UtilityPlotter

@@ -3666,7 +3666,7 @@ void SystematicsHelper::MakeTotUncertaintyPlot(bool AddStatErr){
                 h_uncertainty.at(k_err_detvar)->Draw("hist,same");
                 h_uncertainty.at(k_err_dirt)->Draw("hist,same");
                 h_uncertainty.at(k_err_pot)->Draw("hist,same");
-                h_uncertainty.at(k_err_pi0)->Draw("hist,same");
+                // h_uncertainty.at(k_err_pi0)->Draw("hist,same");
                 h_uncertainty.at(k_err_mcstats)->Draw("hist,same");
 
                 TLegend *leg = new TLegend(0.18, 0.55, 0.88, 0.85);
@@ -3688,7 +3688,7 @@ void SystematicsHelper::MakeTotUncertaintyPlot(bool AddStatErr){
                 leg->AddEntry(h_uncertainty.at(k_err_reint),      "Geant4 Reinteractions", "l");
                 leg->AddEntry(h_uncertainty.at(k_err_pot),        "POT Counting", "l");
                 leg->AddEntry(h_uncertainty.at(k_err_dirt),       "Dirt", "l");
-                leg->AddEntry(h_uncertainty.at(k_err_pi0),        "Pi0 Tune", "l");
+                // leg->AddEntry(h_uncertainty.at(k_err_pi0),        "Pi0 Tune", "l");
                 leg->AddEntry(h_uncertainty.at(k_err_mcstats),    "MC Stat", "l");
 
                 leg->Draw();
