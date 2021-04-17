@@ -55,7 +55,14 @@ void Selection::Initialise(Utility _utility){
     // Get MC variables --------------------------------------------------------
     if (bool_use_mc){
         std::cout << "\nInitialising MC" << std::endl;
-        _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
+        // _util.GetTree(f_mc, mc_tree, "nuselection/NeutrinoSelectionFilter");
+
+        mc_tree = new TChain("nuselection/NeutrinoSelectionFilter");
+
+        if (std::string(_util.intrinsic_mode) == "fakeintrinsic")
+            mc_tree->Add(_util.fake_intrinsic_file); 
+
+        mc_tree->Add(_util.mc_file_name);
 
         // Initialise all the mc slice container
         mc_SC.Initialise(mc_tree, _util.k_mc, _util);
@@ -174,6 +181,21 @@ void Selection::MakeSelection(){
 
             // Get the entry in the tree
             mc_tree->GetEntry(ievent); 
+
+            // Print the TChain number
+            if(treeNumber != mc_tree->GetTreeNumber()) {
+                treeNumber = mc_tree->GetTreeNumber();
+                std::cout << "Moving to tree number " << treeNumber << "." << std::endl;
+                
+                // if there is more than one tree and its the second file, make sure the intrinsic mode is turned off
+                // otherwise we will apply the intrinsic weights to the bkg, this is not what we want
+                if (treeNumber == 1){
+                    _util.TurnoffIntrinsicMode();
+                }
+
+                std::cout << "Intrinsic Mode is: " << std::string(_util.intrinsic_mode) << std::endl;
+
+            }
 
             // std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
 
@@ -419,6 +441,11 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     // In the case of Nuwro, we need to manually set the weight
     if (std::string(_util.variation) == "nuwro" || std::string(_util.fakedataname) == "nuwro")
         SC.SetPPFXCVWeight();
+
+    // Skip signal events in the standard MC file so we dont double count the signal events
+    if (treeNumber == 1 && SC.is_signal && type == _util.k_mc){
+        return false;
+    }
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------

@@ -124,7 +124,7 @@ public:
     bool CheckHistogram(std::vector<std::string> vector, TString hist_name);
     // -------------------------------------------------------------------------
     // Turn off the intrinsic nue mode
-    void TurnoffIntrinsicMode(){intrinsic_mode = (char*)"empty";};
+    void TurnoffIntrinsicMode(){intrinsic_mode = (char*)"default";};
     // -------------------------------------------------------------------------
     // Calculate a covariance matrix
     void CalcCovariance(std::vector<TH1D*> h_universe, TH1D *h_CV, TH2D *h_cov);
@@ -225,6 +225,7 @@ public:
     char * ext_file_name           = (char *)"empty";
     char * data_file_name          = (char *)"empty";
     char * dirt_file_name          = (char *)"empty";
+    char * fake_intrinsic_file     = (char *)"empty";
     char * mc_file_name_out        = (char *)"empty";
     char * ext_file_name_out       = (char *)"empty";
     char * data_file_name_out      = (char *)"empty";

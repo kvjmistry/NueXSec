@@ -320,6 +320,11 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         if (strcmp(arg, "--intrinsic") == 0) {
             std::cout << magenta << "Using Selection with intrinsic nue setting: " << argv[i+1] << reset <<std::endl;
             intrinsic_mode = argv[i+1];
+
+            // Add in the extra intrinsic file for fake data
+            if (std::string(argv[i+1]) == "fakeintrinsic")
+                fake_intrinsic_file = argv[i+2];
+
         }
 
         // Use the gpvm file paths
@@ -769,7 +774,7 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
     }
 
     // This is the intrinsic nue weight that scales it to the standard overlay sample
-    if (std::string(intrinsic_mode) == "intrinsic" && type == k_mc){
+    if ((std::string(intrinsic_mode) == "intrinsic" || std::string(intrinsic_mode) == "fakeintrinsic") && type == k_mc){
         
         // Kill off the out of fv events in the intrinsic nue sample (to avoid double counting)
         if (!infv) weight = 0.0; 

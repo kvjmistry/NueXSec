@@ -325,9 +325,12 @@ fi
 if [ "$1" == "fakemec" ]; then
 
   # Run the cross sec calculation in fake data mode
-  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake mec --tunemec 
+  # ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake mec --tunemec 
 
-  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root --fake mec --intrinsic intrinsic --tunemec 
+  # ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root --fake mec --intrinsic intrinsic --tunemec 
+
+  # Run both standard and intrinsic in one go
+  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake mec --tunemec --intrinsic fakeintrinsic ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root
 
   # Merge the files
   hadd -f -T files/nuexsec_run1_merged_fakemec.root files/nuexsec_data_run1_mec.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root
@@ -347,9 +350,12 @@ fi
 if [ "$1" == "fakenogtune" ]; then
 
   # Run the cross sec calculation in fake data mode
-  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake nogtune --weight_tune 0
+  # ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake nogtune --weight_tune 0
 
-  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root --fake nogtune --intrinsic intrinsic --weight_tune 0
+  # ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root --fake nogtune --intrinsic intrinsic --weight_tune 0
+
+  # Run both standard and intrinsic in one go
+  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake nogtune --weight_tune 0 --intrinsic fakeintrinsic ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root
 
   # Merge the files
   hadd -f -T files/nuexsec_run1_merged_fakenogtune.root files/nuexsec_data_run1_nogtune.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root
@@ -369,9 +375,12 @@ fi
 if [ "$1" == "fakenopi0tune" ]; then
 
   # Run the cross sec calculation in fake data mode
-  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake nopi0tune --weight_pi0 0
+  # ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake nopi0tune --weight_pi0 0
 
-  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root --fake nopi0tune --intrinsic intrinsic --weight_pi0 0
+  # ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root --fake nopi0tune --intrinsic intrinsic --weight_pi0 0
+
+  # Run both standard and intrinsic in one go
+  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake nopi0tune --weight_pi0 0 --intrinsic fakeintrinsic ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root
 
   # Merge the files
   hadd -f -T files/nuexsec_run1_merged_fakenopi0tune.root files/nuexsec_data_run1_nopi0tune.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root
@@ -391,9 +400,12 @@ fi
 if [ "$1" == "faketune1" ]; then
 
   # Run the cross sec calculation in fake data mode
-  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_tune1.root --fake tune1 --weight_tune 0
+  # ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_tune1.root --fake tune1 --weight_tune 0
 
-  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_tune1_intrinsic.root --fake tune1 --intrinsic intrinsic --weight_tune 0
+  # ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_tune1_intrinsic.root --fake tune1 --intrinsic intrinsic --weight_tune 0
+
+  # Run both standard and intrinsic in one go
+  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_tune1.root --fake tune1 --weight_tune 0 --intrinsic fakeintrinsic ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_tune1_intrinsic.root
 
   # Merge the files
   hadd -f -T files/nuexsec_run1_merged_faketune1.root files/nuexsec_data_run1_tune1.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root
@@ -413,9 +425,12 @@ fi
 if [ "$1" == "fakeFLUGG" ]; then
 
   # Run the cross sec calculation in fake data mode
-  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_FLUGG.root --fake FLUGG  --weight_ppfx 0
+  # ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_FLUGG.root --fake FLUGG  --weight_ppfx 0
 
-  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_FLUGG_intrinsic.root --fake FLUGG --intrinsic intrinsic --weight_ppfx 0
+  # ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_FLUGG_intrinsic.root --fake FLUGG --intrinsic intrinsic --weight_ppfx 0
+
+  # Run both standard and intrinsic in one go
+  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_FLUGG.root --fake FLUGG  --weight_ppfx 0 --intrinsic fakeintrinsic ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_FLUGG_intrinsic.root
 
   # Merge the files
   hadd -f -T files/nuexsec_run1_merged_fakeFLUGG.root files/nuexsec_data_run1_FLUGG.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root
@@ -435,9 +450,11 @@ fi
 if [ "$1" == "fakeInput" ]; then
 
   # Run the cross sec calculation in fake data mode
-  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake Input
+  # ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake Input
 
-  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root --fake Input --intrinsic intrinsic
+  # ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root --fake Input --intrinsic intrinsic
+
+  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake Input --intrinsic fakeintrinsic ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root
 
   # Merge the files
   hadd -f -T files/nuexsec_run1_merged_fakeInput.root files/nuexsec_data_run1_Input.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root
@@ -457,9 +474,12 @@ fi
 if [ "$1" == "fakenuwro" ]; then
 
   # Run the cross sec calculation in fake data mode
-  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_nuwro.root --fake nuwro --weight_tune 0
+  # ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_nuwro.root --fake nuwro --weight_tune 0
 
-  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_nuwro_intrinsic.root --fake nuwro --intrinsic intrinsic --weight_tune 0
+  # ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_nuwro_intrinsic.root --fake nuwro --intrinsic intrinsic --weight_tune 0
+
+  # Run both standard and intrinsic in one go
+  ./nuexsec --run 1 --mc ../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_nuwro.root --fake nuwro --weight_tune 0 --intrinsic fakeintrinsic ../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_nuwro_intrinsic.root
 
   # Merge the files
   hadd -f -T files/nuexsec_run1_merged_fakenuwro.root files/nuexsec_data_run1_nuwro.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root
@@ -479,9 +499,12 @@ fi
 if [ "$1" == "fakegeniev3" ]; then
 
   # Run the cross sec calculation in fake data mode
-  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake geniev3 --weight_tune 0
+  # ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake geniev3 --weight_tune 0
 
-  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root --fake geniev3 --intrinsic intrinsic --weight_tune 0
+  # ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root --fake geniev3 --intrinsic intrinsic --weight_tune 0
+
+  # Run both standard and intrinsic in one go
+  ./nuexsec --run 1 --mc ../ntuples/neutrinoselection_filt_run1_overlay_newtune.root --fake geniev3 --weight_tune 0 --intrinsic fakeintrinsic ../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root
 
   # Merge the files
   hadd -f -T files/nuexsec_run1_merged_fakegeniev3.root files/nuexsec_data_run1_geniev3.root files/nuexsec_dirt_run1_fake.root files/nuexsec_ext_run1_fake.root files/nuexsec_mc_run1.root

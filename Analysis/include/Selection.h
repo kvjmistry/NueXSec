@@ -46,12 +46,14 @@ namespace xsecSelection {
             TFile * f_dirt;      // The dirt file
 
             // TTrees
-            TTree * mc_tree;      // MC   Tree
+            TChain * mc_tree;      // MC   Tree
             TTree * data_tree;    // Data Tree
             TTree * ext_tree;     // EXT  Tree
             TTree * dirt_tree;    // Dirt Tree
 
             TTree * eff_tree_out; // TTree to write to the efficiency vec to file for plotting
+
+            int treeNumber{0}; // For switching between tchains and avoiding the double counting
 
             // Class Instances
             Utility                        _util;
