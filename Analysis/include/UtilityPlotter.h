@@ -186,6 +186,13 @@ class UtilityPlotter{
     // -------------------------------------------------------------------------
     // Compare the unfolded cross section extracted with and without the pi0 tune
     void CompareXsecPi0Tunings();
+    // -------------------------------------------------------------------------
+    // Compute flux covariance matrix
+    void CalcFluxCovarianceHP();
+    void CalcFluxCovarianceBeamline();
+    // -------------------------------------------------------------------------
+    // Function to get stitched together universes
+    void GetStitchedUniverses(std::string constraint, std::string mode, std::vector<TH1D*> &hist_unwrap_stitch, TH1D* &hist_unwrap_stitch_CV, std::vector<TH1D*> &hist_unwrap_CV, int index);
 
 
 }; // End Class UtilityPlotter

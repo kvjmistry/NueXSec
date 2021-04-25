@@ -64,6 +64,12 @@ void UtilityPlotter::Initialise(Utility _utility){
         OptimiseBins();
         return;
     }
+    // This will call the function to calculate the covariance matrix
+    else if (std::string(_util.uplotmode) == "flux"){
+        // CalcFluxCovarianceHP();
+        CalcFluxCovarianceBeamline();
+        return;
+    }
     // This will call the code to optimise the bin widths
     else if (std::string(_util.uplotmode) == "models"){ 
 
@@ -3872,7 +3878,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
 
     std::cout << "Genie v2" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_geniev2gen), unf, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_geniev2gen),   Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    // leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_geniev2gen),   Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
     std::cout << "NuWro" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_nuwro), unf, h_cov, chi, ndof, pval);
@@ -3923,7 +3929,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     h_mcxsec_true_model_smear.at(k_model_geniev3)->Draw("hist,same" );
 
     h_mcxsec_true_model_smear.at(k_model_geniev2gen)->SetLineColor(kOrange-1);
-    h_mcxsec_true_model_smear.at(k_model_geniev2gen)->Draw("hist,same" );
+    // h_mcxsec_true_model_smear.at(k_model_geniev2gen)->Draw("hist,same" );
 
     h_mcxsec_true_model_smear.at(k_model_nuwro)->SetLineColor(kPink+1);
     h_mcxsec_true_model_smear.at(k_model_nuwro)->Draw("hist,same" );
@@ -4664,5 +4670,418 @@ void UtilityPlotter::CompareXsecPi0Tunings(){
 
 
 
+
+}
+// -----------------------------------------------------------------------------
+void UtilityPlotter::CalcFluxCovarianceHP(){
+
+    // enums for the models
+    enum enum_flav {
+        k_numu,
+        k_numubar,
+        k_nue,
+        k_nuebar,
+        k_FLAV_MAX
+    };
+
+    std::string mode = "2D";
+    mode = "1D"; // Only study the histograms in terms of energy
+
+
+    std::vector<TH1D*> hist_unwrap_stitch;
+    TH1D *hist_unwrap_stitch_CV;
+    std::vector<TH1D*> hist_unwrap_CV(k_FLAV_MAX);
+
+    // Call function here
+    GetStitchedUniverses("HP", mode, hist_unwrap_stitch, hist_unwrap_stitch_CV, hist_unwrap_CV, 1 );
+    
+    // Draw vertical lines to help the eye
+    std::vector<TLine*> line(6);
+
+    int numu_bin    = hist_unwrap_CV.at(k_numu)->GetNbinsX() + 1;
+    int numubar_bin = hist_unwrap_CV.at(k_numu)->GetNbinsX() + hist_unwrap_CV.at(k_numubar)->GetNbinsX() + 1;
+    int nue_bin     = hist_unwrap_CV.at(k_numu)->GetNbinsX() + hist_unwrap_CV.at(k_numubar)->GetNbinsX() + hist_unwrap_CV.at(k_nue)->GetNbinsX() + 1;
+    int nuebar_bin  = hist_unwrap_CV.at(k_numu)->GetNbinsX() + hist_unwrap_CV.at(k_numubar)->GetNbinsX() + hist_unwrap_CV.at(k_nue)->GetNbinsX() + hist_unwrap_CV.at(k_nuebar)->GetNbinsX() + 1;
+
+    line.at(0) = new TLine(numu_bin,    1, numu_bin,    nuebar_bin);
+    line.at(1) = new TLine(numubar_bin, 1, numubar_bin, nuebar_bin);
+    line.at(2) = new TLine(nue_bin,     1, nue_bin,     nuebar_bin);
+    line.at(3) = new TLine(1,numu_bin,    nuebar_bin, numu_bin);
+    line.at(4) = new TLine(1,numubar_bin, nuebar_bin, numubar_bin);
+    line.at(5) = new TLine(1,nue_bin,     nuebar_bin, nue_bin);
+
+
+    // Create the covariance matrix
+    int n_bins = hist_unwrap_stitch.at(0)->GetNbinsX();
+    TH2D* h_cov = new TH2D("", "Covariance Matrix ;Bin i; Bin j",  n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
+
+    _util.CalcCovariance(hist_unwrap_stitch, hist_unwrap_stitch_CV, h_cov);
+
+    gStyle->SetOptStat(0);
+    
+    // gStyle->SetPalette(kBlueGreenYellow);
+
+    TH2D* h_cor = (TH2D*)h_cov->Clone();
+    TH2D* h_frac_cov = (TH2D*)h_cov->Clone();
+    _util.CalcCorrelation(hist_unwrap_stitch_CV, h_cov, h_cor);
+    _util.CalcCFracCovariance(hist_unwrap_stitch_CV, h_frac_cov);
+
+    TCanvas *c = new TCanvas("", "", 500, 500);
+    h_cov->Draw("colz");
+    for (unsigned int i = 0; i< line.size(); i++){
+        line.at(i)->SetLineColor(kRed+2);
+        line.at(i)->SetLineWidth(4);
+        line.at(i)->Draw();
+    }
+    c->Print("covariance.pdf");
+
+    TCanvas *c2 = new TCanvas("", "", 700, 700);
+    gPad->SetLeftMargin(0.14);
+    gPad->SetRightMargin(0.14);
+    gPad->SetTopMargin(0.14);
+    gPad->SetBottomMargin(0.14);
+    h_cor->SetTitle("Correlation Matrix ;Bin i; Bin j");
+    h_cor->Draw("colz");
+    for (unsigned int i = 0; i< line.size(); i++){
+        line.at(i)->SetLineColor(kRed+2);
+        line.at(i)->SetLineWidth(4);
+        line.at(i)->Draw();
+    }
+    c2->Print("correlation.pdf");
+
+    TCanvas *c3 = new TCanvas("", "", 500, 500);
+    gPad->SetLeftMargin(0.14);
+    gPad->SetRightMargin(0.14);
+    gPad->SetTopMargin(0.14);
+    gPad->SetBottomMargin(0.14);
+    // h_cor->SetMaximum(0.3);
+    // h_cor->SetMinimum(-0.3);
+    h_frac_cov->SetTitle("Fractional Covariance Matrix ;Bin i; Bin j");
+    h_frac_cov->Draw("colz");
+    // gPad->SetLogz();
+    for (unsigned int i = 0; i< line.size(); i++){
+        line.at(i)->SetLineColor(kRed+2);
+        line.at(i)->SetLineWidth(4);
+        line.at(i)->Draw();
+    }
+    c3->Print("fraction_cov.pdf");
+
+
+
+   
+
+
+}
+// -----------------------------------------------------------------------------
+void UtilityPlotter::CalcFluxCovarianceBeamline(){
+
+    // enums for the models
+    enum enum_flav {
+        k_numu,
+        k_numubar,
+        k_nue,
+        k_nuebar,
+        k_FLAV_MAX
+    };
+
+    std::string mode = "2D";
+    // mode = "1D"; // Only study the histograms in terms of energy
+
+    // std::vector<int> index = {1,3,5,7,9,11,13,15,17,19};
+    std::vector<int> index = {9};
+
+    std::vector<std::vector<TH1D*>> hist_unwrap_stitch;
+    hist_unwrap_stitch.resize(index.size());
+
+    std::vector<TH1D*> hist_unwrap_stitch_CV;
+    hist_unwrap_stitch_CV.resize(index.size());
+
+    std::vector<std::vector<TH1D*>> hist_unwrap_CV(k_FLAV_MAX);
+    hist_unwrap_CV.resize(index.size());
+    for (unsigned int i = 0; i < hist_unwrap_CV.size(); i++)
+        hist_unwrap_CV.at(i).resize(k_FLAV_MAX);
+
+    for (unsigned int i = 0; i < index.size(); i++){
+        GetStitchedUniverses("beamline", mode, hist_unwrap_stitch.at(i), hist_unwrap_stitch_CV.at(i), hist_unwrap_CV.at(i), index.at(i) );
+    }
+
+    // Draw vertical lines to help the eye
+    std::vector<TLine*> line(6);
+
+    int numu_bin    = hist_unwrap_CV.at(0).at(k_numu)->GetNbinsX() + 1;
+    int numubar_bin = hist_unwrap_CV.at(0).at(k_numu)->GetNbinsX() + hist_unwrap_CV.at(0).at(k_numubar)->GetNbinsX() + 1;
+    int nue_bin     = hist_unwrap_CV.at(0).at(k_numu)->GetNbinsX() + hist_unwrap_CV.at(0).at(k_numubar)->GetNbinsX() + hist_unwrap_CV.at(0).at(k_nue)->GetNbinsX() + 1;
+    int nuebar_bin  = hist_unwrap_CV.at(0).at(k_numu)->GetNbinsX() + hist_unwrap_CV.at(0).at(k_numubar)->GetNbinsX() + hist_unwrap_CV.at(0).at(k_nue)->GetNbinsX() + hist_unwrap_CV.at(0).at(k_nuebar)->GetNbinsX() + 1;
+
+    line.at(0) = new TLine(numu_bin,    1, numu_bin,    nuebar_bin);
+    line.at(1) = new TLine(numubar_bin, 1, numubar_bin, nuebar_bin);
+    line.at(2) = new TLine(nue_bin,     1, nue_bin,     nuebar_bin);
+    line.at(3) = new TLine(1,numu_bin,    nuebar_bin, numu_bin);
+    line.at(4) = new TLine(1,numubar_bin, nuebar_bin, numubar_bin);
+    line.at(5) = new TLine(1,nue_bin,     nuebar_bin, nue_bin);
+
+
+    // Create the covariance matrix
+    int n_bins = hist_unwrap_stitch.at(0).at(0)->GetNbinsX();
+    
+    std::vector<TH2D*> h_cov_v(index.size());
+    
+    for (unsigned int i = 0; i < index.size(); i++){
+        h_cov_v.at(i) = new TH2D(Form("cov_%d", i), "Covariance Matrix ;Bin i; Bin j",  n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
+
+        _util.CalcCovariance(hist_unwrap_stitch.at(i), hist_unwrap_stitch_CV.at(i), h_cov_v.at(i));
+    }
+
+    TH2D* h_cov = (TH2D*)h_cov_v.at(0)->Clone();
+    for (unsigned int i = 1; i < index.size(); i++){
+        h_cov->Add(h_cov_v.at(i));
+    }
+
+    gStyle->SetOptStat(0);
+    
+    // gStyle->SetPalette(kBlueGreenYellow);
+
+    TH2D* h_cor = (TH2D*)h_cov->Clone();
+    TH2D* h_frac_cov = (TH2D*)h_cov->Clone();
+    _util.CalcCorrelation(hist_unwrap_stitch_CV.at(0), h_cov, h_cor);
+    _util.CalcCFracCovariance(hist_unwrap_stitch_CV.at(0), h_frac_cov);
+
+    TCanvas *c = new TCanvas("", "", 500, 500);
+    h_cov->Draw("colz");
+    for (unsigned int i = 0; i< line.size(); i++){
+        line.at(i)->SetLineColor(kRed+2);
+        line.at(i)->SetLineWidth(4);
+        line.at(i)->Draw();
+    }
+    c->Print("covariance.pdf");
+
+    TCanvas *c2 = new TCanvas("", "", 700, 700);
+    gPad->SetLeftMargin(0.14);
+    gPad->SetRightMargin(0.14);
+    gPad->SetTopMargin(0.14);
+    gPad->SetBottomMargin(0.14);
+    h_cor->SetTitle("Correlation Matrix ;Bin i; Bin j");
+    h_cor->Draw("colz");
+    for (unsigned int i = 0; i< line.size(); i++){
+        line.at(i)->SetLineColor(kRed+2);
+        line.at(i)->SetLineWidth(4);
+        line.at(i)->Draw();
+    }
+    c2->Print("correlation.pdf");
+
+    TCanvas *c3 = new TCanvas("", "", 500, 500);
+    gPad->SetLeftMargin(0.14);
+    gPad->SetRightMargin(0.14);
+    gPad->SetTopMargin(0.14);
+    gPad->SetBottomMargin(0.14);
+    // h_cor->SetMaximum(0.3);
+    // h_cor->SetMinimum(-0.3);
+    h_frac_cov->SetTitle("Fractional Covariance Matrix ;Bin i; Bin j");
+    h_frac_cov->Draw("colz");
+    // gPad->SetLogz();
+    for (unsigned int i = 0; i< line.size(); i++){
+        line.at(i)->SetLineColor(kRed+2);
+        line.at(i)->SetLineWidth(4);
+        line.at(i)->Draw();
+    }
+    c3->Print("fraction_cov.pdf");
+
+}
+// -----------------------------------------------------------------------------
+void UtilityPlotter::GetStitchedUniverses(std::string constraint, std::string mode, std::vector<TH1D*> &hist_unwrap_stitch, TH1D* &hist_unwrap_stitch_CV, std::vector<TH1D*> &hist_unwrap_CV, int index){
+
+    // Create a vector for the models
+    std::vector<std::string> flav = {
+        "numu",
+        "numubar",
+        "nue",
+        "nuebar"
+    };
+
+    // enums for the models
+    enum enum_flav {
+        k_numu,
+        k_numubar,
+        k_nue,
+        k_nuebar,
+        k_FLAV_MAX
+    };
+
+    int nuniverses = 600;
+    if (constraint =="beamline")
+        nuniverses = 2;
+
+    // Load in the flux histogram file
+    TFile * f = TFile::Open("Systematics/output_fhc_uboone_run0.root", "READ");
+
+    TFile * f2, *f3;
+    if (constraint == "beamline"){
+        f2 = TFile::Open(Form("Systematics//beamline/FHC/output_uboone_fhc_run%d.root", index), "READ");
+        f3 = TFile::Open(Form("Systematics//beamline/FHC/output_uboone_fhc_run%d.root", index+1), "READ");
+    }
+
+
+    // Create the 2D histograms to get from file
+    std::vector<std::vector<TH2D*>> hist;
+    hist.resize(k_FLAV_MAX);
+    for (unsigned int h = 0; h < hist.size(); h++ ){
+        hist.at(h).resize(nuniverses);
+    }
+
+    // Create the vector of histograms for unwrapping
+    std::vector<std::vector<TH1D*>> hist_unwrap;
+    hist_unwrap.resize(k_FLAV_MAX);
+    for (unsigned int h = 0; h < hist_unwrap.size(); h++ ){
+        hist_unwrap.at(h).resize(nuniverses);
+    }
+
+    std::vector<TH2D*> hist_2D_CV(k_FLAV_MAX);
+
+    // 2D histogram case
+    if (mode == "2D"){
+        // Now get the histograms
+        std::cout << "Reading in the histograms from file..." << std::endl;
+        for (unsigned int h = 0; h < hist.size(); h++ ){
+            
+            // Get the histograms
+            for (unsigned int u = 0; u < hist.at(h).size(); u++ ){
+                
+                if (constraint == "HP")
+                    hist.at(h).at(u) = (TH2D*)f->Get(Form("%s/Multisims/%s_ppfx_ms_UBPPFX_Uni_%d_AV_TPC_2D", flav.at(h).c_str(), flav.at(h).c_str(), u));
+
+                if (constraint == "beamline"){
+                    hist.at(h).at(0) = (TH2D*)f2->Get(Form("%s/Detsmear/%s_CV_AV_TPC_2D", flav.at(h).c_str(), flav.at(h).c_str()));
+                    hist.at(h).at(1) = (TH2D*)f3->Get(Form("%s/Detsmear/%s_CV_AV_TPC_2D", flav.at(h).c_str(), flav.at(h).c_str()));
+                }
+            }
+            
+            // Get the CV
+            TH2D* h_temp;
+            h_temp= (TH2D*)f->Get(Form("%s/Detsmear/%s_CV_AV_TPC_2D", flav.at(h).c_str(), flav.at(h).c_str()));
+            hist_2D_CV.at(h) = (TH2D*)h_temp->Clone();
+
+
+        }
+    }
+
+    std::cout << "Successfully read in the histograms from file" << std::endl;
+
+    // --
+    // Unwrap the histograms
+    
+
+    // Loop over the flavours
+    for (unsigned int h = 0; h < hist.size(); h++ ){
+        
+        // Loop over the universes
+        for (unsigned int u = 0; u < hist.at(h).size(); u++ ){
+
+            if (mode == "2D"){
+                // Create the unwrapped histograms
+                const int nBinsEnu = hist.at(h).at(0)->GetXaxis()->GetNbins(); // Enu
+                const int nBinsTh  = hist.at(h).at(0)->GetYaxis()->GetNbins(); // Theta
+                hist_unwrap.at(h).at(u) = new TH1D("", "",nBinsEnu*nBinsTh, 0, nBinsEnu*nBinsTh);
+                
+                // Fill the unwrapped histograms
+                int counter{0};
+                for (int i=1; i<hist.at(h).at(u)->GetXaxis()->GetNbins()+1; i++) { // Loop over rows
+                    for (int j=1; j<hist.at(h).at(u)->GetYaxis()->GetNbins()+1; j++){// Loop over columns
+                        counter++;
+                        hist_unwrap.at(h).at(u)->SetBinContent(counter, hist.at(h).at(u)->GetBinContent(i , j)  );
+                    }
+                }
+            }
+            // 1D histogram case
+            else {
+
+                if (constraint == "HP"){
+                    hist_unwrap.at(h).at(u) = (TH1D*)f->Get(Form("%s/Multisims/%s_ppfx_ms_UBPPFX_Uni_%d_AV_TPC", flav.at(h).c_str(), flav.at(h).c_str(), u));
+                }
+
+                if (constraint == "beamline"){
+                    hist_unwrap.at(h).at(0) = (TH1D*)f2->Get(Form("%s/Detsmear/%s_CV_AV_TPC", flav.at(h).c_str(), flav.at(h).c_str()));
+                    hist_unwrap.at(h).at(1) = (TH1D*)f3->Get(Form("%s/Detsmear/%s_CV_AV_TPC", flav.at(h).c_str(), flav.at(h).c_str()));
+                }
+            
+            }
+
+        }
+
+        // CV
+        if (mode == "2D"){
+            // Create the unwrapped histograms
+            const int nBinsEnu = hist.at(h).at(0)->GetXaxis()->GetNbins(); // Enu
+            const int nBinsTh  = hist.at(h).at(0)->GetYaxis()->GetNbins(); // Theta
+            hist_unwrap_CV.at(h) = new TH1D("", "",nBinsEnu*nBinsTh, 0, nBinsEnu*nBinsTh);
+
+            // Fill the CV unwrapped histograms
+            int counter{0};
+            for (int i=1; i<hist_2D_CV.at(h)->GetXaxis()->GetNbins()+1; i++) { // Loop over rows
+                for (int j=1; j<hist_2D_CV.at(h)->GetYaxis()->GetNbins()+1; j++){ // Loop over columns
+                    counter++;
+                    hist_unwrap_CV.at(h)->SetBinContent(counter, hist_2D_CV.at(h)->GetBinContent(i , j)  );
+                }
+            }
+
+        }
+        else {
+            
+            TH1D* h_temp;
+            h_temp= (TH1D*)f->Get(Form("%s/Detsmear/%s_CV_AV_TPC", flav.at(h).c_str(), flav.at(h).c_str()));
+            hist_unwrap_CV.at(h) = (TH1D*)h_temp->Clone();
+        }
+
+
+    }
+
+    std::cout << "Successfully unwrapped the histograms" << std::endl;
+
+    // Now stitch together all the histograms
+    
+    hist_unwrap_stitch.resize(nuniverses);
+    // Loop over universes
+    for (int u = 0; u < nuniverses; u++ ){
+        
+        // Create the stitched histogram
+        const int nBins = hist_unwrap.at(k_numu).at(0)->GetNbinsX() + hist_unwrap.at(k_numubar).at(0)->GetNbinsX() + hist_unwrap.at(k_nue).at(0)->GetNbinsX() + hist_unwrap.at(k_nuebar).at(0)->GetNbinsX();
+        hist_unwrap_stitch.at(u) = new TH1D("", "",nBins, 0, nBins);
+
+        std::vector<double> values;
+
+        // Loop over histograms for each flavour and get the bin contents.
+        for (unsigned int h = 0; h < hist.size(); h++ ){
+
+            for (int bin=1; bin<hist_unwrap.at(h).at(u)->GetXaxis()->GetNbins()+1; bin++){
+                values.push_back( hist_unwrap.at(h).at(u)->GetBinContent(bin) );
+            }
+        }
+
+        // Set the bin content of the stitched histogram
+        for (unsigned int bin=1; bin<values.size()+1; bin++) { // Loop over rows
+    
+            hist_unwrap_stitch.at(u)->SetBinContent(bin, values.at(bin-1));
+        }
+
+    }
+
+    // Create the stitched histogram
+    const int nBins = hist_unwrap_CV.at(k_numu)->GetNbinsX() + hist_unwrap_CV.at(k_numubar)->GetNbinsX() + hist_unwrap_CV.at(k_nue)->GetNbinsX() + hist_unwrap_CV.at(k_nuebar)->GetNbinsX();
+    hist_unwrap_stitch_CV = new TH1D("", "",nBins, 0, nBins);
+
+    std::vector<double> values;
+
+    // Loop over histograms for each flavour and get the bin contents.
+    for (unsigned int h = 0; h < hist.size(); h++ ){
+
+        for (int bin=1; bin<hist_unwrap_CV.at(h)->GetXaxis()->GetNbins()+1; bin++){
+            values.push_back( hist_unwrap_CV.at(h)->GetBinContent(bin) );
+        }
+    }
+
+    // Set the bin content of the stitched histogram
+    for (unsigned int bin=1; bin<values.size()+1; bin++) { // Loop over rows
+
+        hist_unwrap_stitch_CV->SetBinContent(bin, values.at(bin-1));
+    }
 
 }
