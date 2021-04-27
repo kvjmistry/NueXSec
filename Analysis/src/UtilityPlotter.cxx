@@ -70,6 +70,12 @@ void UtilityPlotter::Initialise(Utility _utility){
         CalcFluxCovarianceBeamline();
         return;
     }
+    // This will calculate the event rates for the flux spectrum
+    else if (std::string(_util.uplotmode) == "rates"){
+        PlotParentEventRates("dk2nu");
+        PlotParentEventRates("flugg");
+        return;
+    }
     // This will call the code to optimise the bin widths
     else if (std::string(_util.uplotmode) == "models"){ 
 
@@ -3882,12 +3888,12 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
 
     std::cout << "NuWro" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_nuwro), unf, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_nuwro),   Form("NuWro v19.02.02 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_nuwro),   Form("NuWro v19.02.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
     // Scale the histograms by bin width 
     for (unsigned int m = 0; m < models.size(); m++){
         h_mcxsec_true_model_smear.at(m)->Scale(1.0, "width");
-        h_mcxsec_true_model_smear.at(m)->SetLineWidth(3);
+        h_mcxsec_true_model_smear.at(m)->SetLineWidth(5);
     }
     unf->Scale(1.0, "width");
 
@@ -3901,6 +3907,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
 
     gPad->SetLeftMargin(0.20);
     c->SetBottomMargin(0.15);
+    h_mcxsec_true_model_smear.at(k_model_CV)->SetTitle(_util.var_labels_xsec.at(2).c_str());
     h_mcxsec_true_model_smear.at(k_model_CV)->GetYaxis()->SetTitleOffset(1.7);
     h_mcxsec_true_model_smear.at(k_model_CV)->SetLineColor(kRed+2);
     
@@ -5085,3 +5092,202 @@ void UtilityPlotter::GetStitchedUniverses(std::string constraint, std::string mo
     }
 
 }
+// -----------------------------------------------------------------------------
+void UtilityPlotter::PlotParentEventRates(std::string type){
+
+
+    TFile *f_standard;
+    TTree *t_standard;
+    
+    TFile *f_intrinsic;
+    TTree *t_intrinsic;
+
+    std::string title;
+
+    std::vector<std::string> par_pdg_str = {"#pi^{+}", "#pi^{-}", "#mu^{+}", "#mu^{-}","K^{+}","K^{-}", "K^{0}_{L}", "Tot" };
+    std::vector<std::string> par_pdg_str2 = {"pip", "pim", "mup", "mum","kp","km", "kl", "all" };
+    enum par_enum {k_pi_plus = 211, k_pi_minus = -211, k_mu_plus = -13, k_mu_minus = 13, k_K_plus = 321, k_K_minus = -321, k_k0 = 130, k_all = 1000};
+    std::vector<int> par_pdg = {211, -211, -13, 13, 321, -321, 130, 0};
+    std::vector<int> cols = {42, kMagenta+2, 30, 38, 28, 36, 1001, kBlack };
+
+    std::vector<std::string> flav = {"#nu_{#mu}", "#bar{#nu}_{#mu}", "#nu_{e}", "#bar{#nu}_e"};
+    std::vector<std::string> flav_norm = {"numu", "numubar", "nue", "nuebar"};
+
+
+    std::vector<std::string> q_numu(par_pdg.size());
+    std::vector<std::string> q_numubar(par_pdg.size());
+    std::vector<std::string> q_nue(par_pdg.size());
+    std::vector<std::string> q_nuebar(par_pdg.size());
+    std::string q_all;
+
+    // Load in the TFiles
+    if (type == "dk2nu"){
+        f_standard = TFile::Open("../ntuples/neutrinoselection_filt_run1_overlay_newtune.root" , "READ");
+        t_standard = (TTree*)f_standard->Get("nuselection/NeutrinoSelectionFilter");
+        
+        f_intrinsic = TFile::Open("../ntuples/neutrinoselection_filt_run1_overlay_intrinsic_newtune.root" , "READ");
+        t_intrinsic = (TTree*)f_intrinsic->Get("nuselection/NeutrinoSelectionFilter");
+
+        title = "dk2nu";
+        for (unsigned int pdg = 0; pdg < par_pdg.size(); pdg++){
+            q_numu.at(pdg)    = Form("ppfx_cv*(ccnc==0 && nu_pdg == 14  && true_nu_vtx_x >= -1.55 && true_nu_vtx_x <= 254.8 && true_nu_vtx_y >= -115.53 && true_nu_vtx_y <= 117.47 && true_nu_vtx_z >= 0.11 && true_nu_vtx_z <= 1036.91 && nu_parent_pdg == %d)", par_pdg.at(pdg));
+            q_numubar.at(pdg) = Form("ppfx_cv*(ccnc==0 && nu_pdg == -14 && true_nu_vtx_x >= -1.55 && true_nu_vtx_x <= 254.8 && true_nu_vtx_y >= -115.53 && true_nu_vtx_y <= 117.47 && true_nu_vtx_z >= 0.11 && true_nu_vtx_z <= 1036.91 && nu_parent_pdg == %d)", par_pdg.at(pdg));
+            q_nue.at(pdg)     = Form("ppfx_cv*(ccnc==0 && nu_pdg == 12  && nu_parent_pdg == %d)", par_pdg.at(pdg));
+            q_nuebar.at(pdg)  = Form("ppfx_cv*(ccnc==0 && nu_pdg == -12 && nu_parent_pdg == %d)", par_pdg.at(pdg));
+        
+            if (par_pdg.at(pdg) == 0){
+                q_numu.at(pdg)    = "ppfx_cv*(ccnc==0 && nu_pdg == 14  && true_nu_vtx_x >= -1.55 && true_nu_vtx_x <= 254.8 && true_nu_vtx_y >= -115.53 && true_nu_vtx_y <= 117.47 && true_nu_vtx_z >= 0.11 && true_nu_vtx_z <= 1036.91)";
+                q_numubar.at(pdg) = "ppfx_cv*(ccnc==0 && nu_pdg == -14 && true_nu_vtx_x >= -1.55 && true_nu_vtx_x <= 254.8 && true_nu_vtx_y >= -115.53 && true_nu_vtx_y <= 117.47 && true_nu_vtx_z >= 0.11 && true_nu_vtx_z <= 1036.91)";
+                q_nue.at(pdg)     = "ppfx_cv*(ccnc==0 && nu_pdg == 12 )";
+                q_nuebar.at(pdg)  = "ppfx_cv*(ccnc==0 && nu_pdg == -12)";
+            }
+        }
+    }
+    else if (type == "flugg"){
+
+        f_standard = TFile::Open("../ntuples/detvar_newtune/run1/neutrinoselection_filt_run1_overlay_FLUGG.root" , "READ");
+        t_standard = (TTree*)f_standard->Get("nuselection/NeutrinoSelectionFilter");
+
+        f_intrinsic = TFile::Open("../ntuples/detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_FLUGG_intrinsic.root" , "READ");
+        t_intrinsic = (TTree*)f_intrinsic->Get("nuselection/NeutrinoSelectionFilter");
+
+        title = "flugg";
+        for (unsigned int pdg = 0; pdg < par_pdg.size(); pdg++){
+            q_numu.at(pdg)    = Form("(ccnc==0 && nu_pdg == 14  && true_nu_vtx_x >= -1.55 && true_nu_vtx_x <= 254.8 && true_nu_vtx_y >= -115.53 && true_nu_vtx_y <= 117.47 && true_nu_vtx_z >= 0.11 && true_nu_vtx_z <= 1036.91 && nu_parent_pdg == %d)", par_pdg.at(pdg));
+            q_numubar.at(pdg) = Form("(ccnc==0 && nu_pdg == -14 && true_nu_vtx_x >= -1.55 && true_nu_vtx_x <= 254.8 && true_nu_vtx_y >= -115.53 && true_nu_vtx_y <= 117.47 && true_nu_vtx_z >= 0.11 && true_nu_vtx_z <= 1036.91 && nu_parent_pdg == %d)", par_pdg.at(pdg));
+            q_nue.at(pdg)     = Form("(ccnc==0 && nu_pdg == 12  && nu_parent_pdg == %d)", par_pdg.at(pdg));
+            q_nuebar.at(pdg)  = Form("(ccnc==0 && nu_pdg == -12 && nu_parent_pdg == %d)", par_pdg.at(pdg));
+        
+            if (par_pdg.at(pdg) == 0){
+                q_numu.at(pdg)    = "(ccnc==0 && nu_pdg == 14  && true_nu_vtx_x >= -1.55 && true_nu_vtx_x <= 254.8 && true_nu_vtx_y >= -115.53 && true_nu_vtx_y <= 117.47 && true_nu_vtx_z >= 0.11 && true_nu_vtx_z <= 1036.91)";
+                q_numubar.at(pdg) = "(ccnc==0 && nu_pdg == -14 && true_nu_vtx_x >= -1.55 && true_nu_vtx_x <= 254.8 && true_nu_vtx_y >= -115.53 && true_nu_vtx_y <= 117.47 && true_nu_vtx_z >= 0.11 && true_nu_vtx_z <= 1036.91)";
+                q_nue.at(pdg)     = "(ccnc==0 && nu_pdg == 12 )";
+                q_nuebar.at(pdg)  = "(ccnc==0 && nu_pdg == -12)";
+            }
+        }
+    }
+    else {
+        return;
+    }
+    
+    std::vector<TH1D*> h_numu(par_pdg.size()); 
+    std::vector<TH1D*> h_numubar(par_pdg.size()); 
+    std::vector<TH1D*> h_nue(par_pdg.size()); 
+    std::vector<TH1D*> h_nuebar(par_pdg.size());
+    
+    for (unsigned int pdg = 0; pdg < par_pdg.size(); pdg++){
+        h_numu.at(pdg)    = new TH1D(Form("h_numu_%s", par_pdg_str.at(pdg).c_str()),   Form("%s #nu_{#mu};Neutrino Energy [GeV];Entries",        title.c_str()),50, 0, 5);
+        h_numubar.at(pdg) = new TH1D(Form("h_numubar_%s", par_pdg_str.at(pdg).c_str()),Form("%s #bar{#nu}_{#mu};Neutrino Energy [GeV];Entries", title.c_str()), 35, 0, 5);
+        h_nue.at(pdg)     = new TH1D(Form("h_nue_%s", par_pdg_str.at(pdg).c_str()),    Form("%s #nu_{e};Neutrino Energy [GeV];Entries",         title.c_str()), 50, 0, 5);
+        h_nuebar.at(pdg)  = new TH1D(Form("h_nuebar_%s", par_pdg_str.at(pdg).c_str()), Form("%s #bar{#nu}_{e};Electron Energy [GeV];Entries",   title.c_str()), 30, 0, 5);
+    }
+    
+    std::vector<TLegend*> leg(flav.size());
+    for (unsigned int f = 0; f < leg.size(); f++){
+        leg.at(f) = new TLegend(0.64, 0.45, 0.84, 0.9);
+        leg.at(f)->SetBorderSize(0);
+        leg.at(f)->SetFillStyle(0);
+        leg.at(f)->SetTextSize(0.05);
+    }
+
+    for (unsigned int pdg = 0; pdg < par_pdg.size(); pdg++){
+        std::cout << "On Query: " << par_pdg.at(pdg) << std::endl;
+
+        t_standard->Draw(Form("nu_e >> h_numu_%s",    par_pdg_str.at(pdg).c_str()), q_numu.at(pdg).c_str());
+        t_standard->Draw(Form("nu_e >> h_numubar_%s", par_pdg_str.at(pdg).c_str()), q_numubar.at(pdg).c_str());
+        t_intrinsic->Draw(Form("nu_e >> h_nue_%s",    par_pdg_str.at(pdg).c_str()), q_nue.at(pdg).c_str());
+        t_intrinsic->Draw(Form("nu_e >> h_nuebar_%s", par_pdg_str.at(pdg).c_str()), q_nuebar.at(pdg).c_str());
+
+        h_numu.at(pdg)->SetLineWidth(2);
+        h_numu.at(pdg)->SetLineColor(cols.at(pdg));
+        h_numubar.at(pdg)->SetLineWidth(2);
+        h_numubar.at(pdg)->SetLineColor(cols.at(pdg));
+        h_nue.at(pdg)->SetLineWidth(2);
+        h_nue.at(pdg)->SetLineColor(cols.at(pdg));
+        h_nuebar.at(pdg)->SetLineWidth(2);
+        h_nuebar.at(pdg)->SetLineColor(cols.at(pdg));
+
+        if (type == "flugg"){
+            h_numu.at(pdg)->Scale(2.6324287);
+            h_numubar.at(pdg)->Scale(2.6324287);
+            h_nue.at(pdg)->Scale(0.79076896);
+            h_nuebar.at(pdg)->Scale(0.79076896);
+        }
+
+        // Scale to standard pot
+        h_nue.at(pdg)->Scale(0.098239978);
+        h_nuebar.at(pdg)->Scale(0.098239978);
+        
+    }
+
+    leg.at(0)->AddEntry(h_numu.at(7),    Form("%s (%2.1f%%)", par_pdg_str.at(7).c_str(), double(100*h_numu.at(7)   ->Integral()/h_numu.at(7)   ->Integral() )) , "l");
+    leg.at(1)->AddEntry(h_numubar.at(7), Form("%s (%2.1f%%)", par_pdg_str.at(7).c_str(), double(100*h_numubar.at(7)->Integral()/h_numubar.at(7)->Integral() )) , "l");
+    leg.at(2)->AddEntry(h_nue.at(7),     Form("%s (%2.1f%%)", par_pdg_str.at(7).c_str(), double(100*h_nue.at(7)    ->Integral()/h_nue.at(7)    ->Integral() )) , "l");
+    leg.at(3)->AddEntry(h_nuebar.at(7),  Form("%s (%2.1f%%)", par_pdg_str.at(7).c_str(), double(100*h_nuebar.at(7) ->Integral()/h_nuebar.at(7) ->Integral() )) , "l");
+
+    for (unsigned int pdg = 0; pdg < par_pdg.size()-1; pdg++){
+        leg.at(0)->AddEntry(h_numu.at(pdg),    Form("%s (%2.1f%%)", par_pdg_str.at(pdg).c_str(), double(100*h_numu.at(pdg)   ->Integral()/h_numu.at(7)   ->Integral() )) , "l");
+        leg.at(1)->AddEntry(h_numubar.at(pdg), Form("%s (%2.1f%%)", par_pdg_str.at(pdg).c_str(), double(100*h_numubar.at(pdg)->Integral()/h_numubar.at(7)->Integral() )) , "l");
+        leg.at(2)->AddEntry(h_nue.at(pdg),     Form("%s (%2.1f%%)", par_pdg_str.at(pdg).c_str(), double(100*h_nue.at(pdg)    ->Integral()/h_nue.at(7)    ->Integral() )) , "l");
+        leg.at(3)->AddEntry(h_nuebar.at(pdg),  Form("%s (%2.1f%%)", par_pdg_str.at(pdg).c_str(), double(100*h_nuebar.at(pdg) ->Integral()/h_nuebar.at(7) ->Integral() )) , "l");
+    }
+
+    TCanvas * c;
+    gStyle->SetOptStat(0);
+    _util.CreateDirectory("Rates/");
+    
+    for (unsigned int f = 0; f < leg.size(); f++){
+        std::cout << "Plotting..." << f << std::endl; 
+        
+        c = new TCanvas();
+        for (unsigned int pdg = 0; pdg < par_pdg.size(); pdg++){
+            
+            if (f == 0){
+                h_numu.at(pdg)->SetMaximum(h_numu.at(7)->GetMaximum()*1.3);
+                h_numu.at(pdg)->Draw("hist,same");
+                _util.IncreaseLabelSize(h_numu.at(pdg), c);
+                leg.at(f)->Draw();
+            }
+            else if (f == 1){
+                h_numubar.at(pdg)->SetMaximum(h_numubar.at(7)->GetMaximum()*1.3);
+                h_numubar.at(pdg)->Draw("hist,same");
+                _util.IncreaseLabelSize(h_numubar.at(pdg),c);
+                leg.at(f)->Draw();
+            }
+            else if (f==2){
+                h_nue.at(pdg)->SetMaximum(h_nue.at(7)->GetMaximum()*1.3);
+                h_nue.at(pdg)->Draw("hist,same");
+                _util.IncreaseLabelSize(h_nue.at(pdg),c);
+                leg.at(f)->Draw();
+            }
+            else{
+                h_nuebar.at(pdg)->SetMaximum(h_nuebar.at(7)->GetMaximum()*1.3);
+                h_nuebar.at(pdg)->Draw("hist,same");
+                _util.IncreaseLabelSize(h_nuebar.at(pdg), c);
+                leg.at(f)->Draw();
+            }
+        }
+        c->Print(Form("plots/run%s/Rates/%s_%s_parent.pdf", _util.run_period, flav_norm.at(f).c_str(), type.c_str() ));
+        delete c;
+    }
+
+    TFile *f_out = TFile::Open("files/flux_rates.root", "UPDATE");
+    f_out->cd();
+    for (unsigned int pdg = 0; pdg < par_pdg.size(); pdg++){
+        h_numu.at(pdg)   ->Write(Form("numu_%s_%s",   par_pdg_str2.at(pdg).c_str(), type.c_str() ), TObject::kOverwrite);
+        h_numubar.at(pdg)->Write(Form("numubar_%s_%s",par_pdg_str2.at(pdg).c_str(), type.c_str() ), TObject::kOverwrite);
+        h_nue.at(pdg)    ->Write(Form("nue_%s_%s",    par_pdg_str2.at(pdg).c_str(), type.c_str() ), TObject::kOverwrite);
+        h_nuebar.at(pdg) ->Write(Form("nuebar_%s_%s", par_pdg_str2.at(pdg).c_str(), type.c_str() ), TObject::kOverwrite);
+    }
+    f_out->Close();
+
+
+
+
+}
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
