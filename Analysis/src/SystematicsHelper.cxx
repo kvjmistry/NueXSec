@@ -2220,8 +2220,7 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
             label == "Horn_Water" ||
             label == "Beam_shift_x" ||
             label == "Beam_shift_y" ||
-            label == "Target_z" ||
-            label == "Decay_pipe_Bfield"){
+            label == "Target_z" ){
             h_cov_v.at(var).at(_type).at(k_err_beamline)->Add(cov);
             h_cov_v.at(var).at(_type).at(k_err_tot)->Add(cov);
             h_cov_v.at(var).at(_type).at(k_err_sys)->Add(cov);
@@ -2349,8 +2348,7 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         variation == "Horn_Water" ||
         variation == "Beam_shift_x" ||
         variation == "Beam_shift_y" ||
-        variation == "Target_z" ||
-        variation == "Decay_pipe_Bfield"){
+        variation == "Target_z" ){
 
         // Loop over histogram bins
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
@@ -2869,8 +2867,7 @@ void SystematicsHelper::PlotTotUnisim(std::string unisim_type){
                     "Horn_Water",
                     "Beam_shift_x",
                     "Beam_shift_y",
-                    "Target_z",
-                    "Decay_pipe_Bfield"
+                    "Target_z"
                 };
     }
     else if (unisim_type == "Genie_Unisim") {
@@ -3297,7 +3294,7 @@ void SystematicsHelper::InitialiseReweightingModeCut(){
         std::make_tuple("Beam_shift_x",     2,   "unisim"),
         std::make_tuple("Beam_shift_y",     2,   "unisim"),
         std::make_tuple("Target_z",         2,   "unisim"),
-        std::make_tuple("Decay_pipe_Bfield",2,   "unisim"),
+        // std::make_tuple("Decay_pipe_Bfield",2,   "unisim"),
         std::make_tuple("weightsGenie",     600, "multisim"),
         std::make_tuple("weightsReint",     1000,"multisim"),
         std::make_tuple("weightsPPFX",      600, "multisim")
