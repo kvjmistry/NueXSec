@@ -2420,6 +2420,9 @@ void HistogramPlotter::MakeInteractionPlot(std::string var, bool scale, const ch
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);
 
+    if (var == "h_true_nue_nuebar_E" || var == "h_int_nu_E_single_bin" || var == "h_int_elec_E" || var == "h_int_elec_E_rebin" || var == "h_int_elec_theta" || var == "h_int_elec_phi" || var == "h_int_effective_ang" || var == "h_int_cosbeta")
+        sum_integrals = hist_integrals.at(_util.k_plot_tot);
+
     leg_stack->AddEntry(hist.at(_util.k_plot_mec), Form("CC MEC (%2.1f%%)", 100 * hist_integrals.at(_util.k_plot_mec) / sum_integrals), "f");
     leg_stack->AddEntry(hist.at(_util.k_plot_coh), Form("CC Coh (%2.1f%%)", 100 * hist_integrals.at(_util.k_plot_coh) / sum_integrals), "f");
     leg_stack->AddEntry(hist.at(_util.k_plot_dis), Form("CC DIS (%2.1f%%)", 100 * hist_integrals.at(_util.k_plot_dis) / sum_integrals), "f");

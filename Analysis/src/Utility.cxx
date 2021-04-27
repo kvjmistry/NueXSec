@@ -1452,7 +1452,7 @@ void Utility::SetAxesNames(){
         
         var_labels_xsec = {";;#nu_{e} + #bar{#nu}_{e} CC Cross Section [10^{-39} cm^{2}/nucleon]",
                            ";E^{reco}_{e} [GeV];#frac{dR}{dE^{reco}_{e}} [10^{-39} cm^{2}/GeV/nucleon]",
-                           ";E^{true}_{e} [GeV];#frac{d#sigma}{dE^{true}_{e}} [10^{-39} cm^{2}/GeV/nucleon"
+                           ";E^{true}_{e} [GeV];#frac{d#sigma}{dE^{true}_{e}} [10^{-39} cm^{2}/GeV/nucleon]"
                           };
 
 
