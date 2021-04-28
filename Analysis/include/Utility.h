@@ -111,6 +111,9 @@ public:
     // Draw MicroBooNE Simulation on canvas
     void Draw_ubooneSim(TCanvas *c, double x1, double y1, double x2, double y2);
     // -------------------------------------------------------------------------
+    // Draw FHC/RHC on the plots
+    void Draw_Nu_Mode(TCanvas* c, double x1, double y1, double x2, double y2);
+    // -------------------------------------------------------------------------
     // Function to customise the TLatex
     void SetTextProperties(TLatex* text);
     // -------------------------------------------------------------------------

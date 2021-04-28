@@ -1147,6 +1147,32 @@ void Utility::Draw_ubooneSim(TCanvas *c, double x1, double y1, double x2, double
 
 }
 // -----------------------------------------------------------------------------
+// Function to draw whether neutrino mode or anti neutrino mode on a plot
+void Utility::Draw_Nu_Mode(TCanvas* c, double x1, double y1, double x2, double y2){
+    c->cd();
+
+    TPaveText *pt;
+
+    // 0.115, 0.89, 0.315, 0.96
+
+    if (std::string(run_period) == "1"){
+        pt = new TPaveText(x1, y1, x2, y2,"NDC");
+        pt->AddText("FHC Mode");
+        pt->SetTextColor(kRed+2);
+    }
+    else {
+        pt = new TPaveText(x1, y1, x2, y2,"NDC");
+        pt->AddText("RHC Mode");
+        pt->SetTextColor(kBlue+2);
+    }
+    
+    pt->SetBorderSize(0);
+    pt->SetFillColor(0);
+    pt->SetFillStyle(0);
+    pt->SetTextSize(0.04);
+    pt->Draw();
+}
+// -----------------------------------------------------------------------------
 void Utility::SetTextProperties(TLatex* text){
     text->SetTextColor(kGray+2);
     text->SetNDC();

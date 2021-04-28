@@ -74,6 +74,7 @@ void UtilityPlotter::Initialise(Utility _utility){
     else if (std::string(_util.uplotmode) == "rates"){
         PlotParentEventRates("dk2nu");
         PlotParentEventRates("flugg");
+        PlotBeamSimRates();
         return;
     }
     // This will call the code to optimise the bin widths
@@ -5104,13 +5105,13 @@ void UtilityPlotter::PlotParentEventRates(std::string type){
 
     std::string title;
 
-    std::vector<std::string> par_pdg_str = {"#pi^{+}", "#pi^{-}", "#mu^{+}", "#mu^{-}","K^{+}","K^{-}", "K^{0}_{L}", "Tot" };
+    std::vector<std::string> par_pdg_str = {"#pi^{+}", "#pi^{-}", "#mu^{+}", "#mu^{-}","K^{+}","K^{-}", "K^{0}_{L}", "Total" };
     std::vector<std::string> par_pdg_str2 = {"pip", "pim", "mup", "mum","kp","km", "kl", "all" };
     enum par_enum {k_pi_plus = 211, k_pi_minus = -211, k_mu_plus = -13, k_mu_minus = 13, k_K_plus = 321, k_K_minus = -321, k_k0 = 130, k_all = 1000};
     std::vector<int> par_pdg = {211, -211, -13, 13, 321, -321, 130, 0};
     std::vector<int> cols = {42, kMagenta+2, 30, 38, 28, 36, 1001, kBlack };
 
-    std::vector<std::string> flav = {"#nu_{#mu}", "#bar{#nu}_{#mu}", "#nu_{e}", "#bar{#nu}_e"};
+    std::vector<std::string> flav = {"#nu_{#mu}", "#bar{#nu}_{#mu}", "#nu_{e}", "#bar{#nu}_{e}"};
     std::vector<std::string> flav_norm = {"numu", "numubar", "nue", "nuebar"};
 
 
@@ -5220,10 +5221,10 @@ void UtilityPlotter::PlotParentEventRates(std::string type){
         
     }
 
-    leg.at(0)->AddEntry(h_numu.at(7),    Form("%s (%2.1f%%)", par_pdg_str.at(7).c_str(), double(100*h_numu.at(7)   ->Integral()/h_numu.at(7)   ->Integral() )) , "l");
-    leg.at(1)->AddEntry(h_numubar.at(7), Form("%s (%2.1f%%)", par_pdg_str.at(7).c_str(), double(100*h_numubar.at(7)->Integral()/h_numubar.at(7)->Integral() )) , "l");
-    leg.at(2)->AddEntry(h_nue.at(7),     Form("%s (%2.1f%%)", par_pdg_str.at(7).c_str(), double(100*h_nue.at(7)    ->Integral()/h_nue.at(7)    ->Integral() )) , "l");
-    leg.at(3)->AddEntry(h_nuebar.at(7),  Form("%s (%2.1f%%)", par_pdg_str.at(7).c_str(), double(100*h_nuebar.at(7) ->Integral()/h_nuebar.at(7) ->Integral() )) , "l");
+    leg.at(0)->AddEntry(h_numu.at(7),    Form("%s", par_pdg_str.at(7).c_str()) , "l");
+    leg.at(1)->AddEntry(h_numubar.at(7), Form("%s", par_pdg_str.at(7).c_str()) , "l");
+    leg.at(2)->AddEntry(h_nue.at(7),     Form("%s", par_pdg_str.at(7).c_str()) , "l");
+    leg.at(3)->AddEntry(h_nuebar.at(7),  Form("%s", par_pdg_str.at(7).c_str()) , "l");
 
     for (unsigned int pdg = 0; pdg < par_pdg.size()-1; pdg++){
         leg.at(0)->AddEntry(h_numu.at(pdg),    Form("%s (%2.1f%%)", par_pdg_str.at(pdg).c_str(), double(100*h_numu.at(pdg)   ->Integral()/h_numu.at(7)   ->Integral() )) , "l");
@@ -5243,30 +5244,32 @@ void UtilityPlotter::PlotParentEventRates(std::string type){
         for (unsigned int pdg = 0; pdg < par_pdg.size(); pdg++){
             
             if (f == 0){
-                h_numu.at(pdg)->SetMaximum(h_numu.at(7)->GetMaximum()*1.3);
+                h_numu.at(pdg)->SetMaximum(12000);
                 h_numu.at(pdg)->Draw("hist,same");
                 _util.IncreaseLabelSize(h_numu.at(pdg), c);
                 leg.at(f)->Draw();
             }
             else if (f == 1){
-                h_numubar.at(pdg)->SetMaximum(h_numubar.at(7)->GetMaximum()*1.3);
+                h_numubar.at(pdg)->SetMaximum(3500);
                 h_numubar.at(pdg)->Draw("hist,same");
                 _util.IncreaseLabelSize(h_numubar.at(pdg),c);
                 leg.at(f)->Draw();
             }
             else if (f==2){
-                h_nue.at(pdg)->SetMaximum(h_nue.at(7)->GetMaximum()*1.3);
+                h_nue.at(pdg)->SetMaximum(900);
                 h_nue.at(pdg)->Draw("hist,same");
                 _util.IncreaseLabelSize(h_nue.at(pdg),c);
                 leg.at(f)->Draw();
             }
             else{
-                h_nuebar.at(pdg)->SetMaximum(h_nuebar.at(7)->GetMaximum()*1.3);
+                h_nuebar.at(pdg)->SetMaximum(200);
                 h_nuebar.at(pdg)->Draw("hist,same");
                 _util.IncreaseLabelSize(h_nuebar.at(pdg), c);
                 leg.at(f)->Draw();
             }
         }
+
+        _util.Draw_Nu_Mode(c, 0.14, 0.89, 0.34, 0.96);
         c->Print(Form("plots/run%s/Rates/%s_%s_parent.pdf", _util.run_period, flav_norm.at(f).c_str(), type.c_str() ));
         delete c;
     }
@@ -5286,6 +5289,75 @@ void UtilityPlotter::PlotParentEventRates(std::string type){
 
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::PlotBeamSimRates(){
+
+
+    TFile *f_in = TFile::Open("files/flux_rates.root", "READ");
+    std::vector<std::string> flav_norm = {"numu", "numubar", "nue", "nuebar"};
+    std::vector<std::string> par_pdg_str2 = {"pip", "pim", "mup", "mum","kp","km", "kl", "all" };
+    std::vector<std::string> flav = {"#nu_{#mu}", "#bar{#nu}_{#mu}", "#nu_{e}", "#bar{#nu}_{e}"};
+
+    // Select which flavour to get from the file
+    std::string par = "all";
+
+    std::vector<TH1D*> h_rate_dk2nu(flav_norm.size());
+    std::vector<TH1D*> h_rate_flugg(flav_norm.size());
+    for (unsigned int f = 0; f < h_rate_dk2nu.size(); f++){
+        h_rate_dk2nu.at(f) = (TH1D*)f_in->Get(Form("%s_%s_dk2nu", flav_norm.at(f).c_str(), par.c_str()));
+        h_rate_dk2nu.at(f)->SetLineColor(kRed+2);
+
+        h_rate_flugg.at(f) = (TH1D*)f_in->Get(Form("%s_%s_flugg", flav_norm.at(f).c_str(), par.c_str()));
+        h_rate_flugg.at(f)->SetLineColor(kGreen+2);
+
+        h_rate_dk2nu.at(f)->SetTitle(Form("%s; Neutrino Energy [GeV]; Entries", flav.at(f).c_str()));
+    }
+
+    
+
+    TLegend* leg;
+    leg = new TLegend(0.64, 0.65, 0.84, 0.9);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->SetTextSize(0.05);
+    leg->AddEntry(h_rate_dk2nu.at(0), "dk2nu", "l");
+    leg->AddEntry(h_rate_flugg.at(0), "flugg", "l");
+
+    TCanvas * c;
+    gStyle->SetOptStat(0);
+
+    for (unsigned int f = 0; f < h_rate_dk2nu.size(); f++){
+        
+        c = new TCanvas();
+        _util.IncreaseLabelSize(h_rate_dk2nu.at(f),c);
+        c->SetLeftMargin(0.17);
+
+        if (f == 0){
+            h_rate_dk2nu.at(f)->SetMaximum(12000);
+        }
+        else if (f == 1){
+            h_rate_dk2nu.at(f)->SetMaximum(3500);
+        }
+        else if (f==2){
+            h_rate_dk2nu.at(f)->SetMaximum(900);
+        }
+        else{
+            h_rate_dk2nu.at(f)->SetMaximum(200);
+        }
+
+        if (f ==  2|| f == 0) gStyle->SetTitleH(0.1);
+	    else gStyle->SetTitleH(0.07);
+        
+        h_rate_dk2nu.at(f)->Draw("hist");
+        h_rate_flugg.at(f)->Draw("hist,same");
+        leg->Draw();
+
+        _util.Draw_Nu_Mode(c, 0.14, 0.89, 0.34, 0.96);
+
+        c->Print(Form("plots/run%s/Rates/%s_comparison.pdf", _util.run_period, flav_norm.at(f).c_str() ));
+        delete c;
+    }
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

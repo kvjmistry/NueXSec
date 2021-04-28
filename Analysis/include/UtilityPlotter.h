@@ -197,6 +197,8 @@ class UtilityPlotter{
     // Function to plot the event rates by parent type
     void PlotParentEventRates(std::string type);
     // -------------------------------------------------------------------------
+    // Make comparisons with the beamline simulation from flugg and dk2nu
+    void PlotBeamSimRates();
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
