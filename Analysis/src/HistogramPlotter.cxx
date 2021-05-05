@@ -2166,11 +2166,15 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title,
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
 
+    std::vector<TH1D*> h_eff_rel(hist_eff.size());
+
     for (int p = 2; p < _util.k_cuts_MAX; p++) {
         leg->AddEntry(hist_eff.at(p), Form("%i. %s", p - 1,  _util.cut_dirs_pretty.at(p).c_str()), "l");       
         hist_eff.at(p)->SetTitle("");
         hist_eff.at(p)->SetMaximum(1.3);
         hist_eff.at(p)->SetLineColor(p + 30 + 4);
+
+        h_eff_rel.at(p) = (TH1D*)hist_eff.at(p)->Clone();
 
         if (p == _util.k_e_candidate)
             hist_eff.at(p)->SetLineColor(kViolet-5);
@@ -2190,6 +2194,51 @@ void HistogramPlotter::MakeEfficiencyPlotByCut(std::string var, bool mask_title,
     leg->Draw();
 
     c->Print(Form("plots/run%s/Efficiency/All_TEff_%s.pdf", _util.run_period, printname) );
+
+    delete c;
+
+    // Now we will draw the efficiency by cut on the same plot
+    c = new TCanvas("c", "c", 500, 500);
+    c->SetTopMargin(0.11);
+    c->SetLeftMargin(0.17);
+    c->SetBottomMargin(0.11);
+
+    TLegend *leg2 = new TLegend(0.30, 0.59, 0.80, 0.89);
+    leg2->SetNColumns(2);
+    leg2->SetBorderSize(0);
+    leg2->SetFillStyle(0);
+
+    for (int p = 3; p < _util.k_cuts_MAX; p++) {  
+
+        h_eff_rel.at(p)->Divide(hist_eff.at(p-1));
+           
+        h_eff_rel.at(p)->SetTitle("");
+        h_eff_rel.at(p)->GetYaxis()->SetTitle("Rel. Efficiency");
+        h_eff_rel.at(p)->SetMaximum(1.8);
+        h_eff_rel.at(p)->SetLineColor(p + 30 + 4);
+
+        if (p == _util.k_e_candidate)
+            h_eff_rel.at(p)->SetLineColor(kViolet-5);
+
+        if (p == _util.k_contained_frac)
+            h_eff_rel.at(p)->SetLineColor(kMagenta-4);
+
+        if (p == _util.k_topo_score)
+            h_eff_rel.at(p)->SetLineColor(kOrange+8);
+
+        if (p == _util.k_shr_moliere_avg)
+            h_eff_rel.at(p)->SetLineColor(30);
+
+
+        
+
+        leg2->AddEntry(h_eff_rel.at(p), Form("%i. %s", p - 1,  _util.cut_dirs_pretty.at(p).c_str()), "l");      
+        h_eff_rel.at(p)->Draw("hist,E, same");
+    }
+
+    leg2->Draw();
+
+    c->Print(Form("plots/run%s/Efficiency/RelAll_TEff_%s.pdf", _util.run_period, printname) );
 
     delete c;
 

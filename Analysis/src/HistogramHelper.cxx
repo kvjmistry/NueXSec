@@ -524,7 +524,7 @@ void HistogramHelper::InitHistograms(){
             TH2D_true_hists.at(i).at(k_true_nue_phi_theta)    = new TH2D( Form("h_true_nue_phi_theta_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),   ";True #nu_{e} + #bar{#nu}_{e} #phi [deg];True #nu_{e} #theta [deg]",     14, 0, 80, 16, 20, 140 );
             TH2D_true_hists.at(i).at(k_true_nue_energy_theta) = new TH2D( Form("h_true_nue_energy_theta_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),   ";True #nu_{e} + #bar{#nu}_{e} E [GeV];True #nu_{e} #theta [deg]",           25, 0, 5, 16, 0, 140);
             TH2D_true_hists.at(i).at(k_true_nue_energy_phi)   = new TH2D( Form("h_true_nue_energy_phi_%s_%s",   _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),   ";True #nu_{e} + #bar{#nu}_{e} E [GeV];True #nu_{e} #phi [deg]",             25, 0, 5, 14, 0, 75);
-            TH2D_true_hists.at(i).at(k_true_nue_energy_angle) = new TH2D( Form("h_true_nue_energy_angle_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),   ";True #nu_{e} + #bar{#nu}_{e} E [GeV];True #nu_{e} Angle from NuMI [deg]", 25, 0, 5, 30, 0, 120);
+            TH2D_true_hists.at(i).at(k_true_nue_energy_angle) = new TH2D( Form("h_true_nue_energy_angle_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),   ";True #nu_{e} + #bar{#nu}_{e} E [GeV];True #nu_{e} + #bar{#nu}_{e} Angle [deg]",  20, 0, 3, 33, 7, 40);
         
             TH2D_true_hists.at(i).at(k_true_nue_vtx_z_y)     = new TH2D( Form("h_true_nue_vtx_z_y_%s_%s",     _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True #nu_{e} + #bar{#nu}_{e} Vtx Z [cm] ;True #nu_{e} + #bar{#nu}_{e} Vtx Y [cm]", 40, -10, 1050, 20, -10, 120);
             TH2D_true_hists.at(i).at(k_true_nue_vtx_z_y_sce) = new TH2D( Form("h_true_nue_vtx_z_y_sce_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),";True #nu_{e} + #bar{#nu}_{e} Vtx Z  SCE Corr. [cm];True #nu_{e} + #bar{#nu}_{e} Vtx Y SCE Corr. [cm]", 40, -10, 1050, 20, -10, 120);
@@ -744,7 +744,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
  
     TH1D_hists.at(k_reco_leading_mom).at(cut_index).at(classification_index)->Fill(SC.shr_p, weight);
     
-    TH1D_hists.at(k_reco_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.shr_distance, weight);
+    if (SC.n_tracks > 0) TH1D_hists.at(k_reco_shower_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.shr_distance, weight);
 
     TH1D_hists.at(k_reco_track_to_vtx_dist).at(cut_index).at(classification_index)->Fill(SC.trk_distance, weight);
     
