@@ -466,7 +466,9 @@ void HistogramHelper::InitHistograms(){
                 TEfficiency_hists.at(k_eff_beta_rebin_nue).at(l)           = new TH1D( Form("h_eff_beta_rebin_nue_%s",           _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins_ang.size()-1, edges );
                 TEfficiency_hists.at(k_eff_beta_rebin_nuebar).at(l)        = new TH1D( Form("h_eff_beta_rebin_nuebar_%s",        _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins_ang.size()-1, edges );
                 
-                TEfficiency_hists.at(k_eff_cosine_beta).at(l)              = new TH1D( Form("h_eff_cosine_beta_%s",              _util.cut_dirs.at(l).c_str() ), "", 16, -1, 1 );
+                TEfficiency_hists.at(k_eff_cosine_beta).at(l)              = new TH1D( Form("h_eff_cosine_beta_%s",              _util.cut_dirs.at(l).c_str() ), "", 5, 0.6, 1 );
+                TEfficiency_hists.at(k_eff_cosine_beta_nue).at(l)          = new TH1D( Form("h_eff_cosine_beta_nue_%s",          _util.cut_dirs.at(l).c_str() ), "", 5, 0.6, 1 );
+                TEfficiency_hists.at(k_eff_cosine_beta_nuebar).at(l)       = new TH1D( Form("h_eff_cosine_beta_nuebar_%s",       _util.cut_dirs.at(l).c_str() ), "", 5, 0.6, 1 );
                 edges = &_util.reco_shr_bins_cang[0]; // Cast to an array 
                 TEfficiency_hists.at(k_eff_cosine_beta_rebin).at(l)        = new TH1D( Form("h_eff_cosine_beta_rebin_%s",        _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins_cang.size()-1, edges );
                 TEfficiency_hists.at(k_eff_cosine_beta_rebin_nue).at(l)    = new TH1D( Form("h_eff_cosine_beta_rebin_nue_%s",    _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins_cang.size()-1, edges );
@@ -1505,6 +1507,7 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
             TEfficiency_hists.at(k_eff_charg_par_multi_nue).at(cut_index)   ->Fill(SC.nproton + SC.npion, weight);
             TEfficiency_hists.at(k_eff_beta_rebin_nue).at(cut_index)        ->Fill(SC.true_effective_angle, weight);
             TEfficiency_hists.at(k_eff_cosine_beta_rebin_nue).at(cut_index) ->Fill(std::cos(SC.true_effective_angle *  3.14159 / 180.0), weight);
+            TEfficiency_hists.at(k_eff_cosine_beta_nue).at(cut_index)       ->Fill(std::cos(SC.true_effective_angle *  3.14159 / 180.0), weight);
         }
         
         // Nuebar only
@@ -1517,6 +1520,7 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
             TEfficiency_hists.at(k_eff_charg_par_multi_nuebar).at(cut_index)  ->Fill(SC.nproton + SC.npion, weight);
             TEfficiency_hists.at(k_eff_beta_rebin_nuebar).at(cut_index)       ->Fill(SC.true_effective_angle, weight);
             TEfficiency_hists.at(k_eff_cosine_beta_rebin_nuebar).at(cut_index)->Fill(std::cos(SC.true_effective_angle *  3.14159 / 180.0), weight);
+            TEfficiency_hists.at(k_eff_cosine_beta_nuebar).at(cut_index)      ->Fill(std::cos(SC.true_effective_angle *  3.14159 / 180.0), weight);
         }
         
     
@@ -1553,6 +1557,7 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
             TEfficiency_hists.at(k_eff_charg_par_multi_nue).at(cut_index)  ->Fill(SC.nproton + SC.npion, weight);
             TEfficiency_hists.at(k_eff_beta_rebin_nue).at(cut_index)       ->Fill(SC.true_effective_angle, weight);
             TEfficiency_hists.at(k_eff_cosine_beta_rebin_nue).at(cut_index)->Fill(std::cos(SC.true_effective_angle *  3.14159 / 180.0), weight);
+            TEfficiency_hists.at(k_eff_cosine_beta_nue).at(cut_index)      ->Fill(std::cos(SC.true_effective_angle *  3.14159 / 180.0), weight);
         }
         
         // Nuebar only
@@ -1565,6 +1570,7 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
             TEfficiency_hists.at(k_eff_charg_par_multi_nuebar).at(cut_index)  ->Fill(SC.nproton + SC.npion, weight);
             TEfficiency_hists.at(k_eff_beta_rebin_nuebar).at(cut_index)       ->Fill(SC.true_effective_angle, weight);
             TEfficiency_hists.at(k_eff_cosine_beta_rebin_nuebar).at(cut_index)->Fill(std::cos(SC.true_effective_angle *  3.14159 / 180.0), weight);
+            TEfficiency_hists.at(k_eff_cosine_beta_nuebar).at(cut_index)      ->Fill(std::cos(SC.true_effective_angle *  3.14159 / 180.0), weight);
         }
         
     }

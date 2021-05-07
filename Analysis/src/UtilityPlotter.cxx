@@ -3865,7 +3865,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     }
     
    
-    TLegend *leg = new TLegend(0.4, 0.6, 0.75, 0.85);
+    TLegend *leg = new TLegend(0.35, 0.6, 0.7, 0.85);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(unf, "Data (Stat. + Sys.)", "ep");
@@ -3877,7 +3877,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
 
     std::cout << "CV" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_CV), unf, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_CV),   Form("MC #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_CV),   Form("GENIE v3.0.6 (#muB tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
     
     std::cout << "Genie v3" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_geniev3), unf, h_cov, chi, ndof, pval);

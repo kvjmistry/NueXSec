@@ -226,6 +226,8 @@ class HistogramHelper{
         k_eff_beta_rebin_nue,        // beta with uneven bins nue
         k_eff_beta_rebin_nuebar,     // beta with uneven bins nueber
         k_eff_cosine_beta,           // cosine beta
+        k_eff_cosine_beta_nue,       // cosine beta nue
+        k_eff_cosine_beta_nuebar,    // cosine beta nue bar
         k_eff_cosine_beta_rebin,     // cosine beta with uneven bins
         k_eff_cosine_beta_rebin_nue, // cosine beta with uneven bins
         k_eff_cosine_beta_rebin_nuebar, // cosine beta with uneven bins

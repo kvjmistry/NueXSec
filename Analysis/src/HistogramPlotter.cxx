@@ -111,11 +111,13 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_eff_charg_par_multi_nuebar",  false, false, "True #bar{#nu}_{e} Charged Particle Multi.; Efficiency",          "True #bar{#nu}_{e} Events in FV",                  "charg_par_multi_nuebar" );
 
         MakeEfficiencyPlotByCutTot("h_true_nu_E",             "h_true_nu_E_nue",             "h_true_nu_E_nuebar",             "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Neutrino Energy [GeV]; Efficiency",         "nu_E");
-        MakeEfficiencyPlotByCutTot("h_true_elec_E_rebin",     "h_true_elec_E_rebin_nue",     "h_true_elec_E_rebin_nuebar",     "e#lower[-0.5]{-} + e^{+}","e#lower[-0.5]{-}", "e^{+}",           true, false, "True Electron Energy [GeV]; Efficiency",         "elec_E_rebin");
-        MakeEfficiencyPlotByCutTot("h_eff_cosine_beta_rebin", "h_eff_cosine_beta_rebin_nue", "h_eff_cosine_beta_rebin_nuebar", "e#lower[-0.5]{-} + e^{+}","e#lower[-0.5]{-}", "e^{+}",           true, false, "True cos#beta; Efficiency",         "cosine_beta_rebin");
+        MakeEfficiencyPlotByCutTot("h_true_elec_E_rebin",     "h_true_elec_E_rebin_nue",     "h_true_elec_E_rebin_nuebar",     "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True (anti-)lepton Energy [GeV]; Efficiency",         "elec_E_rebin");
+        MakeEfficiencyPlotByCutTot("h_eff_cosine_beta_rebin", "h_eff_cosine_beta_rebin_nue", "h_eff_cosine_beta_rebin_nuebar", "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True (anti-)lepton cos#beta; Efficiency",         "cosine_beta_rebin");
         MakeEfficiencyPlotByCutTot("h_eff_proton_multi",      "h_eff_proton_multi_nue",      "h_eff_proton_multi_nuebar",      "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Proton Multiplicity; Efficiency",           "prot_multi");
         MakeEfficiencyPlotByCutTot("h_eff_pion_multi",        "h_eff_pion_multi_nue",        "h_eff_pion_multi_nuebar",        "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Pion Multiplicity; Efficiency",             "pion_multi");
         MakeEfficiencyPlotByCutTot("h_eff_charg_par_multi",   "h_eff_charg_par_multi_nue",   "h_eff_charg_par_multi_nuebar",   "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Charged Particle Multiplicity; Efficiency", "charg_par_multi");
+        MakeEfficiencyPlotByCutTot("h_true_nu_E_single_bin",  "h_true_nu_E_nue_single_bin",  "h_true_nu_E_nuebar_single_bin",   "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, true, "True Neutrino Energy [GeV]; Efficiency", "nu_E_single_bin");
+        MakeEfficiencyPlotByCutTot("h_eff_cosine_beta", "h_eff_cosine_beta_nue", "h_eff_cosine_beta_nuebar", "#nu_{e} + #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True (anti-)lepton cos#beta; Efficiency",         "cosine_beta");
 
         // Create the interaction folder
         _util.CreateDirectory("Interaction");
@@ -2329,10 +2331,11 @@ void HistogramPlotter::MakeEfficiencyPlotByCutTot(std::string var_tot, std::stri
         }
 
         h_clone_tot->GetXaxis()->CenterTitle();
-        h_clone_tot->GetYaxis()->SetRangeUser(0, 1);
+        h_clone_tot->GetYaxis()->SetRangeUser(0, 0.4);
         h_clone_tot->SetLineColor(kBlack);
         h_clone_tot->SetLineWidth(2);
         _util.IncreaseLabelSize(h_clone_tot, c);
+        c->SetLeftMargin(0.17);
         if (mask_title) h_clone_tot->SetTitle("");
         h_clone_tot->Draw("E same");
         h_clone_nue->Draw("E same");
@@ -2355,11 +2358,14 @@ void HistogramPlotter::MakeEfficiencyPlotByCutTot(std::string var_tot, std::stri
         leg->Draw();
 
         // Draw the run period on the plot
-        _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);
+        // _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);
 
         c->Print(Form("plots/run%s/Efficiency/TEff_%s_%s_combined.pdf", _util.run_period, _util.cut_dirs.at(p).c_str(), printname) );
         
         delete c;
+        delete h_clone_tot;
+        delete h_clone_nue;
+        delete h_clone_nuebar;
     }
 
 }
