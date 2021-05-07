@@ -612,6 +612,7 @@ public:
         k_cut_vtx_z_sce,
         k_cut_shower_score,
         k_cut_shr_tkfit_dedx_max,
+        k_cut_shr_tkfit_dedx_max_tune,
         k_cut_shr_tkfit_dedx_max_with_tracks,
         k_cut_shr_tkfit_dedx_max_no_tracks,
         k_cut_shower_to_vtx_dist,
@@ -644,6 +645,7 @@ public:
         "h_reco_vtx_z_sce",
         "h_reco_shower_score",
         "h_reco_shr_tkfit_dedx_max",
+        "h_reco_shr_tkfit_dedx_max_tune",
         "h_reco_shr_tkfit_dedx_max_with_tracks",
         "h_reco_shr_tkfit_dedx_max_no_tracks",
         "h_reco_shower_to_vtx_dist",
@@ -674,6 +676,7 @@ public:
         "Reco Vertex Z [cm]",
         "Shower Score",
         "Leading Shower dE/dx (All Planes) [MeV/cm]",
+        "Leading Shower dE/dx (All Planes) [MeV/cm]",
         "Leading Shower dE/dx (All Planes) (with tracks) [MeV/cm]",
         "Leading Shower dE/dx (All Planes) (0 tracks) [MeV/cm]",
         "Leading Shower to Vertex Distance [cm]",
@@ -696,7 +699,6 @@ public:
     // list of detector variations
     std::vector<std::string> vec_var_string = {
         "CV",
-        //"BNB_Diffusion",
         "LYRayleigh",
         "LYAttenuation",
         "SCE",

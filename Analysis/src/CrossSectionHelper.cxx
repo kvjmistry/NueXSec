@@ -621,6 +621,8 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
 
     bool pass = true;
 
+    SC.ReClassifyPileUps(type);
+
     // Set derived variables in the slice container
     // Classify the event
     SC.SliceClassifier(type);      // Classification of the event
@@ -632,7 +634,6 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
     SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
     SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
-    SC.SetNonLdgShrEvent(type);    // If the backtracked pdg of the leading shower is not an electron
 
     // Skip signal events in the standard MC file so we dont double count the signal events
     if (treeNum == 1 && SC.is_signal){
@@ -737,6 +738,10 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     // *************************************************************************
     pass = _scuts.dEdx_max_no_tracks(SC);
     if(!pass) return false; // Failed the cut!
+
+    // If the backtracked pdg of the leading shower is not an electron then alter classification
+    // Turn these off to get the efficiencies at low energies correct
+    SC.SetNonLdgShrEvent(type);
     
     FillCutHists(type, SC, SC.classification, _util.k_dEdx_max_no_tracks );
 
@@ -778,6 +783,10 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
 
             double dedx_max = SC.GetdEdxMax();
 
+            double pi0_tuned_weight = weight_uni;
+            _util.GetPiZeroWeight(pi0_tuned_weight, 1, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e); // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
+
+
             // Now we got the weight for universe i, lets fill the histograms :D
             // Use [] rather than .at() to speed this process up. This can cause errors if indexes go out of bound
             h_cut_v[label][cut_index][_util.k_cut_nslice][uni]                   ->Fill(SC.nslice,                 weight_uni);
@@ -789,6 +798,7 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
             h_cut_v[label][cut_index][_util.k_cut_vtx_z_sce][uni]                ->Fill(SC.reco_nu_vtx_sce_z,      weight_uni);
             h_cut_v[label][cut_index][_util.k_cut_shower_score][uni]             ->Fill(SC.shr_score,              weight_uni);
             h_cut_v[label][cut_index][_util.k_cut_shr_tkfit_dedx_max][uni]       ->Fill(dedx_max, weight_uni);
+            h_cut_v[label][cut_index][_util.k_cut_shr_tkfit_dedx_max_tune][uni]  ->Fill(dedx_max, pi0_tuned_weight);
             
             if (SC.n_tracks > 0)
                 h_cut_v[label][cut_index][_util.k_cut_shr_tkfit_dedx_max_with_tracks][uni]    ->Fill(dedx_max, weight_uni);
@@ -2168,6 +2178,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                     h_cut_v.at(label).at(cut).at(_util.k_cut_vtx_z_sce).at(uni)                      = new TH1D(Form("h_reco_vtx_z_sce_%s_%s_%i",                      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -10, 1050);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_shower_score).at(uni)                   = new TH1D(Form("h_reco_shower_score_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 0.5);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max).at(uni)             = new TH1D(Form("h_reco_shr_tkfit_dedx_max_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
+                    h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max_tune).at(uni)        = new TH1D(Form("h_reco_shr_tkfit_dedx_max_tune_%s_%s_%i",        reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 10);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max_with_tracks).at(uni) = new TH1D(Form("h_reco_shr_tkfit_dedx_max_with_tracks_%s_%s_%i", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max_no_tracks).at(uni)   = new TH1D(Form("h_reco_shr_tkfit_dedx_max_no_tracks_%s_%s_%i",   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 10);
                     h_cut_v.at(label).at(cut).at(_util.k_cut_shower_to_vtx_dist).at(uni)             = new TH1D(Form("h_reco_shower_to_vtx_dist_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 20);

@@ -327,6 +327,7 @@ void HistogramHelper::InitHistograms(){
             TH1D_hists.at(k_reco_shr_tkfit_dedx_v).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_v_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_shr_tkfit_dedx_y).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_y_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_shr_tkfit_dedx_max).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_max_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
+            TH1D_hists.at(k_reco_shr_tkfit_dedx_max_tune).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_max_tune_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 10);
             TH1D_hists.at(k_reco_shr_tkfit_dedx_max_with_tracks).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_max_with_tracks_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_shr_tkfit_dedx_y_no_tracks).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_y_no_tracks_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 40, 0, 10);
             TH1D_hists.at(k_reco_shr_tkfit_dedx_max_no_tracks).at(i).at(j) = new TH1D ( Form("h_reco_shr_tkfit_dedx_max_no_tracks_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 20, 0, 10);
@@ -550,11 +551,11 @@ void HistogramHelper::InitHistograms(){
             TH2D_true_hists.at(i).at(k_true_elec_E_reco_elec_E_rebin) = new TH2D( Form("h_true_elec_E_reco_elec_E_rebin_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";Generated Electron Energy [GeV] ;Measured Electron Energy [GeV]", _util.reco_shr_bins.size()-1, edges, _util.reco_shr_bins.size()-1, edges);
 
 
-            edges = &_util.reco_shr_bins_cang[0]; // Cast to an array 
-            TH2D_true_hists.at(i).at(k_true_shr_cosbeta_purity)          = new TH2D( Form("h_true_shr_cosbeta_purity_%s_%s",      _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";cos#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} ;Shower Purity", _util.reco_shr_bins_cang.size()-1, edges, 21, 0, 1.1);
-            TH2D_true_hists.at(i).at(k_true_shr_cosbeta_completeness)    = new TH2D( Form("h_true_shr_cosbeta_completeness_%s_%s",_util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";cos#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} ;Shower Completeness", _util.reco_shr_bins_cang.size()-1, edges, 21, 0, 1.1);
-            TH2D_true_hists.at(i).at(k_true_shr_cosbeta_resolution_reco) = new TH2D( Form("h_true_shr_cosbeta_resolution_reco_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";cos#beta^{reco}_{e#lower[-0.5]{-} + e^{+}}; Reco - True / Reco", _util.reco_shr_bins_cang.size()-1, edges, 30, -1.2, 1.2);
-            TH2D_true_hists.at(i).at(k_true_shr_cosbeta_resolution_true) = new TH2D( Form("h_true_shr_cosbeta_resolution_true_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";cos#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} ;Reco - True / True", _util.reco_shr_bins_cang.size()-1, edges, 30, -1.2, 1.2);
+            double* edges_cbeta = &_util.reco_shr_bins_cang[0]; // Cast to an array 
+            TH2D_true_hists.at(i).at(k_true_shr_cosbeta_purity)          = new TH2D( Form("h_true_shr_cosbeta_purity_%s_%s",      _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";cos#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} ;Shower Purity", _util.reco_shr_bins_cang.size()-1, edges_cbeta, 21, 0, 1.1);
+            TH2D_true_hists.at(i).at(k_true_shr_cosbeta_completeness)    = new TH2D( Form("h_true_shr_cosbeta_completeness_%s_%s",_util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";cos#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} ;Shower Completeness", _util.reco_shr_bins_cang.size()-1, edges_cbeta, 21, 0, 1.1);
+            TH2D_true_hists.at(i).at(k_true_shr_cosbeta_resolution_reco) = new TH2D( Form("h_true_shr_cosbeta_resolution_reco_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";cos#beta^{reco}_{e#lower[-0.5]{-} + e^{+}}; Reco - True / Reco", _util.reco_shr_bins_cang.size()-1, edges_cbeta, 30, -1.2, 1.2);
+            TH2D_true_hists.at(i).at(k_true_shr_cosbeta_resolution_true) = new TH2D( Form("h_true_shr_cosbeta_resolution_true_%s_%s", _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";cos#beta^{reco}_{e#lower[-0.5]{-} + e^{+}} ;Reco - True / True", _util.reco_shr_bins_cang.size()-1, edges_cbeta, 30, -1.2, 1.2);
 
             TH2D_true_hists.at(i).at(k_elec_true_beta_reco_beta)      = new TH2D( Form("h_elec_true_beta_reco_beta_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),            ";True e#lower[-0.5]{-} + e^{+} #beta [deg]; Reco e#lower[-0.5]{-} + e^{+} #beta [deg]",  36, 0, 180, 36, 0, 180 );
             TH2D_true_hists.at(i).at(k_elec_true_beta_reco_beta_nue)    = new TH2D( Form("h_elec_true_beta_reco_beta_nue_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),      ";True e#lower[-0.5]{-} #beta [deg]; Reco e#lower[-0.5]{-} + e^{+} #beta [deg]",  36, 0, 180, 36, 0, 180 );
@@ -562,7 +563,9 @@ void HistogramHelper::InitHistograms(){
             TH2D_true_hists.at(i).at(k_elec_true_theta_reco_theta)    = new TH2D( Form("h_elec_true_theta_reco_theta_%s_%s",  _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),   ";True e#lower[-0.5]{-} + e^{+} #theta [deg];Reco e#lower[-0.5]{-} + e^{+} #theta [deg]", 36, 0, 180, 36, 0, 180 );
             TH2D_true_hists.at(i).at(k_elec_true_phi_reco_phi)        = new TH2D( Form("h_elec_true_phi_reco_phi_%s_%s",      _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),   ";True e#lower[-0.5]{-} + e^{+} #phi [deg];  Reco e#lower[-0.5]{-} + e^{+} #phi [deg]",   36, -180, 180, 36, -180, 180 );
         
-            TH2D_true_hists.at(i).at(k_elec_true_cosbeta_reco_cosbeta_rebin) = new TH2D( Form("h_elec_true_cosbeta_reco_cosbeta_rebin_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";Generated Electron cos#beta ;Measured Electron cos#beta", _util.reco_shr_bins_cang.size()-1, edges, _util.reco_shr_bins_cang.size()-1, edges);
+            TH2D_true_hists.at(i).at(k_elec_true_cosbeta_reco_cosbeta_rebin) = new TH2D( Form("h_elec_true_cosbeta_reco_cosbeta_rebin_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";Generated Electron cos#beta ;Measured Electron cos#beta", _util.reco_shr_bins_cang.size()-1, edges_cbeta, _util.reco_shr_bins_cang.size()-1, edges_cbeta);
+
+            TH2D_true_hists.at(i).at(k_true_elec_E_true_beta_rebin) = new TH2D( Form("h_true_elec_E_true_beta_rebin_%s_%s",         _util.type_prefix.at(_type).c_str(), cut_stage.c_str()),    ";True Electron Energy [GeV] ;True Electron cos#beta", _util.reco_shr_bins.size()-1, edges, _util.reco_shr_bins_cang.size()-1, edges_cbeta);
         }
     }
 
@@ -827,6 +830,12 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
     if (SC.n_tracks == 0) TH1D_hists.at(k_reco_shr_tkfit_dedx_y_no_tracks).at(cut_index).at(classification_index)->Fill(SC.shr_tkfit_dedx_Y, weight);
     if (SC.n_tracks == 0) TH1D_hists.at(k_reco_shr_tkfit_dedx_max_no_tracks).at(cut_index).at(classification_index)->Fill(dedx_max,  weight);
 
+
+    // For paper plot add the pi0 tune to the plot
+    double pi0_tuned_weight = weight;
+    _util.GetPiZeroWeight(pi0_tuned_weight, 1, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e); // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
+    TH1D_hists.at(k_reco_shr_tkfit_dedx_max_tune).at(cut_index).at(classification_index)->Fill(dedx_max, pi0_tuned_weight);
+
     // Split the dedx into good and bad angles
     
     if (SC.shr_theta * 180/3.14159 > 80 && SC.shr_theta * 180/3.14159 < 100) {
@@ -994,6 +1003,8 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
 
             TH2D_true_hists.at(index).at(k_true_elec_E_reco_elec_E_rebin)->Fill(SC.elec_e,  SC.shr_energy_cali, weight);
             TH2D_true_hists.at(index).at(k_elec_true_cosbeta_reco_cosbeta_rebin)  ->Fill(true_cosbeta, SC.cos_effective_angle, weight);
+
+            TH2D_true_hists.at(index).at(k_true_elec_E_true_beta_rebin)  ->Fill(SC.shr_energy_cali, true_cosbeta, weight);
 
             // True nue interaction histograms
             if (interaction == "nue_cc_qe" || interaction == "nue_bar_cc_qe"){

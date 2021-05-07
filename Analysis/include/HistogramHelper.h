@@ -166,6 +166,7 @@ class HistogramHelper{
         k_reco_shr_tkfit_dedx_v,                                                // The dEdx using the trackfit variable v plane
         k_reco_shr_tkfit_dedx_y,                                                // The dEdx using the trackfit variable collection
         k_reco_shr_tkfit_dedx_max,                                              // The dEdx using the trackfit variable plane with the max hits
+        k_reco_shr_tkfit_dedx_max_tune,                                         // The dEdx using the trackfit variable plane with the max hits with pi0 tune
         k_reco_shr_tkfit_dedx_max_with_tracks,                                  // The dEdx using the trackfit variable plane with the max hits for events with tracks only
         k_reco_shr_tkfit_dedx_y_no_tracks,                                      // The dEdx using the trackfit variable collection in the case there is no tracks
         k_reco_shr_tkfit_dedx_max_no_tracks,                                    // The dEdx using the trackfit variable plane with the most hits in the case there is no tracks
@@ -309,6 +310,7 @@ class HistogramHelper{
         k_elec_true_phi_reco_phi,
         k_elec_true_cosbeta_reco_cosbeta_rebin, 
         k_true_elec_E_reco_elec_E_rebin,
+        k_true_elec_E_true_beta_rebin,
         k_TH2D_true_MAX
     };
 

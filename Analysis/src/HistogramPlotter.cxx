@@ -247,6 +247,8 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
             Save2DHists(Form("plots/run%s/Truth/h_elec_true_beta_reco_beta_nue_%s.pdf",    _util.run_period, cut_type.c_str()), "h_elec_true_beta_reco_beta_nue",   cut_type, true);
             Save2DHists(Form("plots/run%s/Truth/h_elec_true_beta_reco_beta_nuebar_%s.pdf", _util.run_period, cut_type.c_str()), "h_elec_true_beta_reco_beta_nuebar",   cut_type, true);
 
+            Save2DHists(Form("plots/run%s/Truth/h_true_elec_E_true_beta_rebin_%s.pdf", _util.run_period, cut_type.c_str()), "h_true_elec_E_true_beta_rebin",   cut_type, false);
+
             // Normalised by reco (row)
             Save2DHistsNorm(Form("plots/run%s/Truth/h_true_elec_E_reco_elec_E_%s_row_norm_reco.pdf",     _util.run_period, cut_type.c_str()), "h_true_elec_E_reco_elec_E", cut_type, true, "reco");
 
