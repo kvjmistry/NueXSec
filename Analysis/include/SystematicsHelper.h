@@ -147,6 +147,15 @@ class SystematicsHelper{
     // -------------------------------------------------------------------------
     // Calculate the Mean and RMS in a range
     void CalcdEdxRMSMean(TH1D* hist, std::string variation);
+    // -------------------------------------------------------------------------
+    // Make dedx plot for WireMod paper
+    void MakedEdxPaperPlot();
+    // -------------------------------------------------------------------------
+    // Add the systematic uncertainty to the plot
+    void AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D* h_dirt, std::string histname, std::string cut_name, std::string label, std::string mode);
+    // -------------------------------------------------------------------------
+
+
 
 
 
@@ -210,14 +219,14 @@ class SystematicsHelper{
     // colors used for the plots of the detector variations
     std::vector<int> var_string_pretty_color = {
          1,  // CV
-         2,  // LYRayleigh
-         95, // LY Down
-         6,  // LYAttenuation
+         30,  // LYRayleigh
+         9, // LY Down
+        //  53,  // LYAttenuation
          3,  // SCE
-         9,  // Recombination
-         30, // WM X
+         95,  // Recombination
+         2, // WM X
          4,  // WM YZ
-         53, // WM Theta XZ
+         6, // WM Theta XZ
          8,  // WM Theta YZ w/ Spl.
         //  8, // WM Theta YZ w/o Spl.
         //  7 // WM dE/dX

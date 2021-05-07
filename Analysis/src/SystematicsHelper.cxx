@@ -52,21 +52,27 @@ void SystematicsHelper::Initialise(Utility _utility){
     for (unsigned int l =0; l < var_string.size(); l++){
         
         // Standard variation mode
-        if (std::string(_util.sysmode) == "default")  {
+        if (std::string(_util.sysmode) == "default" || std::string(_util.sysmode) == "dedx")  {
             f_vars.at(l) = TFile::Open( Form("files/nuexsec_run%s_%s_merged.root", _util.run_period, var_string.at(l).c_str() ), "READ");
         }
         // Off beam mode
         else if (std::string(_util.sysmode) == "ext") {
             f_vars.at(l) = new TFile( Form("files/nuexsec_ext_run%s_%s.root", _util.run_period, var_string.at(l).c_str() ), "READ");
         }
-        else {
-            std::cout << "Error I dont know what mode you have configured..." << std::string(_util.sysmode) << std::endl;
-            exit(1);
-        }
+        // else {
+        //     std::cout << "Error I dont know what mode you have configured..." << std::string(_util.sysmode) << std::endl;
+        //     exit(1);
+        // }
         
         
         // Maybe add something here to pickup non processed variation
     }
+
+    if (std::string(_util.sysmode) == "dedx"){
+        MakedEdxPaperPlot();
+        return;
+    }
+
 
     // Now loop over events and caluclate the cross section
     MakeHistograms();
@@ -4110,3 +4116,373 @@ void SystematicsHelper::ExportTotalCrossSectionResult(){
 
 }
 // -----------------------------------------------------------------------------
+void SystematicsHelper::MakedEdxPaperPlot(){
+
+    // ------------------------------------------------------------
+    // Some initial configurations and work around fixes
+
+    int cut = _util.k_shr_moliere_avg;
+    const char* x_axis_name = "Leading Shower dE/dx [MeV/cm]";
+    bool plotdata = true;
+    
+    
+    gStyle->SetOptStat(0);
+
+    std::vector<TH1D*> hist; // The vector of histograms from the file for the plot
+    std::vector<TH1D*> hist_diff; // The vector of histogram differentes between CV and the vatiation (variation-CV)
+    std::vector<TH1D*> hist_ratio; // The vector of histogram ratios from the file for the plot
+    TH1D * h_error_hist;
+    hist.resize(k_vars_MAX);
+    hist_diff.resize(k_vars_MAX);
+    hist_ratio.resize(k_vars_MAX);
+
+    // Get the data histogram
+    TFile *f_data;
+    TH1D *h_data, *h_dirt, *h_ext;
+
+    if (plotdata){
+        f_data= TFile::Open("files/nuexsec_run1_merged.root", "READ");
+        _util.GetHist(f_data, h_data, Form("Stack/%s/%s/%s_%s_%s", _util.cut_dirs.at(cut).c_str(), "data", "h_reco_shr_tkfit_dedx_max", _util.cut_dirs.at(cut).c_str(), "data"));
+        _util.GetHist(f_data, h_dirt, Form("Stack/%s/%s/%s_%s_%s", _util.cut_dirs.at(cut).c_str(), "dirt", "h_reco_shr_tkfit_dedx_max", _util.cut_dirs.at(cut).c_str(), "dirt"));
+        _util.GetHist(f_data, h_ext, Form("Stack/%s/%s/%s_%s_%s",  _util.cut_dirs.at(cut).c_str(), "ext",  "h_reco_shr_tkfit_dedx_max", _util.cut_dirs.at(cut).c_str(), "ext"));
+        h_data->SetDirectory(0);
+        h_dirt->SetDirectory(0);
+        h_ext->SetDirectory(0);
+        f_data->Close();
+        h_data->SetMarkerStyle(20);
+        h_data->SetMarkerSize(0.5);
+        h_data->SetLineColor(kBlack);
+        h_dirt->Scale(_util.dirt_scale_factor);
+        h_ext->Scale(_util.ext_scale_factor);
+    }
+
+    TCanvas * c      = new TCanvas("","",500,500);
+    TPad * topPad    = new TPad("topPad", "", 0, 0.3, 1, 1.0);
+    TPad * bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
+    _util.SetTPadOptions(topPad, bottomPad );
+
+    // ------------------------------------------------------------
+    // Loop over the variations and get the histograms
+    
+    for (unsigned int k=0; k < f_vars.size(); k++){
+        
+        // Loop over the classifications and get the histograms
+        for (unsigned int i=0; i <_util.classification_dirs.size(); i++){
+
+            // Only want the MC piece -- may want to add in dirt too? -- will need to separately scale that hitogram though
+            if ( i == _util.k_leg_data || i == _util.k_leg_ext || i == _util.k_leg_dirt ) continue;
+
+            // Get all the MC histograms and add them together
+            TH1D *h_temp;
+
+            _util.GetHist(f_vars.at(k), h_temp, Form("Stack/%s/%s/%s_%s_%s", _util.cut_dirs.at(cut).c_str(), _util.classification_dirs.at(i).c_str(),  "h_reco_shr_tkfit_dedx_max", _util.cut_dirs.at(cut).c_str(), _util.classification_dirs.at(i).c_str()));
+
+            // First case so clone the histogram
+            if (i == 0) hist.at(k) = (TH1D*) h_temp->Clone("h_sum_hist");
+            else hist.at(k)->Add(h_temp, 1);
+        }
+        
+    }
+
+    // Legend
+    // on top of the topCanvs to avoid overlaping the plot
+    TLegend *leg = new TLegend(0.1686747,0.7233083,0.8795181,0.8406015,NULL,"brNDC");
+    leg->SetNColumns(4);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+
+    // ------------------------------------------------------------
+    // Now scale the histograms to POT
+    // and draw the histograms on the top pad
+
+    // variable used to track the max bin content to later scale the plot to avoid cutting information
+    Double_t max_bin = 0.; 
+
+    // Clone a histogram to plot the CV error as a grey band
+    TH1D* h_error_hist_data = (TH1D*)h_data->Clone();
+    h_error_hist = (TH1D*) hist.at(k_CV)->Clone("h_error_hist");
+    h_error_hist->SetFillColorAlpha(12, 0.15);
+    h_error_hist->SetLineWidth(2);
+    h_error_hist->SetLineColor(kBlack);
+    h_error_hist->Scale(_util.mc_scale_factor*3.0754529);
+    h_error_hist->Add(h_dirt, 1.0);
+    h_error_hist->Add(h_ext, 1.0);
+
+
+    // Genie Unisim
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "RPA", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "CCMEC", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "AxFFCCQE", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "VecFFCCQE", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "DecayAngMEC", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "ThetaDelta2Npi", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "ThetaDelta2NRad", "MC");
+    // AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "RPA_CCQE_Reduced", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "NormCCCOH", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "NormNCCOH", "MC");
+    
+    // Beamline
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Horn1_x", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Horn_curr", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Horn1_y", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Beam_spot", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Horn2_x", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Horn2_y", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Horn_Water", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Beam_shift_x", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Beam_shift_y", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Target_z", "MC");
+            
+    // Other
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "weightsPPFX", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "weightsGenie", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "weightsReint", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "POT",  "Stack");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Dirt", "Dirt");
+
+    // Clone a histogram to plot the CV error as a grey band
+    TH1D* h_error_hist_noDetvar = (TH1D*) h_error_hist->Clone("h_error_hist_nodetvar");
+    h_error_hist_noDetvar->SetFillColorAlpha(kRed+2, 0.15);
+
+    // Individual detector systematics
+    // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "LYRayleigh", "MC");
+    // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "SCE", "MC");
+    // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Recomb2", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "WireModX", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "WireModYZ", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "WireModThetaXZ", "MC");
+    // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "WireModThetaYZ_withSigmaSplines", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "WireModThetaYZ_withoutSigmaSplines", "MC");
+    // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "WireModdEdX", "MC");
+
+
+
+
+    for (unsigned int y=0; y < hist.size(); y++ ){
+        double scale_fact = POT_v.at(k_CV) / POT_v.at(y);
+        // std::cout << "scale factor: " << scale_fact << std::endl;
+        hist.at(y)->Scale(scale_fact);
+
+        if (plotdata){
+            hist.at(y)->Scale(_util.mc_scale_factor*3.0754529); // extra factor to scale to main mc pot rather than detvar -- hack
+            hist.at(y)->Add(h_dirt, 1.0);
+            hist.at(y)->Add(h_ext, 1.0);
+        }
+
+        // Save clones of the histograms for doing the ratios
+        hist_ratio.at(y) = (TH1D*) hist.at(y)->Clone(Form("h_ratio_%s", var_string.at(y).c_str()));
+        hist_ratio.at(y)->Divide(hist.at(k_CV));
+
+        // Set the customisation of the histogram
+        SetVariationProperties(hist.at(y), y);
+        SetVariationProperties(hist_ratio.at(y), y);
+
+        // Draw the histograms
+        if (y == k_CV) {
+            leg->AddEntry(h_error_hist, "CV (Tot Unc.)", "lf");
+            
+            if (hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()) > max_bin)
+                max_bin = hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()); // for scale purposes
+        
+        }
+        else {
+            hist.at(y)->SetLineColor(var_string_pretty_color.at(y));  // change color of the histogram
+            hist_ratio.at(y)->SetLineColor(var_string_pretty_color.at(y));
+            leg->AddEntry(hist.at(y), var_string_pretty.at(y).c_str(), "l"); // add histogram to legend
+            
+            if (hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()) > max_bin)
+                max_bin = hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()); // for scale purposes
+        }
+    }
+    
+
+    if (plotdata)
+         leg->AddEntry(h_data, "Beam-On", "lep"); // add histogram to legend
+
+    // -----------------------------------------------------------------
+    // Drawing histograms on top pad
+
+    // setting hist config to the first one that we drawn
+    hist.at(0)->GetYaxis()->SetRangeUser(0,max_bin*2.2);
+    hist.at(0)->GetYaxis()->SetTitle("Entries");
+    hist.at(0)->GetXaxis()->SetLabelSize(0);
+    hist.at(0)->GetYaxis()->SetTitleSize(0.05);
+    hist.at(0)->GetYaxis()->SetLabelSize(0.05);
+
+    // drawing histograms
+    for (unsigned int y=0; y < hist.size(); y++ ) {
+    
+            hist.at(y)->Rebin(2);
+            hist.at(y)->Draw("hist, same");
+            //if (y == k_CV) h_error_hist->Draw("E2, same");
+    }
+    
+    // -----------------------------------------------------------------
+    
+    h_error_hist->Rebin(2); 
+    h_error_hist_noDetvar->Rebin(2);
+    h_error_hist->Draw("E2, same");
+
+    TH1D * h_error_hist_ratio = (TH1D*)h_error_hist->Clone();
+    TH1D * h_error_hist_noDetvar_ratio = (TH1D*)h_error_hist->Clone();
+    // Take the ratio of the error histograms
+    for(int bin = 1; bin <= h_error_hist->GetNbinsX(); bin++){
+        h_error_hist_ratio->SetBinContent( bin , 1.0);
+        h_error_hist_ratio->SetBinError( bin , h_error_hist->GetBinError(bin)/h_error_hist->GetBinContent(bin) );
+        h_error_hist_noDetvar_ratio->SetBinContent( bin , 1.0);
+        h_error_hist_noDetvar_ratio->SetBinError( bin , h_error_hist_noDetvar->GetBinError(bin)/h_error_hist->GetBinContent(bin) );
+    }
+
+    h_error_hist_data->Rebin(2);
+    h_error_hist_data->Divide(h_error_hist);
+
+    // h_error_hist_ratio = (TH1D*) h_error_hist->Clone("h_error_hist_rat");
+    // h_error_hist_ratio->Divide();
+
+    // drawing CV again to make sure it is on top of everything else
+    hist.at(k_CV)->Draw("hist, same");
+
+    if (plotdata){
+        h_data->Rebin(2);
+        h_data->Draw("same PE");
+    }
+
+    // drawing legend
+    leg->Draw();
+
+
+    // -----------------------------------------------------------------
+    // Drawing the total detector systematic uncertainty on the bottom pad
+
+    bottomPad->cd();
+
+    hist_ratio.at(0)->SetLineWidth(2);
+    hist_ratio.at(0)->GetXaxis()->SetLabelSize(15); // 12
+    hist_ratio.at(0)->GetXaxis()->SetLabelFont(43); 
+    hist_ratio.at(0)->GetYaxis()->SetLabelSize(11);
+    hist_ratio.at(0)->GetYaxis()->SetLabelFont(43);
+    hist_ratio.at(0)->GetXaxis()->SetTitleOffset(3.2); // 3
+    hist_ratio.at(0)->GetXaxis()->SetTitleSize(17); // 17
+    hist_ratio.at(0)->GetXaxis()->SetTitleFont(46);
+    hist_ratio.at(0)->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
+    hist_ratio.at(0)->GetYaxis()->SetRangeUser(0, 2.0);
+    hist_ratio.at(0)->GetYaxis()->SetTitle("Ratio to MC");
+    hist_ratio.at(0)->GetYaxis()->SetTitleSize(13); // 13
+    hist_ratio.at(0)->GetYaxis()->SetTitleFont(44);
+    hist_ratio.at(0)->GetYaxis()->SetLabelSize(15); // new
+    hist_ratio.at(0)->GetYaxis()->SetTitleOffset(2);
+    hist_ratio.at(0)->SetTitle(" ");
+    hist_ratio.at(0)->GetXaxis()->SetTitle(x_axis_name);
+
+    // Draw the ratios on the ratio pad
+    for (unsigned int y=0; y < hist.size(); y++ ) {
+   
+        hist_ratio.at(y)->Rebin(2);
+        hist_ratio.at(y)->Scale(0.5);
+        hist_ratio.at(y)->Draw("hist,same");
+    }
+
+    h_error_hist_ratio->Draw("E2,same");
+    h_error_hist_noDetvar_ratio->SetFillColorAlpha(kRed+2, 0.15);
+    h_error_hist_noDetvar_ratio->Draw("E2,same");
+
+    h_error_hist_data->Draw("PE, same");
+
+    if (plotdata)
+        _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.45, 0.915, 0.45, 0.915);
+
+    //---------------------------------------------------------------
+    // draw final canvas as pdf
+
+    c->Print("test.pdf"); 
+
+    // close the canvas to avoid warning messages on the terminal
+    c->Close();  
+
+
+    if (plotdata){
+        delete h_data;
+        delete h_dirt;
+        delete h_ext;
+    }
+
+
+}
+// -----------------------------------------------------------------------------
+void SystematicsHelper::AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D* h_dirt, std::string histname, std::string cut_name, std::string label, std::string mode){
+        
+    TH1D  *h_sys;
+
+    TFile *file_sys_uncertainties = TFile::Open("files/run1_sys_var.root", "READ");
+
+    // The error is on the MC events -- so comes from reweighting or detvar
+    if (mode == "MC"){
+
+        _util.GetHist(file_sys_uncertainties, h_sys, Form("%s/%s/%s", cut_name.c_str(), label.c_str(), histname.c_str()) );
+        
+        // loop over the bins in h_error_hist
+        for (int i = 1; i <= h_error_hist->GetNbinsX() ; i++){
+
+            double bin_error = h_error_hist->GetBinError(i);
+
+            // Need to subtract the beam off and dirt
+            double bin_content = h_error_hist->GetBinContent(i) - h_ext->GetBinContent(i) - h_dirt->GetBinContent(i);
+
+            double sys_error = h_sys->GetBinContent(i) * bin_content;
+
+            double tot_error = std::sqrt( bin_error*bin_error + sys_error*sys_error );
+
+            h_error_hist->SetBinError(i, tot_error);
+
+        }
+
+        delete h_sys;
+    }
+    // Just add the uncertainty on the dirt -- e.g. add 100% uncertainty on the dirt
+    else if (mode == "Dirt"){
+        
+        // loop over the bins in h_error_hist
+        for (int i = 1; i <= h_error_hist->GetNbinsX() ; i++){
+
+            double bin_error = h_error_hist->GetBinError(i);
+
+            // Need to subtract the beam off and dirt
+            double bin_content = h_dirt->GetBinContent(i);
+
+            double sys_error = bin_content; // 100 % err on the dirt
+
+            double tot_error = std::sqrt( bin_error*bin_error + sys_error*sys_error );
+
+            h_error_hist->SetBinError(i, tot_error);
+
+        }
+    }
+    // Add uncertainty on the total stack i.e. MC + dirt + EXT i.e.  in the case of POT counting
+    else if (mode == "Stack"){
+
+        // loop over the bins in h_error_hist
+        for (int i = 1; i <= h_error_hist->GetNbinsX() ; i++){
+
+            // std::cout <<histname  <<"  " << cut_name<< std::endl;
+
+            double bin_error = h_error_hist->GetBinError(i);
+
+            // Get the bin content
+            double bin_content = h_error_hist->GetBinContent(i);
+
+            double sys_error = 0.02 * bin_content; // 2 % err on the stack
+
+            double tot_error = std::sqrt( bin_error*bin_error + sys_error*sys_error );
+
+            h_error_hist->SetBinError(i, tot_error);
+
+        }
+
+    }
+    else {
+        std::cout << "Unknown systematics mode confugured!!" << std::endl;
+    }
+
+    file_sys_uncertainties->Close();
+
+}
