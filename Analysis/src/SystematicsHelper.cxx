@@ -740,7 +740,6 @@ void SystematicsHelper::InitialiseReweightingMode(){
         CompareVariationXSec("DecayAngMEC",      var, "Decay Ang MEC" );
         CompareVariationXSec("ThetaDelta2Npi",   var, "Theta Delta 2N #pi" );
         CompareVariationXSec("ThetaDelta2NRad",  var, "Theta Delta 2N Rad" );
-        // CompareVariationXSec("RPA_CCQE_Reduced", var, "RPA CCQE Reduced" );
         CompareVariationXSec("NormCCCOH",        var, "Norm CC COH" );
         CompareVariationXSec("NormNCCOH",        var, "Norm NC COH" );
 
@@ -752,7 +751,6 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeUnisim("DecayAngMEC",      var, "Decay Ang MEC" );
         PlotReweightingModeUnisim("ThetaDelta2Npi",   var, "Theta Delta 2N #pi" );
         PlotReweightingModeUnisim("ThetaDelta2NRad",  var, "Theta Delta 2N Rad" );
-        // PlotReweightingModeUnisim("RPA_CCQE_Reduced", var, "RPA CCQE Reduced" );
         PlotReweightingModeUnisim("NormCCCOH",        var, "Norm CC COH" );
         PlotReweightingModeUnisim("NormNCCOH",        var, "Norm NC COH" );
         PlotReweightingModeUnisim("xsr_scc_Fv3",      var, "SCC Fv3" );
@@ -779,18 +777,20 @@ void SystematicsHelper::InitialiseReweightingMode(){
         PlotReweightingModeUnisim("Beam_shift_x",       var, "Beam shift x" );
         PlotReweightingModeUnisim("Beam_shift_y",       var, "Beam shift y" );
         PlotReweightingModeUnisim("Target_z",           var, "Target z" );
+        
         // PlotReweightingModeUnisim("Decay_pipe_Bfield",  var, "Decay pipe Bfield" );
 
         // Detector Variations
         PlotReweightingModeDetVar("LYRayleigh",                         var, k_LYRayleigh,                         var_string_pretty.at(k_LYRayleigh));
         PlotReweightingModeDetVar("LYDown",                             var, k_LYDown,                             var_string_pretty.at(k_LYDown));
         PlotReweightingModeDetVar("SCE",                                var, k_SCE,                                var_string_pretty.at(k_SCE));
-        // PlotReweightingModeDetVar("LYAttenuation",                      var, k_LYAttenuation,                      var_string_pretty.at(k_LYAttenuation));
         PlotReweightingModeDetVar("Recomb2",                            var, k_Recomb2,                            var_string_pretty.at(k_Recomb2));
         PlotReweightingModeDetVar("WireModX",                           var, k_WireModX,                           var_string_pretty.at(k_WireModX));
         PlotReweightingModeDetVar("WireModYZ",                          var, k_WireModYZ,                          var_string_pretty.at(k_WireModYZ));
         PlotReweightingModeDetVar("WireModThetaXZ",                     var, k_WireModThetaXZ,                     var_string_pretty.at(k_WireModThetaXZ));
         PlotReweightingModeDetVar("WireModThetaYZ_withSigmaSplines",    var, k_WireModThetaYZ_withSigmaSplines,    var_string_pretty.at(k_WireModThetaYZ_withSigmaSplines));
+        
+        // PlotReweightingModeDetVar("LYAttenuation",                      var, k_LYAttenuation,                      var_string_pretty.at(k_LYAttenuation));
         // PlotReweightingModeDetVar("WireModThetaYZ_withoutSigmaSplines", var, k_WireModThetaYZ_withoutSigmaSplines, var_string_pretty.at(k_WireModThetaYZ_withoutSigmaSplines));
         // PlotReweightingModeDetVar("WireModdEdX",                        var, k_WireModdEdX,                        var_string_pretty.at(k_WireModdEdX));
 
