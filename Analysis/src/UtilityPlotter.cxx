@@ -77,6 +77,12 @@ void UtilityPlotter::Initialise(Utility _utility){
         PlotBeamSimRates();
         return;
     }
+    // This will call the function to calculate the covariance matrix
+    else if (std::string(_util.uplotmode) == "print"){
+        PrintFluxValues();
+        PrintXSecResults();
+        return;
+    }
     // This will call the code to optimise the bin widths
     else if (std::string(_util.uplotmode) == "models"){ 
 
@@ -3227,7 +3233,7 @@ void UtilityPlotter::SaveResponseMatrix(){
         h_response.at(m)->Draw("colz");
 
         // Draw the run period on the plot
-        _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);
+        // _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);
 
         c->Print(Form("plots/run%s/Response/Response_run%s_%s.pdf", _util.run_period, _util.run_period, variables.at(m).c_str()));
         delete c;
@@ -3238,7 +3244,7 @@ void UtilityPlotter::SaveResponseMatrix(){
     for (unsigned int m = 0; m < variables.size(); m++){
         
         // Get the response matrix
-        h_response_index.at(m) = new TH2D("h_response", ";Bin i;Bin j", h_response.at(m)->GetNbinsX(), 0, h_response.at(m)->GetNbinsX(), h_response.at(m)->GetNbinsY(), 0, h_response.at(m)->GetNbinsY());
+        h_response_index.at(m) = new TH2D("h_response", ";True Bin i; Reconstructed Bin j", h_response.at(m)->GetNbinsX(), 1, h_response.at(m)->GetNbinsX()+1, h_response.at(m)->GetNbinsY(), 1, h_response.at(m)->GetNbinsY()+1);
     
         // Set the bin values
         for (int x = 1; x < h_response.at(m)->GetNbinsY()+1; x++){
@@ -3248,13 +3254,13 @@ void UtilityPlotter::SaveResponseMatrix(){
         }
 
         if (variables.at(m) == "elec_E"){
-            h_response_index.at(m)->SetTitle("E_{e#lower[-0.5]{-} + e^{+}}");
+            h_response_index.at(m)->SetTitle("E_{e}");
         }
         if (variables.at(m) == "elec_ang"){
             h_response_index.at(m)->SetTitle("#beta_{e#lower[-0.5]{-} + e^{+}}");
         }
-        if (variables.at(m) == "elec_"){
-            h_response_index.at(m)->SetTitle("cos#beta_{e#lower[-0.5]{-} + e^{+}}");
+        if (variables.at(m) == "elec_cang"){
+            h_response_index.at(m)->SetTitle("cos#beta_{e}");
         }
 
 
@@ -3279,8 +3285,9 @@ void UtilityPlotter::SaveResponseMatrix(){
         h_response_index.at(m)->GetYaxis()->SetNdivisions(h_response.at(m)->GetNbinsY(), 0, 0, kFALSE);
 
 
-        // Draw the run period on the plot
-        _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);
+        // Draw the run period on the plot 
+        // _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);
+        _util.Draw_ubooneSim(c, 0.33, 0.925, 0.33, 0.905);
 
         c->Print(Form("plots/run%s/Response/Response_run%s_%s_index.pdf", _util.run_period, _util.run_period, variables.at(m).c_str()));
         delete c;
@@ -5359,7 +5366,172 @@ void UtilityPlotter::PlotBeamSimRates(){
 
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::PrintXSecResults(){
+
+    TFile *f_xsec = TFile::Open("files/xsec_result_run1.root", "READ");
+
+
+    TH2D* h_temp_2D;
+    TH1D* h_temp;
+
+    // Total Covariance Matrix
+    h_temp_2D = (TH2D*)f_xsec->Get(Form("%s/wiener/h_data_cov_tot_unfolded",_util.xsec_var));
+    TH2D* h_cov_reco = (TH2D*)h_temp_2D->Clone();
+    h_cov_reco->SetDirectory(0);
+
+    // Ac
+    h_temp_2D = (TH2D*)f_xsec->Get(Form("%s/wiener/h_ac",_util.xsec_var));
+    TH2D* h_ac = (TH2D*)h_temp_2D->Clone();
+    h_ac->SetDirectory(0);
+
+    // Response
+    h_temp_2D = (TH2D*)f_xsec->Get(Form("%s/wiener/h_response",_util.xsec_var));
+    TH2D* h_response = (TH2D*)h_temp_2D->Clone();
+    h_response->SetDirectory(0);
+
+    // Data XSec
+    h_temp  = (TH1D*)f_xsec->Get(Form("%s/wiener/h_data_xsec_unfolded", _util.xsec_var));
+    TH1D* unf = (TH1D*)h_temp->Clone();
+    unf->SetDirectory(0);
+    _util.UndoBinWidthScaling(unf);
+
+    TH1D* unf_width = (TH1D*)h_temp->Clone(); // bin width scaled
+    unf_width->SetDirectory(0);
+
+    // Convert the Covariance Matrix-- switching from not binwidth scaled to bin-width scaled
+    _util.ConvertCovarianceUnits(h_cov_reco,
+                        unf,
+                        unf_width);
+    
+
+    // Load in the histograms for the efficeincy
+    TFile *f_eff = TFile::Open(Form("files/nuexsec_mc_run%s.root", _util.run_period));
+    TH1D* h_nue_den, *h_nue_num, *h_nuebar_den, *h_nuebar_num;
+
+
+    if (std::string(_util.xsec_var) == "elec_E"){
+        h_nue_den  = (TH1D*)f_eff->Get("TEff/h_true_elec_E_rebin_nue_Unselected");
+        h_nue_num  = (TH1D*)f_eff->Get("TEff/h_true_elec_E_rebin_nue_dEdx_max_no_tracks");
+        h_nuebar_den  = (TH1D*)f_eff->Get("TEff/h_true_elec_E_rebin_nuebar_Unselected");
+        h_nuebar_num  = (TH1D*)f_eff->Get("TEff/h_true_elec_E_rebin_nuebar_dEdx_max_no_tracks");
+    }
+    else if (std::string(_util.xsec_var) == "elec_cang"){
+        h_nue_den  = (TH1D*)f_eff->Get("TEff/h_eff_cosine_beta_rebin_nue_Unselected");
+        h_nue_num  = (TH1D*)f_eff->Get("TEff/h_eff_cosine_beta_rebin_nue_dEdx_max_no_tracks");
+        h_nuebar_den  = (TH1D*)f_eff->Get("TEff/h_eff_cosine_beta_rebin_nuebar_Unselected");
+        h_nuebar_num  = (TH1D*)f_eff->Get("TEff/h_eff_cosine_beta_rebin_nuebar_dEdx_max_no_tracks");
+    }
+
+    h_nue_num->Divide(h_nue_den);
+    h_nuebar_num->Divide(h_nuebar_den);
+
+    // Print the x-section values
+    std::cout << "Printing XSection Values and Uncertainties"<< std::endl;
+    std::cout << "Bin & Bin Range & XSec & Err & nue eff & nuebar eff" << std::endl; 
+    for (int bin = 1; bin < unf->GetNbinsX()+1; bin++){
+        std::cout << bin << std::fixed << std::setprecision(2)<< " & ["  <<  unf_width->GetBinLowEdge(bin) << ", " << unf_width->GetBinLowEdge(bin+1) << ") & " <<  unf_width->GetBinContent(bin) << " & " << std::sqrt(h_cov_reco->GetBinContent(bin, bin)) << " & " << h_nue_num->GetBinContent(bin) << " & " <<h_nuebar_num->GetBinContent(bin) << " \\\\"<< std::endl;
+    }
+
+    // Now Print the Covariance Matrix
+    std::cout << "\nPrinting Cov matric elements\n\n"<< std::endl;
+
+    for (int j = 1; j < h_cov_reco->GetNbinsX()+1;j++){
+
+        for (int i = 1; i < h_cov_reco->GetNbinsY()+1;i++){
+            
+            std::cout << std::fixed << std::setprecision(4)<< i << ", " << j <<", " << h_cov_reco->GetBinContent(i,j) << std::endl;
+        }
+
+    }
+
+    // Now Print the AC
+    std::cout << "\nPrinting AC elements\n\n"<< std::endl;
+
+    for (int j = 1; j < h_ac->GetNbinsX()+1;j++){
+
+        for (int i = 1; i < h_ac->GetNbinsY()+1;i++){
+            
+            std::cout << std::fixed << std::setprecision(4) << i << ", " << j <<", " << h_ac->GetBinContent(i,j) << std::endl;
+        }
+
+    }
+
+    // Now Print the Response
+    std::cout << "\nPrinting Response elements\n\n"<< std::endl;
+
+    for (int j = 1; j < h_response->GetNbinsX()+1;j++){
+
+        for (int i = 1; i < h_response->GetNbinsY()+1;i++){
+            
+            std::cout << std::fixed << std::setprecision(4)<< i << ", " << j <<", " << h_response->GetBinContent(i,j) << std::endl;
+        }
+
+    }
+
+
+
+}
 // -----------------------------------------------------------------------------
+void UtilityPlotter::PrintFluxValues(){
+
+    // Load in the Flux file
+    TFile *f_flux = TFile::Open("Systematics/output_fhc_uboone_run0.root","READ");
+
+    TH1D* h_nue    = (TH1D*)f_flux->Get("nue/Detsmear/nue_CV_AV_TPC_5MeV_bin");
+    TH1D* h_nuebar = (TH1D*)f_flux->Get("nuebar/Detsmear/nuebar_CV_AV_TPC_5MeV_bin");
+    
+    h_nue->Rebin(2);
+    h_nuebar->Rebin(2);
+
+    // Print the Nue values
+    std::cout << "\nPrinting nue flux elements\n\n"<< std::endl;
+
+    for (int bin = 1; bin < h_nue->GetNbinsX()+1; bin++){
+        if (h_nue->GetBinLowEdge(bin) >= 10.0)
+            continue;
+
+        std::cout << h_nue->GetBinLowEdge(bin) << ", " << h_nue->GetBinLowEdge(bin+1) << ", " << h_nue->GetBinContent(bin) << std::endl;
+    }
+
+    // Print the Nuebar values
+    std::cout << "\nPrinting nuebar flux elements\n\n"<< std::endl;
+
+    for (int bin = 1; bin < h_nuebar->GetNbinsX()+1; bin++){
+        if (h_nuebar->GetBinLowEdge(bin) >= 10.0)
+            continue;
+
+        std::cout << h_nuebar->GetBinLowEdge(bin) << ", " << h_nuebar->GetBinLowEdge(bin+1) << ", " << h_nuebar->GetBinContent(bin) << std::endl;
+    }
+
+    std::cout <<"\n\n\n" << std::endl;
+
+
+    // Make a plot of the nue to nuebar fluxes
+    gStyle->SetOptStat(0);
+    TCanvas *c = new TCanvas();
+    h_nue->Rebin(10);
+    h_nuebar->Rebin(10);
+    h_nue->Divide(h_nuebar);
+    
+    h_nue->SetLineWidth(2);
+    h_nue->SetLineColor(kBlue+2);
+    h_nue->SetTitle(";Electron Neutrino Energy [GeV]; Ratio #nu_{e}/#bar{#nu}_{e} Flux");
+    h_nue->GetXaxis()->SetLabelSize(0.04);
+    h_nue->GetXaxis()->SetTitleSize(0.05);
+    h_nue->GetYaxis()->SetLabelSize(0.05);
+    h_nue->GetYaxis()->SetTitleSize(0.05);
+    h_nue->Draw("hist");
+    h_nue->GetXaxis()->SetRangeUser(0,5);
+    c->SetLeftMargin(0.15);
+    c->SetBottomMargin(0.12);
+
+    _util.Draw_ubooneSim(c, 0.33, 0.925, 0.33, 0.925);
+
+    c->Print("plots/nue_fhc_flux_ratio.pdf");
+
+
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

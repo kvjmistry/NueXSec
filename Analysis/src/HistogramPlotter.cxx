@@ -73,7 +73,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_true_nu_E_nue",               true,  false, "True #nu_{e} Energy [GeV]; Efficiency",                           "True #nu_{e} Events in FV",                        "nu_E_nue");
         MakeEfficiencyPlotByCut("h_true_nu_E_nuebar",            true,  false, "True #bar{#nu}_{e} Energy [GeV]; Efficiency",                     "True #bar{#nu}_{e} Events in FV",                  "nu_E_nuebar");   
         
-        MakeEfficiencyPlotByCut("h_true_elec_E_rebin",           true,  false, "Generated Electron Energy [GeV]; Efficiency",                     "True e#lower[-0.5]{-}/e^{+} Events in FV / GeV",   "elec_E_rebin");
+        MakeEfficiencyPlotByCut("h_true_elec_E_rebin",           true,  false, "(anti-)lepton Energy [GeV]; Efficiency",                          "True e#lower[-0.5]{-}/e^{+} Events in FV / GeV",   "elec_E_rebin");
         MakeEfficiencyPlotByCut("h_true_elec_E_rebin_nue",       true,  false, "True e#lower[-0.5]{-} Energy [GeV]; Efficiency",                  "True e#lower[-0.5]{-} Events in FV / GeV",         "elec_E_rebin_nue");
         MakeEfficiencyPlotByCut("h_true_elec_E_rebin_nuebar",    true,  false, "True e^{+} Energy [GeV]; Efficiency",                             "True e^{+} Events in FV / GeV",                    "elec_E_rebin_nuebar");
         
@@ -82,7 +82,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_true_nu_E_nuebar_single_bin", true,  true,  "True #bar{#nu}_{e}; Efficiency",                                  "True #bar{#nu}_{e} Events in FV",                  "nu_E_nuebar_single_bin");
         
         MakeEfficiencyPlotByCut("h_true_elec_E",                 false, false, "True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_E");
-        MakeEfficiencyPlotByCut("h_eff_elec_E_many_bins",        true,  false, "Generated Electron Energy [GeV]; Efficiency",                     "True e#lower[-0.5]{-}/e^{+} Events in FV",         "elec_E_many_bins");
+        MakeEfficiencyPlotByCut("h_eff_elec_E_many_bins",        true,  false, "(anti-)lepton Energy [GeV]; Efficiency",                          "True e#lower[-0.5]{-}/e^{+} Events in FV",         "elec_E_many_bins");
         MakeEfficiencyPlotByCut("h_eff_nu_theta",                false, false, "True #nu_{e} + #bar{#nu}_{e} #theta [deg]; Efficiency",           "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "nu_theta" );
         MakeEfficiencyPlotByCut("h_eff_nu_phi",                  false, false, "True #nu_{e} + #bar{#nu}_{e} #phi [deg]; Efficiency",             "True #nu_{e} + #bar{#nu}_{e} Events in FV",        "nu_phi" );
         MakeEfficiencyPlotByCut("h_eff_elec_theta",              false, false, "True e#lower[-0.5]{-} + e^{+} #theta [deg]; Efficiency",          "True e#lower[-0.5]{-} + e^{+} Events in FV",       "elec_theta" );
@@ -93,7 +93,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_eff_beta_rebin_nue",          true, false, "True e#lower[-0.5]{-} [deg]; Efficiency",                          "True e#lower[-0.5]{-} Events in FV",                "beta_rebin_nue" );
         MakeEfficiencyPlotByCut("h_eff_beta_rebin_nuebar",       true, false, "True e^{+} #beta [deg]; Efficiency",                               "True e^{+} Events in FV",                           "beta_rebin_nuebar" );
 
-        MakeEfficiencyPlotByCut("h_eff_cosine_beta",             false, false, "Generated Electron cos(#beta); Efficiency",                       "True e#lower[-0.5]{-}/e^{+} Events in FV",          "cosine_beta" );
+        MakeEfficiencyPlotByCut("h_eff_cosine_beta",             false, false, "(anti-)lepton cos(#beta); Efficiency",                            "True e#lower[-0.5]{-}/e^{+} Events in FV",          "cosine_beta" );
         MakeEfficiencyPlotByCut("h_eff_cosine_beta_rebin",       true, false,  "True e#lower[-0.5]{-} + e^{+} cos(#beta); Efficiency",            "True e#lower[-0.5]{-} + e^{+} Events in FV",        "cosine_beta_rebin" );
         MakeEfficiencyPlotByCut("h_eff_cosine_beta_rebin_nue",   true, false,  "True e#lower[-0.5]{-} cos(#beta); Efficiency",                    "True e#lower[-0.5]{-} Events in FV",                "cosine_beta_rebin_nue" );
         MakeEfficiencyPlotByCut("h_eff_cosine_beta_rebin_nuebar",true, false,  "True e^{+} cos(#beta); Efficiency",                               "True e^{+} Events in FV",                           "cosine_beta_rebin_nuebar" );
@@ -159,7 +159,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeInteractionEfficiency("h_int_nu_E_nue_single_bin",    true,  "True #nu_{e};; Efficiency",                                 "nu_E_nue_single_bin");
         MakeInteractionEfficiency("h_int_nu_E_nuebar_single_bin", true,  "True #bar{#nu}_{e};; Efficiency",                           "nu_E_nuebar_single_bin");
         MakeInteractionEfficiency("h_int_elec_E",                 false, ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Efficiency",   "elec_E");
-        MakeInteractionEfficiency("h_int_elec_E_rebin",           false, ";Generated Electron Energy [GeV]; Efficiency",              "elec_E_rebin");
+        MakeInteractionEfficiency("h_int_elec_E_rebin",           false, ";True (anti-)lepton Energy [GeV]; Efficiency",                   "elec_E_rebin");
         MakeInteractionEfficiency("h_int_elec_E_rebin_nue",       false, ";True e#lower[-0.5]{-} Energy [GeV]; Efficiency",           "elec_E_rebin_nue");
         MakeInteractionEfficiency("h_int_elec_E_rebin_nuebar",    false, ";True e^{+} Energy [GeV]; Efficiency",                      "elec_E_rebin_nuebar");
         MakeInteractionEfficiency("h_int_elec_theta",             false, ";True e#lower[-0.5]{-} + e^{+} #theta [deg]; Efficiency",   "elec_theta");
@@ -167,7 +167,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeInteractionEfficiency("h_int_effective_ang",          false, ";True e#lower[-0.5]{-} + e^{+} #beta [deg]; Efficiency",    "eff_ang");
         MakeInteractionEfficiency("h_int_beta_nue",               false, ";True e#lower[-0.5]{-} #beta [deg]; Efficiency",            "eff_ang_nue");
         MakeInteractionEfficiency("h_int_beta_nuebar",            false, ";True e^{+} #beta [deg]; Efficiency",                       "eff_ang_nuebar");
-        MakeInteractionEfficiency("h_int_cosbeta",                false, ";Generated Electron cos#beta; Efficiency",       "cosbeta");
+        MakeInteractionEfficiency("h_int_cosbeta",                false, ";True (anti-)lepton cos#beta; Efficiency",                       "cosbeta");
 
         // Create the 2D folder
         _util.CreateDirectory("2D");
@@ -2361,6 +2361,7 @@ void HistogramPlotter::MakeEfficiencyPlotByCutTot(std::string var_tot, std::stri
 
         // Draw the run period on the plot
         // _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);
+        _util.Draw_ubooneSim(c, 0.33, 0.925, 0.33, 0.905);
 
         c->Print(Form("plots/run%s/Efficiency/TEff_%s_%s_combined.pdf", _util.run_period, _util.cut_dirs.at(p).c_str(), printname) );
         
@@ -2990,12 +2991,14 @@ void HistogramPlotter::MakePurityPlot(THStack *h_stack, TH1D *h_nue, TH1D* h_nue
     _util.IncreaseLabelSize(h_purity, c);
 
     if (histname == "h_reco_shower_energy_cali_rebin")
-        h_purity->SetTitle(";Measured Electron Energy [GeV]; Purity [\%]");
+        h_purity->SetTitle(";Reco. (anti-)lepton Energy [GeV]; Purity [\%]");
 
     if (histname == "h_reco_effective_cosangle_rebin"){
-        h_purity->SetTitle(";Measured Electron cos#beta; Purity [\%]");
+        h_purity->SetTitle(";Reco. (anti-)lepton cos#beta; Purity [\%]");
         h_purity->GetXaxis()->SetLabelSize(0.035);
     }
+
+    h_purity->GetXaxis()->CenterTitle();
 
     h_purity->Draw("hist");
     

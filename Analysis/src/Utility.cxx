@@ -1637,11 +1637,11 @@ void Utility::Save2DHists(const char *print_name, TH2D* hist, const char* draw_o
     delete c;
 }
 // -----------------------------------------------------------------------------
-void Utility::Save2DHistsBinIndex(const char *print_name, TH2D* hist, const char* draw_option) {
+void Utility::Save2DHistsBinIndex(const char *print_name, TH2D* hist, const char* draw_option, std::string type) {
 
 
     // Get make the 2D hist
-    TH2D* h_2D_index = new TH2D("h_2D", ";Bin i;Bin j",hist->GetNbinsX(), 0, hist->GetNbinsX(), hist->GetNbinsY(), 0, hist->GetNbinsY());
+    TH2D* h_2D_index = new TH2D("h_2D", ";Bin i;Bin j",hist->GetNbinsX(), 1, hist->GetNbinsX()+1, hist->GetNbinsY(), 1, hist->GetNbinsY()+1);
 
     // Set the bin values
     for (int x = 1; x < hist->GetNbinsY()+1; x++){
@@ -1650,6 +1650,29 @@ void Utility::Save2DHistsBinIndex(const char *print_name, TH2D* hist, const char
         }
     }
 
+    if (type== "cov"){
+        h_2D_index->GetZaxis()->SetTitle("Covariance");
+
+        if (std::string(xsec_var) =="elec_cang"){
+            h_2D_index->SetTitle("cos#beta_{e}");
+        }
+        else{
+            h_2D_index->SetTitle("E_{e}");
+        }
+
+    }
+    else {
+
+        if (std::string(xsec_var) =="elec_cang"){
+            h_2D_index->SetTitle("cos#beta_{e} A_{c}");
+        }
+        else{
+            h_2D_index->SetTitle("E_{e} A_{c}");
+        }
+        
+    }
+
+    gStyle->SetTitleH(0.07);
     TCanvas * c = new TCanvas(Form("c_%s", print_name), "c", 500, 500);
     c->SetTopMargin(0.11);
     gStyle->SetPaintTextFormat("4.2f");
@@ -1660,11 +1683,14 @@ void Utility::Save2DHistsBinIndex(const char *print_name, TH2D* hist, const char
     h_2D_index->SetMarkerColor(kRed+2);
     h_2D_index->Draw(draw_option);
     h_2D_index->Draw("colz,text00");
-    Draw_Run_Period(c, 0.82, 0.915, 0.82, 0.915);
+    // Draw_Run_Period(c, 0.82, 0.915, 0.82, 0.915);
     h_2D_index->GetXaxis()->CenterLabels(kTRUE);
     h_2D_index->GetYaxis()->CenterLabels(kTRUE);
     h_2D_index->GetXaxis()->SetNdivisions(h_2D_index->GetNbinsX(), 0, 0, kFALSE);
     h_2D_index->GetYaxis()->SetNdivisions(h_2D_index->GetNbinsY(), 0, 0, kFALSE);
+
+    Draw_ubooneSim(c, 0.33, 0.925, 0.33, 0.905);
+
     c->Print(print_name);
     
     delete h_2D_index;

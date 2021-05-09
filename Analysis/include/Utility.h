@@ -158,7 +158,7 @@ public:
     void Save2DHists(const char *print_name, TH2D* hist, const char* draw_option);
     // -------------------------------------------------------------------------
     // Convert 2D histogram to bin index and then save it to pdf
-    void Save2DHistsBinIndex(const char *print_name, TH2D* hist, const char* draw_option);
+    void Save2DHistsBinIndex(const char *print_name, TH2D* hist, const char* draw_option, std::string type);
     // -------------------------------------------------------------------------
     // Apply matrix to smear from true to reco space
     void MatrixMultiply(TH1D* h_true, TH1D* &h_reco, TH2D* matrix, std::string option, bool norm);

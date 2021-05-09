@@ -229,11 +229,11 @@ void WienerSVD::CompareModel(TH1D *sig){
     // Histograms to be printed to pdf
     _util.Save2DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_smear_%s.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), smear,    "colz");
     _util.Save2DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unfold_cov_%s.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov,   "colz");
-    _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_smear_%s_index.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), smear,    "colz");
-    _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unfold_cov_%s_index.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov,   "colz");
+    _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_smear_%s_index.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), smear,    "colz", "");
+    _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unfold_cov_%s_index.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov,   "colz", "cov");
 
     _util.Save2DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unfold_cov_%s_converted.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov_width,   "colz");
-    _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unfold_cov_%s_index_converted.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov_width,   "colz");
+    _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unfold_cov_%s_index_converted.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov_width,   "colz", "cov");
 
     _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_wiener_%s.pdf",    _util.run_period, _util.xsec_var ,_util.xsec_var), wiener,    "hist");
     _util.Save1DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unf_%s.pdf",       _util.run_period, _util.xsec_var ,_util.xsec_var), unf,       "hist");
