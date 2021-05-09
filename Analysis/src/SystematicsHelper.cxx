@@ -781,14 +781,14 @@ void SystematicsHelper::InitialiseReweightingMode(){
         // PlotReweightingModeUnisim("Decay_pipe_Bfield",  var, "Decay pipe Bfield" );
 
         // Detector Variations
-        PlotReweightingModeDetVar("LYRayleigh",                         var, k_LYRayleigh,                         var_string_pretty.at(k_LYRayleigh));
-        PlotReweightingModeDetVar("LYDown",                             var, k_LYDown,                             var_string_pretty.at(k_LYDown));
-        PlotReweightingModeDetVar("SCE",                                var, k_SCE,                                var_string_pretty.at(k_SCE));
-        PlotReweightingModeDetVar("Recomb2",                            var, k_Recomb2,                            var_string_pretty.at(k_Recomb2));
-        PlotReweightingModeDetVar("WireModX",                           var, k_WireModX,                           var_string_pretty.at(k_WireModX));
-        PlotReweightingModeDetVar("WireModYZ",                          var, k_WireModYZ,                          var_string_pretty.at(k_WireModYZ));
-        PlotReweightingModeDetVar("WireModThetaXZ",                     var, k_WireModThetaXZ,                     var_string_pretty.at(k_WireModThetaXZ));
-        PlotReweightingModeDetVar("WireModThetaYZ_withSigmaSplines",    var, k_WireModThetaYZ_withSigmaSplines,    var_string_pretty.at(k_WireModThetaYZ_withSigmaSplines));
+            PlotReweightingModeDetVar("LYRayleigh",                         var, k_LYRayleigh,                         var_string_pretty.at(k_LYRayleigh));
+            PlotReweightingModeDetVar("LYDown",                             var, k_LYDown,                             var_string_pretty.at(k_LYDown));
+            PlotReweightingModeDetVar("SCE",                                var, k_SCE,                                var_string_pretty.at(k_SCE));
+            PlotReweightingModeDetVar("Recomb2",                            var, k_Recomb2,                            var_string_pretty.at(k_Recomb2));
+            PlotReweightingModeDetVar("WireModX",                           var, k_WireModX,                           var_string_pretty.at(k_WireModX));
+            PlotReweightingModeDetVar("WireModYZ",                          var, k_WireModYZ,                          var_string_pretty.at(k_WireModYZ));
+            PlotReweightingModeDetVar("WireModThetaXZ",                     var, k_WireModThetaXZ,                     var_string_pretty.at(k_WireModThetaXZ));
+            PlotReweightingModeDetVar("WireModThetaYZ_withSigmaSplines",    var, k_WireModThetaYZ_withSigmaSplines,    var_string_pretty.at(k_WireModThetaYZ_withSigmaSplines));
         
         // PlotReweightingModeDetVar("LYAttenuation",                      var, k_LYAttenuation,                      var_string_pretty.at(k_LYAttenuation));
         // PlotReweightingModeDetVar("WireModThetaYZ_withoutSigmaSplines", var, k_WireModThetaYZ_withoutSigmaSplines, var_string_pretty.at(k_WireModThetaYZ_withoutSigmaSplines));
@@ -4208,51 +4208,50 @@ void SystematicsHelper::MakedEdxPaperPlot(){
     h_error_hist->Add(h_dirt, 1.0);
     h_error_hist->Add(h_ext, 1.0);
 
-
     // Genie Unisim
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "RPA", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "CCMEC", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "AxFFCCQE", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "VecFFCCQE", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "DecayAngMEC", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "ThetaDelta2Npi", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "ThetaDelta2NRad", "MC");
-    // AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "RPA_CCQE_Reduced", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "NormCCCOH", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "NormNCCOH", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "RPA", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "CCMEC", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "AxFFCCQE", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "VecFFCCQE", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "DecayAngMEC", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "ThetaDelta2Npi", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "ThetaDelta2NRad", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "NormCCCOH", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "NormNCCOH", "MC");
     
     // Beamline
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Horn1_x", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Horn_curr", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Horn1_y", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Beam_spot", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Horn2_x", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Horn2_y", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Horn_Water", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Beam_shift_x", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Beam_shift_y", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Target_z", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "Horn1_x", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "Horn_curr", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "Horn1_y", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "Beam_spot", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "Horn2_x", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "Horn2_y", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "Horn_Water", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "Beam_shift_x", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "Beam_shift_y", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "Target_z", "MC");
             
     // Other
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "weightsPPFX", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "weightsGenie", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "weightsReint", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "POT",  "Stack");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Dirt", "Dirt");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "weightsPPFX", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "weightsGenie", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "weightsReint", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "POT",  "Stack");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "Dirt", "Dirt");
 
     // Clone a histogram to plot the CV error as a grey band
     TH1D* h_error_hist_noDetvar = (TH1D*) h_error_hist->Clone("h_error_hist_nodetvar");
     h_error_hist_noDetvar->SetFillColorAlpha(kRed+2, 0.15);
 
     // Individual detector systematics
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "WireModX", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "WireModYZ", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "WireModThetaXZ", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "WireModThetaYZ_withoutSigmaSplines", "MC");
+
     // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "LYRayleigh", "MC");
     // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "SCE", "MC");
     // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Recomb2", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "WireModX", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "WireModYZ", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "WireModThetaXZ", "MC");
     // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "WireModThetaYZ_withSigmaSplines", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "WireModThetaYZ_withoutSigmaSplines", "MC");
     // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "WireModdEdX", "MC");
 
 
@@ -4312,6 +4311,7 @@ void SystematicsHelper::MakedEdxPaperPlot(){
     // drawing histograms
     for (unsigned int y=0; y < hist.size(); y++ ) {
     
+            hist.at(0)->GetXaxis()->SetRangeUser(0,7);
             hist.at(y)->Draw("hist, same");
             //if (y == k_CV) h_error_hist->Draw("E2, same");
     }
@@ -4328,9 +4328,12 @@ void SystematicsHelper::MakedEdxPaperPlot(){
         h_error_hist_ratio->SetBinError( bin , h_error_hist->GetBinError(bin)/h_error_hist->GetBinContent(bin) );
         h_error_hist_noDetvar_ratio->SetBinContent( bin , 1.0);
         h_error_hist_noDetvar_ratio->SetBinError( bin , h_error_hist_noDetvar->GetBinError(bin)/h_error_hist->GetBinContent(bin) );
+        
+        h_error_hist_data->SetBinContent( bin , h_error_hist_data->GetBinContent(bin)/h_error_hist->GetBinContent(bin) );
+        h_error_hist_data->SetBinError( bin , h_error_hist_data->GetBinError(bin)/h_error_hist->GetBinContent(bin) );
     }
 
-    h_error_hist_data->Divide(h_error_hist);
+    // h_error_hist_data->Divide(h_error_hist);
 
     // h_error_hist_ratio = (TH1D*) h_error_hist->Clone("h_error_hist_rat");
     // h_error_hist_ratio->Divide();
@@ -4359,8 +4362,8 @@ void SystematicsHelper::MakedEdxPaperPlot(){
     hist_ratio.at(0)->GetXaxis()->SetTitleOffset(3.2); // 3
     hist_ratio.at(0)->GetXaxis()->SetTitleSize(17); // 17
     hist_ratio.at(0)->GetXaxis()->SetTitleFont(46);
-    hist_ratio.at(0)->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
-    hist_ratio.at(0)->GetYaxis()->SetRangeUser(0, 2.0);
+    hist_ratio.at(0)->GetYaxis()->SetNdivisions(5, 0, 0, kFALSE);
+    hist_ratio.at(0)->GetYaxis()->SetRangeUser(0, 2.5);
     hist_ratio.at(0)->GetYaxis()->SetTitle("Ratio to MC");
     hist_ratio.at(0)->GetYaxis()->SetTitleSize(13); // 13
     hist_ratio.at(0)->GetYaxis()->SetTitleFont(44);
@@ -4368,6 +4371,7 @@ void SystematicsHelper::MakedEdxPaperPlot(){
     hist_ratio.at(0)->GetYaxis()->SetTitleOffset(2);
     hist_ratio.at(0)->SetTitle(" ");
     hist_ratio.at(0)->GetXaxis()->SetTitle(x_axis_name);
+    hist_ratio.at(0)->GetXaxis()->SetRangeUser(0,7);
 
     // Draw the ratios on the ratio pad
     for (unsigned int y=0; y < hist.size(); y++ ) {
@@ -4387,7 +4391,7 @@ void SystematicsHelper::MakedEdxPaperPlot(){
     //---------------------------------------------------------------
     // draw final canvas as pdf
 
-    c->Print("test.pdf"); 
+    c->Print("plots/WireModPaperPlot.pdf"); 
 
     // close the canvas to avoid warning messages on the terminal
     c->Close();  
