@@ -21,9 +21,6 @@ void UtilityPlotter::Initialise(Utility _utility){
         // leave this commented out, needs speccific files for this to run 
         // CompareDetVarEfficiency();
         
-        // Save the Response Matrix
-        SaveResponseMatrix();
-
         // Compare the efficiency in run 1 and run 3
         CompareEfficiency();
 
@@ -81,6 +78,7 @@ void UtilityPlotter::Initialise(Utility _utility){
     else if (std::string(_util.uplotmode) == "print"){
         PrintFluxValues();
         PrintXSecResults();
+        SaveResponseMatrix();
         return;
     }
     // This will call the code to optimise the bin widths
@@ -3244,7 +3242,7 @@ void UtilityPlotter::SaveResponseMatrix(){
     for (unsigned int m = 0; m < variables.size(); m++){
         
         // Get the response matrix
-        h_response_index.at(m) = new TH2D("h_response", ";True Bin i; Reconstructed Bin j", h_response.at(m)->GetNbinsX(), 1, h_response.at(m)->GetNbinsX()+1, h_response.at(m)->GetNbinsY(), 1, h_response.at(m)->GetNbinsY()+1);
+        h_response_index.at(m) = new TH2D("", ";True Bin i; Reconstructed Bin j", h_response.at(m)->GetNbinsX(), 1, h_response.at(m)->GetNbinsX()+1, h_response.at(m)->GetNbinsY(), 1, h_response.at(m)->GetNbinsY()+1);
     
         // Set the bin values
         for (int x = 1; x < h_response.at(m)->GetNbinsY()+1; x++){
@@ -3262,6 +3260,18 @@ void UtilityPlotter::SaveResponseMatrix(){
         if (variables.at(m) == "elec_cang"){
             h_response_index.at(m)->SetTitle("cos#beta_{e}");
         }
+
+        // Write the histograms to file
+        TFile *f_result = TFile::Open("files/xsec_result_run1_paper.root", "UPDATE");
+        
+        if (variables.at(m) == "elec_E"){
+            h_response_index.at(m)->Write("response_energy",TObject::kOverwrite);
+        }
+        if (variables.at(m) == "elec_cang"){
+            h_response_index.at(m)->Write("response_angle",TObject::kOverwrite);
+        }
+    
+        f_result->Close();
 
 
 
@@ -3294,8 +3304,25 @@ void UtilityPlotter::SaveResponseMatrix(){
     
     }
 
-
+    // MC XSec
+    TH1D* h_temp;
+    h_temp  = (TH1D*)fxsec->Get(Form("geniev3/%s/h_run1_CV_0_%s_mc_xsec", _util.vars.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));
+    TH1D* truexsec = (TH1D*)h_temp->Clone();
+    truexsec->Scale(1.0, "width");
+    truexsec->SetDirectory(0);
     fxsec->Close();
+
+    TFile *f_result = TFile::Open("files/xsec_result_run1_paper.root", "UPDATE");
+    if (std::string(_util.xsec_var) == "elec_E"){
+        truexsec->Write("mc_xsec_true_genie_v3_0_6_energy",TObject::kOverwrite);
+    }
+    else {
+        truexsec->Write("mc_xsec_true_genie_v3_0_6_angle",TObject::kOverwrite);
+    }
+    f_result->Close();
+
+
+   
 
 }
 // -----------------------------------------------------------------------------
@@ -5401,8 +5428,7 @@ void UtilityPlotter::PrintXSecResults(){
     // Convert the Covariance Matrix-- switching from not binwidth scaled to bin-width scaled
     _util.ConvertCovarianceUnits(h_cov_reco,
                         unf,
-                        unf_width);
-    
+                        unf_width);    
 
     // Load in the histograms for the efficeincy
     TFile *f_eff = TFile::Open(Form("files/nuexsec_mc_run%s.root", _util.run_period));
@@ -5468,7 +5494,23 @@ void UtilityPlotter::PrintXSecResults(){
 
     }
 
-
+    // Write the histograms to file
+    TFile *f_result = TFile::Open("files/xsec_result_run1_paper.root", "UPDATE");
+    
+    if (std::string(_util.xsec_var) == "elec_E"){
+        h_cov_reco->Write("unf_cov_energy",TObject::kOverwrite);
+        h_ac->Write("ac_energy",TObject::kOverwrite);
+        unf_width->Write("unf_data_xsec_energy",TObject::kOverwrite);
+        // truexsec->Write("mc_xsec_true_genie_v3_0_6_energy",TObject::kOverwrite);
+    }
+    else {
+        h_cov_reco->Write("unf_cov_angle",TObject::kOverwrite);
+        h_ac->Write("ac_angle",TObject::kOverwrite);
+        unf_width->Write("unf_data_xsec_angle",TObject::kOverwrite);
+        // truexsec->Write("mc_xsec_true_genie_v3_0_6_angle",TObject::kOverwrite);
+    }
+    
+    f_result->Close();
 
 }
 // -----------------------------------------------------------------------------
@@ -5505,6 +5547,12 @@ void UtilityPlotter::PrintFluxValues(){
 
     std::cout <<"\n\n\n" << std::endl;
 
+    // Write the histograms to file
+    TFile *f_result = TFile::Open("files/xsec_result_run1_paper.root", "UPDATE");
+    h_nue->Write("nue_flux",TObject::kOverwrite);
+    h_nuebar->Write("nuebar_flux",TObject::kOverwrite);
+    f_result->Close();
+
 
     // Make a plot of the nue to nuebar fluxes
     gStyle->SetOptStat(0);
@@ -5528,6 +5576,7 @@ void UtilityPlotter::PrintFluxValues(){
     _util.Draw_ubooneSim(c, 0.33, 0.925, 0.33, 0.925);
 
     c->Print("plots/nue_fhc_flux_ratio.pdf");
+
 
 
 
