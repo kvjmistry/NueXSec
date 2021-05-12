@@ -1024,6 +1024,39 @@ void SliceContainer::SetNuMIAngularVariables(){
     // The angle of the reconstructed shower relative to the NuMI target to detector direction
     shr_ang_numi = _util.GetNuMIAngle(shr_px, shr_py, shr_pz, "target");
 
+
+    // Try to calculate "NuMI Phi" which I am going to call gamma
+    TVector3 v_tu_unit = -1*v_targ_uboone.Unit(); // Unit vector from target to uboone origin 
+    double rthetax = std::atan( v_tu_unit.X()/v_tu_unit.Z()); // angle to rotate in z-x plane
+    double rthetay = std::atan( v_tu_unit.Y()/v_tu_unit.Z()); // angle to rotate in z-y plane
+
+    // // First do a rotation in the z-x plane
+    double shr_pz_rx =  shr_pz*std::cos(rthetax) + shr_px*std::sin(rthetax);
+    double shr_px_rx = -shr_pz*std::sin(rthetax) + shr_px*std::cos(rthetax);
+
+    // Now do a rotation in the z-y plane
+    double shr_pz_rx_ry =  shr_pz_rx*std::cos(rthetay) + shr_py*std::sin(rthetay);
+    double shr_py_ry    = -shr_pz_rx*std::sin(rthetay) + shr_py*std::cos(rthetay);
+
+    TVector3 numi_phi(shr_px_rx, shr_py_ry, shr_pz_rx_ry);
+    shr_gamma = numi_phi.Phi() * 180/3.14159;
+
+    // Try to calculate "True NuMI Phi" which I am going to call gamma
+    TVector3 v_tu_unit_true = nu_dir.Unit(); // Unit vector from target to uboone origin 
+    rthetax = std::atan( v_tu_unit_true.X()/v_tu_unit_true.Z());
+    rthetay = std::atan( v_tu_unit_true.Y()/v_tu_unit_true.Z());
+
+    // First do a rotation in the z-x plane
+    double elec_pz_rx =  elec_pz*std::cos(rthetax) + elec_px*std::sin(rthetax);
+    double elec_px_rx = -elec_pz*std::sin(rthetax) + elec_px*std::cos(rthetax);
+
+    // Now do a rotation in the z-y plane
+    double elec_pz_rx_ry =  elec_pz_rx*std::cos(rthetay) + elec_py*std::sin(rthetay);
+    double elec_py_ry    = -elec_pz_rx*std::sin(rthetay) + elec_py*std::cos(rthetay);
+
+    TVector3 true_numi_phi(elec_px_rx, elec_py_ry, elec_pz_rx_ry);
+    elec_gamma = true_numi_phi.Phi() * 180/3.14159;
+
 }
 // -----------------------------------------------------------------------------
 void SliceContainer::CalibrateShowerEnergy(){

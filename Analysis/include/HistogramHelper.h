@@ -124,6 +124,7 @@ class HistogramHelper{
         k_reco_n_track_contained,                                               // Number of Tracks Contained
         k_reco_n_shower_contained,                                              // Number of Showers Contained
         k_reco_leading_shower_phi,                                              // Leading shower phi
+        k_reco_shower_gamma,                                                    // Leading shower NuMI phi
         k_reco_leading_shower_theta,                                            // Leading shower theta
         k_reco_leading_shower_cos_theta,                                        // Leading shower cos theta
         k_reco_shower_multiplicity,                                             // Leading shower multiplicity
@@ -263,6 +264,7 @@ class HistogramHelper{
         k_true_elec_E,        // True energy of electron
         k_true_elec_theta,    // True theta of electron in BNB coordinates
         k_true_elec_phi,      // True phi of electron in BNB coordinates
+        k_true_elec_gamma,    // True phi of electron in NuMI coordinates
         k_true_nu_ang_targ,   // True angle of electron shower wrt target
         k_reco_true_ang,      // Angle between the reco and true neutrino angle
         k_TH1D_true_MAX

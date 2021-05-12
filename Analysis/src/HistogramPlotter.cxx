@@ -210,6 +210,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
             Save1DHists(Form("plots/run%s/Truth/true_elec_phi_%s.pdf",   _util.run_period, cut_type.c_str()),     "h_true_elec_phi", cut_type, true);
             Save1DHists(Form("plots/run%s/Truth/true_elec_theta_%s.pdf", _util.run_period, cut_type.c_str()),     "h_true_elec_theta", cut_type, true);
             Save1DHists(Form("plots/run%s/Truth/reco_true_nu_ang_%s.pdf", _util.run_period, cut_type.c_str()),     "h_reco_true_ang", cut_type, true);
+            Save1DHists(Form("plots/run%s/Truth/true_elec_gamma_%s.pdf",   _util.run_period, cut_type.c_str()),     "h_true_elec_gamma", cut_type, true);
 
             // Make the 2D histograms
             Save2DHists(Form("plots/run%s/Truth/h_true_nue_phi_theta_%s.pdf",                _util.run_period, cut_type.c_str()), "h_true_nue_phi_theta", cut_type, false);
@@ -1299,6 +1300,11 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
     MakeStack("h_reco_leading_shower_theta", _util.cut_dirs.at(cut_index).c_str(),
               area_norm, false, 1.5, "Leading Shower Theta [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_leading_shower_theta.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
+
+    // Leading shower phi
+    MakeStack("h_reco_shower_gamma", _util.cut_dirs.at(cut_index).c_str(),
+              area_norm, false, 1.8, "Leading Shower NuMI Phi [deg]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              Form("cuts/%s/reco_leading_shower_numi_phi.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
     // Leading shower cos theta
     MakeStack("h_reco_leading_shower_cos_theta", _util.cut_dirs.at(cut_index).c_str(),
@@ -2719,6 +2725,7 @@ void HistogramPlotter::Save1DHists(const char *print_name, const char *histname,
     // gPad->SetLogy();
 
     hist->SetStats(kFALSE);
+    hist->SetMinimum(0);
 
     hist->SetLineColor(kBlack);
     hist->SetFillColorAlpha(kAzure - 6, 0.3);

@@ -334,6 +334,7 @@ public:
     float true_nu_py;            // True Neutrino Py
     float true_nu_pz;            // True Neutrino Pz
     double true_effective_angle; // True angle between electron and neutrino vectors
+    double shr_gamma;            // Phi equivalent in NuMI
     
     float reco_nu_vtx_x;         // Reco Neutrino Vtx x
     float reco_nu_vtx_y;         // Reco Neutrino Vtx y
@@ -362,6 +363,7 @@ public:
     float elec_theta; // True electron theta
     float elec_phi;  // True electron phi
     double elec_ang_targ; // True electron angle wrt numi target to uboone vector
+    double elec_gamma; // true electron NuMI phi
 
     int   npi0;     // Truth Number of Pi0
     float pi0_e;    // Truth Pi0 Energy

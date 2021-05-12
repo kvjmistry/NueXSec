@@ -229,6 +229,9 @@ void HistogramHelper::InitHistograms(){
             // Leading shower phi
             TH1D_hists.at(k_reco_leading_shower_phi).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_phi_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 14, -190, 190);
 
+            // Leading shower gamma
+            TH1D_hists.at(k_reco_shower_gamma).at(i).at(j) = new TH1D ( Form("h_reco_shower_gamma_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 14, -180, 180);
+
             // Leading shower theta
             TH1D_hists.at(k_reco_leading_shower_theta).at(i).at(j) = new TH1D ( Form("h_reco_leading_shower_theta_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 13, 0, 190);
 
@@ -521,6 +524,7 @@ void HistogramHelper::InitHistograms(){
             TH1D_true_hists.at(i).at(k_true_elec_E)      = new TH1D( Form("h_true_elec_E_%s_%s",      _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries",                15, 0, 5 );
             TH1D_true_hists.at(i).at(k_true_elec_theta)  = new TH1D( Form("h_true_elec_theta_%s_%s",  _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e#lower[-0.5]{-} + e^{+} #theta [deg]; Entries",            14, 0, 180 );
             TH1D_true_hists.at(i).at(k_true_elec_phi)    = new TH1D( Form("h_true_elec_phi_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e#lower[-0.5]{-} + e^{+} #phi [deg]; Entries",              25, -180, 180);
+            TH1D_true_hists.at(i).at(k_true_elec_gamma)  = new TH1D( Form("h_true_elec_gamma_%s_%s",   _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e#lower[-0.5]{-} + e^{+} NuMI #Phi [deg]; Entries",        10, -180, 180);
 
             TH1D_true_hists.at(i).at(k_reco_true_ang)    = new TH1D( Form("h_reco_true_ang_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), "; Angle (Reco to True) Nu Dir [deg]; Entries",              25, -2, 20);
 
@@ -760,6 +764,8 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
     TH1D_hists.at(k_reco_n_shower_contained).at(cut_index).at(classification_index)->Fill(SC.n_showers_contained, weight);
     
     TH1D_hists.at(k_reco_leading_shower_phi).at(cut_index).at(classification_index)->Fill(SC.shr_phi * 180/3.14159, weight);
+
+    TH1D_hists.at(k_reco_shower_gamma).at(cut_index).at(classification_index)->Fill(SC.shr_gamma, weight);
     
     TH1D_hists.at(k_reco_leading_shower_theta).at(cut_index).at(classification_index)->Fill(SC.shr_theta * 180/3.14159, weight);
     
@@ -962,6 +968,7 @@ void HistogramHelper::FillHists(int type, int classification_index, std::string 
             TH1D_true_hists.at(index).at(k_true_elec_E)          ->Fill(SC.elec_e, weight);
             TH1D_true_hists.at(index).at(k_true_elec_theta)      ->Fill(SC.elec_theta, weight);
             TH1D_true_hists.at(index).at(k_true_elec_phi)        ->Fill(SC.elec_phi, weight);
+            TH1D_true_hists.at(index).at(k_true_elec_gamma)      ->Fill(SC.elec_gamma, weight);
             TH1D_true_hists.at(index).at(k_reco_true_ang)        ->Fill(SC.reco_true_nu_ang, weight);
             TH2D_true_hists.at(index).at(k_true_nue_phi_theta)   ->Fill(SC.nu_phi, SC.nu_theta, weight);
             TH2D_true_hists.at(index).at(k_true_nue_energy_theta)->Fill(SC.nu_e, SC.nu_theta, weight);
