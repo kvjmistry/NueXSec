@@ -2202,6 +2202,11 @@ void UtilityPlotter::CompareFakeDataReco(){
                                h_temp_CV,
                                h_fake.at(m));
 
+        // Add the fake data stat error to the diagonals
+        for (int i=1; i<h_cov_m.at(m)->GetYaxis()->GetNbins()+2; i++){
+            h_cov_m.at(m)->SetBinContent(i,i, h_cov_m.at(m)->GetBinContent(i, i) + h_fake.at(m)->GetBinError(i)*h_fake.at(m)->GetBinError(i)  );
+        }
+
         // Now set the bin errors
         for (int bin = 1; bin <  h_fake.at(m)->GetNbinsX()+1; bin++ ){    
             h_fake.at(m)->SetBinError(bin, std::sqrt(h_cov_m.at(m)->GetBinContent(bin, bin)));
@@ -2215,11 +2220,16 @@ void UtilityPlotter::CompareFakeDataReco(){
 
     // Now lets plot
     TCanvas *c;
+    TPad *topPad;
+    TPad *bottomPad;
     
     // Loop over each model
     for (unsigned int m = 0; m < models.size(); m++){
     
         c = new TCanvas("c", "c", 500, 500);
+        topPad = new TPad("topPad", "", 0, 0.3, 1, 1.0);
+        bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
+        _util.SetTPadOptions(topPad, bottomPad);
         c->SetLeftMargin(0.2);
         c->SetBottomMargin(0.15);
         h_true_smear.at(m)->GetYaxis()->SetTitleOffset(1.7);
@@ -2235,6 +2245,8 @@ void UtilityPlotter::CompareFakeDataReco(){
         if (m == k_model_tune1)    h_true_smear.at(k_model_tune1)    ->SetLineColor(kOrange-1);
 
         h_true_smear.at(m)->SetTitle(_util.var_labels_xsec.at(k_var_recoX).c_str());
+        h_true_smear.at(m)->GetXaxis()->SetTitle(0);
+        h_true_smear.at(m)->GetXaxis()->SetLabelSize(0);
 
         TH1D* h_error_hist = (TH1D*)h_true_smear.at(m)->Clone();
         h_error_hist->SetFillColorAlpha(12, 0.15);
@@ -2259,6 +2271,25 @@ void UtilityPlotter::CompareFakeDataReco(){
         leg->AddEntry(h_error_hist, Form("True %s (stat.)", models.at(m).c_str()), "lf");
         leg->AddEntry(h_fake.at(m), Form("Fake %s (sys.)", models.at(m).c_str()), "elp");
         leg->Draw();
+
+        bottomPad->cd();
+        TH1D* h_ratio = (TH1D*)h_fake.at(m)->Clone();
+        h_ratio->Divide(h_error_hist);
+        h_ratio->Draw("PE");
+
+        h_ratio->GetXaxis()->SetLabelSize(0.13);
+        h_ratio->GetYaxis()->SetLabelSize(0.13);
+        h_ratio->GetXaxis()->SetTitleOffset(0.9);
+        h_ratio->GetXaxis()->SetTitleSize(0.13);
+        h_ratio->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
+        h_ratio->GetYaxis()->SetRangeUser(0, 2.0);
+        h_ratio->GetYaxis()->SetTitle("Fake / True");
+        h_ratio->GetYaxis()->SetTitleSize(13);
+        h_ratio->GetYaxis()->SetTitleFont(44);
+        h_ratio->GetYaxis()->CenterTitle();
+        h_ratio->GetYaxis()->SetTitleOffset(2.5);
+        h_ratio->SetTitle(" ");
+
 
         // Save and close
         c->Print(Form("plots/run%s/Models/%s/run%s_FakeDataComparison_%s_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var, models.at(m).c_str()));
@@ -2365,6 +2396,11 @@ void UtilityPlotter::CompareFakeDataTrue(){
                                h_reco_data_xsec,
                                h_fake.at(m));
 
+        // Add the fake data stat error to the diagonals
+        for (int i=1; i<h_cov_diag.at(m)->GetYaxis()->GetNbins()+2; i++){
+
+            h_cov_diag.at(m)->SetBinContent(i,i, h_cov_diag.at(m)->GetBinContent(i, i) + h_fake.at(m)->GetBinError(i)*h_fake.at(m)->GetBinError(i)  );
+        }
 
         // Initialise the WienerSVD class
         WienerSVD _wSVD;
@@ -2387,8 +2423,10 @@ void UtilityPlotter::CompareFakeDataTrue(){
         
         // Make the plot
         TCanvas *c = new TCanvas("c", "c", 500, 500);
-        // _util.IncreaseLabelSize( h_mcxsec_true_model_smear.at(k_model_CV), c);
-        gPad->SetLeftMargin(0.20);
+        TPad *topPad = new TPad("topPad", "", 0, 0.3, 1, 1.0);
+        TPad *bottomPad = new TPad("bottomPad", "", 0, 0.05, 1, 0.3);
+        _util.SetTPadOptions(topPad, bottomPad);
+        c->SetLeftMargin(0.2);
         c->SetBottomMargin(0.15);
 
 
@@ -2427,10 +2465,14 @@ void UtilityPlotter::CompareFakeDataTrue(){
         if (m == k_model_input)
             h_fake_xsec_smear_CV = (TH1D*)h_fake_xsec_smear->Clone();
 
-        TH1D* h_error_hist = (TH1D*)h_fake_xsec_smear->Clone();
-        h_error_hist->SetFillColorAlpha(12, 0.15);
 
         h_fake_xsec_smear->Draw("hist");
+        h_fake_xsec_smear->SetTitle(_util.var_labels_xsec.at(k_var_trueX).c_str());
+        h_fake_xsec_smear->GetXaxis()->SetTitle(0);
+        h_fake_xsec_smear->GetXaxis()->SetLabelSize(0);
+
+        TH1D* h_error_hist = (TH1D*)h_fake_xsec_smear->Clone();
+        h_error_hist->SetFillColorAlpha(12, 0.15);
 
         if (m != k_model_input)
             h_fake_xsec_smear_CV->Draw("hist,same");
@@ -2451,9 +2493,34 @@ void UtilityPlotter::CompareFakeDataTrue(){
         leg->AddEntry(_wSVD.unf, Form("Fake %s (sys.)", models.at(m).c_str()), "elp");
         leg->Draw();
 
+        bottomPad->cd();
+        TH1D* h_ratio = (TH1D*)_wSVD.unf->Clone();
+        h_ratio->Divide(h_error_hist);
+        h_ratio->Draw("PE");
+
+        h_ratio->SetTitle(_util.var_labels_xsec.at(k_var_trueX).c_str());
+
+        h_ratio->GetXaxis()->SetLabelSize(0.13);
+        h_ratio->GetYaxis()->SetLabelSize(0.13);
+        h_ratio->GetXaxis()->SetTitleOffset(0.9);
+        h_ratio->GetXaxis()->SetTitleSize(0.13);
+        h_ratio->GetYaxis()->SetNdivisions(4, 0, 0, kFALSE);
+        h_ratio->GetYaxis()->SetRangeUser(0, 2.0);
+        h_ratio->GetYaxis()->SetTitle("Fake / True");
+        h_ratio->GetYaxis()->SetTitleSize(13);
+        h_ratio->GetYaxis()->SetTitleFont(44);
+        h_ratio->GetYaxis()->CenterTitle();
+        h_ratio->GetYaxis()->SetTitleOffset(2.5);
+        h_ratio->SetTitle(" ");
+
         
         c->Print(Form("plots/run%s/Models/%s/run%s_UnfoldedFakeDataComparison_%s_%s.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var, models.at(m).c_str()));
         delete c;
+
+        // c  = new TCanvas("c", "c", 500, 500);
+        // _wSVD.smear->Draw("colz");
+        // c->Print(Form("plots/run%s/Models/%s/run%s_UnfoldedFakeDataComparison_%s_%s_smear.pdf", _util.run_period, _util.xsec_var, _util.run_period, _util.xsec_var, models.at(m).c_str()));
+        // delete c;
 
         delete _wSVD.smear;
         delete _wSVD.wiener;

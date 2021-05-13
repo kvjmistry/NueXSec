@@ -3874,6 +3874,7 @@ void SystematicsHelper::ExportResult(TFile* f){
         h_cov_xsec_sys_tot->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_genie_multi));
         h_cov_xsec_sys_tot->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_genie_uni));
         h_cov_xsec_sys_tot->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_pi0));
+        h_cov_xsec_sys_tot->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_mcstats));
         h_cov_xsec_sys_tot->SetOption("col");
         h_cov_xsec_sys_tot->Write("h_cov_xsec_sys_mcxsec_reco", TObject::kOverwrite);
 
@@ -3881,6 +3882,10 @@ void SystematicsHelper::ExportResult(TFile* f){
         TH2D* h_cov_flux_sys_tot = (TH2D*)h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_hp)->Clone();
         h_cov_flux_sys_tot->Add(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_beamline));
         h_cov_flux_sys_tot->SetOption("col");
+        h_cov_flux_sys_tot->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_hp));
+        h_cov_flux_sys_tot->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_beamline));
+        h_cov_flux_sys_tot->Add(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat));
+        h_cov_flux_sys_tot->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_mcstats));
         h_cov_flux_sys_tot->Write("h_cov_flux_sys_mcxsec_reco", TObject::kOverwrite);
 
         // MC XSec Genie All Covariance Matrix  ---------------------------------
@@ -3924,9 +3929,9 @@ void SystematicsHelper::ExportResult(TFile* f){
         TH2D* h_smear = (TH2D*)h_response->Clone();
 
         // Loop over rows
-        for (int row=0; row<h_response->GetXaxis()->GetNbins()+2; row++) {
+        for (int row=1; row<h_response->GetXaxis()->GetNbins()+1; row++) {
 
-            for (int col=0; col<h_response->GetYaxis()->GetNbins()+2; col++){
+            for (int col=1; col<h_response->GetYaxis()->GetNbins()+1; col++){
                 h_smear->SetBinContent(col, row, h_response->GetBinContent(row, col));          
             }
         } 
@@ -3966,6 +3971,7 @@ void SystematicsHelper::ExportResult(TFile* f){
         h_cov_xsec_sys_tot_temp->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_genie_multi));
         h_cov_xsec_sys_tot_temp->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_genie_uni));
         h_cov_xsec_sys_tot_temp->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_pi0));
+        h_cov_xsec_sys_tot_temp->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_mcstats));
 
         // Convert the Covariance Matrix-- switching from MC CV deviations to Data CV deviation
         _util.ConvertCovarianceUnits(h_cov_xsec_sys_tot_temp,
@@ -3984,6 +3990,7 @@ void SystematicsHelper::ExportResult(TFile* f){
         TH2D* h_cov_flux_sys_tot_temp = (TH2D*)h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat)->Clone();
         h_cov_flux_sys_tot_temp->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_hp));
         h_cov_flux_sys_tot_temp->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_beamline));
+        h_cov_flux_sys_tot_temp->Add(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_smear).at(k_err_mcstats));
 
         // Convert the Covariance Matrix-- switching from MC CV deviations to Data CV deviation
         _util.ConvertCovarianceUnits(h_cov_flux_sys_tot_temp,
