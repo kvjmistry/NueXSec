@@ -59,6 +59,8 @@ double GetNuMIAngle(double px, double py, double pz, std::string direction){
 
 void plot_ang_baseline(){
 
+    gStyle->SetOptStat(0);
+
 
     TFile *f = TFile::Open("~/Desktop/neutrinoselection_filt_run1_overlay_intrinsic.root", "READ");
 
@@ -75,7 +77,7 @@ void plot_ang_baseline(){
     int  tree_total_entries = t->GetEntries();
 
     TH2D* h_baseline = new TH2D("h_baseline", ";Baseline [m]; Angle [deg]", 100, 50, 710, 100, 0, 180);
-    TH2D* h_zpos = new TH2D("h_zpos", ";z pos Beamline [m]; Angle [deg]", 100, 0, 1000, 180, 0, 180);
+    TH2D* h_zpos = new TH2D("h_zpos", ";Decay z Position in Beamline [m]; Neutrino Angle [deg]", 40, 0, 800, 65, 0, 130);
 
     // Event loop
     for (int ievent = 0; ievent < tree_total_entries; ievent++){
@@ -97,7 +99,12 @@ void plot_ang_baseline(){
     h_baseline->Draw("colz");
 
     TCanvas *c2 = new TCanvas("", "", 500, 500);
+    c2->SetLeftMargin(0.13);
+    c2->SetRightMargin(0.15);
+    c2->SetGrid();
     h_zpos->Draw("colz");
+    c2->Print("Neutrino_Angle_Decay_Z.pdf");
+    
 
     std::cout << 100* h_zpos->Integral(0, h_zpos->GetNbinsX()+1, 7, 12)/ h_zpos->Integral() << std::endl;
 

@@ -617,8 +617,27 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
      
 
     // Draw the Query -- adjust by query type
-    if      (x_var == "res_reco") tree->Draw(Form("(%s - %s) / %s >> htemp", reco_var.c_str(), true_var.c_str(), reco_var.c_str()), query);
-    else if (x_var == "res_true") tree->Draw(Form("(%s - %s) / %s >> htemp", reco_var.c_str(), true_var.c_str(), true_var.c_str()), query);
+    if (x_var == "res_reco"){
+        
+        // Cosines done make sense with the ratio
+        if (true_var == "cos_true_effective_angle"){
+            tree->Draw(Form("(%s - %s) >> htemp", reco_var.c_str(), true_var.c_str()), query);
+        }
+        else {
+            tree->Draw(Form("(%s - %s) / %s >> htemp", reco_var.c_str(), true_var.c_str(), reco_var.c_str()), query);
+        }
+    } 
+    else if (x_var == "res_true"){
+        
+        // Cosines done make sense with the ratio
+        if (true_var == "cos_true_effective_angle"){
+            tree->Draw(Form("(%s - %s) >> htemp", reco_var.c_str(), true_var.c_str()), query);
+        }
+        else {
+            tree->Draw(Form("(%s - %s) / %s >> htemp", reco_var.c_str(), true_var.c_str(), true_var.c_str()), query);
+        }   
+        
+    }
     else if (x_var == "purity") tree->Draw("shr_bkt_purity >> htemp", query);
     else if (x_var == "completeness") tree->Draw("shr_bkt_completeness >> htemp", query);
     else {
@@ -639,7 +658,7 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     if (true_var == "true_effective_angle"){
         range  = new TLatex(0.65,0.91, Form("Reco #beta %0.2f - %0.2f deg",bin_lower_edge, bin_upper_edge ));
     }
-     if (true_var == "cos_true_effective_angle"){
+    if (true_var == "cos_true_effective_angle"){
         range  = new TLatex(0.65,0.91, Form("Reco cos#beta %0.2f - %0.2f",bin_lower_edge, bin_upper_edge ));
     }
 
@@ -662,7 +681,15 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     text_rms->Draw();
 
     if (x_var == "res_reco")          htemp->SetTitle("; Reco - True / Reco; Entries");
-    else if (x_var == "res_true")     htemp->SetTitle("; Reco - True / True; Entries");
+    else if (x_var == "res_true"){
+        if (true_var == "cos_true_effective_angle"){
+            htemp->SetTitle("; Reco - True; Entries");
+        }
+        else {
+            htemp->SetTitle("; Reco - True / True; Entries");
+        }
+        
+    }
     else if (x_var == "purity")       htemp->SetTitle("; Reco Shower Purity; Entries");
     else if (x_var == "completeness") htemp->SetTitle("; Reco Shower Completeness; Entries");
     else {
@@ -686,9 +713,6 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
         }
         if (true_var == "true_effective_angle"){
             c->Print(Form("plots/run%s/Resolution/%s/resolution_%0.1fdeg_to_%0.1fdeg_reco.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
-        }
-        if (true_var == "cos_true_effective_angle"){
-            c->Print(Form("plots/run%s/Resolution/%s/resolution_%0.2f_to_%0.2f_reco.pdf", _util.run_period, _util.xsec_var, bin_lower_edge, bin_upper_edge ));
         }
     }
     else if (x_var == "res_true"){
