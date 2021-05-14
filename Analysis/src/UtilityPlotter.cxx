@@ -2961,6 +2961,14 @@ void UtilityPlotter::CompareDataCrossSections(){
     
     delete c;
 
+    // Calculate NuWro Data Xsec Chi-Squared
+    double chi, pval;
+    int ndof;
+    std::cout <<"Nuwro Data Chi-Squared Test" << std::endl;
+    std::vector<int> indexes = {4,5};
+    _util.CalcChiSquaredRemove(h_dataxsec_model.at(k_model_nuwro), h_dataxsec, h_cov_reco, chi, ndof,pval, indexes);
+    _util.CalcChiSquared(h_dataxsec_model.at(k_model_nuwro), h_dataxsec, h_cov_reco, chi, ndof,pval);
+
     fxsec->Close();
 
 }

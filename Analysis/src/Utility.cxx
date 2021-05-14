@@ -1471,6 +1471,68 @@ void Utility::CalcChiSquaredNoCorr(TH1D* h_model, TH1D* h_data, TH2D* cov, doubl
 
 }
 // -----------------------------------------------------------------------------
+void Utility::CalcChiSquaredRemove(TH1D* h_model, TH1D* h_data, TH2D* cov, double &chi, int &ndof, double &pval, std::vector<int> indexes){
+
+    // Clone them so we can scale them 
+    TH1D* h_model_clone = (TH1D*)h_model->Clone();
+    TH1D* h_data_clone  = (TH1D*)h_data->Clone();
+    TH2D* h_cov_clone   = (TH2D*)cov->Clone();
+
+    // Getting covariance matrix in TMatrix form
+    TMatrix cov_m;
+    cov_m.Clear();
+    cov_m.ResizeTo(h_cov_clone->GetNbinsX(), h_cov_clone->GetNbinsX());
+
+    // loop over rows
+    for (int i = 0; i < h_cov_clone->GetNbinsX(); i++) {
+        // loop over columns
+        for (int j = 0; j < h_cov_clone->GetNbinsY(); j++) {
+            cov_m[i][j] = h_cov_clone->GetBinContent(i+1, j+1);
+        }
+    
+    }
+
+    // Inverting the covariance matrix
+    TMatrix inverse_cov_m = cov_m.Invert();
+
+    // Calculating the chi2 = Summation_ij{ (x_i - mu_j)*E_ij^(-1)*(x_j - mu_j)  }
+    // x = data, mu = model, E^(-1) = inverted covariance matrix 
+    chi = 0;
+    for (int i = 0; i < h_cov_clone->GetNbinsX(); i++) {
+
+        bool flag_index_i = false, flag_index_j = false;
+
+        // loop over the indexes, if index i matches then continue
+        for (unsigned int index = 0; index < indexes.size(); index++){
+            if (indexes.at(index) == i+1) flag_index_i = true;
+        }
+        if (flag_index_i) continue;
+
+        for (int j = 0; j < h_cov_clone->GetNbinsY(); j++) {
+
+            // loop over the indexes, if index i matches then continue
+            for (unsigned int index = 0; index < indexes.size(); index++){
+                if (indexes.at(index) == j+1) flag_index_j = true;
+            }
+            if (flag_index_j) continue;
+
+            // Add the chi-square
+            chi += (h_data_clone->GetBinContent(i+1) - h_model_clone->GetBinContent(i+1)) * inverse_cov_m[i][j] * (h_data_clone->GetBinContent(j+1) - h_model_clone->GetBinContent(j+1));
+        }
+    }
+
+    ndof = h_data_clone->GetNbinsX() - indexes.size();
+    pval = TMath::Prob(chi, ndof);
+
+    std::cout << blue << "Chi2/dof: " << chi << "/" << ndof << " = " << chi/double(ndof)  << reset <<  std::endl;
+    std::cout << red << "p-value: " <<  pval << reset << "\n" <<  std::endl;
+
+    delete h_model_clone;
+    delete h_data_clone;
+    delete h_cov_clone;
+
+}
+// -----------------------------------------------------------------------------
 void Utility::SetAxesNames(){
 
     // Electron/Shower Energy

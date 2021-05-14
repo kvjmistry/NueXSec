@@ -524,7 +524,7 @@ void HistogramHelper::InitHistograms(){
             TH1D_true_hists.at(i).at(k_true_elec_E)      = new TH1D( Form("h_true_elec_E_%s_%s",      _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e#lower[-0.5]{-} + e^{+} Energy [GeV]; Entries",                15, 0, 5 );
             TH1D_true_hists.at(i).at(k_true_elec_theta)  = new TH1D( Form("h_true_elec_theta_%s_%s",  _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e#lower[-0.5]{-} + e^{+} #theta [deg]; Entries",            14, 0, 180 );
             TH1D_true_hists.at(i).at(k_true_elec_phi)    = new TH1D( Form("h_true_elec_phi_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e#lower[-0.5]{-} + e^{+} #phi [deg]; Entries",              25, -180, 180);
-            TH1D_true_hists.at(i).at(k_true_elec_gamma)  = new TH1D( Form("h_true_elec_gamma_%s_%s",   _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e#lower[-0.5]{-} + e^{+} NuMI #Phi [deg]; Entries",        10, -180, 180);
+            TH1D_true_hists.at(i).at(k_true_elec_gamma)  = new TH1D( Form("h_true_elec_gamma_%s_%s",   _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), ";True e#lower[-0.5]{-} + e^{+} NuMI #Phi [deg]; Entries",        18, -180, 180);
 
             TH1D_true_hists.at(i).at(k_reco_true_ang)    = new TH1D( Form("h_reco_true_ang_%s_%s",    _util.type_prefix.at(_type).c_str(), cut_stage.c_str() ), "; Angle (Reco to True) Nu Dir [deg]; Entries",              25, -2, 20);
 

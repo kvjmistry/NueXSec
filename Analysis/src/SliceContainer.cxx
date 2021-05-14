@@ -1027,8 +1027,8 @@ void SliceContainer::SetNuMIAngularVariables(){
 
     // Try to calculate "NuMI Phi" which I am going to call gamma
     TVector3 v_tu_unit = -1*v_targ_uboone.Unit(); // Unit vector from target to uboone origin 
-    double rthetax = std::atan( v_tu_unit.X()/v_tu_unit.Z()); // angle to rotate in z-x plane
-    double rthetay = std::atan( v_tu_unit.Y()/v_tu_unit.Z()); // angle to rotate in z-y plane
+    double rthetax = std::atan2( v_tu_unit.X(),v_tu_unit.Z()); // angle to rotate in z-x plane
+    double rthetay = std::atan2( v_tu_unit.Y(),v_tu_unit.Z()); // angle to rotate in z-y plane
 
     // // First do a rotation in the z-x plane
     double shr_pz_rx =  shr_pz*std::cos(rthetax) + shr_px*std::sin(rthetax);
@@ -1042,9 +1042,9 @@ void SliceContainer::SetNuMIAngularVariables(){
     shr_gamma = numi_phi.Phi() * 180/3.14159;
 
     // Try to calculate "True NuMI Phi" which I am going to call gamma
-    TVector3 v_tu_unit_true = nu_dir.Unit(); // Unit vector from target to uboone origin 
-    rthetax = std::atan( v_tu_unit_true.X()/v_tu_unit_true.Z());
-    rthetay = std::atan( v_tu_unit_true.Y()/v_tu_unit_true.Z());
+    TVector3 v_tu_unit_true = nu_dir.Unit(); // Unit vector of neutrino direction
+    rthetax = std::atan2( v_tu_unit_true.X(), v_tu_unit_true.Z());
+    rthetay = std::atan2( v_tu_unit_true.Y(), v_tu_unit_true.Z());
 
     // First do a rotation in the z-x plane
     double elec_pz_rx =  elec_pz*std::cos(rthetax) + elec_px*std::sin(rthetax);

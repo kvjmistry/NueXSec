@@ -145,6 +145,9 @@ public:
     // Calculate a chi squared using a covarinace matrix, for a model to data with no correlations between bins
     void CalcChiSquaredNoCorr(TH1D* h_model, TH1D* h_data, TH2D* cov, double &chi, int &ndof, double &pval);
     // -------------------------------------------------------------------------
+    // Calculate the chi-quared with a list of bin indexes to remove
+    void CalcChiSquaredRemove(TH1D* h_model, TH1D* h_data, TH2D* cov, double &chi, int &ndof, double &pval, std::vector<int> indexes);
+    // -------------------------------------------------------------------------
     // Set the axes names of the cross section plots
     void SetAxesNames();
     // -------------------------------------------------------------------------
