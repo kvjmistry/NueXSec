@@ -703,7 +703,9 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     
     
     // Draw the run period on the plot
-    _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
+    // _util.Draw_Run_Period(c, 0.86, 0.915, 0.86, 0.915);
+    // _util.Draw_ubooneSim(c, 0.337, 0.955, 0.337, 0.935);
+    // _util.Draw_ubooneSim(c, 0.437, 0.955, 0.437, 0.935);
     
 
     // Save it 
