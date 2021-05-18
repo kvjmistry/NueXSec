@@ -2330,8 +2330,8 @@ void HistogramPlotter::MakeEfficiencyPlotByCutTot(std::string var_tot, std::stri
         h_clone_tot->SetStats(kFALSE);
         h_clone_nue->SetLineColor(kBlue+2);
         h_clone_nuebar->SetLineColor(kRed+2);
-        h_clone_nue->SetLineWidth(2);
-        h_clone_nuebar->SetLineWidth(2);
+        h_clone_nue->SetLineWidth(3);
+        h_clone_nuebar->SetLineWidth(3);
         h_clone_tot->SetTitle(Form("%s;%s", _util.cut_dirs_pretty.at(p).c_str(), pri_ax_name));
         
         // Get rid of the ticks and the axes labels for single bin
@@ -2343,7 +2343,7 @@ void HistogramPlotter::MakeEfficiencyPlotByCutTot(std::string var_tot, std::stri
         h_clone_tot->GetXaxis()->CenterTitle();
         h_clone_tot->GetYaxis()->SetRangeUser(0, 0.4);
         h_clone_tot->SetLineColor(kBlack);
-        h_clone_tot->SetLineWidth(2);
+        h_clone_tot->SetLineWidth(3);
         _util.IncreaseLabelSize(h_clone_tot, c);
         c->SetLeftMargin(0.17);
         if (mask_title) h_clone_tot->SetTitle("");
@@ -2366,6 +2366,43 @@ void HistogramPlotter::MakeEfficiencyPlotByCutTot(std::string var_tot, std::stri
         leg->AddEntry(h_clone_nuebar, leg_nuebar.c_str(), "l");  
 
         leg->Draw();
+
+        TH1D* h_nue_clone = (TH1D*) hist_nue.at(p)->Clone();
+        TH1D* h_nuebar_clone = (TH1D*) hist_nuebar.at(p)->Clone();
+        
+        found = std::string(printname).find("rebin"); // Look for "multi" in the name
+        if (found!=std::string::npos){
+            h_nue_clone->Scale(1.0, "width");
+            h_nuebar_clone->Scale(1.0, "width");
+        }
+
+        
+        h_nue_clone->SetLineWidth(2);
+        h_nue_clone->SetLineStyle(2);
+
+        
+        h_nuebar_clone->SetLineWidth(2);
+        h_nuebar_clone->SetLineStyle(2);
+        h_nuebar_clone->SetLineColor(kRed+2);
+        
+        found = std::string(printname).find("elec_E"); // Look for "elec_E" in the name
+
+        if (found!=std::string::npos){
+            h_nue_clone->Scale(0.30 / (h_nue_clone->GetMaximum()));
+            h_nuebar_clone->Scale(h_nue_clone->Integral() / (h_nuebar_clone->Integral()));
+        }
+        
+        found = std::string(printname).find("cosine"); // Look for "cosine" in the name
+
+        if (found!=std::string::npos){
+            
+            h_nuebar_clone->Scale(0.28 / (h_nuebar_clone->GetMaximum()));
+            h_nue_clone->Scale(h_nuebar_clone->Integral() / (h_nue_clone->Integral()));
+        }
+        
+        h_nue_clone->Draw("hist,same");
+
+        h_nuebar_clone->Draw("hist,same");
 
         // Draw the run period on the plot
         // _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);

@@ -826,7 +826,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     c->SetLogy();
     
     // Nue flux
-    h_nue->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu}_{e} / cm^{2} / 5 MeV / 2.0 #times 10^{20} POT");
+    h_nue->SetTitle(";Electron Neutrino Energy [GeV];(#nu_{e}/#bar{#nu}_{e}) / cm^{2} / 5 MeV / 2.0 #times 10^{20} POT");
     h_nue->GetXaxis()->CenterTitle();
     h_nue->GetYaxis()->CenterTitle();
 
@@ -836,7 +836,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     h_nue->GetYaxis()->SetLabelSize(0.04);
     h_nue->GetYaxis()->SetTitleSize(0.04);
 
-    h_nue->GetXaxis()->SetRangeUser(0,6);
+    h_nue->GetXaxis()->SetRangeUser(0,4);
     // h_nue->GetYaxis()->SetRangeUser(0,150.0e6);
     h_nue->SetLineColor(kBlue+2);
     h_nue->SetFillColor(17);
@@ -849,8 +849,8 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     TH1D* h_nue_clone = (TH1D*)h_nue->Clone("h_nue_clone");
     
     // Nuebar flux
-    h_nuebar->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e}/#bar{#nu}_{e} / cm^{2} / 5 MeV / 2.0 #times 10^{20} POT");
-    h_nuebar->GetXaxis()->SetRangeUser(0,6);
+    h_nuebar->SetTitle(";Electron Neutrino Energy [GeV];(#nu_{e}/#bar{#nu}_{e}) / cm^{2} / 5 MeV / 2.0 #times 10^{20} POT");
+    h_nuebar->GetXaxis()->SetRangeUser(0,4);
     h_nuebar->SetLineColor(kGreen+2);
     h_nuebar->SetFillColor(16);
     if (!draw_averge)h_nuebar->Draw("hist,same");
@@ -876,7 +876,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
         h_summed_flux_clone->SetBinContent(p, 0);
     }
 
-    summed_flux->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e} + #bar{#nu}_{e} / cm^{2} / 5 MeV / 2.0 #times 10^{20} POT");
+    summed_flux->SetTitle(";Electron Neutrino Energy [GeV];(#nu_{e} + #bar{#nu}_{e}) / cm^{2} / 5 MeV / 2.0 #times 10^{20} POT");
     summed_flux->GetXaxis()->CenterTitle();
     summed_flux->GetYaxis()->CenterTitle();
     summed_flux->GetXaxis()->SetLabelFont(42);
@@ -938,7 +938,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
 
     h_summed_flux_clone->SetLineWidth(0);
     h_summed_flux_clone->SetFillColorAlpha(46, 0.4);
-    h_summed_flux_clone->SetTitle(";Electron Neutrino Energy [GeV];#nu_{e} + #bar{#nu}_{e} / cm^{2} / 2.0 #times 10^{20} POT");
+    h_summed_flux_clone->SetTitle(";Electron Neutrino Energy [GeV];(#nu_{e} + #bar{#nu}_{e}) / cm^{2} / 2.0 #times 10^{20} POT");
     if (draw_averge) h_summed_flux_clone->Draw("hist,same");
 
     
@@ -962,7 +962,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     _util.Draw_ubooneSim(c, 0.37, 0.93, 0.37, 0.91);
 
     // Draw the run period on the plot
-    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+    _util.Draw_Nu_Mode(c, 0.8, 0.92, 0.8, 0.92);
 
     if (!draw_averge)c->Print("plots/Integrated_Flux_Separate.pdf");
     if (draw_averge)c->Print("plots/Integrated_Flux_Average.pdf");
@@ -1155,6 +1155,8 @@ void UtilityPlotter::Save2DHists(const char* printname, TH2D* hist){
     gStyle->SetPalette(kBlueGreenYellow);
 
     hist->Draw("colz");
+
+   _util.Draw_ubooneSim(c, 0.33, 0.925, 0.33, 0.905);
 
     c->Print(printname);
     delete c;
