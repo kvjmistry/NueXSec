@@ -213,6 +213,7 @@ class HistogramHelper{
         k_eff_elec_E_rebin,          // True energy of electron with binning scheme
         k_eff_elec_E_rebin_nue,      // True energy of electron with binning scheme (nue only)
         k_eff_elec_E_rebin_nuebar,   // True energy of positron with binning scheme (nuebar only)
+        k_eff_elec_E_rebin_pi0,      // True energy of electron with binning scheme only pi0 events
         k_eff_nu_E_nue,              // True Electron-neutrino energy
         k_eff_nu_E_nuebar,           // True anti Electron-neutrino energy
         k_eff_nu_E_single_bin,       // True Electron-neutrino energy, single bin
@@ -233,6 +234,7 @@ class HistogramHelper{
         k_eff_cosine_beta_rebin,     // cosine beta with uneven bins
         k_eff_cosine_beta_rebin_nue, // cosine beta with uneven bins
         k_eff_cosine_beta_rebin_nuebar, // cosine beta with uneven bins
+        k_eff_cosine_beta_rebin_pi0,  // cosine beta with uneven bins with pi0 events
         k_eff_proton_multi,          // Efficiency as a function of the number of true protons in the interaction.
         k_eff_proton_multi_nue,      // Efficiency as a function of the number of true protons in the interaction. Nue events only
         k_eff_proton_multi_nuebar,   // Efficiency as a function of the number of true protons in the interaction. Nuebar events only

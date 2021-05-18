@@ -453,6 +453,7 @@ void HistogramHelper::InitHistograms(){
                 TEfficiency_hists.at(k_eff_elec_E_rebin).at(l)             = new TH1D( Form("h_true_elec_E_rebin_%s",            _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins.size()-1, edges);
                 TEfficiency_hists.at(k_eff_elec_E_rebin_nue).at(l)         = new TH1D( Form("h_true_elec_E_rebin_nue_%s",        _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins.size()-1, edges);
                 TEfficiency_hists.at(k_eff_elec_E_rebin_nuebar).at(l)      = new TH1D( Form("h_true_elec_E_rebin_nuebar_%s",     _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins.size()-1, edges);
+                TEfficiency_hists.at(k_eff_elec_E_rebin_pi0).at(l)         = new TH1D( Form("h_true_elec_E_rebin_pi0_%s",        _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins.size()-1, edges);
                 TEfficiency_hists.at(k_eff_nu_E_nue).at(l)                 = new TH1D( Form("h_true_nu_E_nue_%s",                _util.cut_dirs.at(l).c_str() ), "", 8, 0, 6 );
                 TEfficiency_hists.at(k_eff_nu_E_nuebar).at(l)              = new TH1D( Form("h_true_nu_E_nuebar_%s",             _util.cut_dirs.at(l).c_str() ), "", 8, 0, 6 );
                 TEfficiency_hists.at(k_eff_nu_E_single_bin).at(l)          = new TH1D( Form("h_true_nu_E_single_bin_%s",         _util.cut_dirs.at(l).c_str() ), "", 1, 0, 10);
@@ -477,6 +478,7 @@ void HistogramHelper::InitHistograms(){
                 TEfficiency_hists.at(k_eff_cosine_beta_rebin).at(l)        = new TH1D( Form("h_eff_cosine_beta_rebin_%s",        _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins_cang.size()-1, edges );
                 TEfficiency_hists.at(k_eff_cosine_beta_rebin_nue).at(l)    = new TH1D( Form("h_eff_cosine_beta_rebin_nue_%s",    _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins_cang.size()-1, edges );
                 TEfficiency_hists.at(k_eff_cosine_beta_rebin_nuebar).at(l) = new TH1D( Form("h_eff_cosine_beta_rebin_nuebar_%s", _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins_cang.size()-1, edges );
+                TEfficiency_hists.at(k_eff_cosine_beta_rebin_pi0).at(l)    = new TH1D( Form("h_eff_cosine_beta_rebin_pi0_%s",    _util.cut_dirs.at(l).c_str() ), "", _util.reco_shr_bins_cang.size()-1, edges );
                 
                 TEfficiency_hists.at(k_eff_proton_multi).at(l)             = new TH1D( Form("h_eff_proton_multi_%s",             _util.cut_dirs.at(l).c_str() ), "", 6, 0, 6 );
                 TEfficiency_hists.at(k_eff_proton_multi_nue).at(l)         = new TH1D( Form("h_eff_proton_multi_nue_%s",         _util.cut_dirs.at(l).c_str() ), "", 6, 0, 6 );
@@ -1499,6 +1501,7 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
             TEfficiency_hists.at(k_eff_elec_E).at(cut_index)           ->Fill(SC.elec_e, weight);
             TEfficiency_hists.at(k_eff_elec_E_many_bins).at(cut_index) ->Fill(SC.elec_e, weight);
             TEfficiency_hists.at(k_eff_elec_E_rebin).at(cut_index)     ->Fill(SC.elec_e, weight);
+            if (SC.npi0 > 0) TEfficiency_hists.at(k_eff_elec_E_rebin_pi0).at(cut_index) ->Fill(SC.elec_e, weight);
             TEfficiency_hists.at(k_eff_nu_E_single_bin).at(cut_index)  ->Fill(SC.nu_e, weight);
             TEfficiency_hists.at(k_eff_nu_flash_time).at(cut_index)    ->Fill(SC.flash_time + 0.055 -0.359, weight);
             TEfficiency_hists.at(k_eff_nu_theta).at(cut_index)         ->Fill(SC.nu_theta, weight);
@@ -1509,6 +1512,7 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
             TEfficiency_hists.at(k_eff_beta_rebin).at(cut_index)       ->Fill(SC.true_effective_angle, weight);
             TEfficiency_hists.at(k_eff_cosine_beta).at(cut_index)      ->Fill(std::cos(SC.true_effective_angle *  3.14159 / 180.0), weight);
             TEfficiency_hists.at(k_eff_cosine_beta_rebin).at(cut_index)->Fill(std::cos(SC.true_effective_angle *  3.14159 / 180.0), weight);
+            if (SC.npi0 > 0)TEfficiency_hists.at(k_eff_cosine_beta_rebin_pi0).at(cut_index)->Fill(std::cos(SC.true_effective_angle *  3.14159 / 180.0), weight);
             TEfficiency_hists.at(k_eff_proton_multi).at(cut_index)     ->Fill(SC.nproton, weight);
             TEfficiency_hists.at(k_eff_pion_multi).at(cut_index)       ->Fill(SC.npion, weight);
             TEfficiency_hists.at(k_eff_charg_par_multi).at(cut_index)  ->Fill(SC.nproton + SC.npion, weight);
@@ -1550,6 +1554,7 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
             TEfficiency_hists.at(k_eff_elec_E).at(cut_index)           ->Fill(SC.elec_e, weight);
             TEfficiency_hists.at(k_eff_elec_E_many_bins).at(cut_index) ->Fill(SC.elec_e, weight);
             TEfficiency_hists.at(k_eff_elec_E_rebin).at(cut_index)     ->Fill(SC.elec_e, weight);
+            if (SC.npi0 > 0) TEfficiency_hists.at(k_eff_elec_E_rebin_pi0).at(cut_index) ->Fill(SC.elec_e, weight);
             TEfficiency_hists.at(k_eff_nu_E_single_bin).at(cut_index)  ->Fill(SC.nu_e, weight);
             TEfficiency_hists.at(k_eff_nu_flash_time).at(cut_index)    ->Fill(SC.flash_time+ 0.055 -0.359, weight);
             TEfficiency_hists.at(k_eff_nu_theta).at(cut_index)         ->Fill(SC.nu_theta, weight);
@@ -1560,6 +1565,7 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
             TEfficiency_hists.at(k_eff_beta_rebin).at(cut_index)       ->Fill(SC.true_effective_angle, weight);
             TEfficiency_hists.at(k_eff_cosine_beta).at(cut_index)      ->Fill(std::cos(SC.true_effective_angle *  3.14159 / 180.0), weight);
             TEfficiency_hists.at(k_eff_cosine_beta_rebin).at(cut_index)->Fill(std::cos(SC.true_effective_angle *  3.14159 / 180.0), weight);
+            if (SC.npi0 > 0)TEfficiency_hists.at(k_eff_cosine_beta_rebin_pi0).at(cut_index)->Fill(std::cos(SC.true_effective_angle *  3.14159 / 180.0), weight);
             TEfficiency_hists.at(k_eff_proton_multi).at(cut_index)     ->Fill(SC.nproton, weight);
             TEfficiency_hists.at(k_eff_pion_multi).at(cut_index)       ->Fill(SC.npion, weight);
             TEfficiency_hists.at(k_eff_charg_par_multi).at(cut_index)  ->Fill(SC.nproton + SC.npion, weight);
