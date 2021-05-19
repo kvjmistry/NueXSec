@@ -86,10 +86,10 @@ void UtilityPlotter::Initialise(Utility _utility){
 
         _util.CreateDirectory("Models/" + std::string(_util.xsec_var));
         _util.CreateDirectory("Models/Total");
-        TestModelDependence();
+        // TestModelDependence();
         CompareDataCrossSections();
         CompareSmearing();
-        CompareUnfoldedModels();
+        // CompareUnfoldedModels();
         CompareFakeDataReco();
         CompareFakeDataTrue();
         CompareTotalCrossSec();
@@ -3855,6 +3855,7 @@ void UtilityPlotter::CompareGeneratorTotalCrossSec(){
     
     // Y-Axis
     h_data->GetYaxis()->SetRangeUser(3.0, 8.0);
+    // h_data->GetYaxis()->SetRangeUser(2.2,12.2);
     h_data->GetYaxis()->CenterTitle();
     h_data->GetYaxis()->SetLabelSize(0.1);
     h_data->GetYaxis()->SetTitleSize(0.1);
