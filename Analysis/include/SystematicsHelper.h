@@ -245,6 +245,7 @@ class SystematicsHelper{
         k_xsec_data,         // Data event histogram binned in energy
         k_xsec_mcxsec,       // MC Cross Section
         k_xsec_mcxsec_smear, // MC Cross Section smeared truth
+        k_xsec_mcxsec_shape, // MC Cross Section smeared truth
         k_xsec_dataxsec,     // Data Cross Section
         k_TH1D_xsec_MAX
     };
@@ -258,8 +259,8 @@ class SystematicsHelper{
     };
 
     // Names for cross section histograms
-    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "data_xsec"};
-    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Smeared Prediction", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC Event Rate", "MC Event Rate Response",  "Data Event Rate"};
+    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "mc_xsec_shape", "data_xsec"};
+    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Smeared Prediction", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC Event Rate", "MC Event Rate Response", "MC Event Rate Shape", "Data Event Rate"};
 
     std::vector<std::string> vars = {"integrated","recoX", "trueX" };
 

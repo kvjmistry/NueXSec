@@ -129,7 +129,7 @@ class CrossSectionHelper{
         k_xsec_bkg,          // Bkg event histogram binned in energy
         k_xsec_gen,          // Gen event histogram binned in energy
         k_xsec_gen_smear,    // Gen event histogram binned in energy with smeared truth
-        k_xsec_gen_fine,     // Generated events with a fine truth binning
+        k_xsec_gen_shape,    // Generated events for shape uncertainties
         k_xsec_sig,          // Sig event histogram binned in energy
         k_xsec_eff,          // Efficiency histogram binned in energy
         k_xsec_ext,          // EXT event histogram binned in energy
@@ -137,7 +137,7 @@ class CrossSectionHelper{
         k_xsec_data,         // Data event histogram binned in energy
         k_xsec_mcxsec,       // MC Cross Section
         k_xsec_mcxsec_smear, // MC Cross Section smeared truth
-        k_xsec_mcxsec_fine, // MC Cross Section smeared truth
+        k_xsec_mcxsec_shape, // MC Cross Section shape uncertainties
         k_xsec_dataxsec,     // Data Cross Section
         k_TH1D_xsec_MAX
     };
@@ -151,7 +151,7 @@ class CrossSectionHelper{
     };
 
     // Names for cross section histograms
-    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "gen_fine", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "mc_xsec_fine", "data_xsec"};
+    std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "gen_shape", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "mc_xsec_shape", "data_xsec"};
 
     std::vector<std::string> vars = {"integrated", "recoX", "trueX"};
     
@@ -412,7 +412,7 @@ class CrossSectionHelper{
     void Smear(TH1D* h_sig, TH1D* h_gen, TH2D* h_smear, TH1D* h_eff);
     // -------------------------------------------------------------------------
     // Create a response matrix and smear the generated events in truth to sig events in reco
-    void ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH1D* h_gen_CV, TH2D* h_smear);
+    void ApplyResponseMatrix(TH1D* h_gen, TH1D* h_gen_smear, TH1D* h_gen_CV, TH2D* h_smear, bool norm);
     // -------------------------------------------------------------------------
     // Save the event to file
     void SaveEvent(std::string _classification, bool _passed_selection, std::vector<float> ev_weight, double reco_E, double true_E);

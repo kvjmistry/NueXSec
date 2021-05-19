@@ -1396,14 +1396,14 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         
         if (std::string(_util.xsec_smear_mode) == "mcc8" ){
             //               sel - bkg -   gen - gen_smear - sig  - eff - ext - dirt - data - mcxsec- mcxsec_smear - dataxsec
-            int_bins_low  = {2000, 200,   4000,       1000,  1000, 0.15,   0,     0,      0,     0.5,          0.5,     0.5}; 
-            int_bins_high = {3000, 1000, 12000,       3000,  3000, 0.3,    10,    15,   140,     3.0,          3.0,     3.0}; 
+            int_bins_low  = {2000, 200,   4000,       1000,  1000, 0.15,   0,     0,      0,     0.5,          0.5,0.5,     0.5}; 
+            int_bins_high = {3000, 1000, 12000,       3000,  3000, 0.3,    10,    15,   140,     3.0,          3.0,3.0,     3.0}; 
         }
         // Event Rate Binning
         else {
              //               sel - bkg -   gen - gen_smear - sig  - eff - ext - dirt - data - mcxsec - mcxsec_smear - dataxsec
-            int_bins_low  = {3000, 200,   4000,       1000,  1000, 0.1,    0,     0,      0,     0.5,            0.5,    0.5}; 
-            int_bins_high = {4000, 1000, 16000,       3000,  3000, 0.3,    10,    15,   140,     3.0,            3.0,    3.0}; 
+            int_bins_low  = {3000, 200,   4000,       1000,  1000, 0.1,    0,     0,      0,     0.5,            0.5,0.5,    0.5}; 
+            int_bins_high = {4000, 1000, 16000,       3000,  3000, 0.3,    10,    15,   140,     3.0,            3.0,3.0,    3.0}; 
 
         }
 
@@ -1418,6 +1418,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_universe_2D.at(k_xsec_data)          = new TH2D("h_2D_data",         "", nbins, edges, 80,  int_bins_low.at(k_xsec_data),         int_bins_high.at(k_xsec_data));
         h_universe_2D.at(k_xsec_mcxsec)        = new TH2D("h_2D_mcxsec",       "", nbins, edges, 100, int_bins_low.at(k_xsec_mcxsec),       int_bins_high.at(k_xsec_mcxsec));
         h_universe_2D.at(k_xsec_mcxsec_smear)  = new TH2D("h_2D_mcxsec_smear", "", nbins, edges, 100, int_bins_low.at(k_xsec_mcxsec_smear), int_bins_high.at(k_xsec_mcxsec_smear));
+        h_universe_2D.at(k_xsec_mcxsec_shape)  = new TH2D("h_2D_mcxsec_shape", "", nbins, edges, 100, int_bins_low.at(k_xsec_mcxsec_shape), int_bins_high.at(k_xsec_mcxsec_shape));
         h_universe_2D.at(k_xsec_dataxsec)      = new TH2D("h_2D_dataxsec",     "", nbins, edges, 100, int_bins_low.at(k_xsec_dataxsec),     int_bins_high.at(k_xsec_dataxsec));
         
     }
@@ -1428,15 +1429,15 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         std::vector<double> diff_bins_high;
         
         if (std::string(_util.xsec_smear_mode) == "mcc8" ){
-            //               sel - bkg -   gen - gen_smear - sig  - eff - ext - dirt - data - mcxsec - mcxsec_smear - dataxsec
-            diff_bins_low  = { 0,    0,      0,          0,    0,     0,    0,     0,      0,       0,            0,     0}; 
-            diff_bins_high = {2500, 1200, 16000,      2700, 2700,     5,   30,    40,    250, _util.xsec_scale, _util.xsec_scale,  _util.xsec_scale}; 
+            //               sel - bkg -   gen - gen_smear - sig  - eff - ext - dirt - data - mcxsec - mcxsec_smear/shape - dataxsec
+            diff_bins_low  = { 0,    0,      0,          0,    0,     0,    0,     0,      0,       0,            0,0,     0}; 
+            diff_bins_high = {2500, 1200, 16000,      2700, 2700,     5,   30,    40,    250, _util.xsec_scale, _util.xsec_scale, _util.xsec_scale,  _util.xsec_scale}; 
         }
         // Event Rate Binning
         else {
-            //               sel - bkg -   gen - gen_smear - sig  - eff - ext - dirt - data - mcxsec - mcxsec_smear - dataxsec
-            diff_bins_low  = { 0,    0,      0,          0,    0,     0,    0,     0,      0,      0,             0,        0}; 
-            diff_bins_high = {4000, 1200, 16000,      2700, 2700,     0.5, 50,    50,    250, _util.xsec_scale, _util.xsec_scale, _util.xsec_scale}; 
+            //               sel - bkg -   gen - gen_smear - sig  - eff - ext - dirt - data - mcxsec - mcxsec_smear/shape - dataxsec
+            diff_bins_low  = { 0,    0,      0,          0,    0,     0,    0,     0,      0,      0,             0,0,        0}; 
+            diff_bins_high = {4000, 1200, 16000,      2700, 2700,     0.5, 50,    50,    250, _util.xsec_scale, _util.xsec_scale, _util.xsec_scale, _util.xsec_scale}; 
 
         }
 
@@ -1451,6 +1452,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
         h_universe_2D.at(k_xsec_data)          = new TH2D("h_2D_data",         "", nbins, edges, 100, diff_bins_low.at(k_xsec_data),          diff_bins_high.at(k_xsec_data));
         h_universe_2D.at(k_xsec_mcxsec)        = new TH2D("h_2D_mcxsec",       "", nbins, edges, 100, diff_bins_low.at(k_xsec_mcxsec),        diff_bins_high.at(k_xsec_mcxsec));
         h_universe_2D.at(k_xsec_mcxsec_smear)  = new TH2D("h_2D_mcxsec_smear", "", nbins, edges, 100, diff_bins_low.at(k_xsec_mcxsec_smear),  diff_bins_high.at(k_xsec_mcxsec_smear));
+        h_universe_2D.at(k_xsec_mcxsec_shape)  = new TH2D("h_2D_mcxsec_shape", "", nbins, edges, 100, diff_bins_low.at(k_xsec_mcxsec_shape),  diff_bins_high.at(k_xsec_mcxsec_shape));
         h_universe_2D.at(k_xsec_dataxsec)      = new TH2D("h_2D_dataxsec",     "", nbins, edges, 100, diff_bins_low.at(k_xsec_dataxsec),      diff_bins_high.at(k_xsec_dataxsec));
     }
     
@@ -1665,7 +1667,7 @@ void SystematicsHelper::PlotReweightingModeMultisim(std::string label, int var, 
 
         // Choose what histograms to save
         if ( (var == k_var_recoX && (k == k_xsec_mcxsec || k == k_xsec_dataxsec || k == k_xsec_bkg || k == k_xsec_sig)) || 
-             (var == k_var_trueX && (k == k_xsec_eff || k == k_xsec_mcxsec_smear)) ||
+             (var == k_var_trueX && (k == k_xsec_eff || k == k_xsec_mcxsec_smear || k == k_xsec_mcxsec_shape)) ||
              (var == k_var_integrated && (k == k_xsec_mcxsec || k == k_xsec_dataxsec || k == k_xsec_bkg || k == k_xsec_sig || k == k_xsec_eff)) 
             ){
                 c->Print(Form("plots/run%s/Systematics/%s/%s/run%s_%s_%s_%s.pdf", _util.run_period, label.c_str(), _util.vars.at(var).c_str(),  _util.run_period, label.c_str(), _util.vars.at(var).c_str(), xsec_types.at(k).c_str()));

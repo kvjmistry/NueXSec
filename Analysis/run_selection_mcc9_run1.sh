@@ -163,7 +163,7 @@ if [ "$1" == "allvarxsec" ]; then
   # run the above script for every det variation 
   for i in "${var[@]}"
   do
-    ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$i.root --var dummy $i --xsecmode default --xsecvar elec_cang --xsec_smear er --xsecbins standard
+    ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$i.root --var dummy $i --xsecmode default --xsecvar elec_E --xsec_smear er --xsecbins standard
   done
 
 fi
