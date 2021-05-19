@@ -282,7 +282,7 @@ class SystematicsHelper{
         k_err_pot,
         k_err_reint,
         k_err_detvar,
-        k_err_pi0,
+        k_err_ext,
         k_err_mcstats,
         k_ERR_MAX
     };
@@ -299,7 +299,7 @@ class SystematicsHelper{
         "pot",
         "reint",
         "detvar",
-        "pi0",
+        "ext",
         "mcstats"
     };
 

@@ -204,7 +204,7 @@ void CrossSectionHelper::LoopEvents(){
 
         double cv_weight = weight; // SplinetimesTune * PPFX CV * Pi0 Tune
         double weight_dirt = weight; // Use this for estimating dirt and POT sys
-        double weight_ext  = weight;  // Use this for estimating pot sys
+        double weight_ext  = weight;  // Use this for estimating ext
 
         // Loop over the reweighter labels
         for (unsigned int label = 0; label < reweighter_labels.size(); label++){
@@ -228,7 +228,7 @@ void CrossSectionHelper::LoopEvents(){
                 double weight_uni{1.0}; 
 
                 // Set the weight for universe i
-                SetUniverseWeight(reweighter_labels.at(label), weight_uni, weight_dirt, weightSplineTimesTune, *classification, cv_weight, uni, nu_pdg, true_energy, numi_ang, npi0, pi0_e, ccnc);
+                SetUniverseWeight(reweighter_labels.at(label), weight_uni, weight_dirt, weight_ext, weightSplineTimesTune, *classification, cv_weight, uni, nu_pdg, true_energy, numi_ang, npi0, pi0_e, ccnc);
 
                 // Signal event
                 if ((*classification == "nue_cc" || *classification == "nuebar_cc" || *classification == "unmatched_nue" || *classification == "unmatched_nuebar") && passed_selection) {
@@ -320,7 +320,7 @@ void CrossSectionHelper::LoopEvents(){
                     // Fill histograms
                     if (std::string(_util.xsecmode) != "txtlist"){
                         
-                        FillHists(label, uni, k_xsec_ext, cv_weight, recoX, trueX);
+                        FillHists(label, uni, k_xsec_ext, weight_ext, recoX, trueX);
 
                         // Apply additional weight to the ext events to get the N selected number correct
                         FillHists(label, uni, k_xsec_sel, cv_weight*(_util.ext_scale_factor / _util.mc_scale_factor), recoX, trueX);
@@ -780,7 +780,7 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
             // Update the CV weight to CV * universe i
             double weight_uni{cv_weight}; 
 
-            SetUniverseWeight(reweighter_labels[label], weight_uni, weight_dirt, SC.weightSplineTimesTune, classification.first, cv_weight, uni, SC.nu_pdg, SC.nu_e, SC.nu_angle, SC.npi0, SC.pi0_e, SC.ccnc);
+            SetUniverseWeight(reweighter_labels[label], weight_uni, weight_dirt, weight_ext, SC.weightSplineTimesTune, classification.first, cv_weight, uni, SC.nu_pdg, SC.nu_e, SC.nu_angle, SC.npi0, SC.pi0_e, SC.ccnc);
 
             double dedx_max = SC.GetdEdxMax();
 
@@ -831,7 +831,7 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
 
 }
 // -----------------------------------------------------------------------------
-void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double _weightSplineTimesTune,
+void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni, double &weight_dirt, double &weight_ext, double _weightSplineTimesTune,
                                            std::string _classification, double cv_weight, int uni, int _nu_pdg, double _true_energy, double _numi_ang, int _npi0, double _pi0_e, int _ccnc ){
 
     // Weight equal to universe weight times cv weight
@@ -886,10 +886,16 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
     else if ( label == "Dirtup" || label == "Dirtdn"){
         
         if (label == "Dirtup")
-            weight_dirt = cv_weight*1.25; // increase the dirt by 25%
+            weight_dirt = cv_weight*1.50; // increase the dirt by 50%
         else
-            weight_dirt = cv_weight*0.75; // decrease the dirt by 25%
+            weight_dirt = cv_weight*0.50; // decrease the dirt by 50%
         
+        weight_uni = cv_weight;
+    }
+    // EXT reweighting
+    else if ( label == "EXT"){
+        
+        weight_ext = cv_weight*1.01; // increase the ext norm by 1%
         weight_uni = cv_weight;
     }
     // POT Counting
@@ -1811,7 +1817,8 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 "Dirtdn",
                 "POTup",
                 "POTdn", 
-                "pi0"
+                "pi0",
+                "EXT"
             };
         }
         // Only run PPFX
