@@ -2969,7 +2969,8 @@ void UtilityPlotter::CompareDataCrossSections(){
     double chi, pval;
     int ndof;
     std::cout <<"Nuwro Data Chi-Squared Test" << std::endl;
-    std::vector<int> indexes = {4,5};
+    // std::vector<int> indexes = {5}; //cang
+    std::vector<int> indexes = {1};    //energy
     _util.CalcChiSquaredRemove(h_dataxsec_model.at(k_model_nuwro), h_dataxsec, h_cov_reco, chi, ndof,pval, indexes);
     _util.CalcChiSquared(h_dataxsec_model.at(k_model_nuwro), h_dataxsec, h_cov_reco, chi, ndof,pval);
 

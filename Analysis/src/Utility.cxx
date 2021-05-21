@@ -1510,6 +1510,8 @@ void Utility::CalcChiSquaredRemove(TH1D* h_model, TH1D* h_data, TH2D* cov, doubl
 
         for (int j = 0; j < h_cov_clone->GetNbinsY(); j++) {
 
+            flag_index_j = false;
+
             // loop over the indexes, if index i matches then continue
             for (unsigned int index = 0; index < indexes.size(); index++){
                 if (indexes.at(index) == j+1) flag_index_j = true;
@@ -1518,6 +1520,7 @@ void Utility::CalcChiSquaredRemove(TH1D* h_model, TH1D* h_data, TH2D* cov, doubl
 
             // Add the chi-square
             chi += (h_data_clone->GetBinContent(i+1) - h_model_clone->GetBinContent(i+1)) * inverse_cov_m[i][j] * (h_data_clone->GetBinContent(j+1) - h_model_clone->GetBinContent(j+1));
+            // std::cout << chi<< std::endl;
         }
     }
 

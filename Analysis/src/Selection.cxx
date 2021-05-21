@@ -558,7 +558,6 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     // Turn these off to get the efficiencies at low energies correct
     SC.SetNonLdgShrEvent(type);
     
-    
     SelectionFill(type, SC, _util.k_dEdx_max_no_tracks, counter_v );
 
     // if (SC.classification.first == "cosmic")

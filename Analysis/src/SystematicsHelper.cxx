@@ -3579,8 +3579,13 @@ void SystematicsHelper::MakeTotUncertaintyPlot(bool AddStatErr){
                         // h_uncertainty.at(err)->SetBinContent(bin+1, std::sqrt(v_err.at(err).at(var).at(type).at(bin)) );
                         
                         // In the case of MC stat error include the MC stat + response stat err in the same line
-                        if (var == k_var_recoX && err == k_err_mcstats && (type == k_xsec_dataxsec || type == k_xsec_mcxsec)){
-                            h_uncertainty.at(err)->SetBinContent(bin+1, 100 * std::sqrt(h_cov_v.at(var).at(type).at(err)->GetBinContent(bin+1, bin+1) + h_cov_v.at(var).at(k_xsec_mcxsec).at(k_err_stat)->GetBinContent(bin+1, bin+1)) / cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(bin+1));
+                        if (var == k_var_recoX && err == k_err_mcstats && (type == k_xsec_dataxsec || type == k_xsec_mcxsec || type == k_xsec_bkg || type == k_xsec_sig)){
+                            if (type == k_xsec_dataxsec || type == k_xsec_mcxsec){
+                                h_uncertainty.at(err)->SetBinContent(bin+1, 100 * std::sqrt(h_cov_v.at(var).at(type).at(err)->GetBinContent(bin+1, bin+1) + h_cov_v.at(var).at(k_xsec_mcxsec).at(k_err_stat)->GetBinContent(bin+1, bin+1)) / cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(bin+1));
+                            }
+                            else {
+                                h_uncertainty.at(err)->SetBinContent(bin+1, 100 * std::sqrt(h_cov_v.at(var).at(type).at(err)->GetBinContent(bin+1, bin+1) + h_cov_v.at(var).at(type).at(k_err_stat)->GetBinContent(bin+1, bin+1)) / cv_hist_vec.at(var).at(type)->GetBinContent(bin+1));
+                            }
                         }
                         // Plot data stat error in both cases
                         else if (var == k_var_recoX && err == k_err_stat && (type == k_xsec_dataxsec || type == k_xsec_mcxsec)){
