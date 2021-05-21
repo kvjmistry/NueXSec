@@ -428,7 +428,7 @@ void CrossSectionHelper::LoopEvents(){
                 if (var == k_var_trueX){
                     
                     // Use standard binning to smear
-                    if (std::string(_util.xsec_bin_mode) == "standard"){
+                    if (std::string(_util.xsec_bin_mode) == "standard" || std::string(_util.xsec_bin_mode) == "ratio"){
 
                         // Apply the response matrix to the detvar CV for detector variations
                         if (_util.isvariation && std::string(_util.variation) != "CV"){
@@ -508,6 +508,13 @@ void CrossSectionHelper::LoopEvents(){
                 if (std::string(_util.xsec_var) == "elec_ang" && var != k_var_integrated){
                     h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec)->Scale(100);
                     h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dataxsec)->Scale(100);
+                }
+
+                // If using the ratio option then calculate the cross section ratio
+                if (std::string(_util.xsec_bin_mode) == "ratio" && var != k_var_integrated){
+                    h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dataxsec)->Scale(1.0/h_cross_sec.at(label).at(uni).at(k_var_integrated).at(k_xsec_dataxsec)->GetBinContent(1));
+                    h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec)->Scale(1.0/h_cross_sec.at(label).at(uni).at(k_var_integrated).at(k_xsec_mcxsec)->GetBinContent(1));
+                    h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec_smear)->Scale((integrated_flux / temp_integrated_flux) * (1.0/h_cross_sec.at(label).at(uni).at(k_var_integrated).at(k_xsec_mcxsec)->GetBinContent(1)));
                 }
 
                 // if (var == k_var_trueX){
@@ -1334,7 +1341,13 @@ void CrossSectionHelper::WriteHists(){
     // Now open the output file
     // File not already open, open the file
     if (!gROOT->GetListOfFiles()->FindObject( Form("files/crosssec_run%s.root", _util.run_period ) )) {
-        fnuexsec_out = new TFile( Form("files/crosssec_run%s.root", _util.run_period) , "UPDATE");
+
+        if (std::string(_util.xsec_bin_mode) == "ratio"){
+            fnuexsec_out = new TFile( Form("files/crosssec_run%s_ratio.root", _util.run_period) , "UPDATE");
+        }
+        else {
+            fnuexsec_out = new TFile( Form("files/crosssec_run%s.root", _util.run_period) , "UPDATE");
+        }
     }
 
     fnuexsec_out->cd();

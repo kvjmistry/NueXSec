@@ -718,8 +718,14 @@ void SystematicsHelper::InitialiseReweightingMode(){
     gStyle->SetOptStat(0);
 
     // Load in the input file
-    // Should we add more protection to this command??
-    f_nuexsec = new TFile( Form("files/crosssec_run%s.root", _util.run_period ), "READ");
+    // cross section ratios
+    if (std::string(_util.xsec_bin_mode) == "ratio"){
+        f_nuexsec = new TFile( Form("files/crosssec_run%s_ratio.root", _util.run_period ), "READ");
+    }
+    // Normal cross sections
+    else {
+        f_nuexsec = new TFile( Form("files/crosssec_run%s.root", _util.run_period ), "READ");
+    }
 
     InitialsePlotCV();
 
@@ -3802,7 +3808,14 @@ void SystematicsHelper::ExportResult(TFile* f){
     }
 
     // Now we have the histograms we need, lets open a new file to store the systematics
-    TFile *f_sys_out = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "UPDATE");
+    TFile *f_sys_out;
+    if (std::string(_util.xsec_bin_mode) == "ratio"){
+        f_sys_out = TFile::Open(Form("files/xsec_result_run%s_ratio.root", _util.run_period), "UPDATE");
+    }
+    else {
+        f_sys_out = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "UPDATE");
+    }
+    
     f_sys_out->cd();
 
     // Create subdirectory for each reweighter

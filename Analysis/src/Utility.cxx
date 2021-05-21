@@ -222,11 +222,11 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
 
         // Use standard or fine bins to smear/unfold the cross section
         if (strcmp(arg, "--xsecbins") == 0){
-            std::cout << "Using Truth Binning mode to build response matrix from: " << argv[i+1] << std::endl;
+            std::cout << "Using Binning mode to build response matrix from: " << argv[i+1] << std::endl;
             xsec_bin_mode = argv[i+1];
 
-            if (std::string(xsec_bin_mode) != "standard" && std::string(xsec_bin_mode) != "fine" && std::string(xsec_bin_mode) != "e_ang"){
-                std::cout << red << "Error specified variable which is not supported! You can use: standard or fine or e_ang" << reset << std::endl;
+            if (std::string(xsec_bin_mode) != "standard" && std::string(xsec_bin_mode) != "fine" && std::string(xsec_bin_mode) != "e_ang" && std::string(xsec_bin_mode) != "ratio"){
+                std::cout << red << "Error specified variable which is not supported! You can use: standard or fine or e_ang or ratio" << reset << std::endl;
                 exit(5);
             }
         }
@@ -1571,6 +1571,9 @@ void Utility::SetAxesNames(){
 
             if (std::string(scale_bins) == "standard")
                 xsec_scale*=0.3;
+            
+            if (std::string(xsec_bin_mode) == "ratio")
+                xsec_scale*=0.2;
         }        
     
     }
@@ -1607,6 +1610,9 @@ void Utility::SetAxesNames(){
 
             if (std::string(scale_bins) == "standard")
                 xsec_scale*=0.3;
+
+            if (std::string(xsec_bin_mode) == "ratio")
+            xsec_scale*=0.2;
         }
 
     }
@@ -1643,6 +1649,9 @@ void Utility::SetAxesNames(){
 
             if (std::string(scale_bins) == "standard")
                 xsec_scale*=0.3;
+
+            if (std::string(xsec_bin_mode) == "ratio")
+                xsec_scale*=0.2;
         }
 
     }
