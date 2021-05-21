@@ -815,6 +815,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
     // Save the total covariance matrices
     _util.CreateDirectory("/Systematics/Covariance/" + _util.vars.at(k_var_recoX));
     _util.CreateDirectory("/Systematics/Correlation/" + _util.vars.at(k_var_recoX));
+    _util.CreateDirectory("/Systematics/Correlation/" + _util.vars.at(k_var_trueX));
     _util.CreateDirectory("/Systematics/FracCovariance/" + _util.vars.at(k_var_recoX));
     for (unsigned int cov = 0; cov < h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).size(); cov++){
         
@@ -825,6 +826,8 @@ void SystematicsHelper::InitialiseReweightingMode(){
         SaveFracCovMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(cov),   cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec),   Form("plots/run%s/Systematics/FracCovariance/%s/run%s_%s_%s_%s_frac_cov.pdf", _util.run_period, _util.vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_mcxsec).c_str(),   _util.vars.at(k_var_recoX).c_str()));
         SaveFracCovMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(cov), cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), Form("plots/run%s/Systematics/FracCovariance/%s/run%s_%s_%s_%s_frac_cov.pdf", _util.run_period, _util.vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_dataxsec).c_str(), _util.vars.at(k_var_recoX).c_str()));
     }
+
+    SaveCorMatrix(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_shape).at(k_err_hp),     cv_hist_vec.at(k_var_trueX).at(k_xsec_mcxsec_shape), Form("plots/run%s/Systematics/Correlation/%s/run%s_%s_%s_%s_cor_shape.pdf",         _util.run_period, _util.vars.at(k_var_trueX).c_str(), _util.run_period, systematic_names.at(k_err_hp).c_str(), xsec_types.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));
 
     // Create the directories
     _util.CreateDirectory("/Systematics/Beamline");

@@ -84,8 +84,8 @@ if [ "$1" == "weight" ]; then
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel reint   --xsecvar elec_cang --xsec_smear er
   ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel mcstats --xsecvar elec_cang --xsec_smear er
 
-  # ./nuexsec --run 1 --sys reweight --xsec_smear wiener --binscaling standard --xsecvar elec_cang
-  # ./nuexsec --run 1 --sys reweight --xsec_smear er --binscaling width --xsecvar elec_cang
+  ./nuexsec --run 1 --sys reweight --xsec_smear wiener --binscaling standard --xsecvar elec_cang
+  ./nuexsec --run 1 --sys reweight --xsec_smear er --binscaling width --xsecvar elec_cang
 
   # -- 
 
@@ -164,6 +164,7 @@ if [ "$1" == "allvarxsec" ]; then
   for i in "${var[@]}"
   do
     ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$i.root --var dummy $i --xsecmode default --xsecvar elec_E --xsec_smear er --xsecbins standard
+    ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$i.root --var dummy $i --xsecmode default --xsecvar elec_cang --xsec_smear er --xsecbins standard
   done
 
 fi

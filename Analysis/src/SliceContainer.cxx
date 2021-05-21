@@ -1042,20 +1042,14 @@ void SliceContainer::SetNuMIAngularVariables(){
     shr_gamma = numi_phi.Phi() * 180/3.14159;
 
     // Try to calculate "True NuMI Phi" which I am going to call gamma
-    TVector3 v_tu_unit_true = nu_dir.Unit(); // Unit vector of neutrino direction
-    rthetax = std::atan2( v_tu_unit_true.X(), v_tu_unit_true.Z());
-    rthetay = std::atan2( v_tu_unit_true.Y(), v_tu_unit_true.Z());
+    const TVector3 beamdir = -1*(v_targ_uboone.Unit());
+    TRotation rot;
+    rot.SetZAxis(beamdir.Unit());
+    rot.Invert();
+    const TVector3 d1 = nu_dir;
+    elec_gamma = (rot*d1).Phi() * 180/3.14159;
 
-    // First do a rotation in the z-x plane
-    double elec_pz_rx =  elec_pz*std::cos(rthetax) + elec_px*std::sin(rthetax);
-    double elec_px_rx = -elec_pz*std::sin(rthetax) + elec_px*std::cos(rthetax);
-
-    // Now do a rotation in the z-y plane
-    double elec_pz_rx_ry =  elec_pz_rx*std::cos(rthetay) + elec_py*std::sin(rthetay);
-    double elec_py_ry    = -elec_pz_rx*std::sin(rthetay) + elec_py*std::cos(rthetay);
-
-    TVector3 true_numi_phi(elec_px_rx, elec_py_ry, elec_pz_rx_ry);
-    elec_gamma = true_numi_phi.Phi() * 180/3.14159;
+    // std::cout << beamdir.X() << " " <<  beamdir.Y() << "  " << beamdir.Z() << "  "<< elec_gamma << std::endl;
 
 }
 // -----------------------------------------------------------------------------
