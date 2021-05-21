@@ -446,6 +446,7 @@ void HistogramHelper::InitHistograms(){
             
             for (unsigned int l = 0; l < _util.k_cuts_MAX; l++ ){
                 TEfficiency_hists.at(k_eff_nu_E).at(l)                     = new TH1D( Form("h_true_nu_E_%s",                    _util.cut_dirs.at(l).c_str() ), "", 8, 0, 6 );
+                TEfficiency_hists.at(k_eff_nu_E_many_bins).at(l)           = new TH1D( Form("h_true_nu_E_many_bins_%s",          _util.cut_dirs.at(l).c_str() ), "", 100, 0, 1 );
                 TEfficiency_hists.at(k_eff_elec_E).at(l)                   = new TH1D( Form("h_true_elec_E_%s",                  _util.cut_dirs.at(l).c_str() ), "", 8, 0, 6 );
                 TEfficiency_hists.at(k_eff_elec_E_many_bins).at(l)         = new TH1D( Form("h_eff_elec_E_many_bins_%s",         _util.cut_dirs.at(l).c_str() ), "", 100, 0, 1 );
                 
@@ -1498,6 +1499,7 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
             classification == "unmatched_nue" || classification == "unmatched_nuebar" ||
             classification == "cosmic_nue"    || classification == "cosmic_nuebar"){
             TEfficiency_hists.at(k_eff_nu_E).at(cut_index)             ->Fill(SC.nu_e, weight);
+            TEfficiency_hists.at(k_eff_nu_E_many_bins).at(cut_index)   ->Fill(SC.nu_e, weight);
             TEfficiency_hists.at(k_eff_elec_E).at(cut_index)           ->Fill(SC.elec_e, weight);
             TEfficiency_hists.at(k_eff_elec_E_many_bins).at(cut_index) ->Fill(SC.elec_e, weight);
             TEfficiency_hists.at(k_eff_elec_E_rebin).at(cut_index)     ->Fill(SC.elec_e, weight);
@@ -1551,6 +1553,7 @@ void HistogramHelper::FillTEfficiency(int cut_index, std::string classification,
     else {
         if (classification == "nue_cc" || classification == "nuebar_cc" || classification == "unmatched_nue" || classification == "unmatched_nuebar"){
             TEfficiency_hists.at(k_eff_nu_E).at(cut_index)             ->Fill(SC.nu_e, weight);
+            TEfficiency_hists.at(k_eff_nu_E_many_bins).at(cut_index)   ->Fill(SC.nu_e, weight);
             TEfficiency_hists.at(k_eff_elec_E).at(cut_index)           ->Fill(SC.elec_e, weight);
             TEfficiency_hists.at(k_eff_elec_E_many_bins).at(cut_index) ->Fill(SC.elec_e, weight);
             TEfficiency_hists.at(k_eff_elec_E_rebin).at(cut_index)     ->Fill(SC.elec_e, weight);

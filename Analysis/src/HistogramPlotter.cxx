@@ -72,6 +72,7 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
         MakeEfficiencyPlotByCut("h_true_nu_E",                   false, false, "True #nu_{e}/#bar{#nu}_{e} Energy [GeV]; Efficiency",             "True #nu_{e}/#bar{#nu}_{e} Events in FV",          "nu_E" );     
         MakeEfficiencyPlotByCut("h_true_nu_E_nue",               true,  false, "True #nu_{e} Energy [GeV]; Efficiency",                           "True #nu_{e} Events in FV",                        "nu_E_nue");
         MakeEfficiencyPlotByCut("h_true_nu_E_nuebar",            true,  false, "True #bar{#nu}_{e} Energy [GeV]; Efficiency",                     "True #bar{#nu}_{e} Events in FV",                  "nu_E_nuebar");   
+        MakeEfficiencyPlotByCut("h_true_nu_E_many_bins",         true,  false, "True #nu_{e}/#bar{#nu}_{e} Energy [GeV]; Efficiency",             "True #nu_{e}/#bar{#nu}_{e} Events in FV",          "nu_E_many_bins");
         
         MakeEfficiencyPlotByCut("h_true_elec_E_rebin",           true,  false, "True e#lower[-0.5]{-}/e^{+} Energy [GeV]; Efficiency",            "True e#lower[-0.5]{-}/e^{+} Events in FV / GeV",   "elec_E_rebin");
         MakeEfficiencyPlotByCut("h_true_elec_E_rebin_nue",       true,  false, "True e#lower[-0.5]{-} Energy [GeV]; Efficiency",                  "True e#lower[-0.5]{-} Events in FV / GeV",         "elec_E_rebin_nue");

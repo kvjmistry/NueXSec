@@ -208,6 +208,7 @@ class HistogramHelper{
     // enum for plots by efficiency
     enum TH1D_eff_vars {
         k_eff_nu_E,                  // True Electron-neutrino energy
+        k_eff_nu_E_many_bins,      // True Electron Energy with many bins
         k_eff_elec_E,                // True Electron Energy
         k_eff_elec_E_many_bins,      // True Electron Energy with many bins
         k_eff_elec_E_rebin,          // True energy of electron with binning scheme
