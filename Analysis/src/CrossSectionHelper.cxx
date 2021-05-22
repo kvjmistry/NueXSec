@@ -894,9 +894,9 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
     else if ( label == "Dirtup" || label == "Dirtdn"){
         
         if (label == "Dirtup")
-            weight_dirt = cv_weight*1.50; // increase the dirt by 50%
+            weight_dirt = cv_weight*2.0; // increase the dirt by 100%
         else
-            weight_dirt = cv_weight*0.50; // decrease the dirt by 50%
+            weight_dirt = cv_weight*0.0; // decrease the dirt by 0%
         
         weight_uni = cv_weight;
     }

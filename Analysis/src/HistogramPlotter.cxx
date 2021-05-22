@@ -1446,7 +1446,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
 
     // Cosmic Inpact Parameter in 3D
     MakeStack("h_reco_CosmicIPAll3D", _util.cut_dirs.at(cut_index).c_str(),
-              area_norm, false, 1.7, "Pandora Cosmic Impact Parameter 3D [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
+              area_norm, false, 1.7, "Cosmic Impact Parameter [cm]",  0.35, 0.85, 0.55, 0.85, Data_POT,
               Form("cuts/%s/reco_CosmicIPAll3D.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", false, false, true);
 
     // 3D direction between closest pfp not in the neutrino slice
