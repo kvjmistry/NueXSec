@@ -161,6 +161,11 @@ void CrossSectionHelper::Initialise(Utility _utility){
         return;
     }
 
+    if (std::string(_util.xsec_rw_mode) == "fluxshape"){
+        StudyFluxShape();
+        return;
+    }
+
     // Now loop over events and caluclate the cross section
     LoopEvents();
 
@@ -2946,5 +2951,120 @@ void CrossSectionHelper::CheckPi0CrossSection(){
     h_genie->Write("h_ratio");
 
     f_out->Close();
+
+}
+// -----------------------------------------------------------------------------
+void CrossSectionHelper::StudyFluxShape(){
+
+    gStyle->SetOptStat(0);
+
+    TH1D* h_CV_ppfx = new TH1D("h_cv", "", 30, 0, 6);
+
+    std::vector<TH1D*> h_ppfx_uni(600);
+
+    for (unsigned int u = 0; u < h_ppfx_uni.size(); u++){
+        h_ppfx_uni.at(u) = new TH1D("", "", 30, 0, 6);
+    }
+
+
+    std::cout << "Total Tree Entries: "<< tree->GetEntries() << std::endl;
+
+    // Loop over the tree entries and weight the events in each universe
+    for (unsigned int ievent = 0; ievent < tree->GetEntries(); ievent++){
+        
+        tree->GetEntry(ievent); 
+
+        if (ievent % 20000 == 0 && ievent > 0) std::cout << "On entry " << ievent/10000.0 <<"0k " << std::endl;
+
+        double cv_weight = weight; // SplinetimesTune * PPFX CV * Pi0 Tune
+        double weight_dirt = weight; // Use this for estimating dirt and POT sys
+        double weight_ext  = weight;  // Use this for estimating ext
+
+        // Loop over the reweighter labels
+        for (unsigned int label = 0; label < reweighter_labels.size(); label++){
+            
+            // Call switch function
+            SwitchReweighterLabel(reweighter_labels.at(label));
+
+            // Ensure this isnt ever zero
+            if (vec_universes.size() == 0) {
+                for (unsigned int t=0; t < h_cross_sec.at(label).size(); t++){
+                    vec_universes.push_back(1.0);
+                }
+            }
+            
+            if (ievent == 0) std::cout << "Running over reweighter label: " << reweighter_labels.at(label) << " with " << vec_universes.size() << " universes" << std::endl;
+
+            // Now loop over the universes
+            for (unsigned int uni = 0; uni < h_cross_sec.at(label).size(); uni++){
+                
+                // Update the CV weight to CV * universe i
+                double weight_uni{1.0}; 
+
+                // Set the weight for universe i
+                SetUniverseWeight(reweighter_labels.at(label), weight_uni, weight_dirt, weight_ext, weightSplineTimesTune, *classification, cv_weight, uni, nu_pdg, true_energy, numi_ang, npi0, pi0_e, ccnc);
+
+                // Generated event
+                if (  *classification == "nue_cc"           || *classification == "nuebar_cc" || 
+                      *classification == "unmatched_nue"    || *classification == "cosmic_nue" ||
+                      *classification == "unmatched_nuebar" || *classification == "cosmic_nuebar") {
+                    
+                    if (reweighter_labels.at(label) == "CV"){
+                        h_CV_ppfx->Fill(true_energy, weight_uni);
+                    }
+                    else {
+                        h_ppfx_uni.at(uni)->Fill(true_energy, weight_uni);
+                    }                    
+                    
+                }
+                
+            } // End loop over uni
+
+        } // End loop over labels
+        
+    } // End loop over events
+
+
+    // Set the integrated flux
+    double temp_integrated_flux = integrated_flux;
+    h_CV_ppfx->Scale(1.0/(integrated_flux* mc_flux_scale_factor * N_target_MC));
+    h_CV_ppfx->Scale(1.0e-39);
+
+    // If we are reweighting by the PPFX Multisims, we need to change the integrated flux too
+    for (int uni = 0; uni < 600; uni++){
+        temp_integrated_flux = GetIntegratedFluxHP(uni, "ppfx_ms_UBPPFX");
+        h_ppfx_uni.at(uni)->Scale(1.0/(temp_integrated_flux* mc_flux_scale_factor * N_target_MC));
+        h_ppfx_uni.at(uni)->Scale(1.0e-39);
+    }
+
+    // Now make the covariance/correlation matrix
+    int n_bins = h_CV_ppfx->GetNbinsX();
+    TH2D* cov  = new TH2D("h_cov",   ";Bin i; Bin j",n_bins, 1, n_bins+1, n_bins, 1, n_bins+1 ); // Create the covariance matrix
+    _util.CalcCovariance(h_ppfx_uni, h_CV_ppfx, cov);
+
+    TH2D* cor = (TH2D*)cov->Clone();
+    _util.CalcCorrelation(h_CV_ppfx, cov, cor);
+
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+    cor->GetXaxis()->CenterLabels(kTRUE);
+    cor->GetYaxis()->CenterLabels(kTRUE);
+    cor->GetZaxis()->CenterTitle();
+    cor->GetZaxis()->SetTitleOffset(1.45);
+    cor->SetMarkerColor(kRed+1);
+    gStyle->SetPaintTextFormat("0.3f");
+    cor->SetTitle("Correlation Matrix");
+    cor->GetZaxis()->SetTitle("Correlation");
+    if (std::string(_util.xsec_var) == "elec_cang"){
+        cor->GetXaxis()->SetNdivisions(cor->GetNbinsX(), 0, 0, kFALSE);
+        cor->GetYaxis()->SetNdivisions(cor->GetNbinsY(), 0, 0, kFALSE);
+    }
+    cor->Draw("colz");
+    _util.IncreaseLabelSize(cor, c);
+    cor->SetMarkerSize(1.3);
+    _util.Draw_ubooneSim(c, 0.30, 0.915, 0.30, 0.915);
+    // cor->GetZaxis()->SetRangeUser(-1,1);
+    c->Print("test_correlation.pdf");
+    delete c;
+
 
 }
