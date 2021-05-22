@@ -3621,7 +3621,13 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
     gStyle->SetOptStat(0);
 
     // Load in the cross section output
-    TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
+    TFile *fxsec;
+    if (std::string(_util.xsec_bin_mode) == "ratio"){
+        fxsec = TFile::Open(Form("files/xsec_result_run%s_ratio.root", _util.run_period), "READ");
+    }
+    else {
+        fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
+    }
 
     TH2D* h_temp_2D;
     TH1D* h_temp;
@@ -3649,7 +3655,12 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
     fxsec->Close();
 
     // Load in the cross section output
-    fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+    if (std::string(_util.xsec_bin_mode) == "ratio"){
+        fxsec = TFile::Open(Form("files/crosssec_run%s_ratio.root ", _util.run_period), "READ");
+    }
+    else {
+        fxsec = TFile::Open(Form("files/crosssec_run%s.root ", _util.run_period), "READ");
+    }
 
     // Create a vector for the models
     std::vector<std::string> models = {

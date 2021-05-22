@@ -520,6 +520,7 @@ void CrossSectionHelper::LoopEvents(){
                     h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dataxsec)->Scale(1.0/h_cross_sec.at(label).at(uni).at(k_var_integrated).at(k_xsec_dataxsec)->GetBinContent(1));
                     h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec)->Scale(1.0/h_cross_sec.at(label).at(uni).at(k_var_integrated).at(k_xsec_mcxsec)->GetBinContent(1));
                     h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec_smear)->Scale((integrated_flux / temp_integrated_flux) * (1.0/h_cross_sec.at(label).at(uni).at(k_var_integrated).at(k_xsec_mcxsec)->GetBinContent(1)));
+                    h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec_shape)->Scale(1.0/h_cross_sec.at(label).at(uni).at(k_var_integrated).at(k_xsec_mcxsec)->GetBinContent(1));
                 }
 
                 // if (var == k_var_trueX){
@@ -2847,7 +2848,14 @@ void CrossSectionHelper::SaveGenXSec(){
     t_gen->Draw("cosbeta >> h_elec_cang", "ppfx_cv*(elec_e > 0.12 && nu_e > 0.06 && infv && ccnc == 0)");
     t_gen->Draw("0.5 >> h_elec_tot", "ppfx_cv*(elec_e > 0.12 && nu_e > 0.06 && infv && ccnc == 0)");
 
-    TFile *f_out = TFile::Open(Form("files/crosssec_run%s.root", _util.run_period), "UPDATE");
+    TFile *f_out;
+    
+    if (std::string(_util.xsec_bin_mode) == "ratio"){
+        f_out = TFile::Open(Form("files/crosssec_run%s_ratio.root", _util.run_period), "UPDATE");
+    }
+    else {
+        f_out = TFile::Open(Form("files/crosssec_run%s.root", _util.run_period), "UPDATE");
+    }
 
     htemp_e->Scale(1.0 / (integrated_flux * mc_flux_scale_factor * N_target_MC));
     htemp_cang->Scale(1.0 / (integrated_flux * mc_flux_scale_factor * N_target_MC));
@@ -2856,6 +2864,11 @@ void CrossSectionHelper::SaveGenXSec(){
     htemp_e->Scale(1.0e39);
     htemp_cang->Scale(1.0e39);
     htemp_tot->Scale(1.0e39);
+
+    if (std::string(_util.xsec_bin_mode) == "ratio"){
+        htemp_e->Scale(1.0/htemp_tot->Integral());
+        htemp_cang->Scale(1.0/htemp_tot->GetBinContent(1));
+    }
 
     htemp_e->SetOption("hist");
     htemp_cang->SetOption("hist");
@@ -2955,6 +2968,9 @@ void CrossSectionHelper::CheckPi0CrossSection(){
 }
 // -----------------------------------------------------------------------------
 void CrossSectionHelper::StudyFluxShape(){
+
+    // To Run:
+    // ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode reweight --xseclabel ppfx    --xsec_smear er --xsecbins standard --xsecvar elec_E --xsecplot fluxshape
 
     gStyle->SetOptStat(0);
 

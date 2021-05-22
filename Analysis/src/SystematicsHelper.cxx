@@ -1862,14 +1862,14 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             // Rewrite the errors for data to sys
             if (error_type.at(err_lab) == "sys"){
                 for (int bin = 0; bin < h_dataxsec->GetNbinsX(); bin++){
-                    h_dataxsec->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_sys).at(var).at(k_xsec_mcxsec).at(bin)) * h_dataxsec->GetBinContent(bin+1)); // 0.01 is to convert back from a percentage
+                    h_dataxsec->SetBinError(bin+1, (std::sqrt(h_cov_v.at(var).at(k_xsec_mcxsec).at(k_err_sys)->GetBinContent(bin+1, bin+1)) / cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(bin+1)) * h_dataxsec->GetBinContent(bin+1));
                 }
 
             }
             // Overwrite error to stat + sys
             else {
                 for (int bin = 0; bin < h_dataxsec->GetNbinsX(); bin++){
-                    h_dataxsec_tot->SetBinError(bin+1, 0.01*std::sqrt(v_err.at(k_err_sys).at(var).at(k_xsec_mcxsec).at(bin) + v_err.at(k_err_stat).at(var).at(k_xsec_dataxsec).at(bin)) * h_dataxsec->GetBinContent(bin+1));
+                    h_dataxsec_tot->SetBinError(bin+1, (std::sqrt(h_cov_v.at(var).at(k_xsec_mcxsec).at(k_err_tot)->GetBinContent(bin+1, bin+1)) / cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(bin+1)) * h_dataxsec->GetBinContent(bin+1));
                 }
 
             }
