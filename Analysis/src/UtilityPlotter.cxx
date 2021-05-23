@@ -3746,6 +3746,12 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(h_dataxsec, "Data (Stat. + Sys.)", "ep");
+
+    // Convert to data units
+    _util.ConvertCovarianceUnits(h_cov, 
+                    h_mcxsec_reco_model.at(k_model_CV), 
+                    h_dataxsec);
+
     
     double chi, pval;
     int ndof;

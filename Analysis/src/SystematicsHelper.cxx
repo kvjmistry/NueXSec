@@ -1858,18 +1858,47 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             h_dataxsec_tot->SetMarkerStyle(20);
             h_dataxsec_tot->SetMarkerSize(0.5);
             h_dataxsec->SetMinimum(0);
-            
+
+            // Get the chi-squared
+            double chi, pval;
+            int ndof;
+            int index = 0;
+            if (error_type.at(err_lab) == "stat"){
+                index = k_err_stat;
+            }
+            else if (error_type.at(err_lab) == "sys"){
+                index = k_err_sys;
+            }
+            else{
+                index = k_err_tot;
+            }
+
+            TH2D *h_cov_temp = (TH2D*)h_cov_v.at(var).at(k_xsec_mcxsec).at(index)->Clone();
+
+            // Convert to data units
+            _util.ConvertCovarianceUnits(h_cov_temp, 
+                           cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec), 
+                           cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec));
+
+            if (index == k_err_stat)
+                h_cov_temp->Add(h_cov_v.at(var).at(k_xsec_dataxsec).at(k_err_stat));
+
+
             // Rewrite the errors for data to sys
             if (error_type.at(err_lab) == "sys"){
                 for (int bin = 0; bin < h_dataxsec->GetNbinsX(); bin++){
-                    h_dataxsec->SetBinError(bin+1, (std::sqrt(h_cov_v.at(var).at(k_xsec_mcxsec).at(k_err_sys)->GetBinContent(bin+1, bin+1)) / cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(bin+1)) * h_dataxsec->GetBinContent(bin+1));
+                    h_dataxsec->SetBinError(bin+1, (std::sqrt(h_cov_temp->GetBinContent(bin+1, bin+1)) / cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(bin+1)) * h_dataxsec->GetBinContent(bin+1));
                 }
-
+            }
+            else if (error_type.at(err_lab) == "stat"){
+                for (int bin = 0; bin < h_dataxsec->GetNbinsX(); bin++){
+                    h_dataxsec->SetBinError(bin+1, (std::sqrt(h_cov_temp->GetBinContent(bin+1, bin+1)) / cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(bin+1)) * h_dataxsec->GetBinContent(bin+1));
+                }
             }
             // Overwrite error to stat + sys
             else {
                 for (int bin = 0; bin < h_dataxsec->GetNbinsX(); bin++){
-                    h_dataxsec_tot->SetBinError(bin+1, (std::sqrt(h_cov_v.at(var).at(k_xsec_mcxsec).at(k_err_tot)->GetBinContent(bin+1, bin+1)) / cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(bin+1)) * h_dataxsec->GetBinContent(bin+1));
+                    h_dataxsec_tot->SetBinError(bin+1, (std::sqrt(h_cov_temp->GetBinContent(bin+1, bin+1)) / cv_hist_vec.at(var).at(k_xsec_mcxsec)->GetBinContent(bin+1)) * h_dataxsec->GetBinContent(bin+1));
                 }
 
             }
@@ -1902,22 +1931,7 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
 
             }
 
-            // Get the chi-squared
-            double chi, pval;
-            int ndof;
-            int index = 0;
-            if (error_type.at(err_lab) == "stat"){
-                index = k_err_stat;
-            }
-            else if (error_type.at(err_lab) == "sys"){
-                index = k_err_sys;
-            }
-            else{
-                index = index = k_err_tot;
-            }
-
-            _util.CalcChiSquared(cv_hist_vec.at(var).at(k_xsec_mcxsec), cv_hist_vec.at(var).at(k_xsec_dataxsec), h_cov_v.at(var).at(k_xsec_mcxsec).at(index), chi, ndof, pval);
-            
+            _util.CalcChiSquared(cv_hist_vec.at(var).at(k_xsec_mcxsec), cv_hist_vec.at(var).at(k_xsec_dataxsec), h_cov_temp , chi, ndof, pval);            
 
             TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
             leg->SetBorderSize(0);
@@ -1940,6 +1954,7 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             delete c;
             delete h_dataxsec;
             delete h_mcxsec;
+            delete h_cov_temp;
 
         
         }

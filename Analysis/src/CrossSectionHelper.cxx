@@ -2866,8 +2866,8 @@ void CrossSectionHelper::SaveGenXSec(){
     htemp_tot->Scale(1.0e39);
 
     if (std::string(_util.xsec_bin_mode) == "ratio"){
-        htemp_e->Scale(1.0/htemp_tot->Integral());
-        htemp_cang->Scale(1.0/htemp_tot->GetBinContent(1));
+        htemp_e->Scale(1.0/htemp_e->Integral());
+        htemp_cang->Scale(1.0/htemp_cang->Integral());
     }
 
     htemp_e->SetOption("hist");
