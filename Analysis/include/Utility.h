@@ -625,6 +625,7 @@ public:
         k_cut_effective_cosangle,
         k_cut_effective_angle_rebin,
         k_cut_effective_cosangle_rebin,
+        k_pi0_mass,
         k_cut_vars_max
     };
 
