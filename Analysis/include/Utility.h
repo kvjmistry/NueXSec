@@ -426,18 +426,6 @@ public:
     // enums for cut dirs
     enum enum_cut_dirs {
                 k_unselected,        // Unselected 
-                k_swtrig,            // Software Trigger
-                k_slice_id,          // Slice ID
-                k_e_candidate,       // Electron Candidate
-                k_in_fv,             // Reco Nu Vtx (SC Corr) In the FV 
-                k_contained_frac,    // Slice Contained Fraction
-                k_topo_score,        // Topo Score
-                k_cosmic_ip,         // Pandora Cosmic Impact Param 3D
-                k_shower_score,      // Shower Score
-                k_hit_ratio,         // Ratio of shr hits and slice hits
-                k_shr_moliere_avg,   // Shower Moliere Average
-                k_vtx_dist_dedx,     //  2D cut for shower to vertex distance and dEdx. Only applied for > 1 track
-                k_dEdx_max_no_tracks,// dEdx all planes when there is no tracks
                 k_cuts_MAX
                 }; 
 

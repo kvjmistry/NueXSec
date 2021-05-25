@@ -178,10 +178,10 @@ void Selection::MakeSelection(){
             // std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
 
             // Apply Pi0 Selection
-            ApplyPiZeroSelection(_util.k_mc, mc_SC);
+            //ApplyPiZeroSelection(_util.k_mc, mc_SC);
 
             // Apply NuMu Selection
-            ApplyNuMuSelection(_util.k_mc, mc_SC);
+            //ApplyNuMuSelection(_util.k_mc, mc_SC);
             
             // Apply the Selection cuts 
             bool pass = ApplyCuts(_util.k_mc, counter_v, mc_SC);
@@ -397,28 +397,28 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     // Here we apply the Selection cuts ----------------------------------------
     bool pass; // A flag to see if an event passes an event
 
-    SC.ReClassifyPileUps(type);
+    //SC.ReClassifyPileUps(type);
 
     // Classify the event -- sets variable in the slice contianer
     SC.SliceClassifier(type);      // Classification of the event
 
     // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
-    SC.SetThresholdEvent(type);
+    //SC.SetThresholdEvent(type);
 
     // If the backtracked pdg of the leading shower is not an electron then alter classification
     // Turn these off to get the efficiencies at low energies correct
-    SC.SetNonLdgShrEvent(type);
+    //SC.SetNonLdgShrEvent(type);
     
-    SC.SliceInteractionType(type); // Genie interaction type
+    //SC.SliceInteractionType(type); // Genie interaction type
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
-    SC.Pi0Classifier(type); 
+    //SC.Pi0Classifier(type); 
 
     // Set derived variables in the slice container
-    SC.SetSignal();                // Set the event as either signal or other
-    SC.SetFakeData();              // Set the classifcation as data if fake data mode
-    SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
-    SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
-    SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
+    //SC.SetSignal();                // Set the event as either signal or other
+    //SC.SetFakeData();              // Set the classifcation as data if fake data mode
+    //SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
+    //SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
+    //SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
 
     // In the case of Nuwro, we need to manually set the weight
     if (std::string(_util.variation) == "nuwro" || std::string(_util.fakedataname) == "nuwro")
@@ -429,6 +429,7 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     // *************************************************************************
     SelectionFill(type, SC, _util.k_unselected, counter_v );
     
+    /*
     // *************************************************************************
     // Software Trigger -- MC Only  --------------------------------------------
     // *************************************************************************
@@ -532,6 +533,7 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     }
     
     SelectionFill(type, SC, _util.k_dEdx_max_no_tracks, counter_v );
+    */
 
     // if (SC.classification.first == "cosmic")
     //     std::cout << SC.nu_purity_from_pfp<< " " << SC.nu_pdg << " " << SC.shr_bkt_pdg <<" " << SC.trk_bkt_pdg<< std::endl; 
@@ -660,6 +662,8 @@ void Selection::SelectionFill(int type, SliceContainer &SC, int cut_index, std::
     // *************************************************************************
     _util.Tabulate(is_in_fv, SC.genie_interaction, SC.classification.first, SC.pi0_classification, type, counter_v.at(cut_index), weight );
 
+
+
 }
 // -----------------------------------------------------------------------------
 void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
@@ -691,9 +695,9 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
     _util.GetPiZeroWeight(weight_Escale, 2, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
 
     // Now Fill the histograms
-    if (!_util.slim) _hhelper.at(type).FillPiZeroHists(SC.classification.second, SC, weight, 0);
-    if (!_util.slim) _hhelper.at(type).FillPiZeroHists(SC.classification.second, SC, weight_norm, 1);
-    if (!_util.slim) _hhelper.at(type).FillPiZeroHists(SC.classification.second, SC, weight_Escale, 2);
+    if (!_util.slim) _hhelper.at(type).FillHists(SC.classification.second, SC, weight, 0);
+    if (!_util.slim) _hhelper.at(type).FillHists(SC.classification.second, SC, weight_norm, 1);
+    if (!_util.slim) _hhelper.at(type).FillHists(SC.classification.second, SC, weight_Escale, 2);
 
 
 }
