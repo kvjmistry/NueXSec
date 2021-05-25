@@ -3078,7 +3078,7 @@ void CrossSectionHelper::StudyFluxShape(){
     _util.IncreaseLabelSize(cor, c);
     cor->SetMarkerSize(1.3);
     _util.Draw_ubooneSim(c, 0.30, 0.915, 0.30, 0.915);
-    // cor->GetZaxis()->SetRangeUser(-1,1);
+    cor->GetZaxis()->SetRangeUser(-1,1);
     c->Print("test_correlation.pdf");
     delete c;
 

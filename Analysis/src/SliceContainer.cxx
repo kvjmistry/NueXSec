@@ -1027,29 +1027,33 @@ void SliceContainer::SetNuMIAngularVariables(){
 
     // Try to calculate "NuMI Phi" which I am going to call gamma
     TVector3 v_tu_unit = -1*v_targ_uboone.Unit(); // Unit vector from target to uboone origin 
-    double rthetax = std::atan2( v_tu_unit.X(),v_tu_unit.Z()); // angle to rotate in z-x plane
-    double rthetay = std::atan2( v_tu_unit.Y(),v_tu_unit.Z()); // angle to rotate in z-y plane
+    TRotation rot_reco;
 
-    // // First do a rotation in the z-x plane
-    double shr_pz_rx =  shr_pz*std::cos(rthetax) + shr_px*std::sin(rthetax);
-    double shr_px_rx = -shr_pz*std::sin(rthetax) + shr_px*std::cos(rthetax);
+    // Set the z axis to rotate to
+    rot_reco.SetZAxis(v_tu_unit.Unit());
+    rot_reco.Invert();
 
-    // Now do a rotation in the z-y plane
-    double shr_pz_rx_ry =  shr_pz_rx*std::cos(rthetay) + shr_py*std::sin(rthetay);
-    double shr_py_ry    = -shr_pz_rx*std::sin(rthetay) + shr_py*std::cos(rthetay);
-
-    TVector3 numi_phi(shr_px_rx, shr_py_ry, shr_pz_rx_ry);
-    shr_gamma = numi_phi.Phi() * 180/3.14159;
+    // Vector to rotate
+    const TVector3 d1_reco = shr_dir;
+    
+    shr_gamma = (rot_reco*d1_reco).Phi() * 180/3.14159;
 
     // Try to calculate "True NuMI Phi" which I am going to call gamma
-    const TVector3 beamdir = -1*(v_targ_uboone.Unit());
+    const TVector3 beamdir = nu_dir;
     TRotation rot;
+    
+    // Set the z axis to rotate to
     rot.SetZAxis(beamdir.Unit());
     rot.Invert();
-    const TVector3 d1 = nu_dir;
+    
+    // Vector to rotate
+    const TVector3 d1 = elec_dir;
+    
+    // Do the rotation
+    TVector3 v_rot = (rot*d1).Unit();
+
     elec_gamma = (rot*d1).Phi() * 180/3.14159;
 
-    // std::cout << beamdir.X() << " " <<  beamdir.Y() << "  " << beamdir.Z() << "  "<< elec_gamma << std::endl;
 
 }
 // -----------------------------------------------------------------------------

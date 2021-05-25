@@ -2808,10 +2808,15 @@ void SystematicsHelper::SaveCovMatrix(TH2D* cov, std::string print_name){
         cov->GetXaxis()->SetNdivisions(cov->GetNbinsX(), 0, 0, kFALSE);
         cov->GetYaxis()->SetNdivisions(cov->GetNbinsY(), 0, 0, kFALSE);
     }
+    gStyle->SetPaintTextFormat("0.3f");
+    gStyle->SetPaintTextFormat("1.1g");
+    cov->SetMarkerColor(kRed+1);
+    cov->GetZaxis()->SetMaxDigits(2);
     cov->GetZaxis()->SetTitleOffset(1.45);
     cov->SetTitle("Covariance Matrix");
-    cov->Draw("colz");
+    cov->Draw("colz,text00");
     _util.IncreaseLabelSize(cov, c);
+    cov->SetMarkerSize(1.3);
     _util.Draw_ubooneSim(c, 0.30, 0.915, 0.30, 0.915);
     c->Print(print_name.c_str());
     delete c;
@@ -2868,8 +2873,9 @@ void SystematicsHelper::SaveFracCovMatrix(TH2D* cov, TH1D* h_CV, std::string pri
         frac_cov->GetXaxis()->SetNdivisions(frac_cov->GetNbinsX(), 0, 0, kFALSE);
         frac_cov->GetYaxis()->SetNdivisions(frac_cov->GetNbinsY(), 0, 0, kFALSE);
     }
-
+    gStyle->SetPaintTextFormat("1.1g");
     frac_cov->Draw("colz,text00");
+    frac_cov->GetZaxis()->SetMaxDigits(2);
     _util.IncreaseLabelSize(frac_cov, c);
     frac_cov->SetMarkerSize(1.3);
     _util.Draw_ubooneSim(c, 0.30, 0.915, 0.30, 0.915);
