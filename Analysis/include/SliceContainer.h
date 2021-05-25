@@ -522,7 +522,7 @@ public:
     std::map<std::string, std::vector<double>> *weights_v = nullptr;
     std::vector<unsigned short> *weightsGenie  = nullptr;
     std::vector<unsigned short> *weightsReint  = nullptr;
-    std::vector<unsigned short> *weightsPPFX     = nullptr;
+    std::vector<unsigned short> *weightsFlux     = nullptr;
 
 
     double knobRPAup{1.0};
