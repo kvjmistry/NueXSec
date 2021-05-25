@@ -641,12 +641,33 @@ void Selection::SelectionFill(int type, SliceContainer &SC, int cut_index, std::
 
     // Set the CV weight variable in the slice container
     SC.SetCVWeight(weight);
+
+    // *************************************************************************
+    // Pi0 Selection Cuts ------------------------------------------------------
+    // *************************************************************************
+    pass = _scuts.pi_zero_cuts(SC);
+    if(!pass) return; // Failed the cut!
+
+    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+
+    // Get the Central Value weight
+    double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);
+    double weight_norm = weight;
+    double weight_Escale = weight;
+
+    // Try scaling the pi0
+    // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
+    _util.GetPiZeroWeight(weight,        0, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
+    _util.GetPiZeroWeight(weight_norm,   1, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
+    _util.GetPiZeroWeight(weight_Escale, 2, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
     
     // *************************************************************************
     // Fill Histograms
     // *************************************************************************
     // Fill almost all the histograms with this function call
     if (!_util.slim) _hhelper.at(type).FillHists(type, SC.classification.second, SC.genie_interaction, SC.particle_type.second, cut_index, SC, weight);
+    if (!_util.slim) _hhelper.at(type).FillHists(type, SC.classification.second, SC.genie_interaction, SC.particle_type.second, cut_index, SC, weight_norm);
+    if (!_util.slim) _hhelper.at(type).FillHists(type, SC.classification.second, SC.genie_interaction, SC.particle_type.second, cut_index, SC, weight_Escale);
 
     // Fill Plots for Efficiency
     if (!_util.slim && type == _util.k_mc) _hhelper.at(type).FillTEfficiency(cut_index, SC.classification.first, SC, weight);
@@ -661,8 +682,6 @@ void Selection::SelectionFill(int type, SliceContainer &SC, int cut_index, std::
     // Tabulate the selection i.e count everything
     // *************************************************************************
     _util.Tabulate(is_in_fv, SC.genie_interaction, SC.classification.first, SC.pi0_classification, type, counter_v.at(cut_index), weight );
-
-
 
 }
 // -----------------------------------------------------------------------------
@@ -695,9 +714,9 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
     _util.GetPiZeroWeight(weight_Escale, 2, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
 
     // Now Fill the histograms
-    if (!_util.slim) _hhelper.at(type).FillHists(SC.classification.second, SC, weight, 0);
-    if (!_util.slim) _hhelper.at(type).FillHists(SC.classification.second, SC, weight_norm, 1);
-    if (!_util.slim) _hhelper.at(type).FillHists(SC.classification.second, SC, weight_Escale, 2);
+    if (!_util.slim) _hhelper.at(type).FillPiZeroHists(SC.classification.second, SC, weight, 0);
+    if (!_util.slim) _hhelper.at(type).FillPiZeroHists(SC.classification.second, SC, weight_norm, 1);
+    if (!_util.slim) _hhelper.at(type).FillPiZeroHists(SC.classification.second, SC, weight_Escale, 2);
 
 
 }
