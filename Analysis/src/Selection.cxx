@@ -631,20 +631,23 @@ void Selection::SelectionFill(int type, SliceContainer &SC, int cut_index, std::
     // *************************************************************************
     // Get the CV weight
     // *************************************************************************
-    double weight = 1.0;
-    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
-    weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);
+    //double weight = 1.0;
+    //bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+    //weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);
 
     // Try scaling the pi0 -- need to implement this as a configurable option
     // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
-    _util.GetPiZeroWeight(weight, _util.pi0_correction, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
+    //_util.GetPiZeroWeight(weight, _util.pi0_correction, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
 
     // Set the CV weight variable in the slice container
-    SC.SetCVWeight(weight);
+    //SC.SetCVWeight(weight);
 
     // *************************************************************************
     // Pi0 Selection Cuts ------------------------------------------------------
     // *************************************************************************
+
+    bool pass;
+
     pass = _scuts.pi_zero_cuts(SC);
     if(!pass) return; // Failed the cut!
 
