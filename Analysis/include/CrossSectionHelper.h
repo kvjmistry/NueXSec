@@ -230,7 +230,7 @@ class CrossSectionHelper{
         "pi0",
         "weightsGenie",
         "weightsReint",
-        "weightsPPFX"
+        "weightsFlux"
         // "MCStats"
     };
 
