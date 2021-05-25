@@ -50,7 +50,7 @@ class CrossSectionHelper{
     // Weights
     std::vector<unsigned short> *weightsGenie = NULL;
     std::vector<unsigned short> *weightsReint = NULL;
-    std::vector<unsigned short> *weightsPPFX = NULL ;
+    std::vector<unsigned short> *weightsFlux = NULL ;
     double knobRPAup{0.0};
     double knobCCMECup{0.0};
     double knobAxFFCCQEup{0.0};

@@ -345,7 +345,7 @@ template<typename T> void SliceContainer::Initialise(T *tree, int type, Utility 
         if (type == _util.k_mc){
             tree->SetBranchAddress("weightsGenie",          &weightsGenie);
             tree->SetBranchAddress("weightsReint",          &weightsReint);
-            tree->SetBranchAddress("weightsPPFX",           &weightsPPFX);
+            tree->SetBranchAddress("weightsFlux",           &weightsFlux);
             tree->SetBranchAddress("knobRPAup",             &knobRPAup);
             tree->SetBranchAddress("knobRPAdn",             &knobRPAdn);
             tree->SetBranchAddress("knobCCMECup",           &knobCCMECup);
