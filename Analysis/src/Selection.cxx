@@ -1,4 +1,5 @@
 #include "../include/Selection.h"
+#include <stdexcept> // std::out_of_range
 
 namespace xsecSelection {
 // -----------------------------------------------------------------------------
@@ -152,7 +153,7 @@ void Selection::Initialise(Utility _utility){
 // Main function for Selection
 void Selection::MakeSelection(){
     std::cout << "\n\033[0;32mNow Running the Selection!\033[0m"<< std::endl;
-    
+    bool badEvent = false;
     // MC ----------------------------------------------------------------------
     if (bool_use_mc){
         std::cout << "\nStarting Selection over MC" << std::endl;
@@ -161,19 +162,28 @@ void Selection::MakeSelection(){
         std::ofstream run_subrun_file_mc;
         run_subrun_file_mc.open(Form("files/txt/run%s_run_subrun_list_mc.txt",_util.run_period));
 
+	mc_tree_total_entries = mc_tree->GetEntries();
+	std::cout << "mc_tree_total_entries = " << mc_tree_total_entries << std::endl;
+
         // Event loop
         for (int ievent = 0; ievent < mc_tree_total_entries; ievent++){
+
+	    //std::cout << ievent << std::endl;
 
             // See if we want to process all the events
             if (max_events > 0){
                 if (ievent >= max_events) break;
             }
 
+	    std::cout << "entry = " << ievent << std::endl;
+	    //if(ievent==21091 || ievent==24552 || ievent==32322 || ievent==54922) continue;
             // Alert the user
             if (ievent % 100000 == 0) std::cout << "On entry " << ievent/100000.0 <<"00k " << std::endl;
 
             // Get the entry in the tree
-            mc_tree->GetEntry(ievent); 
+            printf("get entry...");
+            mc_tree->GetEntry(ievent);
+	    printf(" done\n");
 
             // std::cout << mc_SC.run << " " << mc_SC.sub<<" " << mc_SC.evt<<  std::endl;
 
@@ -184,7 +194,9 @@ void Selection::MakeSelection(){
             //ApplyNuMuSelection(_util.k_mc, mc_SC);
             
             // Apply the Selection cuts 
+            printf("apply the selection cuts...");
             bool pass = ApplyCuts(_util.k_mc, counter_v, mc_SC);
+	    printf(" done\n");
 
             // Only fill passed events for fake data
             if (_util.isfakedata){
@@ -195,7 +207,10 @@ void Selection::MakeSelection(){
             // Fill the output tree if the event passed or it was signal
             else {
                 if (pass || mc_SC.is_signal)
+		    std::cout << "Start TreeHelper...";
                     _thelper.at(_util.k_mc).FillVars(mc_SC, pass);
+		    std::cout << " done" << std::endl;
+		    
             }
             
             // If the event passed the selection then save the run subrun event to file
@@ -214,6 +229,8 @@ void Selection::MakeSelection(){
         // Create file for saving run, subrun event
         std::ofstream run_subrun_file_data;
         run_subrun_file_data.open(Form("files/txt/run%s_run_subrun_list_data.txt",_util.run_period));
+
+	std::cout << "data_tree_total_entries = " << data_tree_total_entries << std::endl;
 
         for (int ievent = 0; ievent < data_tree_total_entries; ievent++){
 
@@ -400,7 +417,9 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     //SC.ReClassifyPileUps(type);
 
     // Classify the event -- sets variable in the slice contianer
+    if(type==_util.k_mc) printf("slice classifier...");
     SC.SliceClassifier(type);      // Classification of the event
+    if(type==_util.k_mc) printf(" done\n");
 
     // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
     //SC.SetThresholdEvent(type);
@@ -410,7 +429,9 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     //SC.SetNonLdgShrEvent(type);
     
     //SC.SliceInteractionType(type); // Genie interaction type
+    if(type==_util.k_mc) printf("particle classifier...");
     SC.ParticleClassifier(type);   // The truth matched particle type of the leading shower
+    if(type==_util.k_mc) printf(" done\n");
     //SC.Pi0Classifier(type); 
 
     // Set derived variables in the slice container
@@ -420,14 +441,18 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     //SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
     //SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
 
+    if(type==_util.k_mc)std::cout << "nuwro...";
     // In the case of Nuwro, we need to manually set the weight
     if (std::string(_util.variation) == "nuwro" || std::string(_util.fakedataname) == "nuwro")
         SC.SetPPFXCVWeight();
+    if(type==_util.k_mc)std::cout << " done" << std::endl;
 
     // *************************************************************************
     // Unselected---------------------------------------------------------------
     // *************************************************************************
+    if(type==_util.k_mc)std::cout << "selectionFill...";
     SelectionFill(type, SC, _util.k_unselected, counter_v );
+    if(type==_util.k_mc)std::cout << " done" << std::endl;
     
     /*
     // *************************************************************************
@@ -553,7 +578,7 @@ void Selection::SavetoFile(){
     // Now saving histograms to file
     std::cout << "Now Saving Histograms to file" << std::endl;
     if (bool_use_mc) {
-    
+    	std::cout << "here1" << std::endl;
         if (std::string(_util.intrinsic_mode) == "default" || std::string(_util.intrinsic_mode) == "intrinsic"){
             _hhelper.at(_util.k_mc).WriteTEfficiency();
             _hhelper.at(_util.k_mc).WriteTrue();
@@ -568,7 +593,7 @@ void Selection::SavetoFile(){
             else
                 _hhelper.at(_util.k_mc).WriteReco(_util.k_mc);
         }
-        
+        std::cout << "here2" << std::endl;
         if (std::string(_util.intrinsic_mode) == "default") {
             _hhelper.at(_util.k_mc).WriteFlash();
             
@@ -585,7 +610,7 @@ void Selection::SavetoFile(){
                 _hhelper.at(_util.k_mc).WriteNuMu(_util.k_mc);
             }
         }
-
+	std::cout << "here3" << std::endl;
         _thelper.at(_util.k_mc).WriteTree(_util.k_mc);
 
 

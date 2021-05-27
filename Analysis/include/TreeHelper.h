@@ -63,7 +63,7 @@ class TreeHelper{
     float shrmoliereavg{0.0};
     float shr_hits_max{0.0};
     float elec_e{0.0};
-    float ppfx_cv{1.0};
+    //float ppfx_cv{1.0};
     float weightSplineTimesTune{1.0};
     float numi_ang{0};
     int nu_pdg{0};
@@ -74,8 +74,8 @@ class TreeHelper{
     int npi0{0};
     double pi0_e{0.0};
     int interaction{0};
-    std::vector<float> all_shr_hits;
-    std::vector<float> all_shr_energies;
+    //std::vector<float> all_shr_hits;
+    //std::vector<float> all_shr_energies;
     double effective_angle{0.0};     // The angle between the vector from the target to nu vtx compared to the reconstructed shower direction.
     double cos_effective_angle{0.0}; // The cosine of the angle between the vector from the target to nu vtx compared to the reconstructed shower direction.
     double true_effective_angle{0.0};     // True angle between electron and neutrino vectors

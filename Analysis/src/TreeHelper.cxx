@@ -221,7 +221,7 @@ void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
     shrmoliereavg            = SC.shrmoliereavg;
     shr_hits_max             = SC.shr_hits_max;
     elec_e                   = SC.elec_e;
-    ppfx_cv                  = SC.ppfx_cv;
+    //ppfx_cv                  = SC.ppfx_cv;
     weightSplineTimesTune    = SC.weightSplineTimesTune;
     nu_pdg                   = SC.nu_pdg;
     numi_ang                 = SC.nu_angle;
@@ -237,10 +237,9 @@ void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
     shr_bkt_purity       = SC.shr_bkt_purity;
     shr_bkt_completeness = SC.shr_bkt_completeness;
     shr_bkt_E            = SC.shr_bkt_E;
-    all_shr_hits         = *SC.all_shr_hits;
-    all_shr_energies     = *SC.all_shr_energies;
+    //all_shr_hits         = *SC.all_shr_hits;
+    //all_shr_energies     = *SC.all_shr_energies;
 
-    
     if (SC.weightsGenie != NULL) weightsGenie           = *SC.weightsGenie; // If these aren't set by default then bad things happen in memory land
     if (SC.weightsReint != NULL) weightsReint           = *SC.weightsReint;
     if (SC.weightsFlux  != NULL) weightsFlux            = *SC.weightsFlux;
@@ -444,7 +443,7 @@ void TreeHelper::SetBranches(TTree * tree){
     tree->Branch("shrmoliereavg",          &shrmoliereavg, "shrmoliereavg/F");
     tree->Branch("shr_hits_max",           &shr_hits_max,  "shr_hits_max/F");
     tree->Branch("elec_e",                 &elec_e,  "elec_e/F");
-    tree->Branch("ppfx_cv",                &ppfx_cv,  "ppfx_cv/F");
+    //tree->Branch("ppfx_cv",                &ppfx_cv,  "ppfx_cv/F");
     tree->Branch("weightSplineTimesTune",  &weightSplineTimesTune,  "weightSplineTimesTune/F");
     tree->Branch("nu_pdg",                 &nu_pdg,  "nu_pdg/I");
     tree->Branch("numi_ang",               &numi_ang,  "numi_ang/F");
@@ -454,8 +453,8 @@ void TreeHelper::SetBranches(TTree * tree){
     tree->Branch("shr_bkt_E",              &shr_bkt_E);
     tree->Branch("npi0",                   &npi0,  "npi0/I");
     tree->Branch("pi0_e",                  &pi0_e, "pi0_e/D");
-    tree->Branch("all_shr_hits",     "std::vector<float>", &all_shr_hits);
-    tree->Branch("all_shr_energies", "std::vector<float>", &all_shr_energies);
+    //tree->Branch("all_shr_hits",     "std::vector<float>", &all_shr_hits);
+    //tree->Branch("all_shr_energies", "std::vector<float>", &all_shr_energies);
     tree->Branch("interaction",              &interaction,  "interaction/I");
     tree->Branch("effective_angle",          &effective_angle);
     tree->Branch("cos_effective_angle",      &cos_effective_angle);

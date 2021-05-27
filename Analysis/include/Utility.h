@@ -266,7 +266,7 @@ public:
 
     // Weight configurations
     bool weight_tune{true}; // Use the GENIE Tune
-    bool weight_ppfx{true}; // Use the PPFX CV Corr
+    bool weight_ppfx{false}; // Use the PPFX CV Corr
     bool weight_dirt{true}; // Weight the Dirt events
     bool weight_ext{true};  // Weight the EXT events
     int  pi0_correction{1}; // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling

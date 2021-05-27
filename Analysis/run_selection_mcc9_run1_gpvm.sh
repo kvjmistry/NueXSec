@@ -9,10 +9,15 @@ fi
 
 if [ -z "$1" ]; then
   # Run the selection
-  mc="./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v7/neutrinoselection_filt_run1_overlay.root --gpvm"
-  data="./nuexsec --run 1 --data /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v5/neutrinoselection_filt_run1_beamon_beamgood.root --gpvm"
-  ext="./nuexsec --run 1 --ext /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v5/neutrinoselection_filt_run1_beamoff.root --gpvm"
-  dirt="./nuexsec --run 1 --dirt /pnfs/uboone/persistent/users/davidc/searchingfornues/v08_00_00_51/1124/prodgenie_numi_uboone_overlay_dirt_fhc_mcc9_run1_v28_all_snapshot.root --gpvm"
+  #mc="./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v7/neutrinoselection_filt_run1_overlay.root --gpvm"
+  #data="./nuexsec --run 1 --data /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v5/neutrinoselection_filt_run1_beamon_beamgood.root --gpvm"
+  #ext="./nuexsec --run 1 --ext /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v5/neutrinoselection_filt_run1_beamoff.root --gpvm"
+  #dirt="./nuexsec --run 1 --dirt /pnfs/uboone/persistent/users/davidc/searchingfornues/v08_00_00_51/1124/prodgenie_numi_uboone_overlay_dirt_fhc_mcc9_run1_v28_all_snapshot.root --gpvm"
+
+  mc="./nuexsec --run 1 --mc /pnfs/uboone/persistent/users/davidc/searchingfornues/v08_00_00_43/0928/prodgenie_bnb_nu_uboone_overlay_mcc9.1_v08_00_00_26_filter_run1_reco2_reco2.root"
+  #data="./nuexsec --run 1 --data /uboone/data/users/davidc/searchingfornues/v08_00_00_43/0702/run1/nslice/data_bnb_mcc9.1_v08_00_00_25_reco2_C1_beam_good_reco2_5e19.root"
+  #ext="./nuexsec --run 1 --ext /uboone/data/users/davidc/searchingfornues/v08_00_00_43/0702/run1/nslice/data_extbnb_mcc9.1_v08_00_00_25_reco2_C_all_reco2.root"
+  #dirt="./nuexsec --run 1 --dirt /uboone/data/users/davidc/searchingfornues/v08_00_00_43/0702/run1/nslice/prodgenie_bnb_dirt_overlay_mcc9.1_v08_00_00_26_run1_reco2_reco2.root"
 
   # This runs each of the strings above in parallel to maximise cpu usage
   eval $mc | tee log/run1_mc.log | sed -e 's/^/[MC] /' &
@@ -32,7 +37,7 @@ if [ -z "$1" ]; then
   done
 
   # Overwrite the Nue cc events with a higher stats version
-  ./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v7/neutrinoselection_filt_run1_overlay_intrinsic.root --intrinsic intrinsic --gpvm
+  #./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v7/neutrinoselection_filt_run1_overlay_intrinsic.root --intrinsic intrinsic --gpvm
 
   # Print the selection
   ./nuexsec --run 1 --printonly --printall --gpvm | tee -a log/run1.log 
