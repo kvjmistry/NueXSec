@@ -9,6 +9,8 @@
 #include <cstring>
 #include <cstdlib>
 #include <sstream>
+#include <iomanip>
+#include <limits>
 
 // Root Includes
 #include "TDirectory.h"
@@ -76,7 +78,7 @@ public:
     template<typename T> void CheckWeight(T &weight);
     // -------------------------------------------------------------------------
     // Get the CV weight correction
-    double GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv, int interaction, double elec_e);
+    double GetCVWeight(int type, double weightSplineTimesTune, double nu_e, int nu_pdg, bool infv, int interaction, double elec_e);
     // -------------------------------------------------------------------------
     // Get the pi0 weight correction
     void GetPiZeroWeight(double &weight, int pizero_mode, int nu_pdg, int ccnc, int npi0, double pi0_e);
@@ -606,97 +608,19 @@ public:
 
     // Variables to get the systematic uncertainty by cut for
     enum TH1D_cut_vars {
-        k_cut_nslice,
-        k_cut_shower_multiplicity,
-        k_cut_track_multiplicity,
-        k_cut_topological_score,
-        k_cut_vtx_x_sce,
-        k_cut_vtx_y_sce,
-        k_cut_vtx_z_sce,
-        k_cut_shower_score,
-        k_cut_shr_tkfit_dedx_max,
-        k_cut_shr_tkfit_dedx_max_tune,
-        k_cut_shr_tkfit_dedx_max_with_tracks,
-        k_cut_shr_tkfit_dedx_max_no_tracks,
-        k_cut_shower_to_vtx_dist,
-        k_cut_hits_ratio,
-        k_cut_CosmicIPAll3D,
-        k_cut_contained_fraction,
-        k_cut_shrmoliereavg,
-        k_cut_leading_shower_theta,
-        k_cut_leading_shower_phi,
-        k_cut_shower_energy_cali,
-        k_cut_shower_energy_cali_rebin,
-        k_cut_flash_time,
-        k_cut_flash_pe,
-        k_cut_effective_angle,
-        k_cut_effective_cosangle,
-        k_cut_effective_angle_rebin,
-        k_cut_effective_cosangle_rebin,
+	k_pi0_mass,
         k_cut_vars_max
     };
 
     // ------------------------------------------
     // variables to plot PlotVariations and SysVariations
         std::vector<std::string> vec_hist_name = {
-        "h_reco_nslice",
-        "h_reco_shower_multiplicity",
-        "h_reco_track_multiplicity",
-        "h_reco_topological_score",
-        "h_reco_vtx_x_sce",
-        "h_reco_vtx_y_sce",
-        "h_reco_vtx_z_sce",
-        "h_reco_shower_score",
-        "h_reco_shr_tkfit_dedx_max",
-        "h_reco_shr_tkfit_dedx_max_tune",
-        "h_reco_shr_tkfit_dedx_max_with_tracks",
-        "h_reco_shr_tkfit_dedx_max_no_tracks",
-        "h_reco_shower_to_vtx_dist",
-        "h_reco_hits_ratio",
-        "h_reco_CosmicIPAll3D",
-        "h_reco_contained_fraction",
-        "h_reco_shrmoliereavg",
-        "h_reco_leading_shower_theta",
-        "h_reco_leading_shower_phi",
-        "h_reco_shower_energy_cali",
-        "h_reco_shower_energy_cali_rebin",
-        "h_reco_flash_time",
-        "h_reco_flash_pe",
-        "h_reco_effective_angle",
-        "h_reco_effective_cosangle",
-        "h_reco_effective_angle_rebin",
-        "h_reco_effective_cosangle_rebin",
+	"h_pi0_mass"
     };
  
     // x axis label for those plots
     std::vector<std::string> vec_axis_label = {
-        "Pandora Slice ID",
-        "Shower Multiplicity",
-        "Track Multiplicity",
-        "Topological Score",
-        "Reco Vertex X [cm]",
-        "Reco Vertex Y [cm]",
-        "Reco Vertex Z [cm]",
-        "Shower Score",
-        "Leading Shower dE/dx (All Planes) [MeV/cm]",
-        "Leading Shower dE/dx (All Planes) [MeV/cm]",
-        "Leading Shower dE/dx (All Planes) (with tracks) [MeV/cm]",
-        "Leading Shower dE/dx (All Planes) (0 tracks) [MeV/cm]",
-        "Leading Shower to Vertex Distance [cm]",
-        "Hit Ratio",
-        "Pandora Cosmic Impact Parameter 3D [cm]",
-        "Contained Fraction (PFP hits in FV / hits in slice)",
-        "Leading Shower Moliere Average [deg]",
-        "Leading Shower Theta [deg]",
-        "Leading Shower Phi [deg]",
-        "Reconstructed Leading Shower Energy [GeV]",
-        "Reconstructed Leading Shower Energy [GeV]",
-        "Largest Flash Time [#mus]",
-        "Largest Flash Intensity [PE]",
-        "#beta [deg]",
-        "cos(#beta) [deg]",
-        "#beta [deg]",
-        "cos(#beta) [deg]"
+	"Pi0 Mass [GeV]"
     };
 
     // list of detector variations

@@ -730,7 +730,7 @@ template<typename T> void Utility::CheckWeight(T &weight){
 template void Utility::CheckWeight<double>(double &weight);
 template void Utility::CheckWeight<float>(float   &weight);
 // -----------------------------------------------------------------------------
-double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_cv, double nu_e, int nu_pdg, bool infv, int interaction, double elec_e){
+double Utility::GetCVWeight(int type, double weightSplineTimesTune, double nu_e, int nu_pdg, bool infv, int interaction, double elec_e){
 
     // Always give weights of 1 to the data
     if (type == k_data) return 1.0;
@@ -762,7 +762,7 @@ double Utility::GetCVWeight(int type, double weightSplineTimesTune, double ppfx_
 
     // Get the PPFX CV flux correction weight
     double weight_flux = 1.0;
-    if (weight_ppfx) weight_flux = ppfx_cv;
+    //if (weight_ppfx) weight_flux = ppfx_cv;
 
     CheckWeight(weight_flux);
 

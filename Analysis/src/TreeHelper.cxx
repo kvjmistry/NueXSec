@@ -202,7 +202,7 @@ void TreeHelper::Initialise(int type, const char* file_out, Utility _utility ){
 void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
 
     f_nuexsec_tree->cd();
-
+    
     run                      = SC.run;
     subrun                   = SC.sub;
     event                    = SC.evt;
@@ -234,17 +234,16 @@ void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
     true_effective_angle     = SC.true_effective_angle;
     cos_true_effective_angle = std::cos(SC.true_effective_angle * 3.14159 / 180.0);
     ccnc = SC.ccnc;
-
+    
     shr_bkt_purity       = SC.shr_bkt_purity;
     shr_bkt_completeness = SC.shr_bkt_completeness;
     shr_bkt_E            = SC.shr_bkt_E;
-    all_shr_hits         = *SC.all_shr_hits;
-    all_shr_energies     = *SC.all_shr_energies;
-
-    
+    //all_shr_hits         = *SC.all_shr_hits;
+    //all_shr_energies     = *SC.all_shr_energies;
+        
     if (SC.weightsGenie != NULL) weightsGenie           = *SC.weightsGenie; // If these aren't set by default then bad things happen in memory land
     if (SC.weightsReint != NULL) weightsReint           = *SC.weightsReint;
-    if (SC.weightsPPFX  != NULL) weightsPPFX            = *SC.weightsPPFX;
+    if (SC.weightsFlux  != NULL) weightsFlux            = *SC.weightsFlux;
     knobRPAup              = SC.knobRPAup;
     knobCCMECup            = SC.knobCCMECup;
     knobAxFFCCQEup         = SC.knobAxFFCCQEup;
@@ -269,13 +268,13 @@ void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
     knobNormNCCOHdn        = SC.knobNormNCCOHdn;
     knobxsr_scc_Fv3dn      = SC.knobxsr_scc_Fv3dn;
     knobxsr_scc_Fa3dn      = SC.knobxsr_scc_Fa3dn;
-
+    
     // Fill the nue tree
     if (std::string(_util.intrinsic_mode) == "intrinsic")
         nue_tree->Fill();
     else
         tree->Fill();
-
+    
 }
 // -----------------------------------------------------------------------------
 void TreeHelper::Fill_dedxVars(SliceContainer &SC, std::pair<std::string, int> _classification, std::string _cut, double _weight){
@@ -466,7 +465,7 @@ void TreeHelper::SetBranches(TTree * tree){
 
     tree->Branch("weightsGenie", "std::vector<unsigned short>", &weightsGenie);
     tree->Branch("weightsReint", "std::vector<unsigned short>", &weightsReint);
-    tree->Branch("weightsPPFX",  "std::vector<unsigned short>", &weightsPPFX);
+    tree->Branch("weightsFlux",  "std::vector<unsigned short>", &weightsFlux);
     tree->Branch("knobRPAup",             &knobRPAup,             "knobRPAup/D");
     tree->Branch("knobRPAdn",             &knobRPAdn,             "knobRPAdn/D");
     tree->Branch("knobCCMECup",           &knobCCMECup,           "knobCCMECup/D");

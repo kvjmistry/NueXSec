@@ -1048,7 +1048,7 @@ void UtilityPlotter::PlotTrueVar(){
 
         bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
 
-        double weight = _util.GetCVWeight(_util.k_mc, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);
+        double weight = _util.GetCVWeight(_util.k_mc, SC.weightSplineTimesTune, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);
         
         // True nue energy
         h_hit_pur.at(0).at(SC.classification.second)->Fill(SC.nu_e, SC.nu_purity_from_pfp, weight);
@@ -4179,7 +4179,7 @@ void UtilityPlotter::CompareGeneratorPi0(){
 
         bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
 
-        double weight = _util.GetCVWeight(_util.k_mc, 1.0, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e); // Turn off the genie tune
+        double weight = _util.GetCVWeight(_util.k_mc, 1.0, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e); // Turn off the genie tune
         
         // Pi0 Energy
         if (is_in_fv && SC.npi0>0 && SC.ccnc == 1) 
@@ -4254,7 +4254,7 @@ void UtilityPlotter::CompareGeneratorPi0(){
 
         bool is_in_fv = _util.in_fv(SC_nuwro.true_nu_vtx_sce_x, SC_nuwro.true_nu_vtx_sce_y, SC_nuwro.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
 
-        double weight = _util.GetCVWeight(_util.k_mc, SC_nuwro.weightSplineTimesTune, SC_nuwro.ppfx_cv, SC_nuwro.nu_e, SC_nuwro.nu_pdg, is_in_fv, SC_nuwro.interaction, SC_nuwro.elec_e);
+        double weight = _util.GetCVWeight(_util.k_mc, SC_nuwro.weightSplineTimesTune, SC_nuwro.nu_e, SC_nuwro.nu_pdg, is_in_fv, SC_nuwro.interaction, SC_nuwro.elec_e);
         
         // Pi0 Energy
         if (is_in_fv && SC_nuwro.npi0>0 && SC_nuwro.ccnc == 1) 
@@ -4326,7 +4326,7 @@ void UtilityPlotter::CompareGeneratorPi0(){
 
         bool is_in_fv = _util.in_fv(SC_tune1.true_nu_vtx_sce_x, SC_tune1.true_nu_vtx_sce_y, SC_tune1.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
 
-        double weight = _util.GetCVWeight(_util.k_mc, SC_tune1.weightSplineTimesTune, SC_tune1.ppfx_cv, SC_tune1.nu_e, SC_tune1.nu_pdg, is_in_fv, SC_tune1.interaction, SC_tune1.elec_e);
+        double weight = _util.GetCVWeight(_util.k_mc, SC_tune1.weightSplineTimesTune, SC_tune1.nu_e, SC_tune1.nu_pdg, is_in_fv, SC_tune1.interaction, SC_tune1.elec_e);
         
         // Pi0 Energy
         if (is_in_fv && SC_tune1.npi0>0 && SC_tune1.ccnc == 1) 

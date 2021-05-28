@@ -403,7 +403,7 @@ void CrossSectionHelper::LoopEvents(){
                 double temp_integrated_flux = integrated_flux;
 
                 // If we are reweighting by the PPFX Multisims, we need to change the integrated flux too
-                if (reweighter_labels.at(label) == "weightsPPFX") 
+                if (reweighter_labels.at(label) == "weightsFlux") 
                     temp_integrated_flux = GetIntegratedFluxHP(uni, "ppfx_ms_UBPPFX");
 
                 // If this is a beamline variation then we use the corresponding beamline flux
@@ -776,7 +776,7 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
         bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
 
         // Get the CV weight
-        double cv_weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);
+        double cv_weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);
         _util.GetPiZeroWeight(cv_weight, _util.pi0_correction, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
         
         double weight_dirt = cv_weight;
@@ -856,7 +856,7 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
         weight_uni = cv_weight * vec_universes[uni];
     }
     // Hadron Production weights
-    else if (label == "weightsPPFX"){
+    else if (label == "weightsFlux"){
 
         // Get weight from ratio of flux histograms
         if (_util.usefluggflux){
@@ -1508,7 +1508,7 @@ void CrossSectionHelper::InitTree(){
     
     tree->SetBranchAddress("weightsGenie",          &weightsGenie);
     tree->SetBranchAddress("weightsReint",          &weightsReint);
-    tree->SetBranchAddress("weightsPPFX",           &weightsPPFX);
+    tree->SetBranchAddress("weightsFlux",           &weightsFlux);
     tree->SetBranchAddress("knobRPAup",             &knobRPAup);
     tree->SetBranchAddress("knobRPAdn",             &knobRPAdn);
     tree->SetBranchAddress("knobCCMECup",           &knobCCMECup);
@@ -1560,11 +1560,11 @@ void CrossSectionHelper::SwitchReweighterLabel(std::string label){
 
     }
     // PPFX All
-    else if (label == "weightsPPFX"){
+    else if (label == "weightsFlux"){
         
         // Convert from unsigned short to double and push back -- divide by 1000 to undo previous *1000
-        for (unsigned int j = 0; j < weightsPPFX->size(); j++){
-            vec_universes.push_back( (double) weightsPPFX->at(j)/1000.0);
+        for (unsigned int j = 0; j < weightsFlux->size(); j++){
+            vec_universes.push_back( (double) weightsFlux->at(j)/1000.0);
         }
 
     }
@@ -1676,11 +1676,11 @@ void CrossSectionHelper::SwitchReweighterLabel(std::string label, SliceContainer
 
     }
     // PPFX All
-    else if (label == "weightsPPFX"){
+    else if (label == "weightsFlux"){
         
         // Convert from unsigned short to double and push back -- divide by 1000 to undo previous *1000
-        for (unsigned int j = 0; j < SC.weightsPPFX->size(); j++){
-            vec_universes.push_back( (double) SC.weightsPPFX->at(j)/1000.0);
+        for (unsigned int j = 0; j < SC.weightsFlux->size(); j++){
+            vec_universes.push_back( (double) SC.weightsFlux->at(j)/1000.0);
         }
 
     }
@@ -1845,7 +1845,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
         else if (std::string(_util.xsec_labels) == "ppfx"){
             std::cout << "XSec reweighting mode set to ppfx" << std::endl;
             reweighter_labels.clear();
-            reweighter_labels = {"CV", "weightsPPFX"};
+            reweighter_labels = {"CV", "weightsFlux"};
         }
         // Only run Genie All
         else if (std::string(_util.xsec_labels) == "genie"){
@@ -1929,7 +1929,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
             
         }
         // Specific resizing -- hardcoded and may break in the future
-        else if ( reweighter_labels.at(j) == "weightsPPFX"){
+        else if ( reweighter_labels.at(j) == "weightsFlux"){
             std::cout << "Setting PPFX All Histogram universe vector to size: " << uni_ppfx << std::endl;
             h_cross_sec.at(j).resize(uni_ppfx);
             h_smear.at(j).resize(uni_ppfx);
@@ -2112,7 +2112,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                     h_cut_v.at(label).at(cut).at(var).resize(uni_genie);
                 }
                 // Specific resizing -- hardcoded and may break in the future
-                else if ( reweighter_labels.at(label) == "weightsPPFX"){
+                else if ( reweighter_labels.at(label) == "weightsFlux"){
                     h_cut_v.at(label).at(cut).at(var).resize(uni_ppfx);
                 }
                 // Specific resizing -- hardcoded and may break in the future
