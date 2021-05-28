@@ -440,17 +440,46 @@ void CrossSectionHelper::LoopEvents(){
                             
                             ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
                             h_detvar_cv, h_smear.at(label).at(uni).at(k_var_trueX), true);
+
+                            ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape),
+                            h_detvar_cv, h_smear.at(label).at(uni).at(k_var_trueX), false);
+
+                            // Add in the reco background
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_ext));
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_dirt));
                         }
                         else {
+
+                            // For shape uncertainties
+                            // TH1D* h_shape_temp = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Clone();
+                            // ApplyResponseMatrix(h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape),
+                            // h_shape_temp, h_smear.front().front().at(k_var_trueX), false);
+                            
+                            // For making covariance matrix on response * gen + B
+                            if (reweighter_labels.at(label) == "weightsPPFX" || CheckBeamline(reweighter_labels.at(label))){
+                                TH2D* h_smear_temp = (TH2D*) h_smear.at(label).at(uni).at(k_var_trueX)->Clone();
+
+                                ApplyResponseMatrix( h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape),
+                                h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear_temp, true);
+                                delete h_smear_temp;
+                            }
+                            else {
+                                TH2D* h_smear_temp = (TH2D*) h_smear.at(label).at(uni).at(k_var_trueX)->Clone();
+                                ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape),
+                                h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear_temp, true);
+                                delete h_smear_temp;
+                            }
 
                             // Standard Smearing
                             ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
                             h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_trueX), true);
-
-                            // For shape uncertainties
-                            TH1D* h_shape_temp = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Clone();
-                            ApplyResponseMatrix(h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape),
-                            h_shape_temp, h_smear.front().front().at(k_var_trueX), false);
+                            
+                            
+                            // Add in the reco background
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_ext));
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_dirt));
                         }
                     }
                 }
@@ -493,9 +522,13 @@ void CrossSectionHelper::LoopEvents(){
 
                     // Calculate the the cross section shape prediction
                     h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape), 1);
-                    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_shape)->Scale(1.0 / (integrated_flux * mc_flux_scale_factor * N_target_MC));
-                    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_shape)->Scale(integrated_flux / temp_integrated_flux);
+                    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_shape)->Scale(1.0 / (weight_POT * integrated_flux * mc_flux_scale_factor * N_target_MC));
+                    // h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_shape)->Scale(integrated_flux / temp_integrated_flux);
                     h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_shape)->Scale(1.0e39);
+
+                    // Normalise the data event rate for calculations and an easier way to propagate the satistical uncertainties
+                    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_dataxsec)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_data), 1);
+                    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_dataxsec)->Scale(1.0 / (weight_POT * integrated_flux * data_flux_scale_factor * N_target_Data));
 
                     // If the crosssec is a function of angle then scale again by a factor of 100
                     if (std::string(_util.xsec_var) == "elec_ang"){

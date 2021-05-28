@@ -260,7 +260,7 @@ class SystematicsHelper{
 
     // Names for cross section histograms
     std::vector<std::string> xsec_types = {"sel", "bkg", "gen", "gen_smear", "sig", "eff", "ext", "dirt", "data", "mc_xsec", "mc_xsec_smear", "mc_xsec_shape", "data_xsec"};
-    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Smeared Prediction", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC Event Rate", "MC Event Rate Response", "MC Event Rate Shape", "Data Event Rate"};
+    std::vector<std::string> xsec_types_pretty = {"Selected", "Background", "Generated Signal", "Smeared Prediction", "Signal", "Efficiency", "Beam-Off", "Dirt", "Beam-On", "MC Event Rate", "MC Event Rate Response", "MC Event Rate", "Data Event Rate"};
 
     std::vector<std::string> vars = {"integrated","recoX", "trueX" };
 
