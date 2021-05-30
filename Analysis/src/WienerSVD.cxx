@@ -164,7 +164,7 @@ void WienerSVD::CompareModel(TH1D *sig){
 
     // Make an error histogram
     TH1D* h_model_smear_err = (TH1D*)h_model_smear->Clone();
-    h_model_smear_err->SetFillColorAlpha(12, 0.15);
+    h_model_smear_err->SetFillColorAlpha(12, 0.0);
 
     TCanvas *c = new TCanvas("c", "c", 500, 500);
     gPad->SetLeftMargin(0.20);
@@ -185,14 +185,14 @@ void WienerSVD::CompareModel(TH1D *sig){
     h_model_smear->GetYaxis()->SetTitleOffset(1.5);
 
     h_model_smear->Draw("hist");
-    h_model_smear_err->Draw("E2,same");
+    h_model_smear_err->Draw("hist,same");
     unf->Draw("E1,X0,same");
 
     TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(unf, "Data (Stat. + Sys.)", "ep");
-    leg->AddEntry(h_model_smear_err,   Form("MC (Stat.) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    leg->AddEntry(h_model_smear_err,   Form("MC (Stat.) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     leg->Draw();
     
     _util.CreateDirectory(Form("Systematics/CV/Unfolded/%s", _util.xsec_var));

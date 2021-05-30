@@ -2253,7 +2253,7 @@ void UtilityPlotter::CompareFakeDataReco(){
         h_true_smear.at(m)->GetXaxis()->SetLabelSize(0);
 
         TH1D* h_error_hist = (TH1D*)h_true_smear.at(m)->Clone();
-        h_error_hist->SetFillColorAlpha(12, 0.15);
+        h_error_hist->SetFillColorAlpha(12, 0.0);
 
         h_true_smear.at(m)->Draw("hist");
 
@@ -2272,7 +2272,7 @@ void UtilityPlotter::CompareFakeDataReco(){
         if (m != k_model_input)
             leg->AddEntry( h_true_smear.at(k_model_input), "CV", "lf");
 
-        leg->AddEntry(h_error_hist, Form("True %s (stat.)", models.at(m).c_str()), "lf");
+        leg->AddEntry(h_error_hist, Form("True %s (stat.)", models.at(m).c_str()), "l");
         leg->AddEntry(h_fake.at(m), Form("Fake %s (sys.)", models.at(m).c_str()), "elp");
         leg->Draw();
 
@@ -2476,7 +2476,7 @@ void UtilityPlotter::CompareFakeDataTrue(){
         h_fake_xsec_smear->GetXaxis()->SetLabelSize(0);
 
         TH1D* h_error_hist = (TH1D*)h_fake_xsec_smear->Clone();
-        h_error_hist->SetFillColorAlpha(12, 0.15);
+        h_error_hist->SetFillColorAlpha(12, 0.0);
 
         if (m != k_model_input)
             h_fake_xsec_smear_CV->Draw("hist,same");
@@ -2493,7 +2493,7 @@ void UtilityPlotter::CompareFakeDataTrue(){
 
         if (m != k_model_input)
             leg->AddEntry(h_fake_xsec_smear_CV, "CV", "lf");
-        leg->AddEntry(h_error_hist, Form("True %s (stat.)", models.at(m).c_str()), "lf");
+        leg->AddEntry(h_error_hist, Form("True %s (stat.)", models.at(m).c_str()), "l");
         leg->AddEntry(_wSVD.unf, Form("Fake %s (sys.)", models.at(m).c_str()), "elp");
         leg->Draw();
 
@@ -2954,7 +2954,7 @@ void UtilityPlotter::CompareDataCrossSections(){
     leg->Draw();
 
     // Draw the run period on the plot
-    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+    // _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
 
     _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.52, 0.92, 0.52, 0.92);
 
@@ -3284,7 +3284,7 @@ void UtilityPlotter::CompareUnfoldedDataCrossSections(){
     leg->Draw();
 
     // Draw the run period on the plot
-    _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+    // _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
 
     _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.52, 0.92, 0.52, 0.92);
 
@@ -3734,6 +3734,11 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
         h_dataxsec->GetYaxis()->SetRangeUser(0, 10);
         h_dataxsec->GetXaxis()->SetLabelSize(0.03);
     }
+
+    if (_util.vars.at(k_var_recoX) == "integrated")
+        h_dataxsec->GetYaxis()->SetRangeUser(3.5, 10.5);
+    else
+        h_dataxsec->GetYaxis()->SetRangeUser(0.0, _util.xsec_scale/0.3);
     
     h_mcxsec_reco_model.at(k_model_CV)->Draw("hist,same");
     h_mcxsec_reco_model.at(k_model_geniev3)->Draw("hist,same");
@@ -3742,7 +3747,7 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
     h_dataxsec->Draw("E1,X0,same");
     h_dataxsec_stat->Draw("E1,X0,same");
 
-    TLegend *leg = new TLegend(0.4, 0.6, 0.75, 0.85);
+    TLegend *leg = new TLegend(0.31, 0.6, 0.66, 0.85);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(h_dataxsec, "Data (Stat. + Sys.)", "ep");
@@ -3752,13 +3757,16 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
                     h_mcxsec_reco_model.at(k_model_CV), 
                     h_dataxsec);
 
-    
+    for (int bin = 1; bin < h_dataxsec->GetNbinsX()+1; bin++){
+        std::cout << "Test: " << 100 * std::sqrt(h_cov->GetBinContent(bin,bin)) / h_dataxsec->GetBinContent(bin) << std::endl;
+    }
+
     double chi, pval;
     int ndof;
     std::cout << "CV" << std::endl;
     _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_CV), h_dataxsec, h_cov, chi, ndof, pval);
     // _util.CalcChiSquaredNoCorr(h_mcxsec_reco_model.at(k_model_CV), h_dataxsec, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_reco_model.at(k_model_CV),  Form("MC #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_CV),  Form("GENIE v3.0.6 (#muB tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     
     std::cout << "Genie v3" << std::endl;
     _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_geniev3), h_dataxsec, h_cov, chi, ndof, pval);
@@ -3770,7 +3778,7 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
 
     std::cout << "NuWro" << std::endl;
     _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_nuwrogen), h_dataxsec, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_reco_model.at(k_model_nuwrogen),  Form("NuWro v19.02.02 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_nuwrogen),  Form("NuWro v19.02.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
 
 
     gStyle->SetLegendTextSize(0.03);
@@ -4021,7 +4029,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     }
     
    
-    TLegend *leg = new TLegend(0.35, 0.6, 0.7, 0.85);
+    TLegend *leg = new TLegend(0.31, 0.6, 0.66, 0.85);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(unf, "Data (Stat. + Sys.)", "ep");
@@ -4041,7 +4049,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
 
     std::cout << "Genie v2" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_geniev2gen), unf, h_cov, chi, ndof, pval);
-    // leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_geniev2gen),   Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_geniev2gen),   Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
     std::cout << "NuWro" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_nuwro), unf, h_cov, chi, ndof, pval);
@@ -4050,7 +4058,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     // Scale the histograms by bin width 
     for (unsigned int m = 0; m < models.size(); m++){
         h_mcxsec_true_model_smear.at(m)->Scale(1.0, "width");
-        h_mcxsec_true_model_smear.at(m)->SetLineWidth(5);
+        h_mcxsec_true_model_smear.at(m)->SetLineWidth(3);
     }
     unf->Scale(1.0, "width");
 
@@ -4093,7 +4101,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     h_mcxsec_true_model_smear.at(k_model_geniev3)->Draw("hist,same" );
 
     h_mcxsec_true_model_smear.at(k_model_geniev2gen)->SetLineColor(kOrange-1);
-    // h_mcxsec_true_model_smear.at(k_model_geniev2gen)->Draw("hist,same" );
+    h_mcxsec_true_model_smear.at(k_model_geniev2gen)->Draw("hist,same" );
 
     h_mcxsec_true_model_smear.at(k_model_nuwro)->SetLineColor(kPink+1);
     h_mcxsec_true_model_smear.at(k_model_nuwro)->Draw("hist,same" );

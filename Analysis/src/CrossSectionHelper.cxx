@@ -480,6 +480,11 @@ void CrossSectionHelper::LoopEvents(){
                             h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));
                             h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_ext));
                             h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_dirt));
+
+                            // Store the bkg so we can draw it
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_ext));
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_dirt));
                         }
                     }
                 }
@@ -535,6 +540,10 @@ void CrossSectionHelper::LoopEvents(){
                         h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_smear)->Scale(100);
                         h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_shape)->Scale(100);
                     }
+
+                    // Scale the true bkg down
+                    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Scale(1.0 / (weight_POT * integrated_flux * mc_flux_scale_factor * N_target_MC));
+                    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Scale(1.0e39);
 
                 }
 
@@ -2231,8 +2240,10 @@ void CrossSectionHelper::FillHists(int label, int uni, int xsec_type, double wei
     // Reco Electron Energy
     h_cross_sec.at(label).at(uni).at(k_var_recoX).at(xsec_type)->Fill(_recoX, weight_uni);
 
-    // True Electron Energy
-    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(xsec_type)->Fill(_trueX, weight_uni);
+    // True Electron Energy, but dont fill the bkg
+    if (xsec_type != k_xsec_bkg){
+        h_cross_sec.at(label).at(uni).at(k_var_trueX).at(xsec_type)->Fill(_trueX, weight_uni);
+    }
     
 
     // Smearing Matrix -- only fill for selected signal events
