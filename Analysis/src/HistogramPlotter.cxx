@@ -151,8 +151,8 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
             MakeInteractionPlot("h_int_beta_nue",               true, ";True e#lower[-0.5]{-} #beta [deg]; Entries",            "eff_ang_nue",            cut_stage, 600);
             MakeInteractionPlot("h_int_beta_nuebar",            true, ";True e^{+} #beta [deg]; Entries",                       "eff_ang_nuebar",         cut_stage, 600);
             MakeInteractionPlot("h_int_cosbeta",                true, ";True e#lower[-0.5]{-}/e^{+} cos#beta; Entries",         "cosbeta_rebin",          cut_stage, 600);
-            MakeInteractionPlot("h_int_cosbeta_rebin_nue",      true, ";True e#lower[-0.5]{-} cos#beta; Entries",               "cosbeta_rebin_nue",      cut_stage, 600);
-            MakeInteractionPlot("h_int_cosbeta_rebin_nuebar",   true, ";True e^{+} cos#beta; Entries",                          "cosbeta_rebin_nuebar",   cut_stage, 600);
+            MakeInteractionPlot("h_int_cosbeta_rebin_nue",      true, ";True e#lower[-0.5]{-} cos#beta; Entries/Bin",               "cosbeta_rebin_nue",      cut_stage, 600);
+            MakeInteractionPlot("h_int_cosbeta_rebin_nuebar",   true, ";True e^{+} cos#beta; Entries/Bin",                          "cosbeta_rebin_nuebar",   cut_stage, 600);
         }
         
         MakeInteractionEfficiency("h_true_nue_E",                 false, ";True #nu_{e} Energy [GeV]; Efficiency",                    "nue_E");
@@ -845,7 +845,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
     // Otherwise just use an unsplit canvas
     else {
         gPad->SetLeftMargin(0.15);
-        gPad->SetRightMargin(0.20);
+        // gPad->SetRightMargin(0.20);
     }
 
     // Scaling and setting stats
@@ -979,6 +979,10 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         if (hist_name == "h_reco_shower_energy_cali_rebin"){
             h_stack->GetYaxis()->SetTitle("Entries / GeV");
         }
+
+        if (hist_name == "h_reco_effective_cosangle_rebin"){
+            h_stack->GetYaxis()->SetTitle("Entries / bin");
+        }
     }
     else
         h_stack->GetYaxis()->SetTitle("Entries [A.U.]");
@@ -1109,7 +1113,9 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         leg_stack->SetNColumns(2);
     }
     else {
-        leg_stack = new TLegend(0.8, 0.87, 0.98, 0.32);
+        // leg_stack = new TLegend(0.8, 0.87, 0.98, 0.32);
+        leg_stack = new TLegend(leg_x1-0.1, leg_y1, leg_x2-0.1, leg_y2);
+        leg_stack->SetNColumns(2);
     }
     leg_stack->SetBorderSize(0);
     leg_stack->SetFillStyle(0);

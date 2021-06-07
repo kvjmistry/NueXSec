@@ -4073,7 +4073,7 @@ void SystematicsHelper::ExportResult(TFile* f){
         // Data XSec Covariance Matrix ---------------------------------
         h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_shape).at(k_err_tot)->SetOption("colz");
 
-        // Convert to data units
+        // Convert to data units (N-B)
         _util.ConvertCovarianceUnits( h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_shape).at(k_err_tot), 
                     cv_hist_vec.at(k_var_trueX).at(k_xsec_mcxsec_shape), 
                     cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec));
@@ -4178,10 +4178,10 @@ void SystematicsHelper::ExportResult(TFile* f){
 
         TH2D *h_cov_temp = (TH2D*)h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_shape).at(k_err_tot)->Clone();
 
-        // // Convert to data units
+        // // Convert to S+B data units
         // _util.ConvertCovarianceUnits(h_cov_temp, 
         //             cv_hist_vec.at(k_var_trueX).at(k_xsec_mcxsec_shape), 
-        //             cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec));
+        //             cv_hist_vec.at(k_var_trueX).at(k_xsec_dataxsec));
 
 
         _wSVD.DoUnfolding(2, 0, cv_hist_vec.at(k_var_trueX).at(k_xsec_mcxsec), cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), h_smear, h_cov_temp);

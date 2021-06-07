@@ -102,6 +102,7 @@ void UtilityPlotter::Initialise(Utility _utility){
         CompareGeneratorTotalCrossSec();
         CompareGeneratorUnfoldedModels();
         CompareXsecPi0Tunings();
+        ValidateSmearing();
         return;
     }
     else {
@@ -3334,6 +3335,21 @@ void UtilityPlotter::SaveResponseMatrix(){
 
         h_response.at(m)->Draw("colz");
 
+        if (m == 2)
+            h_response.at(m)->GetXaxis()->SetLabelSize(0.035);
+
+        _util.Draw_ubooneSim(c, 0.33, 0.925, 0.33, 0.905);
+
+        if (variables.at(m) == "elec_E"){
+            h_response.at(m)->SetTitle("E_{e}");
+        }
+        if (variables.at(m) == "elec_ang"){
+            h_response.at(m)->SetTitle("#beta_{e#lower[-0.5]{-} + e^{+}}");
+        }
+        if (variables.at(m) == "elec_cang"){
+            h_response.at(m)->SetTitle("cos#beta_{e}");
+        }
+
         // Draw the run period on the plot
         // _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);
 
@@ -3346,7 +3362,7 @@ void UtilityPlotter::SaveResponseMatrix(){
     for (unsigned int m = 0; m < variables.size(); m++){
         
         // Get the response matrix
-        h_response_index.at(m) = new TH2D("", ";True Bin i; Reconstructed Bin j", h_response.at(m)->GetNbinsX(), 1, h_response.at(m)->GetNbinsX()+1, h_response.at(m)->GetNbinsY(), 1, h_response.at(m)->GetNbinsY()+1);
+        h_response_index.at(m) = new TH2D("", ";True Bin j; Reconstructed Bin i", h_response.at(m)->GetNbinsX(), 1, h_response.at(m)->GetNbinsX()+1, h_response.at(m)->GetNbinsY(), 1, h_response.at(m)->GetNbinsY()+1);
     
         // Set the bin values
         for (int x = 1; x < h_response.at(m)->GetNbinsY()+1; x++){
@@ -5344,7 +5360,7 @@ void UtilityPlotter::PlotParentEventRates(std::string type){
         h_numu.at(pdg)    = new TH1D(Form("h_numu_%s", par_pdg_str.at(pdg).c_str()),   Form("%s #nu_{#mu};Neutrino Energy [GeV];Entries",        title.c_str()),50, 0, 5);
         h_numubar.at(pdg) = new TH1D(Form("h_numubar_%s", par_pdg_str.at(pdg).c_str()),Form("%s #bar{#nu}_{#mu};Neutrino Energy [GeV];Entries", title.c_str()), 35, 0, 5);
         h_nue.at(pdg)     = new TH1D(Form("h_nue_%s", par_pdg_str.at(pdg).c_str()),    Form("%s #nu_{e};Neutrino Energy [GeV];Entries",         title.c_str()), 50, 0, 5);
-        h_nuebar.at(pdg)  = new TH1D(Form("h_nuebar_%s", par_pdg_str.at(pdg).c_str()), Form("%s #bar{#nu}_{e};Electron Energy [GeV];Entries",   title.c_str()), 30, 0, 5);
+        h_nuebar.at(pdg)  = new TH1D(Form("h_nuebar_%s", par_pdg_str.at(pdg).c_str()), Form("%s #bar{#nu}_{e};Neutrino Energy [GeV];Entries",   title.c_str()), 30, 0, 5);
     }
     
     std::vector<TLegend*> leg(flav.size());
@@ -5712,5 +5728,55 @@ void UtilityPlotter::PrintFluxValues(){
 
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::ValidateSmearing(){
+
+    std::string label = "ee";
+
+    TFile* f = TFile::Open("files/xsec_result_run1_paper.root");
+    TString nh = (label == "ee" ? "unf_data_xsec_energy" : "unf_data_xsec_angle");
+    TString ns = (label == "ee" ? "ac_energy" : "ac_angle");
+    TH1D* fMCHist = (TH1D*)  f->Get(nh);
+    TH1D* fMCHist_clone = (TH1D*)fMCHist->Clone();
+    TH2D* hsmear = (TH2D*)  f->Get(ns);
+    int nrows = hsmear->GetNbinsX();
+    int ncols = hsmear->GetNbinsY();
+    TMatrixD* fSmearingMatrix = new TMatrixD(nrows, ncols);
+    for (int i=0; i<nrows; i++) {
+        for (int j=0; j<ncols; j++) {
+        fSmearingMatrix->operator()(i,j) = hsmear->GetBinContent(i+1, j+1);
+        }
+    }
+    int n = fMCHist->GetNbinsX();
+    TVectorD v(n);
+    for (int i=0; i<n; i++) {
+        v(i) = fMCHist->GetBinContent(i+1) * fMCHist->GetBinWidth(i+1);
+    }
+    TVectorD vs = (*fSmearingMatrix) * v;
+    for (int i=0; i<n; i++) {
+        fMCHist->SetBinContent(i+1, vs(i) / fMCHist->GetBinWidth(i+1));
+    }
+    // fMCHist->Scale(1e-39);
+    fMCHist->SetLineStyle(2);
+    fMCHist->SetLineWidth(2);
+    fMCHist->SetLineColor(kBlack);
+
+    // undo the bin width scaling
+    _util.UndoBinWidthScaling(fMCHist_clone);
+    
+    // Matrix multiply
+    TH1D* fMCHist_clone_smear = (TH1D*)fMCHist_clone->Clone();
+    _util.MatrixMultiply(fMCHist_clone, fMCHist_clone_smear, hsmear, "reco_true",true);
+
+    TCanvas *c = new TCanvas();
+    fMCHist_clone_smear->SetLineColor(kRed+2);
+    fMCHist->SetLineColor(kBlack);
+
+    fMCHist_clone_smear->Draw("hist");
+    fMCHist->Draw("hist,same");
+
+    c->Print("test.pdf");
+
+
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
