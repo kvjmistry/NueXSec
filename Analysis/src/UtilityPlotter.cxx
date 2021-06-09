@@ -63,7 +63,7 @@ void UtilityPlotter::Initialise(Utility _utility){
     }
     // This will call the function to calculate the covariance matrix
     else if (std::string(_util.uplotmode) == "flux"){
-        // CalcFluxCovarianceHP();
+        CalcFluxCovarianceHP();
         CalcFluxCovarianceBeamline();
         return;
     }
@@ -4921,7 +4921,7 @@ void UtilityPlotter::CalcFluxCovarianceHP(){
         line.at(i)->SetLineWidth(4);
         line.at(i)->Draw();
     }
-    c->Print("covariance.pdf");
+    c->Print("Systematics/covariance.pdf");
 
     TCanvas *c2 = new TCanvas("", "", 700, 700);
     gPad->SetLeftMargin(0.14);
@@ -4929,13 +4929,17 @@ void UtilityPlotter::CalcFluxCovarianceHP(){
     gPad->SetTopMargin(0.14);
     gPad->SetBottomMargin(0.14);
     h_cor->SetTitle("Correlation Matrix ;Bin i; Bin j");
+    h_cor->GetZaxis()->SetRangeUser(-1,1);
     h_cor->Draw("colz");
     for (unsigned int i = 0; i< line.size(); i++){
         line.at(i)->SetLineColor(kRed+2);
         line.at(i)->SetLineWidth(4);
         line.at(i)->Draw();
     }
-    c2->Print("correlation.pdf");
+
+    _util.Draw_Nu_Mode(c2, 0.14, 0.85, 0.34, 0.92);
+
+    c2->Print(Form("Systematics/correlation_HP_run%s.pdf", _util.run_period));
 
     TCanvas *c3 = new TCanvas("", "", 500, 500);
     gPad->SetLeftMargin(0.14);
@@ -4952,12 +4956,9 @@ void UtilityPlotter::CalcFluxCovarianceHP(){
         line.at(i)->SetLineWidth(4);
         line.at(i)->Draw();
     }
-    c3->Print("fraction_cov.pdf");
 
-
-
-   
-
+    _util.Draw_Nu_Mode(c3, 0.14, 0.85, 0.34, 0.92);
+    c3->Print(Form("Systematics/fraction_cov_HP_run%s.pdf", _util.run_period));
 
 }
 // -----------------------------------------------------------------------------
@@ -5041,7 +5042,7 @@ void UtilityPlotter::CalcFluxCovarianceBeamline(){
         line.at(i)->SetLineWidth(4);
         line.at(i)->Draw();
     }
-    c->Print("covariance.pdf");
+    c->Print("Systematics/covariance.pdf");
 
     TCanvas *c2 = new TCanvas("", "", 700, 700);
     gPad->SetLeftMargin(0.14);
@@ -5049,13 +5050,16 @@ void UtilityPlotter::CalcFluxCovarianceBeamline(){
     gPad->SetTopMargin(0.14);
     gPad->SetBottomMargin(0.14);
     h_cor->SetTitle("Correlation Matrix ;Bin i; Bin j");
+    h_cor->GetZaxis()->SetRangeUser(-1,1);
     h_cor->Draw("colz");
     for (unsigned int i = 0; i< line.size(); i++){
         line.at(i)->SetLineColor(kRed+2);
         line.at(i)->SetLineWidth(4);
         line.at(i)->Draw();
     }
-    c2->Print("correlation.pdf");
+
+    _util.Draw_Nu_Mode(c2, 0.14, 0.85, 0.34, 0.92);
+    c2->Print(Form("Systematics/correlation_Beamline_run%s.pdf", _util.run_period));
 
     TCanvas *c3 = new TCanvas("", "", 500, 500);
     gPad->SetLeftMargin(0.14);
@@ -5072,7 +5076,8 @@ void UtilityPlotter::CalcFluxCovarianceBeamline(){
         line.at(i)->SetLineWidth(4);
         line.at(i)->Draw();
     }
-    c3->Print("fraction_cov.pdf");
+    _util.Draw_Nu_Mode(c3, 0.14, 0.85, 0.34, 0.92);
+    c3->Print(Form("Systematics/fraction_cov_Beamline_run%s.pdf", _util.run_period));
 
 }
 // -----------------------------------------------------------------------------
@@ -5100,13 +5105,31 @@ void UtilityPlotter::GetStitchedUniverses(std::string constraint, std::string mo
         nuniverses = 2;
 
     // Load in the flux histogram file
-    TFile * f = TFile::Open("Systematics/output_fhc_uboone_run0.root", "READ");
-
+    TFile * f;
     TFile * f2, *f3;
-    if (constraint == "beamline"){
-        f2 = TFile::Open(Form("Systematics//beamline/FHC/output_uboone_fhc_run%d.root", index), "READ");
-        f3 = TFile::Open(Form("Systematics//beamline/FHC/output_uboone_fhc_run%d.root", index+1), "READ");
+    
+    if (std::string(_util.run_period) == "1"){
+        f = TFile::Open("Systematics/output_fhc_uboone_run0.root", "READ");
+
+        if (constraint == "beamline"){
+            f2 = TFile::Open(Form("Systematics//beamline/FHC/output_uboone_fhc_run%d.root", index), "READ");
+            f3 = TFile::Open(Form("Systematics//beamline/FHC/output_uboone_fhc_run%d.root", index+1), "READ");
+        }
+
     }
+    else if (std::string(_util.run_period) == "3"){
+        f = TFile::Open("Systematics/output_rhc_uboone_run0.root", "READ");
+
+        if (constraint == "beamline"){
+            f2 = TFile::Open(Form("Systematics//beamline/RHC/output_uboone_rhc_run%d.root", index), "READ");
+            f3 = TFile::Open(Form("Systematics//beamline/RHC/output_uboone_rhc_run%d.root", index+1), "READ");
+        }
+    }
+    else {
+        std::cout<< "Error unknown run period configured!" << std::endl;
+        exit(1);
+    }
+    
 
 
     // Create the 2D histograms to get from file
