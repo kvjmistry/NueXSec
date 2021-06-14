@@ -209,7 +209,11 @@ class UtilityPlotter{
     // Validate smearing calculated by andy mastbaum to mine
     void ValidateSmearing();
     // -------------------------------------------------------------------------
+    // Get the flux universes for making HP uncertainties plot for first bin in the flux
+    void GetUniversesChris(std::string constraint, std::vector<std::vector<TH1D*>> &hist_unwrap, std::vector<TH1D*> &hist_unwrap_CV, int index, std::string label);
     // -------------------------------------------------------------------------
+    // Call function to make hadron production uncertainties for Chris
+    void MakeHadronProductionUncertaintyPlot();
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

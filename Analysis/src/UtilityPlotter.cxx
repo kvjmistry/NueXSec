@@ -63,8 +63,9 @@ void UtilityPlotter::Initialise(Utility _utility){
     }
     // This will call the function to calculate the covariance matrix
     else if (std::string(_util.uplotmode) == "flux"){
-        CalcFluxCovarianceHP();
-        CalcFluxCovarianceBeamline();
+        MakeHadronProductionUncertaintyPlot();
+        // CalcFluxCovarianceHP();
+        // CalcFluxCovarianceBeamline();
         return;
     }
     // This will calculate the event rates for the flux spectrum
@@ -2397,9 +2398,9 @@ void UtilityPlotter::CompareFakeDataTrue(){
             h_cov_diag.at(m) = (TH2D*)h_cov_reco_xsec->Clone();
         
         // Convert the Covariance Matrix-- switching from data deviations to Fake Data CV deviation
-        _util.ConvertCovarianceUnits(h_cov_diag.at(m),
-                               h_reco_data_xsec,
-                               h_fake.at(m));
+        // _util.ConvertCovarianceUnits(h_cov_diag.at(m),
+        //                        h_reco_data_xsec,
+        //                        h_fake.at(m));
 
         // Add the fake data stat error to the diagonals
         for (int i=1; i<h_cov_diag.at(m)->GetYaxis()->GetNbins()+2; i++){
@@ -4093,7 +4094,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     h_mcxsec_true_model_smear.at(k_model_CV)->SetLineColor(kRed+2);
     
     if (std::string(_util.xsec_var) == "elec_E"){
-        h_mcxsec_true_model_smear.at(k_model_CV)->SetMaximum(7);
+        h_mcxsec_true_model_smear.at(k_model_CV)->SetMaximum(8);
     }
     else if (std::string(_util.xsec_var) == "elec_ang"){
         h_mcxsec_true_model_smear.at(k_model_CV)->SetMaximum(15);
@@ -5802,4 +5803,394 @@ void UtilityPlotter::ValidateSmearing(){
 
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::MakeHadronProductionUncertaintyPlot(){
+
+    // enums for the models
+    enum enum_flav {k_numu,k_numubar,k_nue,k_nuebar,k_FLAV_MAX};
+
+    // Select the option
+    std::string constraint = "HP";
+    // std::string constraint = "beamline";
+
+    // Set the neutrino flavour to store
+    int flavour = k_numu;
+    // int flavour = k_numubar;
+
+    // -- 
+
+    // Create a vector for the models
+    std::vector<std::string> flav = {
+        "numu",
+        "numubar",
+        "nue",
+        "nuebar"
+    };
+
+    // PPFX Weight Modes
+    std::vector<std::string> inputmode = {
+        "ppfx_other_PPFXOther",
+        "ppfx_targatt_PPFXTargAtten",
+        "ppfx_think_PPFXThinKaon",
+        "ppfx_thinmes_PPFXThinMeson",
+        "ppfx_thinnpi_PPFXThinNeutronPion",
+        "ppfx_thinna_PPFXThinNucA",
+        "ppfx_thinn_PPFXThinNuc",
+        "ppfx_thinpi_PPFXThinPion",
+        "ppfx_totabs_PPFXTotAbsorp",
+        "ppfx_ms_UBPPFX"};
+
+
+    //  Now we have the beamline variations, calculate the covariance matrices for each one
+    if (constraint == "beamline"){
+        inputmode = { "Horn_curr","Horn1_x","Horn1_y","Beam_spot","Horn2_x","Horn2_y","Horn_water","Beam_shift_x","Beam_shift_y","Target_z"};
+    }
+
+    std::vector<TH1D*> h_frac(inputmode.size()); // fractional uncertainties
+
+    gStyle->SetOptStat(0);
+    TCanvas *c = new TCanvas();
+    // Legened
+    TLegend* legend = new TLegend(0.5, 0.65, 0.9, 0.9);
+    legend->SetNColumns(3);
+    legend->SetBorderSize(0);
+    legend->SetFillStyle(0);
+    legend->SetTextFont(62); 
+
+    // loop over the input modes
+    for (unsigned label = 0; label< inputmode.size(); label++){
+        
+        std::vector<std::vector<TH1D*>> h_uni(k_FLAV_MAX);
+        std::vector<TH1D*> h_cv(k_FLAV_MAX);
+
+        // Load in the file and get the universes and CV histogram
+        GetUniversesChris(constraint, h_uni, h_cv, label+1, inputmode.at(label));
+
+        // Create the covariance matrix
+        int n_bins = h_cv.at(flavour)->GetNbinsX();
+        TH2D* h_cov = new TH2D("", "Covariance Matrix ;Bin i; Bin j",  n_bins, 1, n_bins+1, n_bins, 1, n_bins+1);
+
+        // Calculate the covariance matrix
+        _util.CalcCovariance(h_uni.at(flavour), h_cv.at(flavour), h_cov);
+
+        // Clone the CV hist to get the binning and set the bins sqrt(diag)/CV
+        h_frac.at(label) = (TH1D*) h_cv.at(flavour)->Clone();
+        for (int bin  = 1; bin < h_frac.at(label)->GetNbinsX(); bin++){
+            h_frac.at(label)->SetBinContent(bin, std::sqrt(h_cov->GetBinContent(bin, bin)) / h_cv.at(flavour)->GetBinContent(bin));
+        }
+
+        // Set the legend
+        if ( inputmode.at(label) == "ppfx_ms_UBPPFX"){
+        h_frac.at(label)->SetLineColor(kBlack);
+        legend->AddEntry(h_frac.at(label), "All", "l");
+        h_frac.at(label)->Draw("hist,text00,same");
+        } 
+        else if  ( inputmode.at(label) == "ms_PPFX"){
+            h_frac.at(label)->SetLineColor(kMagenta+2);
+
+            legend->AddEntry(h_frac.at(label), "ms_ppfx", "l");
+        }
+        else if  ( inputmode.at(label) == "ppfx_other_PPFXOther"){
+            h_frac.at(label)->SetLineColor(28);
+            
+            legend->AddEntry(h_frac.at(label), "Other", "l");
+            h_frac.at(label)->SetLineStyle(2);
+            
+        }
+        else if  ( inputmode.at(label) == "ppfx_targatt_PPFXTargAtten" ){
+            h_frac.at(label)->SetLineColor(36);
+            legend->AddEntry(h_frac.at(label), "TargAtten", "l");
+            h_frac.at(label)->SetLineStyle(2);
+        }
+        else if  ( inputmode.at(label) == "ppfx_think_PPFXThinKaon"){
+            h_frac.at(label)->SetLineColor(1001);
+            legend->AddEntry(h_frac.at(label), "pC #rightarrow KX", "l");
+            h_frac.at(label)->SetLineStyle(2);
+        }
+        else if  ( inputmode.at(label) == "ppfx_thinmes_PPFXThinMeson"){
+            h_frac.at(label)->SetLineColor(kBlue+1);
+            legend->AddEntry(h_frac.at(label), "Meson Incident.", "l");
+            h_frac.at(label)->SetLineStyle(2);
+        }
+        else if  ( inputmode.at(label) == "ppfx_thinnpi_PPFXThinNeutronPion"){
+            h_frac.at(label)->SetLineColor(42);
+            legend->AddEntry(h_frac.at(label), "nC #rightarrow #piX", "l");
+            h_frac.at(label)->SetLineStyle(2);
+        }
+        else if  ( inputmode.at(label) == "ppfx_thinna_PPFXThinNucA"){
+            h_frac.at(label)->SetLineColor(50);
+            legend->AddEntry(h_frac.at(label), "Nucleon-A", "l");
+            h_frac.at(label)->SetLineStyle(2);
+        }
+        else if  ( inputmode.at(label) == "ppfx_thinn_PPFXThinNuc"){
+            h_frac.at(label)->SetLineColor(kOrange+10);
+            legend->AddEntry(h_frac.at(label), "pC #rightarrow NucleonX", "l");
+            h_frac.at(label)->SetLineStyle(2);
+        }
+        else if  ( inputmode.at(label) == "ppfx_thinpi_PPFXThinPion"){
+            h_frac.at(label)->SetLineColor(8);
+            legend->AddEntry(h_frac.at(label), "pC #rightarrow #piX", "l");
+            h_frac.at(label)->SetLineStyle(2);
+        }
+        else if  ( inputmode.at(label) == "ppfx_totabs_PPFXTotAbsorp"){
+            h_frac.at(label)->SetLineColor(kMagenta-7);
+            legend->AddEntry(h_frac.at(label), "TotAbsorp", "l");
+            h_frac.at(label)->SetLineStyle(2);
+        }
+        else if  (inputmode.at(label) == "Horn_curr" ){ 
+            h_frac.at(label)->SetLineColor(30);
+            legend->AddEntry( h_frac.at(label), "Horn Current", "l");
+            h_frac.at(label)->SetLineStyle(1);
+        }
+        else if  (inputmode.at(label) == "Horn1_x"){
+            h_frac.at(label)->SetLineColor(28);
+            legend->AddEntry(h_frac.at(label), "Horn1 x", "l");
+            h_frac.at(label)->SetLineStyle(1);
+            
+        }
+        else if  (inputmode.at(label) == "Horn1_y"){
+            h_frac.at(label)->SetLineColor(1001);
+            legend->AddEntry(h_frac.at(label), "Horn1 y", "l");
+            h_frac.at(label)->SetLineStyle(1);
+        }
+        else if  (inputmode.at(label) == "Beam_spot"){
+            h_frac.at(label)->SetLineColor(kBlue+1);
+            legend->AddEntry(h_frac.at(label), "Beam Spot Size", "l");
+            h_frac.at(label)->SetLineStyle(1);
+        }
+        else if  (inputmode.at(label) == "Horn2_x"){
+            h_frac.at(label)->SetLineColor(kOrange+1);
+            legend->AddEntry(h_frac.at(label), "Horn2 x", "l");
+            h_frac.at(label)->SetLineStyle(1);
+        }
+        else if  (inputmode.at(label) == "Horn2_y"){
+            h_frac.at(label)->SetLineColor(kMagenta);
+            legend->AddEntry(h_frac.at(label), "Horn2 y", "l");
+            h_frac.at(label)->SetLineStyle(1);
+        }
+        else if  (inputmode.at(label) == "Horn_water"){
+            h_frac.at(label)->SetLineColor(kSpring-7);
+            legend->AddEntry(h_frac.at(label), "Horn Water", "l");
+            h_frac.at(label)->SetLineStyle(1);
+        }
+        else if  (inputmode.at(label) == "Beam_shift_x" ){
+            h_frac.at(label)->SetLineColor(36);
+            legend->AddEntry(h_frac.at(label),"Beam shift x", "l");
+            h_frac.at(label)->SetLineStyle(1);
+        }
+        else if  (inputmode.at(label) == "Beam_shift_y"){
+            h_frac.at(label)->SetLineColor(42);
+            legend->AddEntry(h_frac.at(label), "Beam shift y", "l");
+            h_frac.at(label)->SetLineStyle(1);
+        }
+        else if  (inputmode.at(label) == "Target_z"){
+            h_frac.at(label)->SetLineColor(kOrange+10);
+            legend->AddEntry(h_frac.at(label), "Target z", "l");
+            h_frac.at(label)->SetLineStyle(1);
+        }
+        h_frac.at(label)->SetLineWidth(2);
+        
+        if (flavour == k_numu){
+            h_frac.at(label)->SetTitle("#nu_{#mu};Neutrino Energy [GeV];Fractional Uncertainty [%]");
+        }
+        else if (flavour == k_numubar){
+            h_frac.at(label)->SetTitle("#bar{#nu}_{#mu};Neutrino Energy [GeV];Fractional Uncertainty [%]");
+        }
+        else if (flavour == k_nue){
+            h_frac.at(label)->SetTitle("#nu_{e};Neutrino Energy [GeV];Fractional Uncertainty [%]");
+        }
+        else if (flavour == k_nuebar){
+            h_frac.at(label)->SetTitle("#bar{#nu}_{e};Neutrino Energy [GeV];Fractional Uncertainty [%]");
+        }
+
+        h_frac.at(label)->GetXaxis()->SetRangeUser(0,4);
+        h_frac.at(label)->GetYaxis()->SetRangeUser(0,0.5);
+
+         if (constraint == "beamline")
+            h_frac.at(label)->GetYaxis()->SetRangeUser(0,0.1);
+
+        h_frac.at(label)->Draw("hist,same");
+
+        // h_uni.at(flavour).at(0)->Draw("hist,same");
+        // h_cv.at(flavour)->Draw("hist,same");
+
+    }
+
+    gStyle->SetPaintTextFormat("4.2f");
+
+    legend->Draw();
+    c->SetLeftMargin(0.15);
+
+    if (flavour == k_numu){
+        c->Print("Systematics/fractional_uncertainty_numu_slice.pdf");
+    }
+    else if (flavour == k_numubar){
+        c->Print("Systematics/fractional_uncertainty_numubar_slice.pdf");
+    }
+
+}
+// -----------------------------------------------------------------------------
+void UtilityPlotter::GetUniversesChris(std::string constraint, std::vector<std::vector<TH1D*>> &hist_unwrap, std::vector<TH1D*> &hist_unwrap_CV, int index, std::string label){
+
+    std::cout << "On Label: "<< label<< std::endl;  
+
+    // Create a vector for the models
+    std::vector<std::string> flav = {
+        "numu",
+        "numubar",
+        "nue",
+        "nuebar"
+    };
+
+    // enums for the models
+    enum enum_flav {
+        k_numu,
+        k_numubar,
+        k_nue,
+        k_nuebar,
+        k_FLAV_MAX
+    };
+
+    TH1D* h_temp_1D;
+
+    // Set the number of universes
+    int nuniverses = 600;
+    if (constraint =="beamline")
+        nuniverses = 2;
+
+    // Load in the flux histogram file
+    TFile * f;
+    TFile * f2, *f3;
+
+    // POT for beamline variations
+    double fPOT_f2{0};
+    double fPOT_f3{0};
+    
+    // Depending on FHC or RHC load in the files with the flux histograms
+    if (std::string(_util.run_period) == "1"){
+        f = TFile::Open("Systematics/output_fhc_uboone_run0.root", "READ");
+
+        if (constraint == "beamline"){
+            f2 = TFile::Open(Form("Systematics//beamline/FHC/output_uboone_fhc_run%d.root", index), "READ");
+            TTree* TPOT_f2 = (TTree*) f2->Get("POT");
+            TPOT_f2->SetBranchAddress("POT", &fPOT_f2); // Get the POT
+            TPOT_f2->GetEntry(0);
+            double total_entries = TPOT_f2->GetEntries(); // if using hadd, this will not be 1 equal to 1 anymore
+            fPOT_f2*=total_entries;
+
+            f3 = TFile::Open(Form("Systematics//beamline/FHC/output_uboone_fhc_run%d.root", index+1), "READ");
+
+            TTree* TPOT_f3 = (TTree*) f3->Get("POT");
+            TPOT_f3->SetBranchAddress("POT", &fPOT_f3); // Get the POT
+            TPOT_f3->GetEntry(0);
+            total_entries = TPOT_f3->GetEntries(); // if using hadd, this will not be 1 equal to 1 anymore
+            fPOT_f3*=total_entries;
+        }
+
+    }
+    else if (std::string(_util.run_period) == "3"){
+        f = TFile::Open("Systematics/output_rhc_uboone_run0.root", "READ");
+
+        if (constraint == "beamline"){
+            f2 = TFile::Open(Form("Systematics//beamline/RHC/output_uboone_rhc_run%d.root", index), "READ");
+            f3 = TFile::Open(Form("Systematics//beamline/RHC/output_uboone_rhc_run%d.root", index+1), "READ");
+        }
+    }
+    else {
+        std::cout<< "Error unknown run period configured!" << std::endl;
+        exit(1);
+    }
+    
+
+
+    // Create the 2D histograms to get from file
+    std::vector<std::vector<TH2D*>> hist;
+    hist.resize(k_FLAV_MAX);
+    for (unsigned int h = 0; h < hist.size(); h++ ){
+        hist.at(h).resize(nuniverses);
+    }
+
+    // Create the vector of histograms for unwrapping
+    hist_unwrap.resize(k_FLAV_MAX);
+    for (unsigned int h = 0; h < hist_unwrap.size(); h++ ){
+        hist_unwrap.at(h).resize(nuniverses);
+    }
+
+    std::vector<TH2D*> hist_2D_CV(k_FLAV_MAX);
+
+    // 2D histogram case
+    
+    // Now get the histograms
+    std::cout << "Reading in the histograms from file..." << std::endl;
+    for (unsigned int h = 0; h < hist.size(); h++ ){
+        
+        // Get the histograms
+        for (unsigned int u = 0; u < hist.at(h).size(); u++ ){
+            
+            if (constraint == "HP")
+                hist.at(h).at(u) = (TH2D*)f->Get(Form("%s/Multisims/%s_%s_Uni_%d_AV_TPC_2D", flav.at(h).c_str(), flav.at(h).c_str(), label.c_str(), u));
+
+        }
+
+        if (constraint == "beamline"){
+            hist.at(h).at(0) = (TH2D*)f2->Get(Form("%s/Detsmear/%s_CV_AV_TPC_2D", flav.at(h).c_str(), flav.at(h).c_str()));
+            hist.at(h).at(1) = (TH2D*)f3->Get(Form("%s/Detsmear/%s_CV_AV_TPC_2D", flav.at(h).c_str(), flav.at(h).c_str()));
+
+            if (hist.at(h).at(0) == NULL || hist.at(h).at(1) == NULL)
+                std::cout << "Error in reading histograms..."<< std::endl;
+
+                // Rescale the histograms to per POT
+            hist.at(h).at(0)->Scale(1.0/fPOT_f2);
+            hist.at(h).at(1)->Scale(1.0/fPOT_f3);
+
+        }
+        
+        // Get the CV
+        TH2D* h_temp;
+        h_temp= (TH2D*)f->Get(Form("%s/Detsmear/%s_CV_AV_TPC_2D", flav.at(h).c_str(), flav.at(h).c_str()));
+        hist_2D_CV.at(h) = (TH2D*)h_temp->Clone();
+
+        // Get the 1D CV hist
+        h_temp_1D= (TH1D*)f->Get(Form("%s/Detsmear/%s_CV_AV_TPC", flav.at(h).c_str(), flav.at(h).c_str()));
+        h_temp_1D->SetDirectory(0);
+    }
+    
+
+    std::cout << "Successfully read in the histograms from file" << std::endl;
+
+    // --
+    // Unwrap the histograms -- i.e get the first row of the 2D histogram
+    
+
+    // Loop over the flavours
+    for (unsigned int h = 0; h < hist.size(); h++ ){
+        
+        // Loop over the universes
+        for (unsigned int u = 0; u < hist.at(h).size(); u++ ){
+
+            // Create the unwrapped histogram binning by cloning the CV histogram
+            hist_unwrap.at(h).at(u) = (TH1D*)h_temp_1D->Clone();
+            
+            // Fill the unwrapped histograms with the first row of the histogram
+            for (int i=1; i<hist.at(h).at(u)->GetXaxis()->GetNbins()+1; i++) { // Loop over row
+                hist_unwrap.at(h).at(u)->SetBinContent(i, hist.at(h).at(u)->GetBinContent(i , 1)  );
+            }
+
+        }
+
+        // CV -- do the same as above
+        
+        // Create the unwrapped histograms
+        hist_unwrap_CV.at(h) = (TH1D*)h_temp_1D->Clone();
+
+        // Fill the CV unwrapped histograms
+        for (int i=1; i<hist_2D_CV.at(h)->GetXaxis()->GetNbins()+1; i++) { // Loop over rows
+            hist_unwrap_CV.at(h)->SetBinContent(i, hist_2D_CV.at(h)->GetBinContent(i , 1));
+        }
+
+    }
+
+    std::cout << "Successfully unwrapped the histograms" << std::endl;
+
+
+}
 // -----------------------------------------------------------------------------
