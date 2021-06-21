@@ -1386,7 +1386,8 @@ void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov, double &chi
     TH2D* h_cov_clone   = (TH2D*)cov->Clone();
 
     // Getting covariance matrix in TMatrix form
-    TMatrix cov_m;
+    TMatrixD cov_m;
+    cov_m.SetTol(1e-20);
     cov_m.Clear();
     cov_m.ResizeTo(h_cov_clone->GetNbinsX(), h_cov_clone->GetNbinsX());
 
@@ -1401,7 +1402,7 @@ void Utility::CalcChiSquared(TH1D* h_model, TH1D* h_data, TH2D* cov, double &chi
     }
 
     // Inverting the covariance matrix
-    TMatrix inverse_cov_m = cov_m.Invert();
+    TMatrixD inverse_cov_m = cov_m.Invert();
 
     // Calculating the chi2 = Summation_ij{ (x_i - mu_j)*E_ij^(-1)*(x_j - mu_j)  }
     // x = data, mu = model, E^(-1) = inverted covariance matrix 

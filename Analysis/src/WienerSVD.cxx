@@ -125,6 +125,7 @@ void WienerSVD::CompareModel(TH1D *sig){
     for (int bin = 1; bin < unf->GetNbinsX()+1; bin++){
         double err = unfcov->GetBinContent(bin, bin);
         unf->SetBinError(bin, std::sqrt(err));
+        std::cout << "Unfolded Err: "<< 100 * unf->GetBinError(bin)/unf->GetBinContent(bin)<< std::endl;
     }
 
     sig->SetLineColor(kRed+2);
@@ -171,7 +172,7 @@ void WienerSVD::CompareModel(TH1D *sig){
     c->SetBottomMargin(0.15);
 
     if (std::string(_util.xsec_var) == "elec_E"){
-        h_model_smear->SetMaximum(7);
+        h_model_smear->SetMaximum(8);
     }
     else if (std::string(_util.xsec_var) == "elec_ang"){
         h_model_smear->SetMaximum(15);

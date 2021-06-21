@@ -2204,9 +2204,9 @@ void UtilityPlotter::CompareFakeDataReco(){
         h_fake.at(m)->Scale(1.0, "width");
 
         // Convert the Covariance Matrix-- switching from MC CV deviations to Fake Data CV deviation
-        _util.ConvertCovarianceUnits(h_cov_m.at(m),
-                               h_temp_CV,
-                               h_fake.at(m));
+        // _util.ConvertCovarianceUnits(h_cov_m.at(m),
+        //                        h_temp_CV,
+        //                        h_fake.at(m));
 
         // Add the fake data stat error to the diagonals
         for (int i=1; i<h_cov_m.at(m)->GetYaxis()->GetNbins()+2; i++){
@@ -2539,6 +2539,7 @@ void UtilityPlotter::CompareFakeDataTrue(){
         delete _wSVD.absError;
         delete _wSVD.MSE;
         delete _wSVD.MSE2;
+        delete h_ratio;
     }
 
 }
@@ -2899,9 +2900,9 @@ void UtilityPlotter::CompareDataCrossSections(){
         h_cov_reco = (TH2D*) h_cov_xsec->Clone();
 
     // Convert the Covariance Matrix-- switching from MC CV deviations to Data CV deviation
-    _util.ConvertCovarianceUnits(h_cov_reco,
-                            h_dataxsec_model.at(k_model_input),
-                            h_dataxsec);
+    // _util.ConvertCovarianceUnits(h_cov_reco,
+    //                         h_dataxsec_model.at(k_model_input),
+    //                         h_dataxsec);
 
     // Now set the bin errors
     for (int bin = 1; bin < h_dataxsec->GetNbinsX()+1; bin++ ){    
@@ -3770,9 +3771,9 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
     leg->AddEntry(h_dataxsec, "Data (Stat. + Sys.)", "ep");
 
     // Convert to data units
-    _util.ConvertCovarianceUnits(h_cov, 
-                    h_mcxsec_reco_model.at(k_model_CV), 
-                    h_dataxsec);
+    // _util.ConvertCovarianceUnits(h_cov, 
+    //                 h_mcxsec_reco_model.at(k_model_CV), 
+    //                 h_dataxsec);
 
     for (int bin = 1; bin < h_dataxsec->GetNbinsX()+1; bin++){
         std::cout << "Test: " << 100 * std::sqrt(h_cov->GetBinContent(bin,bin)) / h_dataxsec->GetBinContent(bin) << std::endl;
@@ -4015,7 +4016,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
         "CV",
         "geniev3",
         "geniev2gen",
-        "nuwro"
+        "nuwrogen"
     };
 
     // enums for the models
@@ -4034,7 +4035,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     for (unsigned int m = 0; m < models.size(); m++){
         // MC Xsec True
         
-        if (m == k_model_geniev2gen)
+        if (m == k_model_geniev2gen || m == k_model_nuwro)
             h_temp  = (TH1D*)fxsec->Get(Form("%s/h_%s", models.at(m).c_str(), _util.xsec_var));
         else
             h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));

@@ -425,8 +425,15 @@ void CrossSectionHelper::LoopEvents(){
                           h_smear.at(label).at(uni).at(k_var_recoX), h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_eff));
                 }
                 // Calculate the efficiency histogram by dividing the sig and gen
-                else{ 
-                    h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff)->Divide(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(var).at(k_xsec_gen));
+                else { 
+
+                    // In the case of PPFX and Beamline, use the wiener method of taking the ratio of event distributions
+                    if ( (reweighter_labels.at(label) == "weightsPPFX" || CheckBeamline(reweighter_labels.at(label))) && var == k_var_integrated){
+                        h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff)->Divide(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig), h_cross_sec.front().front().at(var).at(k_xsec_gen));
+                    }
+                    else {
+                        h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff)->Divide(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig), h_cross_sec.at(label).at(uni).at(var).at(k_xsec_gen));
+                    }
                 }
 
                 // For the x-sec in true space, appy a response matrix to the generated events
@@ -437,12 +444,14 @@ void CrossSectionHelper::LoopEvents(){
 
                         // Apply the response matrix to the detvar CV for detector variations
                         if (_util.isvariation && std::string(_util.variation) != "CV"){
-                            
-                            ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
-                            h_detvar_cv, h_smear.at(label).at(uni).at(k_var_trueX), true);
 
+                            TH2D* h_smear_temp = (TH2D*) h_smear.at(label).at(uni).at(k_var_trueX)->Clone();
                             ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape),
-                            h_detvar_cv, h_smear.at(label).at(uni).at(k_var_trueX), false);
+                            h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear_temp, true);
+                            delete h_smear_temp;
+
+                            ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
+                            h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_trueX), true);
 
                             // Add in the reco background
                             h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));
@@ -463,18 +472,22 @@ void CrossSectionHelper::LoopEvents(){
                                 ApplyResponseMatrix( h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape),
                                 h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear_temp, true);
                                 delete h_smear_temp;
+
+                                // Standard Smearing
+                                ApplyResponseMatrix(h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
+                                h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_trueX), true);
+
                             }
                             else {
                                 TH2D* h_smear_temp = (TH2D*) h_smear.at(label).at(uni).at(k_var_trueX)->Clone();
                                 ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape),
                                 h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear_temp, true);
                                 delete h_smear_temp;
-                            }
 
-                            // Standard Smearing
-                            ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
-                            h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_trueX), true);
-                            
+                                // Standard Smearing
+                                ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
+                                h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_trueX), true);
+                            }
                             
                             // Add in the reco background
                             h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));
@@ -494,7 +507,7 @@ void CrossSectionHelper::LoopEvents(){
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff),  // Eff
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),  // N Bkg
                                 _util.mc_scale_factor,
-                                weight_POT * temp_integrated_flux * mc_flux_scale_factor, // Flux
+                                weight_POT * integrated_flux * mc_flux_scale_factor, // Flux
                                 _util.ext_scale_factor,
                                 h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),  // N EXT
                                 _util.dirt_scale_factor,
@@ -509,7 +522,7 @@ void CrossSectionHelper::LoopEvents(){
                                     h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff),   // Eff
                                     h_cross_sec.at(label).at(uni).at(var).at(k_xsec_bkg),   // N Bkg
                                     _util.mc_scale_factor,
-                                    weight_POT * temp_integrated_flux * data_flux_scale_factor, // Flux
+                                    weight_POT * integrated_flux * data_flux_scale_factor, // Flux
                                     _util.ext_scale_factor,
                                     h_cross_sec.at(label).at(uni).at(var).at(k_xsec_ext),   // N EXT
                                     _util.dirt_scale_factor,
@@ -561,7 +574,7 @@ void CrossSectionHelper::LoopEvents(){
                 if (std::string(_util.xsec_bin_mode) == "ratio" && var != k_var_integrated){
                     h_cross_sec.at(label).at(uni).at(var).at(k_xsec_dataxsec)->Scale(1.0/h_cross_sec.at(label).at(uni).at(k_var_integrated).at(k_xsec_dataxsec)->GetBinContent(1));
                     h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec)->Scale(1.0/h_cross_sec.at(label).at(uni).at(k_var_integrated).at(k_xsec_mcxsec)->GetBinContent(1));
-                    h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec_smear)->Scale((integrated_flux / temp_integrated_flux) * (1.0/h_cross_sec.at(label).at(uni).at(k_var_integrated).at(k_xsec_mcxsec)->GetBinContent(1)));
+                    h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec_smear)->Scale((1.0/h_cross_sec.at(label).at(uni).at(k_var_integrated).at(k_xsec_mcxsec)->GetBinContent(1)));
                     h_cross_sec.at(label).at(uni).at(var).at(k_xsec_mcxsec_shape)->Scale(1.0/h_cross_sec.at(label).at(uni).at(k_var_integrated).at(k_xsec_mcxsec)->GetBinContent(1));
                 }
 
