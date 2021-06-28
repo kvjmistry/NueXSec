@@ -2752,9 +2752,9 @@ void UtilityPlotter::CompareFakeTotalCrossSec(){
         h_temp  = (TH1D*)fxsec->Get(Form("fake%s/integrated/h_run%s_CV_0_integrated_data_xsec", models.at(m).c_str(), _util.run_period));
         h_fake_xsec.at(m) = (TH1D*)h_temp->Clone();
 
-        // Set the error to be equal to the total systematic uncertainty of ~21%
+        // Set the error to be equal to the total systematic uncertainty of ~17%
         if (m == k_model_FLUGG)
-            h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * 0.216 );
+            h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * 0.17 );
         else
             h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * std::sqrt(0.032*0.032 + 0.056*0.056) ); 
             // h_fake_xsec.at(m)->SetBinError(1,h_fake_xsec.at(m)->GetBinContent(1) * std::sqrt(0.04551*0.04551 + 0.0374*0.0374) );
@@ -3019,9 +3019,9 @@ void UtilityPlotter::CompareTotalDataCrossSections(){
     h_temp  = (TH1D*)fxsec->Get(Form("CV/integrated/h_run%s_CV_0_integrated_data_xsec", _util.run_period));
     TH1D* h_dataxsec = (TH1D*)h_temp->Clone();
 
-    // Set the error to be 21% total systematic uncertainty
+    // Set the error to be 17% total systematic uncertainty
     if (genmode == "flux")
-        h_dataxsec->SetBinError(1,h_dataxsec->GetBinContent(1) * 0.216 );
+        h_dataxsec->SetBinError(1,h_dataxsec->GetBinContent(1) * 0.17 );
     else
         h_dataxsec->SetBinError(1,h_dataxsec->GetBinContent(1) * std::sqrt(0.032*0.032 + 0.056*0.056) );
     
