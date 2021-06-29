@@ -215,6 +215,8 @@ class UtilityPlotter{
     // Call function to make hadron production uncertainties for Chris
     void MakeHadronProductionUncertaintyPlot();
     // -------------------------------------------------------------------------
+    // Test the unfolding procedure
+    void TestUnfolding();
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------

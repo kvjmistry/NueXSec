@@ -445,7 +445,7 @@ void SliceContainer::SliceClassifier(int type){
     // MC Specific classsifications
     if (type == _util.k_mc){
         
-        bool is_in_fv = _util.in_fv(true_nu_vtx_sce_x, true_nu_vtx_sce_y, true_nu_vtx_sce_z);
+        bool is_in_fv = _util.in_fv(true_nu_vtx_x, true_nu_vtx_y, true_nu_vtx_z);
 
         // Out of Fiducial Volume Event
         if (!is_in_fv) {

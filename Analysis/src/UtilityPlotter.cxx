@@ -75,6 +75,11 @@ void UtilityPlotter::Initialise(Utility _utility){
         PlotBeamSimRates();
         return;
     }
+    // This will calculate the event rates for the flux spectrum
+    else if (std::string(_util.uplotmode) == "unfold"){
+        TestUnfolding();
+        return;
+    }
     // This will call the function to calculate the covariance matrix
     else if (std::string(_util.uplotmode) == "print"){
         PrintFluxValues();
@@ -6195,3 +6200,172 @@ void UtilityPlotter::GetUniversesChris(std::string constraint, std::vector<std::
 
 }
 // -----------------------------------------------------------------------------
+void UtilityPlotter::TestUnfolding(){
+
+    gStyle->SetOptStat(0);
+
+    TFile *f = TFile::Open("files/xsec_result_run1.root","READ");
+
+    TH2D* h_response = (TH2D*)f->Get("elec_E/wiener/h_response");
+    
+    TH1D* h_data     = (TH1D*)f->Get("elec_E/wiener/h_data_xsec_stat_sys_reco");
+    TH1D* h_true     = (TH1D*)f->Get("elec_E/wiener/h_mc_xsec_true");
+
+    TH2D* h_cov      = (TH2D*)f->Get("elec_E/wiener/h_cov_tot_dataxsec_reco");
+    // TH2D* h_cov      = (TH2D*)f->Get("elec_E/er/h_cov_tot_mcxsec_reco");
+
+
+    // Bake in the bin widths to the response matrix
+    for (int i=1; i < h_response->GetXaxis()->GetNbins()+1; i++){
+
+        for (int j=1; j < h_response->GetYaxis()->GetNbins()+1; j++) { 
+            
+            // h_response->SetBinContent(i, j, (h_data->GetBinLowEdge(j+1) - h_data->GetBinLowEdge(j)) *  h_response ->GetBinContent(i,j));
+        }
+
+    } 
+
+    // h_data->Scale(1.0, "width");
+    // h_true->Scale(1.0, "width");
+
+
+    WienerSVD _wSVD;
+    _wSVD.Initialise(_util);
+    _wSVD.DoUnfolding(2, 0, h_true, h_data, h_response, h_cov);
+    
+
+    // Get The unfolded spectrum
+    _wSVD.unf->SetLineColor(kBlack);
+    _wSVD.unf->SetMarkerStyle(20);
+    _wSVD.unf->SetMarkerSize(0.5);
+    _wSVD.unf->SetLineStyle(1);
+
+    for (int bin = 1; bin < _wSVD.unf->GetNbinsX()+1; bin++){
+        double err = _wSVD.unfcov->GetBinContent(bin, bin);
+        _wSVD.unf->SetBinError(bin, std::sqrt(err));
+        std::cout << "Unfolded Err: "<< 100 * _wSVD.unf->GetBinError(bin)/_wSVD.unf->GetBinContent(bin)<< "  " << _wSVD.unf->Integral()<<  std::endl;
+    }
+
+    h_true->SetLineColor(kRed+2);
+    h_true->SetLineStyle(1);
+
+    TH1D* h_model_smear = (TH1D*)h_true->Clone();
+    for (int bin = 0; bin < h_model_smear->GetNbinsX()+2; bin++){
+        h_model_smear->SetBinContent(bin, 0);
+        h_model_smear->SetBinError(bin, 0);
+    }
+
+    // Now Apply the smear matrix to the model
+    // Now do the multiplication
+    for (int i=1; i < _wSVD.smear->GetXaxis()->GetNbins()+1; i++){
+
+        for (int j=1; j < _wSVD.smear->GetYaxis()->GetNbins()+1; j++) { 
+            
+            h_model_smear->SetBinContent(i, h_model_smear->GetBinContent(i) + _wSVD.smear->GetBinContent(i, j) * h_true->GetBinContent(j));
+            h_model_smear->SetBinError(i, h_model_smear->GetBinError(i) + _wSVD.smear->GetBinContent(i, j) * h_true->GetBinError(j));
+        }
+
+    } 
+
+    // Clone the covariance matrix for-bin width version
+    TH2D* unfcov_width = (TH2D*)_wSVD.unfcov->Clone();
+    _util.ConvertCovarianceBinWidth(unfcov_width, _wSVD.unf);
+
+    // Now calculate the chi-squared
+    double chi, pval;
+    int ndof;
+    _util.CalcChiSquared(h_model_smear, _wSVD.unf, _wSVD.unfcov, chi, ndof, pval);
+
+    // Now scale the bin widths for plotting
+    h_model_smear->Scale(1.0, "width");
+    _wSVD.unf->Scale(1.0, "width");
+    _wSVD.unf->SetLineWidth(2);
+
+    // Make an error histogram
+    TH1D* h_model_smear_err = (TH1D*)h_model_smear->Clone();
+    h_model_smear_err->SetFillColorAlpha(12, 0.0);
+
+    TCanvas *c = new TCanvas("c", "c", 500, 500);
+    gPad->SetLeftMargin(0.20);
+    c->SetBottomMargin(0.15);
+
+    if (std::string(_util.xsec_var) == "elec_E"){
+        h_model_smear->SetMaximum(8);
+    }
+    else if (std::string(_util.xsec_var) == "elec_ang"){
+        h_model_smear->SetMaximum(15);
+    }
+    else if (std::string(_util.xsec_var) == "elec_cang"){
+        h_model_smear->SetMaximum(30.0);
+        h_model_smear->GetXaxis()->SetLabelSize(0.035);
+        h_model_smear->GetXaxis()->SetTitleOffset(1.1);
+    }
+
+    h_model_smear->GetYaxis()->SetTitleOffset(1.5);
+
+    h_model_smear->Draw("hist");
+    h_model_smear_err->Draw("hist,same");
+    _wSVD.unf->Draw("E1,X0,same");
+
+    TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(_wSVD.unf, "Data (Stat. + Sys.)", "ep");
+    leg->AddEntry(h_model_smear_err,   Form("MC (Stat.) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    leg->Draw();
+    
+    _util.CreateDirectory(Form("Systematics/CV/UnfoldedTest/%s", _util.xsec_var));
+    c->Print(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_unfolded_%s.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var));
+
+
+
+    // Now plot the diff and fractional bias
+    delete c;
+    delete leg;
+    c = new TCanvas("c", "c", 500, 500);
+    _wSVD.diff->SetTitle("; True e#lower[-0.5]{-} + e^{+} Energy [GeV];");
+    _wSVD.diff->GetYaxis()->SetRangeUser(-0.5, 0.5);
+    _wSVD.diff->SetLineWidth(2);
+    _wSVD.bias->SetLineColor(kRed+2);
+    _wSVD.bias->SetLineWidth(2);
+    _wSVD.diff->Draw("hist");
+    _wSVD.bias->Draw("hist,same");
+    TLine *line = new TLine(0, 0, 6.00, 0.0);
+    line->SetLineColor(kBlack);
+    line->SetLineStyle(kDotted);
+    line->Draw();
+    
+
+    
+    leg = new TLegend(0.5, 0.7, 0.85, 0.85);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->AddEntry(_wSVD.diff, "Fractional difference", "l");
+    leg->AddEntry(_wSVD.bias, "Intrinsic bias", "l");
+    leg->Draw();
+    c->Print(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_diff_bias_%s.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var));
+
+    // Histograms to be printed to pdf
+    _util.Save2DHists(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_smear_%s.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), _wSVD.smear,    "colz");
+    _util.Save2DHists(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_unfold_cov_%s.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), _wSVD.unfcov,   "colz");
+    _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_smear_%s_index.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), _wSVD.smear,    "colz", "");
+    _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_unfold_cov_%s_index.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), _wSVD.unfcov,   "colz", "cov");
+
+    _util.Save2DHists(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_unfold_cov_%s_converted.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov_width,   "colz");
+    _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_unfold_cov_%s_index_converted.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov_width,   "colz", "cov");
+
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_wiener_%s.pdf",    _util.run_period, _util.xsec_var ,_util.xsec_var), _wSVD.wiener,    "hist");
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_unf_%s.pdf",       _util.run_period, _util.xsec_var ,_util.xsec_var), _wSVD.unf,       "hist");
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_diff_%s.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), _wSVD.diff,      "hist");
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_bias_%s.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), _wSVD.bias,      "hist");
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_bias2_%s.pdf",     _util.run_period, _util.xsec_var ,_util.xsec_var), _wSVD.bias2,     "hist");
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_fracError_%s.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), _wSVD.fracError, "hist");
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_absError_%s.pdf",  _util.run_period, _util.xsec_var ,_util.xsec_var), _wSVD.absError,  "hist");
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_MSE_%s.pdf",       _util.run_period, _util.xsec_var ,_util.xsec_var), _wSVD.MSE,       "hist");
+    _util.Save1DHists(Form("plots/run%s/Systematics/CV/UnfoldedTest/%s/xsec_MSE2_%s.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), _wSVD.MSE2,      "hist");
+
+
+
+
+
+}
