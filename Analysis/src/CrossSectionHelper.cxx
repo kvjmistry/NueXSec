@@ -453,10 +453,21 @@ void CrossSectionHelper::LoopEvents(){
                             ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
                             h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_trueX), true);
 
+                            TH1D* h_ext = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_ext)->Clone();
+                            TH1D* h_dirt = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_dirt)->Clone();
+
+                            // Scale histograms to add in with right scaling
+                            h_ext->Scale(_util.ext_scale_factor / _util.mc_scale_factor);
+                            h_dirt->Scale(_util.dirt_scale_factor / _util.mc_scale_factor);
+
                             // Add in the reco background
                             h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_ext));
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_dirt));
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_ext);
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_dirt);
+
+                            delete h_ext;
+                            delete h_dirt;
+
                         }
                         else {
 
@@ -488,16 +499,26 @@ void CrossSectionHelper::LoopEvents(){
                                 ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
                                 h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_trueX), true);
                             }
-                            
+
+                            TH1D* h_ext = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_ext)->Clone();
+                            TH1D* h_dirt = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_dirt)->Clone();
+
+                            // Scale histograms to add in with right scaling
+                            h_ext->Scale(_util.ext_scale_factor / _util.mc_scale_factor);
+                            h_dirt->Scale(_util.dirt_scale_factor / _util.mc_scale_factor);
+
                             // Add in the reco background
                             h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_ext));
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_dirt));
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_ext);
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_dirt);
 
                             // Store the bkg so we can draw it
                             h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_ext));
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_dirt));
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Add(h_ext);
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Add(h_dirt);
+
+                            delete h_ext;
+                            delete h_dirt;
                         }
                     }
                 }
@@ -1094,7 +1115,7 @@ void CrossSectionHelper::CalcCrossSecHist(TH1D* h_sel, TH1D* h_eff, TH1D* h_bkg,
         h_xsec->Add(h_ext_clone,  -1);
         h_xsec->Add(h_dirt_clone, -1);
     }
-    
+
     // If using Marco's Method we correct by the efficiency
     if (std::string(_util.xsec_smear_mode) == "mcc8" || _var == k_var_integrated || _var == k_var_trueX){
         h_xsec->Divide(h_eff) ;
