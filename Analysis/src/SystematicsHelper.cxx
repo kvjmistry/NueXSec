@@ -2620,17 +2620,17 @@ void SystematicsHelper::FillStatVector(){
 
     // Add the data stat to the total mc cov matrix
     // Convert the Covariance Matrix-- switching from detvar Data CV deviations to MC CV deviation
-    _util.ConvertCovarianceUnits(h_cov_v.at(k_var_trueX).at(k_xsec_dataxsec).at(k_err_stat), 
-                           cv_hist_vec.at(k_var_trueX).at(k_xsec_dataxsec), 
+    _util.ConvertCovarianceUnits(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_stat), 
+                           cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), 
                            cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec));
     
-    h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_trueX).at(k_xsec_dataxsec).at(k_err_stat));
+    h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_stat));
 
     // Put it back
     // Convert the Covariance Matrix-- switching from detvar MC CV deviations to data CV deviation
-    _util.ConvertCovarianceUnits(h_cov_v.at(k_var_trueX).at(k_xsec_dataxsec).at(k_err_stat), 
+    _util.ConvertCovarianceUnits(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_stat), 
                            cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec), 
-                           cv_hist_vec.at(k_var_trueX).at(k_xsec_dataxsec));
+                           cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec));
 
     // Add the MC stat err tot the total MC sys error
     h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_sys)->Add(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat));
@@ -2639,18 +2639,18 @@ void SystematicsHelper::FillStatVector(){
 
     // Add the mc stat to the total data cov matrix
     // Convert the Covariance Matrix-- switching from MC CV deviations to Data CV deviation
-    _util.ConvertCovarianceUnits(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat),
-                           cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec),
-                           cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec));
+    // _util.ConvertCovarianceUnits(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat),
+    //                        cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec),
+    //                        cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec));
     
-    h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat));
-    h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_sys)->Add(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat));
+    // h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_tot)->Add(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat));
+    // h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(k_err_sys)->Add(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat));
 
-    // put it back
-    // Convert the Covariance Matrix-- switching from data CV deviations to mc CV deviation
-    _util.ConvertCovarianceUnits(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat),
-                           cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec),
-                           cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec));
+    // // put it back
+    // // Convert the Covariance Matrix-- switching from data CV deviations to mc CV deviation
+    // _util.ConvertCovarianceUnits(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(k_err_stat),
+    //                        cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec),
+    //                        cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec));
 
     // ---
 
