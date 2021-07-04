@@ -22,19 +22,19 @@ void UtilityPlotter::Initialise(Utility _utility){
         // CompareDetVarEfficiency();
         
         // Compare the efficiency in run 1 and run 3
-        CompareEfficiency();
+        // CompareEfficiency();
 
         // Function that plots all the ppfx universe weights on one plot for the backgrounds
         // StudyPPFXWeights();
 
         // Look to see if the shower with the most hits is the same as the shower with the most energy
-        CompareHitstoEnergy();
+        // CompareHitstoEnergy();
 
         // Lets see how many of the leading showers that we select are not an electorn
-        CompareSignalPurity();
+        // CompareSignalPurity();
 
         // Make the bin resolution plots
-        PlotVarbyRecoBin();
+        // PlotVarbyRecoBin();
 
         // Plot the 1D flux with the threhsold line
         PlotIntegratedFluxwithThrehold();
@@ -775,7 +775,7 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
 void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     
     // This changes the plot to average flux or not
-    bool draw_averge =true;
+    bool draw_averge =false;
 
     gStyle->SetOptStat(0);
 
@@ -833,7 +833,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     c->SetLogy();
     
     // Nue flux
-    h_nue->SetTitle(";Electron Neutrino Energy [GeV];(#nu_{e}/#bar{#nu}_{e}) / cm^{2} / 5 MeV / 2.0 #times 10^{20} POT");
+    h_nue->SetTitle(";Electron Neutrino Energy [GeV];(#nu_{e} or #bar{#nu}_{e}) / cm^{2} / 5 MeV / 2.0 #times 10^{20} POT");
     h_nue->GetXaxis()->CenterTitle();
     h_nue->GetYaxis()->CenterTitle();
 
@@ -856,7 +856,7 @@ void UtilityPlotter::PlotIntegratedFluxwithThrehold(){
     TH1D* h_nue_clone = (TH1D*)h_nue->Clone("h_nue_clone");
     
     // Nuebar flux
-    h_nuebar->SetTitle(";Electron Neutrino Energy [GeV];(#nu_{e}/#bar{#nu}_{e}) / cm^{2} / 5 MeV / 2.0 #times 10^{20} POT");
+    h_nuebar->SetTitle(";Electron Neutrino Energy [GeV];(#nu_{e} or #bar{#nu}_{e}) / cm^{2} / 5 MeV / 2.0 #times 10^{20} POT");
     h_nuebar->GetXaxis()->SetRangeUser(0,4);
     h_nuebar->SetLineColor(kGreen+2);
     h_nuebar->SetFillColor(16);

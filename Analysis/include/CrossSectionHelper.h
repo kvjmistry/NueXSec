@@ -121,7 +121,7 @@ class CrossSectionHelper{
 
     TH2D* h_2D_CV_binning; // Histogram to define the bin indexes for a response matrix in energy and angle
 
-    TH1D *h_detvar_cv; // the detector variation cv for us to apply the response matrix to. 
+    TH1D *h_detvar_cv_bkg; // the detector variation cv bkg prediction.
 
     // enum for histogram types
     enum TH1D_xsec_hist_vars {

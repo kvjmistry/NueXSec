@@ -69,58 +69,58 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
 
         MakeEfficiencyPlot(Form("plots/run%s/Efficiency/Integrated_Efficiency_Purity.pdf", _util.run_period));
 
-        MakeEfficiencyPlotByCut("h_true_nu_E",                   false, false, "True #nu_{e}/#bar{#nu}_{e} Energy [GeV]; Efficiency",             "True #nu_{e}/#bar{#nu}_{e} Events in FV",          "nu_E" );     
+        MakeEfficiencyPlotByCut("h_true_nu_E",                   false, false, "True #nu_{e} or #bar{#nu}_{e} Energy [GeV]; Efficiency",             "True #nu_{e} or #bar{#nu}_{e} Events in FV",          "nu_E" );     
         MakeEfficiencyPlotByCut("h_true_nu_E_nue",               true,  false, "True #nu_{e} Energy [GeV]; Efficiency",                           "True #nu_{e} Events in FV",                        "nu_E_nue");
         MakeEfficiencyPlotByCut("h_true_nu_E_nuebar",            true,  false, "True #bar{#nu}_{e} Energy [GeV]; Efficiency",                     "True #bar{#nu}_{e} Events in FV",                  "nu_E_nuebar");   
-        MakeEfficiencyPlotByCut("h_true_nu_E_many_bins",         true,  false, "True #nu_{e}/#bar{#nu}_{e} Energy [GeV]; Efficiency",             "True #nu_{e}/#bar{#nu}_{e} Events in FV",          "nu_E_many_bins");
+        MakeEfficiencyPlotByCut("h_true_nu_E_many_bins",         true,  false, "True #nu_{e} or #bar{#nu}_{e} Energy [GeV]; Efficiency",             "True #nu_{e} or #bar{#nu}_{e} Events in FV",          "nu_E_many_bins");
         
-        MakeEfficiencyPlotByCut("h_true_elec_E_rebin",           true,  false, "True e#lower[-0.5]{-}/e^{+} Energy [GeV]; Efficiency",            "True e#lower[-0.5]{-}/e^{+} Events in FV / GeV",   "elec_E_rebin");
+        MakeEfficiencyPlotByCut("h_true_elec_E_rebin",           true,  false, "True e#lower[-0.5]{-} or e^{+} Energy [GeV]; Efficiency",            "True e#lower[-0.5]{-} or e^{+} Events in FV / GeV",   "elec_E_rebin");
         MakeEfficiencyPlotByCut("h_true_elec_E_rebin_nue",       true,  false, "True e#lower[-0.5]{-} Energy [GeV]; Efficiency",                  "True e#lower[-0.5]{-} Events in FV / GeV",         "elec_E_rebin_nue");
         MakeEfficiencyPlotByCut("h_true_elec_E_rebin_nuebar",    true,  false, "True e^{+} Energy [GeV]; Efficiency",                             "True e^{+} Events in FV / GeV",                    "elec_E_rebin_nuebar");
-        MakeEfficiencyPlotByCut("h_true_elec_E_rebin_pi0",       true,  false, "True e#lower[-0.5]{-}/e^{+} (with #pi^{0}) Energy [GeV]; Efficiency", "True e#lower[-0.5]{-}/e^{+} (with #pi^{0}) Events in FV / GeV",   "elec_E_rebin_pi0");
+        MakeEfficiencyPlotByCut("h_true_elec_E_rebin_pi0",       true,  false, "True e#lower[-0.5]{-} or e^{+} (with #pi^{0}) Energy [GeV]; Efficiency", "True e#lower[-0.5]{-} or e^{+} (with #pi^{0}) Events in FV / GeV",   "elec_E_rebin_pi0");
         
-        MakeEfficiencyPlotByCut("h_true_nu_E_single_bin",        true,  true,  "True #nu_{e}/#bar{#nu}_{e}; Efficiency",                          "True #nu_{e}/#bar{#nu}_{e} Events in FV",          "nu_E_single_bin");
+        MakeEfficiencyPlotByCut("h_true_nu_E_single_bin",        true,  true,  "True #nu_{e} or #bar{#nu}_{e}; Efficiency",                          "True #nu_{e} or #bar{#nu}_{e} Events in FV",          "nu_E_single_bin");
         MakeEfficiencyPlotByCut("h_true_nu_E_nue_single_bin",    true,  true,  "True #nu_{e}; Efficiency",                                        "True #nu_{e} Events in FV",                        "nu_E_nue_single_bin");
         MakeEfficiencyPlotByCut("h_true_nu_E_nuebar_single_bin", true,  true,  "True #bar{#nu}_{e}; Efficiency",                                  "True #bar{#nu}_{e} Events in FV",                  "nu_E_nuebar_single_bin");
         
-        MakeEfficiencyPlotByCut("h_true_elec_E",                 false, false, "True e#lower[-0.5]{-}/e^{+} Energy [GeV]; Efficiency",          "True e#lower[-0.5]{-}/e^{+} Events in FV",       "elec_E");
-        MakeEfficiencyPlotByCut("h_eff_elec_E_many_bins",        true,  false, "True e#lower[-0.5]{-}/e^{+} Energy [GeV]; Efficiency",          "True e#lower[-0.5]{-}/e^{+} Events in FV",       "elec_E_many_bins");
-        MakeEfficiencyPlotByCut("h_eff_nu_theta",                false, false, "True #nu_{e}/#bar{#nu}_{e} #theta [deg]; Efficiency",           "True #nu_{e}/#bar{#nu}_{e} Events in FV",        "nu_theta" );
-        MakeEfficiencyPlotByCut("h_eff_nu_phi",                  false, false, "True #nu_{e}/#bar{#nu}_{e} #phi [deg]; Efficiency",             "True #nu_{e}/#bar{#nu}_{e} Events in FV",        "nu_phi" );
-        MakeEfficiencyPlotByCut("h_eff_elec_theta",              false, false, "True e#lower[-0.5]{-}/e^{+} #theta [deg]; Efficiency",          "True e#lower[-0.5]{-}/e^{+} Events in FV",       "elec_theta" );
-        MakeEfficiencyPlotByCut("h_eff_elec_phi",                false, false, "True e#lower[-0.5]{-}/e^{+} #phi [deg]; Efficiency",            "True e#lower[-0.5]{-}/e^{+} Events in FV",       "elec_phi" );
+        MakeEfficiencyPlotByCut("h_true_elec_E",                 false, false, "True e#lower[-0.5]{-} or e^{+} Energy [GeV]; Efficiency",          "True e#lower[-0.5]{-} or e^{+} Events in FV",       "elec_E");
+        MakeEfficiencyPlotByCut("h_eff_elec_E_many_bins",        true,  false, "True e#lower[-0.5]{-} or e^{+} Energy [GeV]; Efficiency",          "True e#lower[-0.5]{-} or e^{+} Events in FV",       "elec_E_many_bins");
+        MakeEfficiencyPlotByCut("h_eff_nu_theta",                false, false, "True #nu_{e} or #bar{#nu}_{e} #theta [deg]; Efficiency",           "True #nu_{e} or #bar{#nu}_{e} Events in FV",        "nu_theta" );
+        MakeEfficiencyPlotByCut("h_eff_nu_phi",                  false, false, "True #nu_{e} or #bar{#nu}_{e} #phi [deg]; Efficiency",             "True #nu_{e} or #bar{#nu}_{e} Events in FV",        "nu_phi" );
+        MakeEfficiencyPlotByCut("h_eff_elec_theta",              false, false, "True e#lower[-0.5]{-} or e^{+} #theta [deg]; Efficiency",          "True e#lower[-0.5]{-} or e^{+} Events in FV",       "elec_theta" );
+        MakeEfficiencyPlotByCut("h_eff_elec_phi",                false, false, "True e#lower[-0.5]{-} or e^{+} #phi [deg]; Efficiency",            "True e#lower[-0.5]{-} or e^{+} Events in FV",       "elec_phi" );
         
-        MakeEfficiencyPlotByCut("h_eff_beta",                    false, false, "True e#lower[-0.5]{-}/e^{+} #beta [deg]; Efficiency",             "True e#lower[-0.5]{-}/e^{+} Events in FV",          "beta" );
-        MakeEfficiencyPlotByCut("h_eff_beta_rebin",              true, false, "True e#lower[-0.5]{-}/e^{+} #beta [deg]; Efficiency",              "True e#lower[-0.5]{-}/e^{+} Events in FV",          "beta_rebin" );
+        MakeEfficiencyPlotByCut("h_eff_beta",                    false, false, "True e#lower[-0.5]{-} or e^{+} #beta [deg]; Efficiency",             "True e#lower[-0.5]{-} or e^{+} Events in FV",          "beta" );
+        MakeEfficiencyPlotByCut("h_eff_beta_rebin",              true, false, "True e#lower[-0.5]{-} or e^{+} #beta [deg]; Efficiency",              "True e#lower[-0.5]{-} or e^{+} Events in FV",          "beta_rebin" );
         MakeEfficiencyPlotByCut("h_eff_beta_rebin_nue",          true, false, "True e#lower[-0.5]{-} [deg]; Efficiency",                          "True e#lower[-0.5]{-} Events in FV",                "beta_rebin_nue" );
-        MakeEfficiencyPlotByCut("h_eff_beta_rebin_nuebar",       true, false, "True e^{+} #beta [deg]; Efficiency",                               "True e^{+} Events in FV",                           "beta_rebin_nuebar" );
+        MakeEfficiencyPlotByCut("h_eff_beta_rebin_nuebar",       true, false, "True e^{+} #beta [deg]; Efficiency",                               "True e^{+} Events or in FV",                           "beta_rebin_nuebar" );
 
-        MakeEfficiencyPlotByCut("h_eff_cosine_beta",             false, false, "True e#lower[-0.5]{-}/e^{+} cos#beta; Efficiency",              "True e#lower[-0.5]{-}/e^{+} Events in FV",          "cosine_beta" );
-        MakeEfficiencyPlotByCut("h_eff_cosine_beta_rebin",       true, false,  "True e#lower[-0.5]{-}/e^{+} cos#beta; Efficiency",              "True e#lower[-0.5]{-}/e^{+} Events in FV",          "cosine_beta_rebin" );
+        MakeEfficiencyPlotByCut("h_eff_cosine_beta",             false, false, "True e#lower[-0.5]{-} or e^{+} cos#beta; Efficiency",              "True e#lower[-0.5]{-} or e^{+} Events in FV",          "cosine_beta" );
+        MakeEfficiencyPlotByCut("h_eff_cosine_beta_rebin",       true, false,  "True e#lower[-0.5]{-} or e^{+} cos#beta; Efficiency",              "True e#lower[-0.5]{-} or e^{+} Events in FV",          "cosine_beta_rebin" );
         MakeEfficiencyPlotByCut("h_eff_cosine_beta_rebin_nue",   true, false,  "True e#lower[-0.5]{-} cos#beta; Efficiency",                    "True e#lower[-0.5]{-} Events in FV",                "cosine_beta_rebin_nue" );
         MakeEfficiencyPlotByCut("h_eff_cosine_beta_rebin_nuebar",true, false,  "True e^{+} cos#beta; Efficiency",                               "True e^{+} Events in FV",                           "cosine_beta_rebin_nuebar" );
-        MakeEfficiencyPlotByCut("h_eff_cosine_beta_rebin_pi0",   true, false,  "True e#lower[-0.5]{-}/e^{+} (with #pi^{0}) cos#beta; Efficiency","True e#lower[-0.5]{-}/e^{+} (with #pi^{0}) Events in FV", "cosine_beta_rebin_pi0" );
+        MakeEfficiencyPlotByCut("h_eff_cosine_beta_rebin_pi0",   true, false,  "True e#lower[-0.5]{-} or e^{+} (with #pi^{0}) cos#beta; Efficiency","True e#lower[-0.5]{-} or e^{+} (with #pi^{0}) Events in FV", "cosine_beta_rebin_pi0" );
         
-        MakeEfficiencyPlotByCut("h_eff_proton_multi",            false, false, "True #nu_{e}/#bar{#nu}_{e} Proton Multi.; Efficiency",            "True #nu_{e}/#bar{#nu}_{e} Events in FV",          "prot_multi" );
+        MakeEfficiencyPlotByCut("h_eff_proton_multi",            false, false, "True #nu_{e} or #bar{#nu}_{e} Proton Multi.; Efficiency",            "True #nu_{e} or #bar{#nu}_{e} Events in FV",          "prot_multi" );
         MakeEfficiencyPlotByCut("h_eff_proton_multi_nue",        false, false, "True #nu_{e} Proton Multi.; Efficiency",                          "True #nu_{e} Events in FV",                        "prot_multi_nue" );
         MakeEfficiencyPlotByCut("h_eff_proton_multi_nuebar",     false, false, "True #bar{#nu}_{e} Proton Multi.; Efficiency",                    "True #bar{#nu}_{e} Events in FV",                  "prot_multi_nuebar" );
         
-        MakeEfficiencyPlotByCut("h_eff_pion_multi",              false, false, "True #nu_{e}/#bar{#nu}_{e} Pion Multi.; Efficiency",              "True #nu_{e}/#bar{#nu}_{e} Events in FV",          "pion_multi" );
+        MakeEfficiencyPlotByCut("h_eff_pion_multi",              false, false, "True #nu_{e} or #bar{#nu}_{e} Pion Multi.; Efficiency",              "True #nu_{e} or #bar{#nu}_{e} Events in FV",          "pion_multi" );
         MakeEfficiencyPlotByCut("h_eff_pion_multi_nue",          false, false, "True #nu_{e} Pion Multi.; Efficiency",                            "True #nu_{e} Events in FV",                        "pion_multi_nue" );
         MakeEfficiencyPlotByCut("h_eff_pion_multi_nuebar",       false, false, "True #bar{#nu}_{e} Pion Multi.; Efficiency",                      "True #bar{#nu}_{e} Events in FV",                  "pion_multi_nuebar" );
         
-        MakeEfficiencyPlotByCut("h_eff_charg_par_multi",         false, false, "True #nu_{e}/#bar{#nu}_{e} Charged Particle Multi; Efficiency",   "True #nu_{e}/#bar{#nu}_{e} Events in FV",          "charg_par_multi" );
+        MakeEfficiencyPlotByCut("h_eff_charg_par_multi",         false, false, "True #nu_{e} or #bar{#nu}_{e} Charged Particle Multi; Efficiency",   "True #nu_{e} or #bar{#nu}_{e} Events in FV",          "charg_par_multi" );
         MakeEfficiencyPlotByCut("h_eff_charg_par_multi_nue",     false, false, "True #nu_{e} Charged Particle Multi.; Efficiency",                "True #nu_{e} Events in FV",                        "charg_par_multi_nue" );
         MakeEfficiencyPlotByCut("h_eff_charg_par_multi_nuebar",  false, false, "True #bar{#nu}_{e} Charged Particle Multi.; Efficiency",          "True #bar{#nu}_{e} Events in FV",                  "charg_par_multi_nuebar" );
 
-        MakeEfficiencyPlotByCutTot("h_true_nu_E",             "h_true_nu_E_nue",             "h_true_nu_E_nuebar",             "#nu_{e}/#bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Neutrino Energy [GeV]; Efficiency",         "nu_E");
-        MakeEfficiencyPlotByCutTot("h_true_elec_E_rebin",     "h_true_elec_E_rebin_nue",     "h_true_elec_E_rebin_nuebar",     "#nu_{e}/#bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True e#lower[-0.5]{-}/e^{+} Energy [GeV]; Efficiency",         "elec_E_rebin");
-        MakeEfficiencyPlotByCutTot("h_eff_cosine_beta_rebin", "h_eff_cosine_beta_rebin_nue", "h_eff_cosine_beta_rebin_nuebar", "#nu_{e}/#bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True e#lower[-0.5]{-}/e^{+} cos#beta; Efficiency",         "cosine_beta_rebin");
-        MakeEfficiencyPlotByCutTot("h_eff_proton_multi",      "h_eff_proton_multi_nue",      "h_eff_proton_multi_nuebar",      "#nu_{e}/#bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Proton Multiplicity; Efficiency",           "prot_multi");
-        MakeEfficiencyPlotByCutTot("h_eff_pion_multi",        "h_eff_pion_multi_nue",        "h_eff_pion_multi_nuebar",        "#nu_{e}/#bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Pion Multiplicity; Efficiency",             "pion_multi");
-        MakeEfficiencyPlotByCutTot("h_eff_charg_par_multi",   "h_eff_charg_par_multi_nue",   "h_eff_charg_par_multi_nuebar",   "#nu_{e}/#bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Charged Particle Multiplicity; Efficiency", "charg_par_multi");
-        MakeEfficiencyPlotByCutTot("h_true_nu_E_single_bin",  "h_true_nu_E_nue_single_bin",  "h_true_nu_E_nuebar_single_bin",  "#nu_{e}/#bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, true,  "True Neutrino Energy [GeV]; Efficiency", "nu_E_single_bin");
-        MakeEfficiencyPlotByCutTot("h_eff_cosine_beta", "h_eff_cosine_beta_nue", "h_eff_cosine_beta_nuebar", "#nu_{e}/#bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True e#lower[-0.5]{-}/e^{+} cos#beta; Efficiency",         "cosine_beta");
+        MakeEfficiencyPlotByCutTot("h_true_nu_E",             "h_true_nu_E_nue",             "h_true_nu_E_nuebar",             "#nu_{e} or #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Neutrino Energy [GeV]; Efficiency",         "nu_E");
+        MakeEfficiencyPlotByCutTot("h_true_elec_E_rebin",     "h_true_elec_E_rebin_nue",     "h_true_elec_E_rebin_nuebar",     "#nu_{e} or #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True e#lower[-0.5]{-} or e^{+} Energy [GeV]; Efficiency",         "elec_E_rebin");
+        MakeEfficiencyPlotByCutTot("h_eff_cosine_beta_rebin", "h_eff_cosine_beta_rebin_nue", "h_eff_cosine_beta_rebin_nuebar", "#nu_{e} or #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True e#lower[-0.5]{-} or e^{+} cos#beta; Efficiency",         "cosine_beta_rebin");
+        MakeEfficiencyPlotByCutTot("h_eff_proton_multi",      "h_eff_proton_multi_nue",      "h_eff_proton_multi_nuebar",      "#nu_{e} or #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Proton Multiplicity; Efficiency",           "prot_multi");
+        MakeEfficiencyPlotByCutTot("h_eff_pion_multi",        "h_eff_pion_multi_nue",        "h_eff_pion_multi_nuebar",        "#nu_{e} or #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Pion Multiplicity; Efficiency",             "pion_multi");
+        MakeEfficiencyPlotByCutTot("h_eff_charg_par_multi",   "h_eff_charg_par_multi_nue",   "h_eff_charg_par_multi_nuebar",   "#nu_{e} or #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True Charged Particle Multiplicity; Efficiency", "charg_par_multi");
+        MakeEfficiencyPlotByCutTot("h_true_nu_E_single_bin",  "h_true_nu_E_nue_single_bin",  "h_true_nu_E_nuebar_single_bin",  "#nu_{e} or #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, true,  "True Neutrino Energy [GeV]; Efficiency", "nu_E_single_bin");
+        MakeEfficiencyPlotByCutTot("h_eff_cosine_beta", "h_eff_cosine_beta_nue", "h_eff_cosine_beta_nuebar", "#nu_{e} or #bar{#nu}_{e}", "#nu_{e}",          "#bar{#nu}_{e}",   true, false, "True e#lower[-0.5]{-} or e^{+} cos#beta; Efficiency",         "cosine_beta");
 
         // Create the interaction folder
         _util.CreateDirectory("Interaction");
@@ -135,42 +135,42 @@ void HistogramPlotter::MakeHistograms(Utility _utility) {
 
             MakeInteractionPlot("h_true_nue_E",                 true, ";True #nu_{e} Energy [GeV]; Entries",                    "nue_E",                  cut_stage, 1100 );
             MakeInteractionPlot("h_true_nuebar_E",              true, ";True #bar{#nu}_{e} Energy [GeV]; Entries",              "nuebar_E",               cut_stage, 170);
-            MakeInteractionPlot("h_true_nue_nuebar_E",          true, ";True #nu_{e}/#bar{#nu}_{e} Energy [GeV]; Entries",      "nue_nuebar_E",           cut_stage, 1300);
-            MakeInteractionPlot("h_int_nu_E_single_bin",        true, "True #nu_{e}/#bar{#nu}_{e};; Entries",                   "nu_E_single_bin",        cut_stage, 30000);
+            MakeInteractionPlot("h_true_nue_nuebar_E",          true, ";True #nu_{e} or #bar{#nu}_{e} Energy [GeV]; Entries",      "nue_nuebar_E",           cut_stage, 1300);
+            MakeInteractionPlot("h_int_nu_E_single_bin",        true, "True #nu_{e} or #bar{#nu}_{e};; Entries",                   "nu_E_single_bin",        cut_stage, 30000);
             MakeInteractionPlot("h_int_nu_E_nue_single_bin",    true, "True #nu_{e};; Entries",                                 "nu_E_nue_single_bin",    cut_stage, 25000);
             MakeInteractionPlot("h_int_nu_E_nuebar_single_bin", true, "True #bar{#nu}_{e};; Entries",                           "nu_E_nuebar_single_bin", cut_stage, 5500);
-            MakeInteractionPlot("h_int_elec_E",                 true, ";True e#lower[-0.5]{-}/e^{+} Energy [GeV]; Entries",     "elec_E",                 cut_stage, 1600);
+            MakeInteractionPlot("h_int_elec_E",                 true, ";True e#lower[-0.5]{-} or e^{+} Energy [GeV]; Entries",     "elec_E",                 cut_stage, 1600);
             MakeInteractionPlot("h_int_elec_E_nue",             true, ";True e#lower[-0.5]{-} Energy [GeV]; Entries",           "elec_E_nue",             cut_stage, 1600);
             MakeInteractionPlot("h_int_elec_E_nuebar",          true, ";True e^{+} Energy [GeV]; Entries",                      "elec_E_nuebar",          cut_stage, 1600);
-            MakeInteractionPlot("h_int_elec_E_rebin",           true, ";True e#lower[-0.5]{-}/e^{+} Energy [GeV]; Entries",     "elec_E_rebin",           cut_stage, 3000);
+            MakeInteractionPlot("h_int_elec_E_rebin",           true, ";True e#lower[-0.5]{-} or e^{+} Energy [GeV]; Entries",     "elec_E_rebin",           cut_stage, 3000);
             MakeInteractionPlot("h_int_elec_E_rebin_nue",       true, ";True e#lower[-0.5]{-} Energy [GeV]; Entries",           "elec_E_rebin_nue",       cut_stage, 3000);
             MakeInteractionPlot("h_int_elec_E_rebin_nuebar",    true, ";True e^{+} Energy [GeV]; Entries",                      "elec_E_rebin_nuebar",    cut_stage, 300);
-            MakeInteractionPlot("h_int_elec_theta",             true, ";True e#lower[-0.5]{-}/e^{+} #theta [deg]; Entries",     "elec_theta",             cut_stage, 600);
-            MakeInteractionPlot("h_int_elec_phi",               true, ";True e#lower[-0.5]{-}/e^{+} #phi [deg]; Entries",       "elec_phi",               cut_stage, 500);
-            MakeInteractionPlot("h_int_effective_ang",          true, ";True e#lower[-0.5]{-}/e^{+} Eff Ang. [deg]; Entries",   "eff_ang",                cut_stage, 600);
+            MakeInteractionPlot("h_int_elec_theta",             true, ";True e#lower[-0.5]{-} or e^{+} #theta [deg]; Entries",     "elec_theta",             cut_stage, 600);
+            MakeInteractionPlot("h_int_elec_phi",               true, ";True e#lower[-0.5]{-} or e^{+} #phi [deg]; Entries",       "elec_phi",               cut_stage, 500);
+            MakeInteractionPlot("h_int_effective_ang",          true, ";True e#lower[-0.5]{-} or e^{+} Eff Ang. [deg]; Entries",   "eff_ang",                cut_stage, 600);
             MakeInteractionPlot("h_int_beta_nue",               true, ";True e#lower[-0.5]{-} #beta [deg]; Entries",            "eff_ang_nue",            cut_stage, 600);
             MakeInteractionPlot("h_int_beta_nuebar",            true, ";True e^{+} #beta [deg]; Entries",                       "eff_ang_nuebar",         cut_stage, 600);
-            MakeInteractionPlot("h_int_cosbeta",                true, ";True e#lower[-0.5]{-}/e^{+} cos#beta; Entries",         "cosbeta_rebin",          cut_stage, 600);
+            MakeInteractionPlot("h_int_cosbeta",                true, ";True e#lower[-0.5]{-} or e^{+} cos#beta; Entries",         "cosbeta_rebin",          cut_stage, 600);
             MakeInteractionPlot("h_int_cosbeta_rebin_nue",      true, ";True e#lower[-0.5]{-} cos#beta; Entries/Bin",               "cosbeta_rebin_nue",      cut_stage, 600);
             MakeInteractionPlot("h_int_cosbeta_rebin_nuebar",   true, ";True e^{+} cos#beta; Entries/Bin",                          "cosbeta_rebin_nuebar",   cut_stage, 600);
         }
         
         MakeInteractionEfficiency("h_true_nue_E",                 false, ";True #nu_{e} Energy [GeV]; Efficiency",                    "nue_E");
         MakeInteractionEfficiency("h_true_nuebar_E",              false, ";True #bar{#nu}_{e} Energy [GeV]; Efficiency",              "nuebar_E");
-        MakeInteractionEfficiency("h_true_nue_nuebar_E",          false, ";True #nu_{e}/#bar{#nu}_{e} Energy [GeV]; Efficiency",      "nue_nuebar_E");
-        MakeInteractionEfficiency("h_int_nu_E_single_bin",        true,  "True #nu_{e}/#bar{#nu}_{e};; Efficiency",                   "nu_E_single_bin");
+        MakeInteractionEfficiency("h_true_nue_nuebar_E",          false, ";True #nu_{e} or #bar{#nu}_{e} Energy [GeV]; Efficiency",      "nue_nuebar_E");
+        MakeInteractionEfficiency("h_int_nu_E_single_bin",        true,  "True #nu_{e} or #bar{#nu}_{e};; Efficiency",                   "nu_E_single_bin");
         MakeInteractionEfficiency("h_int_nu_E_nue_single_bin",    true,  "True #nu_{e};; Efficiency",                                 "nu_E_nue_single_bin");
         MakeInteractionEfficiency("h_int_nu_E_nuebar_single_bin", true,  "True #bar{#nu}_{e};; Efficiency",                           "nu_E_nuebar_single_bin");
-        MakeInteractionEfficiency("h_int_elec_E",                 false, ";True e#lower[-0.5]{-}/e^{+} Energy [GeV]; Efficiency",     "elec_E");
-        MakeInteractionEfficiency("h_int_elec_E_rebin",           false, ";True e#lower[-0.5]{-}/e^{+} Energy [GeV]; Efficiency",     "elec_E_rebin");
+        MakeInteractionEfficiency("h_int_elec_E",                 false, ";True e#lower[-0.5]{-} or e^{+} Energy [GeV]; Efficiency",     "elec_E");
+        MakeInteractionEfficiency("h_int_elec_E_rebin",           false, ";True e#lower[-0.5]{-} or e^{+} Energy [GeV]; Efficiency",     "elec_E_rebin");
         MakeInteractionEfficiency("h_int_elec_E_rebin_nue",       false, ";True e#lower[-0.5]{-} Energy [GeV]; Efficiency",           "elec_E_rebin_nue");
         MakeInteractionEfficiency("h_int_elec_E_rebin_nuebar",    false, ";True e^{+} Energy [GeV]; Efficiency",                      "elec_E_rebin_nuebar");
-        MakeInteractionEfficiency("h_int_elec_theta",             false, ";True e#lower[-0.5]{-}/e^{+} #theta [deg]; Efficiency",     "elec_theta");
-        MakeInteractionEfficiency("h_int_elec_phi",               false, ";True e#lower[-0.5]{-}/e^{+} #phi [deg]; Efficiency",       "elec_phi");
-        MakeInteractionEfficiency("h_int_effective_ang",          false, ";True e#lower[-0.5]{-}/e^{+} #beta [deg]; Efficiency",      "eff_ang");
+        MakeInteractionEfficiency("h_int_elec_theta",             false, ";True e#lower[-0.5]{-} or e^{+} #theta [deg]; Efficiency",     "elec_theta");
+        MakeInteractionEfficiency("h_int_elec_phi",               false, ";True e#lower[-0.5]{-} or e^{+} #phi [deg]; Efficiency",       "elec_phi");
+        MakeInteractionEfficiency("h_int_effective_ang",          false, ";True e#lower[-0.5]{-} or e^{+} #beta [deg]; Efficiency",      "eff_ang");
         MakeInteractionEfficiency("h_int_beta_nue",               false, ";True e#lower[-0.5]{-} #beta [deg]; Efficiency",            "eff_ang_nue");
         MakeInteractionEfficiency("h_int_beta_nuebar",            false, ";True e^{+} #beta [deg]; Efficiency",                       "eff_ang_nuebar");
-        MakeInteractionEfficiency("h_int_cosbeta",                false, ";True e#lower[-0.5]{-}/e^{+} cos#beta; Efficiency",                       "cosbeta");
+        MakeInteractionEfficiency("h_int_cosbeta",                false, ";True e#lower[-0.5]{-} or e^{+} cos#beta; Efficiency",                       "cosbeta");
 
         // Create the 2D folder
         _util.CreateDirectory("2D");
@@ -3051,10 +3051,10 @@ void HistogramPlotter::MakePurityPlot(THStack *h_stack, TH1D *h_nue, TH1D* h_nue
     _util.IncreaseLabelSize(h_purity, c);
 
     if (histname == "h_reco_shower_energy_cali_rebin")
-        h_purity->SetTitle(";Reco. e#lower[-0.5]{-}/e^{+} Energy [GeV]; Purity [\%]");
+        h_purity->SetTitle(";Reco. e#lower[-0.5]{-} or e^{+} Energy [GeV]; Purity [\%]");
 
     if (histname == "h_reco_effective_cosangle_rebin"){
-        h_purity->SetTitle(";Reco. e#lower[-0.5]{-}/e^{+} cos#beta; Purity [\%]");
+        h_purity->SetTitle(";Reco. e#lower[-0.5]{-} or e^{+} cos#beta; Purity [\%]");
         h_purity->GetXaxis()->SetLabelSize(0.035);
     }
 

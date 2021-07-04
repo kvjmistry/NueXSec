@@ -465,6 +465,8 @@ void CrossSectionHelper::LoopEvents(){
                             h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_ext);
                             h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_dirt);
 
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_detvar_cv_bkg, -1);
+
                             delete h_ext;
                             delete h_dirt;
 
@@ -500,17 +502,25 @@ void CrossSectionHelper::LoopEvents(){
                                 h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_trueX), true);
                             }
 
-                            TH1D* h_ext = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_ext)->Clone();
-                            TH1D* h_dirt = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_dirt)->Clone();
+                            TH1D* h_ext     = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_ext)->Clone();
+                            TH1D* h_dirt    = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_dirt)->Clone();
+                            TH1D* h_ext_CV  = (TH1D*)h_cross_sec.front().front().at(k_var_recoX).at(k_xsec_ext)->Clone();
+                            TH1D* h_dirt_CV = (TH1D*)h_cross_sec.front().front().at(k_var_recoX).at(k_xsec_dirt)->Clone();
 
                             // Scale histograms to add in with right scaling
-                            h_ext->Scale(_util.ext_scale_factor / _util.mc_scale_factor);
-                            h_dirt->Scale(_util.dirt_scale_factor / _util.mc_scale_factor);
+                            h_ext    ->Scale(_util.ext_scale_factor / _util.mc_scale_factor);
+                            h_dirt   ->Scale(_util.dirt_scale_factor / _util.mc_scale_factor);
+                            h_ext_CV ->Scale(_util.ext_scale_factor / _util.mc_scale_factor);
+                            h_dirt_CV->Scale(_util.dirt_scale_factor / _util.mc_scale_factor);
 
                             // Add in the reco background
                             h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));
                             h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_ext);
                             h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_dirt);
+
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.front().front().at(k_var_recoX).at(k_xsec_bkg), -1);
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_ext_CV, -1);
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_dirt_CV, -1);
 
                             // Store the bkg so we can draw it
                             h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));
@@ -519,6 +529,8 @@ void CrossSectionHelper::LoopEvents(){
 
                             delete h_ext;
                             delete h_dirt;
+                            delete h_ext_CV;
+                            delete h_dirt_CV;
                         }
                     }
                 }
@@ -2832,9 +2844,17 @@ void CrossSectionHelper::LoadDetvarCVHist(){
     TH1D* h_temp;
     
     // Get the CV histogram we want to smear
-    h_temp = (TH1D*)f->Get(Form("detvar_CV/%s/h_run%s_CV_0_%s_gen", _util.vars.at(k_var_trueX).c_str(), _util.run_period, _util.vars.at(k_var_trueX).c_str()));
-    h_detvar_cv = (TH1D*)h_temp->Clone();
-    h_detvar_cv->SetDirectory(0);
+    h_temp = (TH1D*)f->Get(Form("detvar_CV/%s/h_run%s_CV_0_%s_bkg", _util.vars.at(k_var_recoX).c_str(), _util.run_period, _util.vars.at(k_var_recoX).c_str()));
+    h_detvar_cv_bkg = (TH1D*)h_temp->Clone();
+    h_detvar_cv_bkg->SetDirectory(0);
+
+    h_temp = (TH1D*)f->Get(Form("detvar_CV/%s/h_run%s_CV_0_%s_ext", _util.vars.at(k_var_recoX).c_str(), _util.run_period, _util.vars.at(k_var_recoX).c_str()));
+    h_temp->Scale(_util.ext_scale_factor / _util.mc_scale_factor);
+    h_detvar_cv_bkg->Add(h_temp);
+
+    h_temp = (TH1D*)f->Get(Form("detvar_CV/%s/h_run%s_CV_0_%s_dirt", _util.vars.at(k_var_recoX).c_str(), _util.run_period, _util.vars.at(k_var_recoX).c_str()));
+    h_temp->Scale(_util.dirt_scale_factor / _util.mc_scale_factor);
+    h_detvar_cv_bkg->Add(h_temp);
 
     delete h_temp;
 
