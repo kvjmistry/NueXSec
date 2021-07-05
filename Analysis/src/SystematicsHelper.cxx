@@ -824,6 +824,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
     // Save the total covariance matrices
     _util.CreateDirectory("/Systematics/Covariance/" + _util.vars.at(k_var_recoX));
     _util.CreateDirectory("/Systematics/Correlation/" + _util.vars.at(k_var_recoX));
+    _util.CreateDirectory("/Systematics/Covariance/" + _util.vars.at(k_var_trueX));
     _util.CreateDirectory("/Systematics/Correlation/" + _util.vars.at(k_var_trueX));
     _util.CreateDirectory("/Systematics/FracCovariance/" + _util.vars.at(k_var_recoX));
     for (unsigned int cov = 0; cov < h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).size(); cov++){
@@ -834,9 +835,11 @@ void SystematicsHelper::InitialiseReweightingMode(){
         SaveCorMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(cov),     cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), Form("plots/run%s/Systematics/Correlation/%s/run%s_%s_%s_%s_cor.pdf",         _util.run_period, _util.vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_dataxsec).c_str(), _util.vars.at(k_var_recoX).c_str()));
         SaveFracCovMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_mcxsec).at(cov),   cv_hist_vec.at(k_var_recoX).at(k_xsec_mcxsec),   Form("plots/run%s/Systematics/FracCovariance/%s/run%s_%s_%s_%s_frac_cov.pdf", _util.run_period, _util.vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_mcxsec).c_str(),   _util.vars.at(k_var_recoX).c_str()));
         SaveFracCovMatrix(h_cov_v.at(k_var_recoX).at(k_xsec_dataxsec).at(cov), cv_hist_vec.at(k_var_recoX).at(k_xsec_dataxsec), Form("plots/run%s/Systematics/FracCovariance/%s/run%s_%s_%s_%s_frac_cov.pdf", _util.run_period, _util.vars.at(k_var_recoX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_dataxsec).c_str(), _util.vars.at(k_var_recoX).c_str()));
+    
+        SaveCovMatrix(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_shape).at(cov),                                                          Form("plots/run%s/Systematics/Covariance/%s/run%s_%s_%s_%s_cov_shape.pdf",          _util.run_period, _util.vars.at(k_var_trueX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_xsec_mcxsec_shape).c_str(),   _util.vars.at(k_var_trueX).c_str()));
+        SaveCorMatrix(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_shape).at(cov),     cv_hist_vec.at(k_var_trueX).at(k_xsec_mcxsec_shape), Form("plots/run%s/Systematics/Correlation/%s/run%s_%s_%s_%s_cor_shape.pdf",         _util.run_period, _util.vars.at(k_var_trueX).c_str(), _util.run_period, systematic_names.at(cov).c_str(), xsec_types.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));
     }
 
-    SaveCorMatrix(h_cov_v.at(k_var_trueX).at(k_xsec_mcxsec_shape).at(k_err_hp),     cv_hist_vec.at(k_var_trueX).at(k_xsec_mcxsec_shape), Form("plots/run%s/Systematics/Correlation/%s/run%s_%s_%s_%s_cor_shape.pdf",         _util.run_period, _util.vars.at(k_var_trueX).c_str(), _util.run_period, systematic_names.at(k_err_hp).c_str(), xsec_types.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));
 
     // Create the directories
     _util.CreateDirectory("/Systematics/Beamline");
@@ -1969,11 +1972,11 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             if (error_type.at(err_lab) == "stat")     leg->AddEntry(h_dataxsec_tot, "Data (Stat.)", "ep");
             else if (error_type.at(err_lab) == "sys") leg->AddEntry(h_dataxsec_tot, "Data (Sys.)", "ep");
             else                                      leg->AddEntry(h_dataxsec_tot, "Data (Stat. + Sys.)", "ep");
-            leg->AddEntry(h_mcxsec_clone,   Form("MC #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+            leg->AddEntry(h_mcxsec_clone,   Form("GENIE v3.0.6 (#muB tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
             leg->Draw();
 
             // Draw the run period on the plot
-            _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
+            // _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
 
             _util.Draw_Data_POT(c, Data_POT, 0.52, 0.92, 0.52, 0.92);
 
@@ -2579,15 +2582,21 @@ void SystematicsHelper::FillStatVector(){
                 double stat_err = 100 * cv_hist_vec.at(var).at(type)->GetBinError(bin+1) / cv_hist_vec.at(var).at(type)->GetBinContent(bin+1);
                 v_err.at(k_err_stat).at(var).at(type).at(bin) += stat_err*stat_err;
 
+                if ((var == k_var_recoX || var == k_var_trueX) && (type == k_xsec_mcxsec || type == k_xsec_mcxsec_shape)){
+                    cv_hist_vec.at(var).at(type)->SetBinError(bin+1,0);
+                    v_err.at(k_err_stat).at(var).at(type).at(bin) = 0.0;
+                }
+                    
+
             }
         
         }
     }
 
     // Set the reco error to be same as the true var in the case of the data
-    v_err.at(k_err_stat).at(k_var_recoX).at(k_xsec_dataxsec) = v_err.at(k_err_stat).at(k_var_trueX).at(k_xsec_dataxsec);
-    v_err.at(k_err_stat).at(k_var_recoX).at(k_xsec_mcxsec) = v_err.at(k_err_stat).at(k_var_recoX).at(k_xsec_sel);
-    v_err.at(k_err_stat).at(k_var_integrated).at(k_xsec_dataxsec) = v_err.at(k_err_stat).at(k_var_integrated).at(k_xsec_data);
+    // v_err.at(k_err_stat).at(k_var_recoX).at(k_xsec_dataxsec) = v_err.at(k_err_stat).at(k_var_trueX).at(k_xsec_dataxsec);
+    // v_err.at(k_err_stat).at(k_var_recoX).at(k_xsec_mcxsec) = v_err.at(k_err_stat).at(k_var_recoX).at(k_xsec_sel);
+    // v_err.at(k_err_stat).at(k_var_integrated).at(k_xsec_dataxsec) = v_err.at(k_err_stat).at(k_var_integrated).at(k_xsec_data);
 
     // Lets also fill the diagonals of the statistical covariance matrix
 
@@ -2900,6 +2909,7 @@ void SystematicsHelper::SaveCorMatrix(TH2D* cov, TH1D* h_CV, std::string print_n
         cor->GetXaxis()->SetNdivisions(cor->GetNbinsX(), 0, 0, kFALSE);
         cor->GetYaxis()->SetNdivisions(cor->GetNbinsY(), 0, 0, kFALSE);
     }
+    cor->GetZaxis()->SetRangeUser(-1, 1);
     cor->Draw("colz, text00");
     _util.IncreaseLabelSize(cor, c);
     cor->SetMarkerSize(1.3);
@@ -3728,7 +3738,7 @@ void SystematicsHelper::MakeTotUncertaintyPlot(bool AddStatErr){
                     h_uncertainty.at(k_err_tot)->GetYaxis()->SetTitle("Uncertainty [%]");
                     
                     if (std::string(_util.xsec_var) == "elec_E")
-                        h_uncertainty.at(k_err_tot)->GetYaxis()->SetRangeUser(0, 250);
+                        h_uncertainty.at(k_err_tot)->GetYaxis()->SetRangeUser(0, 120);
                     else 
                         h_uncertainty.at(k_err_tot)->GetYaxis()->SetRangeUser(0, 100);
 

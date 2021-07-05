@@ -108,7 +108,7 @@ void UtilityPlotter::Initialise(Utility _utility){
         CompareGeneratorTotalCrossSec();
         CompareGeneratorUnfoldedModels();
         CompareXsecPi0Tunings();
-        ValidateSmearing();
+        // ValidateSmearing();
         return;
     }
     else {

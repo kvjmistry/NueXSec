@@ -193,7 +193,7 @@ void WienerSVD::CompareModel(TH1D *sig){
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(unf, "Data (Stat. + Sys.)", "ep");
-    leg->AddEntry(h_model_smear_err,   Form("MC (Stat.) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    leg->AddEntry(h_model_smear_err,   Form("GENIE v3.0.6 (#muB tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     leg->Draw();
     
     _util.CreateDirectory(Form("Systematics/CV/Unfolded/%s", _util.xsec_var));

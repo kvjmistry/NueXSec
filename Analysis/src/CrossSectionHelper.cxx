@@ -442,96 +442,65 @@ void CrossSectionHelper::LoopEvents(){
                     // Use standard binning to smear
                     if (std::string(_util.xsec_bin_mode) == "standard" || std::string(_util.xsec_bin_mode) == "ratio"){
 
-                        // Apply the response matrix to the detvar CV for detector variations
-                        if (_util.isvariation && std::string(_util.variation) != "CV"){
+                        // For shape uncertainties
+                        // TH1D* h_shape_temp = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Clone();
+                        // ApplyResponseMatrix(h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape),
+                        // h_shape_temp, h_smear.front().front().at(k_var_trueX), false);
+                        
+                        // For making covariance matrix on response * gen + B
+                        if (reweighter_labels.at(label) == "weightsPPFX" || CheckBeamline(reweighter_labels.at(label))){
+                            TH2D* h_smear_temp = (TH2D*) h_smear.at(label).at(uni).at(k_var_trueX)->Clone();
 
+                            ApplyResponseMatrix( h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape),
+                            h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear_temp, true);
+                            delete h_smear_temp;
+
+                            // Standard Smearing
+                            ApplyResponseMatrix(h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
+                            h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_trueX), true);
+
+                        }
+                        else {
                             TH2D* h_smear_temp = (TH2D*) h_smear.at(label).at(uni).at(k_var_trueX)->Clone();
                             ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape),
                             h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear_temp, true);
                             delete h_smear_temp;
 
+                            // Standard Smearing
                             ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
                             h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_trueX), true);
-
-                            TH1D* h_ext = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_ext)->Clone();
-                            TH1D* h_dirt = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_dirt)->Clone();
-
-                            // Scale histograms to add in with right scaling
-                            h_ext->Scale(_util.ext_scale_factor / _util.mc_scale_factor);
-                            h_dirt->Scale(_util.dirt_scale_factor / _util.mc_scale_factor);
-
-                            // Add in the reco background
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_ext);
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_dirt);
-
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_detvar_cv_bkg, -1);
-
-                            delete h_ext;
-                            delete h_dirt;
-
                         }
-                        else {
 
-                            // For shape uncertainties
-                            // TH1D* h_shape_temp = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Clone();
-                            // ApplyResponseMatrix(h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape),
-                            // h_shape_temp, h_smear.front().front().at(k_var_trueX), false);
-                            
-                            // For making covariance matrix on response * gen + B
-                            if (reweighter_labels.at(label) == "weightsPPFX" || CheckBeamline(reweighter_labels.at(label))){
-                                TH2D* h_smear_temp = (TH2D*) h_smear.at(label).at(uni).at(k_var_trueX)->Clone();
+                        TH1D* h_ext     = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_ext)->Clone();
+                        TH1D* h_dirt    = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_dirt)->Clone();
+                        TH1D* h_ext_CV  = (TH1D*)h_cross_sec.front().front().at(k_var_recoX).at(k_xsec_ext)->Clone();
+                        TH1D* h_dirt_CV = (TH1D*)h_cross_sec.front().front().at(k_var_recoX).at(k_xsec_dirt)->Clone();
 
-                                ApplyResponseMatrix( h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape),
-                                h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear_temp, true);
-                                delete h_smear_temp;
+                        // Scale histograms to add in with right scaling
+                        h_ext    ->Scale(_util.ext_scale_factor / _util.mc_scale_factor);
+                        h_dirt   ->Scale(_util.dirt_scale_factor / _util.mc_scale_factor);
+                        h_ext_CV ->Scale(_util.ext_scale_factor / _util.mc_scale_factor);
+                        h_dirt_CV->Scale(_util.dirt_scale_factor / _util.mc_scale_factor);
 
-                                // Standard Smearing
-                                ApplyResponseMatrix(h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
-                                h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_trueX), true);
+                        // Add in the reco background
+                        h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));
+                        h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_ext);
+                        h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_dirt);
 
-                            }
-                            else {
-                                TH2D* h_smear_temp = (TH2D*) h_smear.at(label).at(uni).at(k_var_trueX)->Clone();
-                                ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape),
-                                h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear_temp, true);
-                                delete h_smear_temp;
+                        h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.front().front().at(k_var_recoX).at(k_xsec_bkg), -1);
+                        h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_ext_CV, -1);
+                        h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_dirt_CV, -1);
 
-                                // Standard Smearing
-                                ApplyResponseMatrix(h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_smear),
-                                h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_smear.at(label).at(uni).at(k_var_trueX), true);
-                            }
+                        // Store the bkg so we can draw it
+                        h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));
+                        h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Add(h_ext);
+                        h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Add(h_dirt);
 
-                            TH1D* h_ext     = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_ext)->Clone();
-                            TH1D* h_dirt    = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_dirt)->Clone();
-                            TH1D* h_ext_CV  = (TH1D*)h_cross_sec.front().front().at(k_var_recoX).at(k_xsec_ext)->Clone();
-                            TH1D* h_dirt_CV = (TH1D*)h_cross_sec.front().front().at(k_var_recoX).at(k_xsec_dirt)->Clone();
-
-                            // Scale histograms to add in with right scaling
-                            h_ext    ->Scale(_util.ext_scale_factor / _util.mc_scale_factor);
-                            h_dirt   ->Scale(_util.dirt_scale_factor / _util.mc_scale_factor);
-                            h_ext_CV ->Scale(_util.ext_scale_factor / _util.mc_scale_factor);
-                            h_dirt_CV->Scale(_util.dirt_scale_factor / _util.mc_scale_factor);
-
-                            // Add in the reco background
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_ext);
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_dirt);
-
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.front().front().at(k_var_recoX).at(k_xsec_bkg), -1);
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_ext_CV, -1);
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_dirt_CV, -1);
-
-                            // Store the bkg so we can draw it
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Add(h_ext);
-                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Add(h_dirt);
-
-                            delete h_ext;
-                            delete h_dirt;
-                            delete h_ext_CV;
-                            delete h_dirt_CV;
-                        }
+                        delete h_ext;
+                        delete h_dirt;
+                        delete h_ext_CV;
+                        delete h_dirt_CV;
+                        
                     }
                 }
 
@@ -578,7 +547,17 @@ void CrossSectionHelper::LoopEvents(){
                     h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_mcxsec_shape)->Scale(1.0e39);
 
                     // Normalise the data event rate for calculations and an easier way to propagate the satistical uncertainties
+                    TH1D* h_bkg     = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg)->Clone();
+                    TH1D* h_ext     = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_ext)->Clone();
+                    TH1D* h_dirt    = (TH1D*)h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_dirt)->Clone();
+                    h_bkg    ->Scale(_util.mc_scale_factor);
+                    h_ext    ->Scale(_util.ext_scale_factor);
+                    h_dirt   ->Scale(_util.dirt_scale_factor);
                     h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_dataxsec)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_data), 1);
+                    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_dataxsec)->Add(h_bkg, -1);
+                    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_dataxsec)->Add(h_ext, -1);
+                    h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_dataxsec)->Add(h_dirt, -1);
+                    delete h_bkg; delete h_ext; delete h_dirt;
                     h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_dataxsec)->Scale(1.0 / (weight_POT * integrated_flux * data_flux_scale_factor * N_target_Data));
 
                     // If the crosssec is a function of angle then scale again by a factor of 100
