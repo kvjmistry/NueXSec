@@ -1053,7 +1053,7 @@ void UtilityPlotter::PlotTrueVar(){
         SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
         SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
 
-        bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+        bool is_in_fv = _util.in_fv(SC.true_nu_vtx_x, SC.true_nu_vtx_y, SC.true_nu_vtx_z); // This variable is only used in the case of MC, so it should be fine 
 
         double weight = _util.GetCVWeight(_util.k_mc, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);
         
@@ -4208,7 +4208,7 @@ void UtilityPlotter::CompareGeneratorPi0(){
         SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
         SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
 
-        bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+        bool is_in_fv = _util.in_fv(SC.true_nu_vtx_x, SC.true_nu_vtx_y, SC.true_nu_vtx_z); // This variable is only used in the case of MC, so it should be fine 
 
         double weight = _util.GetCVWeight(_util.k_mc, 1.0, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e); // Turn off the genie tune
         

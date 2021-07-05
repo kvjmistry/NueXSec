@@ -740,7 +740,7 @@ void HistogramHelper::InitHistograms(){
 void HistogramHelper::FillHists(int type, int classification_index, std::string interaction, int _par_type, int cut_index, SliceContainer SC, double weight){
 
     // Check if the interaction was in the FV
-    bool true_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z);
+    bool true_in_fv = _util.in_fv(SC.true_nu_vtx_x, SC.true_nu_vtx_y, SC.true_nu_vtx_z);
 
     // Get the trkfit dedx max variable
     double dedx_max = SC.GetdEdxMax();

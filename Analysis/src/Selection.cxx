@@ -560,8 +560,8 @@ bool Selection::ApplyCuts(int type,std::vector<std::vector<double>> &counter_v, 
     
     SelectionFill(type, SC, _util.k_dEdx_max_no_tracks, counter_v );
 
-    // if (SC.classification.first == "cosmic")
-    //     std::cout << SC.nu_purity_from_pfp<< " " << SC.nu_pdg << " " << SC.shr_bkt_pdg <<" " << SC.trk_bkt_pdg<< std::endl; 
+    // if (SC.classification.first != "data")
+    //     std::cout << SC.classification.first << std::endl; 
 
     // Future versions of this code needs to add the CRT veto to run 3 
     // improves the purity by about 5% with a small drop in efficiency
@@ -657,7 +657,7 @@ void Selection::SelectionFill(int type, SliceContainer &SC, int cut_index, std::
     // Get the CV weight
     // *************************************************************************
     double weight = 1.0;
-    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_x, SC.true_nu_vtx_y, SC.true_nu_vtx_z); // This variable is only used in the case of MC, so it should be fine 
     weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);
 
     // Try scaling the pi0 -- need to implement this as a configurable option
@@ -704,7 +704,7 @@ void Selection::ApplyPiZeroSelection(int type, SliceContainer &SC){
     pass = _scuts.pi_zero_cuts(SC);
     if(!pass) return; // Failed the cut!
 
-    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_x, SC.true_nu_vtx_y, SC.true_nu_vtx_z); // This variable is only used in the case of MC, so it should be fine 
 
     // Get the Central Value weight
     double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);
@@ -789,7 +789,7 @@ void Selection::ApplyNuMuSelection(int type, SliceContainer &SC){
     pass = _scuts.numu_cuts(SC);
     if(!pass) return; // Failed the cut!
 
-    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+    bool is_in_fv = _util.in_fv(SC.true_nu_vtx_x, SC.true_nu_vtx_y, SC.true_nu_vtx_z); // This variable is only used in the case of MC, so it should be fine 
 
     // Get the Central Value weight
     double weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);

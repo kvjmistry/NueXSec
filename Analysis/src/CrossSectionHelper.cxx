@@ -840,7 +840,7 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
         // Call switch function
         SwitchReweighterLabel(reweighter_labels[label], SC);
 
-        bool is_in_fv = _util.in_fv(SC.true_nu_vtx_sce_x, SC.true_nu_vtx_sce_y, SC.true_nu_vtx_sce_z); // This variable is only used in the case of MC, so it should be fine 
+        bool is_in_fv = _util.in_fv(SC.true_nu_vtx_x, SC.true_nu_vtx_y, SC.true_nu_vtx_z); // This variable is only used in the case of MC, so it should be fine 
 
         // Get the CV weight
         double cv_weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);

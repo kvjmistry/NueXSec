@@ -1096,6 +1096,10 @@ void SliceContainer::SetNonLdgShrEvent(int type){
         if (classification.first == "nuebar_cc" && shr_bkt_pdg != -11){
             classification = std::make_pair("cosmic_nuebar",   _util.k_cosmic_nuebar);
         }
+
+        if (_util.isfakedata)
+            classification = std::make_pair("data",_util.k_leg_data);
+
     }
 }
 // -----------------------------------------------------------------------------
