@@ -189,7 +189,7 @@ void WienerSVD::CompareModel(TH1D *sig){
     h_model_smear_err->Draw("hist,same");
     unf->Draw("E1,X0,same");
 
-    TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.85);
+    TLegend *leg = new TLegend(0.31, 0.6, 0.66, 0.85);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(unf, "Data (Stat. + Sys.)", "ep");

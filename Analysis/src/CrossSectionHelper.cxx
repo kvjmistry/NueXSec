@@ -487,9 +487,20 @@ void CrossSectionHelper::LoopEvents(){
                         h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_ext);
                         h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_dirt);
 
-                        h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.front().front().at(k_var_recoX).at(k_xsec_bkg), -1);
-                        h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_ext_CV, -1);
-                        h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_dirt_CV, -1);
+
+                        // Subtract the CV background. In the case of detvar we do this in the systematics helper in order to ensure the subtraction is done to the correct POT scaled result
+                        if (_util.isvariation && std::string(_util.variation) == "CV"){
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.front().front().at(k_var_recoX).at(k_xsec_bkg), -1);
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_ext_CV, -1);
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_dirt_CV, -1);
+                        }
+                        else if ((_util.isvariation && std::string(_util.variation) != "CV")){
+                        }
+                        else {
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_cross_sec.front().front().at(k_var_recoX).at(k_xsec_bkg), -1);
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_ext_CV, -1);
+                            h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape)->Add(h_dirt_CV, -1);
+                        }
 
                         // Store the bkg so we can draw it
                         h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_bkg)->Add(h_cross_sec.at(label).at(uni).at(k_var_recoX).at(k_xsec_bkg));

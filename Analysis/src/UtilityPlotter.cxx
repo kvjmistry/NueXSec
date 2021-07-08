@@ -996,6 +996,11 @@ void UtilityPlotter::PlotTrueVar(){
     
     // 1D pi0 momentum
     TH1D *h_pi0_momentum = new TH1D("h_true_pi0_momentum", "; #pi^{0} Momentum [GeV/c]; Entries", 40, 0, 2.0);
+
+    int const nbins = _util.reco_shr_bins.size()-1;
+    std::vector<double> temp_bins = _util.reco_shr_bins;
+    double* edges = &temp_bins[0]; // Cast to an array 
+    TH1D *h_nuexsec = new TH1D("h_nuexsec", ";Energy [GeV]; Cross Section", nbins, edges);
     
     // 2D shower multiplicity vd nue/electron energy
     TH2D *h_shr_multi_nue_E         = new TH2D("h_shr_multi_nue_E", "; Shower Multiplicty;#nu_{e} Energy [GeV] ", 6, 0, 6, 10, 0, 4.0);
@@ -1078,6 +1083,16 @@ void UtilityPlotter::PlotTrueVar(){
             h_shr_multi_nuebar_E->Fill(SC.n_showers, SC.nu_e, weight);
             h_shr_multi_elec_e_nuebar->Fill(SC.n_showers, SC.elec_e, weight);
         }
+    
+        if (is_in_fv && (SC.nu_pdg == 12 || SC.nu_pdg == -12) ){
+            if (SC.nu_e <= _util.energy_threshold || SC.elec_e <= _util.elec_threshold){
+                
+            }
+            else{
+                h_nuexsec->Fill(SC.elec_e, weight);
+            }
+        }
+    
     }
 
     // Create the resolutions directory for saving the plots to
@@ -1124,6 +1139,12 @@ void UtilityPlotter::PlotTrueVar(){
     c->Print(Form("plots/run%s/Truth/h_pi0_momentum.pdf", _util.run_period));
 
     delete c;
+
+    h_nuexsec->GetYaxis()->SetRangeUser(0, 6e-39);
+    h_nuexsec->Scale(0.09824/(4.31343e10 * 4.31247e31));
+    h_nuexsec->Scale(1.0, "width");
+    // _util.Save1DHists("crosssec_test.pdf", h_nuexsec, "hist,E");
+
 
     RowNorm(h_shr_multi_nue_E);
     RowNorm(h_shr_multi_elec_e);
@@ -2992,8 +3013,8 @@ void UtilityPlotter::CompareTotalDataCrossSections(){
 
     TH1D* h_temp;
 
-    std::string genmode = "flux";
-    // std::string genmode = "other";
+    // std::string genmode = "flux";
+    std::string genmode = "other";
 
 
     // Create a vector for the models
@@ -3389,7 +3410,7 @@ void UtilityPlotter::SaveResponseMatrix(){
         }
 
         // Write the histograms to file
-        TFile *f_result = TFile::Open("files/xsec_result_run1_paper.root", "UPDATE");
+        TFile *f_result = TFile::Open("files/xsec_result_run1_paper_v3.root", "UPDATE");
         
         if (variables.at(m) == "elec_E"){
             h_response_index.at(m)->Write("response_energy",TObject::kOverwrite);
@@ -3439,7 +3460,7 @@ void UtilityPlotter::SaveResponseMatrix(){
     truexsec->SetDirectory(0);
     fxsec->Close();
 
-    TFile *f_result = TFile::Open("files/xsec_result_run1_paper.root", "UPDATE");
+    TFile *f_result = TFile::Open("files/xsec_result_run1_paper_v3.root", "UPDATE");
     if (std::string(_util.xsec_var) == "elec_E"){
         truexsec->Write("mc_xsec_true_genie_v3_0_6_energy",TObject::kOverwrite);
     }
@@ -3935,14 +3956,14 @@ void UtilityPlotter::CompareGeneratorTotalCrossSec(){
     leg->SetFillStyle(0);
     h_data->SetMarkerSize(0.4);
     leg->AddEntry(h_data, "Data (stat. + sys.)",        "ep");
-    leg->AddEntry( h_model_xsec.at(k_model_CV),         "MC", "lf");
+    leg->AddEntry( h_model_xsec.at(k_model_CV),         "GENIE v3.0.6 (#muB tune)", "lf");
     leg->AddEntry( h_model_xsec.at(k_model_geniev3),    "GENIE v3.0.6", "lf");
     leg->AddEntry( h_model_xsec.at(k_model_geniev2gen), "GENIE v2.12.2", "lf");
     leg->AddEntry( h_model_xsec.at(k_model_nuwrogen),      "NuWro v19.02.02", "lf");
     
     leg->Draw();
 
-    gStyle->SetLegendTextSize(0.06);
+    gStyle->SetLegendTextSize(0.045);
 
     double Data_POT; 
 
@@ -5671,7 +5692,7 @@ void UtilityPlotter::PrintXSecResults(){
     }
 
     // Write the histograms to file
-    TFile *f_result = TFile::Open("files/xsec_result_run1_paper.root", "UPDATE");
+    TFile *f_result = TFile::Open("files/xsec_result_run1_paper_v3.root", "UPDATE");
     
     if (std::string(_util.xsec_var) == "elec_E"){
         h_cov_reco->Write("unf_cov_energy",TObject::kOverwrite);
@@ -5724,7 +5745,7 @@ void UtilityPlotter::PrintFluxValues(){
     std::cout <<"\n\n\n" << std::endl;
 
     // Write the histograms to file
-    TFile *f_result = TFile::Open("files/xsec_result_run1_paper.root", "UPDATE");
+    TFile *f_result = TFile::Open("files/xsec_result_run1_paper_v3.root", "UPDATE");
     h_nue->Write("nue_flux",TObject::kOverwrite);
     h_nuebar->Write("nuebar_flux",TObject::kOverwrite);
     f_result->Close();
@@ -5762,7 +5783,7 @@ void UtilityPlotter::ValidateSmearing(){
 
     std::string label = "ee";
 
-    TFile* f = TFile::Open("files/xsec_result_run1_paper.root");
+    TFile* f = TFile::Open("files/xsec_result_run1_paper_v3.root");
     TString nh = (label == "ee" ? "unf_data_xsec_energy" : "unf_data_xsec_angle");
     TString ns = (label == "ee" ? "ac_energy" : "ac_angle");
     TH1D* fMCHist = (TH1D*)  f->Get(nh);
