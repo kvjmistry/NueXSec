@@ -131,6 +131,9 @@ void WienerSVD::CompareModel(TH1D *sig){
     sig->SetLineColor(kRed+2);
     sig->SetLineStyle(1);
 
+    // sig->SetLineColor(kGreen+2);
+    // sig->SetLineStyle(2);
+
     TH1D* h_model_smear = (TH1D*)sig->Clone();
     for (int bin = 0; bin < h_model_smear->GetNbinsX()+2; bin++){
         h_model_smear->SetBinContent(bin, 0);
@@ -194,6 +197,7 @@ void WienerSVD::CompareModel(TH1D *sig){
     leg->SetFillStyle(0);
     leg->AddEntry(unf, "Data (Stat. + Sys.)", "ep");
     leg->AddEntry(h_model_smear_err,   Form("GENIE v3.0.6 (#muB tune) #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+    // leg->AddEntry(h_model_smear_err,   Form("GENIE v3.0.6 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
     leg->Draw();
     
     _util.CreateDirectory(Form("Systematics/CV/Unfolded/%s", _util.xsec_var));
@@ -230,7 +234,7 @@ void WienerSVD::CompareModel(TH1D *sig){
     // Histograms to be printed to pdf
     _util.Save2DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_smear_%s.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), smear,    "colz");
     _util.Save2DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unfold_cov_%s.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov,   "colz");
-    _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_smear_%s_index.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), smear,    "colz", "");
+    _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_smear_%s_index.pdf",      _util.run_period, _util.xsec_var ,_util.xsec_var), smear,    "colz", "cor");
     _util.Save2DHistsBinIndex(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unfold_cov_%s_index.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov,   "colz", "cov");
 
     _util.Save2DHists(Form("plots/run%s/Systematics/CV/Unfolded/%s/xsec_unfold_cov_%s_converted.pdf", _util.run_period, _util.xsec_var ,_util.xsec_var), unfcov_width,   "colz");

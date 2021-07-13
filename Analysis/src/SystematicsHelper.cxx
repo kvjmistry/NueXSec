@@ -740,6 +740,7 @@ void SystematicsHelper::InitialiseReweightingMode(){
 
         // if (var == 0) continue;
         // if (var != 2) continue;
+        // if (var != 0) continue;
 
         // Comparison plots for data to MC
         CompareVariationXSec("RPA",              var, "RPA" );
@@ -1964,6 +1965,7 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             else {
                 for (int bin = 0; bin < h_dataxsec->GetNbinsX(); bin++){
                     h_dataxsec_tot->SetBinError(bin+1, std::sqrt(h_cov_temp->GetBinContent(bin+1, bin+1)));
+                    // h_dataxsec_tot->SetBinError(bin+1, 0.257 * h_dataxsec->GetBinContent(bin+1)  );
 
                     std::cout << "Tot: "<< 100*h_dataxsec_tot->GetBinError(bin+1) / h_dataxsec_tot->GetBinContent(bin+1) << std::endl;
                 }
@@ -1975,6 +1977,10 @@ void SystematicsHelper::CompareCVXSecNoRatio(){
             }
 
             h_dataxsec->SetTitle(_util.var_labels_xsec.at(k_var_recoX).c_str());
+            if (var == k_var_integrated){
+                h_dataxsec->GetXaxis()->SetLabelSize(0);
+                h_dataxsec->SetTitle("");
+            }
 
             c->SetLeftMargin(0.2);
             c->SetBottomMargin(0.15);

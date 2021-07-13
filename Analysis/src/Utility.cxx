@@ -1706,7 +1706,12 @@ void Utility::Save2DHists(const char *print_name, TH2D* hist, const char* draw_o
     hist->SetStats(kFALSE);
     IncreaseLabelSize(hist, c);
     hist->Draw(draw_option);
-    Draw_Run_Period(c, 0.82, 0.915, 0.82, 0.915);
+    // Draw_Run_Period(c, 0.82, 0.915, 0.82, 0.915);
+
+    std::size_t found = std::string(print_name).find("smear");
+    if (found!=std::string::npos)
+        hist->GetZaxis()->SetRangeUser(-0.5, 1); 
+
     c->Print(print_name);
     
     delete c;
@@ -1763,6 +1768,14 @@ void Utility::Save2DHistsBinIndex(const char *print_name, TH2D* hist, const char
     h_2D_index->GetYaxis()->CenterLabels(kTRUE);
     h_2D_index->GetXaxis()->SetNdivisions(h_2D_index->GetNbinsX(), 0, 0, kFALSE);
     h_2D_index->GetYaxis()->SetNdivisions(h_2D_index->GetNbinsY(), 0, 0, kFALSE);
+
+    if (type== "cor"){
+       h_2D_index->GetZaxis()->SetRangeUser(-0.5, 1); 
+    }
+
+    std::size_t found = std::string(print_name).find("smear");
+    if (found!=std::string::npos)
+        hist->GetZaxis()->SetRangeUser(-0.5, 1); 
 
     Draw_ubooneSim(c, 0.33, 0.925, 0.33, 0.905);
 
