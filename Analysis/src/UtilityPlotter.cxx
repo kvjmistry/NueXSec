@@ -3943,6 +3943,7 @@ void UtilityPlotter::CompareGeneratorTotalCrossSec(){
     h_data->GetYaxis()->CenterTitle();
     h_data->GetYaxis()->SetLabelSize(0.1);
     h_data->GetYaxis()->SetTitleSize(0.1);
+    // h_data->SetBinError(1, 0.257*h_data->GetBinContent(1));
    
     // h_data->SetLineWidth(2);
     h_data->SetMarkerStyle(20);
@@ -4041,7 +4042,6 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
 
     fxsec->Close();
 
-
     for (int bin = 1; bin < unf->GetNbinsX()+1; bin++){
         double err = h_cov->GetBinContent(bin, bin);
         unf->SetBinError(bin, std::sqrt(err));
@@ -4110,7 +4110,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
 
     std::cout << "Genie v2" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_geniev2gen), unf, h_cov, chi, ndof, pval);
-    // leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_geniev2gen),   Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_geniev2gen),   Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
     std::cout << "NuWro" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_nuwro), unf, h_cov, chi, ndof, pval);
@@ -4167,13 +4167,14 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     h_mcxsec_true_model_smear.at(k_model_geniev3)->Draw("hist,same" );
 
     h_mcxsec_true_model_smear.at(k_model_geniev2gen)->SetLineColor(kOrange-1);
-    // h_mcxsec_true_model_smear.at(k_model_geniev2gen)->Draw("hist,same" );
+    h_mcxsec_true_model_smear.at(k_model_geniev2gen)->Draw("hist,same" );
 
     h_mcxsec_true_model_smear.at(k_model_nuwro)->SetLineColor(kPink+1);
     h_mcxsec_true_model_smear.at(k_model_nuwro)->Draw("hist,same" );
 
     h_mcxsec_true_model_smear.at(k_model_gibuu)->SetLineColor(kViolet-1);
     h_mcxsec_true_model_smear.at(k_model_gibuu)->Draw("hist,same" );
+
     
     unf->Draw("E1,X0,same");
 

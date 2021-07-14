@@ -2958,6 +2958,11 @@ void CrossSectionHelper::SaveGenXSec(){
     htemp_cang->Scale(1.0e39);
     htemp_tot->Scale(1.0e39);
 
+    // Normalisation factor
+    htemp_e->Scale(0.955);
+    htemp_cang->Scale(0.955);
+    htemp_tot->Scale(0.955);
+
     if (std::string(_util.xsec_bin_mode) == "ratio"){
         htemp_e->Scale(1.0/htemp_e->Integral());
         htemp_cang->Scale(1.0/htemp_cang->Integral());
