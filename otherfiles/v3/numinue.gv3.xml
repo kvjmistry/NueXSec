@@ -1,0 +1,7 @@
+<nuisance>
+ <config UseSVDInverse="1" />
+ <sample name="MicroBooNE_CCInc_NuMI_XSec_1DEe_nue"      input="GENIE:mc/gv3/gv3.nue.prep.root,mc/gv3/gv3.nbe.prep.root"/>
+ <sample name="MicroBooNE_CCInc_NuMI_XSec_1DCosBeta_nue" input="GENIE:mc/gv3/gv3.nue.prep.root,mc/gv3/gv3.nbe.prep.root"/>
+ <sample name="SigmaEnuHists"                            input="GENIE:mc/gv3/gv3.nue.prep.root,mc/gv3/gv3.nbe.prep.root"/>
+</nuisance>
+

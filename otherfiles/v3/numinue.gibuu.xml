@@ -1,0 +1,7 @@
+<nuisance>
+ <config UseSVDInverse="1" />
+ <sample name="MicroBooNE_CCInc_NuMI_XSec_1DEe_nue"      input="GiBUU:mc/gibuu/gibuu.nue.root,mc/gibuu/gibuu.nbe.root"/>
+ <sample name="MicroBooNE_CCInc_NuMI_XSec_1DCosBeta_nue" input="GiBUU:mc/gibuu/gibuu.nue.root,mc/gibuu/gibuu.nbe.root"/>
+ <sample name="SigmaEnuHists"                            input="GiBUU:mc/gibuu/gibuu.nue.root,mc/gibuu/gibuu.nbe.root"/>
+</nuisance>
+

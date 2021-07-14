@@ -1,0 +1,7 @@
+<nuisance>
+ <config UseSVDInverse="1" />
+ <sample name="MicroBooNE_CCInc_NuMI_XSec_1DEe_nue"      input="NUWRO:mc/nuwro/nuwro.nue.prep.root,mc/nuwro/nuwro.nbe.prep.root"/>
+ <sample name="MicroBooNE_CCInc_NuMI_XSec_1DCosBeta_nue" input="NUWRO:mc/nuwro/nuwro.nue.prep.root,mc/nuwro/nuwro.nbe.prep.root"/>
+ <sample name="SigmaEnuHists"                            input="NUWRO:mc/nuwro/nuwro.nue.prep.root,mc/nuwro/nuwro.nbe.prep.root"/>
+</nuisance>
+
