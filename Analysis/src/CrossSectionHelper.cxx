@@ -155,6 +155,11 @@ void CrossSectionHelper::Initialise(Utility _utility){
         return;
     }
 
+    if (std::string(_util.xsec_rw_mode) == "gengibuu"){
+        SaveGiBUUXSec();
+        return;
+    }
+
     // Load in NuWro file and add true cross section to file
     if (std::string(_util.xsec_rw_mode) == "pi0"){
         CheckPi0CrossSection();
@@ -2978,6 +2983,75 @@ void CrossSectionHelper::SaveGenXSec(){
 
     htemp_e->Write("",TObject::kOverwrite);
     htemp_cang->Write("",TObject::kOverwrite);
+    htemp_tot->Write("",TObject::kOverwrite);
+
+    f_out->Close();
+
+    f_gen->cd();
+    f_gen->Close();
+
+
+}
+// -----------------------------------------------------------------------------
+void CrossSectionHelper::SaveGiBUUXSec(){
+
+    // To run :
+    // ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecplot gengibuu --var files/numinue.gibuu.nosmear.root gibuu
+
+    TFile *f_gen = TFile::Open(_util.mc_file_name, "READ");
+
+    TH1D* h_temp = (TH1D*)f_gen->Get("MicroBooNE_CCInc_NuMI_XSec_1DEe_nue_MC");
+
+    TH1D *htemp_e = (TH1D*)h_temp->Clone();
+
+    h_temp = (TH1D*)f_gen->Get("MicroBooNE_CCInc_NuMI_XSec_1DCosBeta_nue_MC");
+    TH1D *htemp_cang = (TH1D*)h_temp->Clone();
+
+    TH1D *htemp_tot= new TH1D("h_elec_tot","", 1, 0, 1.1);
+    htemp_tot->SetBinContent(1, htemp_e->Integral("width"));
+
+    TFile *f_out;
+    
+    if (std::string(_util.xsec_bin_mode) == "ratio"){
+        f_out = TFile::Open(Form("files/crosssec_run%s_ratio.root", _util.run_period), "UPDATE");
+    }
+    else {
+        f_out = TFile::Open(Form("files/crosssec_run%s.root", _util.run_period), "UPDATE");
+    }
+
+    htemp_e->Scale(1.0e39);
+    htemp_cang->Scale(1.0e39);
+    htemp_tot->Scale(1.0e39);
+
+    if (std::string(_util.xsec_bin_mode) == "ratio"){
+        htemp_e->Scale(1.0/htemp_e->Integral());
+        htemp_cang->Scale(1.0/htemp_cang->Integral());
+    }
+
+    htemp_e->SetOption("hist");
+    htemp_cang->SetOption("hist");
+    htemp_tot->SetOption("hist");
+    
+    // Create a directory to save the histograms
+    TDirectory *dir;
+    
+    // Get the directory 
+    bool bool_dir = _util.GetDirectory(f_out, dir, _util.variation );
+
+    // Make the directory
+    if (!bool_dir){
+        dir = f_out->mkdir(_util.variation);
+        _util.GetDirectory(f_out, dir, _util.variation );
+    }
+
+    dir->cd();
+
+    // Undo the bin width scaling
+    _util.UndoBinWidthScaling(htemp_e);
+    _util.UndoBinWidthScaling(htemp_cang);
+
+    htemp_e->Write("h_elec_E",TObject::kOverwrite);
+    htemp_cang->Write("h_elec_cang",TObject::kOverwrite);
     htemp_tot->Write("",TObject::kOverwrite);
 
     f_out->Close();

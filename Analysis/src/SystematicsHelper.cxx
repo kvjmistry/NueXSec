@@ -4548,7 +4548,8 @@ void SystematicsHelper::MakedEdxPaperPlot(){
     hist_ratio.at(0)->GetXaxis()->SetTitleSize(17); // 17
     hist_ratio.at(0)->GetXaxis()->SetTitleFont(46);
     hist_ratio.at(0)->GetYaxis()->SetNdivisions(5, 0, 0, kFALSE);
-    hist_ratio.at(0)->GetYaxis()->SetRangeUser(0, 2.5);
+    hist_ratio.at(0)->GetYaxis()->SetRangeUser(0.3, 1.7);
+    hist_ratio.at(0)->GetYaxis()->SetMaxDigits(1);
     hist_ratio.at(0)->GetYaxis()->SetTitle("Ratio to MC");
     hist_ratio.at(0)->GetYaxis()->SetTitleSize(13); // 13
     hist_ratio.at(0)->GetYaxis()->SetTitleFont(44);

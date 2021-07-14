@@ -3711,7 +3711,8 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
         "CV",
         "geniev3",
         "geniev2gen",
-        "nuwrogen"
+        "nuwrogen",
+        "gibuu"
     };
 
     // enums for the models
@@ -3720,6 +3721,7 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
         k_model_geniev3,
         k_model_geniev2gen,
         k_model_nuwrogen,
+        k_model_gibuu,
         k_MODEL_MAX
     };
 
@@ -3738,9 +3740,10 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
         h_response_model.at(m) = (TH2D*)h_temp_2D->Clone();
 
         // MC xsec in True
-        if (m == k_model_geniev2gen || m == k_model_nuwrogen){
+        if (m == k_model_geniev2gen || m == k_model_nuwrogen || m == k_model_gibuu){
             h_temp  = (TH1D*)fxsec->Get(Form("%s/h_%s", models.at(m).c_str(), _util.xsec_var));
             std::cout << Form("%s/h_%s", models.at(m).c_str(), _util.xsec_var) << std::endl;
+
         }
         else
             h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));
@@ -3758,12 +3761,14 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
     h_mcxsec_reco_model.at(k_model_geniev3)   ->SetLineColor(kGreen+2);
     h_mcxsec_reco_model.at(k_model_geniev2gen)->SetLineColor(kOrange-1);
     h_mcxsec_reco_model.at(k_model_nuwrogen)  ->SetLineColor(kPink+1);
+    h_mcxsec_reco_model.at(k_model_gibuu)     ->SetLineColor(kViolet-1);
 
     // Set the line styles
     h_mcxsec_reco_model.at(k_model_CV)         ->SetLineStyle(1);
     h_mcxsec_reco_model.at(k_model_geniev3)    ->SetLineStyle(2);
     h_mcxsec_reco_model.at(k_model_geniev2gen) ->SetLineStyle(3);
     h_mcxsec_reco_model.at(k_model_nuwrogen)   ->SetLineStyle(4);
+    h_mcxsec_reco_model.at(k_model_gibuu)      ->SetLineStyle(5);
     
 
     // Now lets plot
@@ -3788,6 +3793,7 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
     h_mcxsec_reco_model.at(k_model_geniev3)->Draw("hist,same");
     h_mcxsec_reco_model.at(k_model_geniev2gen)->Draw("hist,same");
     h_mcxsec_reco_model.at(k_model_nuwrogen)->Draw("hist,same");
+    h_mcxsec_reco_model.at(k_model_gibuu)->Draw("hist,same");
     h_dataxsec->Draw("E1,X0,same");
     h_dataxsec_stat->Draw("E1,X0,same");
 
@@ -3823,6 +3829,10 @@ void UtilityPlotter::ForwardFoldedGeneratorComparison(){
     std::cout << "NuWro" << std::endl;
     _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_nuwrogen), h_dataxsec, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_reco_model.at(k_model_nuwrogen),  Form("NuWro v19.02.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
+
+    std::cout << "GiBUU" << std::endl;
+    _util.CalcChiSquared(h_mcxsec_reco_model.at(k_model_gibuu), h_dataxsec, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_reco_model.at(k_model_gibuu),  Form("GiBUU 2019 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "l");
 
 
     gStyle->SetLegendTextSize(0.03);
@@ -3877,7 +3887,8 @@ void UtilityPlotter::CompareGeneratorTotalCrossSec(){
         "CV",
         "geniev3",
         "geniev2gen",
-        "nuwrogen"
+        "nuwrogen",
+        "gibuu"
     };
 
     // enums for the models
@@ -3886,6 +3897,7 @@ void UtilityPlotter::CompareGeneratorTotalCrossSec(){
         k_model_geniev3,
         k_model_geniev2gen,
         k_model_nuwrogen,
+        k_model_gibuu,
         k_MODEL_MAX
     };
 
@@ -3894,7 +3906,7 @@ void UtilityPlotter::CompareGeneratorTotalCrossSec(){
     for (unsigned int m = 0; m < models.size(); m++){
 
         // Get true tune1 xsec
-        if (m == k_model_geniev2gen || m == k_model_nuwrogen)
+        if (m == k_model_geniev2gen || m == k_model_nuwrogen || m == k_model_gibuu)
             h_temp  = (TH1D*)fxsec->Get(Form("%s/h_elec_tot", models.at(m).c_str()));
         else
             h_temp  = (TH1D*)fxsec->Get(Form("%s/integrated/h_run%s_CV_0_integrated_mc_xsec", models.at(m).c_str(), _util.run_period));
@@ -3909,12 +3921,14 @@ void UtilityPlotter::CompareGeneratorTotalCrossSec(){
     h_model_xsec.at(k_model_geniev3)->SetLineColor(kGreen+2);
     h_model_xsec.at(k_model_geniev2gen)->SetLineColor(kOrange-1);
     h_model_xsec.at(k_model_nuwrogen)->SetLineColor(kPink+1);
+     h_model_xsec.at(k_model_gibuu)->SetLineColor(kViolet-1);
 
     // Set the line styles
-    h_model_xsec.at(k_model_CV)       ->SetLineStyle(1);
-    h_model_xsec.at(k_model_geniev3)  ->SetLineStyle(2);
-    h_model_xsec.at(k_model_geniev2gen)    ->SetLineStyle(3);
-    h_model_xsec.at(k_model_nuwrogen)    ->SetLineStyle(4);
+    h_model_xsec.at(k_model_CV)         ->SetLineStyle(1);
+    h_model_xsec.at(k_model_geniev3)    ->SetLineStyle(2);
+    h_model_xsec.at(k_model_geniev2gen) ->SetLineStyle(3);
+    h_model_xsec.at(k_model_nuwrogen)   ->SetLineStyle(4);
+     h_model_xsec.at(k_model_gibuu)     ->SetLineStyle(5);
 
 
     // X-Axis
@@ -3959,7 +3973,8 @@ void UtilityPlotter::CompareGeneratorTotalCrossSec(){
     leg->AddEntry( h_model_xsec.at(k_model_CV),         "GENIE v3.0.6 (#muB tune)", "lf");
     leg->AddEntry( h_model_xsec.at(k_model_geniev3),    "GENIE v3.0.6", "lf");
     leg->AddEntry( h_model_xsec.at(k_model_geniev2gen), "GENIE v2.12.2", "lf");
-    leg->AddEntry( h_model_xsec.at(k_model_nuwrogen),      "NuWro v19.02.02", "lf");
+    leg->AddEntry( h_model_xsec.at(k_model_nuwrogen),   "NuWro v19.02.02", "lf");
+    leg->AddEntry( h_model_xsec.at(k_model_gibuu),      "GiBUU 2019", "lf");
     
     leg->Draw();
 
@@ -4042,7 +4057,8 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
         "CV",
         "geniev3",
         "geniev2gen",
-        "nuwrogen"
+        "nuwrogen",
+        "gibuu"
     };
 
     // enums for the models
@@ -4051,6 +4067,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
         k_model_geniev3,
         k_model_geniev2gen,
         k_model_nuwro,
+        k_model_gibuu,
         k_MODEL_MAX
     };
 
@@ -4061,7 +4078,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     for (unsigned int m = 0; m < models.size(); m++){
         // MC Xsec True
         
-        if (m == k_model_geniev2gen || m == k_model_nuwro)
+        if (m == k_model_geniev2gen || m == k_model_nuwro || m == k_model_gibuu)
             h_temp  = (TH1D*)fxsec->Get(Form("%s/h_%s", models.at(m).c_str(), _util.xsec_var));
         else
             h_temp  = (TH1D*)fxsec->Get(Form("%s/%s/h_run1_CV_0_%s_mc_xsec", models.at(m).c_str(), _util.vars.at(k_var_trueX).c_str(), _util.vars.at(k_var_trueX).c_str()));
@@ -4093,11 +4110,15 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
 
     std::cout << "Genie v2" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_geniev2gen), unf, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_geniev2gen),   Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    // leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_geniev2gen),   Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
     std::cout << "NuWro" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_nuwro), unf, h_cov, chi, ndof, pval);
     leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_nuwro),   Form("NuWro v19.02.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+
+    std::cout << "GiBUU" << std::endl;
+    _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_gibuu), unf, h_cov, chi, ndof, pval);
+    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_gibuu),   Form("GiBUU 2019 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
     // Scale the histograms by bin width 
     for (unsigned int m = 0; m < models.size(); m++){
@@ -4137,6 +4158,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     h_mcxsec_true_model_smear.at(k_model_geniev3)    ->SetLineStyle(2);
     h_mcxsec_true_model_smear.at(k_model_geniev2gen) ->SetLineStyle(3);
     h_mcxsec_true_model_smear.at(k_model_nuwro)      ->SetLineStyle(4);
+    h_mcxsec_true_model_smear.at(k_model_gibuu)      ->SetLineStyle(5);
 
     h_mcxsec_true_model_smear.at(k_model_CV)->SetMinimum(0.0);
     h_mcxsec_true_model_smear.at(k_model_CV)->Draw("hist");
@@ -4145,10 +4167,13 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     h_mcxsec_true_model_smear.at(k_model_geniev3)->Draw("hist,same" );
 
     h_mcxsec_true_model_smear.at(k_model_geniev2gen)->SetLineColor(kOrange-1);
-    h_mcxsec_true_model_smear.at(k_model_geniev2gen)->Draw("hist,same" );
+    // h_mcxsec_true_model_smear.at(k_model_geniev2gen)->Draw("hist,same" );
 
     h_mcxsec_true_model_smear.at(k_model_nuwro)->SetLineColor(kPink+1);
     h_mcxsec_true_model_smear.at(k_model_nuwro)->Draw("hist,same" );
+
+    h_mcxsec_true_model_smear.at(k_model_gibuu)->SetLineColor(kViolet-1);
+    h_mcxsec_true_model_smear.at(k_model_gibuu)->Draw("hist,same" );
     
     unf->Draw("E1,X0,same");
 
