@@ -2929,6 +2929,19 @@ void CrossSectionHelper::SaveGenXSec(){
 
     TTree *t_gen = (TTree*)f_gen->Get("tree");
 
+    TTree *t_pot = (TTree*)f_gen->Get("pottree");
+
+    // Get the POT from the file
+    double pot = 0, pot_sum = 0;
+    t_pot->SetBranchAddress("pot", &pot);
+
+    for (int i = 0; i < t_pot->GetEntries(); i++) {
+        t_pot->GetEntry(i);
+        pot_sum = pot_sum + pot;
+    }
+
+    // mc_flux_scale_factor   = flux_scale_factor * pot_sum;
+
     double* edges = &_util.reco_shr_bins[0]; // Cast to an array 
     TH1D *htemp_e= new TH1D("h_elec_E","", _util.reco_shr_bins.size()-1, edges);
 
