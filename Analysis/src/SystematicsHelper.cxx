@@ -4582,6 +4582,26 @@ void SystematicsHelper::MakedEdxPaperPlot(){
     // close the canvas to avoid warning messages on the terminal
     c->Close();  
 
+    // TSave the histograms to file 
+    TFile *f_dedx_out = new TFile("plots/WireModPaperPlot.root", "RECREATE");
+
+    for (unsigned int y=0; y < hist.size(); y++ ) {
+        hist.at(y)->Write(var_string.at(y).c_str());
+    }
+
+    h_error_hist->Write("h_error_hist");
+    h_data->Write("h_data");
+
+    for (unsigned int y=0; y < hist.size(); y++ ) {
+        hist_ratio.at(y)->Write(Form("%s_ratio", var_string.at(y).c_str()) );
+    }
+
+    h_error_hist_ratio->Write("h_error_hist_ratio");
+    h_error_hist_noDetvar_ratio->Write("h_error_hist_ratio_noDetvar");
+    h_error_hist_data->Write("h_error_hist_ratio_data");
+
+    f_dedx_out->Close();
+
 
     if (plotdata){
         delete h_data;
