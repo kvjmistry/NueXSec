@@ -81,6 +81,7 @@ class TreeHelper{
     double cos_effective_angle{0.0}; // The cosine of the angle between the vector from the target to nu vtx compared to the reconstructed shower direction.
     double true_effective_angle{0.0};     // True angle between electron and neutrino vectors
     double cos_true_effective_angle{0.0}; // True angle between electron and neutrino vectors
+    int nu_parent_pdg{0};
 
 
     // Weights

@@ -47,6 +47,7 @@ class CrossSectionHelper{
     double true_effective_angle{0.0};     // True angle between electron and neutrino vectors
     double cos_true_effective_angle{0.0}; // True angle between electron and neutrino vectors
     int ccnc{0};
+    int nu_parent_pdg{0};
 
     // Weights
     std::vector<unsigned short> *weightsGenie = NULL;

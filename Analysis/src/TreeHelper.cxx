@@ -234,6 +234,7 @@ void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
     true_effective_angle     = SC.true_effective_angle;
     cos_true_effective_angle = std::cos(SC.true_effective_angle * 3.14159 / 180.0);
     ccnc = SC.ccnc;
+    nu_parent_pdg = SC.nu_parent_pdg;
 
     shr_bkt_purity       = SC.shr_bkt_purity;
     shr_bkt_completeness = SC.shr_bkt_completeness;
@@ -463,6 +464,7 @@ void TreeHelper::SetBranches(TTree * tree){
     tree->Branch("true_effective_angle",     &true_effective_angle);
     tree->Branch("cos_true_effective_angle", &cos_true_effective_angle);
     tree->Branch("ccnc",                     &ccnc,  "ccnc/I");
+    tree->Branch("nu_parent_pdg",            &nu_parent_pdg,  "nu_parent_pdg/I");
 
     tree->Branch("weightsGenie", "std::vector<unsigned short>", &weightsGenie);
     tree->Branch("weightsReint", "std::vector<unsigned short>", &weightsReint);

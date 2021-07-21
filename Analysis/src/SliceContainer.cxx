@@ -185,6 +185,7 @@ template<typename T> void SliceContainer::Initialise(T *tree, int type, Utility 
     tree->SetBranchAddress("isVtxInFiducial",  &isVtxInFiducial);
     tree->SetBranchAddress("truthFiducial",    &truthFiducial);
     tree->SetBranchAddress("reco_e",           &reco_e);
+    tree->SetBranchAddress("nu_parent_pdg",    &nu_parent_pdg);
     
     tree->SetBranchAddress("true_nu_vtx_t", &true_nu_vtx_t);
     tree->SetBranchAddress("true_nu_vtx_x", &true_nu_vtx_x);

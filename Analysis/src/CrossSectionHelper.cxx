@@ -955,6 +955,17 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
 
             _util.CheckWeight(vec_universes[uni]);
 
+            // Scale up the systematics for K0L/K0S/K0 decays
+            // if (nu_parent_pdg == 130 || nu_parent_pdg == 310 || nu_parent_pdg == 311){
+                
+            //     double sfact = 0.4;
+            //     if (vec_universes[uni] > 1)
+            //         vec_universes[uni]*=(1.0 + sfact);
+            //     else if (vec_universes[uni] < 1)
+            //         vec_universes[uni]*=(1.0 - sfact);
+            // }
+                
+
             weight_uni = cv_weight * vec_universes[uni];
         }
 
@@ -1588,6 +1599,9 @@ void CrossSectionHelper::InitTree(){
     tree->SetBranchAddress("true_effective_angle",       &true_effective_angle);
     tree->SetBranchAddress("cos_true_effective_angle",   &cos_true_effective_angle);
     tree->SetBranchAddress("ccnc",  &ccnc);
+
+    if (!_util.isvariation)
+        tree->SetBranchAddress("nu_parent_pdg",  &nu_parent_pdg);
     
     tree->SetBranchAddress("weightsGenie",          &weightsGenie);
     tree->SetBranchAddress("weightsReint",          &weightsReint);

@@ -79,6 +79,7 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, bool fake_int
     std::vector<float> *_all_shr_hits = NULL;
     std::vector<float> *_all_shr_energies = NULL;
     int ccnc{0}, _ccnc{0};
+    int nu_parent_pdg{0}, _nu_parent_pdg{0};
 
     std::vector<unsigned short> weightsGenie;
     std::vector<unsigned short> weightsReint;
@@ -173,6 +174,7 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, bool fake_int
     outtree->Branch("true_effective_angle",     &true_effective_angle);
     outtree->Branch("cos_true_effective_angle", &cos_true_effective_angle);
     outtree->Branch("ccnc", &ccnc);
+    outtree->Branch("nu_parent_pdg", &nu_parent_pdg);
     
     outtree->Branch("weightsGenie", "std::vector<unsigned short>", &weightsGenie);
     outtree->Branch("weightsReint", "std::vector<unsigned short>", &weightsReint);
@@ -250,6 +252,7 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, bool fake_int
         trees.at(k)->SetBranchAddress("true_effective_angle",       &_true_effective_angle);
         trees.at(k)->SetBranchAddress("cos_true_effective_angle",   &_cos_true_effective_angle);
         trees.at(k)->SetBranchAddress("ccnc",   &_ccnc);
+        trees.at(k)->SetBranchAddress("nu_parent_pdg",   &_nu_parent_pdg);
         
         trees.at(k)->SetBranchAddress("weightsGenie",          &_weightsGenie);
         trees.at(k)->SetBranchAddress("weightsReint",          &_weightsReint);
@@ -333,6 +336,7 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, bool fake_int
                 true_effective_angle     = _true_effective_angle;
                 cos_true_effective_angle = _cos_true_effective_angle;
                 ccnc = _ccnc;
+                nu_parent_pdg = _nu_parent_pdg;
 
                 if (_all_shr_hits != NULL)    all_shr_hits = *_all_shr_hits;
                 if (_all_shr_energies != NULL)all_shr_energies = *_all_shr_energies;

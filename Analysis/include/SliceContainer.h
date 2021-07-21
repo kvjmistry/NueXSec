@@ -317,6 +317,7 @@ public:
     double nu_angle_targ;    // True nue angle wrt numi target to uboone vector
     double reco_true_nu_ang; // Angle between the effectve neutrino direction and the true neutrino direction
     float reco_e;            // Reconstructed Neutrino energy 
+    int nu_parent_pdg;       // Parent pdg code of neutrino
     
     // Is the truth information contained? 
     // Require all track start/end point in FV and showers deposit > 60% of energy
