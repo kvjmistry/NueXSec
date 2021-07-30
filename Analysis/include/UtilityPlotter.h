@@ -49,7 +49,7 @@ class UtilityPlotter{
     float shr_bkt_E{0.0}; // energy of truth matched particle to the leading shower
     std::vector<float> *all_shr_hits = NULL;
     std::vector<float> *all_shr_energies = NULL;
-    std::vector<unsigned short> *weightsPPFX = NULL ;
+    std::vector<unsigned short> *weightsFlux = NULL ;
 
     std::vector<std::string> var_labels_xsec = {};
 

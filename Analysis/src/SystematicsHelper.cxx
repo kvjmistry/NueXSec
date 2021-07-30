@@ -418,12 +418,7 @@ void SystematicsHelper::SysVariations(int hist_index, const char* print_name, in
                 max_bin = hist.at(y)->GetBinContent(hist.at(y)->GetMaximumBin()); // for scale purposes
         }
 
-        if (cut == _util.k_shr_moliere_avg && hist_index == _util.k_cut_shr_tkfit_dedx_max)
-            CalcdEdxRMSMean(hist.at(y), var_string_pretty.at(y).c_str());
     }
-
-    if (cut == _util.k_shr_moliere_avg && hist_index == _util.k_cut_shr_tkfit_dedx_max)
-        CalcdEdxRMSMean(h_data, "data");
 
 
     if (plotdata)
@@ -805,9 +800,9 @@ void SystematicsHelper::InitialiseReweightingMode(){
         // PlotReweightingModeDetVar("WireModdEdX",                        var, k_WireModdEdX,                        var_string_pretty.at(k_WireModdEdX));
 
         // Plot the multisims
-        PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 600);
+        PlotReweightingModeMultisim("weightsGenie", var,  "GENIE", 500);
         PlotReweightingModeMultisim("weightsReint", var,  "Geant Reinteractions", 1000);
-        PlotReweightingModeMultisim("weightsPPFX",  var,  "Hadron Production", 600);
+        PlotReweightingModeMultisim("weightsFlux",  var,  "Hadron Production", 500);
         PlotReweightingModeMultisim("MCStats",      var,  "MC Stats", 1000);
         
     }
@@ -2367,7 +2362,7 @@ void SystematicsHelper::CalcMatrices(std::string label, int var, std::vector<std
         h_cov_v.at(var).at(_type).at(k_err_sys)->Add(cov);
 
     }
-    else if (label == "weightsPPFX"){
+    else if (label == "weightsFlux"){
         h_cov_v.at(var).at(_type).at(k_err_hp)->Add(cov);
         h_cov_v.at(var).at(_type).at(k_err_tot)->Add(cov);
         h_cov_v.at(var).at(_type).at(k_err_sys)->Add(cov);
@@ -2537,7 +2532,7 @@ void SystematicsHelper::FillSysVector(std::string variation, int var, int type, 
         }
 
     }
-    else if (variation == "weightsPPFX"){
+    else if (variation == "weightsFlux"){
         // Loop over histogram bins
         for (int bin = 0; bin < h_up->GetNbinsX(); bin++){
             
@@ -3453,22 +3448,9 @@ void SystematicsHelper::InitialiseReweightingModeCut(){
         std::make_tuple("RPA_CCQE_Reduced", 2,   "unisim"),
         std::make_tuple("NormCCCOH",        2,   "unisim"),
         std::make_tuple("NormNCCOH",        2,   "unisim"),
-        std::make_tuple("xsr_scc_Fa3",      2,   "unisim"),
-        std::make_tuple("xsr_scc_Fv3",      2,   "unisim"),
-        std::make_tuple("Horn1_x",          2,   "unisim"),
-        std::make_tuple("Horn_curr",        2,   "unisim"),
-        std::make_tuple("Horn1_y",          2,   "unisim"),
-        std::make_tuple("Beam_spot",        2,   "unisim"),
-        std::make_tuple("Horn2_x",          2,   "unisim"),
-        std::make_tuple("Horn2_y",          2,   "unisim"),
-        std::make_tuple("Horn_Water",       2,   "unisim"),
-        std::make_tuple("Beam_shift_x",     2,   "unisim"),
-        std::make_tuple("Beam_shift_y",     2,   "unisim"),
-        std::make_tuple("Target_z",         2,   "unisim"),
-        // std::make_tuple("Decay_pipe_Bfield",2,   "unisim"),
-        std::make_tuple("weightsGenie",     600, "multisim"),
+        std::make_tuple("weightsGenie",     500, "multisim"),
         std::make_tuple("weightsReint",     1000,"multisim"),
-        std::make_tuple("weightsPPFX",      600, "multisim")
+        std::make_tuple("weightsFlux",      500, "multisim")
     };
 
 
@@ -4306,7 +4288,7 @@ void SystematicsHelper::MakedEdxPaperPlot(){
     // ------------------------------------------------------------
     // Some initial configurations and work around fixes
 
-    int cut = _util.k_shr_moliere_avg;
+    int cut = _util.k_unselected;
     const char* x_axis_name = "Leading Shower dE/dx [MeV/cm]";
     bool plotdata = true;
     
@@ -4417,7 +4399,7 @@ void SystematicsHelper::MakedEdxPaperPlot(){
     AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "Target_z", "MC");
             
     // Other
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "weightsPPFX", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "weightsFlux", "MC");
     AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "weightsGenie", "MC");
     AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "weightsReint", "MC");
     AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "POT",  "Stack");

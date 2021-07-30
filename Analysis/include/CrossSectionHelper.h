@@ -51,7 +51,7 @@ class CrossSectionHelper{
     // Weights
     std::vector<unsigned short> *weightsGenie = NULL;
     std::vector<unsigned short> *weightsReint = NULL;
-    std::vector<unsigned short> *weightsPPFX = NULL ;
+    std::vector<unsigned short> *weightsFlux = NULL ;
     double knobRPAup{0.0};
     double knobCCMECup{0.0};
     double knobAxFFCCQEup{0.0};
@@ -100,7 +100,7 @@ class CrossSectionHelper{
     double mc_flux_scale_factor{1.0};
     double data_flux_scale_factor{1.0};
 
-    int uni_reint{1000}, uni_genie{600}, uni_ppfx{600}, uni_mcstats{1000}; // For resizing data, ext and dirt in multisims
+    int uni_reint{1000}, uni_genie{500}, uni_ppfx{500}, uni_mcstats{1000}; // For resizing data, ext and dirt in multisims
 
     // Random number generator for generating MC stats uncertainty
     TRandom3 *rand = new TRandom3(); 
@@ -232,7 +232,7 @@ class CrossSectionHelper{
         "EXT",
         "weightsGenie",
         "weightsReint",
-        "weightsPPFX"
+        "weightsFlux"
         // "MCStats"
     };
 
@@ -320,7 +320,7 @@ class CrossSectionHelper{
     float potData = 2.0;
     float potMC   = 23.2136;
     float n_targ  = 4.31247;
-    float nUniverses = 600;
+    float nUniverses = 500;
     bool isData, isSignal, isSelected; 
     float xTrue, xReco;
     double integrated_flux_tree{0.0};

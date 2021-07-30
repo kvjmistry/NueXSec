@@ -238,13 +238,13 @@ void TreeHelper::FillVars(SliceContainer &SC, bool _passed_selection){
     shr_bkt_purity       = SC.shr_bkt_purity;
     shr_bkt_completeness = SC.shr_bkt_completeness;
     shr_bkt_E            = SC.shr_bkt_E;
-    all_shr_hits         = *SC.all_shr_hits;
-    all_shr_energies     = *SC.all_shr_energies;
+    //all_shr_hits         = *SC.all_shr_hits;
+    //all_shr_energies     = *SC.all_shr_energies;
 
     
     if (SC.weightsGenie != NULL) weightsGenie           = *SC.weightsGenie; // If these aren't set by default then bad things happen in memory land
     if (SC.weightsReint != NULL) weightsReint           = *SC.weightsReint;
-    if (SC.weightsPPFX  != NULL) weightsPPFX            = *SC.weightsPPFX;
+    if (SC.weightsFlux  != NULL) weightsFlux            = *SC.weightsFlux;
     knobRPAup              = SC.knobRPAup;
     knobCCMECup            = SC.knobCCMECup;
     knobAxFFCCQEup         = SC.knobAxFFCCQEup;
@@ -466,7 +466,7 @@ void TreeHelper::SetBranches(TTree * tree){
 
     tree->Branch("weightsGenie", "std::vector<unsigned short>", &weightsGenie);
     tree->Branch("weightsReint", "std::vector<unsigned short>", &weightsReint);
-    tree->Branch("weightsPPFX",  "std::vector<unsigned short>", &weightsPPFX);
+    tree->Branch("weightsFlux",  "std::vector<unsigned short>", &weightsFlux);
     tree->Branch("knobRPAup",             &knobRPAup,             "knobRPAup/D");
     tree->Branch("knobRPAdn",             &knobRPAdn,             "knobRPAdn/D");
     tree->Branch("knobCCMECup",           &knobCCMECup,           "knobCCMECup/D");

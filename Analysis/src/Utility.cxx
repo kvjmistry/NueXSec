@@ -970,7 +970,7 @@ void Utility::Tabulate(bool inFV, std::string interaction, std::string classific
 double Utility::GetNuMIAngle(double px, double py, double pz, std::string direction){
 
     // Variables
-    TRotation RotDet2Beam;             // Rotations
+    //TRotation RotDet2Beam;             // Rotations
     TVector3  detxyz, BeamCoords;      // Translations
     std::vector<double> rotmatrix;     // Inputs
 
@@ -989,11 +989,11 @@ double Utility::GetNuMIAngle(double px, double py, double pz, std::string direct
     newY = TVector3(rotmatrix[3], rotmatrix[4], rotmatrix[5]);
     newZ = TVector3(rotmatrix[6], rotmatrix[7], rotmatrix[8]);
 
-    RotDet2Beam.RotateAxes(newX, newY, newZ); // Return the TRotation now det to beam
+    //RotDet2Beam.RotateAxes(newX, newY, newZ); // Return the TRotation now det to beam
     // RotDet2Beam.Invert(); // Invert back to the beam to det
 
     // Rotate to beam coords
-    BeamCoords = RotDet2Beam * detxyz;
+    //BeamCoords = RotDet2Beam * detxyz;
 
     TVector3 beamdir = {0 , 0 , 1};;
     

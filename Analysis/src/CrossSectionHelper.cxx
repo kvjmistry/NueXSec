@@ -43,7 +43,7 @@ void CrossSectionHelper::Initialise(Utility _utility){
     InitTree();
 
     // Initialise the Flux file
-    if (std::string(_util.run_period) == "1"){
+    /*if (std::string(_util.run_period) == "1"){
         
         // Switch the file path depending on whether we are on the gpvm or not
         if (!_util.use_gpvm)
@@ -73,7 +73,7 @@ void CrossSectionHelper::Initialise(Utility _utility){
     }
     
     // Get the integrated flux for the CV
-    integrated_flux = GetIntegratedFluxCV();
+//    integrated_flux = GetIntegratedFluxCV();
 
     // Turn this on for using the FLUGG flux as the integrated flux
     if (_util.usefluggflux){
@@ -81,9 +81,9 @@ void CrossSectionHelper::Initialise(Utility _utility){
         integrated_flux = GetIntegratedFluxFLUGG();
     }
 
-
+*/
     // Now lets open the beamline variation files
-    GetBeamlineHists();
+  //  GetBeamlineHists();
 
     f_nuexsec->cd();
 
@@ -408,7 +408,7 @@ void CrossSectionHelper::LoopEvents(){
                 double temp_integrated_flux = integrated_flux;
 
                 // If we are reweighting by the PPFX Multisims, we need to change the integrated flux too
-                if (reweighter_labels.at(label) == "weightsPPFX") 
+                if (reweighter_labels.at(label) == "weightsFlux") 
                     temp_integrated_flux = GetIntegratedFluxHP(uni, "ppfx_ms_UBPPFX");
 
                 // If this is a beamline variation then we use the corresponding beamline flux
@@ -433,7 +433,7 @@ void CrossSectionHelper::LoopEvents(){
                 else { 
 
                     // In the case of PPFX and Beamline, use the wiener method of taking the ratio of event distributions
-                    if ( (reweighter_labels.at(label) == "weightsPPFX" || CheckBeamline(reweighter_labels.at(label))) && var == k_var_integrated){
+                    if ( (reweighter_labels.at(label) == "weightsFlux" || CheckBeamline(reweighter_labels.at(label))) && var == k_var_integrated){
                         h_cross_sec.at(label).at(uni).at(var).at(k_xsec_eff)->Divide(h_cross_sec.at(label).at(uni).at(var).at(k_xsec_sig), h_cross_sec.front().front().at(var).at(k_xsec_gen));
                     }
                     else {
@@ -453,7 +453,7 @@ void CrossSectionHelper::LoopEvents(){
                         // h_shape_temp, h_smear.front().front().at(k_var_trueX), false);
                         
                         // For making covariance matrix on response * gen + B
-                        if (reweighter_labels.at(label) == "weightsPPFX" || CheckBeamline(reweighter_labels.at(label))){
+                        if (reweighter_labels.at(label) == "weightsFlux" || CheckBeamline(reweighter_labels.at(label))){
                             TH2D* h_smear_temp = (TH2D*) h_smear.at(label).at(uni).at(k_var_trueX)->Clone();
 
                             ApplyResponseMatrix( h_cross_sec.front().front().at(k_var_trueX).at(k_xsec_gen), h_cross_sec.at(label).at(uni).at(k_var_trueX).at(k_xsec_gen_shape),
@@ -719,131 +719,22 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
 
     bool pass = true;
 
-    SC.ReClassifyPileUps(type);
 
     // Set derived variables in the slice container
     // Classify the event
     SC.SliceClassifier(type);      // Classification of the event
 
-    // If we have a signal event that is below threshold, then set its category to thr_nue or thr_nuebar
-    SC.SetThresholdEvent(type);
-
-    SC.SetSignal();                // Set the event as either signal or other
-    SC.SetTrueElectronThetaPhi();  // Set the true electron theta and phi variables
-    SC.SetNuMIAngularVariables();  // Set the NuMI angular variables
-    SC.CalibrateShowerEnergy();    // Divide the shower energy by 0.83 so it is done in one place
-
-    // Skip signal events in the standard MC file so we dont double count the signal events
-    if (treeNum == 1 && SC.is_signal){
-        return false;
-    }
-
     // *************************************************************************
     // Unselected---------------------------------------------------------------
     // *************************************************************************
+    pass =_scuts.opfilt_pe(SC, type);
+    if(!pass) return false; // Failed the cut!
+    pass =_scuts.opfilt_veto(SC, type);
+    if(!pass) return false; // Failed the cut!
+    pass = _scuts.pi_zero_cuts(SC);
+    if(!pass) return false; // Failed the cut! 
     FillCutHists(type, SC, SC.classification, _util.k_unselected );
     
-    // *************************************************************************
-    // Software Trigger -- MC Only  --------------------------------------------
-    // *************************************************************************
-    pass = _scuts.swtrig(SC, type);
-    if(!pass) return false; // Failed the cut!
-    
-    FillCutHists(type, SC, SC.classification, _util.k_swtrig );
-
-    // *************************************************************************
-    // Slice ID ----------------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.slice_id(SC);
-    if(!pass) return false; // Failed the cut!
-    
-    FillCutHists(type, SC, SC.classification, _util.k_slice_id );
-    
-    // *************************************************************************
-    // Electron Candidate ------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.e_candidate(SC);
-    if(!pass) return false; // Failed the cut!
-    
-    FillCutHists(type, SC, SC.classification, _util.k_e_candidate );
-
-    // *************************************************************************
-    // In FV -------------------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.in_fv(SC);
-    if(!pass) return false; // Failed the cut!
-    
-    FillCutHists(type, SC, SC.classification, _util.k_in_fv );
-    
-    // *************************************************************************
-    // Slice Contained Fraction ------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.contained_frac(SC);
-    if(!pass) return false; // Failed the cut!
-    
-    FillCutHists(type, SC, SC.classification, _util.k_contained_frac );
-
-    // *************************************************************************
-    // Topological Score -------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.topo_score(SC);
-    if(!pass) return false; // Failed the cut!
-    
-    FillCutHists(type, SC, SC.classification, _util.k_topo_score );
-
-    // *************************************************************************
-    // Cosmic Impact Parameter -------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.shr_cosmic_IP(SC);
-    if(!pass) return false; // Failed the cut!
-    
-    FillCutHists(type, SC, SC.classification, _util.k_cosmic_ip );
-
-    // *************************************************************************
-    // Shower Score ------------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.shower_score(SC);
-    if(!pass) return false; // Failed the cut!
-    
-    FillCutHists(type, SC, SC.classification, _util.k_shower_score );
-
-    // *************************************************************************
-    // Shower Hit Ratio  -------------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.shr_hitratio(SC);
-    if(!pass) return false; // Failed the cut!
-    
-    FillCutHists(type, SC, SC.classification, _util.k_hit_ratio );
-
-    // *************************************************************************
-    // Shower Moliere Average --------------------------------------------------
-    // *************************************************************************
-    pass = _scuts.shr_moliere_avg(SC);
-    if(!pass) return false; // Failed the cut!
-    
-    FillCutHists(type, SC, SC.classification, _util.k_shr_moliere_avg );
-
-    // *************************************************************************
-    // 2D cut for Shower to Vertex Distance and dEdx ---------------------------
-    // *************************************************************************
-    pass = _scuts.shr_dist_dEdx_max(SC);
-    if(!pass) return false; // Failed the cut!
-    
-    FillCutHists(type, SC, SC.classification, _util.k_vtx_dist_dedx );
-
-    // *************************************************************************
-    // dEdx in all planes for 0 track events -----------------------------------
-    // *************************************************************************
-    pass = _scuts.dEdx_max_no_tracks(SC);
-    if(!pass) return false; // Failed the cut!
-
-    // If the backtracked pdg of the leading shower is not an electron then alter classification
-    // Turn these off to get the efficiencies at low energies correct
-    SC.SetNonLdgShrEvent(type);
-    
-    FillCutHists(type, SC, SC.classification, _util.k_dEdx_max_no_tracks );
-
-    // **************************************************************************
     return true;
 
 }
@@ -887,38 +778,7 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
 
             // Now we got the weight for universe i, lets fill the histograms :D
             // Use [] rather than .at() to speed this process up. This can cause errors if indexes go out of bound
-            h_cut_v[label][cut_index][_util.k_cut_nslice][uni]                   ->Fill(SC.nslice,                 weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_shower_multiplicity][uni]      ->Fill(SC.n_showers,              weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_track_multiplicity][uni]       ->Fill(SC.n_tracks,               weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_topological_score][uni]        ->Fill(SC.topological_score,      weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_vtx_x_sce][uni]                ->Fill(SC.reco_nu_vtx_sce_x,      weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_vtx_y_sce][uni]                ->Fill(SC.reco_nu_vtx_sce_y,      weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_vtx_z_sce][uni]                ->Fill(SC.reco_nu_vtx_sce_z,      weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_shower_score][uni]             ->Fill(SC.shr_score,              weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_shr_tkfit_dedx_max][uni]       ->Fill(dedx_max, weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_shr_tkfit_dedx_max_tune][uni]  ->Fill(dedx_max, pi0_tuned_weight);
-            
-            if (SC.n_tracks > 0)
-                h_cut_v[label][cut_index][_util.k_cut_shr_tkfit_dedx_max_with_tracks][uni]    ->Fill(dedx_max, weight_uni);
-            
-            if (SC.n_tracks == 0)
-                h_cut_v[label][cut_index][_util.k_cut_shr_tkfit_dedx_max_no_tracks][uni]      ->Fill(dedx_max, weight_uni);
-            
-            h_cut_v[label][cut_index][_util.k_cut_shower_to_vtx_dist][uni]       ->Fill(SC.shr_distance,           weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_hits_ratio][uni]               ->Fill(SC.hits_ratio,             weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_CosmicIPAll3D][uni]            ->Fill(SC.CosmicIPAll3D,          weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_contained_fraction][uni]       ->Fill(SC.contained_fraction,     weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_shrmoliereavg][uni]            ->Fill(SC.shrmoliereavg,          weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_leading_shower_theta][uni]     ->Fill(SC.shr_theta * 180/3.14159,weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_leading_shower_phi][uni]       ->Fill(SC.shr_phi * 180/3.14159,  weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_shower_energy_cali][uni]       ->Fill(SC.shr_energy_cali,        weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_shower_energy_cali_rebin][uni] ->Fill(SC.shr_energy_cali,        weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_flash_time][uni]               ->Fill(SC.flash_time,             weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_flash_pe][uni]                 ->Fill(SC.flash_pe,               weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_effective_angle][uni]          ->Fill(SC.effective_angle,        weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_effective_cosangle][uni]       ->Fill(SC.cos_effective_angle,    weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_effective_angle_rebin][uni]          ->Fill(SC.effective_angle,        weight_uni);
-            h_cut_v[label][cut_index][_util.k_cut_effective_cosangle_rebin][uni]       ->Fill(SC.cos_effective_angle,    weight_uni);
+            h_cut_v[label][cut_index][_util.k_pi0_mass][uni]                   ->Fill(SC.pi0_mass_Y,                 weight_uni);
         
         }
 
@@ -939,7 +799,7 @@ void CrossSectionHelper::SetUniverseWeight(std::string label, double &weight_uni
         weight_uni = cv_weight * vec_universes[uni];
     }
     // Hadron Production weights
-    else if (label == "weightsPPFX"){
+    else if (label == "weightsFlux"){
 
         // Get weight from ratio of flux histograms
         if (_util.usefluggflux){
@@ -1591,7 +1451,7 @@ void CrossSectionHelper::InitTree(){
     
     tree->SetBranchAddress("weightsGenie",          &weightsGenie);
     tree->SetBranchAddress("weightsReint",          &weightsReint);
-    tree->SetBranchAddress("weightsPPFX",           &weightsPPFX);
+    tree->SetBranchAddress("weightsFlux",           &weightsFlux);
     tree->SetBranchAddress("knobRPAup",             &knobRPAup);
     tree->SetBranchAddress("knobRPAdn",             &knobRPAdn);
     tree->SetBranchAddress("knobCCMECup",           &knobCCMECup);
@@ -1643,11 +1503,11 @@ void CrossSectionHelper::SwitchReweighterLabel(std::string label){
 
     }
     // PPFX All
-    else if (label == "weightsPPFX"){
+    else if (label == "weightsFlux"){
         
         // Convert from unsigned short to double and push back -- divide by 1000 to undo previous *1000
-        for (unsigned int j = 0; j < weightsPPFX->size(); j++){
-            vec_universes.push_back( (double) weightsPPFX->at(j)/1000.0);
+        for (unsigned int j = 0; j < weightsFlux->size(); j++){
+            vec_universes.push_back( (double) weightsFlux->at(j)/1000.0);
         }
 
     }
@@ -1759,11 +1619,11 @@ void CrossSectionHelper::SwitchReweighterLabel(std::string label, SliceContainer
 
     }
     // PPFX All
-    else if (label == "weightsPPFX"){
+    else if (label == "weightsFlux"){
         
         // Convert from unsigned short to double and push back -- divide by 1000 to undo previous *1000
-        for (unsigned int j = 0; j < SC.weightsPPFX->size(); j++){
-            vec_universes.push_back( (double) SC.weightsPPFX->at(j)/1000.0);
+        for (unsigned int j = 0; j < SC.weightsFlux->size(); j++){
+            vec_universes.push_back( (double) SC.weightsFlux->at(j)/1000.0);
         }
 
     }
@@ -1869,29 +1729,6 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
             reweighter_labels.clear();
             reweighter_labels = {
                 "CV",    
-                "Horn_p2kA",
-                "Horn_m2kA",
-                "Horn1_x_p3mm",
-                "Horn1_x_m3mm",
-                "Horn1_y_p3mm",
-                "Horn1_y_m3mm",
-                "Beam_spot_1_1mm",
-                "Beam_spot_1_5mm",
-                "Horn2_x_p3mm",
-                "Horn2_x_m3mm",
-                "Horn2_y_p3mm",
-                "Horn2_y_m3mm",
-                "Horns_0mm_water",
-                "Horns_2mm_water",
-                "Beam_shift_x_p1mm",
-                "Beam_shift_x_m1mm",
-                "Beam_shift_y_p1mm",
-                "Beam_shift_y_m1mm",
-                "Target_z_p7mm",
-                "Target_z_m7mm",
-                "Horn1_refined_descr",
-                "Decay_pipe_Bfield",
-                "Old_Horn_Geometry",
                 "RPAup",
                 "CCMECup",
                 "AxFFCCQEup",
@@ -1899,7 +1736,6 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 "DecayAngMECup",
                 "ThetaDelta2Npiup",
                 "ThetaDelta2NRadup",
-                "RPA_CCQE_Reducedup",
                 "NormCCCOHup",
                 "NormNCCOHup",
                 "RPAdn",
@@ -1909,26 +1745,19 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 "DecayAngMECdn",
                 "ThetaDelta2Npidn",
                 "ThetaDelta2NRaddn",
-                "RPA_CCQE_Reduceddn",
                 "NormCCCOHdn",
                 "NormNCCOHdn",
-                "xsr_scc_Fv3up",
-                "xsr_scc_Fa3up",
-                "xsr_scc_Fv3dn",
-                "xsr_scc_Fa3dn",
                 "Dirtup",
                 "Dirtdn",
                 "POTup",
-                "POTdn", 
-                "pi0",
-                "EXT"
+                "POTdn" 
             };
         }
         // Only run PPFX
         else if (std::string(_util.xsec_labels) == "ppfx"){
             std::cout << "XSec reweighting mode set to ppfx" << std::endl;
             reweighter_labels.clear();
-            reweighter_labels = {"CV", "weightsPPFX"};
+            reweighter_labels = {"CV", "weightsFlux"};
         }
         // Only run Genie All
         else if (std::string(_util.xsec_labels) == "genie"){
@@ -2012,7 +1841,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
             
         }
         // Specific resizing -- hardcoded and may break in the future
-        else if ( reweighter_labels.at(j) == "weightsPPFX"){
+        else if ( reweighter_labels.at(j) == "weightsFlux"){
             std::cout << "Setting PPFX All Histogram universe vector to size: " << uni_ppfx << std::endl;
             h_cross_sec.at(j).resize(uni_ppfx);
             h_smear.at(j).resize(uni_ppfx);
@@ -2195,7 +2024,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                     h_cut_v.at(label).at(cut).at(var).resize(uni_genie);
                 }
                 // Specific resizing -- hardcoded and may break in the future
-                else if ( reweighter_labels.at(label) == "weightsPPFX"){
+                else if ( reweighter_labels.at(label) == "weightsFlux"){
                     h_cut_v.at(label).at(cut).at(var).resize(uni_ppfx);
                 }
                 // Specific resizing -- hardcoded and may break in the future
@@ -2227,40 +2056,7 @@ void CrossSectionHelper::InitialiseHistograms(std::string run_mode){
                 
                 // Only initialise if this mode to stop loading too much into memory
                 if (std::string(_util.xsec_rw_mode) == "rw_cuts"){
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_nslice).at(uni)                         = new TH1D(Form("h_reco_nslice_%s_%s_%i",                         reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 2, 0, 2);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_shower_multiplicity).at(uni)            = new TH1D(Form("h_reco_shower_multiplicity_%s_%s_%i",            reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 6, 0, 6);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_track_multiplicity).at(uni)             = new TH1D(Form("h_reco_track_multiplicity_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 6, 0, 6);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_topological_score).at(uni)              = new TH1D(Form("h_reco_topological_score_%s_%s_%i",              reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, 0, 1);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_vtx_x_sce).at(uni)                      = new TH1D(Form("h_reco_vtx_x_sce_%s_%s_%i",                      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 15, -10, 270);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_vtx_y_sce).at(uni)                      = new TH1D(Form("h_reco_vtx_y_sce_%s_%s_%i",                      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -120, 120);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_vtx_z_sce).at(uni)                      = new TH1D(Form("h_reco_vtx_z_sce_%s_%s_%i",                      reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, -10, 1050);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_shower_score).at(uni)                   = new TH1D(Form("h_reco_shower_score_%s_%s_%i",                   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 0.5);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max).at(uni)             = new TH1D(Form("h_reco_shr_tkfit_dedx_max_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max_tune).at(uni)        = new TH1D(Form("h_reco_shr_tkfit_dedx_max_tune_%s_%s_%i",        reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 10);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max_with_tracks).at(uni) = new TH1D(Form("h_reco_shr_tkfit_dedx_max_with_tracks_%s_%s_%i", reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 10);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_shr_tkfit_dedx_max_no_tracks).at(uni)   = new TH1D(Form("h_reco_shr_tkfit_dedx_max_no_tracks_%s_%s_%i",   reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 10);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_shower_to_vtx_dist).at(uni)             = new TH1D(Form("h_reco_shower_to_vtx_dist_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 20);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_hits_ratio).at(uni)                     = new TH1D(Form("h_reco_hits_ratio_%s_%s_%i",                     reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 21, 0, 1.05);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_CosmicIPAll3D).at(uni)                  = new TH1D(Form("h_reco_CosmicIPAll3D_%s_%s_%i",                  reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 40, 0, 200);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_contained_fraction).at(uni)             = new TH1D(Form("h_reco_contained_fraction_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 21, 0, 1.05);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_shrmoliereavg).at(uni)                  = new TH1D(Form("h_reco_shrmoliereavg_%s_%s_%i",                  reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 30, 0, 30);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_leading_shower_theta).at(uni)           = new TH1D(Form("h_reco_leading_shower_theta_%s_%s_%i",           reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 13, 0, 190);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_leading_shower_phi).at(uni)             = new TH1D(Form("h_reco_leading_shower_phi_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 14, -190, 190);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_shower_energy_cali).at(uni)             = new TH1D(Form("h_reco_shower_energy_cali_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 20, 0, 4);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_flash_time).at(uni)                     = new TH1D(Form("h_reco_flash_time_%s_%s_%i",                     reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 50, 0, 25);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_flash_pe).at(uni)                       = new TH1D(Form("h_reco_flash_pe_%s_%s_%i",                       reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 25, 0, 5000);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_effective_angle).at(uni)                = new TH1D(Form("h_reco_effective_angle_%s_%s_%i",                reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 13, 0, 190);
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_effective_cosangle).at(uni)             = new TH1D(Form("h_reco_effective_cosangle_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 16, -1, 1);
-
-
-                    double* edges = &_util.reco_shr_bins[0]; // Cast to an array 
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_shower_energy_cali_rebin).at(uni)  = new TH1D(Form("h_reco_shower_energy_cali_rebin_%s_%s_%i",  reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", _util.reco_shr_bins.size()-1, edges);
-
-                    edges = &_util.reco_shr_bins_ang[0]; // Cast to an array 
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_effective_angle_rebin).at(uni)                = new TH1D(Form("h_reco_effective_angle_rebin_%s_%s_%i",                reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", _util.reco_shr_bins_ang.size()-1, edges);
-                    
-                    edges = &_util.reco_shr_bins_cang[0]; // Cast to an array 
-                    h_cut_v.at(label).at(cut).at(_util.k_cut_effective_cosangle_rebin).at(uni)             = new TH1D(Form("h_reco_effective_cosangle_rebin_%s_%s_%i",             reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", _util.reco_shr_bins_cang.size()-1, edges);
+                    h_cut_v.at(label).at(cut).at(_util.k_pi0_mass).at(uni)                         = new TH1D(Form("h_pi0_mass_%s_%s_%i",                         reweighter_labels.at(label).c_str(), _util.cut_dirs.at(cut).c_str(), uni), "", 25, 0, 500);
                 }
             }
         }
@@ -3143,7 +2939,7 @@ void CrossSectionHelper::StudyFluxShape(){
 
     TH1D* h_CV_ppfx = new TH1D("h_cv", "", 30, 0, 6);
 
-    std::vector<TH1D*> h_ppfx_uni(600);
+    std::vector<TH1D*> h_ppfx_uni(500);
 
     for (unsigned int u = 0; u < h_ppfx_uni.size(); u++){
         h_ppfx_uni.at(u) = new TH1D("", "", 30, 0, 6);
@@ -3214,7 +3010,7 @@ void CrossSectionHelper::StudyFluxShape(){
     h_CV_ppfx->Scale(1.0e-39);
 
     // If we are reweighting by the PPFX Multisims, we need to change the integrated flux too
-    for (int uni = 0; uni < 600; uni++){
+    for (int uni = 0; uni < 500; uni++){
         temp_integrated_flux = GetIntegratedFluxHP(uni, "ppfx_ms_UBPPFX");
         h_ppfx_uni.at(uni)->Scale(1.0/(temp_integrated_flux* mc_flux_scale_factor * N_target_MC));
         h_ppfx_uni.at(uni)->Scale(1.0e-39);

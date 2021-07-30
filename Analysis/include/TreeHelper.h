@@ -86,7 +86,7 @@ class TreeHelper{
     // Weights
     std::vector<unsigned short> weightsGenie;
     std::vector<unsigned short> weightsReint;
-    std::vector<unsigned short> weightsPPFX ;
+    std::vector<unsigned short> weightsFlux ;
     double knobRPAup;
     double knobCCMECup;
     double knobAxFFCCQEup;

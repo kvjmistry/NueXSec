@@ -82,10 +82,10 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, bool fake_int
 
     std::vector<unsigned short> weightsGenie;
     std::vector<unsigned short> weightsReint;
-    std::vector<unsigned short> weightsPPFX ;
+    std::vector<unsigned short> weightsFlux ;
     std::vector<unsigned short> *_weightsGenie  = NULL;
     std::vector<unsigned short> *_weightsReint  = NULL;
-    std::vector<unsigned short> *_weightsPPFX   = NULL;
+    std::vector<unsigned short> *_weightsFlux   = NULL;
     
     double knobRPAup{0.0},              _knobRPAup{0.0};
     double knobCCMECup{0.0},            _knobCCMECup{0.0};
@@ -176,7 +176,7 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, bool fake_int
     
     outtree->Branch("weightsGenie", "std::vector<unsigned short>", &weightsGenie);
     outtree->Branch("weightsReint", "std::vector<unsigned short>", &weightsReint);
-    outtree->Branch("weightsPPFX", "std::vector<unsigned short>",  &weightsPPFX);
+    outtree->Branch("weightsFlux", "std::vector<unsigned short>",  &weightsFlux);
     outtree->Branch("knobRPAup",             &knobRPAup);
     outtree->Branch("knobRPAdn",             &knobRPAdn);
     outtree->Branch("knobCCMECup",           &knobCCMECup);
@@ -253,7 +253,7 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, bool fake_int
         
         trees.at(k)->SetBranchAddress("weightsGenie",          &_weightsGenie);
         trees.at(k)->SetBranchAddress("weightsReint",          &_weightsReint);
-        trees.at(k)->SetBranchAddress("weightsPPFX",           &_weightsPPFX);
+        trees.at(k)->SetBranchAddress("weightsFlux",           &_weightsFlux);
         trees.at(k)->SetBranchAddress("knobRPAup",             &_knobRPAup);
         trees.at(k)->SetBranchAddress("knobRPAdn",             &_knobRPAdn);
         trees.at(k)->SetBranchAddress("knobCCMECup",           &_knobCCMECup);
@@ -339,7 +339,7 @@ void merge_uneaventrees(std::string run_type, bool intrinsic_mode, bool fake_int
 
                 if (_weightsGenie != NULL) weightsGenie           = *_weightsGenie; // If these aren't set by default then bad things happen in memory land
                 if (_weightsReint != NULL) weightsReint           = *_weightsReint;
-                if (_weightsPPFX  != NULL) weightsPPFX            = *_weightsPPFX;
+                if (_weightsFlux  != NULL) weightsFlux            = *_weightsFlux;
                 knobRPAup =              _knobRPAup;
                 knobCCMECup =            _knobCCMECup;
                 knobAxFFCCQEup =         _knobAxFFCCQEup;

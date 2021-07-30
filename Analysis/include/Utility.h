@@ -264,7 +264,7 @@ public:
     int _weight_ppfx{0}; // Use the PPFX CV Corr
     int _weight_dirt{1}; // Weight the Dirt events
     int _weight_ext{1};  // Weight the EXT events
-    int _pi0_correction{0};  // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
+    int _pi0_correction{2};  // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
 
     bool zoom{false};        // bool to decide whether to zoom in on the plots
     bool isfakedata{false};  // bool for using MC as fake data
@@ -277,7 +277,7 @@ public:
     bool weight_ppfx{false}; // Use the PPFX CV Corr
     bool weight_dirt{true}; // Weight the Dirt events
     bool weight_ext{true};  // Weight the EXT events
-    int  pi0_correction{0}; // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
+    int  pi0_correction{2}; // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
     bool tune_mec{false};
 
     // Scale factors to scale samples to data)
@@ -335,35 +335,11 @@ public:
 
     // Cut directory names
     std::vector<std::string> cut_dirs = {
-            "Unselected",     // Unselected
-            "SoftwareTrig",   // Software Trigger
-            "Slice_ID",       // Slice ID
-            "e_candidate",    // Electron Candidate
-            "In_FV",          // In FV
-            "Contained_Frac", // Slice Contained Fraction
-            "Topo_Score",     // Topological Score
-            "Cosmic_IP",      // Pandora Cosmic Impact Parameter
-            "Shower_Score",   // Track Score < 0.5
-            "HitRatio",       // Ratio of shr hits and slice hits
-            "Moliere_Avg",    // Shower Moliere Average
-            "ShrVtxDist_dEdx_max", // 2D cut for shower to vertex distance and dedx
-            "dEdx_max_no_tracks"  // dEdx all planes no tracks
+            "Unselected"     // Unselected
             };
     
     std::vector<std::string> cut_dirs_pretty = {
-            "Unselected",                                 // Unselected
-            "Software Trigger",                           // Software Trigger
-            "Slice ID",                                   // Slice ID
-            "Electron Candidate",                         // Electron Candidate
-            "In Fiducial Volume",                         // In FV
-            "Contained Fraction",                         // Slice Contained Fraction
-            "Topological Score",                          // Topological Score
-            "Cosimc IP",                                  // Pandora Cosmic Impact Parameter
-            "Shower Score",                               // Track Score < 0.5
-            "Hit Ratio",                                  // Ratio of shr hits and slice hits
-            "Moliere Average",                            // Shower Moliere Average
-            "2D Shower Vtx Dist, dE/dx",                  // 2D cut for shower to vertex distance and dedx
-            "dE/dx, 0 Tracks"                             // dEdx all planes no tracks
+            "Unselected"                                 // Unselected
             };
 
 
@@ -434,18 +410,6 @@ public:
     // enums for cut dirs
     enum enum_cut_dirs {
                 k_unselected,        // Unselected 
-                k_swtrig,            // Software Trigger
-                k_slice_id,          // Slice ID
-                k_e_candidate,       // Electron Candidate
-                k_in_fv,             // Reco Nu Vtx (SC Corr) In the FV 
-                k_contained_frac,    // Slice Contained Fraction
-                k_topo_score,        // Topo Score
-                k_cosmic_ip,         // Pandora Cosmic Impact Param 3D
-                k_shower_score,      // Shower Score
-                k_hit_ratio,         // Ratio of shr hits and slice hits
-                k_shr_moliere_avg,   // Shower Moliere Average
-                k_vtx_dist_dedx,     //  2D cut for shower to vertex distance and dEdx. Only applied for > 1 track
-                k_dEdx_max_no_tracks,// dEdx all planes when there is no tracks
                 k_cuts_MAX
                 }; 
 
@@ -607,97 +571,19 @@ public:
 
     // Variables to get the systematic uncertainty by cut for
     enum TH1D_cut_vars {
-        k_cut_nslice,
-        k_cut_shower_multiplicity,
-        k_cut_track_multiplicity,
-        k_cut_topological_score,
-        k_cut_vtx_x_sce,
-        k_cut_vtx_y_sce,
-        k_cut_vtx_z_sce,
-        k_cut_shower_score,
-        k_cut_shr_tkfit_dedx_max,
-        k_cut_shr_tkfit_dedx_max_tune,
-        k_cut_shr_tkfit_dedx_max_with_tracks,
-        k_cut_shr_tkfit_dedx_max_no_tracks,
-        k_cut_shower_to_vtx_dist,
-        k_cut_hits_ratio,
-        k_cut_CosmicIPAll3D,
-        k_cut_contained_fraction,
-        k_cut_shrmoliereavg,
-        k_cut_leading_shower_theta,
-        k_cut_leading_shower_phi,
-        k_cut_shower_energy_cali,
-        k_cut_shower_energy_cali_rebin,
-        k_cut_flash_time,
-        k_cut_flash_pe,
-        k_cut_effective_angle,
-        k_cut_effective_cosangle,
-        k_cut_effective_angle_rebin,
-        k_cut_effective_cosangle_rebin,
+        k_pi0_mass,
         k_cut_vars_max
     };
 
     // ------------------------------------------
     // variables to plot PlotVariations and SysVariations
         std::vector<std::string> vec_hist_name = {
-        "h_reco_nslice",
-        "h_reco_shower_multiplicity",
-        "h_reco_track_multiplicity",
-        "h_reco_topological_score",
-        "h_reco_vtx_x_sce",
-        "h_reco_vtx_y_sce",
-        "h_reco_vtx_z_sce",
-        "h_reco_shower_score",
-        "h_reco_shr_tkfit_dedx_max",
-        "h_reco_shr_tkfit_dedx_max_tune",
-        "h_reco_shr_tkfit_dedx_max_with_tracks",
-        "h_reco_shr_tkfit_dedx_max_no_tracks",
-        "h_reco_shower_to_vtx_dist",
-        "h_reco_hits_ratio",
-        "h_reco_CosmicIPAll3D",
-        "h_reco_contained_fraction",
-        "h_reco_shrmoliereavg",
-        "h_reco_leading_shower_theta",
-        "h_reco_leading_shower_phi",
-        "h_reco_shower_energy_cali",
-        "h_reco_shower_energy_cali_rebin",
-        "h_reco_flash_time",
-        "h_reco_flash_pe",
-        "h_reco_effective_angle",
-        "h_reco_effective_cosangle",
-        "h_reco_effective_angle_rebin",
-        "h_reco_effective_cosangle_rebin",
+        "h_pi0_mass"
     };
  
     // x axis label for those plots
     std::vector<std::string> vec_axis_label = {
-        "Pandora Slice ID",
-        "Shower Multiplicity",
-        "Track Multiplicity",
-        "Topological Score",
-        "Reco Vertex X [cm]",
-        "Reco Vertex Y [cm]",
-        "Reco Vertex Z [cm]",
-        "Shower Score",
-        "Leading Shower dE/dx (All Planes) [MeV/cm]",
-        "Leading Shower dE/dx (All Planes) [MeV/cm]",
-        "Leading Shower dE/dx (All Planes) (with tracks) [MeV/cm]",
-        "Leading Shower dE/dx (All Planes) (0 tracks) [MeV/cm]",
-        "Leading Shower to Vertex Distance [cm]",
-        "Hit Ratio",
-        "Pandora Cosmic Impact Parameter 3D [cm]",
-        "Contained Fraction (PFP hits in FV / hits in slice)",
-        "Leading Shower Moliere Average [deg]",
-        "Leading Shower Theta [deg]",
-        "Leading Shower Phi [deg]",
-        "Reconstructed Leading Shower Energy [GeV]",
-        "Reconstructed Leading Shower Energy [GeV]",
-        "Largest Flash Time [#mus]",
-        "Largest Flash Intensity [PE]",
-        "#beta [deg]",
-        "cos(#beta) [deg]",
-        "#beta [deg]",
-        "cos(#beta) [deg]"
+        "Pi0 Mass [MeV]"
     };
 
     // list of detector variations

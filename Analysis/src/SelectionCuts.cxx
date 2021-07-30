@@ -33,7 +33,7 @@ bool SelectionCuts::opfilt_pe(SliceContainer &SC, int type){
     // This should be turned on if BNB
     if (type == _util.k_data || type == _util.k_ext) {
         // Placeholder to remove a compilation warning
-        // return true;
+        return true;
     }
 
     
@@ -48,7 +48,7 @@ bool SelectionCuts::opfilt_veto(SliceContainer &SC, int type){
     // This should be turned on if BNB
     if (type == _util.k_data || type == _util.k_ext){
         // Placeholder to remove a compilation warning
-        // return true;
+        return true;
     }
 
     if (SC.opfilter_pe_veto < 20) return true; // pass 
@@ -179,7 +179,8 @@ bool SelectionCuts::shr_moliere_avg(SliceContainer &SC){
 }
 // -----------------------------------------------------------------------------
 bool SelectionCuts::pi_zero_cuts(SliceContainer &SC){
-    
+  
+ 
     if (SC.nslice == 1          &&
         SC.pi0_shrscore1 < 0.5  &&
         SC.pi0_shrscore2 < 0.5  &&

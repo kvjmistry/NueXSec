@@ -138,7 +138,7 @@ void UtilityPlotter::InitTree(){
     tree->SetBranchAddress("shr_bkt_pdg", &shr_bkt_pdg);
     tree->SetBranchAddress("all_shr_hits" , &all_shr_hits);
     tree->SetBranchAddress("all_shr_energies",  &all_shr_energies);
-    tree->SetBranchAddress("weightsPPFX",           &weightsPPFX);
+    tree->SetBranchAddress("weightsFlux",           &weightsFlux);
 }
 // -----------------------------------------------------------------------------
 void UtilityPlotter::CompareHitstoEnergy(){
@@ -1229,8 +1229,8 @@ void UtilityPlotter::StudyPPFXWeights(){
         std::vector<double> vec_universes;
 
         // Convert from unsigned short to double and push back -- divide by 1000 to undo previous *1000
-        for (unsigned int j = 0; j < weightsPPFX->size(); j++){
-            vec_universes.push_back( (double) weightsPPFX->at(j)/1000.0);
+        for (unsigned int j = 0; j < weightsFlux->size(); j++){
+            vec_universes.push_back( (double) weightsFlux->at(j)/1000.0);
         }
 
         // Now loop over the universes

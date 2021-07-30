@@ -9,10 +9,10 @@ fi
 
 if [ -z "$1" ]; then
   # Run the selection
-  mc="./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v7/neutrinoselection_filt_run1_overlay.root --gpvm"
-  data="./nuexsec --run 1 --data /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v5/neutrinoselection_filt_run1_beamon_beamgood.root --gpvm"
-  ext="./nuexsec --run 1 --ext /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v5/neutrinoselection_filt_run1_beamoff.root --gpvm"
-  dirt="./nuexsec --run 1 --dirt /pnfs/uboone/persistent/users/davidc/searchingfornues/v08_00_00_51/1124/prodgenie_numi_uboone_overlay_dirt_fhc_mcc9_run1_v28_all_snapshot.root --gpvm"
+  mc="./nuexsec --run 1 --mc /pnfs/uboone/persistent/users/davidc/searchingfornues/v08_00_00_43/0928/prodgenie_bnb_nu_uboone_overlay_mcc9.1_v08_00_00_26_filter_run1_reco2_reco2.root --gpvm"
+  data="./nuexsec --run 1 --data /uboone/data/users/davidc/searchingfornues/v08_00_00_43/0702/farsidebands/run1_neutrinoselection_filt_1e_2showers_sideband_skimmed_extended_v47.root --gpvm"
+  ext="./nuexsec --run 1 --ext /uboone/data/users/davidc/searchingfornues/v08_00_00_43/0702/run1/nslice/data_extbnb_mcc9.1_v08_00_00_25_reco2_C_all_reco2.root --gpvm"
+  dirt="./nuexsec --run 1 --dirt /uboone/data/users/davidc/searchingfornues/v08_00_00_43/0702/run1/nslice/prodgenie_bnb_dirt_overlay_mcc9.1_v08_00_00_26_run1_reco2_reco2.root --gpvm"
 
   # This runs each of the strings above in parallel to maximise cpu usage
   eval $mc | tee log/run1_mc.log | sed -e 's/^/[MC] /' &
@@ -31,9 +31,6 @@ if [ -z "$1" ]; then
     cat "$i" >> log/run1.log 
   done
 
-  # Overwrite the Nue cc events with a higher stats version
-  ./nuexsec --run 1 --mc /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_v7/neutrinoselection_filt_run1_overlay_intrinsic.root --intrinsic intrinsic --gpvm
-
   # Print the selection
   ./nuexsec --run 1 --printonly --printall --gpvm | tee -a log/run1.log 
   
@@ -44,11 +41,6 @@ if [ -z "$1" ]; then
   ./nuexsec --run 1 --hist files/nuexsec_run1_merged.root --gpvm
   # ./nuexsec --run 1 --hist files/nuexsec_run1_merged.root --plotsys tot --gpvm
 
-  # Merge the ttrees to one file
-  root -l -b -q 'merge/merge_uneaventrees.C("1", true, false, "files/trees/nuexsec_selected_tree_mc_run1.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "")'
-
-  # Now run the cross section calculator
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1.root --xsecmode default --xsec_smear mcc8 --gpvm | tee -a log/run1.log 
 fi
 # ---------------------
 
@@ -96,16 +88,9 @@ fi
 if [ "$1" == "var" ]; then
   ./nuexsec --run 1 --var /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_detvar_newtune/run1/extra_stats/neutrinoselection_filt_run1_overlay_$2.root $2 --gpvm
   
-  # Overwrite the true nue information 
-  ./nuexsec --run 1 --var /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_detvar_newtune/run1/intrinsic/neutrinoselection_filt_run1_overlay_$2_intrinsic.root $2 --intrinsic intrinsic --gpvm
-
   source merge/merge_run1_files.sh files/nuexsec_mc_run1_$2.root files/nuexsec_run1_$2_merged.root
 
   ./nuexsec --run 1 --hist files/nuexsec_run1_$2_merged.root --var dummy $2 --gpvm
-
-  root -l -b -q 'merge/merge_uneaventrees.C("1", true, false, "files/trees/nuexsec_selected_tree_mc_run1_'"$2"'.root", "files/trees/nuexsec_selected_tree_data_run1.root", "files/trees/nuexsec_selected_tree_ext_run1.root","files/trees/nuexsec_selected_tree_dirt_run1.root", "'"$2"'")'
-
-  ./nuexsec --run 1 --xsec files/trees/nuexsec_tree_merged_run1_$2.root --var dummy $2 --xsecmode default --xsecvar elec_E --xsec_smear mcc8 --gpvm
 
 fi
 
