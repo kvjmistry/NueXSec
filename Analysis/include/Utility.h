@@ -9,6 +9,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <sstream>
+#include <iomanip>
 
 // Root Includes
 #include "TDirectory.h"
@@ -260,7 +261,7 @@ public:
     int num_events{-1};
     int verbose{1}; // level 0 doesn't print cut summary, level 1 prints cut summary [default is 1 if unset]
     int _weight_tune{1}; // Use the GENIE Tune
-    int _weight_ppfx{1}; // Use the PPFX CV Corr
+    int _weight_ppfx{0}; // Use the PPFX CV Corr
     int _weight_dirt{1}; // Weight the Dirt events
     int _weight_ext{1};  // Weight the EXT events
     int _pi0_correction{0};  // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
@@ -273,7 +274,7 @@ public:
 
     // Weight configurations
     bool weight_tune{true}; // Use the GENIE Tune
-    bool weight_ppfx{true}; // Use the PPFX CV Corr
+    bool weight_ppfx{false}; // Use the PPFX CV Corr
     bool weight_dirt{true}; // Weight the Dirt events
     bool weight_ext{true};  // Weight the EXT events
     int  pi0_correction{0}; // The pi0 correction 0 == no correction, 1 == normalisation factor, 2 == energy dependent scaling
