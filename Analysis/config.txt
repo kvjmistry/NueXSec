@@ -6,39 +6,12 @@
 varname value
 -
 // ---------------- Run 1 ----------------------
-// Run1 MC POT v33
-// Run1_MC_POT 1.30691e+21 // *BNB* overlay POT
-// Run1_MC_POT 1.18488e+21
-// Run1_MC_POT 2.07136e+21 // NuMI POT for high stats file
-// Run1_MC_POT 2.31956e+21 // For Overlay file with evetnweights
-Run1_MC_POT 2.33652e+21 // new Genie tune
--
-// Run 1 dirt POT
-// Run1_Dirt_POT 3.22483e+20 // **BNB** dirt POT
-// Run1_Dirt_POT 1.42143e+21 // v3 includes ppfx cv correction
-Run1_Dirt_POT 1.67392e+21 // new genie tune
--
-// Run1_Data_POT 8.885e+19       // v3 with michel veto updated pawels tool
-Run1_Data_POT 2.0e+20       // v5 pawels tool
-// Run1_Data_POT 1.375e+20 // Run 1 Only 4+6 
-// Run1_Data_POT 6.316e+19 // Run 1 Only 6+6 
--
-// Run 1 data HW Triggers (EA9CNT) 
-// Run1_Data_trig 2347745.0       // v3 with michel veto updated pawels tool
-Run1_Data_trig 5268051.0       // v5 pawels tool
-// Run1_Data_trig 3534367.0  // Run 1 Only 4+6
-// Run1_Data_trig 1753227.0   // Run 1 Only 6+6
--
-// Run 1 Number of EXT HW Triggers ( EXT_NUMIwin_FEMBeamTriggerAlgo )
-// Run1_EXT_trig 4015961.990000 // v3 with michel veto updated
-Run1_EXT_trig 9199232.740000 // v5
-// Run1_EXT_trig 3065881.29 // v5 Set 1 run < 6550
-// Run1_EXT_trig 3043363.1 // v5 Set 2 6550 <= run < 7103
-// Run1_EXT_trig 3089988.35 // v5 Set 3 run >= 7103
--
-// Run1_Intrinsic_POT 1.85664e+22 // For Using Intrinsic nue sample
-Run1_Intrinsic_POT 2.37838e+22 //  new Genie tune
--
+Run1_MC_POT 1.30503e+21 // BNB
+Run1_Dirt_POT 3.20532e+20 // BNB
+Run1_Data_POT 1.669e+20 // BNB
+Run1_Data_trig 40231399.0 // BNB
+Run1_EXT_trig  36463253.0 // BNB
+
 // ------- Additional Run 1 POT Definitions -----
 -
 // Run 1 Det var CV
