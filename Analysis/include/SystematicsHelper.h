@@ -164,16 +164,16 @@ class SystematicsHelper{
 
     enum enum_variations {
         k_CV,
-        k_LYRayleigh,
-        k_LYDown,
+        //k_LYRayleigh,
+        //k_LYDown,
         // k_LYAttenuation,
-        k_SCE,
-        k_Recomb2,
+        //k_SCE,
+        //k_Recomb2,
         k_WireModX,
         k_WireModYZ,
         k_WireModThetaXZ,
-        k_WireModThetaYZ_withSigmaSplines,
-        // k_WireModThetaYZ_withoutSigmaSplines,
+        //k_WireModThetaYZ_withSigmaSplines,
+        k_WireModThetaYZ_withoutSigmaSplines,
         // k_WireModdEdX,
         k_vars_MAX
     };
@@ -186,27 +186,27 @@ class SystematicsHelper{
 
     std::vector<std::string> var_string = {
         "CV",
-        "LYRayleigh",
-        "LYDown",
+        //"LYRayleigh",
+        //"LYDown",
         // "LYAttenuation",
-        "SCE",
-        "Recomb2",
+        //"SCE",
+        //"Recomb2",
         "WireModX",
         "WireModYZ",
         "WireModThetaXZ",
-        "WireModThetaYZ_withSigmaSplines",
-        // "WireModThetaYZ_withoutSigmaSplines",
+        //"WireModThetaYZ_withSigmaSplines",
+        "WireModThetaYZ_withoutSigmaSplines",
         // "WireModdEdX"
     };
 
     // strings used for the legend of the plots of the detector variations
     std::vector<std::string> var_string_pretty = {
         "CV",
-        "LY Rayleigh",
-        "LY Down",
+        //"LY Rayleigh",
+        //"LY Down",
         // "LY Attenuation",
-        "SCE",
-        "Recombination",
+        //"SCE",
+        //"Recombination",
         "WM X",
         "WM YZ",
         "WM Theta XZ",
@@ -219,11 +219,11 @@ class SystematicsHelper{
     // colors used for the plots of the detector variations
     std::vector<int> var_string_pretty_color = {
          1,  // CV
-         30,  // LYRayleigh
-         9, // LY Down
+         //30,  // LYRayleigh
+         //9, // LY Down
         //  53,  // LYAttenuation
-         3,  // SCE
-         95,  // Recombination
+         //3,  // SCE
+         //95,  // Recombination
          2, // WM X
          4,  // WM YZ
          6, // WM Theta XZ

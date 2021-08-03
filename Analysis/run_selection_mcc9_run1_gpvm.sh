@@ -10,7 +10,8 @@ fi
 if [ -z "$1" ]; then
   # Run the selection
   mc="./nuexsec --run 1 --mc /pnfs/uboone/persistent/users/davidc/searchingfornues/v08_00_00_43/0928/prodgenie_bnb_nu_uboone_overlay_mcc9.1_v08_00_00_26_filter_run1_reco2_reco2.root --gpvm"
-  data="./nuexsec --run 1 --data /uboone/data/users/davidc/searchingfornues/v08_00_00_43/0702/farsidebands/run1_neutrinoselection_filt_1e_2showers_sideband_skimmed_extended_v47.root --gpvm"
+  #data="./nuexsec --run 1 --data /uboone/data/users/davidc/searchingfornues/v08_00_00_43/0702/farsidebands/run1_neutrinoselection_filt_1e_2showers_sideband_skimmed_extended_v47.root --gpvm"
+  data="./nuexsec --run 1 --data /uboone/data/users/davidc/searchingfornues/v08_00_00_43/0702/run1/nslice/data_bnb_mcc9.1_v08_00_00_25_reco2_C1_beam_good_reco2_5e19.root --gpvm"
   ext="./nuexsec --run 1 --ext /uboone/data/users/davidc/searchingfornues/v08_00_00_43/0702/run1/nslice/data_extbnb_mcc9.1_v08_00_00_25_reco2_C_all_reco2.root --gpvm"
   dirt="./nuexsec --run 1 --dirt /uboone/data/users/davidc/searchingfornues/v08_00_00_43/0702/run1/nslice/prodgenie_bnb_dirt_overlay_mcc9.1_v08_00_00_26_run1_reco2_reco2.root --gpvm"
 

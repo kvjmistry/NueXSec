@@ -195,7 +195,7 @@ void HistogramHelper::InitHistograms(){
     
         for (unsigned int j=0; j < _util.classification_dirs.size();j++){
         
-            TH1D_hists.at(k_reco_pi0mass).at(i).at(j) = new TH1D ( Form("h_reco_pi0mass_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 500);
+            TH1D_hists.at(k_reco_pi0mass).at(i).at(j) = new TH1D ( Form("h_pi0_mass_%s_%s",_util.cut_dirs.at(i).c_str(), _util.classification_dirs.at(j).c_str()) ,"", 25, 0, 500);
 
         }
         

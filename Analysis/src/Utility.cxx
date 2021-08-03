@@ -1118,7 +1118,7 @@ void Utility::Draw_Data_POT(TCanvas *c, double pot, double x1, double y1, double
     double POT = pot / 1.0e20;
 
     pt = new TPaveText(x1, y1, x2, y2, "NDC");
-    pt->AddText(Form("MicroBooNE NuMI Data: %2.1f#times10^{20} POT", POT));
+    pt->AddText(Form("MicroBooNE BNB Data: %2.1f#times10^{20} POT", POT));
     // pt = new TPaveText(x1+0.05, y1, x2+0.05, y2, "NDC");
     // pt->AddText(Form("MicroBooNE In Progress, NuMI Data: %2.1f#times10^{20} POT", POT));
     pt->SetBorderSize(0);

@@ -786,6 +786,7 @@ void HistogramPlotter::MakeStack(std::string hist_name, std::string cut_name, bo
         
         // Individual detector systematics
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "LYRayleigh", "MC");
+	AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "LYDown", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "SCE", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "Recomb2", "MC");
         AddSysUncertainty(h_error_hist, hist.at(k_plot_ext), hist.at(k_plot_dirt), hist_name, cut_name, "WireModX", "MC");
@@ -980,7 +981,7 @@ void HistogramPlotter::CallMakeStack(int cut_index, double Data_POT) {
     //                                 bool centerxaxis, bool scale );
 
     // Pi0 Mass peak plot
-    MakeStack("h_reco_pi0mass", _util.cut_dirs.at(cut_index).c_str(),
+    MakeStack("h_pi0_mass", _util.cut_dirs.at(cut_index).c_str(),
                area_norm, false, 1.0, "#pi^{0} Mass [MeV]",  0.35, 0.85, 0.55, 0.85, Data_POT,
                Form("cuts/%s/reco_pi0mass.pdf", _util.cut_dirs.at(cut_index).c_str()), false, "classifications", true, false, true);
 
