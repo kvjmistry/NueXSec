@@ -562,8 +562,8 @@ void Utility::Initalise(int argc, char *argv[], std::string usage,std::string us
         }
 
         mc_scale_factor     = config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_MC_POT);
-        dirt_scale_factor   = 0.75*config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_Dirt_POT);
-        ext_scale_factor    = 0.98*config_v.at(k_Run1_Data_trig) / config_v.at(k_Run1_EXT_trig);
+        dirt_scale_factor   = config_v.at(k_Run1_Data_POT)  / config_v.at(k_Run1_Dirt_POT);
+        ext_scale_factor    = config_v.at(k_Run1_Data_trig) / config_v.at(k_Run1_EXT_trig);
         
         // If fake data then scale to the fake data POT
         if (isfakedata){

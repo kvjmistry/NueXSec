@@ -107,7 +107,8 @@ void CrossSectionHelper::Initialise(Utility _utility){
     // Reweight the events by cut to get the sys uncertainty for certain plots in the selection
     // do this rather than reweight events at the end of the selection
     if (std::string(_util.xsec_rw_mode) == "rw_cuts"){
-        LoopEventsbyCut();
+        //std::cout << "gets here" << std::endl;
+	LoopEventsbyCut();
         return;
     }
 
@@ -705,10 +706,14 @@ void CrossSectionHelper::LoopEventsbyCut(){
 
         }
 
+	//std::cout << "gets here 2" << std::endl;
+
         // Apply the selection cuts and fill histograms for each universe
         ApplyCuts(_util.k_mc, SC, _scuts, treeNumber);
 
     }
+
+    //std::cout << "gets here 3" << std::endl;
 
     // Create the direcotry structure in the output file if it doesnt already exist and then write the histograms to file
     WriteHists();
@@ -723,36 +728,48 @@ bool CrossSectionHelper::ApplyCuts(int type, SliceContainer &SC, SelectionCuts _
     // Set derived variables in the slice container
     // Classify the event
     SC.SliceClassifier(type);      // Classification of the event
-
+    //std::cout << "pass slice classifier" << std::endl;
     // *************************************************************************
     // Unselected---------------------------------------------------------------
     // *************************************************************************
     pass =_scuts.opfilt_pe(SC, type);
     if(!pass) return false; // Failed the cut!
+    //std::cout << "pass opfilt_pe" << std::endl;
+
     pass =_scuts.opfilt_veto(SC, type);
     if(!pass) return false; // Failed the cut!
+    //std::cout << "pass opfilt_veto" << std::endl;
+
     pass = _scuts.pi_zero_cuts(SC);
     if(!pass) return false; // Failed the cut! 
+    //std::cout << "pass pi_zero_cuts" << std::endl;
+
     FillCutHists(type, SC, SC.classification, _util.k_unselected );
-    
+    //std::cout << "pass fillcuthists" << std::endl;
     return true;
 
 }
 // -----------------------------------------------------------------------------
 void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<std::string, int> classification, int cut_index){
 
+    //std::cout << "fillcuthists 1" << std::endl;
+
     // Loop over the reweighter labels
     for (unsigned int label = 0; label < reweighter_labels.size(); label++){
 
         // Call switch function
+        //std::cout << "SwitchReweighterLabel...";
         SwitchReweighterLabel(reweighter_labels[label], SC);
+        //std::cout << "ok" << std::endl;
 
         bool is_in_fv = _util.in_fv(SC.true_nu_vtx_x, SC.true_nu_vtx_y, SC.true_nu_vtx_z); // This variable is only used in the case of MC, so it should be fine 
 
         // Get the CV weight
+        //std::cout << "GetPiZeroWeight...";
         double cv_weight = _util.GetCVWeight(type, SC.weightSplineTimesTune, SC.ppfx_cv, SC.nu_e, SC.nu_pdg, is_in_fv, SC.interaction, SC.elec_e);
         _util.GetPiZeroWeight(cv_weight, _util.pi0_correction, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e);
-        
+        //std::cout << "ok" << std::endl;        
+
         double weight_dirt = cv_weight;
         double weight_ext = cv_weight;
 
@@ -761,25 +778,33 @@ void CrossSectionHelper::FillCutHists(int type, SliceContainer &SC, std::pair<st
             std::cout << "Vector size is zero" <<  std::endl;
             exit(3);
         }
-
+	//std::cout << "start loop over universes: " << vec_universes.size() << " universes..." << std::endl;
         // Now loop over the universes
         for (unsigned int uni = 0; uni < vec_universes.size(); uni++){
 
             // Update the CV weight to CV * universe i
             double weight_uni{cv_weight}; 
-
+	
+	    //std::cout << "SetUniverseWeight...";
             SetUniverseWeight(reweighter_labels[label], weight_uni, weight_dirt, weight_ext, SC.weightSplineTimesTune, classification.first, cv_weight, uni, SC.nu_pdg, SC.nu_e, SC.nu_angle, SC.npi0, SC.pi0_e, SC.ccnc);
+	    //std::cout << "ok" << std::endl;
 
+            //std::cout << "GetdEdxMax...";
             double dedx_max = SC.GetdEdxMax();
+	    //std::cout << "ok" << std::endl;
 
+	    //std::cout << "GetPi0Weight...";
             double pi0_tuned_weight = weight_uni;
             _util.GetPiZeroWeight(pi0_tuned_weight, 1, SC.nu_pdg, SC.ccnc, SC.npi0, SC.pi0_e); // 0 == no weighting, 1 == normalisation fix, 2 == energy dependent scaling
+            //std::cout << "ok" << std::endl;
 
 
             // Now we got the weight for universe i, lets fill the histograms :D
             // Use [] rather than .at() to speed this process up. This can cause errors if indexes go out of bound
+            //std::cout << "fill hist... universe number " << uni << "...";
             h_cut_v[label][cut_index][_util.k_pi0_mass][uni]                   ->Fill(SC.pi0_mass_Y,                 weight_uni);
-        
+	    //std::cout << "ok" << std::endl;        
+
         }
 
     }

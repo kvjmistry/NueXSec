@@ -100,7 +100,7 @@ class CrossSectionHelper{
     double mc_flux_scale_factor{1.0};
     double data_flux_scale_factor{1.0};
 
-    int uni_reint{1000}, uni_genie{500}, uni_ppfx{500}, uni_mcstats{1000}; // For resizing data, ext and dirt in multisims
+    int uni_reint{1000}, uni_genie{500}, uni_ppfx{1000}, uni_mcstats{1000}; // For resizing data, ext and dirt in multisims
 
     // Random number generator for generating MC stats uncertainty
     TRandom3 *rand = new TRandom3(); 

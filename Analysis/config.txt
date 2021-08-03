@@ -8,137 +8,48 @@ varname value
 // ---------------- Run 1 ----------------------
 Run1_MC_POT 1.30503e+21 // BNB
 Run1_Dirt_POT 3.20532e+20 // BNB
-Run1_Data_POT 1.669e+20 // BNB
-Run1_Data_trig 40231399.0 // BNB
+#Run1_Data_POT 1.669e+20 // BNB
+#Run1_Data_trig 37094101 // BNB
 Run1_EXT_trig  36463253.0 // BNB
-
+Run1_Data_POT 4.546e+19 // old file
+Run1_Data_trig 10080350.0 // old file
 // ------- Additional Run 1 POT Definitions -----
 -
-// Run 1 Det var CV
-// Run1_MC_POT_CV 3.65214e+20
-Run1_MC_POT_CV 7.59732e+20 // newtune
--
-// Run 1 Det var LYAttenuation
-// Run1_MC_POT_LYAttenuation 3.67755e+20
-Run1_MC_POT_LYAttenuation 7.51336e+20 // new tune
--
-// Run 1 Det var LYRayleigh
-// Run1_MC_POT_LYRayleigh 3.60847e+20
-Run1_MC_POT_LYRayleigh 7.60573e+20 // new tune
--
-// Run 1 Det var LYDown
-Run1_MC_POT_LYDown 7.43109e+20 // new tune
--
-// Run 1 Det var SCE
-// Run1_MC_POT_SCE 3.66636e+20
-Run1_MC_POT_SCE 7.39875e+20 // new tune
--
-// Run 1 Det var Recomb2
-// Run1_MC_POT_Recomb2 3.72107e+20
-Run1_MC_POT_Recomb2 7.59105e+20 // new tune
--
-// Run 1 Det var WireModX
-// Run1_MC_POT_WireModX 3.67495e+20
-Run1_MC_POT_WireModX 7.64918e+20 // new tune
--
-// Run 1 Det var WireModYZ
-// Run1_MC_POT_WireModYZ 3.68494e+20
-Run1_MC_POT_WireModYZ 7.532e+20 // new tune
--
-// Run 1 Det var WireModThetaXZ
-// Run1_MC_POT_WireModThetaXZ 3.64542e+20
-Run1_MC_POT_WireModThetaXZ 7.64282e+20 // new tune
--
-// Run 1 Det var WireModThetaYZ_withSigmaSplines
-// Run1_MC_POT_WireModThetaYZ_withSigmaSplines 3.67869e+20
-Run1_MC_POT_WireModThetaYZ_withSigmaSplines 7.64543e+20 //new tune
--
-// Run 1 Det var WireModThetaYZ_withoutSigmaSplines
-// Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 3.69423e+20
-Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 7.5783e+20 // new tune
--
-// Run 1 Det var WireModdEdX
-// Run1_MC_POT_WireModdEdX 3.6318e+20
-Run1_MC_POT_WireModdEdX 7.60036e+20 // new tune
--
-// Run 1 Det Var for flugg
-Run1_MC_POT_FLUGG 8.87591e+20
--
-// Run 1 Det Var for tune1
-Run1_MC_POT_tune1 6.0093e+20 
--
-// Run 1 Det Var for nuwro
-Run1_MC_POT_nuwro 6.44859e+20
--
-// Run 1 Det Var for nuwro -- straight generated events
-Run1_MC_POT_nuwrogen 1.76264e+22
--
-// Run 1 Det Var for geniev2 -- straight generated events
-Run1_MC_POT_geniev2gen 1.48536e+22
--
-// Run 1 Det var CV intrinsic nue sample
-// Run1_Intrinsic_POT_CV 2.68294e+22
+Run1_MC_POT_CV 1.02657e+20
+Run1_MC_POT_LYAttenuation 1.08755e+20
+Run1_MC_POT_LYRayleigh 1.1037e+20
+Run1_MC_POT_LYDown 1.09653e+20
+Run1_MC_POT_SCE 1.05872e+20
+Run1_MC_POT_Recomb2 1.08338e+20
+Run1_MC_POT_WireModX 1.132e+20
+Run1_MC_POT_WireModYZ 1.10938e+20
+Run1_MC_POT_WireModThetaXZ 1.10741e+20
+//Run1_MC_POT_WireModThetaYZ_withSigmaSplines // doesn't exist for BNB
+Run1_MC_POT_WireModThetaYZ_withoutSigmaSplines 1.15831e+20
+Run1_MC_POT_WireModdEdX 1.08885e+20
+Run1_MC_POT_FLUGG
+Run1_MC_POT_tune1
+Run1_MC_POT_nuwro
+Run1_MC_POT_nuwrogen
+Run1_MC_POT_geniev2gen
+
 Run1_Intrinsic_POT_CV 2.37261e+22 // new tune
--
-// Run 1 Det var LYAttenuation intrinsic nue sample
-// Run1_Intrinsic_POT_LYAttenuation 2.64165e+22
 Run1_Intrinsic_POT_LYAttenuation 2.3837e+22 // new tune
--
-// Run 1 Det var LYDown intrinsic nue sample
 Run1_Intrinsic_POT_LYDown 2.24505e+22 // new tune
--
-// Run 1 Det var LYRayleigh intrinsic nue sample
-// Run1_Intrinsic_POT_LYRayleigh 2.67655e+22
 Run1_Intrinsic_POT_LYRayleigh 2.38081e+22 // new tune
--
-// Run 1 Det var SCE intrinsic nue sample
-// Run1_Intrinsic_POT_SCE 2.60685e+22
 Run1_Intrinsic_POT_SCE 2.39023e+22 // new tune
--
-// Run 1 Det var Recomb2 intrinsic nue sample
-// Run1_Intrinsic_POT_Recomb2 2.60657e+22
 Run1_Intrinsic_POT_Recomb2 2.38193e+22 // new tune
--
-// Run 1 Det var WireModX intrinsic nue sample
-// Run1_Intrinsic_POT_WireModX 2.66184e+22
 Run1_Intrinsic_POT_WireModX 2.38318e+22 // new tune
--
-// Run 1 Det var WireModYZ intrinsic nue sample
-// Run1_Intrinsic_POT_WireModYZ 2.62256e+22
 Run1_Intrinsic_POT_WireModYZ 2.38416e+22 // new tune
--
-// Run 1 Det var WireModThetaXZ intrinsic nue sample
-// Run1_Intrinsic_POT_WireModThetaXZ 2.65175e+22
 Run1_Intrinsic_POT_WireModThetaXZ 2.31518e+22 // new tune
--
-// Run 1 Det var WireModThetaYZ_withSigmaSplines intrinsic nue sample
-// Run1_Intrinsic_POT_WireModThetaYZ_withSigmaSplines 2.63394e+22
 Run1_Intrinsic_POT_WireModThetaYZ_withSigmaSplines 2.31421e+22 // new tune
--
-// Run 1 Det var WireModThetaYZ_withoutSigmaSplines intrinsic nue sample
-// Run1_Intrinsic_POT_WireModThetaYZ_withoutSigmaSplines 2.66734e+22 
 Run1_Intrinsic_POT_WireModThetaYZ_withoutSigmaSplines 2.31755e+22 // new tune
--
-// Run 1 Det var WireModdEdX intrinsic nue sample
-// Run1_Intrinsic_POT_WireModdEdX 2.66806e+22
 Run1_Intrinsic_POT_WireModdEdX 2.37849e+22 // new tune
--
-// Run 1 Det var CV intrinsic nue sample FLUGG flux
 Run1_Intrinsic_POT_FLUGG 3.00768e+22
--
-// Run 1 Det var CV intrinsic nue sample genie tune1
 Run1_Intrinsic_POT_tune1 2.08494e+22
--
-// Run 1 Det var CV intrinsic nue sample nuwro
 Run1_Intrinsic_POT_nuwro 1.68375e+22
--
-// Run 1 Det Var BNB diffusion -- unused now
 Run1_MC_POT_BNB_Diffusion 4.19732e+20
--
-// Run 1 EXT NuMI sample number of triggers
 Run1_EXT_trig_NuMI 4015961.990000
--
-// Run 1 EXT BNB sample number of triggers
 Run1_EXT_trig_BNB 33580525.000000
 -
 // ---------------- Run 3 ----------------------

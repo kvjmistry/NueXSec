@@ -85,12 +85,13 @@ fi
 
 # Could loop these to make it easier to run them all!
 
-if [ "$1" == "var" ]; then
-  ./nuexsec --run 1 --var /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_detvar_newtune/run1/extra_stats/neutrinoselection_filt_run1_overlay_$2.root $2 --gpvm
-  
-  source merge/merge_run1_files.sh files/nuexsec_mc_run1_$2.root files/nuexsec_run1_$2_merged.root
+if [ "$1" == "var" ]
+then
+	#./nuexsec --run 1 --var /uboone/data/users/kmistry/work/MCC9/searchingfornues/ntuple_files_detvar_newtune/run1/extra_stats/neutrinoselection_filt_run1_overlay_$2.root $2 --gpvm
 
-  ./nuexsec --run 1 --hist files/nuexsec_run1_$2_merged.root --var dummy $2 --gpvm
+	source merge/merge_run1_files.sh files/nuexsec_mc_run1_$2.root files/nuexsec_run1_$2_merged.root
+
+	./nuexsec --run 1 --hist files/nuexsec_run1_$2_merged.root --var dummy $2 --gpvm
 
 fi
 
@@ -115,7 +116,6 @@ declare -a var=(
   WireModX
   WireModYZ
   WireModThetaXZ
-  WireModThetaYZ_withSigmaSplines
   WireModThetaYZ_withoutSigmaSplines
   WireModdEdX
 )
