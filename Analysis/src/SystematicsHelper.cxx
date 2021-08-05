@@ -378,7 +378,7 @@ void SystematicsHelper::SysVariations(int hist_index, const char* print_name, in
         hist.at(y)->Scale(scale_fact);
 
         if (plotdata){
-            hist.at(y)->Scale(_util.mc_scale_factor*3.0754529); // extra factor to scale to main mc pot rather than detvar -- hack
+            hist.at(y)->Scale(_util.mc_scale_factor*12.7125); // extra factor to scale to main mc pot rather than detvar -- hack
             hist.at(y)->Add(h_dirt, 1.0);
             hist.at(y)->Add(h_ext, 1.0);
         }
@@ -398,7 +398,7 @@ void SystematicsHelper::SysVariations(int hist_index, const char* print_name, in
         // Save clones of the histograms for doing the ratios
         hist_ratio.at(y) = (TH1D*) hist_diff.at(y)->Clone(Form("h_ratio_%s", var_string.at(y).c_str()));
         hist_ratio.at(y)->Divide(hist.at(k_CV));
-
+	std::cout << "hist_ratio.at at 10 = " << hist_ratio.at(y)->GetBinContent(10) << std::endl;
         // Set the customisation of the histogram
         SetVariationProperties(hist.at(y), y);
 
@@ -4374,6 +4374,12 @@ void SystematicsHelper::MakedEdxPaperPlot(){
     h_error_hist->Add(h_dirt, 1.0);
     h_error_hist->Add(h_ext, 1.0);
 
+    //for(unsigned int j=0; j<h_error_hist->GetNbinsX(); j++){
+//	h_error_hist->SetBinError(j+1,0);
+  //  }
+
+
+
     // Genie Unisim
     AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "RPA", "MC"); // change hist name, Moliere Avg->Unselected
     AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "CCMEC", "MC");
@@ -4392,20 +4398,20 @@ void SystematicsHelper::MakedEdxPaperPlot(){
     AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "POT",  "Stack");
     AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "Dirt", "Dirt");
 
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "LYRayleigh", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "LYDown", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "SCE", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "Recomb2", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "LYRayleigh", "detvar");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "LYDown", "detvar");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "SCE", "detvar");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "Recomb2", "detvar");
     
     // Clone a histogram to plot the CV error as a grey band
     TH1D* h_error_hist_noDetvar = (TH1D*) h_error_hist->Clone("h_error_hist_nodetvar");
     h_error_hist_noDetvar->SetFillColorAlpha(kRed+2, 0.15);
 
     // Individual detector systematics
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "WireModX", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "WireModYZ", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "WireModThetaXZ", "MC");
-    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "WireModThetaYZ_withoutSigmaSplines", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "WireModX", "detvar");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "WireModYZ", "detvar");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "WireModThetaXZ", "detvar");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_pi0_mass", "Unselected", "WireModThetaYZ_withoutSigmaSplines", "detvar");
 
 
 
@@ -4448,6 +4454,9 @@ void SystematicsHelper::MakedEdxPaperPlot(){
         }
     }
     
+    std::cout << "\nprinting YZ:\n";
+    std::cout << "diff = " << hist.at(1)->GetBinContent(10)-hist.at(0)->GetBinContent(10) << std::endl;
+    std::cout << "ratio = " << (hist.at(1)->GetBinContent(10)-hist.at(0)->GetBinContent(10))/hist.at(0)->GetBinContent(10) << std::endl;
 
     if (plotdata)
          leg->AddEntry(h_data, "Beam-On", "lep"); // add histogram to legend
@@ -4545,9 +4554,9 @@ void SystematicsHelper::MakedEdxPaperPlot(){
     h_error_hist_noDetvar_ratio->Draw("E2,same");
 
     h_error_hist_data->Draw("PE, same");
-    for(unsigned int i=0; i<10; i++){
-	std::cout << "data bin=" << i << " value=" << h_error_hist_data->GetBinContent(i) << std::endl;
-    }
+    //for(unsigned int i=0; i<10; i++){
+	//std::cout << "data bin=" << i << " value=" << h_error_hist_data->GetBinContent(i) << std::endl;
+    //}
 
     if (plotdata)
         _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.45, 0.915, 0.45, 0.915);
@@ -4592,7 +4601,7 @@ void SystematicsHelper::AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D*
     TFile *file_sys_uncertainties = TFile::Open("files/run1_sys_var.root", "READ");
 
     // The error is on the MC events -- so comes from reweighting or detvar
-    if (mode == "MC"){
+    if (mode == "MC" || mode == "detvar"){
 
         _util.GetHist(file_sys_uncertainties, h_sys, Form("%s/%s/%s", cut_name.c_str(), label.c_str(), histname.c_str()) );
         
@@ -4600,14 +4609,13 @@ void SystematicsHelper::AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D*
         for (int i = 1; i <= h_error_hist->GetNbinsX() ; i++){
 
             double bin_error = h_error_hist->GetBinError(i);
+            double bin_content;
 
             // Need to subtract the beam off and dirt
-            double bin_content = h_error_hist->GetBinContent(i) - h_ext->GetBinContent(i) - h_dirt->GetBinContent(i);
-
+            if(mode=="MC") bin_content = h_error_hist->GetBinContent(i) - h_ext->GetBinContent(i) - h_dirt->GetBinContent(i);
+            else bin_content = h_error_hist->GetBinContent(i); // - h_ext->GetBinContent(i) - h_dirt->GetBinContent(i);
             double sys_error = h_sys->GetBinContent(i) * bin_content;
-
             double tot_error = std::sqrt( bin_error*bin_error + sys_error*sys_error );
-
             h_error_hist->SetBinError(i, tot_error);
 
         }

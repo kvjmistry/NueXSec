@@ -195,7 +195,7 @@ class SystematicsHelper{
         "WireModYZ",
         "WireModThetaXZ",
         //"WireModThetaYZ_withSigmaSplines",
-        "WireModThetaYZ_withoutSigmaSplines",
+        "WireModThetaYZ_withoutSigmaSplines"
         // "WireModdEdX"
     };
 
@@ -212,7 +212,7 @@ class SystematicsHelper{
         "WM Theta XZ",
         "WM Theta YZ",
         // "WM Theta YZ w/ Spl.",
-        // "WM Theta YZ w/o Spl.",
+        "WM Theta YZ w/o Spl."
         // "WM dE/dX" 
     };
 
@@ -227,8 +227,8 @@ class SystematicsHelper{
          2, // WM X
          4,  // WM YZ
          6, // WM Theta XZ
-         8,  // WM Theta YZ w/ Spl.
-        //  8, // WM Theta YZ w/o Spl.
+         //8,  // WM Theta YZ w/ Spl.
+         8 // WM Theta YZ w/o Spl.
         //  7 // WM dE/dX
     };
 
