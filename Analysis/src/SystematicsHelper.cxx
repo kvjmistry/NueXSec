@@ -4423,6 +4423,12 @@ void SystematicsHelper::MakedEdxPaperPlot(){
     AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "POT",  "Stack");
     AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "Dirt", "Dirt");
 
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "LYRayleigh", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "SCE", "MC");
+    AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Recomb2", "MC");
+    // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "WireModThetaYZ_withSigmaSplines", "MC");
+    // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "WireModdEdX", "MC");
+
     // Clone a histogram to plot the CV error as a grey band
     TH1D* h_error_hist_noDetvar = (TH1D*) h_error_hist->Clone("h_error_hist_nodetvar");
     h_error_hist_noDetvar->SetFillColorAlpha(kRed+2, 0.15);
@@ -4433,11 +4439,6 @@ void SystematicsHelper::MakedEdxPaperPlot(){
     AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "WireModThetaXZ", "MC");
     AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max_tune", "Moliere_Avg", "WireModThetaYZ_withoutSigmaSplines", "MC");
 
-    // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "LYRayleigh", "MC");
-    // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "SCE", "MC");
-    // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "Recomb2", "MC");
-    // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "WireModThetaYZ_withSigmaSplines", "MC");
-    // AddSysUncertainty(h_error_hist, h_ext, h_dirt, "h_reco_shr_tkfit_dedx_max", "Moliere_Avg", "WireModdEdX", "MC");
 
 
 
@@ -4619,7 +4620,7 @@ void SystematicsHelper::AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D*
     TFile *file_sys_uncertainties = TFile::Open("files/run1_sys_var.root", "READ");
 
     // The error is on the MC events -- so comes from reweighting or detvar
-    if (mode == "MC"){
+    if (mode == "MC" || mode == "detvar"){
 
         _util.GetHist(file_sys_uncertainties, h_sys, Form("%s/%s/%s", cut_name.c_str(), label.c_str(), histname.c_str()) );
         
@@ -4629,8 +4630,15 @@ void SystematicsHelper::AddSysUncertainty(TH1D* h_error_hist, TH1D* h_ext, TH1D*
             double bin_error = h_error_hist->GetBinError(i);
 
             // Need to subtract the beam off and dirt
-            double bin_content = h_error_hist->GetBinContent(i) - h_ext->GetBinContent(i) - h_dirt->GetBinContent(i);
-
+            double bin_content;
+            
+            if (mode == "MC"){
+                bin_content = h_error_hist->GetBinContent(i) - h_ext->GetBinContent(i) - h_dirt->GetBinContent(i);
+            }
+            else {
+                bin_content = h_error_hist->GetBinContent(i);
+            }
+        
             double sys_error = h_sys->GetBinContent(i) * bin_content;
 
             double tot_error = std::sqrt( bin_error*bin_error + sys_error*sys_error );

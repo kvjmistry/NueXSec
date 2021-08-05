@@ -4015,6 +4015,14 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
 
     gStyle->SetOptStat(0);
 
+    int pltmode = 0; // 0 internal note style, 1 paper style
+
+    TString hist_style = "hist,same";
+
+    if (pltmode == 1){
+        hist_style = "hist,l,same";
+    }
+
     // Load in the cross section output
     TFile *fxsec = TFile::Open(Form("files/xsec_result_run%s.root", _util.run_period), "READ");
 
@@ -4143,6 +4151,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     
     if (std::string(_util.xsec_var) == "elec_E"){
         h_mcxsec_true_model_smear.at(k_model_CV)->SetMaximum(8);
+        h_mcxsec_true_model_smear.at(k_model_CV)->GetXaxis()->SetRangeUser(0.12,6.0);
     }
     else if (std::string(_util.xsec_var) == "elec_ang"){
         h_mcxsec_true_model_smear.at(k_model_CV)->SetMaximum(15);
@@ -4161,22 +4170,31 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     h_mcxsec_true_model_smear.at(k_model_gibuu)      ->SetLineStyle(5);
 
     h_mcxsec_true_model_smear.at(k_model_CV)->SetMinimum(0.0);
-    h_mcxsec_true_model_smear.at(k_model_CV)->Draw("hist");
+    h_mcxsec_true_model_smear.at(k_model_CV)->Draw(hist_style);
 
     h_mcxsec_true_model_smear.at(k_model_geniev3)->SetLineColor(kGreen+2);
-    h_mcxsec_true_model_smear.at(k_model_geniev3)->Draw("hist,same" );
+    h_mcxsec_true_model_smear.at(k_model_geniev3)->Draw(hist_style);
 
     h_mcxsec_true_model_smear.at(k_model_geniev2gen)->SetLineColor(kOrange-1);
-    h_mcxsec_true_model_smear.at(k_model_geniev2gen)->Draw("hist,same" );
+    h_mcxsec_true_model_smear.at(k_model_geniev2gen)->Draw(hist_style);
 
     h_mcxsec_true_model_smear.at(k_model_nuwro)->SetLineColor(kPink+1);
-    h_mcxsec_true_model_smear.at(k_model_nuwro)->Draw("hist,same" );
+    h_mcxsec_true_model_smear.at(k_model_nuwro)->Draw(hist_style);
 
     h_mcxsec_true_model_smear.at(k_model_gibuu)->SetLineColor(kViolet-1);
-    h_mcxsec_true_model_smear.at(k_model_gibuu)->Draw("hist,same" );
+    h_mcxsec_true_model_smear.at(k_model_gibuu)->Draw(hist_style);
 
     
-    unf->Draw("E1,X0,same");
+    unf->SetLineWidth(3);
+    
+    if (pltmode == 0){
+        unf->Draw("E1,X0,same");
+    }
+    else if (pltmode == 1){
+        unf->Draw("E1,same");
+    }
+
+    
 
     // Draw the run period on the plot
     // _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
