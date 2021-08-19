@@ -34,10 +34,10 @@ void UtilityPlotter::Initialise(Utility _utility){
         // CompareSignalPurity();
 
         // Make the bin resolution plots
-        // PlotVarbyRecoBin();
+        PlotVarbyRecoBin();
 
         // Plot the 1D flux with the threhsold line
-        PlotIntegratedFluxwithThrehold();
+        // PlotIntegratedFluxwithThrehold();
         
     }
     // Make the true variable plots
@@ -612,7 +612,8 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     TCanvas * c = new TCanvas("c", "c", 500, 500);
 
     TH1D *htemp;
-    if      (x_var == "res_reco" || x_var == "res_true") htemp = new TH1D("htemp","", 30, -1.2, 1.2);
+    if      ( (x_var == "res_reco" || x_var == "res_true") &&  true_var == "true_effective_angle") htemp = new TH1D("htemp","", 30, -15, 15);
+    else if (x_var == "res_reco" || x_var == "res_true" ) htemp = new TH1D("htemp","", 30, -1.2, 1.2);
     else if (x_var == "purity") htemp = new TH1D("htemp","", 21, 0, 1.1);
     else if (x_var == "completeness") htemp = new TH1D("htemp","", 21, 0, 1.1);
     else {
@@ -627,7 +628,7 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     if (x_var == "res_reco"){
         
         // Cosines done make sense with the ratio
-        if (true_var == "cos_true_effective_angle"){
+        if (true_var == "cos_true_effective_angle" || true_var == "true_effective_angle"){
             tree->Draw(Form("(%s - %s) >> htemp", reco_var.c_str(), true_var.c_str()), query);
         }
         else {
@@ -637,7 +638,7 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
     else if (x_var == "res_true"){
         
         // Cosines done make sense with the ratio
-        if (true_var == "cos_true_effective_angle"){
+        if (true_var == "cos_true_effective_angle" || true_var == "true_effective_angle"){
             tree->Draw(Form("(%s - %s) >> htemp", reco_var.c_str(), true_var.c_str()), query);
         }
         else {
@@ -689,7 +690,7 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
 
     if (x_var == "res_reco")          htemp->SetTitle("; Reco - True / Reco; Entries");
     else if (x_var == "res_true"){
-        if (true_var == "cos_true_effective_angle"){
+        if (true_var == "cos_true_effective_angle" || true_var == "true_effective_angle"){
             htemp->SetTitle("; Reco - True; Entries");
         }
         else {
@@ -4118,7 +4119,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
 
     std::cout << "Genie v2" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_geniev2gen), unf, h_cov, chi, ndof, pval);
-    leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_geniev2gen),   Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
+    // leg->AddEntry(h_mcxsec_true_model_smear.at(k_model_geniev2gen),   Form("GENIE v2.12.2 #chi^{2}/N_{dof} = %2.1f/%i", chi, ndof), "lf");
 
     std::cout << "NuWro" << std::endl;
     _util.CalcChiSquared(h_mcxsec_true_model_smear.at(k_model_nuwro), unf, h_cov, chi, ndof, pval);
@@ -4152,6 +4153,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     if (std::string(_util.xsec_var) == "elec_E"){
         h_mcxsec_true_model_smear.at(k_model_CV)->SetMaximum(8);
         h_mcxsec_true_model_smear.at(k_model_CV)->GetXaxis()->SetRangeUser(0.12,6.0);
+        h_mcxsec_true_model_smear.at(k_model_CV)->SetTitle(";E_{e} [GeV];#frac{d#sigma}{dE_{e}} [10^{-39} cm^{2}/GeV/nucleon]");
     }
     else if (std::string(_util.xsec_var) == "elec_ang"){
         h_mcxsec_true_model_smear.at(k_model_CV)->SetMaximum(15);
@@ -4159,6 +4161,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     else if (std::string(_util.xsec_var) == "elec_cang"){
         h_mcxsec_true_model_smear.at(k_model_CV)->SetMaximum(30.0);
         if (_util.zoom) h_mcxsec_true_model_smear.at(k_model_CV)->GetXaxis()->SetRangeUser(0.6, 1.0);
+        h_mcxsec_true_model_smear.at(k_model_CV)->SetTitle(";cos#beta_{e};#frac{d#sigma}{dcos#beta_{e}} [10^{-39} cm^{2}/nucleon]");
 
     }
 
@@ -4176,7 +4179,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     h_mcxsec_true_model_smear.at(k_model_geniev3)->Draw(hist_style);
 
     h_mcxsec_true_model_smear.at(k_model_geniev2gen)->SetLineColor(kOrange-1);
-    h_mcxsec_true_model_smear.at(k_model_geniev2gen)->Draw(hist_style);
+    // h_mcxsec_true_model_smear.at(k_model_geniev2gen)->Draw(hist_style);
 
     h_mcxsec_true_model_smear.at(k_model_nuwro)->SetLineColor(kPink+1);
     h_mcxsec_true_model_smear.at(k_model_nuwro)->Draw(hist_style);
@@ -4199,7 +4202,7 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
     // Draw the run period on the plot
     // _util.Draw_Run_Period(c, 0.86, 0.92, 0.86, 0.92);
 
-    _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.52, 0.92, 0.52, 0.92);
+    _util.Draw_Data_POT(c, _util.config_v.at(_util.k_Run1_Data_POT), 0.56, 0.88, 0.56, 0.88);
     
 
     leg->Draw();

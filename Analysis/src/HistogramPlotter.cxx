@@ -2370,9 +2370,9 @@ void HistogramPlotter::MakeEfficiencyPlotByCutTot(std::string var_tot, std::stri
         leg->SetNColumns(1);
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
-        leg->AddEntry(h_clone_tot, leg_tot.c_str(), "l");  
-        leg->AddEntry(h_clone_nue, leg_nue.c_str(), "l");  
-        leg->AddEntry(h_clone_nuebar, leg_nuebar.c_str(), "l");  
+        leg->AddEntry(h_clone_tot, leg_tot.c_str(), "le");  
+        leg->AddEntry(h_clone_nue, leg_nue.c_str(), "le");  
+        leg->AddEntry(h_clone_nuebar, leg_nuebar.c_str(), "le");  
 
         leg->Draw();
 
@@ -2391,8 +2391,18 @@ void HistogramPlotter::MakeEfficiencyPlotByCutTot(std::string var_tot, std::stri
 
         
         h_nuebar_clone->SetLineWidth(2);
-        h_nuebar_clone->SetLineStyle(2);
+        h_nuebar_clone->SetLineStyle(3);
         h_nuebar_clone->SetLineColor(kRed+2);
+
+
+        TLegend *leg2 = new TLegend(0.57, 0.75, 0.80, 0.85);
+        leg2->SetNColumns(1);
+        leg2->SetBorderSize(0);
+        leg2->SetFillStyle(0);
+        leg2->AddEntry(h_nue_clone, leg_nue.c_str(), "l");  
+        leg2->AddEntry(h_nuebar_clone, leg_nuebar.c_str(), "l");  
+
+        leg2->Draw();
         
         found = std::string(printname).find("elec_E"); // Look for "elec_E" in the name
 
@@ -2415,7 +2425,7 @@ void HistogramPlotter::MakeEfficiencyPlotByCutTot(std::string var_tot, std::stri
 
         // Draw the run period on the plot
         // _util.Draw_Run_Period(c, 0.76, 0.915, 0.76, 0.915);
-        _util.Draw_ubooneSim(c, 0.33, 0.925, 0.33, 0.905);
+        _util.Draw_ubooneSim(c, 0.73, 0.885, 0.73, 0.865);
 
         c->Print(Form("plots/run%s/Efficiency/TEff_%s_%s_combined.pdf", _util.run_period, _util.cut_dirs.at(p).c_str(), printname) );
         
