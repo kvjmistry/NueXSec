@@ -613,7 +613,8 @@ void UtilityPlotter::PlotQuery(float bin_lower_edge, float bin_upper_edge, TTree
 
     TH1D *htemp;
     if      ( (x_var == "res_reco" || x_var == "res_true") &&  true_var == "true_effective_angle") htemp = new TH1D("htemp","", 30, -15, 15);
-    else if (x_var == "res_reco" || x_var == "res_true" ) htemp = new TH1D("htemp","", 30, -1.2, 1.2);
+    // else if (x_var == "res_reco" || x_var == "res_true" ) htemp = new TH1D("htemp","", 100, -0.2, 0.2);
+    else if (x_var == "res_reco" || x_var == "res_true" ) htemp = new TH1D("htemp","", 30, -1.5, 1.5);
     else if (x_var == "purity") htemp = new TH1D("htemp","", 21, 0, 1.1);
     else if (x_var == "completeness") htemp = new TH1D("htemp","", 21, 0, 1.1);
     else {
