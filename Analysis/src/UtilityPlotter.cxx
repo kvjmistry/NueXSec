@@ -4212,6 +4212,18 @@ void UtilityPlotter::CompareGeneratorUnfoldedModels(){
 
     delete c;
 
+    // Printing cross section generator values
+    for (int bin = 1; bin < h_mcxsec_true_model_smear.at(k_model_CV)->GetNbinsX()+1; bin++){
+        std::cout << bin << std::fixed << std::setprecision(2)<< " & ["  <<  h_mcxsec_true_model_smear.at(k_model_CV)->GetBinLowEdge(bin) << ", " << h_mcxsec_true_model_smear.at(k_model_CV)->GetBinLowEdge(bin+1) << ") & " << 
+         h_mcxsec_true_model_smear.at(k_model_CV)->GetBinContent(bin) << " & " << 
+         h_mcxsec_true_model_smear.at(k_model_geniev3)->GetBinContent(bin) << " & " <<
+         h_mcxsec_true_model_smear.at(k_model_nuwro)->GetBinContent(bin) << " & "  <<
+         h_mcxsec_true_model_smear.at(k_model_gibuu)->GetBinContent(bin) <<
+         " \\\\"<< std::endl;
+    }
+
+
+
 }
 // -----------------------------------------------------------------------------
 void UtilityPlotter::CompareGeneratorPi0(){
